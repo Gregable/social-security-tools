@@ -183,14 +183,23 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return pastYears;
   }
 
+  $scope.isLastYearIncomplete = function() {
+    for (var record of $scope.taxEngine.earningsRecords) {
+      if (record.year === (CURRENT_YEAR - 1))
+        return record.taxedEarnings === -1;
+    }
+    return false;
+  }
+
   $scope.updateFutureYears = function(id) {
     $scope.taxEngine.simulateFutureEarningsYears(
         /*numYears=*/$scope.futureYearsWorkSlider.minValue,
         /*wage=*/$scope.futureWageWorkSlider.minValue);
     $scope.maybeRenderCharts();
     $scope.futureYears = [];
+    var incompleteAdj = $scope.isLastYearIncomplete() ? 1 : 0;
     for (var i = 0; i < $scope.futureYearsWorkSlider.minValue; i++) {
-      $scope.futureYears.push(i+CURRENT_YEAR);
+      $scope.futureYears.push(i + CURRENT_YEAR - incompleteAdj);
     }
 
     $scope.futureIsTopValue = ($scope.futureWageWorkSlider.minValue >=

@@ -29,6 +29,11 @@ var IsStringSSAYearLine = function(maybe_year) {
  * @return {Number}
  */
 var dollarStringToNumber = function(dollar_string) {
+  // For the current year, the SSA site will display 'Not yet recorded'
+  // if the data is unavailable so far, presumably because taxes haven't
+  // yet been filed. Record this as a -1 sentinel for now.
+  if (dollar_string === 'Not yet recorded')
+    return -1;
   var number_string = dollar_string.replace(/[$,]/g, '');
   return Number(number_string);
 }
@@ -65,7 +70,7 @@ var parseYearRecords = function(earningsRecordsRaw) {
     if (column == 0 && !IsStringSSAYearLine(line))
       break;
 
-    // There are 3 columns, so we rotate through each one once for eay year.
+    // There are 3 columns, so we rotate through each one once for each year.
     var value = dollarStringToNumber(line);
     switch(column) {
       case 0:
