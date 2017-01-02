@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="ssaApp">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Social Security Calculator: Get Started</title>
+
+  <link rel="stylesheet" href="stylesheet.css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.9.0/rzslider.min.css">
+
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.9.0/rzslider.min.js"></script>
+
+
+  <script type="text/javascript" src="src/constants.js"></script>
+  <script type="text/javascript" src="src/ssa-parse.js"></script>
+  <script type="text/javascript" src="src/tax-engine.js"></script>
+  <script type="text/javascript" src="src/age-chart.js"></script>
+  <script type="text/javascript" src="src/breakpoint-chart.js"></script>
+  <script type="text/javascript" src="src/ssa.js"></script>
+</head>
+
+<body ng-controller="SSAController"
+      ng-init="init()">
+  <div class="fixedcontainer">
+    <ng-include src="'partials/header.html'"></ng-include>
+
+    <ng-include src="'partials/ssa-earnings-table.html'" ng-hide='false'></ng-include>
+    <ng-include src="'partials/top-earnings-data.html'" ng-hide='false'></ng-include>
+    <ng-include src="'partials/benefit-estimate.html'" ng-hide='false'></ng-include>
+    <ng-include src="'partials/frequent-questions.html'" ng-hide='false'></ng-include>
+  </div>
+
+</body>
+</html>

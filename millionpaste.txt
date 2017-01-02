@@ -1,0 +1,21 @@
+# This demo is a retire born in 1950 who earned $1M / year for
+# five years, but nothing otherwise.
+
+Work Year
+Taxed Social Security Earnings
+Taxed Medicare Earnings
+1980
+$25,900
+$25,900
+1981
+$29,700
+$29,700
+1982
+$32,400
+$32,400
+1983
+$35,700
+$35,700
+1984
+$37,800
+$37,800

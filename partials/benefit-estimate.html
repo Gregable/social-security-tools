@@ -1,0 +1,201 @@
+<div id=benefitEstimate class="benefit-estimate fixed-center-column"
+     ng-show="showReport()" ng-cloak>
+  <p>
+   Currently, your total indexed earnings:
+    <b>${{taxEngine.totalIndexedEarnings | number}}</b>
+  </p>
+  </p>
+    This is simply the sum of the highest 35 values in the Indexed Earnings
+    column above.
+  </p>
+
+  <p>
+    Your yearly indexed earnings is calculated as your total indexed earnings
+    divided by 35:<br>
+    <b>${{taxEngine.totalIndexedEarnings | number}}</b> / 35 = 
+    <b>${{taxEngine.yearlyIndexedEarnings() | number:0}}</b>
+  </p>
+
+  <p>
+    Your yearly benefit is based on your yearly indexed earnings using a
+    formula that increases as your earnings increases, but increases more slowly
+    for higher earnings. Your estimated yearly benefit at your full
+    retirement age is calcalated from your yearly indexed earnings as follows:
+  </p>
+  <p>
+   <table class=benefitBrackets>
+    <tr>
+     <td>Amount less than ${{taxEngine.benefitBracketMax(0) | number: 0}}
+          multiplied by 90%:</td>
+     <td><b>${{taxEngine.estimatedBenefitByBracket(0) | number:2}}</b></td>
+     <td></td>
+    </tr>
+    <tr>
+     <td>Amount more than ${{taxEngine.benefitBracketMin(1) | number: 0}}
+         and less than ${{taxEngine.benefitBracketMax(1) | number: 0}}
+         multiplied by 32%:</td>
+     <td><b>${{taxEngine.estimatedBenefitByBracket(1) | number:2}}</b></td>
+     <td></td>
+    <tr>
+    </tr>
+    <td>Amount more than ${{taxEngine.benefitBracketMin(2) | number: 0}}
+        multiplied by 15%:</td>
+     <td><b>${{taxEngine.estimatedBenefitByBracket(2) | number:2}}</b></td>
+     <td></td>
+    </tr>
+    </tr>
+     <td>Total:</td>
+     <td><b>${{taxEngine.estimatedFullBenefit() | number:2}}</b></td>
+     <td>/ year</td>
+    </tr>
+    </table>  
+  </p>
+  <p>
+    This total (<b>${{taxEngine.estimatedFullBenefit() | number:2}}</b>) is
+    your estimated annual social security benefit at full retirement age. In
+    the chart below, you can see what your benefit would be if your indexed
+    earnings were to increase. Move your mouse over the chart to watch how
+    the earnings change.
+  </p>
+
+  <div class="chart-container">
+
+  <div class="chart-ylabel">
+    <span class="vertical-text">Estimated Full Annual Benefit</span>
+  </div>
+
+  <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
+  <canvas id="breakpoint-chart-canvas" width=600 height=400>
+    Your browser does not support HTML canvas.
+  </canvas>
+
+  <div class="chart-xlabel">
+    Annual Indexed Earnings
+  </div>
+
+  </div>
+  <p>
+    Your yearly benefit of
+    <b>${{taxEngine.estimatedFullBenefit() | number:2}}</b> is the benefit
+    you will earn if you retire at your Full Retirement Age. Full Retirement Age
+    is between 65 and 67, depending on when you were born.
+  </p>
+
+  <p>
+    You can also begin taking benefits as early as 62 years old or wait until
+    as late as 70 years old. The longer you wait, the higher your benefit will
+    be, so it can be a good idea to wait until 70.
+  </p>
+
+  <h4>I was born in:</h4>
+  <p>
+    To determine your Full Retirement Age, as well as how your benefits will
+    change based on when you begin taking benefits, adjust your birth month and
+    year below. Dates were pre-selected automatically based on your earnings
+    history assumming your first entry was around age 16, but you may need to
+    adjust it.
+  </p>
+
+  <div id=agePicker>
+    <div id=monthPicker>
+      <span ng-repeat="month in all_months">
+       <input type=radio value="{{month}}" id="month-{{month}}"
+              class=radio ng-model="birth.month" ng-change="updateBirthdate()">
+        <label class="radio month" for="month-{{month}}">{{month}}</label>
+      </span>
+    </div>
+    <div id=yearPicker>
+      <span ng-repeat="year in pastYears()">
+        <input type=radio id="year-{{year}}" value="{{year}}"
+               class=radio ng-model="birth.year" ng-change="updateBirthdate()">
+        <label class="radio year" for="year-{{year}}">{{year}}</label>
+      </span>
+    </div>
+  </div>
+
+  <br class=clear>
+
+  <p>
+    For those born in <b>{{birth.year}}</b>, the full retirement age is
+    <b>{{taxEngine.fullRetirement.ageYears}} years and 
+    {{taxEngine.fullRetirement.ageMonths}} months</b>.
+  </p>
+  <p>
+    This puts your full retirement date at
+    <b>{{taxEngine.fullRetirementDate.month}}, 
+    {{taxEngine.fullRetirementDate.year}}</b>. If you start then, your benefit
+    will be the number calculated above:
+    <b>${{taxEngine.estimatedFullBenefit() | number:2}}</b> / year.
+  </p>
+  <p>
+    However, you can choose to start collecting your benefit as early as age 62,
+    as late as age 70, or any age in between. If you choose to take benefits
+    earlier than <b>{{taxEngine.fullRetirementDate.month}} 
+    {{taxEngine.fullRetirementDate.year}}</b>, your benefit amount will be
+    <u>permanently</u> <i>reduced</i> by
+    <b>{{taxEngine.earlyReductionRate() * 100 | number: 2}}%</b> per year
+    that you start early. If you wait until later than
+    <b>{{taxEngine.fullRetirementDate.month}}
+    {{taxEngine.fullRetirementDate.year}}</b>, your benefit amount will be
+    <u>permanently</u> <i>increased</i> by
+    <b>{{taxEngine.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
+    you delay.
+  </p>
+  <p>
+    For a few examples, here's how much your annual benefit would be at
+    different starting ages:
+  </p>
+  <table class=fancy-table>
+    <thead>
+      <tr>
+        <th id="age">Age</th>
+        <th id="date">Date</th>
+        <th id="adjustment">Adjustment</th>
+        <th id="benefit">Annual Benefit</th>
+      </tr>
+    </thead> 
+    <tbody>
+      <tr ng-repeat="age in [62, 63, 64, 65, 66, 67, 68, 69, 70]">
+        <td headers="age">{{age}}</td>
+        <td headers="date">
+          {{taxEngine.dateAtAge(age, 0).month}}
+          {{taxEngine.dateAtAge(age, 0).year}}
+        </td>
+        <td headers="adjustment">
+          {{taxEngine.benefitMultiplierAtAge(age, 0) * 100 | number:2}}%
+        </td>
+        <td headers="benefit">
+          ${{taxEngine.benefitAtAge(age, 0) | number:0}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <p>
+    You can also see this same thing in the interactive chart below, with the
+    age you choose to start taking benefits on the x-axis and the annual
+    benefit amount on the y-axis. Move your mouse over the chart to watch how
+    the earnings change based on the age that you first start taking benefits.
+  </p>
+
+
+  <div class="chart-container">
+
+  <div class="chart-ylabel">
+    <span class="vertical-text">Adjusted Annual Benefit</span>
+  </div>
+
+  <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
+  <canvas id="age-chart-canvas" width=600 height=400>
+    Your browser does not support HTML canvas.
+  </canvas>
+
+  <div class="chart-xlabel">
+    Age Starting Benefits
+  </div>
+
+  </div>
+
+  <br><br><br>
+</div>
+
