@@ -97,10 +97,20 @@
       <tr ng-repeat="earningRecord in earningsRecords() | orderBy:'-'">
         <td headers="pasteworkyear">{{earningRecord.year}}</td>
         <td headers="pastetaxedearnings">
-          ${{earningRecord.taxedEarnings | number:0}}
+          <span ng-show="earningRecord.taxedEarnings >= 0">
+            ${{earningRecord.taxedEarnings | number:0}}
+          </span>
+          <span ng-show="earningRecord.taxedEarnings < 0">
+            Not yet recorded
+          </span>
         </td>
         <td headers="pastetaxedmedicare">
-          ${{earningRecord.taxedMedicareEarnings | number:0}}
+          <span ng-show="earningRecord.taxedMedicareEarnings >= 0">
+            ${{earningRecord.taxedMedicareEarnings | number:0}}
+          </span>
+          <span ng-show="earningRecord.taxedMedicareEarnings < 0">
+            Not yet recorded
+          </span>
         </td>
       </tr>
     </tbody>
@@ -128,11 +138,24 @@
     <tbody>
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
-        <td headers="taxedearnings">${{earningRecord.taxedEarnings | number:0}}</td>
-        <td headers="multsymbol">x</th>
-        <td headers="multiplier">{{earningRecord.indexFactor | number:2}}</td>
-        <td headers="eqsymbol">=</th>
-        <td headers="indexedearnings">${{earningRecord.indexedEarning() | number:0}}</td>
+        <td colspan=5 ng-show="earningRecord.taxedEarnings < 0" style="text-align:center">
+          Not yet recorded
+        </td>
+        <td headers="taxedearnings" ng-show="earningRecord.taxedEarnings >= 0">
+          ${{earningRecord.taxedEarnings | number:0}}</td>
+        <td headers="multsymbol" ng-show="earningRecord.taxedEarnings >= 0">
+          x
+        </td>
+        <td headers="multiplier" ng-show="earningRecord.taxedEarnings >= 0">
+          {{earningRecord.indexFactor | number:2}}
+        </td>
+        <td headers="eqsymbol" ng-show="earningRecord.taxedEarnings >= 0">
+          =
+          </td>
+        <td headers="indexedearnings"
+            ng-show="earningRecord.taxedEarnings >= 0">
+          ${{earningRecord.indexedEarning() | number:0}}
+        </td>
         <td headers="top35indicators">
           <span ng-if="earningRecord.isTopEarningYear">Top 35 Value</span>
         </td>

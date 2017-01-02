@@ -139,6 +139,8 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
   var allIndexedValues = [];
   for (var i = 0; i < this.earningsRecords.length; ++i) {
     var earningRecord = this.earningsRecords[i];
+    if (earningRecord.taxedEarnings === -1)
+      continue;
     allIndexedValues.push(earningRecord.indexedEarning());
   }
   for (var i = 0; i < this.futureEarningsYears; ++i) {
@@ -187,7 +189,13 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
  * @return {number}
  */
 TaxEngine.prototype.numEarningsYears = function() {
-  return this.earningsRecords.length + this.futureEarningsYears;
+  var nonNegativeRecords = 0;
+  for (var i = 0; i < this.earningsRecords.length; ++i) {
+    if (this.earningsRecords[i].taxedEarnings >= 0)
+      nonNegativeRecords += 1;
+  }
+
+  return nonNegativeRecords + this.futureEarningsYears;
 };
 
 /**
