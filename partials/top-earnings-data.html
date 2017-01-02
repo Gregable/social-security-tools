@@ -1,0 +1,25 @@
+<div id=topEarningsData class="top-earnings-data fixed-center-column"
+                        ng-show="showReport()" ng-cloak>
+  <p>
+    You have social security earnings recorded for
+    <b>{{taxEngine.numEarningsYears()}}</b> total years.
+  </p>
+
+  <p ng-if="taxEngine.numEarningsYears() >= 35">
+    Only the top 35 years of indexed earnings values will be used in
+    the calculation of your social security benefit. For you, this means
+    that years where the indexed earnings value falls below
+   <b>${{taxEngine.cutoffIndexedEarnings | number}}</b> do not affect
+   your benefit calculation.
+  </p>
+
+  <p ng-if="taxEngine.numEarningsYears() < 35">
+    The top 35 indexed earnings values will be used in the calculation of
+    your social security benefit. As you don't have 35 years of earnings yet,
+    every additional year you work will increase your benefit a little more.
+    Once you reach 35 years of earnings values, increasing your social
+    security benefit requires earning more than previous years' indexed
+    values.
+  </p>
+
+</div>

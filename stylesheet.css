@@ -1,0 +1,651 @@
+/* 
+ * Allow angular.js to be loaded in body, hiding cloaked elements until 
+ * templates compile.  The !important is important given that there may be 
+ * other selectors that are more specific or come later and might alter display.
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff;
+}
+
+.fixedcontainer {
+  /* horizontally center */
+  max-width: 970px;
+  margin: 0 auto;
+}
+
+/* Page Header with title and static links */
+.fixedheader {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5;
+  line-height: 1.1;
+}
+.fixedheader > h3 {
+  margin-top: 0;
+  margin-bottom: 0 !important;
+  line-height: 40px;
+  color: rgb(150, 150, 150);
+  font-weight: 500;
+  font-size: 24px;
+  font-family: inherit;
+}
+/* Navigation Pills */
+.fixedheader>ul.navpills {
+  list-style-image: none; 
+  list-style-position: none; 
+  list-style-type: none; 
+  line-height: 20px;
+  list-style: none;
+  float: right;
+  display: block;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.fixedheader>ul.navpills>li {
+  float: left;
+  position: relative;
+  display: block;
+}
+.fixedheader>ul.navpills>li>a {
+  border-radius: 4px;
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+}
+.fixedheader>ul.navpills>li.active>a {
+  color: #fff;
+  background-color: #337ab7;
+}
+
+/* Frontpage message and get started button */
+.jumbotron {
+  height: 480
+  text-align: left;
+  /* @license
+   * CC BY-SA 2.0: Creative Commons Attribution-Share Alike 2.0
+   * https://creativecommons.org/licenses/by-sa/2.0/
+   * "Blue And Pink Piggy Banks"
+   * Ken Teegardin
+   * https://www.flickr.com/photos/teegardin/6093701123/in/photostream/
+   */
+  background-image: url("static/piggybanks.jpg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: #fff;
+  height: 500px;
+  padding: 80px;
+}
+.jumbotron > h1 {
+  font-size: 63px;
+  font-family: inherit;
+  color: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0.67em 0;
+
+}
+.jumbotron > p {
+  font-size: 21px;
+  font-family: inherit;
+  color: inherit;
+  font-weight: 200;
+  line-height: 1.4;
+  margin: 0 0 15px 0;
+}
+.jumbotron > p > a.btn {
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  vertical-align: middle;
+  color: #fff;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  display: inline-block;
+  padding: 14px 24px;
+  font-size: 21px;
+  font-weight: 400;
+  font-family: inherit;
+  text-decoration: none;
+  line-height: 1.3;
+  display: inline-block;
+  margin-bottom: 0;
+}
+.jumbotron > p > .btn:hover {
+  background-color: #449d44;
+  border-color: #398439;
+
+}
+
+  
+div#pastePrompt > div.instructions {
+  display: inline-block;
+}
+
+h4 {
+ margin-bottom: 5px;
+}
+
+br.clear {
+  clear: both;
+}
+  
+div#pastePrompt {
+  margin-top: 10px;
+}
+div#pastePrompt > div.videocontainer > img {
+}
+div#pastePrompt > div.videocontainer > p {
+  line-height: 1.1;
+  margin: 4px auto;
+  text-align: center;
+}
+div#pastePrompt > div.instructions {
+  line-height: 1.1;
+  font-size: 18px;
+}
+div#pastePrompt > div.instructions > p{
+  line-height: 1.0;
+  font-size: 16px;
+}
+div#pastePrompt > div.pastearea {
+  width: 480px;
+  margin: 16px auto;
+}
+div#pastePrompt > div.pastearea > #pastearea {
+  width: 100%;
+  height: 100px;
+  resize: none;
+}
+div#pastePrompt > div.pastearea > #pastearea::-webkit-input-placeholder {
+  text-align: center;
+  vertical-align: bottom;
+}
+span.lock {
+  color: green;
+}
+div.instructions li {
+  margin: 20px;
+}
+div.instructions li > img {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+div.earnings-paste button {
+  border: 0 none;
+  border-radius: 36px;
+  color: #fff;
+  font-size: 18px;
+  padding: 8px 26px;
+  margin: 0 10px;
+  min-width: 110px;
+  cursor: pointer;
+}
+ul.demos button {
+  border: 0 none;
+  border-radius: 36px;
+  color: #fff;
+  font-size: 18px;
+  padding: 4px 16px;
+  margin: 0 10px;
+  min-width: 110px;
+  cursor: pointer;
+  background: #4ac15a;
+}
+ul.demos button.success:hover {
+  background: #2aa13a;
+}
+ul.demos button > ico {
+  font-weight: bold;
+  font-size: 22px;
+}
+
+div.earnings-paste {
+  margin-top: 20px;
+  margin-right: 60px;
+  font-size: 18px;
+}
+
+div.earnings-paste > div#earningsConfirmation {
+  float: left;
+  margin: 0;
+  margin-top: 60px;
+  text-align: center;
+}
+div.earnings-paste button {
+  border: 0 none;
+  border-radius: 36px;
+  color: #fff;
+  font-size: 18px;
+  padding: 8px 26px;
+  margin: 0 10px;
+  min-width: 110px;
+  cursor: pointer;
+}
+div.earnings-paste button.success {
+  background: #4ac15a;
+}
+div.earnings-paste button.failure {
+  background: #d9534f;
+}
+div.earnings-paste button.success:hover {
+  background: #2aa13a;
+}
+div.earnings-paste button.failure:hover {
+  background: #b9332f;
+}
+
+div.earnings-paste button > ico {
+  font-weight: bold;
+  font-size: 22px;
+}
+
+/* earnings-record table styles match the SSA.gov site so that the table looks
+ * similar when pasted in. The reason for consistency is that we are asking
+ * the user if we have entered the data correctly and making it a similar
+ * style may help to visually verify the data. */
+table.earnings-record-table {
+  float: right;
+  border-left: 1px solid #CCC;
+  border-spacing: 0;
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+table.earnings-record-table > thead th {
+  border-right: 1px solid #CCC;
+  border-top: 1px solid #CCC;
+  color: #FFF;
+  font-weight: bold;
+  padding: 2px .3em;
+  background-color: #5a5757;
+}
+
+table.earnings-record-table > tbody td {
+  border-right: 1px solid #CCC;
+  border-bottom: 1px solid #CCC;
+  color: #000;
+  padding: .3em;
+}
+
+table.earnings-record-table > tbody tr:nth-of-type(even) td {
+  background-color: #eaeaea;
+}
+
+table.earnings-record-table > tbody tr:nth-of-type(odd) td {
+  background-color: #fff;
+}
+
+table.earnings-record-table > tbody td.indexed-earnings-col {
+  color: #039;
+  font-weight: bold;
+}
+
+/* Animage the indexed earnings and medicare columns.
+ *  When hidden, they slide left for 0.5s underneath whatever is to their left.
+ *  When shown, they slide right out from whatever they are hiding under.
+ */
+table.earnings-record-table table .indexed-earnings-col,.medicare-col {
+  z-index: -1;
+  position:relative;
+
+  -webkit-transform: translateX(0%);
+}
+
+table.earnings-record-table table .indexed-earnings-col {
+  transition:all ease-out 0.5s;
+}
+table.earnings-record-table table .medicare-col {
+  transition:all ease-in 0.5s;
+}
+
+table.earnings-record-table table .indexed-earnings-col.ng-hide,.medicare-col.ng-hide {
+  -webkit-transform: translateX(-100%);
+}
+
+table.earnings-record-table.ng-hide {
+}
+
+table.earnings-confirmation.ng-hide:not(.ng-hide-animate) {
+}
+
+/* The earnings calc table displays similar information as from SSA.gov, but
+ * in a nicer form and with some computed fields. We also reuse this fancy
+ * table format for the age-based benefit table.
+ */
+table.fancy-table {
+  border-collapse: collapse;
+  min-width: 400px;
+  margin: 10px auto;
+}
+
+table.fancy-table tr:not(:last-child) td {
+  border-bottom: 2px solid #ccc;
+}
+table.fancy-table tbody tr:nth-child(even) {
+  background-color: #E9E9FF;
+}
+
+table.fancy-table th#workyear,
+table.fancy-table td[headers='workyear'] {
+  text-align: left;
+  padding-left: 6px;
+  padding-right: 30px;
+}
+table.fancy-table th#taxedearnings,
+table.fancy-table td[headers='taxedearnings'] {
+  text-align: right;
+}
+table.fancy-table td[headers='taxedearnings'] {
+  padding-right: 8px;
+}
+table.fancy-table th#multsymbol,
+table.fancy-table td[headers='multsymbol'] {
+  text-align: center;
+  padding-left: 14px;
+  padding-right: 0px;
+  color: #6B6BBF;
+}
+table.fancy-table th#multiplier,
+table.fancy-table td[headers='multiplier'] {
+  text-align: center;
+  width: 75px;
+}
+table.fancy-table th#eqsymbol,
+table.fancy-table td[headers='eqsymbol'] {
+  padding: 80px, 0;
+  text-align: center;
+  padding-left: 20px;
+  padding-right: 0px;
+  color: #6B6BBF;
+}
+table.fancy-table th#indexedearnings,
+table.fancy-table td[headers='indexedearnings'] {
+  text-align: right;
+  padding-left: 20px;
+}
+table.fancy-table td[headers='indexedearnings'] {
+  padding-right: 20px;
+}
+
+table.fancy-table td[headers='top35indicators'] {
+  width: 81px;
+  white-space: nowrap;
+}
+table.fancy-table th#age,
+table.fancy-table td[headers='age'] {
+  width: 2em;
+  padding-left: 6px;
+  padding-right: 30px;
+  text-align: left;
+}
+table.fancy-table td[headers='age'] {
+  text-align: center;
+}
+table.fancy-table th#date,
+table.fancy-table td[headers='date'] {
+  text-align: left;
+}
+table.fancy-table th#adjustment,
+table.fancy-table td[headers='adjustment'] {
+  text-align: right;
+}
+table.fancy-table th#benefit,
+table.fancy-table td[headers='benefit'] {
+  text-align: right;
+}
+
+/* Benefit breakpoint brackets calculation table */
+table.benefitBrackets tr td:first-child {
+  text-align: right;
+  padding-right: 6px;
+}
+table.benefitBrackets tr td:nth-child(2) {
+  text-align: right;
+}
+table.benefitBrackets tr:last-child td:nth-child(2) {
+  border-top: 1px solid;
+}
+
+/* Canvas Chart CSS */
+.chart-container {
+  position: relative;
+  width: 650px;
+  height: 430px;
+  padding: 0px;
+  margin-top: 20px;
+
+  font-family: Helvetica;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.chart-ylabel {
+  width: 50px;
+  height: 376px;
+  float: left;
+}
+
+.chart-ylabel > .vertical-text {
+  transform: rotate(-90deg) translateY(-86px) translateX(-166px);
+  float: left;
+}
+
+.chart-xlabel {
+  width: 650px;
+  height: 30px;
+  clear: both;
+  text-align: center;
+}
+
+canvas {
+  float: left;
+}
+div.fixed-center-column {
+  max-width: 620px;
+  margin: auto;
+}
+
+/* The Age Picker buttons are simply heavily CSS'ed radio buttons. */
+#monthPicker {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: row;
+  flex-flow: space-between;
+  justify-content: space-between;
+  max-width: 620px;
+  flex-wrap: wrap;
+}
+#yearPicker {
+  display: flex;
+  flex-direction: row;
+  flex-flow: space-between;
+  justify-content: space-between;
+  max-width: 620px;
+  flex-wrap: wrap;
+}
+/* hide the actual radio buttons */
+input.radio {
+  display: none;
+}
+label.radio {
+  width: 75px;
+  border-radius: 4px;
+  border: 1px solid #D1D3D4;
+  position: relative;
+  float: left;
+  line-height: 2.25em;
+  margin-top: 1em;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  color: #999;
+  display: block;
+}
+label.radio.month {
+  text-indent: 3em;
+  margin-right: 0.85em;
+}
+label.radio.year {
+  text-indent: 2.8em;
+  line-height: 2em;
+  margin-right: 0.8em;
+}
+label.radio:before {
+  position: absolute;
+  display: block;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  content: '';
+  width: 2.5em;
+  background: #D1D3D4;
+  border-radius: 3px 0 0 3px;
+}
+input.radio:hover:not(:checked) ~ label.radio:before {
+  content:'\2714';
+  text-indent: .9em;
+  color: #C2C2C2;
+}
+input.radio:hover:not(:checked) ~ label.radio {
+  color: #888;
+}
+input.radio:checked ~ label.radio:before {
+  content:'\2714';
+  text-indent: .9em;
+  color: #9CE2AE;
+  background-color: #4DCB6D;
+}
+input.radio:checked ~ label.radio {
+  color: #777;
+}
+input.radio:focus ~ label.radio:before {
+  box-shadow: 0 0 0 3px #999;
+}
+
+/* Table holding sliders for guessing at future years of work */
+#futureWorkYearsTable  {
+  margin: 0 auto;
+  padding-bottom: 15px;
+}
+#futureWorkYearsTable td:not(.sliderColumn) {
+  vertical-align: bottom;
+  padding-bottom: 8px;
+}
+#futureWorkYearsTable td:nth-child(1) {
+  text-align: right;
+}
+#futureWorkYearsTable td.sliderColumn {
+  vertical-align: bottom;
+  width: 300px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* Frequent Question Expando boxes */
+.frequent-questions {
+  margin: 20px 0;
+  position: relative;
+}
+.frequent-questions p, .frequent-questions ul {
+  display: none;
+}   
+.frequent-questions input {
+  display: none;
+}
+/* Show only the clipped intro */
+.frequent-questions label+p {
+  display: block; 
+  color: #999;
+  font-size: .85em;
+  transition: all .15s ease-out;
+  /* Clipping text */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;                       
+}
+/* If the checkbox is checked, show all paragraphs */
+.frequent-questions input[type=checkbox]:checked~p {
+  display: block;
+  color: #444;
+  font-size: 1em;
+  /* restore clipping defaults */
+  text-overflow: clip; 
+  white-space: normal;
+  overflow: visible;  
+}
+
+/* Style the label */
+.frequent-questions label {
+  font-size: 1.2em;
+  background: #eee;
+  display: block;
+  position: relative;
+      height: 20px;
+  padding: 7px 10px;
+  font-weight: bold;
+  border: 1px solid #ddd;
+  border-left: 3px solid #888;
+  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  transition: all .15s ease-out;          
+}
+
+/* Remove text selection when toggle-ing */
+.frequent-questions label::selection {
+  background: none;
+}
+
+.frequent-questions label:hover {
+  background: #f5f5f5;
+}
+
+/* If the checkbox is checked, style the label accordingly */
+.frequent-questions input[type=checkbox]:checked~label {
+  border-color: #ff7f50;          
+  background: #f5deb4;
+  background-image: linear-gradient(to bottom, #fff, #f5deb4);
+  box-shadow: 0 0 1px rgba(0,0,0,.4);             
+}
+
+/* Label's arrow - default state */
+.frequent-questions label::before {
+  content: '';
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  margin-top: -6px;
+  border: 6px solid transparent;
+  border-left-color: inherit; 
+}
+
+/* Update the right arrow */
+.frequent-questions input[type=checkbox]:checked~label::before {
+  border: 6px solid transparent;
+  border-top-color: inherit;
+  margin-top: -3px;
+  right: 10px;    
+}
+
+

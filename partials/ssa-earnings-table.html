@@ -1,0 +1,191 @@
+
+<div id="pastePrompt" ng-show="showPastePrompt()">
+  <div class="instructions">
+    <p>
+      To use the calculator, you must provide some data from your social
+      security record.<br>
+      If you aren't ready for that yet, select a demo data set at the
+      bottom of the page.
+    </p>
+       
+    <h1>How to retrieve <u>your</u> Social Security data:</h1>
+    <ol>
+      <li>
+        Login to 
+        <a target="_blank" href="https://secure.ssa.gov/RIL/SiView.do">ssa.gov</a>.
+        You may need to create an account if you haven't already.
+      </li>
+      <li>Click to navigate to the "Earnings Record" page of the site.</li>
+      <li>
+        Copy the earnings table. It should look similar to the example below,
+        with different numbers and years.
+        <img src="static/earnings-table-example.png" width=318 height=270>
+        You can copy the table by dragging your mouse over the entire table to
+        select, or you can just use 'Control+A' to copy the entire page. Either
+        way will work as the calculator is smart enough to ignore extra copied
+        text.
+      </li>
+      <li>Return to this page, paste the result into the textarea below.</li>
+    </ol>
+    
+  </div>
+
+  <div class="pastearea">
+    <textarea id=pastearea wrap=off ng-model="pasteArea.contents"
+              placeholder="{{pasteArea.placeholder}}"></textarea>
+    <p>
+      <span class=lock>🔒</span> Your data never leaves you own
+      computer: the report is generated entirely by JavaScript in your browser.
+    </p>
+  </div>
+  
+  <div class="instructions">
+    <h1>Try out some <u>demo</u> data instead:</h1>
+    <p>
+      If you aren't ready to take a look at your own social security data, you
+      can first play with some account data for a few fictional characters.
+    </p>
+    <ul class=demos>
+      <li>
+        Retiree born in 1950, who earned an average US wage most years.
+        <br>
+        <button ng-click="loadDemoData(0)">
+          <ico>&#x261b;</ico> Try the Demo
+        </button>
+      <li>
+        Retiree born in 1950 who earned the maximum social security wages
+        over five years, but nothing otherwise.
+        <br>
+        <button ng-click="loadDemoData(1)">
+          <ico>&#x261b;</ico> Try the Demo
+        </button>
+      </li>
+      <li>
+        Early career, born in 1985, $40k/year starting salary in 2005 with
+        4% annual raises.
+        <br>
+        <button ng-click="loadDemoData(2)">
+          <ico>&#x261b;</ico> Try the Demo
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div id="earningsTable" class="earnings-paste"
+     ng-show="showPasteConfirmation()">
+  <div id="earningsConfirmation">
+    <p>Is this the same table you copied from ssa.gov?</p>
+    
+    <button ng-click="confirmEarningsParse('correct')" class=success>
+      <ico>&#10003;</ico> Yes
+    </button>
+    <button ng-click="confirmEarningsParse('incorrect')" class=failure>
+      <ico>&#128078;</ico> No
+    </button>
+  </div>
+
+  <table class="earnings-record-table">
+    <thead>
+      <tr>
+        <th id="pasteworkyear">Work Year</th>
+        <th id="pastessataxedearnings">Taxed Social Security Earnings</th>
+        <th id="pastetaxedmedicare">Taxed Medicare Earnings</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="earningRecord in earningsRecords() | orderBy:'-'">
+        <td headers="pasteworkyear">{{earningRecord.year}}</td>
+        <td headers="pastetaxedearnings">
+          ${{earningRecord.taxedEarnings | number:0}}
+        </td>
+        <td headers="pastetaxedmedicare">
+          ${{earningRecord.taxedMedicareEarnings | number:0}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="earningsApology" class="earnings-paste" ng-show="showPasteApology()">
+  <p>Sorry about that, let's try again.</p>
+  <button ng-click="reset()" class=success>Click to restart.</button>
+</div>
+
+<table class="fancy-table" ng-show="showReport()">
+  <thead>
+    <tr>
+      <th id="workyear">Year</th>
+      <th id="taxedearnings">Taxed Earnings</th>
+      <th id="multsymbol"></th>
+      <th id="multiplier">Multiplier</th>
+      <th id="indexedearnings" colspan=2>Indexed Earnings<th>
+      <th id="top35indicators"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="earningRecord in earningsRecords()">
+      <td headers="workyear">{{earningRecord.year}}</td>
+      <td headers="taxedearnings">${{earningRecord.taxedEarnings | number:0}}</td>
+      <td headers="multsymbol">x</th>
+      <td headers="multiplier">{{earningRecord.indexFactor | number:2}}</td>
+      <td headers="eqsymbol">=</th>
+      <td headers="indexedearnings">${{earningRecord.indexedEarning() | number:0}}</td>
+      <td headers="top35indicators">
+        <span ng-if="earningRecord.isTopEarningYear">Top 35 Value</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <table id=futureWorkYearsTable ng-show="showReport()">
+   <tr>
+    <td>I plan to work for</td>
+    <td class=sliderColumn>
+      <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+      <rzslider rz-slider-model="futureYearsWorkSlider.minValue"
+                rz-slider-options="futureYearsWorkSlider.options"></rzslider>
+    </td>
+    <td>more years,</td>
+   </tr>
+   <tr>
+    <td>Earning approximately</td>
+    <td class=sliderColumn>
+      <rzslider rz-slider-model="futureWageWorkSlider.minValue"
+                rz-slider-options="futureWageWorkSlider.options"></rzslider>
+    </td>
+    <td>per year.</td>
+   </tr>
+  </table>
+
+  <span ng-if="futureYears.length > 0">
+  <table class="fancy-table" ng-show="showReport()">
+  <thead>
+    <tr>
+      <th id="workyear">Year</th>
+      <th id="taxedearnings">Taxed Earnings</th>
+      <th id="multsymbol"></th>
+      <th id="multiplier">Multiplier</th>
+      <th id="indexedearnings" colspan=2>Indexed Earnings<th>
+      <th id="top35indicators"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="year in futureYears">
+      <td headers="workyear">{{year}}</td>
+      <td headers="taxedearnings">
+        ${{futureWageWorkSlider.minValue | number:0}}
+      </td>
+      <td headers="multsymbol">x</th>
+      <td headers="multiplier">1.00</td>
+      <td headers="eqsymbol">=</th>
+      <td headers="indexedearnings">
+        ${{futureWageWorkSlider.minValue | number:0}}
+      </td>
+      <td headers="top35indicators">
+       <span ng-if="futureIsTopValue">Top 35 Value</span>
+      </td>
+    </tr>
+  </tbody>
+  </table>
+  </span>
