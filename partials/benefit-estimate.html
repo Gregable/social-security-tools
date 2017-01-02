@@ -5,22 +5,31 @@
     <b>${{taxEngine.totalIndexedEarnings | number}}</b>
   </p>
   </p>
-    This is simply the sum of the highest 35 values in the Indexed Earnings
+    This is simply the sum of the highest 35 values in the indexed earnings
     column above.
   </p>
 
   <p>
-    Your yearly indexed earnings is calculated as your total indexed earnings
-    divided by 35:<br>
+    Your annual indexed earnings is calculated as your total indexed earnings
+    divided by 35.
+    <span ng-if="taxEngine.numEarningsYears() >= 35">
+      This is your average indexed earnings in the top 35 years.
+    </span>
+    <span ng-if="taxEngine.numEarningsYears() < 35">
+      If you had 35 years of earnings, this would be your average indexed
+      earnings.
+    </span>
+  </p>
+  <p>
+    Annual indexed earnings: 
     <b>${{taxEngine.totalIndexedEarnings | number}}</b> / 35 = 
     <b>${{taxEngine.yearlyIndexedEarnings() | number:0}}</b>
   </p>
-
   <p>
-    Your yearly benefit is based on your yearly indexed earnings using a
-    formula that increases as your earnings increases, but increases more slowly
-    for higher earnings. Your estimated yearly benefit at your full
-    retirement age is calcalated from your yearly indexed earnings as follows:
+    Your primary insurance amount is based on your annual indexed earnings 
+    using a formula that increases as your earnings increases, but increases
+    more slowly for higher total earnings. Your primary insurance amount is
+    calculated from your annual indexed earnings as follows:
   </p>
   <p>
    <table class=benefitBrackets>
@@ -52,16 +61,15 @@
   </p>
   <p>
     This total (<b>${{taxEngine.estimatedFullBenefit() | number:2}}</b>) is
-    your estimated annual social security benefit at full retirement age. In
-    the chart below, you can see what your benefit would be if your indexed
-    earnings were to increase. Move your mouse over the chart to watch how
-    the earnings change.
+    your primary insurance amount. In the chart below, you can see what your
+    benefit would be if your indexed earnings were to increase. Move your mouse
+    over the chart to watch how the earnings change.
   </p>
 
   <div class="chart-container">
 
   <div class="chart-ylabel">
-    <span class="vertical-text">Estimated Full Annual Benefit</span>
+    <span class="vertical-text">Primary Insurance Amount</span>
   </div>
 
   <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
@@ -74,27 +82,22 @@
   </div>
 
   </div>
+
+  <h2>Normal Retirement Age</h2>
   <p>
     Your yearly benefit of
     <b>${{taxEngine.estimatedFullBenefit() | number:2}}</b> is the benefit
-    you will earn if you retire at your Full Retirement Age. Full Retirement Age
-    is between 65 and 67, depending on when you were born.
+    you will earn if you retire at your <u>normal retirement age</u> (NRA).
+    Normal Retirement Age is between 65 and 67, depending on when you were born.
   </p>
 
   <p>
-    You can also begin taking benefits as early as 62 years old or wait until
-    as late as 70 years old. The longer you wait, the higher your benefit will
-    be, so it can be a good idea to wait until 70.
+    To determine your normal retirement age, as well as learn more about your
+    options on when you can begin taking benefits, adjust your birth month and
+    year below.
   </p>
 
   <h4>I was born in:</h4>
-  <p>
-    To determine your Full Retirement Age, as well as how your benefits will
-    change based on when you begin taking benefits, adjust your birth month and
-    year below. Dates were pre-selected automatically based on your earnings
-    history assumming your first entry was around age 16, but you may need to
-    adjust it.
-  </p>
 
   <div id=agePicker>
     <div id=monthPicker>
@@ -114,30 +117,39 @@
   </div>
 
   <br class=clear>
-
   <p>
-    For those born in <b>{{birth.year}}</b>, the full retirement age is
+    For those born in <b>{{birth.year}}</b>, normal retirement age is
     <b>{{taxEngine.fullRetirement.ageYears}} years and 
     {{taxEngine.fullRetirement.ageMonths}} months</b>.
+
+    This puts your normal retirement date at
+    <b>{{taxEngine.fullRetirementDate.month}}, 
+    {{taxEngine.fullRetirementDate.year}}</b>.
   </p>
   <p>
-    This puts your full retirement date at
-    <b>{{taxEngine.fullRetirementDate.month}}, 
-    {{taxEngine.fullRetirementDate.year}}</b>. If you start then, your benefit
-    will be the number calculated above:
+    If you start then, your benefit will be the primary insurance amount:
     <b>${{taxEngine.estimatedFullBenefit() | number:2}}</b> / year.
   </p>
   <p>
-    However, you can choose to start collecting your benefit as early as age 62,
-    as late as age 70, or any age in between. If you choose to take benefits
-    earlier than <b>{{taxEngine.fullRetirementDate.month}} 
-    {{taxEngine.fullRetirementDate.year}}</b>, your benefit amount will be
-    <u>permanently</u> <i>reduced</i> by
+    You can also begin taking benefits as early as 62 years old
+    (<b>{{taxEngine.dateAtAge(62, 0).month}}
+        {{taxEngine.dateAtAge(62, 0).year}}</b>),
+    wait until as late as 70 years old
+    (<b>{{taxEngine.dateAtAge(70, 0).month}}
+        {{taxEngine.dateAtAge(70, 0).year}}</b>),
+    or start anywhere in between. The longer you wait, the higher your
+    actual benefit will be.
+  </p>
+  <p>
+    If you choose to take benefits earlier than
+    <b>{{taxEngine.fullRetirementDate.month}} 
+       {{taxEngine.fullRetirementDate.year}}</b>,
+    your benefit amount will be <u>permanently</u> <i>reduced</i> by
     <b>{{taxEngine.earlyReductionRate() * 100 | number: 2}}%</b> per year
     that you start early. If you wait until later than
     <b>{{taxEngine.fullRetirementDate.month}}
-    {{taxEngine.fullRetirementDate.year}}</b>, your benefit amount will be
-    <u>permanently</u> <i>increased</i> by
+       {{taxEngine.fullRetirementDate.year}}</b>,
+     your benefit amount will be <u>permanently</u> <i>increased</i> by
     <b>{{taxEngine.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
     you delay.
   </p>
@@ -180,22 +192,18 @@
 
 
   <div class="chart-container">
+    <div class="chart-ylabel">
+      <span class="vertical-text">Adjusted Annual Benefit</span>
+    </div>
 
-  <div class="chart-ylabel">
-    <span class="vertical-text">Adjusted Annual Benefit</span>
+    <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
+    <canvas id="age-chart-canvas" width=600 height=400>
+      Your browser does not support HTML canvas.
+    </canvas>
+
+    <div class="chart-xlabel">
+      Age Starting Benefits
+    </div>
   </div>
-
-  <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
-  <canvas id="age-chart-canvas" width=600 height=400>
-    Your browser does not support HTML canvas.
-  </canvas>
-
-  <div class="chart-xlabel">
-    Age Starting Benefits
-  </div>
-
-  </div>
-
-  <br><br><br>
 </div>
 

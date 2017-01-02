@@ -34,6 +34,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_.setTaxEngine($scope.taxEngine);
     $scope.ageChart_.setTaxEngine($scope.taxEngine);
     $scope.maybeRenderCharts();
+    $scope.loadDemoData(1);
   };
 
   $scope.loadDemoData = function(demoId) {

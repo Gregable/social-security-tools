@@ -1,6 +1,6 @@
 <div id=frequentQuestions class="fixed-center-column"
      ng-show="showReport()" ng-cloak>
-  <h3>Additional Questions</h3>
+  <h2>Additional Questions</h2>
   <section class=frequent-questions>
     <input type=checkbox id=q1>
     <label for=q1>Will inflation reduce the real value of my benefit?</label>
@@ -42,10 +42,14 @@
       the program will still be collecting money, and those collections will
       cover all but 21% of the current payments. So, if nothing at all changes
       by 2037, the numbers above will be reduced by 21% but the payments will
-      still continue. So, if your estimated benefit is $10,000 then it will be
-      reduced to $7,900. This is the 'worst case' scenario.
+      still continue. Roughly speaking, your primary insurance amount of 
+      <b>${{taxEngine.estimatedFullBenefit() | number:2}}</b> would be reduced
+      to:
+      <b>${{taxEngine.estimatedFullBenefit() * 0.79 | number:2}}</b>. This is
+      the 'worst case' scenario.
     </p>
     <p>
+      More information:
       <a href="https://www.ssa.gov/policy/docs/ssb/v70n3/v70n3p111.html">
         The Future Financial Status of the Social Security Program
       </a>
@@ -58,7 +62,7 @@
       'worst case' scenario. What will ultimately happen is unknown. Some of
       the ideas that have been 
       <a href="https://www.ssa.gov/OACT/solvency/provisions/index.html">
-        proposed</a> include, but are not limited to:
+        proposed</a> include:
     </p>
     <ul>
       <li>Increase the payroll tax which funds the program.</li>

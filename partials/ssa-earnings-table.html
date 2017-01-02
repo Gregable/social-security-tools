@@ -112,33 +112,35 @@
   <button ng-click="reset()" class=success>Click to restart.</button>
 </div>
 
-<table class="fancy-table" ng-show="showReport()">
-  <thead>
-    <tr>
-      <th id="workyear">Year</th>
-      <th id="taxedearnings">Taxed Earnings</th>
-      <th id="multsymbol"></th>
-      <th id="multiplier">Multiplier</th>
-      <th id="indexedearnings" colspan=2>Indexed Earnings<th>
-      <th id="top35indicators"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr ng-repeat="earningRecord in earningsRecords()">
-      <td headers="workyear">{{earningRecord.year}}</td>
-      <td headers="taxedearnings">${{earningRecord.taxedEarnings | number:0}}</td>
-      <td headers="multsymbol">x</th>
-      <td headers="multiplier">{{earningRecord.indexFactor | number:2}}</td>
-      <td headers="eqsymbol">=</th>
-      <td headers="indexedearnings">${{earningRecord.indexedEarning() | number:0}}</td>
-      <td headers="top35indicators">
-        <span ng-if="earningRecord.isTopEarningYear">Top 35 Value</span>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<div ng-show="showReport()" class="fixed-center-column ng-cloak">
+  <h2>Earnings Record</h2>
+  <table class="fancy-table">
+    <thead>
+      <tr>
+        <th id="workyear">Year</th>
+        <th id="taxedearnings">Taxed Earnings</th>
+        <th id="multsymbol"></th>
+        <th id="multiplier">Multiplier</th>
+        <th id="indexedearnings" colspan=2>Indexed Earnings<th>
+        <th id="top35indicators"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="earningRecord in earningsRecords()">
+        <td headers="workyear">{{earningRecord.year}}</td>
+        <td headers="taxedearnings">${{earningRecord.taxedEarnings | number:0}}</td>
+        <td headers="multsymbol">x</th>
+        <td headers="multiplier">{{earningRecord.indexFactor | number:2}}</td>
+        <td headers="eqsymbol">=</th>
+        <td headers="indexedearnings">${{earningRecord.indexedEarning() | number:0}}</td>
+        <td headers="top35indicators">
+          <span ng-if="earningRecord.isTopEarningYear">Top 35 Value</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-  <table id=futureWorkYearsTable ng-show="showReport()">
+  <table id=futureWorkYearsTable>
    <tr>
     <td>I plan to work for</td>
     <td class=sliderColumn>
@@ -159,7 +161,7 @@
   </table>
 
   <span ng-if="futureYears.length > 0">
-  <table class="fancy-table" ng-show="showReport()">
+  <table class="fancy-table">
   <thead>
     <tr>
       <th id="workyear">Year</th>
@@ -189,3 +191,4 @@
   </tbody>
   </table>
   </span>
+</div>

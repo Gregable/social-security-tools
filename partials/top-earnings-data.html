@@ -1,25 +1,43 @@
 <div id=topEarningsData class="top-earnings-data fixed-center-column"
                         ng-show="showReport()" ng-cloak>
+  <h2>Primary Insurance Amount</h2>
+  <p>
+    We first compute your <u>primary insurance amount</u> (PIA). This is the
+    dollar amount that Social Security will pay you every year at your
+    <u>normal retirement age</u> (NRA).
+  </p>
+  <p>
+    Don't let the goverment-mandated acronyms confuse you. Think of the primary
+    insurance amount like a salary: it's the amount of money you can expect to
+    earn in retirement every year starting at your normal retirement age. Your
+    normal retirement age is between 65 and 67, depending on what year you were
+    born. We'll look at normal retirement age in more detail later in this
+    report.
+  </p>
   <p>
     You have social security earnings recorded for
     <b>{{taxEngine.numEarningsYears()}}</b> total years.
   </p>
 
   <p ng-if="taxEngine.numEarningsYears() >= 35">
-    Only the top 35 years of indexed earnings values will be used in
-    the calculation of your social security benefit. For you, this means
+    Only the top 35 years of <u>indexed earnings</u> values will be used in
+    the calculation of your primary insurance amount. Indexed earnings
+    are simply the payroll wages you earned in a year multiplied by
+    a number that adjusts for inflation. In your case, this means
     that years where the indexed earnings value falls below
-   <b>${{taxEngine.cutoffIndexedEarnings | number}}</b> do not affect
-   your benefit calculation.
+    <b>${{taxEngine.cutoffIndexedEarnings | number}}</b> do not affect
+    your benefit calculation. If you were to earn additional years of wages
+    in the guture, they would only affect your social security if you earned
+    more than <b>${{taxEngine.cutoffIndexedEarnings | number}}</b> in a year.
   </p>
 
   <p ng-if="taxEngine.numEarningsYears() < 35">
-    The top 35 indexed earnings values will be used in the calculation of
-    your social security benefit. As you don't have 35 years of earnings yet,
-    every additional year you work will increase your benefit a little more.
-    Once you reach 35 years of earnings values, increasing your social
-    security benefit requires earning more than previous years' indexed
-    values.
+    The top 35 <u>indexed earnings</u> values will be used in the calculation of
+    your primary insurance amount. Indexed earnings are simply the payroll
+    wages you earned in a year multiplied by a number that adjusts for
+    inflation. As you don't have 35 years of earnings yet, every additional
+    year you work will increase your benefit a little more. Once you reach 35
+    years of earnings values, increasing your primary insurance amount
+    requires earning more than previous years' indexed values.
   </p>
-
 </div>
