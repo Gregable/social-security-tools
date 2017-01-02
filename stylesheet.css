@@ -587,7 +587,8 @@ input.radio:focus ~ label.radio:before {
   overflow: hidden;                       
 }
 /* If the checkbox is checked, show all paragraphs */
-.frequent-questions input[type=checkbox]:checked~p {
+.frequent-questions input[type=checkbox]:checked~p,
+.frequent-questions input[type=checkbox]:checked~ul {
   display: block;
   color: #444;
   font-size: 1em;
