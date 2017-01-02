@@ -446,6 +446,7 @@ table.benefitBrackets tr:last-child td:nth-child(2) {
 
 .chart-ylabel > .vertical-text {
   transform: rotate(-90deg) translateY(-86px) translateX(-166px);
+  -webkit-transform: rotate(-90deg) translateY(-86px) translateX(-166px);
   float: left;
 }
 
@@ -466,23 +467,34 @@ div.fixed-center-column {
 
 /* The Age Picker buttons are simply heavily CSS'ed radio buttons. */
 #monthPicker {
+  max-width: 620px;
   display: -webkit-flex;
   display: -moz-flex;
   display: -ms-flex;
   display: flex;
   flex-direction: row;
+  -webkit-flex-direction: row;
   flex-flow: space-between;
+  -webkit-flex-flow: space-between;
   justify-content: space-between;
-  max-width: 620px;
+  -webkit-justify-content: space-between;
   flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
 }
 #yearPicker {
+  max-width: 620px;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
   display: flex;
   flex-direction: row;
+  -webkit-flex-direction: row;
   flex-flow: space-between;
+  -webkit-flex-flow: space-between;
   justify-content: space-between;
-  max-width: 620px;
+  -webkit-justify-content: space-between;
   flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
 }
 /* hide the actual radio buttons */
 input.radio {
