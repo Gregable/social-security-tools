@@ -45,15 +45,29 @@ var dollarStringToNumber = function(dollar_string) {
  */
 var parseYearRecords = function(earningsRecordsRaw) {
   earningsRecords = [];
-
   var columnNames = ["year", "taxedEarnings", "taxedMedicareEarnings"];
-  var lines = earningsRecordsRaw.split("\n");
+
+  // Chrome appears to copy a table with each cell on a new line.
+  // Firefox attempts to put each row on a line and each column tab or space
+  // delimited.
+  //
+  // We try to make everything like Chrome. Replace all non-single-space
+  // whitespace with newlines, split lines, and ignore empty lines.
+  var replacedStr = earningsRecordsRaw;
+  // Replace any string of two or more spaces with 1 newline.
+  replacedStr = replacedStr.replace(/[ \t\r\n]{2,}/g, "\n");
+  // Replace any non-whitespace space with 1 newline.
+  replacedStr = replacedStr.replace(/[\t\r\n]/g, "\n");
+  console.log(replacedStr);
+  var lines = replacedStr.split("\n");
 
   var seenStartLine = false;
   var column = 0;
   var record = new TaxRecord();
   for (var i = 0; i < lines.length; ++i) {
     var line = lines[i];
+    if (line === '')
+      continue;
 
     // We ignore lines until we see a line that looks like a SSA website year.
     // At this point we begin processing all later lines.
