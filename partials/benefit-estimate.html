@@ -141,14 +141,34 @@
     actual benefit will be.
   </p>
   <p>
-    If you choose to take benefits earlier than
-    <b>{{taxEngine.fullRetirementDate.month}} 
-       {{taxEngine.fullRetirementDate.year}}</b>,
-    your benefit amount will be <u>permanently</u> <i>reduced</i> by
-    <b>{{taxEngine.earlyReductionRate() * 100 | number: 2}}%</b> per year
-    that you start early. If you wait until later than
-    <b>{{taxEngine.fullRetirementDate.month}}
-       {{taxEngine.fullRetirementDate.year}}</b>,
+    If you choose to take benefits earlier than normal retirement age
+    (<b>{{taxEngine.fullRetirementDate.month}} 
+        {{taxEngine.fullRetirementDate.year}}</b>),
+    your benefit amount will be <u>permanently</u> <i>reduced</i> 
+    per year you start early by:
+    <ul>
+      <li><b>6.67%</b> per year after
+        <b>{{taxEngine.fullRetirement.ageYears - 3}} years and 
+           {{taxEngine.fullRetirement.ageMonths}} months</b>
+        (<b>
+           {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).month}}
+          {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).year}}
+         </b>)
+      </li>
+      <li><b>5.00%</b> per year before
+        <b>{{taxEngine.fullRetirement.ageYears - 3}} years and 
+           {{taxEngine.fullRetirement.ageMonths}} months</b>
+        (<b>
+           {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).month}}
+          {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).year}}
+         </b>)
+      </li>
+    </ul>
+  </p> 
+  <p>
+    If you choose to instead wait until later than normal retirement age
+    (<b>{{taxEngine.fullRetirementDate.month}}
+        {{taxEngine.fullRetirementDate.year}}</b>),
      your benefit amount will be <u>permanently</u> <i>increased</i> by
     <b>{{taxEngine.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
     you delay.

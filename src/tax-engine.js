@@ -294,12 +294,7 @@ function monthsIn(years, months) {
  * @return {number}
  */
 TaxEngine.prototype.earlyReductionRate = function() {
-  // Compute the number of total months between birth and full retirement age.
-  const fullAgeMonths = monthsIn(this.fullRetirement.ageYears,
-                                 this.fullRetirement.ageMonths);
-  // Compute the number of total months between 62 and full retirement age:
-  const monthRange = fullAgeMonths - monthsIn(62, 0);
-  return this.fullRetirement.earlyReductionTotal / monthRange * 12;
+  return -1;
 }
 
 /**
@@ -327,7 +322,8 @@ TaxEngine.prototype.benefitMultiplierAtAge = function(year, month) {
        month <= this.fullRetirement.ageMonths)) {
     // Reduced benefits due to taking benefits early.
     const monthsUntil = fullAgeMonths - monthsIn(year, month);
-    return -1.0 * (this.earlyReductionRate() / 12) * monthsUntil;
+    return -1.0 * ((Math.min(36, monthsUntil) * 5.0 / 900.0) +
+                   (Math.max(0, monthsUntil - 36) * 5.0 / 1200.0));
   } else {
     // Increased benefits due to taking benefits late.
     const monthsAfter = monthsIn(year, month) - fullAgeMonths;

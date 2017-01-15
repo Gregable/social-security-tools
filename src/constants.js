@@ -407,8 +407,8 @@
 // https://www.ssa.gov/planners/retire/retirechart.html
 // https://www.ssa.gov/planners/retire/agereduction.html
 // https://www.ssa.gov/planners/retire/delayret.html
-// earlyReductionTotal is the reduction amount if you start benefits at 62
-// whereas delatedIncreaseAnnual is the increase amount every year after full
+// https://www.ssa.gov/oact/quickcalc/early_late.html
+// delatedIncreaseAnnual is the increase amount every year after full
 // retirement age. These are different denominators essentially, and should be
 // normalized (TODO) for sanity. They are presented in this way in ssa docs.
 /** const */ var FULL_RETIREMENT_AGE = [
@@ -417,7 +417,6 @@
     maxYear: 1937,
     ageYears: 65,
     ageMonths: 0,
-    earlyReductionTotal: 0.2,
     delayedIncreaseAnnual: 0.065
   },
   {
@@ -425,7 +424,6 @@
     maxYear: 1938,
     ageYears: 65,
     ageMonths: 2,
-    earlyReductionTotal: 0.2083,
     delayedIncreaseAnnual: 0.065
   },
   {
@@ -433,7 +431,6 @@
     maxYear: 1939,
     ageYears: 65,
     ageMonths: 4,
-    earlyReductionTotal: 0.2167,
     delayedIncreaseAnnual: 0.07
   },
   {
@@ -441,7 +438,6 @@
     maxYear: 1940,
     ageYears: 65,
     ageMonths: 6,
-    earlyReductionTotal: 0.225,
     delayedIncreaseAnnual: 0.07
   },
   {
@@ -449,7 +445,6 @@
     maxYear: 1941,
     ageYears: 65,
     ageMonths: 8,
-    earlyReductionTotal: 0.2333,
     delayedIncreaseAnnual: 0.075
   },
   {
@@ -457,7 +452,6 @@
     maxYear: 1942,
     ageYears: 65,
     ageMonths: 10,
-    earlyReductionTotal: 0.2417,
     delayedIncreaseAnnual: 0.075
   },
   {
@@ -465,7 +459,6 @@
     maxYear: 1954,
     ageYears: 66,
     ageMonths: 0,
-    earlyReductionTotal: 0.25,
     delayedIncreaseAnnual: 0.08
   },
   {
@@ -473,7 +466,6 @@
     maxYear: 1955,
     ageYears: 66,
     ageMonths: 2,
-    earlyReductionTotal: 0.2583,
     delayedIncreaseAnnual: 0.08
   },
   {
@@ -481,7 +473,6 @@
     maxYear: 1956,
     ageYears: 66,
     ageMonths: 4,
-    earlyReductionTotal: 0.2667,
     delayedIncreaseAnnual: 0.08
   },
   {
@@ -489,7 +480,6 @@
     maxYear: 1957,
     ageYears: 66,
     ageMonths: 6,
-    earlyReductionTotal: 0.2750,
     delayedIncreaseAnnual: 0.08
   },
   {
@@ -497,7 +487,6 @@
     maxYear: 1958,
     ageYears: 66,
     ageMonths: 8,
-    earlyReductionTotal: 0.2833,
     delayedIncreaseAnnual: 0.08
   },
   {
@@ -505,7 +494,6 @@
     maxYear: 1959,
     ageYears: 66,
     ageMonths: 10,
-    earlyReductionTotal: 0.2917,
     delayedIncreaseAnnual: 0.08
   },
   {
@@ -513,7 +501,6 @@
     maxYear: 10000,
     ageYears: 67,
     ageMonths: 0,
-    earlyReductionTotal: 0.3,
     delayedIncreaseAnnual: 0.08
   },
 ];
