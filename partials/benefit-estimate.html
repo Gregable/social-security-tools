@@ -100,14 +100,21 @@
   <h4>I was born in:</h4>
 
   <div id=agePicker>
-    <div id=monthPicker>
-      <span ng-repeat="month in all_months">
+    <div class=monthPicker>
+      <span ng-repeat="month in all_months | limitTo:6">
        <input type=radio value="{{month}}" id="month-{{month}}"
               class=radio ng-model="birth.month" ng-change="updateBirthdate()">
         <label class="radio month" for="month-{{month}}">{{month}}</label>
       </span>
     </div>
-    <div id=yearPicker>
+    <div class=monthPicker>
+      <span ng-repeat="month in all_months | limitTo:6:6">
+       <input type=radio value="{{month}}" id="month-{{month}}"
+              class=radio ng-model="birth.month" ng-change="updateBirthdate()">
+        <label class="radio month" for="month-{{month}}">{{month}}</label>
+      </span>
+    </div>
+    <div class=yearPicker>
       <span ng-repeat="year in pastYears()">
         <input type=radio id="year-{{year}}" value="{{year}}"
                class=radio ng-model="birth.year" ng-change="updateBirthdate()">

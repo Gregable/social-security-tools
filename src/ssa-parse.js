@@ -58,7 +58,6 @@ var parseYearRecords = function(earningsRecordsRaw) {
   replacedStr = replacedStr.replace(/[ \t\r\n]{2,}/g, "\n");
   // Replace any non-whitespace space with 1 newline.
   replacedStr = replacedStr.replace(/[\t\r\n]/g, "\n");
-  console.log(replacedStr);
   var lines = replacedStr.split("\n");
 
   var seenStartLine = false;
