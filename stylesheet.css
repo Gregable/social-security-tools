@@ -466,7 +466,7 @@ div.fixed-center-column {
 }
 
 /* The Age Picker buttons are simply heavily CSS'ed radio buttons. */
-#monthPicker {
+div.monthPicker {
   max-width: 620px;
   display: -webkit-flex;
   display: -moz-flex;
@@ -481,7 +481,7 @@ div.fixed-center-column {
   flex-wrap: wrap;
   -webkit-flex-wrap: wrap;
 }
-#yearPicker {
+div.yearPicker {
   max-width: 620px;
   display: -webkit-flex;
   display: -moz-flex;
