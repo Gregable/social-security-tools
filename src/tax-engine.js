@@ -85,6 +85,11 @@ TaxEngine.prototype.monthIndex = function(monthName) {
 }
 
 TaxEngine.prototype.updateBirthdate = function(birthdate) {
+  // Determine if the previous birthdate placed the user as over 60 this year.
+  var wasOver60 = (this.birthDate.year < (CURRENT_YEAR - 60));
+  // Same calculation for the new birthdate
+  var isOver60 = (birthdate.year < (CURRENT_YEAR - 60));
+
   this.birthDate.year = birthdate.year;
   this.birthDate.month = birthdate.month;
 
@@ -108,6 +113,16 @@ TaxEngine.prototype.updateBirthdate = function(birthdate) {
     monthIdx: retirementMonth,
     year: retirementYear
   };
+
+  // If the earnings were previously adjusted for over 60 or they are now
+  // being adjusted for over 60, then adjust the earnings again since this
+  // can affect the calculation.
+  if (wasOver60 || isOver60)
+    this.processIndexedEarnings_();
+}
+
+TaxEngine.prototype.isOver60 = function() {
+  return this.birthDate.year < (CURRENT_YEAR - 60);
 }
 
 /**
@@ -133,6 +148,11 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
 
       earningRecord.earningsCap = ssaMultiplier.maximumEarnings;
       earningRecord.indexFactor = ssaMultiplier.indexFactor;
+
+      // Starting in the year the user turns 60, their index factor
+      // is always 1.0, regardless of the index factor from the table.
+      if ((earningRecord.year - this.birthDate.year) >= 60)
+        earningRecord.indexFactor = 1.0;
     }
   }
 

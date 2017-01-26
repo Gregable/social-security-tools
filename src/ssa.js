@@ -70,6 +70,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         var records = parseYearRecords(contents.data);
         $scope.taxEngine.initFromEarningsRecords(records);
         $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
+        $scope.computeInitialAgeWarning();
         $scope.maybeRenderCharts();
       }, 
       function(jqxhr, textStatus, error) {
@@ -91,7 +92,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.pasteArea.mode = ModeEnum.PASTE_CONFIRMATION;
     $scope.pasteArea.contents = '';
   });
-
+  
   $scope.guessBirthday = function(records) {
     // Estimate a user's birth year, assumming that they first worked at
     // age 16, the youngest age federally allowed. User can modify this
@@ -102,6 +103,19 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // who knows.
     $scope.birth.maxPossibleYear = records[0].year;
     $scope.taxEngine.updateBirthdate($scope.birth);
+
+    $scope.computeInitialAgeWarning();
+  }
+
+  $scope.computeInitialAgeWarning = function() {
+    $scope.initiallyOver60 = false;
+    if (CURRENT_YEAR - $scope.birth.year > 60)
+      $scope.initiallyOver60 = true;
+  }
+
+  $scope.showOver60Warning = function() {
+    return !$scope.initiallyOver60 &&
+      $scope.taxEngine.isOver60();
   }
 
   $scope.loadReport = function() {
