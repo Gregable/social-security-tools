@@ -661,4 +661,18 @@ input.radio:focus ~ label.radio:before {
   right: 10px;    
 }
 
+/* Small animation to notify that a div just appeared */
+div.flashnotify:not(.ng-hide-animate) {
+  padding: 3px;
+  -webkit-animation: bgfadein linear 0.6s;
+  animation: bgfadein linear 0.6s;
+}
+@-webkit-keyframes bgfadein {
+  0% { background-color: #00ff00; }
+  100% { background-color: #ffffff; }
+}
+@keyframes bgfadein {
+  0% { background-color: #00ff00; }
+  100% { background-color: #ffffff; }
+}
 

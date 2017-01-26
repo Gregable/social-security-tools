@@ -122,8 +122,18 @@
       </span>
     </div>
   </div>
-
   <br class=clear>
+  
+  <div ng-show="showOver60Warning()" class=flashnotify>
+    <p>
+      <u>Quick Note</u>: The multiplier for earnings in the year you turn 60
+      (<b>{{taxEngine.dateAtAge(60, 0).year}}</b>) and later years is
+      fixed to <b>1.0</b>. When you adjusted your age, this affected
+      your calculation of your indexed earnings at the top of the page.
+    </p>
+  </div>
+
+
   <p>
     For those born in <b>{{birth.year}}</b>, normal retirement age is
     <b>{{taxEngine.fullRetirement.ageYears}} years and 
