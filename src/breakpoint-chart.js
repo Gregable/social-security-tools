@@ -110,8 +110,7 @@ BreakPointChart.prototype.maxRenderedXDollars = function() {
   // There are a few goals here when selecting this value:
   // 1) Show all of the breakpoints so the user can get a feel visually
   //    for how these breakpoints affect the computation.
-  var breakpoint_min =
-    BENEFIT_BRACKETS[BENEFIT_BRACKETS.length - 1].min * 1.25;
+  var breakpoint_min = this.taxEngine_.secondBendPoint() * 1.25;
   // 2) Show the user's current earnings with some space on either side
   //    so that they can explore the graph to either direction.
   var user_min = this.taxEngine_.yearlyIndexedEarnings() * 2;
@@ -187,13 +186,25 @@ BreakPointChart.prototype.renderBreakPoints = function() {
 
   this.context_.beginPath();
   this.moveTo(0, 0);
-  for (var i = 0; i < BENEFIT_BRACKETS.length; ++i) {
-    var dollarX = BENEFIT_BRACKETS[i].max;
-    if (dollarX === undefined)
-      dollarX = this.maxRenderedXDollars();
-    var dollarY = this.taxEngine_.estimatedFullBenefitForEarnings(dollarX);
-    this.lineTo(dollarX, dollarY);
-  }
+
+  var dollarX;
+  var dollarY;
+
+  // Origin to first bend point
+  dollarX = this.taxEngine_.firstBendPoint();
+  dollarY = this.taxEngine_.estimatedFullBenefitForEarnings(dollarX);
+  this.lineTo(dollarX, dollarY);
+
+  // First to second bend point
+  dollarX = this.taxEngine_.secondBendPoint();
+  dollarY = this.taxEngine_.estimatedFullBenefitForEarnings(dollarX);
+  this.lineTo(dollarX, dollarY);
+
+  // Second to third bend point
+  dollarX = this.maxRenderedXDollars();
+  dollarY = this.taxEngine_.estimatedFullBenefitForEarnings(dollarX);
+  this.lineTo(dollarX, dollarY);
+
   this.context_.stroke();
 
   this.context_.restore();

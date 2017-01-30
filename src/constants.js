@@ -1,408 +1,222 @@
 /**
  * This file holds constants that various bits of code need. Most of these
- * constatnts are values from the SSA and other IRS laws and require updating
+ * constants are values from the SSA and other IRS laws and require updating
  * regularly.
  */
 
-// https://www.ssa.gov/pubs/EN-05-10070.pdf
-// https://www.ssa.gov/oact/progdata/oasdiRates.html
-// https://www.ssa.gov/cgi-bin/awiFactors.cgi
-/**const*/ var SSA_MULTIPLIERS = [
-  {
-    'year': 1956,
-    'maximumEarnings': 4200,
-    'indexFactor': 13.6166,
-    'taxRate': .02
-  },
-  {
-    'year': 1957,
-    'maximumEarnings': 4200,
-    'indexFactor': 13.2077,
-    'taxRate': .02
-  },
-  {
-    'year': 1958,
-    'maximumEarnings': 2400,
-    'indexFactor': 13.0923,
-    'taxRate': .02
-  },
-  {
-    'year': 1959,
-    'maximumEarnings': 4800,
-    'indexFactor': 12.4744,
-    'taxRate': .0225
-  },
-  {
-    'year': 1960,
-    'maximumEarnings': 4800,
-    'indexFactor': 12.0033,
-    'taxRate': .0275
-  },
-  {
-    'year': 1961,
-    'maximumEarnings': 4800,
-    'indexFactor': 11.7693,
-    'taxRate': .0275
-  },
-  {
-    'year': 1962,
-    'maximumEarnings': 4800,
-    'indexFactor': 11.2081,
-    'taxRate': .02875
-  },
-  {
-    'year': 1963,
-    'maximumEarnings': 4800,
-    'indexFactor': 10.9399,
-    'taxRate': .03375
-  },
-  {
-    'year': 1964,
-    'maximumEarnings': 4800,
-    'indexFactor': 10.5103,
-    'taxRate': .03375
-  },
-  {
-    'year': 1965,
-    'maximumEarnings': 4800,
-    'indexFactor': 10.3244,
-    'taxRate': .03375
-  },
-  {
-    'year': 1966,
-    'maximumEarnings': 6600,
-    'indexFactor': 9.7398,
-    'taxRate': .035
-  },
-  {
-    'year': 1967,
-    'maximumEarnings': 6600,
-    'indexFactor': 9.2259,
-    'taxRate': .0355
-  },
-  {
-    'year': 1968,
-    'maximumEarnings': 7800,
-    'indexFactor': 8.6326,
-    'taxRate': .03325
-  },
-  {
-    'year': 1969,
-    'maximumEarnings': 7800,
-    'indexFactor': 8.1609,
-    'taxRate': .03725
-  },
-  {
-    'year': 1970,
-    'maximumEarnings': 7800,
-    'indexFactor': 7.7751,
-    'taxRate': .0365
-  },
-  {
-    'year': 1971,
-    'maximumEarnings': 7800,
-    'indexFactor': 7.4031,
-    'taxRate': .0405
-  },
-  {
-    'year': 1972,
-    'maximumEarnings': 9000,
-    'indexFactor': 6.7423,
-    'taxRate': .0405
-  },
-  {
-    'year': 1973,
-    'maximumEarnings': 10800,
-    'indexFactor': 6.3453,
-    'taxRate': .043
-  },
-  {
-    'year': 1974,
-    'maximumEarnings': 13200,
-    'indexFactor': 5.9893,
-    'taxRate': .04375
-  },
-  {
-    'year': 1975,
-    'maximumEarnings': 14100,
-    'indexFactor': 5.5728,
-    'taxRate': .04375
-  },
-  {
-    'year': 1976,
-    'maximumEarnings': 15300,
-    'indexFactor': 5.2131,
-    'taxRate': .04375
-  },
-  {
-    'year': 1977,
-    'maximumEarnings': 16500,
-    'indexFactor': 4.9183,
-    'taxRate': .04375
-  },
-  {
-    'year': 1978,
-    'maximumEarnings': 17700,
-    'indexFactor': 4.5565,
-    'taxRate': .04275
-  },
-  {
-    'year': 1979,
-    'maximumEarnings': 22900,
-    'indexFactor': 4.1900,
-    'taxRate': .04330
-  },
-  {
-    'year': 1980,
-    'maximumEarnings': 25900,
-    'indexFactor': 3.8438,
-    'taxRate': .0520
-  },
-  {
-    'year': 1981,
-    'maximumEarnings': 29700,
-    'indexFactor': 3.4922,
-    'taxRate': .047
-  },
-  {
-    'year': 1982,
-    'maximumEarnings': 32400,
-    'indexFactor': 3.3100,
-    'taxRate': .04575
-  },
-  {
-    'year': 1983,
-    'maximumEarnings': 35700,
-    'indexFactor': 3.1562,
-    'taxRate': .04775
-  },
-  {
-    'year': 1984,
-    'maximumEarnings': 37800,
-    'indexFactor': 2.981,
-    'taxRate': .052
-  },
-  {
-    'year': 1985,
-    'maximumEarnings': 39600,
-    'indexFactor': 2.8592,
-    'taxRate': .052
-  },
-  {
-    'year': 1986,
-    'maximumEarnings': 42000,
-    'indexFactor': 2.7768,
-    'taxRate': .052
-  },
-  {
-    'year': 1987,
-    'maximumEarnings': 43800,
-    'indexFactor': 2.6102,
-    'taxRate': .052
-  },
-  {
-    'year': 1988,
-    'maximumEarnings': 45000,
-    'indexFactor': 2.4878,
-    'taxRate': .0553
-  },
-  {
-    'year': 1989,
-    'maximumEarnings': 48000,
-    'indexFactor': 2.3930,
-    'taxRate': .0553
-  },
-  {
-    'year': 1990,
-    'maximumEarnings': 51300,
-    'indexFactor': 2.2874,
-    'taxRate': .056
-  },
-  {
-    'year': 1991,
-    'maximumEarnings': 53400,
-    'indexFactor': 2.2052,
-    'taxRate': .056
-  },
-  {
-    'year': 1992,
-    'maximumEarnings': 55500,
-    'indexFactor': 2.0971,
-    'taxRate': .056
-  },
-  {
-    'year': 1993,
-    'maximumEarnings': 57600,
-    'indexFactor': 2.0793,
-    'taxRate': .056
-  },
-  {
-    'year': 1994,
-    'maximumEarnings': 60600,
-    'indexFactor': 2.0249,
-    'taxRate': .0526
-  },
-  {
-    'year': 1995,
-    'maximumEarnings': 61200,
-    'indexFactor': 1.9469,
-    'taxRate': .0526
-  },
-  {
-    'year': 1996,
-    'maximumEarnings': 62700,
-    'indexFactor': 1.8561,
-    'taxRate': .0526
-  },
-  {
-    'year': 1997,
-    'maximumEarnings': 65400,
-    'indexFactor': 1.7538,
-    'taxRate': .0535
-  },
-  {
-    'year': 1998,
-    'maximumEarnings': 68400,
-    'indexFactor': 1.6665,
-    'taxRate': .0535
-  },
-  {
-    'year': 1999,
-    'maximumEarnings': 72600,
-    'indexFactor': 1.5786,
-    'taxRate': .0535
-  },
-  {
-    'year': 2000,
-    'maximumEarnings': 76200,
-    'indexFactor': 1.4958,
-    'taxRate': .053
-  },
-  {
-    'year': 2001,
-    'maximumEarnings': 80400,
-    'indexFactor': 1.4609,
-    'taxRate': .053
-  },
-  {
-    'year': 2002,
-    'maximumEarnings': 84900,
-    'indexFactor': 1.4465,
-    'taxRate': .053
-  },
-  {
-    'year': 2003,
-    'maximumEarnings': 87000,
-    'indexFactor': 1.4120,
-    'taxRate': .053
-  },
-  {
-    'year': 2004,
-    'maximumEarnings': 87900,
-    'indexFactor': 1.3492,
-    'taxRate': .053
-  },
-  {
-    'year': 2005,
-    'maximumEarnings': 90000,
-    'indexFactor': 1.3016,
-    'taxRate': .053
-  },
-  {
-    'year': 2006,
-    'maximumEarnings': 94200,
-    'indexFactor': 1.2444,
-    'taxRate': .053
-  },
-  {
-    'year': 2007,
-    'maximumEarnings': 97500,
-    'indexFactor': 1.1904,
-    'taxRate': .053
-  },
-  {
-    'year': 2008,
-    'maximumEarnings': 102000,
-    'indexFactor': 1.1636,
-    'taxRate': .053
-  },
-  {
-    'year': 2009,
-    'maximumEarnings': 106800,
-    'indexFactor': 1.1814,
-    'taxRate': .053
-  },
-  {
-    'year': 2010,
-    'maximumEarnings': 106800,
-    'indexFactor': 1.1542,
-    'taxRate': .053
-  },
-  {
-    'year': 2011,
-    'maximumEarnings': 106800,
-    'indexFactor': 1.1191,
-    'taxRate': .053
-  },
-  {
-    'year': 2012,
-    'maximumEarnings': 111100,
-    'indexFactor': 1.0852,
-    'taxRate': .053
-  },
-  {
-    'year': 2013,
-    'maximumEarnings': 113700,
-    'indexFactor': 1.0715,
-    'taxRate': .053
-  },
-  {
-    'year': 2014,
-    'maximumEarnings': 117000,
-    'indexFactor': 1.0348,
-    'taxRate': .053
-  },
-  {
-    'year': 2015,
-    'maximumEarnings': 118500,
-    'indexFactor': 1.00,
-    'taxRate': .053
-  },
-  {
-    'year': 2016,
-    'maximumEarnings': 118500,
-    'indexFactor': 1.00,
-    'taxRate': .053
-  },
-];
+// Maximum earnings in each year which contribute to social security benefits.
+// https://www.ssa.gov/OACT/COLA/awifactors.html
+const MAXIMUM_EARNINGS = {
+  1956: 4200,
+  1957: 4200,
+  1958: 2400,
+  1959: 4800,
+  1960: 4800,
+  1961: 4800,
+  1962: 4800,
+  1963: 4800,
+  1964: 4800,
+  1965: 4800,
+  1966: 6600,
+  1967: 6600,
+  1968: 7800,
+  1969: 7800,
+  1970: 7800,
+  1971: 7800,
+  1972: 9000,
+  1973: 10800,
+  1974: 13200,
+  1975: 14100,
+  1976: 15300,
+  1977: 16500,
+  1978: 17700,
+  1979: 22900,
+  1980: 25900,
+  1981: 29700,
+  1982: 32400,
+  1983: 35700,
+  1984: 37800,
+  1985: 39600,
+  1986: 42000,
+  1987: 43800,
+  1988: 45000,
+  1989: 4800,
+  1990: 51300,
+  1991: 53400,
+  1992: 55500,
+  1993: 57600,
+  1994: 60600,
+  1995: 61200,
+  1996: 62700,
+  1997: 65400,
+  1998: 68400,
+  1999: 72600,
+  2000: 76200,
+  2001: 80400,
+  2002: 84900,
+  2003: 87000,
+  2004: 87900,
+  2005: 90000,
+  2006: 94200,
+  2007: 97500,
+  2008: 102000,
+  2009: 106800,
+  2010: 106800,
+  2011: 106800,
+  2012: 111100,
+  2013: 113700,
+  2014: 117000,
+  2015: 118500,
+  2016: 127200,
+};
 
-// Breakpoints at which the multiplier for indexed earnings to benefits changes.
-// These values are for annual values of indexed earnings, not monthly in the
-// way the SSA likes to display them.
-// https://www.ssa.gov/OACT/COLA/autoAdj.html
-/** const */ var BENEFIT_BRACKETS = [
-  {
-    max: 10620,
-    multiplier: 0.9
-  },
-  {
-    min: 10620,
-    max: 64032,
-    multiplier: 0.32
-  },
-  {
-    min: 64032,
-    multiplier: 0.15
-  },
-];
+// https://www.ssa.gov/oact/progdata/oasdiRates.html
+const TAX_RATES = {
+  1956: .02,
+  1957: .02,
+  1958: .02,
+  1959: .0225,
+  1960: .0275,
+  1961: .0275,
+  1962: .02875,
+  1963: .03375,
+  1964: .03375,
+  1965: .03375,
+  1966: .035,
+  1967: .0355,
+  1968: .03325,
+  1969: .03725,
+  1970: .0365,
+  1971: .0405,
+  1972: .0405,
+  1973: .043,
+  1974: .04375,
+  1975: .04375,
+  1976: .04375,
+  1977: .04375,
+  1978: .04275,
+  1979: .04330,
+  1980: .0520,
+  1981: .047,
+  1982: .04575,
+  1983: .04775,
+  1984: .052,
+  1985: .052,
+  1986: .052,
+  1987: .052,
+  1988: .0553,
+  1989: .0553,
+  1990: .056,
+  1991: .056,
+  1992: .056,
+  1993: .056,
+  1994: .0526,
+  1995: .0526,
+  1996: .0526,
+  1997: .0535,
+  1998: .0535,
+  1999: .0535,
+  2000: .053,
+  2001: .053,
+  2002: .053,
+  2003: .053,
+  2004: .053,
+  2005: .053,
+  2006: .053,
+  2007: .053,
+  2008: .053,
+  2009: .053,
+  2010: .053,
+  2011: .053,
+  2012: .053,
+  2013: .053,
+  2014: .053,
+  2015: .053,
+  2016: .053,
+};
+
+// Values from https://www.ssa.gov/oact/cola/piaformula.html
+const BENDPOINT1_IN_1977 = 180.0
+const BENDPOINT2_IN_1977 = 1085.0
+const BEFORE_BENDPOINT1_MULTIPLIER = 0.9
+const BEFORE_BENDPOINT2_MULTIPLIER = 0.32
+const AFTER_BENDPOINT2_MULTIPLIER = 0.15
+
+// Data from https://www.ssa.gov/oact/cola/awiseries.html
+const WAGE_INDICES = {
+  1952: 2973.32,
+  1953: 3139.44,
+  1954: 3155.64,
+  1955: 3301.44,
+  1956: 3532.36,
+  1957: 3641.72,
+  1958: 3673.80,
+  1959: 3855.80,
+  1960: 4007.12,
+  1961: 4086.76,
+  1962: 4291.40,
+  1963: 4396.64,
+  1964: 4576.32,
+  1965: 4658.72,
+  1966: 4938.36,
+  1967: 5213.44,
+  1968: 5571.76,
+  1969: 5893.76,
+  1970: 6186.24,
+  1971: 6497.08,
+  1972: 7133.80,
+  1973: 7580.16,
+  1974: 8030.76,
+  1975: 8630.92,
+  1976: 9226.48,
+  1977: 9779.44,
+  1978: 10556.03,
+  1979: 11479.46,
+  1980: 12513.46,
+  1981: 13773.10,
+  1982: 14531.34,
+  1983: 15239.24,
+  1984: 16135.07,
+  1985: 16822.51,
+  1986: 17321.82,
+  1987: 18426.51,
+  1988: 19334.04,
+  1989: 20099.55,
+  1990: 21027.98,
+  1991: 21811.60,
+  1992: 22935.42,
+  1993: 23132.67,
+  1994: 23753.53,
+  1995: 24705.66,
+  1996: 25913.90,
+  1997: 27426.00,
+  1998: 28861.44,
+  1999: 30469.84,
+  2000: 32154.82,
+  2001: 32921.92,
+  2002: 33252.09,
+  2003: 34064.95,
+  2004: 35648.55,
+  2005: 36952.94,
+  2006: 38651.41,
+  2007: 40405.48,
+  2008: 41334.97,
+  2009: 40711.61,
+  2010: 41673.83,
+  2011: 42979.61,
+  2012: 44321.67,
+  2013: 44888.16,
+  2014: 46481.52,
+  2015: 48098.63,
+};
 
 // Number of top years of earnings which contribute to SSA calculations.
-/** const */ var SSA_EARNINGS_YEARS = 35;
+const SSA_EARNINGS_YEARS = 35;
 
-/** const */ var CURRENT_YEAR = 2017;
+const CURRENT_YEAR = 2017;
 
-/** const */ var ALL_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const ALL_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 // https://www.ssa.gov/planners/retire/retirechart.html
 // https://www.ssa.gov/planners/retire/agereduction.html
@@ -411,7 +225,7 @@
 // delatedIncreaseAnnual is the increase amount every year after full
 // retirement age. These are different denominators essentially, and should be
 // normalized (TODO) for sanity. They are presented in this way in ssa docs.
-/** const */ var FULL_RETIREMENT_AGE = [
+const FULL_RETIREMENT_AGE = [
   {
     minYear: 0,
     maxYear: 1937,

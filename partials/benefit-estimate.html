@@ -34,20 +34,20 @@
   <p>
    <table class=benefitBrackets>
     <tr>
-     <td>Amount less than ${{taxEngine.benefitBracketMax(0) | number: 0}}
+     <td>Amount less than ${{taxEngine.firstBendPoint() | number: 0}}
           multiplied by 90%:</td>
      <td><b>${{taxEngine.estimatedBenefitByBracket(0) | number:2}}</b></td>
      <td></td>
     </tr>
     <tr>
-     <td>Amount more than ${{taxEngine.benefitBracketMin(1) | number: 0}}
-         and less than ${{taxEngine.benefitBracketMax(1) | number: 0}}
+     <td>Amount more than ${{taxEngine.firstBendPoint() | number: 0}}
+         and less than ${{taxEngine.secondBendPoint() | number: 0}}
          multiplied by 32%:</td>
      <td><b>${{taxEngine.estimatedBenefitByBracket(1) | number:2}}</b></td>
      <td></td>
     <tr>
     </tr>
-    <td>Amount more than ${{taxEngine.benefitBracketMin(2) | number: 0}}
+    <td>Amount more than ${{taxEngine.secondBendPoint() | number: 0}}
         multiplied by 15%:</td>
      <td><b>${{taxEngine.estimatedBenefitByBracket(2) | number:2}}</b></td>
      <td></td>

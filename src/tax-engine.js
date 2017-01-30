@@ -14,7 +14,7 @@ function TaxRecord() {
       
 /**
  * Computes the indexed earnings for this tax record.
- * @return {boolean}
+ * @return {number}
  */
 TaxRecord.prototype.indexedEarning = function() {
   var cappedEarning = Math.min(this.earningsCap, this.taxedEarnings);
@@ -125,43 +125,45 @@ TaxEngine.prototype.isOver60 = function() {
   return this.birthDate.year < (CURRENT_YEAR - 60);
 }
 
+// From https://www.ssa.gov/oact/cola/piaformula.html, the PIA calculation
+// depends on the year at which an individual first becomes eligible for
+// benefits, (when they turn 62). The computation is based on the wage
+// index from two years prior. If the user is not yet 62, we use the
+// most up to date bend points, which are for the current year.
+TaxEngine.prototype.indexingYear = function() {  
+  return Math.min(this.dateAtAge(62, 0).year, CURRENT_YEAR) - 2;
+}
+
 /**
- * For each earnings record, match up the year with the SSA_MULTIPLIERS table
- * and process the indexed earnings for that record, adding it to the record.
+ * For each earnings record, match up the year with the MAXIMUM_EARNINGS
+ * and WAGE_INDICES data, compute indexed earnings for that record, adding it
+ * to the record.
  * @private
  */
 TaxEngine.prototype.processIndexedEarnings_ = function() {
-  var earningRecordIdx = 0;
-  var ssaMultiplierIdx = 0;
-  while (ssaMultiplierIdx < SSA_MULTIPLIERS.length &&
-         earningRecordIdx < this.earningsRecords.length) {
-    var ssaMultiplier = SSA_MULTIPLIERS[ssaMultiplierIdx];
-    var earningRecord = this.earningsRecords[earningRecordIdx];
-
-    if (earningRecord.year > ssaMultiplier.year) {
-      ++ssaMultiplierIdx;
-    } else if (ssaMultiplier.year > earningRecord.year) {
-      ++earningRecordIdx;
-    } else {
-      ++ssaMultiplierIdx;
-      ++earningRecordIdx;
-
-      earningRecord.earningsCap = ssaMultiplier.maximumEarnings;
-      earningRecord.indexFactor = ssaMultiplier.indexFactor;
-
-      // Starting in the year the user turns 60, their index factor
-      // is always 1.0, regardless of the index factor from the table.
-      if ((earningRecord.year - this.birthDate.year) >= 60)
-        earningRecord.indexFactor = 1.0;
-    }
-  }
-
   var allIndexedValues = [];
   for (var i = 0; i < this.earningsRecords.length; ++i) {
     var earningRecord = this.earningsRecords[i];
-    if (earningRecord.taxedEarnings === -1)
-      continue;
-    allIndexedValues.push(earningRecord.indexedEarning());
+
+    earningRecord.earningsCap = MAXIMUM_EARNINGS[earningRecord.year];
+
+    // https://www.ssa.gov/oact/ProgData/retirebenefit1.html
+    // Starting in the year the user turns 60, their index factor
+    // is always 1.0, regardless of the index factor from the table.
+    if ((earningRecord.year - this.birthDate.year) >= 60) {
+      earningRecord.indexFactor = 1.0;
+    // Otherwise the index factor for a prior year Y is the result of
+    // dividing the average wage index for the year in which the person
+    // attains age 60 by the average age index for year Y.
+    } else if (WAGE_INDICES[earningRecord.year] === undefined) {
+        earningRecord.indexFactor = 1.0;
+    } else {
+      earningRecord.indexFactor = (WAGE_INDICES[this.indexingYear()] /
+          WAGE_INDICES[earningRecord.year]);
+    }
+    
+    if (earningRecord.taxedEarnings !== -1)
+      allIndexedValues.push(earningRecord.indexedEarning());
   }
   for (var i = 0; i < this.futureEarningsYears; ++i) {
     allIndexedValues.push(this.futureEarningsWage);
@@ -175,7 +177,7 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
   // Your top N values are the only ones that 'count'. Compute the cutoff
   // value below which earnings don't count.
   // TODO: Right now if there is a tie for the cutoff, we show all tied
-  // elements as a Top N value, leading to a situation where we could have
+  // elements as a Top N value, leading to a situation where we could show
   // more than N top-N values.
   if (allIndexedValues.length < SSA_EARNINGS_YEARS) {
     this.cutoffIndexedEarnings = 0;
@@ -229,43 +231,51 @@ TaxEngine.prototype.yearlyIndexedEarnings = function() {
 };
 
 /**
- * Returns the benefit bracket annual minimum for the given bracket index.
- * @param {number} bracket Must be less than the number of BENEFIT_BRACKETS
- * @return {number} bracket minimum dollar amount.
+ * Returns the first annual bend point in the PIA formula.
+ * @return {number} first annual bend point dollar amount
  */
-TaxEngine.prototype.benefitBracketMin = function(bracket) {
-  var bracket = BENEFIT_BRACKETS[bracket];
-  return bracket.min;
-};
+TaxEngine.prototype.firstBendPoint = function() {
+  const wage_in_1977 = WAGE_INDICES[1977]; 
+  const wage = WAGE_INDICES[this.indexingYear()];
+  const multiplier = wage / wage_in_1977;
+  return Math.round(BENDPOINT1_IN_1977 * multiplier) * 12;
+}
 
 /**
- * Returns the benefit bracket annual maximum for the given bracket index.
- * @param {number} bracket Must be less than the number of BENEFIT_BRACKETS
- * @return {number} bracket maximum dollar amount.
+ * Returns the second annual bend point in the PIA formula.
+ * @return {number} second annual bend point dollar amount
  */
-TaxEngine.prototype.benefitBracketMax = function(bracket) {
-  var bracket = BENEFIT_BRACKETS[bracket];
-  return bracket.max;
-};
+TaxEngine.prototype.secondBendPoint = function() {
+  const wage_in_1977 = WAGE_INDICES[1977];
+  const wage = WAGE_INDICES[this.indexingYear()];
+  const multiplier = wage / wage_in_1977;
+  return Math.round(BENDPOINT2_IN_1977 * multiplier) * 12;
+}
 
 /**
  * Returns the yearly benefit for a specific breakpoint bracket for any
  * yearly indexed earnings.
  * @param {number} earnings yearly indexed earnings to compute
- * @param {number} bracket Must be less than the number of BENEFIT_BRACKETS
+ * @param {number} bracket Must be 0, 1 or 2
  * @return {number} benefit in that bracket for this earnings.
  */
 TaxEngine.prototype.estimatedBenefitForEarningsByBracket =
     function(earnings, bracket) {
-  var bracket = BENEFIT_BRACKETS[bracket];
-  var benefit = earnings;
-  if (bracket.max !== undefined) {
-    benefit = Math.min(benefit, bracket.max);
+  earnings = Math.round(earnings);
+  if (bracket === 0) {
+    return (Math.min(earnings, this.firstBendPoint()) *
+      BEFORE_BENDPOINT1_MULTIPLIER);
+  } else if (bracket === 1) {
+    return (
+        Math.max(0, (
+            Math.min(earnings, this.secondBendPoint()) -
+            this.firstBendPoint())) *
+        BEFORE_BENDPOINT2_MULTIPLIER);
+  } else if (bracket === 2) {
+    return Math.max(0, earnings - this.secondBendPoint()) *
+      AFTER_BENDPOINT2_MULTIPLIER;
   }
-  if (bracket.min !== undefined) {
-    benefit = Math.max(0, benefit - bracket.min);
-  }
-  return bracket.multiplier * benefit;
+  return -1;
 };
 
 /**
@@ -275,7 +285,7 @@ TaxEngine.prototype.estimatedBenefitForEarningsByBracket =
  */
 TaxEngine.prototype.estimatedFullBenefitForEarnings = function(earnings) {
   var sum = 0;
-  for (var i = 0; i < BENEFIT_BRACKETS.length; ++i)
+  for (var i = 0; i < 3; ++i)
     sum += this.estimatedBenefitForEarningsByBracket(earnings, i);
   return sum;
 };
@@ -283,7 +293,7 @@ TaxEngine.prototype.estimatedFullBenefitForEarnings = function(earnings) {
 /**
  * Returns the yearly benefit for a specific breakpoint bracket for this
  * user's yearly indexed earnings.
- * @param {number} bracket Must be less than the number of BENEFIT_BRACKETS
+ * @param {number} bracket Must be 0, 1, or 2
  * @return {number} benefit in that bracket.
  */
 TaxEngine.prototype.estimatedBenefitByBracket = function(bracket) {
