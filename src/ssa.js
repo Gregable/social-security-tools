@@ -246,7 +246,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.futureWageWorkSlider = {
     minValue: 1000,
     options: {
-     floor: 0,
+     floor: 1000,
      ceil: MAXIMUM_EARNINGS[CURRENT_YEAR - 2],
      step: 1000,
      translate: function(value, sliderId, label) {
