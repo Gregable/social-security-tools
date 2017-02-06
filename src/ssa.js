@@ -247,7 +247,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     minValue: 1000,
     options: {
      floor: 1000,
-     ceil: MAXIMUM_EARNINGS[CURRENT_YEAR - 2],
+     ceil: MAXIMUM_EARNINGS[MAXIMUM_EARNINGS.length - 1],
      step: 1000,
      translate: function(value, sliderId, label) {
       if (label === 'model') {

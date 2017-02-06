@@ -317,11 +317,31 @@ TaxEngine.prototype.primaryInsuranceAmountByBracket = function(bracket) {
 
 /**
  * Returns the primary insurance amount (monthly benefit) summed across all
- * benefit brackets.
+ * benefit brackets, but not adjusted for COLA increases.
+ * @return {number} unadjusted primary insurance amount
+ */
+TaxEngine.prototype.primaryInsuranceAmountUnadjusted = function() {
+  return this.primaryInsuranceAmountForEarnings(this.monthlyIndexedEarnings);
+}
+
+/**
+ * Returns the primary insurance amount (monthly benefit) summed across all
+ * benefit brackets and adjusted for COLA increases (if any).
  * @return {number} primary insurance amount
  */
 TaxEngine.prototype.primaryInsuranceAmount = function() {
-  return this.primaryInsuranceAmountForEarnings(this.monthlyIndexedEarnings);
+  var colaAdjustment = 1.0;
+  var adjusted = this.primaryInsuranceAmountUnadjusted();
+  for (var year = this.dateAtAge(62, 0).year; year < CURRENT_YEAR; ++year) {
+    if (COLA[year] !== undefined) {
+      console.log(year, ': ', COLA[year], ' ', adjusted);
+      adjusted = adjusted * (1 + (COLA[year] / 100.0));
+      // Primary Insurance amounts are always rounded down the the nearest dime.
+      adjusted = Math.floor(adjusted * 10) / 10;
+      console.log(adjusted);
+    }
+  }
+  return adjusted;
 };
 
 /**
@@ -330,8 +350,7 @@ TaxEngine.prototype.primaryInsuranceAmount = function() {
  * @return {number} floored primary insurance amount
  */
 TaxEngine.prototype.primaryInsuranceAmountFloored = function() {
-  return Math.floor(
-      this.primaryInsuranceAmountForEarnings(this.monthlyIndexedEarnings));
+  return Math.floor(this.primaryInsuranceAmount());
 };
 
 /**
