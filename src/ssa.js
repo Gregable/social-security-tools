@@ -114,6 +114,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   $scope.showOver60Warning = function() {
+    // TODO: We should also probably show this warning if you are over 60
+    // initially and you change your birth year from the one we guessed.
     return !$scope.initiallyOver60 &&
       $scope.taxEngine.isOver60();
   }
