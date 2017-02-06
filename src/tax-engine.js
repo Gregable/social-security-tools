@@ -166,8 +166,10 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
     if (earningRecord.taxedEarnings !== -1)
       allIndexedValues.push(earningRecord.indexedEarning());
   }
-  for (var i = 0; i < this.futureEarningsYears; ++i) {
-    allIndexedValues.push(this.futureEarningsWage);
+  if (this.futureEarningsWage > 0) {
+    for (var i = 0; i < this.futureEarningsYears; ++i) {
+      allIndexedValues.push(this.futureEarningsWage);
+    }
   }
 
   // Reverse sort the indexed values. Yay javascript, sorting numbers
@@ -188,7 +190,8 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
 
   for (var i = 0; i < this.earningsRecords.length; ++i) {
     var earningRecord = this.earningsRecords[i];
-    if (earningRecord.indexedEarning() >= this.cutoffIndexedEarnings) {
+    if (earningRecord.indexedEarning() >= this.cutoffIndexedEarnings &&
+        earningRecord.taxedEarnings > 0) {
       earningRecord.isTopEarningYear = true;
     } else {
       earningRecord.isTopEarningYear = false;
@@ -221,8 +224,12 @@ TaxEngine.prototype.numEarningsYears = function() {
     if (this.earningsRecords[i].taxedEarnings >= 0)
       nonNegativeRecords += 1;
   }
+  
+  if (this.futureEarningsWage > 0)
+    return nonNegativeRecords + this.futureEarningsYears;
+  else
+    return nonNegativeRecords;
 
-  return nonNegativeRecords + this.futureEarningsYears;
 };
 
 /**

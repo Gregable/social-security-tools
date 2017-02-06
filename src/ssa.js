@@ -218,8 +218,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.futureYears.push(i + CURRENT_YEAR - incompleteAdj);
     }
 
-    $scope.futureIsTopValue = ($scope.futureWageWorkSlider.minValue >=
-                               $scope.taxEngine.cutoffIndexedEarnings);
+    $scope.futureIsTopValue = (
+        ($scope.futureWageWorkSlider.minValue >=
+         $scope.taxEngine.cutoffIndexedEarnings) &&
+        ($scope.futureWageWorkSlider.minValue > 0));
   }
  
   $scope.futureYearsWorkSlider = {
@@ -244,7 +246,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.futureWageWorkSlider = {
     minValue: 1000,
     options: {
-     floor: 0,
+     floor: 1000,
      ceil: MAXIMUM_EARNINGS[CURRENT_YEAR - 2],
      step: 1000,
      translate: function(value, sliderId, label) {
