@@ -408,8 +408,10 @@ table.fancy-table th#adjustment,
 table.fancy-table td[headers='adjustment'] {
   text-align: right;
 }
-table.fancy-table th#benefit,
-table.fancy-table td[headers='benefit'] {
+table.fancy-table th#monthlybenefit,
+table.fancy-table th#annualbenefit,
+table.fancy-table td[headers='annualbenefit'],
+table.fancy-table td[headers='monthlybenefit'] {
   text-align: right;
 }
 
@@ -418,10 +420,11 @@ table.benefitBrackets tr td:first-child {
   text-align: right;
   padding-right: 6px;
 }
-table.benefitBrackets tr td:nth-child(2) {
+table.benefitBrackets tr td:nth-last-child(2) {
   text-align: right;
+  padding-right: 0px;
 }
-table.benefitBrackets tr:last-child td:nth-child(2) {
+table.benefitBrackets tr:nth-last-child(2) td:nth-child(2) {
   border-top: 1px solid;
 }
 

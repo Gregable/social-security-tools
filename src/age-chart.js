@@ -98,7 +98,7 @@ AgeChart.prototype.canvasY = function(benefitY) {
 AgeChart.prototype.ageX = function(canvasX) {
   var xValue = Math.floor(canvasX / this.chartWidth() * this.monthWidth);
   var xClipped = this.monthWidth;
-  var months = Math.min(xValue, xClipped);
+  var months = Math.max(0, Math.min(xValue, xClipped));
   return {
     year: 62 + Math.floor(months / 12),
     month: months % 12
@@ -244,7 +244,7 @@ AgeChart.prototype.renderAgePoint = function(years, months) {
     ageYears: years,
     ageMonths: months,
     x: years * 12 + months,
-    y: Math.floor(this.taxEngine_.benefitAtAge(years, months))
+    y: Math.round(this.taxEngine_.benefitAtAge(years, months))
   };
 
   // Add formatting to the text labels.

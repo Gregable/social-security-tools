@@ -96,7 +96,7 @@ BreakPointChart.prototype.canvasY = function(benefitY) {
  */
 BreakPointChart.prototype.earningsX = function(canvasX) {
   var xValue = Math.floor(
-      canvasX / this.chartWidth() * this.maxRenderedXDollars());
+      Math.max(0, canvasX / this.chartWidth()) * this.maxRenderedXDollars());
   var xClipped = this.maxRenderedXDollars();
   return Math.min(xValue, xClipped);
 };
@@ -113,7 +113,7 @@ BreakPointChart.prototype.maxRenderedXDollars = function() {
   var breakpoint_min = this.taxEngine_.secondBendPoint() * 1.25;
   // 2) Show the user's current earnings with some space on either side
   //    so that they can explore the graph to either direction.
-  var user_min = this.taxEngine_.yearlyIndexedEarnings() * 2;
+  var user_min = this.taxEngine_.monthlyIndexedEarnings * 2;
 
   var computed = Math.max(breakpoint_min, user_min);
 
@@ -134,7 +134,7 @@ BreakPointChart.prototype.maxRenderedXDollars = function() {
  * @return {Number}
  */
 BreakPointChart.prototype.maxRenderedYDollars = function() {
-  return this.taxEngine_.estimatedFullBenefitForEarnings(
+  return this.taxEngine_.primaryInsuranceAmountForEarnings(
       this.maxRenderedXDollars());
 };
 
@@ -192,17 +192,17 @@ BreakPointChart.prototype.renderBreakPoints = function() {
 
   // Origin to first bend point
   dollarX = this.taxEngine_.firstBendPoint();
-  dollarY = this.taxEngine_.estimatedFullBenefitForEarnings(dollarX);
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
   this.lineTo(dollarX, dollarY);
 
   // First to second bend point
   dollarX = this.taxEngine_.secondBendPoint();
-  dollarY = this.taxEngine_.estimatedFullBenefitForEarnings(dollarX);
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
   this.lineTo(dollarX, dollarY);
 
   // Second to third bend point
   dollarX = this.maxRenderedXDollars();
-  dollarY = this.taxEngine_.estimatedFullBenefitForEarnings(dollarX);
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
   this.lineTo(dollarX, dollarY);
 
   this.context_.stroke();
@@ -279,7 +279,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   // Where on the breakpoint 'curve' the user's benefit values lie.
   var userSSA = {
     x: Math.floor(earningsX),
-    y: Math.floor(this.taxEngine_.estimatedFullBenefitForEarnings(earningsX)),
+    y: Math.floor(this.taxEngine_.primaryInsuranceAmountForEarnings(earningsX)),
   };
 
   // Add dollar sign and commas for better looking formatting.
@@ -357,7 +357,7 @@ BreakPointChart.prototype.render = function() {
   this.renderBreakPoints();
   this.context_.strokeStyle = '#5cb85c';
 
-  this.renderEarningsPoint(this.taxEngine_.yearlyIndexedEarnings());
+  this.renderEarningsPoint(this.taxEngine_.monthlyIndexedEarnings);
 
   this.context_.restore();
 };

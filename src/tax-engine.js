@@ -30,6 +30,7 @@ function TaxEngine() {
   this.earningsRecords = [];
   this.cutoffIndexedEarnings = 0;
   this.totalIndexedEarnings = 0;
+  this.monthlyIndexedEarnings = 0;
   this.futureEarningsYears = 0;
   this.futureEarningsWage = 0;
 
@@ -201,8 +202,12 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
     this.totalIndexedEarnings += allIndexedValues[i];
   }
 
+  // SSA floors the monthly indexed earnings value. This floored value
+  // is the basis for all following calculations. So, if you want to consider
+  // your anual insurance amount, it's computed based on monthly values, ie:
+  // 12 * floor(totalIndexedEarnings / 12)
   this.monthlyIndexedEarnings =
-    this.totalIndexedEarnings / 12 / SSA_EARNINGS_YEARS;
+    Math.floor(this.totalIndexedEarnings / 12 / SSA_EARNINGS_YEARS);
 };
 
 
@@ -231,35 +236,35 @@ TaxEngine.prototype.yearlyIndexedEarnings = function() {
 };
 
 /**
- * Returns the first annual bend point in the PIA formula.
+ * Returns the first monthly bend point in the PIA formula.
  * @return {number} first annual bend point dollar amount
  */
 TaxEngine.prototype.firstBendPoint = function() {
   const wage_in_1977 = WAGE_INDICES[1977]; 
   const wage = WAGE_INDICES[this.indexingYear()];
   const multiplier = wage / wage_in_1977;
-  return Math.round(BENDPOINT1_IN_1977 * multiplier) * 12;
+  return Math.round(BENDPOINT1_IN_1977 * multiplier);
 }
 
 /**
- * Returns the second annual bend point in the PIA formula.
+ * Returns the second monthly bend point in the PIA formula.
  * @return {number} second annual bend point dollar amount
  */
 TaxEngine.prototype.secondBendPoint = function() {
   const wage_in_1977 = WAGE_INDICES[1977];
   const wage = WAGE_INDICES[this.indexingYear()];
   const multiplier = wage / wage_in_1977;
-  return Math.round(BENDPOINT2_IN_1977 * multiplier) * 12;
+  return Math.round(BENDPOINT2_IN_1977 * multiplier);
 }
 
 /**
- * Returns the yearly benefit for a specific breakpoint bracket for any
- * yearly indexed earnings.
- * @param {number} earnings yearly indexed earnings to compute
+ * Returns the PIA component for a specific breakpoint bracket for any
+ * monthly indexed earnings.
+ * @param {number} earnings monthly indexed earnings to compute
  * @param {number} bracket Must be 0, 1 or 2
  * @return {number} benefit in that bracket for this earnings.
  */
-TaxEngine.prototype.estimatedBenefitForEarningsByBracket =
+TaxEngine.prototype.primaryInsuranceAmountForEarningsByBracket =
     function(earnings, bracket) {
   earnings = Math.round(earnings);
   if (bracket === 0) {
@@ -279,34 +284,47 @@ TaxEngine.prototype.estimatedBenefitForEarningsByBracket =
 };
 
 /**
- * Returns the total annual fill benefit summed across all benefit brackets.
- * @param {number} earnings yearly indexed earnings to compute
+ * Returns the total monthly full benefit summed across all benefit brackets.
+ * @param {number} earnings monthly indexed earnings to compute
  * @return {number} annual benefit across all benefit brackets.
  */
-TaxEngine.prototype.estimatedFullBenefitForEarnings = function(earnings) {
+TaxEngine.prototype.primaryInsuranceAmountForEarnings = function(earnings) {
   var sum = 0;
   for (var i = 0; i < 3; ++i)
-    sum += this.estimatedBenefitForEarningsByBracket(earnings, i);
-  return sum;
+    sum += this.primaryInsuranceAmountForEarningsByBracket(earnings, i);
+  // Primary Insurance amounts are always rounded down the the nearest dime.
+  // Who decided this was an important step?
+  return Math.floor(sum * 10) / 10;
 };
 
 /**
- * Returns the yearly benefit for a specific breakpoint bracket for this
- * user's yearly indexed earnings.
+ * Returns the PIA component a specific breakpoint bracket for this
+ * user's monthly indexed earnings.
  * @param {number} bracket Must be 0, 1, or 2
  * @return {number} benefit in that bracket.
  */
-TaxEngine.prototype.estimatedBenefitByBracket = function(bracket) {
-  return this.estimatedBenefitForEarningsByBracket(
-      this.yearlyIndexedEarnings(), bracket);
+TaxEngine.prototype.primaryInsuranceAmountByBracket = function(bracket) {
+  return this.primaryInsuranceAmountForEarningsByBracket(
+      this.monthlyIndexedEarnings, bracket);
 };
 
 /**
- * Returns the total annual full benefit summed across all benefit brackets.
- * @return {number} annual benefit across all benefit brackets.
+ * Returns the primary insurance amount (monthly benefit) summed across all
+ * benefit brackets.
+ * @return {number} primary insurance amount
  */
-TaxEngine.prototype.estimatedFullBenefit = function() {
-  return this.estimatedFullBenefitForEarnings(this.yearlyIndexedEarnings());
+TaxEngine.prototype.primaryInsuranceAmount = function() {
+  return this.primaryInsuranceAmountForEarnings(this.monthlyIndexedEarnings);
+};
+
+/**
+ * Returns the primary insurance amount floored. This is the actual payment
+ * amount if paid out.
+ * @return {number} floored primary insurance amount
+ */
+TaxEngine.prototype.primaryInsuranceAmountFloored = function() {
+  return Math.floor(
+      this.primaryInsuranceAmountForEarnings(this.monthlyIndexedEarnings));
 };
 
 /**
@@ -369,7 +387,7 @@ TaxEngine.prototype.benefitMultiplierAtAge = function(year, month) {
  * @return {number}
  */
 TaxEngine.prototype.benefitAtAge = function(year, month) {
-  return this.estimatedFullBenefitForEarnings(this.yearlyIndexedEarnings()) *
+  return this.primaryInsuranceAmountFloored() *
     (1 + this.benefitMultiplierAtAge(year, month));
 };
 

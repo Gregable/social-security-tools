@@ -10,8 +10,8 @@
   </p>
 
   <p>
-    Your annual indexed earnings is calculated as your total indexed earnings
-    divided by 35.
+    Your monthly indexed earnings is calculated as your total indexed earnings
+    divided by 35 years divided by 12 months.
     <span ng-if="taxEngine.numEarningsYears() >= 35">
       This is your average indexed earnings in the top 35 years.
     </span>
@@ -21,46 +21,63 @@
     </span>
   </p>
   <p>
-    Annual indexed earnings: 
-    <b>${{taxEngine.totalIndexedEarnings | number}}</b> / 35 = 
-    <b>${{taxEngine.yearlyIndexedEarnings() | number:0}}</b>
+    Monthly indexed earnings:
+    <b>${{taxEngine.totalIndexedEarnings | number}}</b> / 35 / 12 =
+    <b>${{taxEngine.monthlyIndexedEarnings | number:0}}</b>
   </p>
   <p>
-    Your primary insurance amount is based on your annual indexed earnings 
+    Your primary insurance amount is based on your monthly indexed earnings 
     using a formula that increases as your earnings increases, but increases
     more slowly for higher total earnings. Your primary insurance amount is
-    calculated from your annual indexed earnings as follows:
+    calculated from your monthly indexed earnings as follows:
   </p>
   <p>
    <table class=benefitBrackets>
     <tr>
      <td>Amount less than ${{taxEngine.firstBendPoint() | number: 0}}
           multiplied by 90%:</td>
-     <td><b>${{taxEngine.estimatedBenefitByBracket(0) | number:2}}</b></td>
+     <td>
+       <b>
+         ${{taxEngine.primaryInsuranceAmountByBracket(0) | number:2}}
+       </b>
+     </td>
      <td></td>
     </tr>
     <tr>
      <td>Amount more than ${{taxEngine.firstBendPoint() | number: 0}}
          and less than ${{taxEngine.secondBendPoint() | number: 0}}
          multiplied by 32%:</td>
-     <td><b>${{taxEngine.estimatedBenefitByBracket(1) | number:2}}</b></td>
+     <td>
+       <b>
+         ${{taxEngine.primaryInsuranceAmountByBracket(1) | number:2}}
+       </b>
+     </td>
      <td></td>
     <tr>
     </tr>
     <td>Amount more than ${{taxEngine.secondBendPoint() | number: 0}}
         multiplied by 15%:</td>
-     <td><b>${{taxEngine.estimatedBenefitByBracket(2) | number:2}}</b></td>
+     <td>
+       <b>
+         ${{taxEngine.primaryInsuranceAmountByBracket(2) | number:2}}
+       </b>
+     </td>
      <td></td>
     </tr>
     </tr>
-     <td>Total:</td>
-     <td><b>${{taxEngine.estimatedFullBenefit() | number:2}}</b></td>
+     <td rowspan=2>Total:</td>
+     <td><b>${{taxEngine.primaryInsuranceAmount() | number:2}}</b></td>
+     <td>/ month</td>
+    </tr>
+    </tr>
+     <td><b>${{taxEngine.primaryInsuranceAmount() * 12 | number:2}}</b></td>
      <td>/ year</td>
     </tr>
     </table>  
   </p>
   <p>
-    This total (<b>${{taxEngine.estimatedFullBenefit() | number:2}}</b>) is
+    This total
+    (<b>${{taxEngine.primaryInsuranceAmount() | number:2}}</b> / month) is
     your primary insurance amount. In the chart below, you can see what your
     benefit would be if your indexed earnings were to increase. Move your mouse
     over the chart to watch how the earnings change.
@@ -78,17 +95,18 @@
   </canvas>
 
   <div class="chart-xlabel">
-    Annual Indexed Earnings
+    Monthly Indexed Earnings
   </div>
 
   </div>
 
   <h2>Normal Retirement Age</h2>
   <p>
-    Your yearly benefit of
-    <b>${{taxEngine.estimatedFullBenefit() | number:2}}</b> is the benefit
-    you will earn if you retire at your <u>normal retirement age</u> (NRA).
-    Normal Retirement Age is between 65 and 67, depending on when you were born.
+    Your primary insurance amount of
+    <b>${{taxEngine.primaryInsuranceAmountFloored() | number:0}}</b> / month
+    is the benefit you will earn if you retire at your
+    <u>normal retirement age</u> (NRA). Normal Retirement Age is between 65
+    and 67, depending on when you were born.
   </p>
 
   <p>
@@ -144,8 +162,17 @@
     {{taxEngine.fullRetirementDate.year}}</b>.
   </p>
   <p>
-    If you start then, your benefit will be the primary insurance amount:
-    <b>${{taxEngine.estimatedFullBenefit() | number:2}}</b> / year.
+    If you start then, your benefit will be the primary insurance amount,
+    rounded down:
+    <ul>
+      <li>
+        <b>${{taxEngine.primaryInsuranceAmountFloored() | number}}</b> / month
+      </li>
+      <li>
+        <b>${{taxEngine.primaryInsuranceAmountFloored() * 12 | number}}</b>
+        / year
+      </li>
+    </ul>
   </p>
   <p>
     You can also begin taking benefits as early as 62 years old
@@ -191,16 +218,21 @@
     you delay.
   </p>
   <p>
-    For a few examples, here's how much your annual benefit would be at
-    different starting ages:
+    For a few examples, here's how much your benefit would be at different
+    starting ages:
   </p>
   <table class=fancy-table>
     <thead>
       <tr>
+        <th colspan=3></th>
+        <th colspan=2>Benefit</th>
+      </tr>
+      <tr>
         <th id="age">Age</th>
         <th id="date">Date</th>
         <th id="adjustment">Adjustment</th>
-        <th id="benefit">Annual Benefit</th>
+        <th id="monthlybenefit">monthly</th>
+        <th id="annualbenefit">yearly</th>
       </tr>
     </thead> 
     <tbody>
@@ -213,8 +245,11 @@
         <td headers="adjustment">
           {{taxEngine.benefitMultiplierAtAge(age, 0) * 100 | number:2}}%
         </td>
-        <td headers="benefit">
+        <td headers="monthlybenefit">
           ${{taxEngine.benefitAtAge(age, 0) | number:0}}
+        </td>
+        <td headers="annualbenefit">
+          ${{taxEngine.benefitAtAge(age, 0) * 12 | number:0}}
         </td>
       </tr>
     </tbody>
@@ -230,7 +265,7 @@
 
   <div class="chart-container">
     <div class="chart-ylabel">
-      <span class="vertical-text">Adjusted Annual Benefit</span>
+      <span class="vertical-text">Adjusted Benefit</span>
     </div>
 
     <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
