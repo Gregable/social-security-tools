@@ -188,7 +188,8 @@ TaxEngine.prototype.processIndexedEarnings_ = function() {
 
   for (var i = 0; i < this.earningsRecords.length; ++i) {
     var earningRecord = this.earningsRecords[i];
-    if (earningRecord.indexedEarning() >= this.cutoffIndexedEarnings) {
+    if (earningRecord.indexedEarning() >= this.cutoffIndexedEarnings &&
+        earningRecord.taxedEarnings > 0) {
       earningRecord.isTopEarningYear = true;
     } else {
       earningRecord.isTopEarningYear = false;
