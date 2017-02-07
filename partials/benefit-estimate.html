@@ -2,7 +2,7 @@
      ng-show="showReport()" ng-cloak>
   <p>
    Currently, your total indexed earnings:
-    <b>${{taxEngine.totalIndexedEarnings | number}}</b>
+    <b>${{taxEngine.totalIndexedEarnings | number:0}}</b>
   </p>
   </p>
     This is simply the sum of the highest 35 values in the indexed earnings
