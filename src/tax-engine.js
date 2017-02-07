@@ -18,7 +18,7 @@ function TaxRecord() {
  */
 TaxRecord.prototype.indexedEarning = function() {
   var cappedEarning = Math.min(this.earningsCap, this.taxedEarnings);
-  return Math.floor(cappedEarning * this.indexFactor);
+  return Math.round(100 * cappedEarning * this.indexFactor) / 100;
 };
 
 /**
