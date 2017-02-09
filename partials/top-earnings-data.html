@@ -36,10 +36,16 @@
     The top 35 <u>indexed earnings</u> values will be used in the calculation of
     your primary insurance amount. Indexed earnings are simply the payroll
     wages you earned in a year multiplied by a number that adjusts for
-    wage growth (similar to adjusting for inflation). As you don't have 35
-    years of earnings yet, every additional year you work will increase your
-    benefit a little more. Once you reach 35 years of earnings values,
-    increasing your primary insurance amount requires earning more than
-    previous years' indexed values.
+    wage growth. As you don't have 35 years of earnings yet, every additional
+    year you work will increase your benefit a little more. Once you reach 35
+    years of earnings values, increasing your primary insurance amount requires
+    earning more than previous years' indexed values.
+  </p>
+  
+  <p ng-if="!taxEngine.isOver60()">
+    The multipliers in the above table will increase every year until you
+    attain age 60. The increase is determined by US wage growth. Your 
+    <u>indexed earnings</u> in a year will always be equivalent to modern
+    wages.
   </p>
 </div>

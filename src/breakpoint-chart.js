@@ -113,7 +113,7 @@ BreakPointChart.prototype.maxRenderedXDollars = function() {
   var breakpoint_min = this.taxEngine_.secondBendPoint() * 1.25;
   // 2) Show the user's current earnings with some space on either side
   //    so that they can explore the graph to either direction.
-  var user_min = this.taxEngine_.monthlyIndexedEarnings * 2;
+  var user_min = this.taxEngine_.primaryInsuranceAmount() * 2;
 
   var computed = Math.max(breakpoint_min, user_min);
 

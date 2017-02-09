@@ -424,7 +424,7 @@ table.benefitBrackets tr td:nth-last-child(2) {
   text-align: right;
   padding-right: 0px;
 }
-table.benefitBrackets tr:nth-last-child(2) td:nth-child(2) {
+table.benefitBrackets tr:last-child td:nth-child(2) {
   border-top: 1px solid;
 }
 

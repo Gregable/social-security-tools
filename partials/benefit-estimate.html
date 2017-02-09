@@ -65,22 +65,39 @@
      <td></td>
     </tr>
     </tr>
-     <td rowspan=2>Total:</td>
-     <td><b>${{taxEngine.primaryInsuranceAmount() | number:2}}</b></td>
+     <td>Total:</td>
+     <td>
+       <b>${{taxEngine.primaryInsuranceAmountUnadjusted() | number:2}}</b>
+     </td>
      <td>/ month</td>
-    </tr>
-    </tr>
-     <td><b>${{taxEngine.primaryInsuranceAmount() * 12 | number:2}}</b></td>
-     <td>/ year</td>
     </tr>
     </table>  
   </p>
+  <div ng-if="taxEngine.shouldAdjustForCOLA()">
+    <p>
+      After attaining age 62, your primary insurance amount will increase
+      annually in proportion to the consumer price index, a measure of
+      inflation. This will continue every year, even after beginning
+      to collect your benefit. These adjustments are called 
+      <u>Cost of Living Adjustments</u> (COLA). Below we show you the
+      adjustments in past years affecting your current primary insurance
+      amount.
+    </p>
+    <ul>
+      <li ng-repeat="adjustment in taxEngine.colaAdjustments() | orderBy : adjustment.year">
+        {{adjustment.year}}: <b>{{adjustment.start | number:2}}</b>
+        increased by {{adjustment.cola | number:1 }}% =
+        <b>{{adjustment.end | number:2}}</b>
+      </li>
+    </ul>
+  </div>
   <p>
     This total
     (<b>${{taxEngine.primaryInsuranceAmount() | number:2}}</b> / month) is
     your primary insurance amount. In the chart below, you can see what your
-    benefit would be if your indexed earnings were to increase. Move your mouse
-    over the chart to watch how the earnings change.
+    primary insurance amount would be if your indexed earnings were to
+    increase. Move your mouse over the chart to watch how the primary insurance
+    amount changes.
   </p>
 
   <div class="chart-container">
