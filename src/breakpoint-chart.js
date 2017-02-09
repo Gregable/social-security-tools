@@ -107,7 +107,6 @@ BreakPointChart.prototype.earningsX = function(canvasX) {
  * Selects an x and y-coordinate (in dollars) as the top-right edge.
  */
 BreakPointChart.prototype.recomputeBounds = function() {
-  console.log('recomputeBounds');
   // There are a few goals here when selecting this value:
   // 1) Show all of the breakpoints so the user can get a feel visually
   //    for how these breakpoints affect the computation.
@@ -269,7 +268,6 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
   pixelY = this.canvasY(dollarY);
   // If this is too close to the top of the chart, flip it to below the line.
-  console.log(this.canvasY(dollarY));
   if (pixelY < 100)
     pixelY += 20;
   this.context_.translate(
