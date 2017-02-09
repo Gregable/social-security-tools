@@ -4,7 +4,9 @@
  */
 function BreakPointChart() {
   this.canvas_ = null;
+  this.taxEngine_ = null;
   this.lastRenderedXDollars = -1;
+  this.maxRenderedXDollars = -1;
 }
 
 /**
@@ -71,7 +73,7 @@ BreakPointChart.prototype.chartHeight = function() {
  */
 BreakPointChart.prototype.canvasX = function(earningsX) {
   var xValue = Math.floor(
-      earningsX / this.maxRenderedXDollars() * this.chartWidth());
+      earningsX / this.maxRenderedXDollars * this.chartWidth());
   var xClipped = Math.min(xValue, this.chartWidth());
   return xClipped;
 };
@@ -83,7 +85,7 @@ BreakPointChart.prototype.canvasX = function(earningsX) {
  */
 BreakPointChart.prototype.canvasY = function(benefitY) {
   var yValue = this.chartHeight() -
-      Math.floor(benefitY / this.maxRenderedYDollars() * this.chartHeight());
+      Math.floor(benefitY / this.maxRenderedYDollars * this.chartHeight());
   var yClipped = Math.min(yValue, this.chartHeight());
   return yClipped;
 };
@@ -96,24 +98,22 @@ BreakPointChart.prototype.canvasY = function(benefitY) {
  */
 BreakPointChart.prototype.earningsX = function(canvasX) {
   var xValue = Math.floor(
-      Math.max(0, canvasX / this.chartWidth()) * this.maxRenderedXDollars());
-  var xClipped = this.maxRenderedXDollars();
+      Math.max(0, canvasX / this.chartWidth()) * this.maxRenderedXDollars);
+  var xClipped = this.maxRenderedXDollars;
   return Math.min(xValue, xClipped);
 };
 
 /**
- * Selects a x-coordinate (in dollars) to be the rightmost edge
- * of our chart.
- * @return {Number}
+ * Selects an x and y-coordinate (in dollars) as the top-right edge.
  */
-BreakPointChart.prototype.maxRenderedXDollars = function() {
+BreakPointChart.prototype.recomputeBounds = function() {
   // There are a few goals here when selecting this value:
   // 1) Show all of the breakpoints so the user can get a feel visually
   //    for how these breakpoints affect the computation.
   var breakpoint_min = this.taxEngine_.secondBendPoint() * 1.25;
   // 2) Show the user's current earnings with some space on either side
   //    so that they can explore the graph to either direction.
-  var user_min = this.taxEngine_.primaryInsuranceAmount() * 2;
+  var user_min = this.taxEngine_.monthlyIndexedEarnings * 2;
 
   var computed = Math.max(breakpoint_min, user_min);
 
@@ -125,18 +125,11 @@ BreakPointChart.prototype.maxRenderedXDollars = function() {
       this.lastRenderedXDollars < computed / 1.3)
    this.lastRenderedXDollars = computed;
 
-  return this.lastRenderedXDollars;
-};
-
-/**
- * Selects a y-coordinate (in dollars) to be the topmost edge
- * of our chart.
- * @return {Number}
- */
-BreakPointChart.prototype.maxRenderedYDollars = function() {
-  return this.taxEngine_.primaryInsuranceAmountForEarnings(
-      this.maxRenderedXDollars());
-};
+  this.maxRenderedXDollars = this.lastRenderedXDollars;
+  
+  this.maxRenderedYDollars = this.taxEngine_.primaryInsuranceAmountForEarnings(
+      this.maxRenderedXDollars);
+}
 
 /**
  * Utility method which walls lineTo on this.canvas_ after transforming
@@ -162,14 +155,16 @@ BreakPointChart.prototype.moveTo = function(dollarX, dollarY) {
  *  Render the bounding box for our chart.
  */
 BreakPointChart.prototype.renderBoundingBox = function() {
+  this.recomputeBounds();
+
   this.context_.save();
   this.context_.lineWidth = 1;
 
   this.context_.beginPath();
   this.moveTo(0, 0);
-  this.lineTo(0, this.maxRenderedYDollars());
-  this.lineTo(this.maxRenderedXDollars(), this.maxRenderedYDollars());
-  this.lineTo(this.maxRenderedXDollars(), 0);
+  this.lineTo(0, this.maxRenderedYDollars);
+  this.lineTo(this.maxRenderedXDollars, this.maxRenderedYDollars);
+  this.lineTo(this.maxRenderedXDollars, 0);
   this.lineTo(0, 0);
   this.context_.stroke();
 
@@ -201,11 +196,85 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.lineTo(dollarX, dollarY);
 
   // Second to third bend point
-  dollarX = this.maxRenderedXDollars();
+  dollarX = this.maxRenderedXDollars;
   dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
   this.lineTo(dollarX, dollarY);
 
   this.context_.stroke();
+  this.context_.restore();
+
+
+  // Now lets show vertical bars indicating where the breakpoints live.
+  this.context_.save();
+
+  // Line between 1st and 2nd breakpoints:
+  this.context_.beginPath();
+  this.context_.lineWidth = 0.5;
+  dollarX = this.taxEngine_.firstBendPoint();
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  this.moveTo(dollarX, dollarY - 200);
+  this.lineTo(dollarX, dollarY + 200);
+  this.context_.stroke();
+
+  // Line between 2nd and 3rd breakpoints:
+  this.context_.beginPath();
+  this.context_.lineWidth = 0.5;
+  dollarX = this.taxEngine_.secondBendPoint();
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  this.moveTo(dollarX, dollarY - 200);
+  this.lineTo(dollarX, dollarY + 200);
+  this.context_.stroke();
+
+  // Some text indicating the slope of the curve along each section delineated
+  // by the vertical bars above.
+  const textWidth = this.context_.measureText('XX%').width / 2;
+  this.context_.fillStyle = '#78B'
+
+  // Compute the angle at which the chart dimensions are distoring slopes.
+  const chartAngle = (this.chartHeight() / this.chartWidth() *
+      this.maxRenderedXDollars / this.maxRenderedYDollars);
+  this.context_.fillText('32%', 0, 0);
+
+  this.context_.save();
+  dollarX = this.taxEngine_.firstBendPoint() / 2;
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  this.context_.translate(
+      this.canvasX(dollarX) - textWidth,
+      this.canvasY(dollarY));
+  // For very high earners, the space for this text can get pretty cramped,
+  // so we simply don't show it in this case.
+  if (this.canvasX(dollarX) - this.canvasX(0) > textWidth + 5) {
+    this.context_.rotate(-1 * Math.atan(.90 * chartAngle));
+    this.context_.fillText('90%', 0, 0);
+  }
+  this.context_.restore();
+
+  this.context_.save();
+  dollarX = (
+      ((this.taxEngine_.secondBendPoint() - this.taxEngine_.firstBendPoint())
+       / 2) + this.taxEngine_.firstBendPoint()),
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  this.context_.translate(
+      this.canvasX(dollarX) - textWidth,
+      this.canvasY(dollarY));
+  this.context_.rotate(-1 * Math.atan(.32 * chartAngle));
+  this.context_.fillText('32%', 0, 0);
+  this.context_.restore();
+
+  this.context_.save();
+  dollarX = (
+      ((this.maxRenderedXDollars - this.taxEngine_.secondBendPoint()) / 2) +
+       this.taxEngine_.secondBendPoint()),
+  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  pixelY = this.canvasY(dollarY);
+  // If this is too close to the top of the chart, flip it to below the line.
+  if (pixelY < 100)
+    pixelY += 20;
+  this.context_.translate(
+      this.canvasX(dollarX) - textWidth, pixelY);
+  this.context_.rotate(-1 * Math.atan(.15 * chartAngle));
+  this.context_.fillText('15%', 0, 0);
+  this.context_.restore();
 
   this.context_.restore();
 };
@@ -300,7 +369,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   
   this.context_.beginPath();
   this.moveTo(userSSA.x, userSSA.y);
-  this.lineTo(this.maxRenderedXDollars(), userSSA.y);
+  this.lineTo(this.maxRenderedXDollars, userSSA.y);
   this.context_.stroke();
 
   // White filled circle with black edge showing the user benefit point.
@@ -327,7 +396,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
                   this.context_.measureText(userSSA.xText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
   // Chip on the right edge
-  this.roundedBox(this.canvasX(this.maxRenderedXDollars()) + 1,
+  this.roundedBox(this.canvasX(this.maxRenderedXDollars) + 1,
                   this.canvasY(userSSA.y),
                   this.context_.measureText(userSSA.yText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
@@ -339,7 +408,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
       this.canvasY(0) + 15);
   this.context_.fillText(  // Text on the right edge.
       userSSA.yText, 
-      this.canvasX(this.maxRenderedXDollars()) + 3,
+      this.canvasX(this.maxRenderedXDollars) + 3,
       this.canvasY(userSSA.y) + 15);
 
   this.context_.restore();
