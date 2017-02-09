@@ -401,7 +401,6 @@ TaxEngine.prototype.primaryInsuranceAmount = function() {
  * @return {number} primary insurance amount
  */
 TaxEngine.prototype.primaryInsuranceAmountForEarnings = function(earnings) {
-  console.log(earnings);
   var colaAdjustment = 1.0;
   var adjusted = this.primaryInsuranceAmountForEarningsUnadjusted(earnings);
   for (var year of this.colaAdjustmentYears()) {
