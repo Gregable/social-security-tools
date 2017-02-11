@@ -1,121 +1,5 @@
 <div id=benefitEstimate class="benefit-estimate fixed-center-column"
      ng-show="showReport()" ng-cloak>
-  <p>
-   Currently, your total indexed earnings:
-    <b>${{taxEngine.totalIndexedEarnings | number:0}}</b>
-  </p>
-  </p>
-    This is simply the sum of the highest 35 values in the indexed earnings
-    column above.
-  </p>
-
-  <p>
-    Your monthly indexed earnings is calculated as your total indexed earnings
-    divided by 35 years divided by 12 months.
-    <span ng-if="taxEngine.numEarningsYears() >= 35">
-      This is your average indexed earnings in the top 35 years.
-    </span>
-    <span ng-if="taxEngine.numEarningsYears() < 35">
-      If you had 35 years of earnings, this would be your average indexed
-      earnings.
-    </span>
-  </p>
-  <p>
-    Monthly indexed earnings:
-    <b>${{taxEngine.totalIndexedEarnings | number}}</b> / 35 / 12 =
-    <b>${{taxEngine.monthlyIndexedEarnings | number:0}}</b>
-  </p>
-  <p>
-    Your primary insurance amount is based on your monthly indexed earnings 
-    using a formula that increases as your earnings increases, but increases
-    more slowly for higher total earnings. Your primary insurance amount is
-    calculated from your monthly indexed earnings as follows:
-  </p>
-  <p>
-   <table class=benefitBrackets>
-    <tr>
-     <td>Amount less than ${{taxEngine.firstBendPoint() | number: 0}}
-          multiplied by 90%:</td>
-     <td>
-       <b>
-         ${{taxEngine.primaryInsuranceAmountByBracket(0) | number:2}}
-       </b>
-     </td>
-     <td></td>
-    </tr>
-    <tr>
-     <td>Amount more than ${{taxEngine.firstBendPoint() | number: 0}}
-         and less than ${{taxEngine.secondBendPoint() | number: 0}}
-         multiplied by 32%:</td>
-     <td>
-       <b>
-         ${{taxEngine.primaryInsuranceAmountByBracket(1) | number:2}}
-       </b>
-     </td>
-     <td></td>
-    <tr>
-    </tr>
-    <td>Amount more than ${{taxEngine.secondBendPoint() | number: 0}}
-        multiplied by 15%:</td>
-     <td>
-       <b>
-         ${{taxEngine.primaryInsuranceAmountByBracket(2) | number:2}}
-       </b>
-     </td>
-     <td></td>
-    </tr>
-    </tr>
-     <td>Total:</td>
-     <td>
-       <b>${{taxEngine.primaryInsuranceAmountUnadjusted() | number:2}}</b>
-     </td>
-     <td>/ month</td>
-    </tr>
-    </table>  
-  </p>
-  <div ng-if="taxEngine.shouldAdjustForCOLA()">
-    <p>
-      After attaining age 62, your primary insurance amount will increase
-      annually in proportion to the consumer price index, a measure of
-      inflation. This will continue every year, even after beginning
-      to collect your benefit. These adjustments are called 
-      <u>Cost of Living Adjustments</u> (COLA). Below we show you the
-      adjustments in past years affecting your current primary insurance
-      amount.
-    </p>
-    <ul>
-      <li ng-repeat="adjustment in taxEngine.colaAdjustments() | orderBy : adjustment.year">
-        {{adjustment.year}}: <b>{{adjustment.start | number:2}}</b>
-        increased by {{adjustment.cola | number:1 }}% =
-        <b>{{adjustment.end | number:2}}</b>
-      </li>
-    </ul>
-  </div>
-  <p>
-    This total
-    (<b>${{taxEngine.primaryInsuranceAmount() | number:2}}</b> / month) is
-    your primary insurance amount. In the chart below, you can see what your
-    primary insurance amount would be if your indexed earnings were to
-    increase. Move your mouse over the chart to watch how the primary insurance
-    amount changes.
-  </p>
-
-  <div class="chart-container">
-
-  <div class="chart-ylabel">
-    <span class="vertical-text">Primary Insurance Amount</span>
-  </div>
-
-  <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
-  <canvas id="breakpoint-chart-canvas" width=600 height=400>
-    Your browser does not support HTML canvas.
-  </canvas>
-
-  <div class="chart-xlabel">
-    Monthly Indexed Earnings
-  </div>
-
-  </div>
 
   <h2>Normal Retirement Age</h2>
   <p>
@@ -191,6 +75,8 @@
       </li>
     </ul>
   </p>
+
+  <h2>Early and Delated Retirement</h2>
   <p>
     You can also begin taking benefits as early as 62 years old
     (<b>{{taxEngine.dateAtAge(62, 0).month}}
@@ -198,7 +84,7 @@
     wait until as late as 70 years old
     (<b>{{taxEngine.dateAtAge(70, 0).month}}
         {{taxEngine.dateAtAge(70, 0).year}}</b>),
-    or start anywhere in between. The longer you wait, the higher your
+    or start any month in between. The longer you wait, the higher your
     actual benefit will be.
   </p>
   <p>
