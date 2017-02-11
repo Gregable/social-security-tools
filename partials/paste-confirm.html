@@ -1,0 +1,49 @@
+<div id="earningsTable" class="earnings-paste"
+     ng-show="showPasteConfirmation()">
+  <div id="earningsConfirmation">
+    <p>Is this the same table you copied from ssa.gov?</p>
+    
+    <button ng-click="confirmEarningsParse('correct')" class=success>
+      <ico>&#10003;</ico> Yes
+    </button>
+    <button ng-click="confirmEarningsParse('incorrect')" class=failure>
+      <ico>&#128078;</ico> No
+    </button>
+  </div>
+
+  <table class="earnings-record-table">
+    <thead>
+      <tr>
+        <th id="pasteworkyear">Work Year</th>
+        <th id="pastessataxedearnings">Taxed Social Security Earnings</th>
+        <th id="pastetaxedmedicare">Taxed Medicare Earnings</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="earningRecord in earningsRecords() | orderBy:'-'">
+        <td headers="pasteworkyear">{{earningRecord.year}}</td>
+        <td headers="pastetaxedearnings">
+          <span ng-show="earningRecord.taxedEarnings >= 0">
+            ${{earningRecord.taxedEarnings | number:0}}
+          </span>
+          <span ng-show="earningRecord.taxedEarnings < 0">
+            Not yet recorded
+          </span>
+        </td>
+        <td headers="pastetaxedmedicare">
+          <span ng-show="earningRecord.taxedMedicareEarnings >= 0">
+            ${{earningRecord.taxedMedicareEarnings | number:0}}
+          </span>
+          <span ng-show="earningRecord.taxedMedicareEarnings < 0">
+            Not yet recorded
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="earningsApology" class="earnings-paste" ng-show="showPasteApology()">
+  <p>Sorry about that, let's try again.</p>
+  <button ng-click="reset()" class=success>Click to restart.</button>
+</div>

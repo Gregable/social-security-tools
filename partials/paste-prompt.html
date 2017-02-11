@@ -1,0 +1,74 @@
+<div id="pastePrompt" ng-show="showPastePrompt()">
+  <div class="instructions">
+    <p>
+      To use the calculator, you must provide some data from your social
+      security record.<br>
+      If you aren't ready for that yet, select a demo data set at the
+      bottom of the page.
+    </p>
+       
+    <h1>How to retrieve <u>your</u> Social Security data:</h1>
+    <ol>
+      <li>
+        Login to 
+        <a target="_blank" href="https://secure.ssa.gov/RIL/SiView.do">ssa.gov</a>.
+        You may need to create an account if you haven't already.
+      </li>
+      <li>
+        Click to navigate to the "Earnings Record" page of the site.
+      </li>
+      <li>
+        Copy the earnings table. It should look similar to the example below,
+        with different numbers and years.
+        <img src="static/earnings-table-example.png" width=318 height=270>
+        You can select the table by dragging your mouse over the entire table to
+        select, or you can just use 'Control+A' to select the entire page.
+        Either way will work. Copy the text with 'Control+C'.
+      </li>
+      <li>
+        Return to this page, paste the result into the text area below.
+      </li>
+    </ol>
+  </div>
+
+  <div class="pastearea">
+    <textarea id=pastearea wrap=off ng-model="pasteArea.contents"
+              placeholder="{{pasteArea.placeholder}}"></textarea>
+    <p>
+      <span class=lock>&#x1f512;</span> Your data never leaves you own
+      computer: the report is generated entirely by JavaScript in your browser.
+    </p>
+  </div>
+  
+  <div class="instructions">
+    <h1>Try out some <u>demo</u> data instead:</h1>
+    <p>
+      If you aren't ready to take a look at your own social security data, you
+      can first play with some fictional account data.
+    </p>
+    <ul class=demos>
+      <li>
+        Retiree born in 1950, who earned the roughly average US wage.
+        <br>
+        <button ng-click="loadDemoData(0)">
+          <ico>&#x261b;</ico> Try the Demo
+        </button>
+      <li>
+        Retiree born in 1950 who earned the maximum social security wages
+        over five years, but nothing otherwise.
+        <br>
+        <button ng-click="loadDemoData(1)">
+          <ico>&#x261b;</ico> Try the Demo
+        </button>
+      </li>
+      <li>
+        Early career, born in 1985, $40k/year starting salary in 2005 with
+        4% annual raises.
+        <br>
+        <button ng-click="loadDemoData(2)">
+          <ico>&#x261b;</ico> Try the Demo
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>

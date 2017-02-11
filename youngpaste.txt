@@ -1,14 +1,6 @@
-# These numbers are taken from the following URLs:
-# https://www.socialsecurity.gov/oact/cola/AWI.html (pre 1990)
-# http://www.ssa.gov/oact/cola/central.html (1990 and later)
-#
-# They are roughly the average wage. I'm not sure why the two tables
-# differ, but the differences seem relatively small, so it should be
-# good enough for illustration purposes.
-# 
-# I selected 35 years so that we can use this to see what an average
-# wage earner in the US who worked their entire life can expect to
-# receive in social security benefits.
+# These numbers simulate a user who started earning wages in 2005
+# earning $40,000/yr and who recieved 4% wage increases every year
+# consistently.
 
 Work Year
 Taxed Social Security Earnings

@@ -165,13 +165,20 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    * specific to initializting them.
    */
   $scope.$on("$includeContentLoaded", function(event, templateName) {
-    if (templateName == 'partials/benefit-estimate.html') {
+    var tryRender = false;
+    if (templateName == 'partials/primary-insurance-amount.html') {
       $scope.breakPointChart_.setCanvas(
           document.getElementById('breakpoint-chart-canvas'));
+      tryRender = true;
+    }
+    if (templateName == 'partials/benefit-estimate.html') {
       $scope.ageChart_.setCanvas(
           document.getElementById('age-chart-canvas'));
-      $scope.maybeRenderCharts();
+      tryRender = true;
     }
+
+    if (tryRender)
+      $scope.maybeRenderCharts();
   });
 
   $scope.reset = function() {
