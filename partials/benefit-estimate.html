@@ -11,49 +11,6 @@
   </p>
 
   <p>
-    To determine your normal retirement age, as well as learn more about your
-    options on when you can begin taking benefits, adjust your birth month and
-    year below.
-  </p>
-
-  <h4>I was born in:</h4>
-
-  <div id=agePicker>
-    <div class=monthPicker>
-      <span ng-repeat="month in all_months | limitTo:6">
-       <input type=radio value="{{month}}" id="month-{{month}}"
-              class=radio ng-model="birth.month" ng-change="updateBirthdate()">
-        <label class="radio month" for="month-{{month}}">{{month}}</label>
-      </span>
-    </div>
-    <div class=monthPicker>
-      <span ng-repeat="month in all_months | limitTo:6:6">
-       <input type=radio value="{{month}}" id="month-{{month}}"
-              class=radio ng-model="birth.month" ng-change="updateBirthdate()">
-        <label class="radio month" for="month-{{month}}">{{month}}</label>
-      </span>
-    </div>
-    <div class=yearPicker>
-      <span ng-repeat="year in pastYears()">
-        <input type=radio id="year-{{year}}" value="{{year}}"
-               class=radio ng-model="birth.year" ng-change="updateBirthdate()">
-        <label class="radio year" for="year-{{year}}">{{year}}</label>
-      </span>
-    </div>
-  </div>
-  <br class=clear>
-  
-  <div ng-show="showOver60Warning()" class=flashnotify>
-    <p>
-      <u>Quick Note</u>: The multiplier for earnings in the year you turn 60
-      (<b>{{taxEngine.dateAtAge(60, 0).year}}</b>) and later years is
-      fixed to <b>1.0</b>. When you adjusted your age, this affected
-      your calculation of your indexed earnings at the top of the page.
-    </p>
-  </div>
-
-
-  <p>
     For those born in <b>{{birth.year}}</b>, normal retirement age is
     <b>{{taxEngine.fullRetirement.ageYears}} years and 
     {{taxEngine.fullRetirement.ageMonths}} months</b>.
@@ -62,9 +19,10 @@
     <b>{{taxEngine.fullRetirementDate.month}}, 
     {{taxEngine.fullRetirementDate.year}}</b>.
   </p>
+
   <p>
-    If you start then, your benefit will be the primary insurance amount,
-    rounded down:
+    If you start collecting benefits then, your benefit will be the primary
+    insurance amount, rounded down:
     <ul>
       <li>
         <b>${{taxEngine.primaryInsuranceAmountFloored() | number}}</b> / month
@@ -76,7 +34,7 @@
     </ul>
   </p>
 
-  <h2>Early and Delated Retirement</h2>
+  <h2>Early and Delayed Retirement</h2>
   <p>
     You can also begin taking benefits as early as 62 years old
     (<b>{{taxEngine.dateAtAge(62, 0).month}}

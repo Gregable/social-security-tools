@@ -1,6 +1,7 @@
-<div id="earningsTable" class="earnings-paste"
+<div id="earningsTable" class="confirmation-prompt"
      ng-show="showPasteConfirmation()">
-  <div id="earningsConfirmation">
+  <div class="confirmation-left">
+    <h3>Step 2 of 3: Confirm Earnings Record</h3>
     <p>Is this the same table you copied from ssa.gov?</p>
     
     <button ng-click="confirmEarningsParse('correct')" class=success>
@@ -43,7 +44,7 @@
   </table>
 </div>
 
-<div id="earningsApology" class="earnings-paste" ng-show="showPasteApology()">
+<div id="earningsApology" class="confirmation-prompt" ng-show="showPasteApology()">
   <p>Sorry about that, let's try again.</p>
   <button ng-click="reset()" class=success>Click to restart.</button>
 </div>

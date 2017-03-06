@@ -186,7 +186,7 @@ div.instructions li > img {
   margin-right: auto;
   display: block;
 }
-div.earnings-paste button {
+div.confirmation-prompt button {
   border: 0 none;
   border-radius: 36px;
   color: #fff;
@@ -215,19 +215,19 @@ ul.demos button > ico {
   font-size: 22px;
 }
 
-div.earnings-paste {
+div.confirmation-prompt {
   margin-top: 20px;
   margin-right: 60px;
   font-size: 18px;
 }
 
-div.earnings-paste > div#earningsConfirmation {
+div.confirmation-prompt > div.confirmation-left {
   float: left;
   margin: 0;
   margin-top: 60px;
   text-align: center;
 }
-div.earnings-paste button {
+div.confirmation-prompt button {
   border: 0 none;
   border-radius: 36px;
   color: #fff;
@@ -237,20 +237,20 @@ div.earnings-paste button {
   min-width: 110px;
   cursor: pointer;
 }
-div.earnings-paste button.success {
+div.confirmation-prompt button.success {
   background: #4ac15a;
 }
-div.earnings-paste button.failure {
+div.confirmation-prompt button.failure {
   background: #d9534f;
 }
-div.earnings-paste button.success:hover {
+div.confirmation-prompt button.success:hover {
   background: #2aa13a;
 }
-div.earnings-paste button.failure:hover {
+div.confirmation-prompt button.failure:hover {
   background: #b9332f;
 }
 
-div.earnings-paste button > ico {
+div.confirmation-prompt button > ico {
   font-weight: bold;
   font-size: 22px;
 }
@@ -469,6 +469,10 @@ div.fixed-center-column {
 }
 
 /* The Age Picker buttons are simply heavily CSS'ed radio buttons. */
+div#agePicker {
+  font-size: 14px;
+}
+
 div.monthPicker {
   max-width: 620px;
   display: -webkit-flex;
