@@ -1,0 +1,42 @@
+<div id="ageRequest" class="confirmation-prompt"
+     ng-show="showAgeRequest()">
+  <div>
+    <h3>Step 3 of 3: Select Birthdate Month and Year</h3>
+    <p>
+      Your birthdate determines when you can start
+      collecting social security benefits.
+    </p>
+  </div>
+
+  <div id=agePicker>
+    <div class=monthPicker>
+      <span ng-repeat="month in all_months | limitTo:6">
+       <input type=radio value="{{month}}" id="month-{{month}}"
+              class=radio ng-model="birth.month" ng-change="updateBirthdate()">
+        <label class="radio month" for="month-{{month}}">{{month}}</label>
+      </span>
+    </div>
+    <div class=monthPicker>
+      <span ng-repeat="month in all_months | limitTo:6:6">
+       <input type=radio value="{{month}}" id="month-{{month}}"
+              class=radio ng-model="birth.month" ng-change="updateBirthdate()">
+        <label class="radio month" for="month-{{month}}">{{month}}</label>
+      </span>
+    </div>
+    <div class=yearPicker>
+      <span ng-repeat="year in pastYears()">
+        <input type=radio id="year-{{year}}" value="{{year}}"
+               class=radio ng-model="birth.year" ng-change="updateBirthdate()">
+        <label class="radio year" for="year-{{year}}">{{year}}</label>
+      </span>
+    </div>
+  </div>
+  <br class=clear>
+
+  <div ng-show="birthDateSelected()">
+    You were born in <b>{{birth.month}}, {{birth.year}}</b>:
+    <button ng-click="confirmBirthDate()" class=success>
+      <ico>&#10003;</ico> Yes
+    </button>
+  </div>
+</div>

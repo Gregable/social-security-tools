@@ -1,4 +1,18 @@
 <div ng-show="showReport()" class="fixed-center-column ng-cloak">
+  <h2 ng-show="demoId > -1">Demo Data</h2>
+  <p ng-show="demoId === 0">
+    Retiree born in July, 1950, who earned roughly the US average wage for
+    most of their career.
+  </p>
+  <p ng-show="demoId === 1">
+    Retiree born in August, 1950, who earned the maximum social security wages
+    over five years, but nothing otherwise.
+  </p>
+  <p ng-show="demoId === 2">
+    Earner early in their career, born in September 1985, with a $40,000 per
+    year salary in 2005 and a 4% annual raise.
+  </p>
+
   <h2>Earnings Record</h2>
   <table class="fancy-table">
     <thead>

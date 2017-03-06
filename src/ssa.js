@@ -4,7 +4,7 @@ var ModeEnum = {
   INITIAL: 'INITIAL',
   PASTE_CONFIRMATION: 'PASTE_CONFIRMATION',
   PASTE_APOLOGY: 'PASTE_APOLOGY',
-  HIDE_MEDICARE: 'HIDE_MEDICARE',
+  AGE_REQUEST: 'AGE_REQUEST',
   RENDER_EARNINGS: 'RENDER_EARNINGS'
 };
 
@@ -27,6 +27,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.futureYears = [];
     $scope.futureIsTopValue = false;
     $scope.all_months = ALL_MONTHS;
+    $scope.demoId = -1;
   
     $scope.showMedicare = true;
     $scope.showIndexedEarnings = false;
@@ -42,18 +43,24 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     window.scrollTo(0, 0);
 
     if (demoId === 0) {
+      $scope.demoId = 0;
+      $scope.birth.month = "Jul";
       $scope.birth.year = 1950;
       $scope.birth.maxPossibleYear = 1950;
       $scope.taxEngine.updateBirthdate($scope.birth);
       $scope.fetchTestData('averagepaste.txt');
     }
     if (demoId === 1) {
+      $scope.demoId = 1;
+      $scope.birth.month = "Aug";
       $scope.birth.year = 1950;
       $scope.birth.maxPossibleYear = 1950;
       $scope.taxEngine.updateBirthdate($scope.birth);
       $scope.fetchTestData('millionpaste.txt');
     }
     if (demoId === 2) {
+      $scope.demoId = 2;
+      $scope.birth.month = "Sep";
       $scope.birth.year = 1985;
       $scope.birth.maxPossibleYear = 1985;
       $scope.taxEngine.updateBirthdate($scope.birth);
@@ -61,16 +68,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   }
 
-  // This method exists for now to more quickly play around with our interface.
-  // Rather that relying on copy/paste, it immediately loads an example test
-  // paste via a json request. This method will be deleted at some point.
+  // Rather that using copy/paste, this fn immediately loads an example test
+  // paste via a json request. This allows the user to try out the interface
+  // before committing to the effort of retrieving their earnings record from
+  // ssa.gov.
   $scope.fetchTestData = function(filename) {
     $http.get(filename).then(
       function(contents) {
         var records = parseYearRecords(contents.data);
         $scope.taxEngine.initFromEarningsRecords(records);
         $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
-        $scope.computeInitialAgeWarning();
         $scope.maybeRenderCharts();
       }, 
       function(jqxhr, textStatus, error) {
@@ -88,49 +95,28 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       return;
 
     $scope.taxEngine.initFromEarningsRecords(records);
-    $scope.guessBirthday(records);
     $scope.pasteArea.mode = ModeEnum.PASTE_CONFIRMATION;
     $scope.pasteArea.contents = '';
-  });
-  
-  $scope.guessBirthday = function(records) {
-    // Estimate a user's birth year, assumming that they first worked at
-    // age 16, the youngest age federally allowed. User can modify this
-    // later to be more accurate.
-    $scope.birth.year = records[0].year - 16;
+
     // This is conservative as it assumes the user had wage income the
     // year they were born. I'm not sure if this is even possible, but
     // who knows.
     $scope.birth.maxPossibleYear = records[0].year;
-    $scope.taxEngine.updateBirthdate($scope.birth);
-
-    $scope.computeInitialAgeWarning();
-  }
-
-  $scope.computeInitialAgeWarning = function() {
-    $scope.initiallyOver60 = false;
-    if (CURRENT_YEAR - $scope.birth.year > 60)
-      $scope.initiallyOver60 = true;
-  }
-
-  $scope.showOver60Warning = function() {
-    // TODO: We should also probably show this warning if you are over 60
-    // initially and you change your birth year from the one we guessed.
-    return !$scope.initiallyOver60 &&
-      $scope.taxEngine.isOver60();
-  }
-
-  $scope.loadReport = function() {
-  }
-
+  });
+  
   $scope.confirmEarningsParse = function(confirmationValue) {
     if (confirmationValue === 'incorrect') {
       $scope.pasteArea.mode = ModeEnum.PASTE_APOLOGY;
     } else if (confirmationValue === 'correct') {
-      $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
-      $scope.maybeRenderCharts();
+      $scope.pasteArea.mode = ModeEnum.AGE_REQUEST;
     }
   };
+  
+  $scope.confirmBirthDate = function() {
+    $scope.taxEngine.updateBirthdate($scope.birth);
+    $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
+    $scope.maybeRenderCharts();
+  }
 
   $scope.showPastePrompt = function() {
     return $scope.pasteArea.mode === ModeEnum.INITIAL;
@@ -140,6 +126,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
   $scope.showPasteApology = function() {
     return $scope.pasteArea.mode === ModeEnum.PASTE_APOLOGY;
+  };
+  $scope.showAgeRequest = function() {
+    return $scope.pasteArea.mode === ModeEnum.AGE_REQUEST;
   };
   $scope.showReport = function() {
     return $scope.pasteArea.mode === ModeEnum.RENDER_EARNINGS;
@@ -276,11 +265,18 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   });
 
   $scope.birth = {
-    month: "Jan",
-    year: 1982
+    month: "",
+    year: 0
+  }
+
+  $scope.birthDateSelected = function() {
+    return $scope.birth.year !== 0 && $scope.birth.month !== "";
   }
 
   $scope.updateBirthdate = function() {
+    // Only update once there are some non-default values set.
+    if (!$scope.birthDateSelected())
+      return; 
     $scope.birth.year = parseInt($scope.birth.year);
     $scope.taxEngine.updateBirthdate($scope.birth);
   }
