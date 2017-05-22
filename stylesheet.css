@@ -469,7 +469,7 @@ div.fixed-center-column {
 }
 
 /* The Age Picker buttons are simply heavily CSS'ed radio buttons. */
-div#agePicker {
+div.agePicker {
   font-size: 14px;
 }
 
@@ -683,3 +683,14 @@ div.flashnotify:not(.ng-hide-animate) {
   100% { background-color: #ffffff; }
 }
 
+span.names {
+  color: #3B3B9F;
+  font-weight: 600;
+}
+
+p.nameEntry {
+  text-align: center;
+}
+p.nameEntry input[name=yourName] {
+  margin-right: 12px;
+}

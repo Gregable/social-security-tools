@@ -8,7 +8,7 @@
     </p>
   </div>
 
-  <div id=agePicker>
+  <div class=agePicker>
     <div class=monthPicker>
       <span ng-repeat="month in all_months | limitTo:6">
        <input type=radio value="{{month}}" id="month-{{month}}"
@@ -24,7 +24,7 @@
       </span>
     </div>
     <div class=yearPicker>
-      <span ng-repeat="year in pastYears()">
+      <span ng-repeat="year in primaryEarnerYears()">
         <input type=radio id="year-{{year}}" value="{{year}}"
                class=radio ng-model="birth.year" ng-change="updateBirthdate()">
         <label class="radio year" for="year-{{year}}">{{year}}</label>

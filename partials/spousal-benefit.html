@@ -1,0 +1,101 @@
+<div id=spousalBenefit class="benefit-estimate fixed-center-column"
+     ng-show="showReport()" ng-cloak>
+
+  <h2>Spousal Benefit</h2>
+  <p>
+    Married couples may be able to earn social security benefits based on each
+    other's earning records. This does apply to same-sex couples' marriages,
+    and some non-marital legal relationships such as some civil unions. If you
+    have questions about how your relationship affects your benefits, please
+    contact the social security office.
+  <p>
+
+  <p>
+    To make it easier to read this section of the report, please enter
+    a name for you and for your spouse below. The names need not be real,
+    just something you can use to keep track of who is who in the remainder
+    of the report.
+  </p>
+
+  <p class=nameEntry>
+    Your name: <input type="text"
+                      name="yourName"
+                      ng-model="names.you">
+    Spouse's name: <input type="text"
+                          name="spouseName"
+                          ng-model="names.spouse">
+  </p>
+
+  <p>
+    For <span class=names>{{names.you}}</span>, we will use the values in this
+    report for <u>primary insurance amount</u>
+    (<b>${{taxEngine.primaryInsuranceAmountFloored() | number:0}}</b> / month)
+    and birthdate (<b>{{birth.month}}, {{birth.year}}</b>).
+    For <span class=names>{{names.spouse}}</span>, you must enter these two
+    values.
+  </p>
+ 
+
+  <h3>Select <span class=names>{{names.spouse}}'s</span> Birthdate</h3>
+  <div class=agePicker>
+    <div class=monthPicker>
+      <span ng-repeat="month in all_months | limitTo:6">
+       <input type=radio value="{{month}}" id="spouse-month-{{month}}"
+              class=radio ng-model="spouse.month"
+              ng-change="updateSpouseBirthdate()">
+        <label class="radio month" for="spouse-month-{{month}}">
+          {{month}}
+        </label>
+      </span>
+    </div>
+    <div class=monthPicker>
+      <span ng-repeat="month in all_months | limitTo:6:6">
+       <input type=radio value="{{month}}" id="spouse-month-{{month}}"
+              class=radio ng-model="spouse.month"
+              ng-change="updateSpouseBirthdate()">
+        <label class="radio month" for="spouse-month-{{month}}">
+          {{month}}
+        </label>
+      </span>
+    </div>
+    <div class=yearPicker>
+      <span ng-repeat="year in allAgeYears()">
+        <input type=radio id="spouse-year-{{year}}" value="{{year}}"
+               class=radio ng-model="spouse.year"
+               ng-change="updateSpouseBirthdate()">
+        <label class="radio year" for="spouse-year-{{year}}">{{year}}</label>
+      </span>
+    </div>
+  </div>
+  <br class=clear>
+
+  <h3>
+    Enter <span class=names>{{names.spouse}}'s</span>
+    Primary Insurance Amount
+  </h3>
+  <p>
+    You can compute <span class=names>{{names.spouse}}'s</span>
+    <u>primary insurance amount</u> by using this tool once for
+    <span class=names>{{names.spouse}}</span>, note down the value, and then
+    restart using this tool for <span class=names>{{names.you}}</span>,
+    entering <span class=names>{{names.spouse}}'s</span>
+    <u>primary insurance amount</u> below.
+  </p>
+
+  <p>
+    <span class=names>{{names.you}}'s</span>
+    Primary Insurance Amount:
+    <b>${{taxEngine.primaryInsuranceAmountFloored() | number:0}}</b> / month
+  </p>
+
+  <p>
+    <span class=names>{{names.spouse}}'s</span>
+    Primary Insurance Amount: <b>$</b>
+    <input type="number" min=0 size=6 style="width: 60px"
+           name="spousalPia"
+           ng-model="spouse.pia">
+    / month
+  </p>
+
+</div>
+

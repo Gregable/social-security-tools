@@ -35,6 +35,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_.setTaxEngine($scope.taxEngine);
     $scope.ageChart_.setTaxEngine($scope.taxEngine);
     $scope.maybeRenderCharts();
+
+    $scope.loadDemoData(0);
   };
 
   $scope.loadDemoData = function(demoId) {
@@ -47,7 +49,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.month = "Jul";
       $scope.birth.year = 1950;
       $scope.birth.maxPossibleYear = 1950;
-      $scope.taxEngine.updateBirthdate($scope.birth);
+      $scope.updateBirthdate();
       $scope.fetchTestData('averagepaste.txt');
     }
     if (demoId === 1) {
@@ -55,7 +57,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.month = "Aug";
       $scope.birth.year = 1950;
       $scope.birth.maxPossibleYear = 1950;
-      $scope.taxEngine.updateBirthdate($scope.birth);
+      $scope.updateBirthdate();
       $scope.fetchTestData('millionpaste.txt');
     }
     if (demoId === 2) {
@@ -63,7 +65,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.month = "Sep";
       $scope.birth.year = 1985;
       $scope.birth.maxPossibleYear = 1985;
-      $scope.taxEngine.updateBirthdate($scope.birth);
+      $scope.updateBirthdate();
       $scope.fetchTestData('youngpaste.txt');
     }
   }
@@ -113,7 +115,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
   
   $scope.confirmBirthDate = function() {
-    $scope.taxEngine.updateBirthdate($scope.birth);
+    $scope.updateBirthdate();
     $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
     $scope.maybeRenderCharts();
   }
@@ -175,7 +177,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.pasteArea.mode = ModeEnum.INITIAL;
   };
 
-  $scope.pastYears = function() {
+  $scope.primaryEarnerYears = function() {
     var pastYears = [];
     // We want a multiple of 7 years, want to be sure to include the user's
     // birth year, and don't want to include more than we need to.
@@ -186,6 +188,27 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // End at the first year we have earnings records for. I don't think anyone
     // could have earnings records before they were born.
     var end = $scope.birth.maxPossibleYear;
+    // Add a few years to make sure we have a multiple of 7:
+    end += (7 - (end - start + 1) % 7)
+
+    for (var i = start; i <= end; ++i) {
+      pastYears.push(i);
+    }
+    return pastYears;
+  }
+
+  $scope.allAgeYears = function() {
+    var pastYears = [];
+    // We want a multiple of 7 years, want to be sure to include the user's
+    // birth year, and don't want to include more than we need to.
+    
+    // Start at 70 years ago, anyone older than that is already collecting
+    // social security (and can just pick 70 for example).
+    const start = CURRENT_YEAR - 70;
+    // I'm going to assume that anyone married is at least 18. While it's
+    // possibly incorrect technically, I think it's close enough for our
+    // purposes here.
+    var end = CURRENT_YEAR - 18;
     // Add a few years to make sure we have a multiple of 7:
     end += (7 - (end - start + 1) % 7)
 
@@ -270,6 +293,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     year: 0
   }
 
+  $scope.spouse = {
+    month: "",
+    year: 0,
+    pia: 0  // monthly
+  }
+
+
   $scope.birthDateSelected = function() {
     return $scope.birth.year !== 0 && $scope.birth.month !== "";
   }
@@ -280,5 +310,19 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       return; 
     $scope.birth.year = parseInt($scope.birth.year);
     $scope.taxEngine.updateBirthdate($scope.birth);
+
+    // Also set the spouses birthdate to the same, which is a
+    // reasonable default to start with, until the user selects
+    // differently.
+    $scope.spouse.month = $scope.birth.month;
+    $scope.spouse.year = $scope.birth.year;
+  }
+  
+  $scope.updateSpouseBirthdate = function() {
+  }
+
+  $scope.names = {
+    you: "Self",
+    spouse: "Spouse"
   }
 });
