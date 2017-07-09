@@ -3,16 +3,15 @@
 
   <h2>Spousal Benefit</h2>
   <p>
-    Married couples may be able to earn social security benefits based on each
-    other's earning records. This does apply to same-sex couples' marriages,
-    and some non-marital legal relationships such as some civil unions. If you
-    have questions about how your relationship affects your benefits, please
-    contact the social security office.
+    In addition to your own <u>primary</u> benefit, married couples may be
+    able to earn <u>spousal</u> social security benefits based on each other's
+    earning records. If you are not married, skip this section.
+    <!--TODO: Add some UI element for choosing to hide this section -->
   <p>
 
   <p>
     To make it easier to read this section of the report, please enter
-    a name for you and for your spouse below. The names need not be real,
+    a name for yourself and for your spouse below. The names need not be real,
     just something you can use to keep track of who is who in the remainder
     of the report.
   </p>
@@ -20,28 +19,28 @@
   <p class=nameEntry>
     Your name: <input type="text"
                       name="yourName"
-                      ng-model="names.you">
+                      ng-model="recipient.name">
     Spouse's name: <input type="text"
                           name="spouseName"
-                          ng-model="names.spouse">
+                          ng-model="spouse.name">
   </p>
 
   <p>
-    For <span class=names>{{names.you}}</span>, we will use the values in this
-    report for <u>primary insurance amount</u>
-    (<b>${{taxEngine.primaryInsuranceAmountFloored() | number:0}}</b> / month)
+    For <span class=names>{{recipient.name}}</span>, we will use the values in
+    this report for <u>primary insurance amount</u>
+    (<b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month)
     and birthdate (<b>{{birth.month}}, {{birth.year}}</b>).
-    For <span class=names>{{names.spouse}}</span>, you must enter these two
+    For <span class=names>{{spouse.name}}</span>, you must enter these two
     values.
   </p>
  
 
-  <h3>Select <span class=names>{{names.spouse}}'s</span> Birthdate</h3>
+  <h3>Select <span class=names>{{spouse.name}}'s</span> Birthdate</h3>
   <div class=agePicker>
     <div class=monthPicker>
       <span ng-repeat="month in all_months | limitTo:6">
        <input type=radio value="{{month}}" id="spouse-month-{{month}}"
-              class=radio ng-model="spouse.month"
+              class=radio ng-model="spouseBirth.month"
               ng-change="updateSpouseBirthdate()">
         <label class="radio month" for="spouse-month-{{month}}">
           {{month}}
@@ -51,7 +50,7 @@
     <div class=monthPicker>
       <span ng-repeat="month in all_months | limitTo:6:6">
        <input type=radio value="{{month}}" id="spouse-month-{{month}}"
-              class=radio ng-model="spouse.month"
+              class=radio ng-model="spouseBirth.month"
               ng-change="updateSpouseBirthdate()">
         <label class="radio month" for="spouse-month-{{month}}">
           {{month}}
@@ -61,7 +60,7 @@
     <div class=yearPicker>
       <span ng-repeat="year in allAgeYears()">
         <input type=radio id="spouse-year-{{year}}" value="{{year}}"
-               class=radio ng-model="spouse.year"
+               class=radio ng-model="spouseBirth.year"
                ng-change="updateSpouseBirthdate()">
         <label class="radio year" for="spouse-year-{{year}}">{{year}}</label>
       </span>
@@ -70,32 +69,213 @@
   <br class=clear>
 
   <h3>
-    Enter <span class=names>{{names.spouse}}'s</span>
+    Enter <span class=names>{{spouse.name}}'s</span>
     Primary Insurance Amount
   </h3>
   <p>
-    You can compute <span class=names>{{names.spouse}}'s</span>
+    You can compute <span class=names>{{spouse.name}}'s</span>
     <u>primary insurance amount</u> by using this tool once for
-    <span class=names>{{names.spouse}}</span>, note down the value, and then
-    restart using this tool for <span class=names>{{names.you}}</span>,
-    entering <span class=names>{{names.spouse}}'s</span>
+    <span class=names>{{spouse.name}}</span>, note down the value, and then
+    restart using this tool for <span class=names>{{recipient.name}}</span>,
+    entering <span class=names>{{spouse.name}}'s</span>
     <u>primary insurance amount</u> below.
   </p>
 
   <p>
-    <span class=names>{{names.you}}'s</span>
+    <span class=names>{{recipient.name}}'s</span>
     Primary Insurance Amount:
-    <b>${{taxEngine.primaryInsuranceAmountFloored() | number:0}}</b> / month
+    <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
   </p>
 
   <p>
-    <span class=names>{{names.spouse}}'s</span>
+    <span class=names>{{spouse.name}}'s</span>
     Primary Insurance Amount: <b>$</b>
     <input type="number" min=0 size=6 style="width: 60px"
-           name="spousalPia"
-           ng-model="spouse.pia">
+           name="spousalPia" cast-to-integer
+           ng-model="spouse.primaryInsuranceAmountValue">
     / month
   </p>
 
-</div>
 
+  <h2>Spousal Benefit Calculation</h2>
+  <h3>{{higherEarner().name}}</h3>
+  <p>
+    <span class=names>{{higherEarner().name}}</span> has the higher
+    Primary Insurance Amount, therefore
+    <span class=names>{{higherEarner().name}}</span> is not eligible to
+    collect spousal benefits. This is because the benefit one recieves is
+    always the larger of the personal or spousal benefit and
+    <span class=names>{{higherEarner().name}}'s</span> own benefit is 
+    larger than <span class=names>{{higherEarner().name}}'s</span>
+    spousal benefit.
+  </p>
+
+  <h3>{{lowerEarner().name}}</h3>
+  <div ng-show="!isSpousalBenefit()">
+  <p>
+    <span class=names>{{lowerEarner().name}}</span> has the lower
+    Primary Insurance Amount, therefore
+    <span class=names>{{lowerEarner().name}}</span> may be eligible to
+    recieve a <u>spousal benefit</u> based on
+    <span class=names>{{higherEarner().name}}'s</span> personal benefit.
+    However, in this case, <span class=names>{{lowerEarner().name}}</span>
+    is also not eligible for a <u>spousal benefit</u> as 
+    <span class=names>{{lowerEarner().name}}'s</span> own personal benefit
+    is more than the spousal benefit earned on
+    <span class=names>{{higherEarner().name}}'s</span> social security record.
+  </p>
+  </div><!-- !isSpousalBenefit() -->
+
+  <div ng-show="isSpousalBenefit()">
+  <p>
+    <span class=names>{{lowerEarner().name}}</span> has the lower
+    Primary Insurance Amount, therefore
+    <span class=names>{{lowerEarner().name}}</span> may be eligible to
+    recieve a <u>spousal benefit</u> based on
+    <span class=names>{{higherEarner().name}}'s</span> personal benefit.
+  <p>
+ 
+  <p>
+    <span class=names>{{lowerEarner().name}}'s</span> spousal benefit is equal
+    to 50% of <span class=names>{{higherEarner().name}}'s</span> personal
+    benefit at <u>normal retirement age</u> minus
+    <span class=names>{{lowerEarner().name}}'s</span> own personal benefit at
+    <u>normal retirement age</u>. This benefit cannot be negative.
+  </p>
+  </div><!-- isSpousalBenefit() -->
+
+  <p>
+    <span class=names>{{lowerEarner().name}}'s</span> Personal Benefit:
+    <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>
+    <br>
+    <span class=names>{{lowerEarner().name}}'s</span> Spousal Benefit:
+    ( <b>${{higherEarner().primaryInsuranceAmountFloored() | number:0}}</b>
+      <span class=multsymbol>x</span>
+      50%
+    ) - <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>
+    <span class=multsymbol>=</span> <b>${{spousalBenefit() | number:0}}</b>
+  </p>
+
+  <p ng-show="isSpousalBenefit()">
+    This spousal benefit (<b>${{spousalBenefit() | number:0}}</b>) is the amount
+    <span class=names>{{lowerEarner().name}}</span> will recieve in addition to
+    <span class=names>{{lowerEarner().name}}'s</span> own personal benefit of
+    <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>
+    if filing at <u>normal retirement age</u>.
+    <!-- TODO: Compute NRA here. -->
+  </p>
+
+  <div ng-show="!isSpousalBenefit()">
+  <h3>Final Conclusion</h3>
+  <p>
+    Since neither <span class=names>{{recipient.name}}</span> nor
+    <span class=names>{{spouse.name}}</span> are eligible for a spousal benefit,
+    the date each person selects to begin recieving benefits has no effect on
+    the total benefit of the other person.
+
+    Use the calculations above for <u>Early and Delayed Retirement</u> to make
+    a decision about the best time for each person to begin retirement benefits.
+  <p>
+  </div><!-- !isSpousalBenefit() -->
+
+  <!--
+    TODO: Convert this CSS into a stylesheet format.
+  -->
+  <div ng-show="isSpousalBenefit() && lowerEarner().primaryInsuranceAmountFloored() > 0">
+    <div style="width: 100%">
+      <div style="width: {{Math.min(75, spousalBenefitFraction())}}%; text-align: center; float:left; white-space:nowrap;">
+        Personal (<b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>)
+      </div>
+      <div style="width: {{Math.max(25, 100 - spousalBenefitFraction())}}%; text-align: center; float:left; white-space:nowrap;">
+        Spousal (<b>${{spousalBenefit() | number:0}}</b>)
+      </div>
+    </div>
+    <br style="clear: both">
+    <div style="width: 100%; background-color: #0db9f0; height: 20px; border: 1px solid #666;">
+      <div style="width: {{spousalBenefitFraction()}}%; background-color: #5cb85c; height: 100%; border-right: 1px solid #666">
+      </div>
+    </div>
+    <img style="width: 100%; max-height: 30px; padding-top: 2px;" src="/static/horiz-curly.png">
+    <!-- TODO: Create a sideways { that points to total -->
+    <div style="width: 100%; text-align: center;">
+      Total: <b>${{spousalMax() | number:0}}</b>
+    </div>
+  </div>
+
+  <p>
+    Just like the personal benefit, the spousal benefit can be collected earlier
+    than <u>normal retirement age</u> with a <u>permanently</u> <i>reduced</i>
+    benefit amount. Unlike the personal benefit, delaying the collection date of
+    the spousal benefit until later than <u>normal retirement age</u> will not
+    increase the spousal benefit, only the personal benefit.
+  </p>
+
+  <p>
+  There are two rules that apply to the date that
+  <span class=names>{{lowerEarner().name}}</span> can begin taking benefits:
+  <ul>
+    <li>
+      <span class=names>{{lowerEarner().name}}</span> is not eligible to
+      begin collecting spousal benefits until
+      <span class=names>{{higherEarner().name}}</span> begins collecting
+      <span class=names>{{higherEarner().name}}'s</span> primary benefit.
+    </li>
+    <li>
+      <span class=names>{{lowerEarner().name}}</span> must elect to collect
+      all of the benefits <span class=names>{{lowerEarner().name}}</span> is
+      eligible for or none the benefits.
+      For example, <span class=names>{{lowerEarner().name}}</span> cannot
+      choose to delay personal benefits but collect spousal benefits if
+      eligible for both benefits. This is known as the <u>deeming</u> rule:
+      you are deemed to be filing for all benefits you are eligible for.
+    </li>
+  </ul>
+  </p>
+
+  <p>
+    Use the sliders below to see how different filing dates affect the
+    final monthly benefit for both you and your spouse. The green line
+    connecting the sliders points to the same date 
+    (<span class=names>{{higherEarner().name}}'s</span> filing date) on
+    each slider, adjusting for the age of both spouses. This is the earliest
+    that <span class=names>{{lowerEarner().name}}</span> can begin collecting
+    a spousal benefit.
+  </p>
+
+  <p style="margin-bottom: 2px">
+  <b><span class=names>{{higherEarner().name}}'s</span> files at age:</b>
+  </p>
+
+  <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+  <div class="force-ticks-above" id="higherEarnerSlider">
+  <rzslider rz-slider-model="higherEarnerSlider.value"
+            rz-slider-options="higherEarnerSlider.options"
+            class="with-legend"></rzslider>
+  </div>
+
+  <p>
+    Which is <b>{{higherEarnerFilingDate().month}},
+    {{higherEarnerFilingDate().year}}</b>
+  </p>
+
+  <br>
+
+  <p style="margin-bottom: 2px">
+  <b><span class=names>{{lowerEarner().name}}'s</span> files at age:</b>
+  </p>
+
+  <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+  <div class="force-ticks-above" id="lowerEarnerSlider">
+  <rzslider rz-slider-model="lowerEarnerSlider.value"
+            rz-slider-options="lowerEarnerSlider.options"
+            class="with-legend"></rzslider>
+  </div>
+
+  <p>
+    Which is <b>{{lowerEarnerFilingDate().month}},
+    {{lowerEarnerFilingDate().year}}</b>
+  </p>
+
+  </div><!-- isSpousalBenefit() -->
+
+</div>

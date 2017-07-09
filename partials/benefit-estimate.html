@@ -4,7 +4,7 @@
   <h2>Normal Retirement Age</h2>
   <p>
     Your primary insurance amount of
-    <b>${{taxEngine.primaryInsuranceAmountFloored() | number:0}}</b> / month
+    <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
     is the benefit you will earn if you retire at your
     <u>normal retirement age</u> (NRA). Normal Retirement Age is between 65
     and 67, depending on when you were born.
@@ -12,12 +12,12 @@
 
   <p>
     For those born in <b>{{birth.year}}</b>, normal retirement age is
-    <b>{{taxEngine.fullRetirement.ageYears}} years and 
-    {{taxEngine.fullRetirement.ageMonths}} months</b>.
+    <b>{{recipient.normalRetirement.ageYears}} years and 
+    {{recipient.normalRetirement.ageMonths}} months</b>.
 
     This puts your normal retirement date at
-    <b>{{taxEngine.fullRetirementDate.month}}, 
-    {{taxEngine.fullRetirementDate.year}}</b>.
+    <b>{{recipient.normalRetirementDate.month}}, 
+    {{recipient.normalRetirementDate.year}}</b>.
   </p>
 
   <p>
@@ -25,10 +25,10 @@
     insurance amount, rounded down:
     <ul>
       <li>
-        <b>${{taxEngine.primaryInsuranceAmountFloored() | number}}</b> / month
+        <b>${{recipient.primaryInsuranceAmountFloored() | number}}</b> / month
       </li>
       <li>
-        <b>${{taxEngine.primaryInsuranceAmountFloored() * 12 | number}}</b>
+        <b>${{recipient.primaryInsuranceAmountFloored() * 12 | number}}</b>
         / year
       </li>
     </ul>
@@ -37,45 +37,45 @@
   <h2>Early and Delayed Retirement</h2>
   <p>
     You can also begin taking benefits as early as 62 years old
-    (<b>{{taxEngine.dateAtAge(62, 0).month}}
-        {{taxEngine.dateAtAge(62, 0).year}}</b>),
+    (<b>{{recipient.dateAtAge(62, 0).month}}
+        {{recipient.dateAtAge(62, 0).year}}</b>),
     wait until as late as 70 years old
-    (<b>{{taxEngine.dateAtAge(70, 0).month}}
-        {{taxEngine.dateAtAge(70, 0).year}}</b>),
+    (<b>{{recipient.dateAtAge(70, 0).month}}
+        {{recipient.dateAtAge(70, 0).year}}</b>),
     or start any month in between. The longer you wait, the higher your
     actual benefit will be.
   </p>
   <p>
     If you choose to take benefits earlier than normal retirement age
-    (<b>{{taxEngine.fullRetirementDate.month}} 
-        {{taxEngine.fullRetirementDate.year}}</b>),
+    (<b>{{recipient.normalRetirementDate.month}} 
+        {{recipient.normalRetirementDate.year}}</b>),
     your benefit amount will be <u>permanently</u> <i>reduced</i> 
     per year you start early by:
     <ul>
       <li><b>6.67%</b> per year after
-        <b>{{taxEngine.fullRetirement.ageYears - 3}} years and 
-           {{taxEngine.fullRetirement.ageMonths}} months</b>
+        <b>{{recipient.normalRetirement.ageYears - 3}} years and 
+           {{recipient.normalRetirement.ageMonths}} months</b>
         (<b>
-           {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).month}}
-          {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).year}}
+           {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).month}}
+          {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).year}}
          </b>)
       </li>
       <li><b>5.00%</b> per year before
-        <b>{{taxEngine.fullRetirement.ageYears - 3}} years and 
-           {{taxEngine.fullRetirement.ageMonths}} months</b>
+        <b>{{recipient.normalRetirement.ageYears - 3}} years and 
+           {{recipient.normalRetirement.ageMonths}} months</b>
         (<b>
-           {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).month}}
-          {{taxEngine.dateAtAge(taxEngine.fullRetirement.ageYears - 3, 0).year}}
+           {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).month}}
+          {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).year}}
          </b>)
       </li>
     </ul>
   </p> 
   <p>
     If you choose to instead wait until later than normal retirement age
-    (<b>{{taxEngine.fullRetirementDate.month}}
-        {{taxEngine.fullRetirementDate.year}}</b>),
+    (<b>{{recipient.normalRetirementDate.month}}
+        {{recipient.normalRetirementDate.year}}</b>),
      your benefit amount will be <u>permanently</u> <i>increased</i> by
-    <b>{{taxEngine.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
+    <b>{{recipient.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
     you delay.
   </p>
   <p>
@@ -100,17 +100,17 @@
       <tr ng-repeat="age in [62, 63, 64, 65, 66, 67, 68, 69, 70]">
         <td headers="age">{{age}}</td>
         <td headers="date">
-          {{taxEngine.dateAtAge(age, 0).month}}
-          {{taxEngine.dateAtAge(age, 0).year}}
+          {{recipient.dateAtAge(age, 0).month}}
+          {{recipient.dateAtAge(age, 0).year}}
         </td>
         <td headers="adjustment">
-          {{taxEngine.benefitMultiplierAtAge(age, 0) * 100 | number:2}}%
+          {{recipient.benefitMultiplierAtAge(age, 0) * 100 | number:2}}%
         </td>
         <td headers="monthlybenefit">
-          ${{taxEngine.benefitAtAge(age, 0) | number:0}}
+          ${{recipient.benefitAtAge(age, 0) | number:0}}
         </td>
         <td headers="annualbenefit">
-          ${{taxEngine.benefitAtAge(age, 0) * 12 | number:0}}
+          ${{recipient.benefitAtAge(age, 0) * 12 | number:0}}
         </td>
       </tr>
     </tbody>

@@ -364,6 +364,9 @@ table.fancy-table td[headers='multsymbol'] {
   padding-right: 0px;
   color: #6B6BBF;
 }
+.multsymbol {  
+  color: #6B6BBF;
+}
 table.fancy-table th#multiplier,
 table.fancy-table td[headers='multiplier'] {
   text-align: center;
@@ -565,22 +568,46 @@ input.radio:focus ~ label.radio:before {
 }
 
 /* Table holding sliders for guessing at future years of work */
-#futureWorkYearsTable  {
+.sliderTable  {
   margin: 0 auto;
   padding-bottom: 15px;
 }
-#futureWorkYearsTable td:not(.sliderColumn) {
+.sliderTable td:not(.sliderColumn) {
   vertical-align: bottom;
   padding-bottom: 8px;
+  white-space: nowrap;
 }
-#futureWorkYearsTable td:nth-child(1) {
+.sliderTable td:nth-child(1) {
   text-align: right;
 }
-#futureWorkYearsTable td.sliderColumn {
+.sliderTable td.sliderColumn {
   vertical-align: bottom;
   width: 300px;
   padding-left: 5px;
   padding-right: 5px;
+}
+.sliderTable td.sliderColumnWide {
+  vertical-align: bottom;
+  width: 500px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+/* Override rz-slider's css for placing ticks below the slider
+ * when there are more steps than ticks.*/
+.force-ticks-above .rz-ticks-values-under .rz-tick-value {
+  top: -30px;
+  bottom: unset;
+}
+/* Then make the pointer text hide the tick text with 70% transparency */
+span.rz-bubble {
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 2;
+  color: #339 !important;
+}
+/* Add some padding for the transparency, excluding the left hand side */
+span.rz-bubble:not([style*="left: 5px;"]),  {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
 }
 
 /* Frequent Question Expando boxes */
@@ -630,6 +657,7 @@ input.radio:focus ~ label.radio:before {
   border-left: 3px solid #888;
   text-shadow: 0 1px 0 rgba(255,255,255,.5);
   transition: all .15s ease-out;          
+  box-sizing: initial;
 }
 
 /* Remove text selection when toggle-ing */
@@ -694,3 +722,4 @@ p.nameEntry {
 p.nameEntry input[name=yourName] {
   margin-right: 12px;
 }
+

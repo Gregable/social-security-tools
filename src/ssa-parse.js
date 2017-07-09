@@ -41,7 +41,7 @@ var dollarStringToNumber = function(dollar_string) {
 /* Parses earnings records from a parse of user data from 
  * the SSA.gov website.
  * @param {string} earningsRecordsRaw
- * @return {!Array<!TaxRecord>}
+ * @return {!Array<!EarningRecord>}
  */
 var parseYearRecords = function(earningsRecordsRaw) {
   earningsRecords = [];
@@ -62,7 +62,7 @@ var parseYearRecords = function(earningsRecordsRaw) {
 
   var seenStartLine = false;
   var column = 0;
-  var record = new TaxRecord();
+  var record = new EarningRecord();
   for (var i = 0; i < lines.length; ++i) {
     var line = lines[i];
     if (line === '')
@@ -104,7 +104,7 @@ var parseYearRecords = function(earningsRecordsRaw) {
     column += 1;
     if (column === 3) {
       earningsRecords.push(record);
-      record = new TaxRecord();
+      record = new EarningRecord();
       column = 0;
     }
   }

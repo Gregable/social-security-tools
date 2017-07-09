@@ -18,23 +18,23 @@
 
   <p>
     You have social security earnings recorded for
-    <b>{{taxEngine.numEarningsYears()}}</b> total years.
+    <b>{{recipient.numEarningsYears()}}</b> total years.
   </p>
 
-  <p ng-if="taxEngine.numEarningsYears() >= 35">
+  <p ng-if="recipient.numEarningsYears() >= 35">
     Only the top 35 years of <u>indexed earnings</u> values will be used in
     the calculation of your primary insurance amount. Indexed earnings
     are simply the payroll wages you earned in a year multiplied by
     a number that adjusts for wage growth (similar to adjusting for inflation).
     In your case, this means that years where the indexed earnings value
-    falls below <b>${{taxEngine.cutoffIndexedEarnings | number}}</b> do not
+    falls below <b>${{recipient.cutoffIndexedEarnings | number}}</b> do not
     affect your benefit calculation. If you were to earn additional years of
     wages in the future, they would only affect your social security if you
-    earned more than <b>${{taxEngine.cutoffIndexedEarnings | number}}</b> in
+    earned more than <b>${{recipient.cutoffIndexedEarnings | number}}</b> in
     a year.
   </p>
 
-  <p ng-if="taxEngine.numEarningsYears() < 35">
+  <p ng-if="recipient.numEarningsYears() < 35">
     The top 35 <u>indexed earnings</u> values will be used in the calculation of
     your primary insurance amount. Indexed earnings are simply the payroll
     wages you earned in a year multiplied by a number that adjusts for
@@ -44,7 +44,7 @@
     earning more than previous years' indexed values.
   </p>
   
-  <p ng-if="!taxEngine.isOver60()">
+  <p ng-if="!recipient.isOver60()">
     The multipliers in the above table will increase every year until you
     attain age 60. The increase is determined by US wage growth. Your 
     <u>indexed earnings</u> in a year will always be equivalent to modern
@@ -53,7 +53,7 @@
 
   <p>
    Currently, your total indexed earnings:
-    <b>${{taxEngine.totalIndexedEarnings | number:0}}</b>
+    <b>${{recipient.totalIndexedEarnings | number:0}}</b>
   </p>
 
   </p>
@@ -64,10 +64,10 @@
   <p>
     Your monthly indexed earnings is calculated as your total indexed earnings
     divided by 35 years divided by 12 months.
-    <span ng-if="taxEngine.numEarningsYears() >= 35">
+    <span ng-if="recipient.numEarningsYears() >= 35">
       This is your monthly average indexed earnings in the top 35 years.
     </span>
-    <span ng-if="taxEngine.numEarningsYears() < 35">
+    <span ng-if="recipient.numEarningsYears() < 35">
       If you had 35 years of earnings, this would be your monthly average
       indexed earnings.
     </span>
@@ -75,8 +75,8 @@
 
   <p>
     Monthly average indexed earnings:
-    <b>${{taxEngine.totalIndexedEarnings | number}}</b> / 35 / 12 =
-    <b>${{taxEngine.monthlyIndexedEarnings | number:0}}</b>
+    <b>${{recipient.totalIndexedEarnings | number}}</b> / 35 / 12 =
+    <b>${{recipient.monthlyIndexedEarnings | number:0}}</b>
   </p>
 
   <p>
@@ -89,33 +89,36 @@
   <table class=benefitBrackets>
     <tr>
       <td>
-        Amount less than ${{taxEngine.firstBendPoint() | number: 0}}
+        Amount less than ${{firstBendPoint(recipient.indexingYear()) | number: 0}}
         multiplied by 90%:
       </td>
       <td>
-        <b>${{taxEngine.primaryInsuranceAmountByBracket(0) | number:2}}</b>
+        <b>${{recipient.primaryInsuranceAmountByBracket(0) | number:2}}</b>
       </td>
       <td></td>
     </tr>
     <tr>
       <td>
-        Amount more than ${{taxEngine.firstBendPoint() | number: 0}}
-        and less than ${{taxEngine.secondBendPoint() | number: 0}}
+        Amount more than
+        ${{firstBendPoint(recipient.indexingYear()) | number: 0}}
+        and less than
+        ${{secondBendPoint(recipient.indexingYear()) | number: 0}}
         multiplied by 32%:
       </td>
       <td>
-        <b>${{taxEngine.primaryInsuranceAmountByBracket(1) | number:2}}</b>
+        <b>${{recipient.primaryInsuranceAmountByBracket(1) | number:2}}</b>
       </td>
       <td></td>
     <tr>
     </tr>
       <td>
-        Amount more than ${{taxEngine.secondBendPoint() | number: 0}}
+        Amount more than
+        ${{secondBendPoint(recipient.indexingYear()) | number: 0}}
         multiplied by 15%:
       </td>
       <td>
         <b>
-          ${{taxEngine.primaryInsuranceAmountByBracket(2) | number:2}}
+          ${{recipient.primaryInsuranceAmountByBracket(2) | number:2}}
         </b>
       </td>
       <td></td>
@@ -123,13 +126,13 @@
     <tr>
       <td>Total:</td>
       <td>
-        <b>${{taxEngine.primaryInsuranceAmountUnadjusted() | number:2}}</b>
+        <b>${{recipient.primaryInsuranceAmountUnadjusted() | number:2}}</b>
       </td>
       <td>/ month</td>
     </tr>
   </table>  
 
-  <div ng-if="taxEngine.shouldAdjustForCOLA()">
+  <div ng-if="recipient.shouldAdjustForCOLA()">
     <p>
       After attaining age 62, your primary insurance amount will increase
       annually in proportion to the consumer price index, a measure of
@@ -140,7 +143,7 @@
       amount.
     </p>
     <ul>
-      <li ng-repeat="adjustment in taxEngine.colaAdjustments() | orderBy : adjustment.year">
+      <li ng-repeat="adjustment in recipient.colaAdjustments() | orderBy : adjustment.year">
         {{adjustment.year}}: <b>{{adjustment.start | number:2}}</b>
         increased by {{adjustment.cola | number:1 }}% =
         <b>{{adjustment.end | number:2}}</b>
@@ -150,7 +153,7 @@
 
   <p>
     This total
-    (<b>${{taxEngine.primaryInsuranceAmount() | number:2}}</b> / month) is
+    (<b>${{recipient.primaryInsuranceAmount() | number:2}}</b> / month) is
     your primary insurance amount. In the chart below, you can see what your
     primary insurance amount would be if your indexed earnings were to
     increase. Move your mouse over the chart to watch how the primary insurance

@@ -8,11 +8,11 @@ function AgeChart() {
 
 /**
  * Returns true if the AgeChart has been initialized with a canvas element
- * and taxEngine.
+ * and recipient.
  * @return {boolean}
  */
 AgeChart.prototype.isInitialized = function() {
-  return this.canvas_ !== null && this.taxEngine !== null;
+  return this.canvas_ !== null && this.recipient !== null;
 };
 
 /**
@@ -32,11 +32,11 @@ AgeChart.prototype.setCanvas = function(canvas_element) {
 };
 
 /**
- * Set the taxEngine from which to pull financial data.
- * @param {TaxEngine} taxEngine
+ * Set the recipient from which to pull financial data.
+ * @param {Recipient} recipient
  */
-AgeChart.prototype.setTaxEngine = function(taxEngine) {
-  this.taxEngine_ = taxEngine;
+AgeChart.prototype.setRecipient = function(recipient) {
+  this.recipient_ = recipient;
 };
 
 /**
@@ -111,7 +111,7 @@ AgeChart.prototype.ageX = function(canvasX) {
  * @return {Number}
  */
 AgeChart.prototype.maxRenderedYDollars = function() {
-  return this.taxEngine_.benefitAtAge(70, 0);
+  return this.recipient_.benefitAtAge(70, 0);
 };
 
 /**
@@ -161,10 +161,10 @@ AgeChart.prototype.renderBenefitCurve = function() {
   this.context_.lineWidth = 4;
 
   this.context_.beginPath();
-  this.moveTo(12 * 62, this.taxEngine_.benefitAtAge(62, 0));
+  this.moveTo(12 * 62, this.recipient_.benefitAtAge(62, 0));
   for (var y = 62; y <= 70; ++y) {
     for (var m = 0; m < 12; ++m) {
-      this.lineTo(12 * y + m, this.taxEngine_.benefitAtAge(y, m));
+      this.lineTo(12 * y + m, this.recipient_.benefitAtAge(y, m));
     }
   }
   this.context_.stroke();
@@ -244,7 +244,7 @@ AgeChart.prototype.renderAgePoint = function(years, months) {
     ageYears: years,
     ageMonths: months,
     x: years * 12 + months,
-    y: Math.round(this.taxEngine_.benefitAtAge(years, months))
+    y: Math.round(this.recipient_.benefitAtAge(years, months))
   };
 
   // Add formatting to the text labels.
@@ -322,8 +322,8 @@ AgeChart.prototype.render = function() {
   this.renderBenefitCurve();
   this.context_.strokeStyle = '#5cb85c';
 
-  this.renderAgePoint(this.taxEngine_.fullRetirement.ageYears,
-                      this.taxEngine_.fullRetirement.ageMonths);
+  this.renderAgePoint(this.recipient_.normalRetirement.ageYears,
+                      this.recipient_.normalRetirement.ageMonths);
 
   this.context_.restore();
 };

@@ -33,7 +33,7 @@
   </div>
   <br class=clear>
 
-  <div ng-show="birthDateSelected()">
+  <div ng-show="birthDateSelected(birth)">
     You were born in <b>{{birth.month}}, {{birth.year}}</b>:
     <button ng-click="confirmBirthDate()" class=success>
       <ico>&#10003;</ico> Yes

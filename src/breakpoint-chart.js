@@ -4,18 +4,18 @@
  */
 function BreakPointChart() {
   this.canvas_ = null;
-  this.taxEngine_ = null;
+  this.recipient_ = null;
   this.lastRenderedXDollars = -1;
   this.maxRenderedXDollars = -1;
 }
 
 /**
  * Returns true if the BreakPointChart has been initialized with a canvas
- * element and taxEngine.
+ * element and recipient.
  * @return {boolean}
  */
 BreakPointChart.prototype.isInitialized = function() {
-  return this.canvas_ !== null && this.taxEngine !== null;
+  return this.canvas_ !== null && this.recipient !== null;
 };
 
 /**
@@ -34,11 +34,11 @@ BreakPointChart.prototype.setCanvas = function(canvas_element) {
 };
 
 /**
- * Set the taxEngine from which to pull financial data.
- * @param {TaxEngine} taxEngine
+ * Set the recipient from which to pull financial data.
+ * @param {Recipient} recipient
  */
-BreakPointChart.prototype.setTaxEngine = function(taxEngine) {
-  this.taxEngine_ = taxEngine;
+BreakPointChart.prototype.setRecipient = function(recipient) {
+  this.recipient_ = recipient;
 };
 
 /**
@@ -110,10 +110,10 @@ BreakPointChart.prototype.recomputeBounds = function() {
   // There are a few goals here when selecting this value:
   // 1) Show all of the breakpoints so the user can get a feel visually
   //    for how these breakpoints affect the computation.
-  var breakpoint_min = this.taxEngine_.secondBendPoint() * 1.25;
+  var breakpoint_min = secondBendPoint(this.recipient_.indexingYear()) * 1.25;
   // 2) Show the user's current earnings with some space on either side
   //    so that they can explore the graph to either direction.
-  var user_min = this.taxEngine_.monthlyIndexedEarnings * 2;
+  var user_min = this.recipient_.monthlyIndexedEarnings * 2;
 
   var computed = Math.max(breakpoint_min, user_min);
 
@@ -127,7 +127,7 @@ BreakPointChart.prototype.recomputeBounds = function() {
 
   this.maxRenderedXDollars = this.lastRenderedXDollars;
   
-  this.maxRenderedYDollars = this.taxEngine_.primaryInsuranceAmountForEarnings(
+  this.maxRenderedYDollars = this.primaryInsuranceAmount(
       this.maxRenderedXDollars);
 }
 
@@ -182,22 +182,25 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.context_.beginPath();
   this.moveTo(0, 0);
 
+  const firstBend = firstBendPoint(this.recipient_.indexingYear());
+  const secondBend = secondBendPoint(this.recipient_.indexingYear());
+
   var dollarX;
   var dollarY;
 
   // Origin to first bend point
-  dollarX = this.taxEngine_.firstBendPoint();
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarX = firstBend;
+  dollarY = this.primaryInsuranceAmount(dollarX);
   this.lineTo(dollarX, dollarY);
 
   // First to second bend point
-  dollarX = this.taxEngine_.secondBendPoint();
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarX = secondBend;
+  dollarY = this.primaryInsuranceAmount(dollarX);
   this.lineTo(dollarX, dollarY);
 
   // Second to third bend point
   dollarX = this.maxRenderedXDollars;
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarY = this.primaryInsuranceAmount(dollarX);
   this.lineTo(dollarX, dollarY);
 
   this.context_.stroke();
@@ -210,8 +213,8 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   // Line between 1st and 2nd breakpoints:
   this.context_.beginPath();
   this.context_.lineWidth = 0.5;
-  dollarX = this.taxEngine_.firstBendPoint();
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarX = firstBend;
+  dollarY = this.primaryInsuranceAmount(dollarX);
   this.moveTo(dollarX, dollarY - 200);
   this.lineTo(dollarX, dollarY + 200);
   this.context_.stroke();
@@ -219,8 +222,8 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   // Line between 2nd and 3rd breakpoints:
   this.context_.beginPath();
   this.context_.lineWidth = 0.5;
-  dollarX = this.taxEngine_.secondBendPoint();
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarX = secondBend;
+  dollarY = this.primaryInsuranceAmount(dollarX);
   this.moveTo(dollarX, dollarY - 200);
   this.lineTo(dollarX, dollarY + 200);
   this.context_.stroke();
@@ -236,8 +239,8 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.context_.fillText('32%', 0, 0);
 
   this.context_.save();
-  dollarX = this.taxEngine_.firstBendPoint() / 2;
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarX = firstBend / 2;
+  dollarY = this.primaryInsuranceAmount(dollarX);
   this.context_.translate(
       this.canvasX(dollarX) - textWidth,
       this.canvasY(dollarY));
@@ -250,10 +253,8 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.context_.restore();
 
   this.context_.save();
-  dollarX = (
-      ((this.taxEngine_.secondBendPoint() - this.taxEngine_.firstBendPoint())
-       / 2) + this.taxEngine_.firstBendPoint()),
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarX = ((secondBend - firstBend) / 2) + firstBend;
+  dollarY = this.primaryInsuranceAmount(dollarX);
   this.context_.translate(
       this.canvasX(dollarX) - textWidth,
       this.canvasY(dollarY));
@@ -262,10 +263,8 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.context_.restore();
 
   this.context_.save();
-  dollarX = (
-      ((this.maxRenderedXDollars - this.taxEngine_.secondBendPoint()) / 2) +
-       this.taxEngine_.secondBendPoint()),
-  dollarY = this.taxEngine_.primaryInsuranceAmountForEarnings(dollarX);
+  dollarX = ((this.maxRenderedXDollars - secondBend) / 2) + secondBend;
+  dollarY = this.primaryInsuranceAmount(dollarX);
   pixelY = this.canvasY(dollarY);
   // If this is too close to the top of the chart, flip it to below the line.
   if (pixelY < 100)
@@ -338,6 +337,14 @@ BreakPointChart.prototype.roundedBox =
   this.context_.restore();
 };
 
+
+BreakPointChart.prototype.primaryInsuranceAmount = function(earningsX) {
+  return primaryInsuranceAmountForEarnings(
+      this.recipient_.indexingYear(),
+      this.recipient_.dateAtAge(62, 0).year,
+      earningsX);
+}
+
 /**
  * Renders a point on the breakpoint curve.
  * @param {earningsX} earnings dollar value which a point is rendered for.
@@ -348,7 +355,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   // Where on the breakpoint 'curve' the user's benefit values lie.
   var userSSA = {
     x: Math.floor(earningsX),
-    y: Math.floor(this.taxEngine_.primaryInsuranceAmountForEarnings(earningsX)),
+    y: Math.floor(this.primaryInsuranceAmount(earningsX)),
   };
 
   // Add dollar sign and commas for better looking formatting.
@@ -426,7 +433,7 @@ BreakPointChart.prototype.render = function() {
   this.renderBreakPoints();
   this.context_.strokeStyle = '#5cb85c';
 
-  this.renderEarningsPoint(this.taxEngine_.monthlyIndexedEarnings);
+  this.renderEarningsPoint(this.recipient_.monthlyIndexedEarnings);
 
   this.context_.restore();
 };
