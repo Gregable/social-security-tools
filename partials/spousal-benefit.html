@@ -234,16 +234,11 @@
 
   <p>
     Use the sliders below to see how different filing dates affect the
-    final monthly benefit for both you and your spouse. The green line
-    connecting the sliders points to the same date 
-    (<span class=names>{{higherEarner().name}}'s</span> filing date) on
-    each slider, adjusting for the age of both spouses. This is the earliest
-    that <span class=names>{{lowerEarner().name}}</span> can begin collecting
-    a spousal benefit.
+    final monthly benefit for both you and your spouse.
   </p>
 
   <p style="margin-bottom: 2px">
-  <b><span class=names>{{higherEarner().name}}'s</span> files at age:</b>
+  <b><span class=names>{{higherEarner().name}}</span> files at age:</b>
   </p>
 
   <!-- See http://angular-slider.github.io/angularjs-slider/ -->
@@ -253,15 +248,10 @@
             class="with-legend"></rzslider>
   </div>
 
-  <p>
-    Which is <b>{{higherEarnerFilingDate().month}},
-    {{higherEarnerFilingDate().year}}</b>
-  </p>
-
-  <br>
-
-  <p style="margin-bottom: 2px">
-  <b><span class=names>{{lowerEarner().name}}'s</span> files at age:</b>
+  <p style="margin-bottom: 2px;">
+    <b style="background-color: white">
+      <span class=names>{{lowerEarner().name}}</span> files at age:
+    </b>
   </p>
 
   <!-- See http://angular-slider.github.io/angularjs-slider/ -->
@@ -271,11 +261,12 @@
             class="with-legend"></rzslider>
   </div>
 
-  <p>
-    Which is <b>{{lowerEarnerFilingDate().month}},
-    {{lowerEarnerFilingDate().year}}</b>
-  </p>
+  <!-- TODO: Make sure this is the correct height -->
+  <div style="height: 400px"> </div>
+
+  <span ng-show="runOnceSpousalReportIsVisible()"></span>
 
   </div><!-- isSpousalBenefit() -->
+
 
 </div>

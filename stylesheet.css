@@ -723,3 +723,13 @@ p.nameEntry input[name=yourName] {
   margin-right: 12px;
 }
 
+div.lineElement {
+  border: 1px dashed #CCD;
+  height: 0px;
+  position: absolute;
+}
+
+canvas#spousal-chart-canvas {
+  position: absolute;
+  z-index: -3;
+}

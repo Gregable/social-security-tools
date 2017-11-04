@@ -145,6 +145,7 @@ Recipient.prototype.isOver60 = function() {
  * @return {Object}
  */
 Recipient.prototype.dateAtAge = function(year, month) {
+  if (month === undefined) month = 0;
   var birthMonthIndex = monthIndex(this.birthDate.month);
   var dateYear = (year + this.birthDate.year +
                   Math.floor((month + birthMonthIndex) / 12));
@@ -156,6 +157,23 @@ Recipient.prototype.dateAtAge = function(year, month) {
 };
 
 /**
+ * Returns the date in months (so year 2000 is 12 * 2000) at a given age.
+ * Age is specified as a year and month index (0-11).
+ * @param {number} year
+ * @param {number} month
+ * @return {Object}
+ */
+Recipient.prototype.dateMonthsAtAge = function(year, month) {
+  if (month === undefined) month = 0;
+  var birthMonthIndex = monthIndex(this.birthDate.month);
+  var dateYear = (year + this.birthDate.year +
+                  Math.floor((month + birthMonthIndex) / 12));
+  var dateMonth = (month + birthMonthIndex) % 12;
+  return (dateYear * 12) + dateMonth;
+};
+
+
+/**
  * Returns the age at a given date. Date is specified as a year and
  * month index (0-11).
  * @param {number} year
@@ -163,6 +181,7 @@ Recipient.prototype.dateAtAge = function(year, month) {
  * @return {Object}
  */
 Recipient.prototype.ageAtDate = function(year, month) {
+  if (month === undefined) month = 0;
   var dateMonthIndex = monthIndex(this.birthDate.month);
   var ageYear = (year - this.birthDate.year +
                   Math.floor((month - dateMonthIndex) / 12));
@@ -171,6 +190,19 @@ Recipient.prototype.ageAtDate = function(year, month) {
     month: ALL_MONTHS[ageMonth],
     year: ageYear
   }
+};
+
+/**
+ * Returns the age in months (so could be hundreds) at a given date.
+ * Date is specified as a year and month index (0-11).
+ * @param {number} year
+ * @param {number} month
+ * @return {Object}
+ */
+Recipient.prototype.monthsOldAtDate = function(year, month) {
+  if (month === undefined) month = 0;
+  var dateMonthIndex = monthIndex(this.birthDate.month);
+  return ((year - this.birthDate.year) * 12) + month - dateMonthIndex;
 };
 
 // From https://www.ssa.gov/oact/cola/piaformula.html, the PIA calculation

@@ -35,6 +35,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.Math = window.Math;
     $scope.breakPointChart_ = new BreakPointChart();
     $scope.ageChart_ = new AgeChart();
+    $scope.spousalChart_ = new SpousalChart();
 
     $scope.recipient = new Recipient("Greg");
     $scope.spouse = new Recipient("Cristin");
@@ -170,9 +171,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.breakPointChart_.render();
     if ($scope.ageChart_.isInitialized())
       $scope.ageChart_.render();
-    // Recompute sliders as well.
-    $scope.higherEarnerSlider.refresh();
-    $scope.lowerEarnerSlider.refresh();
   };
 
   /**
@@ -332,10 +330,11 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // differently.
     $scope.spouseBirth.month = $scope.birth.month;
     $scope.spouseBirth.year = $scope.birth.year;
-    $scope.spouse.updateBirthdate($scope.spouseBirth);
-     
-    $scope.higherEarnerSlider.refresh();
-		$scope.adjustSliderConnectionLine();
+
+    // TODO(gregable): Remove this line:
+    $scope.spouseBirth.year += 2;
+
+    $scope.updateSpouseBirthdate();
   }
  
   // Called whenever the spousal birthdate is modified.
@@ -346,8 +345,18 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.spouseBirth.year = parseInt($scope.spouseBirth.year);
     $scope.spouse.updateBirthdate($scope.spouseBirth);
 
-    $scope.lowerEarnerSlider.refresh();
-		$scope.adjustSliderConnectionLine();
+		$scope.adjustSliderTimelines();
+  }
+
+  $scope.runOnceSpousalReportIsVisible = function() {
+    // Bug fix. The slider may not initially be visible, so we need to tell
+    // it to re-render after it becomes visible the first time. This f'n
+    // is triggered by a hidden span in the spousal report.
+    if (!$scope.spousalBenefitLayoutRun && $scope.spousalBenefit() > 0) {
+      $scope.spousalBenefitLayoutRun = true;
+      $scope.adjustSliderTimelines();
+    }
+    return false;
   }
 
   $scope.higherEarner = function() {
@@ -393,18 +402,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // earner's PIA, then the spousal benefit would be smaller than
   // their own benefit, and there is nothing to collect.
   $scope.isSpousalBenefit = function() {
-    // Bug fix. The slider may not initially be visible, so we need to tell
-    // it to re-render after it becomes visible the first time.
-    if (!$scope.spousalBenefitLayoutRun && $scope.spousalBenefit() > 0) {
-      $scope.spousalBenefitLayoutRun = true;
-      $timeout(function() {
-        $scope.$broadcast('rzSliderForceRender');
-      }, 40, false);
-    }
     return $scope.spousalBenefit() > 0;
   }
 
-  // Steps Array method for higherEarnerSlider below.
+  // Steps Array method for spousalSlider below. Produces the full
+  // array of all valid options on the slider bar, which is one for
+  // each month between 62 and 70 years of age. Adds ticks at every
+  // year of age and the legend 'NRA' at the user's Normal Retirement
+  // Age.
   $scope.stepsArray = function(normal_retirement_age) {
     out = [];
     for (i = 62*12; i <= 70*12; i += 1) {
@@ -416,75 +421,119 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
     return out;
   }
+  // Ticks tooltip function for the spousalSlider below.
   $scope.ticksTooltip = function(normal_retirement_age, value) {
     if (value === normal_retirement_age - 62*12)
       return 'Normal Retirement Age';
   };
 
-  $scope.higherEarnerSlider = {
-    value: 65*12,
-    options: {
-     floor: 62*12,
-     ceil: 70*12,
-     showSelectionBarEnd: true,
-     translate: function(value, sliderId, label) {
-      const ageYears = Math.floor(value / 12);
-      const ageMonths = value % 12;
-      // model is the text above the slider pointer
-      if (label === 'model') {
-        if (ageMonths === 0)
+  // Config for choosing a benefits starting age for a single spouse. We
+  // instantiate two of these.
+  function spousalSlider(earnerFn) {
+    this.earnerFn = earnerFn;
+    this.value = 65 * 12;
+    this.options = {
+      floor: 62*12,
+      ceil: 70*12,
+      showSelectionBarEnd: true,
+      translate: function(value, sliderId, label) {
+        const ageYears = Math.floor(value / 12);
+        const ageMonths = value % 12;
+        // model is the text above the slider pointer
+        if (label === 'model') {
+          if (ageMonths === 0)
+            return ageYears;
+          return ageYears + ' ' + ageMonths + ' mo';
+        }
+        // tick-value is the text above each tick mark
+        if (label === 'tick-value') {
           return ageYears;
-        return ageYears + ' ' + ageMonths + ' mo';
+        }
+        return '';
+      },
+      // Show every 12th tick, so yearly.
+      showTicksValues: 12,
+      ticksTooltip: $scope.ticksTooltip.bind(null, -1),
+      stepsArray: $scope.stepsArray(-1),
+      onChange: function(id) {
+        $scope.spousalChart_.render();
       }
-      // tick-value is the text above each tick mark
-      if (label === 'tick-value') {
-        return ageYears;
-      }
-      return '';
-     },
-     // Show every 12th tick, so yearly.
-     showTicksValues: 12,
-     ticksTooltip: $scope.ticksTooltip.bind(null, -1),
-     stepsArray: $scope.stepsArray(-1),
-     id: 'slider-id',
-     onChange: function(id) { $scope.adjustSliderConnectionLine(); },
     },
-    // Refresh to pick up certain changes.
-    refresh: function() {
-      var normal_retirement_age = 65;
+    // Refresh method called externally for some events to cause redraw.
+    this.refresh = function() {
+      var normalRetirementAgeMonths = 12 * 65;
       if ($scope.showReport())  // before this point, the data may be missing.
-        normal_retirement_age = 
-          (12 * $scope.higherEarner().normalRetirement.ageYears) +
-          $scope.higherEarner().normalRetirement.ageMonths;
+        normalRetirementAgeMonths = 
+          (12 * this.earnerFn().normalRetirement.ageYears) +
+          this.earnerFn().normalRetirement.ageMonths;
 
-      $scope.higherEarnerSlider.options.stepsArray =
-        $scope.stepsArray(normal_retirement_age);
-      $scope.higherEarnerSlider.options.ticksTooltip =
-        $scope.ticksTooltip.bind(null, normal_retirement_age);
-      $scope.higherEarnerSlider.value = normal_retirement_age;
-      $scope.adjustSliderConnectionLine();
-    },
-  };
+      this.options.stepsArray = $scope.stepsArray(normalRetirementAgeMonths);
+      this.options.ticksTooltip =
+        $scope.ticksTooltip.bind(null, normalRetirementAgeMonths);
+      this.value = normalRetirementAgeMonths;
+    }
+  }
 
-  $scope.higherEarnerFilingDate = function() {
-    const ageYears = Math.floor($scope.higherEarnerSlider.value / 12);
-    const ageMonths = Math.floor($scope.higherEarnerSlider.value % 12);
-    return $scope.higherEarner().dateAtAge(ageYears, ageMonths);
+  $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
+  $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
+
+  $scope.createCanvasElement = function(x, y, width, height) {
+    var canvas = document.createElement("canvas");
+    canvas.setAttribute('width', width);
+    canvas.setAttribute('height', height);
+    canvas.setAttribute('id', 'spousal-chart-canvas');
+    canvas.setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px; ');
+
+    return canvas;
+	}
+
+  $scope.absoluteBoundingRect = function(element) {
+    var doc  = document;
+    var win  = window;
+    var body = doc.body;
+
+    // pageXOffset and pageYOffset work everywhere except IE <9.
+    var offsetX = win.pageXOffset !== undefined ? win.pageXOffset :
+            (doc.documentElement || body.parentNode || body).scrollLeft;
+    var offsetY = win.pageYOffset !== undefined ? win.pageYOffset :
+            (doc.documentElement || body.parentNode || body).scrollTop;
+
+    var rect = element.getBoundingClientRect();
+
+    if (element !== body) {
+        var parent = element.parentNode;
+
+        // The element's rect will be affected by the scroll positions of
+        // *all* of its scrollable parents, not just the window, so we have
+        // to walk up the tree and collect every scroll offset. Good times.
+        while (parent !== body) {
+            offsetX += parent.scrollLeft;
+            offsetY += parent.scrollTop;
+            parent   = parent.parentNode;
+        }
+    }
+
+    return {
+        bottom: rect.bottom + offsetY,
+        height: rect.height,
+        left  : rect.left + offsetX,
+        right : rect.right + offsetX,
+        top   : rect.top + offsetY,
+        width : rect.width
+    };
   }
 
   $scope.createLineElement = function(x, y, length, angle) {
     var line = document.createElement("div");
-    var styles = 'border: 1px solid #5cb85c; '
-               + 'width: ' + length + 'px; '
-               + 'height: 0px; '
+    var styles = 'width: ' + length + 'px; '
                + '-moz-transform: rotate(' + angle + 'rad); '
                + '-webkit-transform: rotate(' + angle + 'rad); '
                + '-o-transform: rotate(' + angle + 'rad); '  
                + '-ms-transform: rotate(' + angle + 'rad); '  
-               + 'position: absolute; '
                + 'top: ' + y + 'px; '
                + 'left: ' + x + 'px; ';
     line.setAttribute('style', styles);  
+    line.setAttribute('class', 'lineElement');
     return line;
 	}
 
@@ -504,104 +553,117 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return $scope.createLineElement(x, y, c, alpha);
 	}
 
-  $scope.centerOfElement = function(el) {
-    var center = {x: 0, y: 0};
-    var bounds = el.getBoundingClientRect();
-    center.x = (bounds.left + bounds.right) / 2 + window.scrollX;
-    center.y = (bounds.top + bounds.bottom) / 2 + window.scrollY;
-    return center;
+  // Method adjusts the spousal age sliders so that they are vertically
+  // aligned by year.
+  $scope.adjustSliderTimelines = function() {
+    // First refresh the ages for the two sliders.
+    $scope.higherEarnerSlider.refresh();
+    $scope.lowerEarnerSlider.refresh();
+
+    var section = document.getElementById('spousalBenefit');
+    if (section === null) return;
+    // Each slider has a small 'tail' on each side of the slider which is
+    // 16px wide that we must ignore in the total width;
+    var totalWidth = $scope.absoluteBoundingRect(section).width - 32;
+    var higherMonths = $scope.higherEarner().monthsOldAtDate(62, 0);
+    var lowerMonths = $scope.lowerEarner().monthsOldAtDate(62, 0);
+    var higherSlider = document.getElementById('higherEarnerSlider');
+    var lowerSlider = document.getElementById('lowerEarnerSlider');
+
+    // TODO: We should handle cases where the earners are more than 8
+    // years apart in a better way.
+
+    var numMonths = Math.abs(higherMonths - lowerMonths) + (8*12);
+    // Each slider should be 8*12 months wide and the whole thing
+    // is totalWidth wide.
+    var newMargin = (1 - (8*12 / numMonths)) * totalWidth;
+    if (higherMonths < lowerMonths) {  // Higher earner is younger
+      higherSlider.setAttribute('style', "margin-left: " + newMargin + "px");
+      lowerSlider.setAttribute('style', "margin-right: " + newMargin + "px");
+      $scope.drawSliderYears($scope.lowerEarner().dateMonthsAtAge(62),
+                             $scope.higherEarner().dateMonthsAtAge(70));
+    } else if (higherMonths > lowerMonths) {  // Higher earner is older
+      higherSlider.setAttribute('style', "margin-right: " + newMargin + "px");
+      lowerSlider.setAttribute('style', "margin-left: " + newMargin + "px");
+      $scope.drawSliderYears($scope.higherEarner().dateMonthsAtAge(62),
+                             $scope.lowerEarner().dateMonthsAtAge(70));
+    } else { // both earners same birth month and year
+      higherSlider.setAttribute('style', "");
+      lowerSlider.setAttribute('style', "");
+      $scope.drawSliderYears($scope.lowerEarner().dateMonthsAtAge(62),
+                             $scope.lowerEarner().dateMonthsAtAge(70));
+    }
+    // Force a rerender of the slider.
+    $scope.$broadcast('rzSliderForceRender');
   }
 
-  $scope.adjustSliderConnectionLine = function() {
-    var pointerList = $('#higherEarnerSlider div.rzslider span.rz-pointer');
-    if (pointerList.length === 0)  // Not loaded yet;
-      return;
-    var highCenter = $scope.centerOfElement(
-        $('#higherEarnerSlider div.rzslider span.rz-pointer')[0]);
-    var lowCenterLeft = $scope.centerOfElement(
-        $('#lowerEarnerSlider div.rzslider ul li')[0]);
-    var lowCenterRight = $scope.centerOfElement(
-        $('#lowerEarnerSlider div.rzslider ul li')[8]);
+  // startDate and endDate must be in months since year 0.
+  $scope.drawSliderYears = function(startDate, endDate) {
+    var higherSlider = document.getElementById('higherEarnerSlider');
+    var higherBounds = $scope.absoluteBoundingRect(higherSlider);
+    var lowerSlider = document.getElementById('lowerEarnerSlider');
+    var lowerBounds = $scope.absoluteBoundingRect(lowerSlider);
+        
+    var absLeft = Math.min(higherBounds.left, lowerBounds.left);
+    var absRight = Math.max(higherBounds.right, lowerBounds.right);
+    var absWidth = absRight - absLeft;
 
-    dateAtHigherFiling = $scope.higherEarnerFilingDate();
-    lowerAgeAtHigherFiling = $scope.lowerEarner().ageAtDate(
-        dateAtHigherFiling.year, monthIndex(dateAtHigherFiling.month));
-    lowerAgeInMonths = 
-      lowerAgeAtHigherFiling.year * 12 +
-      monthIndex(lowerAgeAtHigherFiling.month);
-    var lowerAgeX;
-    if (lowerAgeInMonths < 62 * 12) {
-      lowerAgeX = lowCenterLeft.x - 5;
-    } else if (lowerAgeInMonths > 70 * 12) {
-      lowerAgeX = lowCenterRight.x + 5;
-    } else {
-      lowerAgeX = ((lowerAgeInMonths - 62*12) / (8*12)) *
-        (lowCenterRight.x - lowCenterLeft.x) + lowCenterLeft.x;
+    if (!$scope.spousalChart_.isInitialized()) {
+      var canvas = $scope.createCanvasElement(
+          absLeft, higherBounds.top, absWidth, 600);
+      document.body.appendChild(canvas);
+      $scope.spousalChart_.setCanvas(canvas);
     }
 
-    // Remove the old line, if present.
-    var lineEl = $('#ageConnectorLine');
-    if (lineEl.length !== 0)
-      document.body.removeChild(lineEl[0]);
+    $scope.spousalChart_.setRecipients(
+        $scope.lowerEarner(), $scope.higherEarner());
+    $scope.spousalChart_.setSliders(
+        $scope.lowerEarnerSlider, $scope.higherEarnerSlider);
+    $scope.spousalChart_.setDateRange(startDate, endDate);
+    $scope.spousalChart_.render();
 
-    // Add a new line.
-    var newLineEl =
-        $scope.createLine(highCenter.x, highCenter.y,
-                          lowerAgeX, lowCenterLeft.y);
-    newLineEl.setAttribute('id', 'ageConnectorLine');
-		document.body.appendChild(newLineEl);
-  };
+    /*
+    // Remove the old line, present.
+    var oldLines = $('div.lineElement');
+    for (var i = 0; i < oldLines.size(); ++i)
+      document.body.removeChild(oldLines[i]);
 
-  //$scope.$on("slideEnded", $scope.adjustSliderConnectionLine);
- 
-  $scope.lowerEarnerSlider = {
-    value: 65*12,
-    options: {
-     floor: 62*12,
-     ceil: 70*12,
-     showSelectionBarEnd: true,
-     translate: function(value, sliderId, label) {
-      const ageYears = Math.floor(value / 12);
-      const ageMonths = value % 12;
-      // model is the text above the slider pointer
-      if (label === 'model') {
-        if (ageMonths === 0)
-          return ageYears;
-        return ageYears + ' ' + ageMonths + ' mo';
-      }
-      // tick-value is the text above each tick mark
-      if (label === 'tick-value') {
-        return ageYears;
-      }
-      return '';
-     },
-     // Show every 12th tick, so yearly.
-     showTicksValues: 12,
-     ticksTooltip: $scope.ticksTooltip.bind(null, -1),
-     stepsArray: $scope.stepsArray(-1),
-    },
-    // Refresh to pick up certain changes.
-    refresh: function() {
-      var normal_retirement_age = 65;
-      if ($scope.showReport())  // before this point, the data may be missing.
-        normal_retirement_age = 
-          (12 * $scope.lowerEarner().normalRetirement.ageYears) +
-          $scope.lowerEarner().normalRetirement.ageMonths;
+    var startY = higherBounds.top;
+    var endY = lowerBounds.bottom;
+    var leftX = higherBounds.left + 16;
+    var rightX = lowerBounds.right - 16;
 
-      $scope.lowerEarnerSlider.options.stepsArray =
-        $scope.stepsArray(normal_retirement_age);
-      $scope.lowerEarnerSlider.options.ticksTooltip =
-        $scope.ticksTooltip.bind(null, normal_retirement_age);
-      $scope.lowerEarnerSlider.value = normal_retirement_age;
-      $scope.adjustSliderConnectionLine();
+    console.log(startDate);
+    console.log(endDate);
+    for (var i = startDate; i <= endDate; ++i) {
+      console.log(i);
+      if (i % 12 !== 0)
+        continue;
+
+      var x = (i - startDate) / (endDate - startDate) *
+        (rightX - leftX) + leftX;
+      console.log(x);
+
+      var line = $scope.createLine(x, startY, x, endY);
+      line.setAttribute('id', 'sliderLine');
+      document.body.appendChild(line);
     }
+    */
+  }
+  
+  $scope.filingDate = function(sliderValue, earner) {
+    const ageYears = Math.floor(sliderValue / 12);
+    const ageMonths = Math.floor(sliderValue % 12);
+    return earner.dateAtAge(ageYears, ageMonths);
   }
 
-
+  $scope.higherEarnerFilingDate = function() {
+    return $scope.filingDate(
+        $scope.higherEarnerSlider.value, $scope.higherEarner());
+  }
  
   $scope.lowerEarnerFilingDate = function() {
-    const ageYears = Math.floor($scope.lowerEarnerSlider.value / 12);
-    const ageMonths = Math.floor($scope.lowerEarnerSlider.value % 12);
-    return $scope.lowerEarner().dateAtAge(ageYears, ageMonths);
+    return $scope.filingDate(
+        $scope.lowerEarnerSlider.value, $scope.lowerEarner());
   }
 })
