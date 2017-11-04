@@ -5,7 +5,7 @@
  */
 
 // Maximum earnings in each year which contribute to social security benefits.
-// https://www.ssa.gov/OACT/COLA/awifactors.html
+// https://www.ssa.gov/OACT/COLA/cbb.html
 const MAXIMUM_EARNINGS = {
   1956: 4200,
   1957: 4200,
@@ -68,6 +68,7 @@ const MAXIMUM_EARNINGS = {
   2014: 117000,
   2015: 118500,
   2016: 127200,
+  2017: 128700,
 };
 
 // https://www.ssa.gov/oact/progdata/oasdiRates.html
@@ -132,7 +133,9 @@ const TAX_RATES = {
   2013: .053,
   2014: .053,
   2015: .053,
-  2016: .053,
+  2016: .0515,
+  2017: .0515,
+  2018: .0515,
 };
 
 // Values from https://www.ssa.gov/oact/cola/piaformula.html
@@ -208,6 +211,7 @@ const WAGE_INDICES = {
   2013: 44888.16,
   2014: 46481.52,
   2015: 48098.63,
+  2016: 48664.73,
 };
 
 // Data from MAXIMUM_EARNINGS
@@ -254,6 +258,7 @@ const COLA = {
   2014: 1.7,
   2015: 0.0,
   2016: 0.3,
+  2017: 2.0,
 };
 
 // Number of top years of earnings which contribute to SSA calculations.
