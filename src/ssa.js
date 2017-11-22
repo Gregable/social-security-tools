@@ -196,7 +196,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   $scope.isLastYearIncomplete = function() {
-    for (var record of $scope.taxEngine.earningsRecords) {
+    for (var i = 0; i < $scope.taxEngine.earningsRecords.length; ++i) {
+      record = $scope.taxEngine.earningsRecords[i];
       if (record.year === (CURRENT_YEAR - 1))
         return record.taxedEarnings === -1;
     }
