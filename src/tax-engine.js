@@ -356,7 +356,9 @@ TaxEngine.prototype.colaAdjustments = function() {
   }
 
   this.adjustments_ = [];
-  for (var year of this.colaAdjustmentYears()) {
+  var allYears = this.colaAdjustmentYears();
+  for (var i = 0; i < allYears.length; ++i) {
+    year = allYears[i];
     if (COLA[year] !== undefined) {
       var newadjusted = adjusted * (1 + (COLA[year] / 100.0));
       // Primary Insurance amounts are always rounded down the the nearest dime.
@@ -384,7 +386,9 @@ TaxEngine.prototype.colaAdjustments = function() {
 TaxEngine.prototype.primaryInsuranceAmount = function() {
   var colaAdjustment = 1.0;
   var adjusted = this.primaryInsuranceAmountUnadjusted();
-  for (var year of this.colaAdjustmentYears()) {
+  var allYears = this.colaAdjustmentYears();
+  for (var i = 0; i < allYears.length; ++i) {
+    year = allYears[i];
     if (COLA[year] !== undefined) {
       adjusted = adjusted * (1 + (COLA[year] / 100.0));
       // Primary Insurance amounts are always rounded down the the nearest dime.
@@ -403,7 +407,9 @@ TaxEngine.prototype.primaryInsuranceAmount = function() {
 TaxEngine.prototype.primaryInsuranceAmountForEarnings = function(earnings) {
   var colaAdjustment = 1.0;
   var adjusted = this.primaryInsuranceAmountForEarningsUnadjusted(earnings);
-  for (var year of this.colaAdjustmentYears()) {
+  var allYears = this.colaAdjustmentYears();
+  for (var i = 0; i < allYears.length; ++i) {
+    year = allYears[i];
     if (COLA[year] !== undefined) {
       adjusted = adjusted * (1 + (COLA[year] / 100.0));
       // Primary Insurance amounts are always rounded down the the nearest dime.
