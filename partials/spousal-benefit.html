@@ -76,7 +76,7 @@
     You can compute <span class=names>{{spouse.name}}'s</span>
     <u>primary insurance amount</u> by using this tool once for
     <span class=names>{{spouse.name}}</span>, note down the value, and then
-    restart using this tool for <span class=names>{{recipient.name}}</span>,
+    reload using this tool for <span class=names>{{recipient.name}}</span>,
     entering <span class=names>{{spouse.name}}'s</span>
     <u>primary insurance amount</u> below.
   </p>
@@ -119,7 +119,7 @@
     recieve a <u>spousal benefit</u> based on
     <span class=names>{{higherEarner().name}}'s</span> personal benefit.
     However, in this case, <span class=names>{{lowerEarner().name}}</span>
-    is also not eligible for a <u>spousal benefit</u> as 
+    will not recieve a <u>spousal benefit</u> as 
     <span class=names>{{lowerEarner().name}}'s</span> own personal benefit
     is more than the spousal benefit earned on
     <span class=names>{{higherEarner().name}}'s</span> social security record.
@@ -136,18 +136,29 @@
   <p>
  
   <p>
-    <span class=names>{{lowerEarner().name}}'s</span> spousal benefit is equal
-    to 50% of <span class=names>{{higherEarner().name}}'s</span> personal
-    benefit at <u>normal retirement age</u> minus
-    <span class=names>{{lowerEarner().name}}'s</span> own personal benefit at
-    <u>normal retirement age</u>. This benefit cannot be negative.
+    <!-- TODO: Compute NRA here. -->
+    Let's start by calculating
+    <span class=names>{{lowerEarner().name}}'s</span> spousal benefit at
+    <span class=names>{{lowerEarner().name}}'s</span> <u>normal retirement
+    age</u>: 50% of <span class=names>{{higherEarner().name}}'s</span> personal
+    benefit minus <span class=names>{{lowerEarner().name}}'s</span> own
+    personal benefit.
   </p>
   </div><!-- isSpousalBenefit() -->
 
+  <ul>
+    <li>
+      <span class=names>{{lowerEarner().name}}'s</span> Personal Benefit:
+      <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>
+    </li>
+
+    <li>
+      <span class=names>{{higherEarner().name}}'s</span> Personal Benefit:
+      <b>${{higherEarner().primaryInsuranceAmountFloored() | number:0}}</b>
+    </li>
+  </ul>
+
   <p>
-    <span class=names>{{lowerEarner().name}}'s</span> Personal Benefit:
-    <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>
-    <br>
     <span class=names>{{lowerEarner().name}}'s</span> Spousal Benefit:
     ( <b>${{higherEarner().primaryInsuranceAmountFloored() | number:0}}</b>
       <span class=multsymbol>x</span>
@@ -160,9 +171,7 @@
     This spousal benefit (<b>${{spousalBenefit() | number:0}}</b>) is the amount
     <span class=names>{{lowerEarner().name}}</span> will recieve in addition to
     <span class=names>{{lowerEarner().name}}'s</span> own personal benefit of
-    <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>
-    if filing at <u>normal retirement age</u>.
-    <!-- TODO: Compute NRA here. -->
+    <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>.
   </p>
 
   <div ng-show="!isSpousalBenefit()">
@@ -203,6 +212,18 @@
   </div>
 
   <p>
+    Note that <span class=names>{{lowerEarner().name}}'s</span> <i>total</i>
+    benefit (combined personal and spousal benefit) is equal to 50% of
+    <span class=names>{{higherEarner().name}}'s</span> <i>personal</i> benefit,
+    regardless of
+    <span class=names>{{lowerEarner().name}}'s</span> <i>personal</i> benefit.
+    This is the case, as long as
+    <span class=names>{{lowerEarner().name}}'s</span>
+    personal benefit is less than 50% of 
+    <span class=names>{{higherEarner().name}}'s</span> personal benefit.
+  </p>     
+
+  <p>
     Just like the personal benefit, the spousal benefit can be collected earlier
     than <u>normal retirement age</u> with a <u>permanently</u> <i>reduced</i>
     benefit amount. Unlike the personal benefit, delaying the collection date of
@@ -237,7 +258,7 @@
     final monthly benefit for both you and your spouse.
   </p>
 
-  <p style="margin-bottom: 2px">
+  <p style="margin-bottom: 2px; z-index: 2">
   <b><span class=names>{{higherEarner().name}}</span> files at age:</b>
   </p>
 
@@ -245,10 +266,10 @@
   <div class="force-ticks-above" id="higherEarnerSlider">
   <rzslider rz-slider-model="higherEarnerSlider.value"
             rz-slider-options="higherEarnerSlider.options"
-            class="with-legend"></rzslider>
+            class="with-legend sliderZ"></rzslider>
   </div>
 
-  <p style="margin-bottom: 2px;">
+  <p style="margin-bottom: 2px; z-index: 2">
     <b style="background-color: white">
       <span class=names>{{lowerEarner().name}}</span> files at age:
     </b>
@@ -258,15 +279,13 @@
   <div class="force-ticks-above" id="lowerEarnerSlider">
   <rzslider rz-slider-model="lowerEarnerSlider.value"
             rz-slider-options="lowerEarnerSlider.options"
-            class="with-legend"></rzslider>
+            class="with-legend sliderZ"></rzslider>
   </div>
 
   <!-- TODO: Make sure this is the correct height -->
-  <div style="height: 400px"> </div>
+  <div style="height: 400px;"> </div>
 
   <span ng-show="runOnceSpousalReportIsVisible()"></span>
 
   </div><!-- isSpousalBenefit() -->
-
-
 </div>

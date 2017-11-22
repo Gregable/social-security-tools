@@ -482,7 +482,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     canvas.setAttribute('width', width);
     canvas.setAttribute('height', height);
     canvas.setAttribute('id', 'spousal-chart-canvas');
-    canvas.setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px; ');
+    canvas.setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px; ' +
+                        'z-index: 1');
 
     return canvas;
 	}

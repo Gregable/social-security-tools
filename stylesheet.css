@@ -568,6 +568,9 @@ input.radio:focus ~ label.radio:before {
 }
 
 /* Table holding sliders for guessing at future years of work */
+.sliderZ {
+  z-index: 2;
+}
 .sliderTable  {
   margin: 0 auto;
   padding-bottom: 15px;

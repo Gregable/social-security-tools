@@ -333,9 +333,9 @@ AgeChart.prototype.mouseClickListener = function() {
   var self = this;
   return function(e) {
     if (self.mouseToggle === 'ON') {
-      self.mouseToggle = 'OFF'
+      self.mouseToggle = 'OFF';
     } else {
-      self.mouseToggle = 'ON'
+      self.mouseToggle = 'ON';
       // Immediately trigger a rendering based on mouse location.
       self.mouseMoveListener()(e);
     }

@@ -422,7 +422,7 @@ Recipient.prototype.delayIncreaseRate = function() {
 }
 
 /**
- * Returns benefit information at a given age. Age is specified as a year and
+ * Returns benefit multiplier at a given age. Age is specified as a year and
  * month index (0-11).
  * @param {number} year
  * @param {number} month
@@ -432,24 +432,22 @@ Recipient.prototype.benefitMultiplierAtAge = function(year, month) {
   // Compute the number of total months between birth and full retirement age.
   const fullAgeMonths = monthsIn(this.normalRetirement.ageYears,
                                  this.normalRetirement.ageMonths);
-  var multiplier = 0;
-  if ((year < this.normalRetirement.ageYears) ||
-      (year == this.normalRetirement.ageYears &&
-       month <= this.normalRetirement.ageMonths)) {
+  const startAgeMonths = monthsIn(year, month);
+  if (fullAgeMonths > startAgeMonths) {
     // Reduced benefits due to taking benefits early.
-    const monthsUntil = fullAgeMonths - monthsIn(year, month);
+    const monthsUntil = fullAgeMonths - startAgeMonths;
     return -1.0 * ((Math.min(36, monthsUntil) * 5.0 / 900.0) +
                    (Math.max(0, monthsUntil - 36) * 5.0 / 1200.0));
   } else {
     // Increased benefits due to taking benefits late.
-    const monthsAfter = monthsIn(year, month) - fullAgeMonths;
+    const monthsAfter = startAgeMonths - fullAgeMonths;
     return this.delayIncreaseRate() / 12 * monthsAfter;
   }
 };
 
 /**
- * Returns benefit information at a given age. Age is specified as a year and
- * month index (0-11).
+ * Returns personal benefit amount if starting benefits at a given age.
+ * Age is specified as a year and month index (0-11).
  * @param {number} year
  * @param {number} month
  * @return {number}
@@ -477,3 +475,54 @@ Recipient.prototype.earliestSpousalBenefitDate = function() {
     return earliestDate;
   return earliestSpouseDate;
 };
+
+/**
+ * Returns spousal benefit multiplier at a given age. Age is specified as a
+ * year and month index (0-11).
+ * @param {number} year
+ * @param {number} month
+ * @return {number}
+ */
+Recipient.prototype.spousalBenefitMultiplierAtAge = function(year, month) {
+  // Compute the number of total months between birth and full retirement age.
+  const fullAgeMonths = monthsIn(this.normalRetirement.ageYears,
+                                 this.normalRetirement.ageMonths);
+  const startAgeMonths = monthsIn(year, month);
+  if (fullAgeMonths > startAgeMonths) {
+    // Reduced benefits due to taking benefits early.
+    const monthsUntil = fullAgeMonths - startAgeMonths;
+    return -1.0 * ((Math.min(36, monthsUntil) * 25.0 / 3600.0) +
+                   (Math.max(0, monthsUntil - 36) * 5.0 / 1200.0));
+  } else {
+    // No increased benefits from taking spousal benefits later than full
+    // retirement age.
+    return 0.0;
+  }
+};
+
+/**
+ * Returns the final total benefit amount (personal + spousal) based on both
+ * the recipient's start age and recipient's age when spousal benefits start.
+ * Age is specified as a year and month index (0-11).
+ * @param {number} selfStartYear
+ * @param {number} selfStartMonth
+ * @param {number} spousalStartYear
+ * @param {number} spousalStartMonth
+ */
+Recipient.prototype.totalBenefitWithSpousal = function(
+    selfStartYear, selfStartMonth, spousalStartYear, spousalStartMonth) {
+  const personalBenefit = 
+    this.benefitAtAge(selfStartYear, selfStartMonth);
+
+  // The spousal benefit at full retirement is half the spouse's PIA minus
+  // the spouses PIA, or 0.
+  const spousalBenefitAtFRA = Math.max(0, 
+      (this.spouse.primaryInsuranceAmount() / 2.0) -
+      this.primaryInsuranceAmount());
+
+  const spousalBenefitMultiplier = this.spousalBenefitMultiplierAtAge(
+      spousalStartYear, spousalStartMonth);
+  const spousalBenefit = spousalBenefitAtFRA * (1 + spousalBenefitMultiplier);
+
+  return personalBenefit + spousalBenefit;
+}
