@@ -67,8 +67,9 @@ const MAXIMUM_EARNINGS = {
   2013: 113700,
   2014: 117000,
   2015: 118500,
-  2016: 127200,
-  2017: 128700,
+  2016: 118500,
+  2017: 127200,
+  2018: 128400,
 };
 
 // https://www.ssa.gov/oact/progdata/oasdiRates.html
