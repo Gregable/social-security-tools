@@ -264,7 +264,7 @@ const COLA = {
 // Number of top years of earnings which contribute to SSA calculations.
 const SSA_EARNINGS_YEARS = 35;
 
-const CURRENT_YEAR = 2017;
+const CURRENT_YEAR = 2018;
 
 const ALL_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
