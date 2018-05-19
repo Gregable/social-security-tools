@@ -12,3 +12,9 @@ SimpleHTTPServer as it is convenient:
 ```
 $ python -m SimpleHTTPServer 8000 
 ```
+
+If you're using Python 3.x, you can also write:
+
+```
+$ python -m http.server
+```
