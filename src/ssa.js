@@ -37,10 +37,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.ageChart_ = new AgeChart();
     $scope.spousalChart_ = new SpousalChart();
 
-    $scope.recipient = new Recipient("Greg");
-    $scope.spouse = new Recipient("Cristin");
-    $scope.spouse.primaryInsuranceAmountValue = 200;
-
+    $scope.recipient = new Recipient("Self");
+    $scope.spouse = new Recipient("Spouse");
+    $scope.spouse.setPrimaryInsuranceAmountValue = 0;
     $scope.recipient.setSpouse($scope.spouse);
     $scope.spouse.setSpouse($scope.recipient);
 
@@ -52,13 +51,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   
     $scope.showMedicare = true;
     $scope.showIndexedEarnings = false;
-    $scope.spousalBenefitLayoutRun = false;
 
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
-
-    $scope.loadDemoData(0);
   };
 
   $scope.loadDemoData = function(demoId) {
@@ -103,6 +99,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         $scope.recipient.initFromEarningsRecords(records);
         $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
         $scope.maybeRenderCharts();
+        $scope.refreshSlider();
       }, 
       function(jqxhr, textStatus, error) {
         console.log("Error loading Test Data");
@@ -127,6 +124,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // who knows.
     $scope.birth.maxPossibleYear = records[0].year;
   });
+
+  $scope.refreshSlider = function() {
+    $timeout(function () {
+      $scope.$broadcast('rzSliderForceRender');
+      console.log('forcerender');
+		  $scope.adjustSliderTimelines();
+    });
+  };
   
   $scope.confirmEarningsParse = function(confirmationValue) {
     if (confirmationValue === 'incorrect') {
@@ -140,6 +145,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.updateBirthdate();
     $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
     $scope.maybeRenderCharts();
+    $scope.refreshSlider();
   }
 
   $scope.showPastePrompt = function() {
@@ -339,24 +345,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
  
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function() {
+    console.log('scope.updateSpouseBirthdate');
     // Only update once there are some non-default values set.
     if (!$scope.birthDateSelected($scope.spouseBirth))
       return; 
     $scope.spouseBirth.year = parseInt($scope.spouseBirth.year);
     $scope.spouse.updateBirthdate($scope.spouseBirth);
-
-		$scope.adjustSliderTimelines();
-  }
-
-  $scope.runOnceSpousalReportIsVisible = function() {
-    // Bug fix. The slider may not initially be visible, so we need to tell
-    // it to re-render after it becomes visible the first time. This f'n
-    // is triggered by a hidden span in the spousal report.
-    if (!$scope.spousalBenefitLayoutRun && $scope.spousalBenefit() > 0) {
-      $scope.spousalBenefitLayoutRun = true;
-      $scope.adjustSliderTimelines();
-    }
-    return false;
+    
+    $scope.refreshSlider();
   }
 
   $scope.higherEarner = function() {
@@ -479,14 +475,22 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   $scope.createCanvasElement = function(x, y, width, height) {
     var canvas = document.createElement("canvas");
+    canvas.setAttribute('id', 'spousal-chart-canvas');
     canvas.setAttribute('width', width);
     canvas.setAttribute('height', height);
-    canvas.setAttribute('id', 'spousal-chart-canvas');
     canvas.setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px; ' +
                         'z-index: 1');
 
     return canvas;
 	}
+  
+  $scope.updateCanvasElement = function(x, y, width, height) {
+    var canvas = document.getElementById('spousal-chart-canvas');
+    canvas.setAttribute('width', width);
+    canvas.setAttribute('height', height);
+    canvas.setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px; ' +
+                        'z-index: 1');
+  }
 
   $scope.absoluteBoundingRect = function(element) {
     var doc  = document;
@@ -594,8 +598,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.drawSliderYears($scope.lowerEarner().dateMonthsAtAge(62),
                              $scope.lowerEarner().dateMonthsAtAge(70));
     }
-    // Force a rerender of the slider.
-    $scope.$broadcast('rzSliderForceRender');
   }
 
   // startDate and endDate must be in months since year 0.
@@ -604,6 +606,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     var higherBounds = $scope.absoluteBoundingRect(higherSlider);
     var lowerSlider = document.getElementById('lowerEarnerSlider');
     var lowerBounds = $scope.absoluteBoundingRect(lowerSlider);
+    console.log(higherBounds);
+    console.log(lowerBounds);
+
+    // Exit early if the slider hasn't been drawn yet.
+    if (higherBounds.width == 0 || lowerBounds.width == 0)
+      return;
         
     var absLeft = Math.min(higherBounds.left, lowerBounds.left);
     var absRight = Math.max(higherBounds.right, lowerBounds.right);
@@ -614,6 +622,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
           absLeft, higherBounds.top, absWidth, 600);
       document.body.appendChild(canvas);
       $scope.spousalChart_.setCanvas(canvas);
+    } else {
+      $scope.updateCanvasElement(
+          absLeft, higherBounds.top, absWidth, 600);
     }
 
     $scope.spousalChart_.setRecipients(

@@ -12,7 +12,11 @@ function SpousalChart() {
  * @return {boolean}
  */
 SpousalChart.prototype.isInitialized = function() {
-  return this.canvas_ !== null && this.recipient !== null;
+  if (this.canvas_ === null || 
+      this.lowerarner_ === null ||
+      this.higherEarner_ === null)
+    return false;
+  return true;
 };
 
 /**

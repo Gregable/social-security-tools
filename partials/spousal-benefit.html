@@ -92,7 +92,8 @@
     Primary Insurance Amount: <b>$</b>
     <input type="number" min=0 size=6 style="width: 60px"
            name="spousalPia" cast-to-integer
-           ng-model="spouse.primaryInsuranceAmountValue">
+           ng-model="spouse.primaryInsuranceAmountValue"
+           ng-change="refreshSlider()">
     / month
   </p>
 
@@ -165,7 +166,7 @@
       50%
     ) - <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>
     <span class=multsymbol>=</span> <b>${{spousalBenefit() | number:0}}</b>
-  </p>
+  </pi>
 
   <p ng-show="isSpousalBenefit()">
     This spousal benefit (<b>${{spousalBenefit() | number:0}}</b>) is the amount
@@ -283,9 +284,7 @@
   </div>
 
   <!-- TODO: Make sure this is the correct height -->
-  <div style="height: 400px;"> </div>
-
-  <span ng-show="runOnceSpousalReportIsVisible()"></span>
+  <div style="height: 450px;"> </div>
 
   </div><!-- isSpousalBenefit() -->
 </div>
