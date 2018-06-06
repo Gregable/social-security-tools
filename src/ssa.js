@@ -128,8 +128,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.refreshSlider = function() {
     $timeout(function () {
       $scope.$broadcast('rzSliderForceRender');
-      console.log('forcerender');
-		  $scope.adjustSliderTimelines();
+		  $scope.layoutSliderChart();
     });
   };
   
@@ -345,7 +344,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
  
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function() {
-    console.log('scope.updateSpouseBirthdate');
     // Only update once there are some non-default values set.
     if (!$scope.birthDateSelected($scope.spouseBirth))
       return; 
@@ -473,25 +471,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
   $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
 
-  $scope.createCanvasElement = function(x, y, width, height) {
-    var canvas = document.createElement("canvas");
-    canvas.setAttribute('id', 'spousal-chart-canvas');
-    canvas.setAttribute('width', width);
-    canvas.setAttribute('height', height);
-    canvas.setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px; ' +
-                        'z-index: 1');
-
-    return canvas;
-	}
-  
-  $scope.updateCanvasElement = function(x, y, width, height) {
-    var canvas = document.getElementById('spousal-chart-canvas');
-    canvas.setAttribute('width', width);
-    canvas.setAttribute('height', height);
-    canvas.setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px; ' +
-                        'z-index: 1');
-  }
-
   $scope.absoluteBoundingRect = function(element) {
     var doc  = document;
     var win  = window;
@@ -558,109 +537,98 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return $scope.createLineElement(x, y, c, alpha);
 	}
 
-  // Method adjusts the spousal age sliders so that they are vertically
-  // aligned by year.
-  $scope.adjustSliderTimelines = function() {
-    // First refresh the ages for the two sliders.
+  // This method lays out the spousal age sliders and associated spousal chart.
+  // The sliders will be verically aligned by year, adjusting for the spouses
+  // ages. The spousal chart will align with the years on the slider.
+  $scope.layoutSliderChart = function() {
+    // Return early if the spousalBenefit section hasn't been rendered yet.
+    var section = document.getElementById('spousalBenefit');
+    if (section === null) return;
+
+    var higherSlider = document.getElementById('higherEarnerSlider');
+    var lowerSlider = document.getElementById('lowerEarnerSlider');
+    var higherSliderBounds = $scope.absoluteBoundingRect(higherSlider);
+    var lowerSliderBounds = $scope.absoluteBoundingRect(lowerSlider);
+    // Return early if the sliders haven't redrawn and have zero size.
+    if (higherSliderBounds.width == 0 || lowerSliderBounds.width == 0)
+      return;
+
+    // Refresh the ages for the two sliders.
     $scope.higherEarnerSlider.refresh();
     $scope.lowerEarnerSlider.refresh();
 
-    var section = document.getElementById('spousalBenefit');
-    if (section === null) return;
-    // Each slider has a small 'tail' on each side of the slider which is
-    // 16px wide that we must ignore in the total width;
-    var totalWidth = $scope.absoluteBoundingRect(section).width - 32;
+    // TODO: Handle cases where the earners are more than 10
+    // years apart in a better way. Currently, the sliders get
+    // bunched up since time is represented linearly.
+
+
+    // The number of months spanned is 8 years (age 62 - 70) plus the
+    //  difference in ages of the two earners.
     var higherMonths = $scope.higherEarner().monthsOldAtDate(62, 0);
     var lowerMonths = $scope.lowerEarner().monthsOldAtDate(62, 0);
-    var higherSlider = document.getElementById('higherEarnerSlider');
-    var lowerSlider = document.getElementById('lowerEarnerSlider');
-
-    // TODO: We should handle cases where the earners are more than 8
-    // years apart in a better way.
-
     var numMonths = Math.abs(higherMonths - lowerMonths) + (8*12);
+    // Each slider has a small 'tail' on each side of the slider which is
+    // 16px wide that we must ignore in the total width.
+    var totalWidth = $scope.absoluteBoundingRect(section).width - 32;
     // Each slider should be 8*12 months wide and the whole thing
-    // is totalWidth wide.
+    // is totalWidth wide. The margin is the width that each slider will
+    // not occupy.
     var newMargin = (1 - (8*12 / numMonths)) * totalWidth;
+
+    // chartStartDate and chartEndDate will be months since year 0. They
+    // represent the start and end date for the entire spousal chart.
+    var chartStartDate;
+    var chartEndDate;
     if (higherMonths < lowerMonths) {  // Higher earner is younger
       higherSlider.setAttribute('style', "margin-left: " + newMargin + "px");
       lowerSlider.setAttribute('style', "margin-right: " + newMargin + "px");
-      $scope.drawSliderYears($scope.lowerEarner().dateMonthsAtAge(62),
-                             $scope.higherEarner().dateMonthsAtAge(70));
+      chartStartDate = $scope.lowerEarner().dateMonthsAtAge(62);
+      chartEndDate = $scope.higherEarner().dateMonthsAtAge(70);
     } else if (higherMonths > lowerMonths) {  // Higher earner is older
       higherSlider.setAttribute('style', "margin-right: " + newMargin + "px");
       lowerSlider.setAttribute('style', "margin-left: " + newMargin + "px");
-      $scope.drawSliderYears($scope.higherEarner().dateMonthsAtAge(62),
-                             $scope.lowerEarner().dateMonthsAtAge(70));
+      chartStartDate = $scope.higherEarner().dateMonthsAtAge(62);
+      chartEndDate = $scope.lowerEarner().dateMonthsAtAge(70);
     } else { // both earners same birth month and year
       higherSlider.setAttribute('style', "");
       lowerSlider.setAttribute('style', "");
-      $scope.drawSliderYears($scope.lowerEarner().dateMonthsAtAge(62),
-                             $scope.lowerEarner().dateMonthsAtAge(70));
+      chartStartDate = $scope.lowerEarner().dateMonthsAtAge(62);
+      chartEndDate = $scope.lowerEarner().dateMonthsAtAge(70);
     }
-  }
 
-  // startDate and endDate must be in months since year 0.
-  $scope.drawSliderYears = function(startDate, endDate) {
-    var higherSlider = document.getElementById('higherEarnerSlider');
-    var higherBounds = $scope.absoluteBoundingRect(higherSlider);
-    var lowerSlider = document.getElementById('lowerEarnerSlider');
-    var lowerBounds = $scope.absoluteBoundingRect(lowerSlider);
-    console.log(higherBounds);
-    console.log(lowerBounds);
+    // We may have resized the element containing the sliders at this point.
+    // We want to rebroadcast that the element's children should relayout one
+    // more time.
+    $scope.$broadcast('rzSliderForceRender');
 
-    // Exit early if the slider hasn't been drawn yet.
-    if (higherBounds.width == 0 || lowerBounds.width == 0)
-      return;
-        
-    var absLeft = Math.min(higherBounds.left, lowerBounds.left);
-    var absRight = Math.max(higherBounds.right, lowerBounds.right);
+    // Create the chart or update it's position.
+    var absLeft = Math.min(higherSliderBounds.left, lowerSliderBounds.left);
+    var absRight = Math.max(higherSliderBounds.right, lowerSliderBounds.right);
     var absWidth = absRight - absLeft;
-
+    var canvas;
     if (!$scope.spousalChart_.isInitialized()) {
-      var canvas = $scope.createCanvasElement(
-          absLeft, higherBounds.top, absWidth, 600);
-      document.body.appendChild(canvas);
+      canvas = document.createElement("canvas");
+      canvas.setAttribute('id', 'spousal-chart-canvas');
+      canvas.setAttribute('width', absWidth);
+      canvas.setAttribute('height', 600);
       $scope.spousalChart_.setCanvas(canvas);
+      document.body.appendChild(canvas);
     } else {
-      $scope.updateCanvasElement(
-          absLeft, higherBounds.top, absWidth, 600);
+      canvas = document.getElementById('spousal-chart-canvas');
     }
+    // The canvas is absolutely positioned on the page based on the location
+    // of other elements, so it must be repositioned on any changes which
+    // can relayout the document.
+    canvas.style.top = higherSliderBounds.top + 'px'
+    canvas.style.left = absLeft + 'px'
+    canvas.style.zIndex = "1";
 
     $scope.spousalChart_.setRecipients(
         $scope.lowerEarner(), $scope.higherEarner());
     $scope.spousalChart_.setSliders(
         $scope.lowerEarnerSlider, $scope.higherEarnerSlider);
-    $scope.spousalChart_.setDateRange(startDate, endDate);
+    $scope.spousalChart_.setDateRange(chartStartDate, chartEndDate);
     $scope.spousalChart_.render();
-
-    /*
-    // Remove the old line, present.
-    var oldLines = $('div.lineElement');
-    for (var i = 0; i < oldLines.size(); ++i)
-      document.body.removeChild(oldLines[i]);
-
-    var startY = higherBounds.top;
-    var endY = lowerBounds.bottom;
-    var leftX = higherBounds.left + 16;
-    var rightX = lowerBounds.right - 16;
-
-    console.log(startDate);
-    console.log(endDate);
-    for (var i = startDate; i <= endDate; ++i) {
-      console.log(i);
-      if (i % 12 !== 0)
-        continue;
-
-      var x = (i - startDate) / (endDate - startDate) *
-        (rightX - leftX) + leftX;
-      console.log(x);
-
-      var line = $scope.createLine(x, startY, x, endY);
-      line.setAttribute('id', 'sliderLine');
-      document.body.appendChild(line);
-    }
-    */
   }
   
   $scope.filingDate = function(sliderValue, earner) {

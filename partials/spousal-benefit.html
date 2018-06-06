@@ -205,7 +205,7 @@
       <div style="width: {{spousalBenefitFraction()}}%; background-color: #5cb85c; height: 100%; border-right: 1px solid #666">
       </div>
     </div>
-    <img style="width: 100%; max-height: 30px; padding-top: 2px;" src="/static/horiz-curly.png">
+    <img style="width: 100%; max-height: 30px; padding-top: 2px;" src="static/horiz-curly.png">
     <!-- TODO: Create a sideways { that points to total -->
     <div style="width: 100%; text-align: center;">
       Total: <b>${{spousalMax() | number:0}}</b>
@@ -224,6 +224,7 @@
     <span class=names>{{higherEarner().name}}'s</span> personal benefit.
   </p>     
 
+  <h2>Early and Delayed Spousal Filing</h3>
   <p>
     Just like the personal benefit, the spousal benefit can be collected earlier
     than <u>normal retirement age</u> with a <u>permanently</u> <i>reduced</i>
@@ -283,8 +284,49 @@
             class="with-legend sliderZ"></rzslider>
   </div>
 
-  <!-- TODO: Make sure this is the correct height -->
-  <div style="height: 450px;"> </div>
+  <div style="height: 450px;"></div>
+
+  <p>
+    As you can see, if you file for your monthly benefit later in
+    life, the actual benefit is larger. Whether it is better to collect
+    earlier or later in life depends on several factors:
+  <ul>
+    <li>
+      If you need income earlier in life, that may be an overriding factor
+      leading you to file for Social Security <u>earlier</u>.
+    </li>
+    <li>
+      If you are concerned about running out of retirement savings at an age
+      where returning to work may no longer be possible, you may choose to
+      file <u>later</u> in order to have a higher monthly income later in life.
+    <li>
+      If you are in good health and feel like you may live longer than average,
+      it may be better to ensure a high monthly benefit <u>later</u> in your
+      life rather than income in your early retirement years.
+    </li>
+    <li>
+      If you are in poor health, it may be the right choice to file
+      <u>earlier</u> because payments stop upon death.
+    </li>
+  </ul>  
+  </p>
+
+  <p>
+    In fact, the Social Security Administration designed the increases from
+    delaying benefits to be financially neutral to the program. The expected
+    payments are the same to the average person regardless of when that person
+    first begins taking his or her benefit. This is done using actuarial tables
+    of average American life expectancies.
+  </p>
+
+  <p>
+    Despite many web pages with strong opinions offering the "perfect strategy"
+    for maximizing benefits, this is a very personal decision. The financially
+    optimal filing date depends on the age at which the recipient dies, which is
+    a date no website can predict. Most such sites simply select an average
+    life expectancy and use that, but you are unlikely to live to a precisely
+    average age.
+  </p>
 
   </div><!-- isSpousalBenefit() -->
 </div>
