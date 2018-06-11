@@ -431,6 +431,24 @@ table.benefitBrackets tr:last-child td:nth-child(2) {
   border-top: 1px solid;
 }
 
+/* Spousal Combined benefit table */
+table.combinedBenefit {
+  margin: auto;
+}
+table.combinedBenefit tr:first-child td:first-child {
+  text-align: left;
+}
+table.combinedBenefit tr:not(:first-child) td:first-child {
+  width: 18px;
+}
+table.combinedBenefit tr:not(:first-child) td:nth-child(2) {
+  text-align: right;
+  padding-right: 6px;
+}
+table.combinedBenefit tr:last-child td:last-child {
+  border-top: 1px solid;
+}
+
 /* Canvas Chart CSS */
 .chart-container {
   position: relative;
@@ -595,6 +613,40 @@ input.radio:focus ~ label.radio:before {
   padding-left: 5px;
   padding-right: 5px;
 }
+/* Slider for the custom earner start dates */
+#higherEarnerSlider .rz-tick,
+#higherEarnerSlider .rz-tick.selected,
+#higherEarnerSlider .rz-bar {
+  background: #f6dfad;
+}
+#higherEarnerSlider .rz-active,
+#higherEarnerSlider .rz-selection,
+#higherEarnerSlider .rz-selected {
+  background: #e69f00;
+}
+#higherEarnerSlider .rz-pointer {
+  background-color: #e69f00;
+}
+#higherEarnerSlider .rz-limit {
+  color: #e69f00;
+}
+#lowerEarnerSlider .rz-tick,
+#lowerEarnerSlider .rz-bar {
+  background: #d9ebd9;
+}
+#lowerEarnerSlider .rz-active,
+#lowerEarnerSlider .rz-selection,
+#lowerEarnerSlider .rz-selected {
+  background: #060;
+}
+#lowerEarnerSlider .rz-pointer {
+  background-color: #060;
+}
+#lowerEarnerSlider .rz-limit {
+  color: #060;
+}
+
+
 /* Override rz-slider's css for placing ticks below the slider
  * when there are more steps than ticks.*/
 .force-ticks-above .rz-ticks-values-under .rz-tick-value {
@@ -605,7 +657,7 @@ input.radio:focus ~ label.radio:before {
 span.rz-bubble {
   background-color: rgba(255, 255, 255, 0.7);
   z-index: 2;
-  color: #339 !important;
+  /*color: #339 !important;*/
 }
 /* Add some padding for the transparency, excluding the left hand side */
 span.rz-bubble:not([style*="left: 5px;"]),  {
@@ -718,7 +770,14 @@ span.names {
   color: #3B3B9F;
   font-weight: 600;
 }
-
+span.higherEarner {
+  color: #5E4000;
+  font-weight: 600;
+}
+span.lowerEarner {
+  color: #004000;
+  font-weight: 600;
+}
 p.nameEntry {
   text-align: center;
 }
@@ -735,4 +794,16 @@ div.lineElement {
 canvas#spousal-chart-canvas {
   position: absolute;
   z-index: -3;
+}
+
+div.totalSpousalAtDate {
+  /* This attempts to match the canvas line selecting the date in the spousal
+   * chart.
+   */
+  border-color: #337ab7;
+  border-style: dashed;
+  border-width: 2px;
+  margin-bottom: 6px;
+  padding: 8px;
+  font-size: 16px;
 }

@@ -2,7 +2,8 @@
  * Code for driving a chart displaying spousal benefits.
  * @constructor
  */
-function SpousalChart() {
+function SpousalChart(selectedDateCb) {
+  this.updateSelectedDate = selectedDateCb;
   this.canvas_ = null;
 }
 
@@ -155,20 +156,21 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
  */
 SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
   var months = this.dateX(canvasX);
+  this.updateSelectedDate(months);
   var text = ALL_MONTHS[months % 12] + ' ';
   text += Math.floor(months / 12);
 
   this.context_.save();
   // Bluish dashed lines.
   this.context_.strokeStyle = '#337ab7';
-  this.context_.setLineDash([3,5]);
+  this.context_.setLineDash([6,4]);
   this.context_.lineCap = 'butt';
   this.context_.lineWidth = 2;
 
   // Draw vertical line.
   this.context_.beginPath();
   this.context_.moveTo(canvasX, 40);
-  this.context_.lineTo(canvasX, 600);
+  this.context_.lineTo(canvasX, 620);
   this.context_.stroke();
 
   var textWidth = this.context_.measureText(text).width;
@@ -257,14 +259,36 @@ SpousalChart.prototype.renderHigherEarner = function() {
 
   var dollars = this.higherEarnerPersonalBenefit();
   
-  this.context_.strokeStyle = '#600';
+  this.context_.strokeStyle = '#e69f00';
   this.context_.beginPath();
-  this.context_.moveTo(this.canvas_.width, this.canvasHigherY(0));
+  this.context_.moveTo(this.canvas_.width - 1, this.canvasHigherY(0));
   this.context_.lineTo(this.canvasX(startDate), this.canvasHigherY(0));
   this.context_.lineTo(this.canvasX(startDate), this.canvasHigherY(dollars));
-  this.context_.lineTo(this.canvas_.width, this.canvasHigherY(dollars));
+  this.context_.lineTo(this.canvas_.width - 1, this.canvasHigherY(dollars));
+  this.context_.fillStyle = '#f6dfad';
+  this.context_.fill();
   this.context_.stroke();
 
+  this.context_.restore();
+
+  // Add the user's name to the box:
+  this.context_.save();
+  var regionWidth = this.canvas_.width - this.canvasX(startDate);
+  var regionHeight = this.canvasHigherY(0) - this.canvasHigherY(dollars);
+  var centerX = regionWidth / 2 + this.canvasX(startDate);
+  var centerY = regionHeight / 2 + this.canvasHigherY(dollars);
+  this.context_.fillStyle = '#5e4000';
+  for (font_height = 24; font_height >= 10; font_height--) {
+    this.context_.font = font_height + "px Helvetica";
+    var box = this.context_.measureText(this.higherEarner_.name);
+    // If there is enough space at this font size, draw the user's name.
+    if ((box.width + 20) < regionWidth && (font_height + 20) < regionHeight) {
+      this.context_.fillText(this.higherEarner_.name,
+                             centerX - (box.width / 2),
+                             centerY + (font_height * 0.4));
+      break;
+    }
+  }
   this.context_.restore();
 };
 
@@ -298,9 +322,9 @@ SpousalChart.prototype.lowerEarnerPersonalBenefit = function() {
 };
 
 /**
- * Compute the lower earner's spousal benefit in dollars.
+ * Compute the lower earner's total benefit (personal + spousal) in dollars.
  */
-SpousalChart.prototype.lowerEarnerSpousalBenefit = function() {
+SpousalChart.prototype.lowerEarnerTotalBenefit = function() {
   var startAge = this.lowerEarnerStartAge();
   const startAgeYears = Math.floor(startAge / 12);
   const startAgeMonths = startAge % 12;
@@ -311,8 +335,7 @@ SpousalChart.prototype.lowerEarnerSpousalBenefit = function() {
   const spousalStartAgeMonths = spousalStartAge % 12;
 
   return this.lowerEarner_.totalBenefitWithSpousal(
-      startAgeYears, startAgeMonths,
-      spousalStartAgeYears, spousalStartAgeMonths);
+      startAgeYears, startAgeMonths);
 };
 
 /**
@@ -326,12 +349,11 @@ SpousalChart.prototype.renderLowerEarner = function() {
   var startDate = this.lowerEarnerStartDate();
   var spousalStartDate = this.spousalStartDate();
   var personal = this.lowerEarnerPersonalBenefit();
-  var spousal = this.lowerEarnerSpousalBenefit();
-  var total = personal + spousal;
-  
+  var total = this.lowerEarnerTotalBenefit();
+ 
   this.context_.strokeStyle = '#060';
   this.context_.beginPath();
-  this.context_.moveTo(this.canvas_.width, this.canvasLowerY(0));
+  this.context_.moveTo(this.canvas_.width - 1, this.canvasLowerY(0));
   this.context_.lineTo(this.canvasX(spousalStartDate), this.canvasLowerY(0));
   if (personal > 0) {
     this.context_.lineTo(this.canvasX(startDate), this.canvasLowerY(0));
@@ -341,9 +363,35 @@ SpousalChart.prototype.renderLowerEarner = function() {
                        this.canvasLowerY(personal));
   this.context_.lineTo(this.canvasX(spousalStartDate),
                        this.canvasLowerY(total));
-  this.context_.lineTo(this.canvas_.width, this.canvasLowerY(total));
-
+  this.context_.lineTo(this.canvas_.width - 1, this.canvasLowerY(total));
+  this.context_.fillStyle = '#d9ebd9';
+  this.context_.fill();
   this.context_.stroke();
+  this.context_.restore();
+
+  // Add the user's name to the box:
+  this.context_.save();
+  if (personal >= total) {
+    var regionWidth = this.canvas_.width - this.canvasX(startDate);
+    var centerX = regionWidth / 2 + this.canvasX(startDate);
+  } else {
+    var regionWidth = this.canvas_.width - this.canvasX(spousalStartDate);
+    var centerX = regionWidth / 2 + this.canvasX(spousalStartDate);
+  }
+  var regionHeight = this.canvasLowerY(total) - this.canvasLowerY(0);
+  var centerY = regionHeight / 2 + this.canvasLowerY(0);
+  this.context_.fillStyle = '#004000';
+  for (font_height = 24; font_height >= 10; font_height--) {
+    this.context_.font = font_height + "px Helvetica";
+    var box = this.context_.measureText(this.lowerEarner_.name);
+    // If there is enough space at this font size, draw the user's name.
+    if ((box.width + 20) < regionWidth && (font_height + 20) < regionHeight) {
+      this.context_.fillText(this.lowerEarner_.name,
+                             centerX - (box.width / 2),
+                             centerY + (font_height * 0.4));
+      break;
+    }
+  }
   this.context_.restore();
 };
 
@@ -359,6 +407,7 @@ SpousalChart.prototype.render = function() {
   this.renderHigherEarner();
   this.renderLowerEarner();
 
+  this.updateSelectedDate(-1);
   if (this.mouseToggle === 'OFF')
     this.renderSelectedDateVerticalLine(this.lastMouseX);
 
@@ -366,33 +415,19 @@ SpousalChart.prototype.render = function() {
 };
 
 /**
- * Selects a y-coordinate (in dollars) to be the topmost edge
- * of our chart.
+ * Returns the maximum dollars that will be displayed on this chart. This is
+ * the maximum benefit for both lower and higher earner summed.
  * @return {Number}
  */
 SpousalChart.prototype.maxRenderedYDollars = function() {
   return this.higherEarner_.benefitAtAge(70, 0) +
-         this.lowerEarner_.benefitAtAge(70, 0) +
-         this.lowerEarner_.totalBenefitWithSpousal(70, 0, 70, 0);
-};
-
-/**
- * Compute the canvas y-coordinate for a benefit dollars value.
- * @param {number} benefitY
- * @return {number}
- */
-SpousalChart.prototype.canvasY = function(benefitY) {
-  var yValue = this.canvas_.height -
-      Math.floor(benefitY / this.maxRenderedYDollars() * this.chartHeight());
-  return yValue;
+         this.lowerEarner_.totalBenefitWithSpousal(70, 0);
 };
 
 SpousalChart.prototype.midpointYValue = function() {
   // The midpoint line is the canvas y position of the 0 benefit line.
-  var spousalDollars =
-      this.lowerEarner_.benefitAtAge(70, 0) +
-      this.lowerEarner_.totalBenefitWithSpousal(70, 0, 70, 0);
-  var midpointYValue = this.canvas_.height -
+  var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(70, 0);
+  var midpointYValue = this.canvas_.height - 20 -
       Math.floor(spousalDollars / this.maxRenderedYDollars()
           * this.chartHeight()) - 10;
 
@@ -426,7 +461,7 @@ SpousalChart.prototype.canvasHigherY = function(benefitY) {
   var canvasYValue =
       Math.floor(benefitY / this.maxRenderedYDollars() * this.chartHeight());
 
-  return this.midpointYValue() - canvasYValue;
+  return this.midpointYValue() - canvasYValue - 1;
 };
 
 /** Renders specific value boxes based on mouse location. */

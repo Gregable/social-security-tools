@@ -47,7 +47,10 @@ function Recipient(name) {
   // Once earnings have been processed, this stores the indexed earning dollar
   // amount below which additional earnings values will not affect earnings.
   this.cutoffIndexedEarnings = 0;
-  
+ 
+  // This value is the your total over the <= 35 years of earning history.
+  this.totalIndexedEarnings = 0;
+ 
   // This value is the your average monthly earnings (floored) over the <= 35
   // years of earning history: total earnings / 35 / 12.
   this.monthlyIndexedEarnings = 0;
@@ -174,22 +177,22 @@ Recipient.prototype.dateMonthsAtAge = function(year, month) {
 
 
 /**
- * Returns the age at a given date. Date is specified as a year and
- * month index (0-11).
- * @param {number} year
- * @param {number} month
+ * Returns the age at a given date. Date is specified as months since epoch.
+ * @param {number} dateMonths
  * @return {Object}
  */
-Recipient.prototype.ageAtDate = function(year, month) {
-  if (month === undefined) month = 0;
-  var dateMonthIndex = monthIndex(this.birthDate.month);
-  var ageYear = (year - this.birthDate.year +
-                  Math.floor((month - dateMonthIndex) / 12));
-  var ageMonth = (month + 12 - dateMonthIndex) % 12
+Recipient.prototype.ageAtDate = function(dateMonths) {
+  var birthMonthIndex = monthIndex(this.birthDate.month);
+  var dateAgeZero = 12 * this.birthDate.year + birthMonthIndex;
+
+  var ageInMonthsAtDate = dateMonths - dateAgeZero;
+  if (ageInMonthsAtDate < 0)
+    return -1;
+
   return {
-    month: ALL_MONTHS[ageMonth],
-    year: ageYear
-  }
+    months: ageInMonthsAtDate % 12,
+    year: Math.floor(ageInMonthsAtDate / 12)
+  };
 };
 
 /**
@@ -287,9 +290,9 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   }
 
   // Total indexed earnings is the sum of your top 35 indexed earnings.
-  var totalIndexedEarnings = 0;
+  this.totalIndexedEarnings = 0;
   for (var i = 0; i < allIndexedValues.length && i < SSA_EARNINGS_YEARS; ++i) {
-    totalIndexedEarnings += allIndexedValues[i];
+    this.totalIndexedEarnings += allIndexedValues[i];
   }
 
   // SSA floors the monthly indexed earnings value. This floored value
@@ -297,7 +300,7 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   // your anual insurance amount, it's computed based on monthly values, ie:
   // 12 * floor(totalIndexedEarnings / 12)
   this.monthlyIndexedEarnings =
-    Math.floor(totalIndexedEarnings / 12 / SSA_EARNINGS_YEARS);
+    Math.floor(this.totalIndexedEarnings / 12 / SSA_EARNINGS_YEARS);
   
   // From the monthlyIndexedEarnings, compute this user's primary insurance
   // amount.
@@ -503,16 +506,12 @@ Recipient.prototype.spousalBenefitMultiplierAtAge = function(year, month) {
 /**
  * Returns the final total benefit amount (personal + spousal) based on both
  * the recipient's start age and recipient's age when spousal benefits start.
- * Age is specified as a year and month index (0-11).
- * @param {number} selfStartYear
- * @param {number} selfStartMonth
- * @param {number} spousalStartYear
- * @param {number} spousalStartMonth
+ * Age is specified as a year and month index (0-11) since birth.
+ * @param {number} startYear
+ * @param {number} startMonth
  */
-Recipient.prototype.totalBenefitWithSpousal = function(
-    selfStartYear, selfStartMonth, spousalStartYear, spousalStartMonth) {
-  const personalBenefit = 
-    this.benefitAtAge(selfStartYear, selfStartMonth);
+Recipient.prototype.totalBenefitWithSpousal = function(startYear, startMonth) {
+  const personalBenefit = this.benefitAtAge(startYear, startMonth);
 
   // The spousal benefit at full retirement is half the spouse's PIA minus
   // the spouses PIA, or 0.
@@ -521,7 +520,7 @@ Recipient.prototype.totalBenefitWithSpousal = function(
       this.primaryInsuranceAmount());
 
   const spousalBenefitMultiplier = this.spousalBenefitMultiplierAtAge(
-      spousalStartYear, spousalStartMonth);
+      startYear, startMonth);
   const spousalBenefit = spousalBenefitAtFRA * (1 + spousalBenefitMultiplier);
 
   return personalBenefit + spousalBenefit;

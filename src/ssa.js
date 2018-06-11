@@ -28,14 +28,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     placeholder: '\n\nPaste Result Here'
   };
 
-  /**
+ /**
    * Initialization
    */
   $scope.init = function() {
     $scope.Math = window.Math;
     $scope.breakPointChart_ = new BreakPointChart();
     $scope.ageChart_ = new AgeChart();
-    $scope.spousalChart_ = new SpousalChart();
+    $scope.spousalChartSelectedDate = 0;
+    $scope.spousalChart_ = new SpousalChart(
+        $scope.updateSpousalChartSelectedDate);
 
     $scope.recipient = new Recipient("Self");
     $scope.spouse = new Recipient("Spouse");
@@ -56,6 +58,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
   };
+
 
   $scope.loadDemoData = function(demoId) {
     // User may have scrolled down. Since we aren't actually chaning URL,
@@ -610,7 +613,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       canvas = document.createElement("canvas");
       canvas.setAttribute('id', 'spousal-chart-canvas');
       canvas.setAttribute('width', absWidth);
-      canvas.setAttribute('height', 600);
+      canvas.setAttribute('height', 620);
       $scope.spousalChart_.setCanvas(canvas);
       document.body.appendChild(canvas);
     } else {
@@ -646,4 +649,53 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return $scope.filingDate(
         $scope.lowerEarnerSlider.value, $scope.lowerEarner());
   }
+
+  // Callback from spousal chart's mouse handlers. |date| is the number of
+  // months since epoch of the selected date in the spousal chart.
+  $scope.updateSpousalChartSelectedDate = function(dateMonths) {
+    console.log(dateMonths);
+    $scope.spousalSelection = {};
+    $scope.spousalSelection.show = (dateMonths > 0);
+    if ($scope.spousalSelection.show) {
+      $scope.spousalSelection.dateText =
+        ALL_MONTHS[dateMonths % 12] + ' ' + Math.floor(dateMonths / 12);
+
+      var lowerAge = $scope.lowerEarner().ageAtDate(dateMonths);
+
+      // TODO: This is incorrect
+      
+      if ($scope.lowerEarner().dateMonthsAtAge(0) +
+          this.lowerEarnerSlider_.value > dateMonths) {
+        $scope.spousalSelection.lowerEarnerBenefit = 0;
+      } else if ($scope.higherEarner().dateMonthsAtAge(0) +
+               this.higherEarnerSlider_.value > dateMonths) {
+        $scope.spousalSelection.lowerEarnerBenefit =
+            $scope.lowerEarner().benefitAtAge(
+                Math.floor(this.lowerEarnerSlider_.value / 12),
+                this.lowerEarnerSlider_.value % 12);
+      } else {
+        $scope.spousalSelection.lowerEarnerBenefit =
+            $scope.lowerEarner().totalBenefitWithSpousal(
+                lowerAge.year, lowerAge.months);
+      };
+      
+      if ($scope.higherEarner().dateMonthsAtAge(0) +
+          this.higherEarnerSlider_.value > dateMonths) {
+        $scope.spousalSelection.higherEarnerBenefit = 0;
+      } else {
+        $scope.spousalSelection.higherEarnerBenefit =
+          $scope.higherEarner().benefitAtAge(
+              Math.floor(this.higherEarnerSlider_.value / 12),
+              this.higherEarnerSlider_.value % 12);
+      };
+
+      $scope.spousalSelection.lowerEarnerBenefit = 
+        Math.floor($scope.spousalSelection.lowerEarnerBenefit);
+      $scope.spousalSelection.higherEarnerBenefit = 
+        Math.floor($scope.spousalSelection.higherEarnerBenefit);
+    }
+    $scope.$apply();
+  }
+
+ 
 })

@@ -224,7 +224,7 @@
     <span class=names>{{higherEarner().name}}'s</span> personal benefit.
   </p>     
 
-  <h2>Early and Delayed Spousal Filing</h3>
+  <h2>Early and Delayed Spousal Retirement</h3>
   <p>
     Just like the personal benefit, the spousal benefit can be collected earlier
     than <u>normal retirement age</u> with a <u>permanently</u> <i>reduced</i>
@@ -255,6 +255,7 @@
   </ul>
   </p>
 
+  <h2>Early and Delayed Combined Retirement</h3>
   <p>
     Use the sliders below to see how different filing dates affect the
     final monthly benefit for both you and your spouse.
@@ -284,7 +285,44 @@
             class="with-legend sliderZ"></rzslider>
   </div>
 
-  <div style="height: 450px;"></div>
+  <!-- Div which positions text at the correct y-position below the spousal
+    canvas element -->
+  <div style="height: 436px;"></div>
+
+  <div ng-show="spousalSelection.show" class=totalSpousalAtDate> 
+    <table class=combinedBenefit>
+      <tr>
+        <td colspan=3>
+          <b>In {{spousalSelection.dateText}},</b>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <span class=higherEarner>{{higherEarner().name}}'s Benefit</span>:
+        </td><td>
+          ${{spousalSelection.higherEarnerBenefit | number:0}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <span class=lowerEarner>{{lowerEarner().name}}'s Benefit</span>:
+        </td><td>
+          ${{spousalSelection.lowerEarnerBenefit | number:0}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <b>Total Benefit</b>:
+        </td><td>
+          ${{(spousalSelection.higherEarnerBenefit + 
+              spousalSelection.lowerEarnerBenefit) | number:0}}
+        </td>
+      </tr>
+    </table>
+  </div>
 
   <p>
     As you can see, if you file for your monthly benefit later in
