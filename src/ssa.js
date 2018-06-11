@@ -72,6 +72,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.maxPossibleYear = 1950;
       $scope.updateBirthdate();
       $scope.fetchTestData('averagepaste.txt');
+      $scope.refreshSlider();
     }
     if (demoId === 1) {
       $scope.demoId = 1;
@@ -80,6 +81,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.maxPossibleYear = 1950;
       $scope.updateBirthdate();
       $scope.fetchTestData('millionpaste.txt');
+      $scope.refreshSlider();
     }
     if (demoId === 2) {
       $scope.demoId = 2;
@@ -88,6 +90,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.maxPossibleYear = 1985;
       $scope.updateBirthdate();
       $scope.fetchTestData('youngpaste.txt');
+      $scope.refreshSlider();
     }
   }
 
@@ -676,7 +679,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       } else {
         $scope.spousalSelection.lowerEarnerBenefit =
             $scope.lowerEarner().totalBenefitWithSpousal(
-                lowerAge.year, lowerAge.months);
+                Math.floor(this.lowerEarnerSlider_.value / 12),
+                this.lowerEarnerSlider_.value % 12);
       };
       
       if ($scope.higherEarner().dateMonthsAtAge(0) +
