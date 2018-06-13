@@ -81,7 +81,7 @@ SpousalChart.prototype.chartWidth = function() {
  * @return {number}
  */
 SpousalChart.prototype.chartHeight = function() {
-  return 300;
+  return 270;
 };
 
 /**
@@ -249,6 +249,13 @@ SpousalChart.prototype.lowerEarnerStartAge = function() {
 };
 
 /**
+ * Converts a string such as '1200' to '1,200'.
+ */
+SpousalChart.prototype.insertNumericalCommas = function(num) {
+ return num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+}
+
+/**
  * Render the earnings of the higher earner.
  */
 SpousalChart.prototype.renderHigherEarner = function() {
@@ -273,9 +280,10 @@ SpousalChart.prototype.renderHigherEarner = function() {
 
   // Add the user's name to the box:
   this.context_.save();
-  var regionWidth = this.canvas_.width - this.canvasX(startDate);
+  var leftX = this.canvasX(startDate);
+  var regionWidth = this.canvas_.width - leftX;
   var regionHeight = this.canvasHigherY(0) - this.canvasHigherY(dollars);
-  var centerX = regionWidth / 2 + this.canvasX(startDate);
+  var centerX = regionWidth / 2 + leftX;
   var centerY = regionHeight / 2 + this.canvasHigherY(dollars);
   this.context_.fillStyle = '#5e4000';
   for (font_height = 24; font_height >= 10; font_height--) {
@@ -290,6 +298,30 @@ SpousalChart.prototype.renderHigherEarner = function() {
     }
   }
   this.context_.restore();
+
+  // Add the dollar amounts below the box.
+  this.context_.save();
+  this.context_.fillStyle = '#5e4000';
+  this.context_.font = "14px Helvetica";
+  var text = '$' + this.insertNumericalCommas(dollars) + ' / mo';
+  var box = this.context_.measureText(text);
+  if ((box.width + 20) < regionWidth) {
+    this.context_.fillText(
+        text,
+        leftX + 10,
+        this.canvasHigherY(dollars) - 4);
+  } else {
+    // Try again with shorter text.
+    var text = '$' + this.insertNumericalCommas(dollars);
+    var box = this.context_.measureText(text);
+    if ((box.width + 10) < regionWidth)
+      this.context_.fillText(
+          text,
+          leftX + 5,
+          this.canvasHigherY(dollars) - 4);
+  }
+  this.context_.restore();
+
 };
 
 /**
@@ -355,7 +387,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.beginPath();
   this.context_.moveTo(this.canvas_.width - 1, this.canvasLowerY(0));
   this.context_.lineTo(this.canvasX(spousalStartDate), this.canvasLowerY(0));
-  if (personal > 0) {
+  if (personal > 0 && startDate < spousalStartDate) {
     this.context_.lineTo(this.canvasX(startDate), this.canvasLowerY(0));
     this.context_.lineTo(this.canvasX(startDate), this.canvasLowerY(personal));
   }
@@ -369,17 +401,21 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.stroke();
   this.context_.restore();
 
+  // regionWidth/regionHeight and centerX/centerY describe the box that forms
+  // the larger dollar amount region in the lower earner section. This may be
+  // the entire lower earner region, or may be the right hand section.
+  if (startDate < spousalStartDate) {
+    var leftX = this.canvasX(spousalStartDate);
+  } else {
+    var leftX = this.canvasX(startDate);
+  }
+  var regionWidth = this.canvas_.width - leftX;
+  var regionHeight = this.canvasLowerY(total) - this.canvasLowerY(0);
+  var centerX = regionWidth / 2 + leftX;
+  var centerY = regionHeight / 2 + this.canvasLowerY(0);
+
   // Add the user's name to the box:
   this.context_.save();
-  if (personal >= total) {
-    var regionWidth = this.canvas_.width - this.canvasX(startDate);
-    var centerX = regionWidth / 2 + this.canvasX(startDate);
-  } else {
-    var regionWidth = this.canvas_.width - this.canvasX(spousalStartDate);
-    var centerX = regionWidth / 2 + this.canvasX(spousalStartDate);
-  }
-  var regionHeight = this.canvasLowerY(total) - this.canvasLowerY(0);
-  var centerY = regionHeight / 2 + this.canvasLowerY(0);
   this.context_.fillStyle = '#004000';
   for (font_height = 24; font_height >= 10; font_height--) {
     this.context_.font = font_height + "px Helvetica";
@@ -392,6 +428,54 @@ SpousalChart.prototype.renderLowerEarner = function() {
       break;
     }
   }
+  this.context_.restore();
+
+  // Add the dollar amounts below the box.
+  this.context_.save();
+  this.context_.fillStyle = '#004000';
+  this.context_.font = "14px Helvetica";
+  var text = '$' + this.insertNumericalCommas(total) + ' / mo';
+  var box = this.context_.measureText(text);
+  if ((box.width + 20) < regionWidth) {
+    this.context_.fillText(
+        text,
+        leftX + 10,
+        this.canvasLowerY(total) + 15);
+  } else {
+    // Try again with shorter text.
+    text = '$' + this.insertNumericalCommas(total);
+    box = this.context_.measureText(text);
+    if ((box.width + 10) < regionWidth)
+      this.context_.fillText(
+          text,
+          leftX + 5,
+          this.canvasLowerY(total) + 15);
+  }
+
+  // We may need to render text for the left leg of the lower recipients chart.
+  if (personal > 0 && startDate < spousalStartDate) {
+    var leftRegionWidth = 
+      this.canvasX(spousalStartDate) - this.canvasX(startDate);
+    text = '$' + this.insertNumericalCommas(personal) + ' / mo';
+    box = this.context_.measureText(text);
+    if ((box.width + 20) < leftRegionWidth) {
+      this.context_.fillText(
+          text,
+          this.canvasX(startDate) + 10,
+          this.canvasLowerY(personal) + 15);
+    } else {
+      // Try again with shorter text.
+      text = '$' + this.insertNumericalCommas(personal);
+      text = '$' + personal;
+      box = this.context_.measureText(text);
+      if ((box.width + 10) < leftRegionWidth)
+        this.context_.fillText(
+            text,
+            this.canvasX(startDate) + 5,
+            this.canvasLowerY(personal) + 15);
+    }
+  }
+  
   this.context_.restore();
 };
 
@@ -427,9 +511,9 @@ SpousalChart.prototype.maxRenderedYDollars = function() {
 SpousalChart.prototype.midpointYValue = function() {
   // The midpoint line is the canvas y position of the 0 benefit line.
   var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(70, 0);
-  var midpointYValue = this.canvas_.height - 20 -
+  var midpointYValue = this.canvas_.height -
       Math.floor(spousalDollars / this.maxRenderedYDollars()
-          * this.chartHeight()) - 10;
+          * this.chartHeight()) - 45;
 
   return midpointYValue;
 }

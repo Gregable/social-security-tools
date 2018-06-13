@@ -460,8 +460,9 @@ Recipient.prototype.benefitMultiplierAtAge = function(year, month) {
  * @return {number}
  */
 Recipient.prototype.benefitAtAge = function(year, month) {
-  return this.primaryInsuranceAmountFloored() *
-    (1 + this.benefitMultiplierAtAge(year, month));
+  return Math.floor(
+      this.primaryInsuranceAmountFloored() *
+      (1 + this.benefitMultiplierAtAge(year, month)));
 };
 
 /**
@@ -527,5 +528,5 @@ Recipient.prototype.totalBenefitWithSpousal = function(startYear, startMonth) {
       startYear, startMonth);
   const spousalBenefit = spousalBenefitAtFRA * (1 + spousalBenefitMultiplier);
 
-  return personalBenefit + spousalBenefit;
+  return Math.floor(personalBenefit + spousalBenefit);
 }
