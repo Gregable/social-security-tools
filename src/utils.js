@@ -111,7 +111,7 @@ function colaAdjustmentYears(yearTurn62) {
  * Returns the final COLA adjusted primary insurance amount.
  * @param {number} yearTurn62
  * @param {number} initialPIA
- * @return {Array<number>}
+ * @return {number}
  */
 function colaAdjustment(yearTurn62, initialPIA) {
   var adjustedPIA = initialPIA;

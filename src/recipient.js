@@ -401,10 +401,14 @@ Recipient.prototype.colaAdjustments = function() {
  * @return {number} primary insurance amount
  */
 Recipient.prototype.primaryInsuranceAmount = function() {
-  // Handle user input. Angular enforces that the input is a number-formatted
-  // string, but not that it's a number.
-  parsed = parseInt(this.primaryInsuranceAmountValue);
-  return isNaN(parsed) ? 0 : parsed;
+  // Handle user input in the spousal case. Angular enforces that the input is
+  // a number-formatted string, but not that it's a number.
+  parsed = parseFloat(this.primaryInsuranceAmountValue);
+  if (isNaN(parsed))
+    return 0;
+  // Primary Insurance amounts are always rounded down the the nearest dime.
+  // Who decided this was an important step?
+  return Math.floor(parsed * 10) / 10;  
 };
 
 /**

@@ -656,7 +656,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Callback from spousal chart's mouse handlers. |date| is the number of
   // months since epoch of the selected date in the spousal chart.
   $scope.updateSpousalChartSelectedDate = function(dateMonths) {
-    console.log(dateMonths);
     $scope.spousalSelection = {};
     $scope.spousalSelection.show = (dateMonths > 0);
     if ($scope.spousalSelection.show) {
