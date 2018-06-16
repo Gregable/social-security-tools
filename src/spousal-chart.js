@@ -156,7 +156,8 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
  */
 SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
   var months = this.dateX(canvasX);
-  this.updateSelectedDate(months);
+  if (this.mouseToggle === 'ON')
+    this.updateSelectedDate(months);
   var text = ALL_MONTHS[months % 12] + ' ';
   text += Math.floor(months / 12);
 
@@ -491,7 +492,6 @@ SpousalChart.prototype.render = function() {
   this.renderHigherEarner();
   this.renderLowerEarner();
 
-  this.updateSelectedDate(-1);
   if (this.mouseToggle === 'OFF')
     this.renderSelectedDateVerticalLine(this.lastMouseX);
 
@@ -562,8 +562,11 @@ SpousalChart.prototype.mouseOutListener = function() {
 SpousalChart.prototype.mouseClickListener = function() {
   var self = this;
   return function(e) {
-    if (e.clientY < 200)
+    var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
+    if (canvasY < 180) {
+      self.updateSelectedDate(-1);
       return;
+    }
     if (self.mouseToggle === 'ON') {
       self.mouseToggle = 'OFF';
       self.lastMouseX = e.clientX - self.canvas_.getBoundingClientRect().left;
@@ -581,8 +584,11 @@ SpousalChart.prototype.mouseMoveListener = function() {
   return function(e) {
     if (self.mouseToggle == 'ON') {
       self.render();
-      if (e.clientY < 200)
+      var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
+      if (canvasY < 180) {
+        self.updateSelectedDate(-1);
         return;
+      }
       var canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
       self.renderSelectedDateVerticalLine(canvasX);
     }

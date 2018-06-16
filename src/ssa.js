@@ -430,11 +430,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Config for choosing a benefits starting age for a single spouse. We
   // instantiate two of these.
   function spousalSlider(earnerFn) {
+    this.lowerSlider_ = null;
     this.earnerFn = earnerFn;
     this.value = 65 * 12;
     this.options = {
       floor: 62*12,
       ceil: 70*12,
+      // minLimit is relative to the floor.
+      minLimit: 0,
       showSelectionBarEnd: true,
       translate: function(value, sliderId, label) {
         const ageYears = Math.floor(value / 12);
@@ -457,7 +460,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       stepsArray: $scope.stepsArray(-1),
       onChange: function(id) {
         $scope.spousalChart_.render();
-      }
+      },
     },
     // Refresh method called externally for some events to cause redraw.
     this.refresh = function() {
@@ -472,10 +475,36 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         $scope.ticksTooltip.bind(null, normalRetirementAgeMonths);
       this.value = normalRetirementAgeMonths;
     }
+    this.setLowerEarnerSlider = function(earnerSlider) {
+      self = this;
+      this.options.onChange = function() {
+        // If the lower earner does not have a personal benefit, it makes no
+        // sense for that earner to file for benefits before the higher earner.
+        // In this specific case, we set the date of the higher earner's slider
+        // as the minimum date for the lower earner's slider.
+        var lowerEarner = earnerSlider.earnerFn();
+        if (lowerEarner.primaryInsuranceAmountFloored() > 0)
+          return;
+        var higherEarner = earnerFn();
+        var date = higherEarner.dateMonthsAtAge(
+            Math.floor(self.value / 12), self.value % 12);
+        var lowerAgeAtDate = Math.max(62,
+            lowerEarner.monthsOldAtDate(Math.floor(date / 12), date % 12));
+        if (earnerSlider.value < lowerAgeAtDate)
+          earnerSlider.value = lowerAgeAtDate;
+        // This hack lets the lower slider 'ride' left with the upper slider.
+        if (earnerSlider.options.minLimit === earnerSlider.value - (62 * 12))
+          earnerSlider.value = lowerAgeAtDate;
+        earnerSlider.options.minLimit = lowerAgeAtDate - (62 * 12);
+        
+        $scope.spousalChart_.render();
+      }
+    }
   }
 
   $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
   $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
+  //$scope.higherEarnerSlider.setLowerEarnerSlider($scope.lowerEarnerSlider);
 
   $scope.absoluteBoundingRect = function(element) {
     var doc  = document;
@@ -664,8 +693,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
       var lowerAge = $scope.lowerEarner().ageAtDate(dateMonths);
 
-      // TODO: This is incorrect
-      
       if ($scope.lowerEarner().dateMonthsAtAge(0) +
           this.lowerEarnerSlider_.value > dateMonths) {
         $scope.spousalSelection.lowerEarnerBenefit = 0;

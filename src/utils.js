@@ -4,11 +4,185 @@
  * @return {number}
  */
 function monthIndex(monthName) {
+  console.assert(typeof month === 'string', monthName);
   for (var i = 0; i < ALL_MONTHS.length; ++i)
     if (monthName === ALL_MONTHS[i])
       return i;
-  return -100000; 
+  console.assert(false, monthName);
 }
+
+/**
+ * In social security calculations, days don't really matter for much.
+ * Everything is computed on month scales, not days. Days or smaller
+ * units of time get in the way, not help. This class provides a Date type
+ * that manages months, without even being aware of days.
+ */
+class MonthDate {
+  // Default constructor, returns a MonthDate of January, Year 0. Use the
+  // various initFrom methods to construct different MonthDates.
+  constructor() {
+    // Internally a MonthDate tracks time from January, Year 0 and counts
+    // months from this date. Jan is considered month 0 of the year, and Dec
+    // is month 11. So, an internal value of 12 would be January, Year 1.
+    this.monthsSinceEpoch_ = 0;
+  }
+
+  /* @param {MonthDate} monthDate (copy initializer) */
+  initFromMonthDate(monthDate) {
+    this.monthsSinceEpoch_ = monthDate.monthsSinceEpoch_;
+  }
+
+  /* @param {number} monthsSinceEpoch integer months since Jan, Year 0 */
+  initFromMonths(monthsSinceEpoch) {
+    console.assert(Number.isInteger(monthsSinceEpoch), monthsSinceEpoch);
+    console.assert(monthsSinceEpoch >= 0, monthsSinceEpoch);
+    this.monthsSinceEpoch_ = monthsSinceEpoch;
+  }
+ 
+  /*
+   * Initializer from a date. So (2000, 0) would be Jan, 2000.
+   * @param {number} years
+   * @param {number} months
+   */
+  initFromYearsMonths(years, months) {
+    console.assert(Number.isInteger(years), years);
+    console.assert(Number.isInteger(months), months);
+    console.assert(years >= 0, years);
+    console.assert(months >= 0, months);
+    this.InitFromMonths(years * 12 + months);
+  }
+
+  /*
+   * Initializer from a date with string Month. So (2000, "Jan") would be
+   * Jan, 2000.
+   * @param {number} years
+   * @param {string} month
+   */
+  initFromYearsMonthName(years, monthName) {
+    console.assert(Number.isInteger(years), years);
+    console.assert(years >= 0, years);
+    const months = monthIndex(monthName);
+    this.InitFromMonths(years * 12 + months);
+  }
+
+  /*
+   * Returns the number of months since epoch.
+   * @return {number}
+   */
+  monthsSinceEpoch() {
+    return this.monthsSinceEpoch_;
+  }
+
+  /*
+   * Returns the year, discarding any extra months.
+   * @return {number}
+   */
+  year() {
+    return Math.floor(this.monthsSinceEpoch_ / 12);
+  }
+
+  /*
+   * Returns the month index. 0 indicates January, 11 indicates December.
+   * @return {number}
+   */
+  monthIndex() {
+    return this.monthsSinceEpoch_ % 12;
+  }
+
+  /*
+   * Returns the month name as a 3 character string such as "Jan".
+   * @return {number}
+   */
+  monthName() {
+    return ALL_MONTHS[this.monthsSinceEpoch_ % 12];
+  }
+
+  /*
+   * @param {monthDate} other
+   * @return {MonthDuration}
+   */
+  subtractDate(other) {
+    return new MonthDuration().InitFromMonths(
+        this.monthsSinceEpoch() - other.monthsSinceEpoch());
+  }
+
+  /*
+   * @param {monthDuration} other
+   * @return {MonthDate}
+   */
+  subtractDuration(other) {
+    return new MonthDate().InitFromMonths(
+        this.monthsSinceEpoch_ - other.asMonths());
+  }
+
+  /*
+   * @param {monthDuration} other
+   * @return {MonthDate}
+   */
+  addDuration(other) {
+    return new MonthDate().InitFromMonths(
+        this.monthsSinceEpoch_ + other.asMonths());
+  }
+
+}
+
+/**
+ * In social security calculations, days don't really matter for much.
+ * Everything is computed on month scales, not days. Days or smaller
+ * units of time get in the way, not help. This class provides a Duration type
+ * that manages months, without even being aware of days.
+ */
+class MonthDuration {
+  // Default constructor, returns a MonthDuration of 0 months. Use the various
+  // initFrom methods to construct different MonthDurations.
+  constructor() {
+    this.months_ = 0;
+  }
+
+  /* @param {number} months */
+  initFromMonths(months) {
+    console.assert(Number.isInteger(months), months);
+    this.months_ = months;
+  }
+
+  /* @param {number} years */
+  /* @param {number} months */
+  initFromMonthsYears(years, months) {
+    console.assert(Number.isInteger(months), months);
+    console.assert(months < 12 && months > -12, months);
+    console.assert(Number.isInteger(years), years);
+    // Negative durations are OK, but shouldn't have both positive and negative.
+    console.assert(Math.sign(years) * Math.sign(months) >= 0, (years, months));
+    this.months_ = years * 12 + months;
+  }
+
+  /*
+   * Returns the number of total months. If the duration is 1y + 1m, this
+   * returns 13. May be negative.
+   * @return {number}
+   */
+  asMonths() {
+    return this.months_;
+  }
+
+  /*
+   * Returns the number of whole years, floored.
+   * @return {number}
+   */
+  years() {
+    return Math.floor(this.months_ / 12);
+  }
+
+  /*
+   * Returns the number of months after subtracting whole years. If the
+   * duration is 13 months, this returns 1.
+   * @return {number}
+   */
+  modMonths() {
+    return this.months_ % 12;
+  }
+}
+
 
 /**
  * Simple function to compute the number of months in a year, months pair.
