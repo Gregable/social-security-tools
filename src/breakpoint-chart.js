@@ -341,7 +341,7 @@ BreakPointChart.prototype.roundedBox =
 BreakPointChart.prototype.primaryInsuranceAmount = function(earningsX) {
   return primaryInsuranceAmountForEarnings(
       this.recipient_.indexingYear(),
-      this.recipient_.dateAtAge(62, 0).year,
+      this.recipient_.dateAtYearsOld(62).year(),
       earningsX);
 }
 
@@ -351,16 +351,11 @@ BreakPointChart.prototype.primaryInsuranceAmount = function(earningsX) {
  */
 BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   this.context_.save();
-
+    
   // Where on the breakpoint 'curve' the user's benefit values lie.
-  var userSSA = {
-    x: Math.floor(earningsX),
-    y: Math.floor(this.primaryInsuranceAmount(earningsX)),
-  };
+  const x = Math.floor(earningsX);
+  const y = Math.floor(this.primaryInsuranceAmount(earningsX));
 
-  // Add dollar sign and commas for better looking formatting.
-  userSSA.xText = ('$' + userSSA.x).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-  userSSA.yText = ('$' + userSSA.y).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 
   // Thin dashed lines out from the user benefit point
   this.context_.lineWidth = 2;
@@ -370,13 +365,13 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   // Both lines starting at the point and radiating out makes a nifty
   // animation affect with the dashed lines at the edges of the chart.
   this.context_.beginPath();
-  this.moveTo(userSSA.x, userSSA.y);
-  this.lineTo(userSSA.x, 0);
+  this.moveTo(x, y);
+  this.lineTo(x, 0);
   this.context_.stroke();
   
   this.context_.beginPath();
-  this.moveTo(userSSA.x, userSSA.y);
-  this.lineTo(this.maxRenderedXDollars, userSSA.y);
+  this.moveTo(x, y);
+  this.lineTo(this.maxRenderedXDollars, y);
   this.context_.stroke();
 
   // White filled circle with black edge showing the user benefit point.
@@ -385,8 +380,8 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
 
   this.context_.beginPath();
   this.context_.arc(
-      this.canvasX(userSSA.x),
-      this.canvasY(userSSA.y),
+      this.canvasX(x),
+      this.canvasY(y),
       /*radius=*/ 5,
       /*startAngle=*/ 0,
       /*endAngle=*/ 2 * Math.PI);
@@ -395,34 +390,38 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
 
   // Text at the edges showing the actual values, white on colored chip.
 
-  // TODO: Low Priority. Switch which edge of the chip the dotted line
-  // intersects with so as to avoid the two chips ever overlapping.
+  // Add dollar sign and commas for better looking formatting.
+  const xText = '$' + insertNumericalCommas(x);
+  const yText = '$' + insertNumericalCommas(y);
 
   // Chip on the bottom edge
-  this.roundedBox(this.canvasX(userSSA.x), this.canvasY(0),
-                  this.context_.measureText(userSSA.xText).width + 6, 19,
+  this.roundedBox(this.canvasX(x), this.canvasY(0),
+                  this.context_.measureText(xText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
   // Chip on the right edge
   this.roundedBox(this.canvasX(this.maxRenderedXDollars) + 1,
-                  this.canvasY(userSSA.y),
-                  this.context_.measureText(userSSA.yText).width + 6, 19,
+                  this.canvasY(y),
+                  this.context_.measureText(yText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
 
   this.context_.fillStyle = 'white'
   this.context_.fillText(  // Text on the bottom edge.
-      userSSA.xText,
-      this.canvasX(userSSA.x) + 2,
+      xText,
+      this.canvasX(x) + 2,
       this.canvasY(0) + 15);
   this.context_.fillText(  // Text on the right edge.
-      userSSA.yText, 
+      yText, 
       this.canvasX(this.maxRenderedXDollars) + 3,
-      this.canvasY(userSSA.y) + 15);
+      this.canvasY(y) + 15);
 
   this.context_.restore();
 }
 
 /** Render the breakpoint chart. */
 BreakPointChart.prototype.render = function() {
+  if (!this.isInitialized())
+    return;
+
   // Canvas tutorial:
   // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
   this.context_.save();

@@ -1,17 +1,4 @@
 /**
- * Given a month name, returns the 0-based index of that month.
- * @param {string} monthName
- * @return {number}
- */
-function monthIndex(monthName) {
-  console.assert(typeof month === 'string', monthName);
-  for (var i = 0; i < ALL_MONTHS.length; ++i)
-    if (monthName === ALL_MONTHS[i])
-      return i;
-  console.assert(false, monthName);
-}
-
-/**
  * In social security calculations, days don't really matter for much.
  * Everything is computed on month scales, not days. Days or smaller
  * units of time get in the way, not help. This class provides a Date type
@@ -30,6 +17,7 @@ class MonthDate {
   /* @param {MonthDate} monthDate (copy initializer) */
   initFromMonthDate(monthDate) {
     this.monthsSinceEpoch_ = monthDate.monthsSinceEpoch_;
+    return this;
   }
 
   /* @param {number} monthsSinceEpoch integer months since Jan, Year 0 */
@@ -37,6 +25,7 @@ class MonthDate {
     console.assert(Number.isInteger(monthsSinceEpoch), monthsSinceEpoch);
     console.assert(monthsSinceEpoch >= 0, monthsSinceEpoch);
     this.monthsSinceEpoch_ = monthsSinceEpoch;
+    return this;
   }
  
   /*
@@ -49,20 +38,26 @@ class MonthDate {
     console.assert(Number.isInteger(months), months);
     console.assert(years >= 0, years);
     console.assert(months >= 0, months);
-    this.InitFromMonths(years * 12 + months);
+    console.assert(months < 12, months);
+    this.initFromMonths(years * 12 + months);
+    return this;
   }
 
   /*
-   * Initializer from a date with string Month. So (2000, "Jan") would be
-   * Jan, 2000.
+   * Initializer from a date with string month. Ex: (2000, "Jan").
    * @param {number} years
-   * @param {string} month
+   * @param {string} monthStr
    */
-  initFromYearsMonthName(years, monthName) {
+  initFromYearsMonthsStr(years, monthStr) {
     console.assert(Number.isInteger(years), years);
+    console.assert(typeof monthStr === 'string');
     console.assert(years >= 0, years);
-    const months = monthIndex(monthName);
-    this.InitFromMonths(years * 12 + months);
+    var monthIndex = ALL_MONTHS.indexOf(monthStr)
+    console.assert(monthIndex >= 0, monthStr);
+    console.assert(monthIndex < 12, monthStr);
+
+    this.initFromYearsMonths(years, monthIndex);
+    return this;
   }
 
   /*
@@ -102,28 +97,43 @@ class MonthDate {
    * @return {MonthDuration}
    */
   subtractDate(other) {
-    return new MonthDuration().InitFromMonths(
+    return new MonthDuration().initFromMonths(
         this.monthsSinceEpoch() - other.monthsSinceEpoch());
   }
 
   /*
-   * @param {monthDuration} other
+   * @param {MonthDuration} duration
    * @return {MonthDate}
    */
-  subtractDuration(other) {
-    return new MonthDate().InitFromMonths(
-        this.monthsSinceEpoch_ - other.asMonths());
+  subtractDuration(duration) {
+    return new MonthDate().initFromMonths(
+        this.monthsSinceEpoch_ - duration.asMonths());
   }
 
   /*
-   * @param {monthDuration} other
+   * @param {MonthDuration} duration
    * @return {MonthDate}
    */
-  addDuration(other) {
-    return new MonthDate().InitFromMonths(
-        this.monthsSinceEpoch_ + other.asMonths());
+  addDuration(duration) {
+    return new MonthDate().initFromMonths(
+        this.monthsSinceEpoch_ + duration.asMonths());
   }
 
+  /*
+   * @param {MonthDate} other
+   * @return {boolean}
+   */
+  greaterThan(other) {
+    return this.monthsSinceEpoch() > other.monthsSinceEpoch();
+  }
+
+  /*
+   * @param {MonthDate} other
+   * @return {boolean}
+   */
+  lessThan(other) {
+    return this.monthsSinceEpoch() < other.monthsSinceEpoch();
+  }
 }
 
 /**
@@ -143,17 +153,19 @@ class MonthDuration {
   initFromMonths(months) {
     console.assert(Number.isInteger(months), months);
     this.months_ = months;
+    return this;
   }
 
   /* @param {number} years */
   /* @param {number} months */
-  initFromMonthsYears(years, months) {
+  initFromYearsMonths(years, months) {
     console.assert(Number.isInteger(months), months);
     console.assert(months < 12 && months > -12, months);
     console.assert(Number.isInteger(years), years);
     // Negative durations are OK, but shouldn't have both positive and negative.
     console.assert(Math.sign(years) * Math.sign(months) >= 0, (years, months));
     this.months_ = years * 12 + months;
+    return this;
   }
 
   /*
@@ -181,17 +193,49 @@ class MonthDuration {
   modMonths() {
     return this.months_ % 12;
   }
+
+  /*
+   * @param {MonthDuration} other
+   * @return {boolean}
+   */
+  greaterThan(other) {
+    return this.asMonths() > other.asMonths();
+  }
+
+  /*
+   * @param {MonthDuration} other
+   * @return {boolean}
+   */
+  lessThan(other) {
+    return this.asMonths() < other.asMonths();
+  }
+
+  /*
+   * @param {MonthDuration} other
+   * @return {MonthDuration}
+   */
+  subtract(other) {
+    return new MonthDuration().initFromMonths(
+        this.asMonths() - other.asMonths());
+  }
+
+  /*
+   * @param {MonthDuration} other
+   * @return {MonthDuration}
+   */
+  add(other) {
+    return new MonthDuration().initFromMonths(
+        this.asMonths() + other.asMonths());
+  }
 }
 
-
 /**
- * Simple function to compute the number of months in a year, months pair.
- * @param {number} years
- * @param {number} months
- * @return {number}
+ * Converts a number to a string such as 1200 to '1,200'.
+ * @param {number} num
+ * @return {string}
  */
-function monthsIn(years, months) {
-  return years * 12 + months;
+function insertNumericalCommas(num) {
+ return num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
 
 /**

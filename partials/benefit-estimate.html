@@ -16,8 +16,8 @@
     {{recipient.normalRetirement.ageMonths}} months</b>.
 
     This puts your normal retirement date at
-    <b>{{recipient.normalRetirementDate.month}}, 
-    {{recipient.normalRetirementDate.year}}</b>.
+    <b>{{recipient.normalRetirementDate.monthName()}}, 
+    {{recipient.normalRetirementDate.year()}}</b>.
   </p>
 
   <p>
@@ -37,18 +37,18 @@
   <h2>Early and Delayed Retirement</h2>
   <p>
     You can also begin taking benefits as early as 62 years old
-    (<b>{{recipient.dateAtAge(62, 0).month}}
-        {{recipient.dateAtAge(62, 0).year}}</b>),
+    (<b>{{recipient.dateAtYearsOld(62).monthName()}}
+        {{recipient.dateAtYearsOld(62).year()}}</b>),
     wait until as late as 70 years old
-    (<b>{{recipient.dateAtAge(70, 0).month}}
-        {{recipient.dateAtAge(70, 0).year}}</b>),
+    (<b>{{recipient.dateAtYearsOld(70).monthName()}}
+        {{recipient.dateAtYearsOld(70).year()}}</b>),
     or start any month in between. The longer you wait, the higher your
     actual benefit will be.
   </p>
   <p>
     If you choose to take benefits earlier than normal retirement age
-    (<b>{{recipient.normalRetirementDate.month}} 
-        {{recipient.normalRetirementDate.year}}</b>),
+    (<b>{{recipient.normalRetirementDate.monthName()}} 
+        {{recipient.normalRetirementDate.year()}}</b>),
     your benefit amount will be <u>permanently</u> <i>reduced</i> 
     per year you start early by:
     <ul>
@@ -56,24 +56,24 @@
         <b>{{recipient.normalRetirement.ageYears - 3}} years and 
            {{recipient.normalRetirement.ageMonths}} months</b>
         (<b>
-           {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).month}}
-          {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).year}}
+           {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthName()}}
+          {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}
          </b>)
       </li>
       <li><b>5.00%</b> per year before
         <b>{{recipient.normalRetirement.ageYears - 3}} years and 
            {{recipient.normalRetirement.ageMonths}} months</b>
         (<b>
-           {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).month}}
-          {{recipient.dateAtAge(recipient.normalRetirement.ageYears - 3, 0).year}}
+           {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthName()}}
+          {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}
          </b>)
       </li>
     </ul>
   </p> 
   <p>
     If you choose to instead wait until later than normal retirement age
-    (<b>{{recipient.normalRetirementDate.month}}
-        {{recipient.normalRetirementDate.year}}</b>),
+    (<b>{{recipient.normalRetirementDate.monthName()}}
+        {{recipient.normalRetirementDate.year()}}</b>),
      your benefit amount will be <u>permanently</u> <i>increased</i> by
     <b>{{recipient.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
     you delay.
@@ -100,17 +100,17 @@
       <tr ng-repeat="age in [62, 63, 64, 65, 66, 67, 68, 69, 70]">
         <td headers="age">{{age}}</td>
         <td headers="date">
-          {{recipient.dateAtAge(age, 0).month}}
-          {{recipient.dateAtAge(age, 0).year}}
+          {{recipient.dateAtYearsOld(age).monthName()}}
+          {{recipient.dateAtYearsOld(age).year()}}
         </td>
         <td headers="adjustment">
-          {{recipient.benefitMultiplierAtAge(age, 0) * 100 | number:2}}%
+          {{recipient.benefitMultiplierAtAge(initAge(age)) * 100 | number:2}}%
         </td>
         <td headers="monthlybenefit">
-          ${{recipient.benefitAtAge(age, 0) | number:0}}
+          ${{recipient.benefitAtAge(initAge(age)) | number:0}}
         </td>
         <td headers="annualbenefit">
-          ${{recipient.benefitAtAge(age, 0) * 12 | number:0}}
+          ${{recipient.benefitAtAge(initAge(age)) * 12 | number:0}}
         </td>
       </tr>
     </tbody>

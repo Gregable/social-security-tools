@@ -60,11 +60,13 @@ function Recipient(name) {
   this.primaryInsuranceAmountValue = 0;
 
   // Recipient's birth date and normal retirement date in year and month.
-  this.birthDate = {year: 1970, month: 'Jan'};
-  this.normalRetirementDate = { year: 2037, month: 'Jan' }
+  this.birthDate = new MonthDate().initFromYearsMonths(1970, 0);
+  // TODO(gregable): Compute this on the fly.
+  this.normalRetirementDate = new MonthDate(2037, 0);
 
-  // Will reference a value in the FULL_RETIREMENT_AGE array once age is set.
-  this.normalRetirement = {};
+  // This is a tuple of:
+  // minYear, maxYear, ageYears, ageMonths, delatedIncreaseAnnual
+  this.normalRetirement = FULL_RETIREMENT_AGE[0];
 }
 
 /**
@@ -104,109 +106,67 @@ Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
   this.processIndexedEarnings_();
 };
 
+/*
+ * Update this recipient's birthdate.
+ * @param {monthDate} birthdate
+ */
 Recipient.prototype.updateBirthdate = function(birthdate) {
-  this.birthDate.year = birthdate.year;
-  this.birthDate.month = birthdate.month;
+  this.birthDate.initFromMonthDate(birthdate);
 
   // Find the retirement age bracket data for this recipient.
   for (var i = 0; i < FULL_RETIREMENT_AGE.length; ++i) {
     var ageBracket = FULL_RETIREMENT_AGE[i];
-    if (this.birthDate.year >= ageBracket.minYear &&
-        this.birthDate.year <= ageBracket.maxYear) {
+    if (this.birthDate.year() >= ageBracket.minYear &&
+        this.birthDate.year() <= ageBracket.maxYear) {
       this.normalRetirement = ageBracket;
     }
   }
 
-  var birthMonthIndex = monthIndex(this.birthDate.month);
-  var retirementYear = (
-      parseInt(this.birthDate.year) +
-      this.normalRetirement.ageYears + 
-      Math.floor((birthMonthIndex + this.normalRetirement.ageMonths) / 12));
-  var retirementMonth = (
-      (birthMonthIndex + this.normalRetirement.ageMonths) % 12);
-
-  this.normalRetirementDate = {
-    month: ALL_MONTHS[retirementMonth],
-    year: retirementYear
-  };
+  var normalRetirementAge = this.normalRetirementAge();
+  this.normalRetirementDate = this.birthDate.addDuration(normalRetirementAge);
 
   // Birthdate can affect indexed earnings.
   this.processIndexedEarnings_();
 }
 
+/**
+ * Returns the date at a given age. Age is specified as a year and
+ * month index (0-11). Month can be left off and will be assumed 0.
+ * @param {MonthDuration} age
+ * @return {MonthDate}
+ */
+Recipient.prototype.dateAtAge = function(age) {
+  console.assert(typeof age === typeof new MonthDate(), age);
+  return this.birthDate.addDuration(age);
+};
+
+/**
+ * Convenience method for dateAtAge that accepts an integer years old.
+ * Used primarily in partials.
+ * @param {number} year
+ * @return {MonthDate}
+ */
+Recipient.prototype.dateAtYearsOld = function(years) {
+  return this.dateAtAge(new MonthDuration().initFromYearsMonths(years, 0));
+};
+
+
+/**
+ * Returns the age at a given date.
+ * @param {MonthDate} date
+ * @return {MonthDuration}
+ */
+Recipient.prototype.ageAtDate = function(date) {
+  return date.subtractDate(this.birthDate);
+};
+
 // Used for displaying text for earners whose indexing factors are still
 // changing.
 Recipient.prototype.isOver60 = function() {
-  return this.birthDate.year < (CURRENT_YEAR - 60);
+  var age = this.ageAtDate(
+      new MonthDate().initFromYearsMonths(CURRENT_YEAR, 0));
+  return age.years > 60;
 }
-
-/**
- * Returns the date at a given age. Age is specified as a year and
- * month index (0-11).
- * @param {number} year
- * @param {number} month
- * @return {Object}
- */
-Recipient.prototype.dateAtAge = function(year, month) {
-  if (month === undefined) month = 0;
-  var birthMonthIndex = monthIndex(this.birthDate.month);
-  var dateYear = (year + this.birthDate.year +
-                  Math.floor((month + birthMonthIndex) / 12));
-  var dateMonth = (month + birthMonthIndex) % 12
-  return {
-    month: ALL_MONTHS[dateMonth],
-    year: dateYear
-  }
-};
-
-/**
- * Returns the date in months (so year 2000 is 12 * 2000) at a given age.
- * Age is specified as a year and month index (0-11).
- * @param {number} year
- * @param {number} month
- * @return {Object}
- */
-Recipient.prototype.dateMonthsAtAge = function(year, month) {
-  if (month === undefined) month = 0;
-  var birthMonthIndex = monthIndex(this.birthDate.month);
-  var dateYear = (year + this.birthDate.year +
-                  Math.floor((month + birthMonthIndex) / 12));
-  var dateMonth = (month + birthMonthIndex) % 12;
-  return (dateYear * 12) + dateMonth;
-};
-
-
-/**
- * Returns the age at a given date. Date is specified as months since epoch.
- * @param {number} dateMonths
- * @return {Object}
- */
-Recipient.prototype.ageAtDate = function(dateMonths) {
-  var birthMonthIndex = monthIndex(this.birthDate.month);
-  var dateAgeZero = 12 * this.birthDate.year + birthMonthIndex;
-
-  var ageInMonthsAtDate = dateMonths - dateAgeZero;
-  if (ageInMonthsAtDate < 0)
-    return -1;
-
-  return {
-    months: ageInMonthsAtDate % 12,
-    year: Math.floor(ageInMonthsAtDate / 12)
-  };
-};
-
-/**
- * Returns the age in months (so could be hundreds) at a given date.
- * Date is specified as a year and month index (0-11).
- * @param {number} year
- * @param {number} month
- * @return {Object}
- */
-Recipient.prototype.monthsOldAtDate = function(year, month) {
-  if (month === undefined) month = 0;
-  var dateMonthIndex = monthIndex(this.birthDate.month);
-  return ((year - this.birthDate.year) * 12) + month - dateMonthIndex;
-};
 
 // From https://www.ssa.gov/oact/cola/piaformula.html, the PIA calculation
 // depends on the year at which an individual first becomes eligible for
@@ -214,7 +174,7 @@ Recipient.prototype.monthsOldAtDate = function(year, month) {
 // index from two years prior. If the user is not yet 62, we use the
 // most up to date bend points, which are for the current year.
 Recipient.prototype.indexingYear = function() {  
-  return Math.min(this.dateAtAge(62, 0).year, CURRENT_YEAR) - 2;
+  return Math.min(this.dateAtYearsOld(62).year(), CURRENT_YEAR) - 2;
 }
 
 /**
@@ -241,7 +201,7 @@ Recipient.prototype.processIndexedEarnings_ = function() {
     // https://www.ssa.gov/oact/ProgData/retirebenefit1.html
     // Starting in the year the user turns 60, their index factor
     // is always 1.0, regardless of the index factor from the table.
-    if ((earningRecord.year - this.birthDate.year) >= 60) {
+    if ((earningRecord.year - this.birthDate.year()) >= 60) {
       earningRecord.indexFactor = 1.0;
     // Otherwise the index factor for a prior year Y is the result of
     // dividing the average wage index for the year in which the person
@@ -305,7 +265,7 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   // From the monthlyIndexedEarnings, compute this user's primary insurance
   // amount.
   this.primaryInsuranceAmountValue =
-    colaAdjustment(this.dateAtAge(62, 0).year,
+    colaAdjustment(this.dateAtYearsOld(62).year(),
         this.primaryInsuranceAmountUnadjusted());
 };
 
@@ -355,7 +315,7 @@ Recipient.prototype.primaryInsuranceAmountUnadjusted = function() {
  * @return {boolean}
  */
 Recipient.prototype.shouldAdjustForCOLA = function() {
-  return this.dateAtAge(62, 0).year <= CURRENT_YEAR;
+  return this.dateAtYearsOld(62).year() <= CURRENT_YEAR;
 };
 
 /**
@@ -364,7 +324,7 @@ Recipient.prototype.shouldAdjustForCOLA = function() {
  * @return {Array<Object>}
  */
 Recipient.prototype.colaAdjustments = function() {
-  const years = colaAdjustmentYears(this.dateAtAge(62, 0).year);
+  const years = colaAdjustmentYears(this.dateAtYearsOld(62).year());
   var adjusted = this.primaryInsuranceAmountUnadjusted();
 
   if (this.adjustments_ !== undefined) {
@@ -429,40 +389,44 @@ Recipient.prototype.delayIncreaseRate = function() {
 }
 
 /**
- * Returns benefit multiplier at a given age. Age is specified as a year and
- * month index (0-11).
- * @param {number} year
- * @param {number} month
+ * Returns the normal retirement age given the current birthdate.
+ * @return {MonthDuration}
+ */
+Recipient.prototype.normalRetirementAge = function() {
+  return new MonthDuration().initFromYearsMonths(
+      this.normalRetirement.ageYears,
+      this.normalRetirement.ageMonths);
+}
+
+/**
+ * Returns benefit multiplier at a given age.
+ * @param {MonthDuration} age
  * @return {number}
  */
-Recipient.prototype.benefitMultiplierAtAge = function(year, month) {
+Recipient.prototype.benefitMultiplierAtAge = function(age) {
+  const nra = this.normalRetirementAge();
   // Compute the number of total months between birth and full retirement age.
-  const fullAgeMonths = monthsIn(this.normalRetirement.ageYears,
-                                 this.normalRetirement.ageMonths);
-  const startAgeMonths = monthsIn(year, month);
-  if (fullAgeMonths > startAgeMonths) {
+  if (nra.greaterThan(age)) {
     // Reduced benefits due to taking benefits early.
-    const monthsUntil = fullAgeMonths - startAgeMonths;
-    return -1.0 * ((Math.min(36, monthsUntil) * 5.0 / 900.0) +
-                   (Math.max(0, monthsUntil - 36) * 5.0 / 1200.0));
+    var before = nra.subtract(age);
+    return -1.0 * ((Math.min(36, before.asMonths()) * 5.0 / 900.0) +
+                   (Math.max(0, before.asMonths() - 36) * 5.0 / 1200.0));
   } else {
     // Increased benefits due to taking benefits late.
-    const monthsAfter = startAgeMonths - fullAgeMonths;
-    return this.delayIncreaseRate() / 12 * monthsAfter;
+    const after = age.subtract(nra);
+    return this.delayIncreaseRate() / 12 * after.asMonths();
   }
 };
 
 /**
  * Returns personal benefit amount if starting benefits at a given age.
- * Age is specified as a year and month index (0-11).
- * @param {number} year
- * @param {number} month
+ * @param {MonthDuration} age
  * @return {number}
  */
-Recipient.prototype.benefitAtAge = function(year, month) {
+Recipient.prototype.benefitAtAge = function(age) {
   return Math.floor(
       this.primaryInsuranceAmountFloored() *
-      (1 + this.benefitMultiplierAtAge(year, month)));
+      (1 + this.benefitMultiplierAtAge(age)));
 };
 
 /**
@@ -472,35 +436,19 @@ Recipient.prototype.setSpouse = function(spouse) {
   this.spouse = spouse;
 };
 
-Recipient.prototype.earliestSpousalBenefitDate = function() {
-  earliestSpouseDate = this.spouse.dateAtAge(62, 0);
-  earliestDate = this.dateAtAge(62, 0);
-
-  // The earliest a spouse could start collecting spousal benefits is
-  // the later of the month that both spouses reach 62.
-  if (earliestSpouseDate.year < earliestDate.year ||
-      monthIndex(earliestSpouseDate.month) < monthIndex(earliestDate.month))
-    return earliestDate;
-  return earliestSpouseDate;
-};
-
 /**
- * Returns spousal benefit multiplier at a given age. Age is specified as a
- * year and month index (0-11).
- * @param {number} year
- * @param {number} month
+ * Returns spousal benefit multiplier at a given age.
+ * @param {MonthDuration} age
  * @return {number}
  */
-Recipient.prototype.spousalBenefitMultiplierAtAge = function(year, month) {
+Recipient.prototype.spousalBenefitMultiplierAtAge = function(age) {
   // Compute the number of total months between birth and full retirement age.
-  const fullAgeMonths = monthsIn(this.normalRetirement.ageYears,
-                                 this.normalRetirement.ageMonths);
-  const startAgeMonths = monthsIn(year, month);
-  if (fullAgeMonths > startAgeMonths) {
+  const nra = this.normalRetirementAge();
+  if (nra.greaterThan(age)) {
     // Reduced benefits due to taking benefits early.
-    const monthsUntil = fullAgeMonths - startAgeMonths;
-    return -1.0 * ((Math.min(36, monthsUntil) * 25.0 / 3600.0) +
-                   (Math.max(0, monthsUntil - 36) * 5.0 / 1200.0));
+    var before = nra.subtract(age);
+    return -1.0 * ((Math.min(36, before.asMonths()) * 25.0 / 3600.0) +
+                   (Math.max(0, before.asMonths() - 36) * 5.0 / 1200.0));
   } else {
     // No increased benefits from taking spousal benefits later than full
     // retirement age.
@@ -512,11 +460,10 @@ Recipient.prototype.spousalBenefitMultiplierAtAge = function(year, month) {
  * Returns the final total benefit amount (personal + spousal) based on both
  * the recipient's start age and recipient's age when spousal benefits start.
  * Age is specified as a year and month index (0-11) since birth.
- * @param {number} startYear
- * @param {number} startMonth
+ * @param {MonthDuration} startAge
  */
-Recipient.prototype.totalBenefitWithSpousal = function(startYear, startMonth) {
-  const personalBenefit = this.benefitAtAge(startYear, startMonth);
+Recipient.prototype.totalBenefitWithSpousal = function(startAge) {
+  const personalBenefit = this.benefitAtAge(startAge);
 
   // The spousal benefit at full retirement is half the spouse's PIA minus
   // the spouses PIA, or 0.
@@ -524,8 +471,7 @@ Recipient.prototype.totalBenefitWithSpousal = function(startYear, startMonth) {
       (this.spouse.primaryInsuranceAmount() / 2.0) -
       this.primaryInsuranceAmount());
 
-  const spousalBenefitMultiplier = this.spousalBenefitMultiplierAtAge(
-      startYear, startMonth);
+  const spousalBenefitMultiplier = this.spousalBenefitMultiplierAtAge(startAge);
   const spousalBenefit = spousalBenefitAtFRA * (1 + spousalBenefitMultiplier);
 
   return Math.floor(personalBenefit + spousalBenefit);

@@ -261,28 +261,31 @@
     final monthly benefit for both you and your spouse.
   </p>
 
-  <p style="margin-bottom: 2px; z-index: 2">
-  <b><span class=names>{{higherEarner().name}}</span> files at age:</b>
-  </p>
+  <div id=spousal-box>
+    <canvas id=spousal-chart-canvas width=620 height=620></canvas>
+    <p style="margin-bottom: 2px; z-index: 2">
+      <b><span class=names>{{higherEarner().name}}</span> files at age:</b>
+    </p>
 
-  <!-- See http://angular-slider.github.io/angularjs-slider/ -->
-  <div class="force-ticks-above" id="higherEarnerSlider">
-  <rzslider rz-slider-model="higherEarnerSlider.value"
-            rz-slider-options="higherEarnerSlider.options"
-            class="with-legend sliderZ"></rzslider>
-  </div>
+    <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+    <div class="force-ticks-above" id="higherEarnerSlider">
+      <rzslider rz-slider-model="higherEarnerSlider.value"
+                rz-slider-options="higherEarnerSlider.options"
+                class="with-legend sliderZ"></rzslider>
+    </div>
 
-  <p style="margin-bottom: 2px; z-index: 2">
-    <b style="background-color: white">
-      <span class=names>{{lowerEarner().name}}</span> files at age:
-    </b>
-  </p>
+    <p style="margin-bottom: 2px; z-index: 2">
+      <b style="background-color: white">
+        <span class=names>{{lowerEarner().name}}</span> files at age:
+      </b>
+    </p>
 
-  <!-- See http://angular-slider.github.io/angularjs-slider/ -->
-  <div class="force-ticks-above" id="lowerEarnerSlider">
-  <rzslider rz-slider-model="lowerEarnerSlider.value"
-            rz-slider-options="lowerEarnerSlider.options"
-            class="with-legend sliderZ"></rzslider>
+    <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+    <div class="force-ticks-above" id="lowerEarnerSlider">
+    <rzslider rz-slider-model="lowerEarnerSlider.value"
+              rz-slider-options="lowerEarnerSlider.options"
+              class="with-legend sliderZ"></rzslider>
+    </div>
   </div>
 
   <!-- Div which positions text at the correct y-position below the spousal

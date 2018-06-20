@@ -793,7 +793,8 @@ div.lineElement {
 
 canvas#spousal-chart-canvas {
   position: absolute;
-  z-index: -3;
+  z-index: 1;
+  margin-top: 22px;
 }
 
 div.totalSpousalAtDate {

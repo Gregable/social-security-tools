@@ -52,14 +52,14 @@ SpousalChart.prototype.setRecipients = function(lowerEarner, higherEarner) {
  */
 SpousalChart.prototype.setSliders = function(
     lowerEarnerSlider, higherEarnerSlider) {
-  this.lowerEarnerSlider_ = lowerEarnerSlider;
-  this.higherEarnerSlider_ = higherEarnerSlider;
+  this.lowerEarnerSlider = lowerEarnerSlider;
+  this.higherEarnerSlider = higherEarnerSlider;
 };
 
 /**
  * Set the date range in months that this chart covers.
- * @param {number} startDate months since year 0
- * @param {number} endDate months since year 0
+ * @param {MonthDate} startDate
+ * @param {MonthDate} endDate
  */
 SpousalChart.prototype.setDateRange = function(startDate, endDate) {
   this.startDate_ = startDate;
@@ -85,28 +85,31 @@ SpousalChart.prototype.chartHeight = function() {
 };
 
 /**
- * Compute the canvas x-coordinate for a date in months.
- * @param {number} ageMonths
+ * Compute the canvas x-coordinate for a date.
+ * @param {MonthDate} date
  * @return {number}
  */
-SpousalChart.prototype.canvasX = function(ageMonths) {
-  var xValue = (ageMonths - this.startDate_) / (this.endDate_ - this.startDate_)
-    * this.chartWidth() + 16;
+SpousalChart.prototype.canvasX = function(date) {
+  var xValue = ((date.subtractDate(this.startDate_).asMonths() /
+                 this.endDate_.subtractDate(this.startDate_).asMonths())
+                * this.chartWidth()) + 16;
   // To deal with rounding errors, clip to the usable range.
   return Math.round(Math.max(16, Math.min(this.chartWidth() + 16, xValue)));
 };
 
 /**
- * Inverse of canvasX, computes a date in months for a canvas x-coordinate.
+ * Inverse of canvasX, computes a date for a canvas x-coordinate.
  * @param {number} x
- * @return {number}
+ * @return {MonthDate}
  */
 SpousalChart.prototype.dateX = function(x) {
   // Clip x to a range smaller than the chart.
   x = Math.max(16, Math.min(this.chartWidth() + 16, x));
-  var ageMonths = ((x - 16) / this.chartWidth()) 
-    * (this.endDate_ - this.startDate_) + this.startDate_;
-  return Math.round(ageMonths);
+  var percent = (x - 16) / this.chartWidth();
+  var numMonths = Math.round(
+      this.endDate_.subtractDate(this.startDate_).asMonths() * percent);
+  return this.startDate_.addDuration(
+      new MonthDuration().initFromMonths(numMonths));
 };
  
 /**
@@ -118,33 +121,35 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
   this.context_.strokeStyle = '#666';
   this.context_.setLineDash([2,2]);
 
-  firstYearIdx = this.startDate_;
+  firstYear = this.startDate_;
   // If the start date doesn't fall on a year value, move it forward until
   // it does.
-  if (firstYearIdx % 12 !== 0)
-    firstYearIdx += 12 - (firstYearIdx % 12);
+  if (firstYear.monthIndex() !== 0)
+    firstYear = new MonthDate().initFromYearsMonths(firstYear.year() + 1, 0);
 
   // Iterate over each year within the date range.
-  for (var i = firstYearIdx; i <= this.endDate_; i += 12) {
+  for (var date = new MonthDate().initFromMonthDate(firstYear);
+       !this.endDate_.lessThan(date);
+       date = date.addDuration(new MonthDuration().initFromMonths(12))) {
     // Draw vertical line.
     this.context_.beginPath();
-    this.context_.moveTo(this.canvasX(i), 40);
-    this.context_.lineTo(this.canvasX(i), 600);
+    this.context_.moveTo(this.canvasX(date), 40);
+    this.context_.lineTo(this.canvasX(date), 600);
     this.context_.stroke();
   
     // Print the year vertically atop the line, with a white rectangle behind
     // the text, so that the line isn't going through the text.
-    text = '' + Math.floor(i / 12);
+    text = '' + date.year();
     var textWidth = this.context_.measureText(text).width;
     var xpos = 210 + textWidth;
 
     this.context_.save();
-    this.context_.translate(this.canvasX(i) + 5, xpos);
+    this.context_.translate(this.canvasX(date) + 5, xpos);
     this.context_.rotate(-90 * Math.PI / 180);
     this.context_.fillStyle = '#FFF';
     this.context_.fillRect(-8, -13, textWidth + 16, 16);
     this.context_.fillStyle = '#999';
-    this.context_.fillText(i / 12, 0, 0);
+    this.context_.fillText(text, 0, 0);
     this.context_.restore();
   }
   this.context_.restore();
@@ -152,14 +157,13 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
 
 /**
  * Renders a single vertical line at the user's selected date.
- * @param{number} canvasX x-coordinate of vertical line we should render.
+ * @param {number} canvasX x-coordinate of vertical line we should render.
  */
 SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
-  var months = this.dateX(canvasX);
+  var date = this.dateX(canvasX);
   if (this.mouseToggle === 'ON')
-    this.updateSelectedDate(months);
-  var text = ALL_MONTHS[months % 12] + ' ';
-  text += Math.floor(months / 12);
+    this.updateSelectedDate(date);
+  var text = date.monthName() + ' ' + date.year();
 
   this.context_.save();
   // Bluish dashed lines.
@@ -210,51 +214,54 @@ SpousalChart.prototype.renderAxes = function() {
 };
 
 /**
- * Computes the date (in months) that the higher earner starts receiving
- * benefits.
+ * Computes the date that the higher earner starts receiving benefits.
+ * @return {MonthDate}
  */
 SpousalChart.prototype.higherEarnerStartDate = function() {
-  // The date (in months) that the earner starts recieving benefits.
-  return this.higherEarner_.dateMonthsAtAge(62) +
-    this.higherEarnerSlider_.value - (62 * 12);
+  return this.higherEarnerSlider.selectedDate();
 };
 
 /**
- * Computes the date (in months) that the lower earner starts receiving
- * benefits.
+ * Computes the date that the lower earner starts receiving benefits.
+ * @return {MonthDate}
  */
 SpousalChart.prototype.lowerEarnerStartDate = function() {
-  // The date (in months) that the earner starts recieving benefits.
-  return this.lowerEarner_.dateMonthsAtAge(62) +
-    this.lowerEarnerSlider_.value - (62 * 12);
+  // Typically this is the date of the lower earner's slider. However, if the
+  // lower earner has no personal benefit, the lower earner will wait until
+  // the higher earner has filed, or effectively 70, whichever is earlier.
+  
+  // If the lower earner has a personal benefit, start at lower earner's date.
+  if (this.lowerEarner_.primaryInsuranceAmountFloored() > 0)
+    return this.lowerEarnerSlider.selectedDate();
+  // If the lower earner files at or after the higher earner, start at lower
+  // earner's date.
+  if (this.lowerEarnerSlider.selectedDate() >=
+      this.higherEarnerSlider.selectedDate())
+    return this.lowerEarnerSlider.selectedDate();
+  // If the higher earner files after the lower earner is already 70, just use
+  // the date the lower earner turns 70.
+  if (this.lowerEarner_.ageAtDate(this.higherEarnerStartDate()).greaterThan(
+          new MonthDuration().initFromYearsMonths(70, 0)))
+    return this.lowerEarner_.dateAtYearsOld(70);
+  // Otherwise, use the date that the higher earner files.
+  return this.higherEarnerStartDate();
 };
 
 /**
- * Computes the age (in months) that the higher earner starts receiving
- * benefits.
+ * Computes the age that the higher earner starts receiving benefits.
+ * @return {MonthDuration}
  */
 SpousalChart.prototype.higherEarnerStartAge = function() {
-  // The date (in months) that the earner starts recieving benefits.
-  var date = this.higherEarnerStartDate();
-  return this.higherEarner_.monthsOldAtDate(Math.floor(date / 12), date % 12);
+  return this.higherEarnerSlider.selectedAge();
 };
 
 /**
- * Computes the age (in months) that the lower earner starts receiving
- * benefits.
+ * Computes the age that the lower earner starts receiving benefits.
+ * @return {MonthDuration}
  */
 SpousalChart.prototype.lowerEarnerStartAge = function() {
-  // The date (in months) that the earner starts recieving benefits.
-  var date = this.lowerEarnerStartDate();
-  return this.lowerEarner_.monthsOldAtDate(Math.floor(date / 12), date % 12);
+  return this.lowerEarner_.ageAtDate(this.lowerEarnerStartDate());
 };
-
-/**
- * Converts a string such as '1200' to '1,200'.
- */
-SpousalChart.prototype.insertNumericalCommas = function(num) {
- return num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-}
 
 /**
  * Render the earnings of the higher earner.
@@ -264,7 +271,6 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.lineWidth = 2;
   var startDate = this.higherEarnerStartDate();
   var startAge = this.higherEarnerStartAge();
-
   var dollars = this.higherEarnerPersonalBenefit();
   
   this.context_.strokeStyle = '#e69f00';
@@ -304,71 +310,49 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.save();
   this.context_.fillStyle = '#5e4000';
   this.context_.font = "14px Helvetica";
-  var text = '$' + this.insertNumericalCommas(dollars) + ' / mo';
+  var text = '$' + insertNumericalCommas(dollars) + ' / mo';
   var box = this.context_.measureText(text);
   if ((box.width + 20) < regionWidth) {
-    this.context_.fillText(
-        text,
-        leftX + 10,
-        this.canvasHigherY(dollars) - 4);
+    this.context_.fillText(text, leftX + 10, this.canvasHigherY(dollars) - 4);
   } else {
     // Try again with shorter text.
-    var text = '$' + this.insertNumericalCommas(dollars);
+    var text = '$' + insertNumericalCommas(dollars);
     var box = this.context_.measureText(text);
     if ((box.width + 10) < regionWidth)
-      this.context_.fillText(
-          text,
-          leftX + 5,
-          this.canvasHigherY(dollars) - 4);
+      this.context_.fillText(text, leftX + 5, this.canvasHigherY(dollars) - 4);
   }
   this.context_.restore();
-
 };
 
 /**
- * Compute the start date (in months) when the spousal benefits start.
+ * Compute the start date when the spousal benefits start.
+ * @return {MonthDate}
  */
 SpousalChart.prototype.spousalStartDate = function() {
-  var startDate = this.lowerEarnerStartDate();
-  var startSpouseDate = this.higherEarnerStartDate();
-  return Math.max(startDate, startSpouseDate);
+  var dateA = this.lowerEarnerStartDate();
+  var dateB = this.higherEarnerStartDate();
+  return dateA.greaterThan(dateB) ? dateA : dateB;
 };
 
 /**
  * Compute the higher earner's personal benefit in dollars.
  */
 SpousalChart.prototype.higherEarnerPersonalBenefit = function() {
-  var startAge = this.higherEarnerStartAge();
-  const startAgeYears = Math.floor(startAge / 12);
-  const startAgeMonths = startAge % 12;
-  return this.higherEarner_.benefitAtAge(startAgeYears, startAgeMonths);
+  return this.higherEarner_.benefitAtAge(this.higherEarnerStartAge());
 };
 
 /**
  * Compute the lower earner's personal benefit in dollars.
  */
 SpousalChart.prototype.lowerEarnerPersonalBenefit = function() {
-  var startAge = this.lowerEarnerStartAge();
-  const startAgeYears = Math.floor(startAge / 12);
-  const startAgeMonths = startAge % 12;
-  return this.lowerEarner_.benefitAtAge(startAgeYears, startAgeMonths);
+  return this.lowerEarner_.benefitAtAge(this.lowerEarnerStartAge());
 };
 
 /**
  * Compute the lower earner's total benefit (personal + spousal) in dollars.
  */
 SpousalChart.prototype.lowerEarnerTotalBenefit = function() {
-  var startAge = this.lowerEarnerStartAge();
-  const startAgeYears = Math.floor(startAge / 12);
-  const startAgeMonths = startAge % 12;
-
-  var spousalStartDate = this.spousalStartDate();
-  var spousalStartAge = this.lowerEarner_.monthsOldAtDate(spousalStartDate);
-  const spousalStartAgeYears = Math.floor(spousalStartAge / 12);
-  const spousalStartAgeMonths = spousalStartAge % 12;
-
-  return this.lowerEarner_.totalBenefitWithSpousal(
-      startAgeYears, startAgeMonths);
+  return this.lowerEarner_.totalBenefitWithSpousal(this.lowerEarnerStartAge());
 };
 
 /**
@@ -388,7 +372,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.beginPath();
   this.context_.moveTo(this.canvas_.width - 1, this.canvasLowerY(0));
   this.context_.lineTo(this.canvasX(spousalStartDate), this.canvasLowerY(0));
-  if (personal > 0 && startDate < spousalStartDate) {
+  if (personal > 0 && startDate.lessThan(spousalStartDate)) {
     this.context_.lineTo(this.canvasX(startDate), this.canvasLowerY(0));
     this.context_.lineTo(this.canvasX(startDate), this.canvasLowerY(personal));
   }
@@ -405,7 +389,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
   // regionWidth/regionHeight and centerX/centerY describe the box that forms
   // the larger dollar amount region in the lower earner section. This may be
   // the entire lower earner region, or may be the right hand section.
-  if (startDate < spousalStartDate) {
+  if (startDate.lessThan(spousalStartDate)) {
     var leftX = this.canvasX(spousalStartDate);
   } else {
     var leftX = this.canvasX(startDate);
@@ -435,7 +419,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.save();
   this.context_.fillStyle = '#004000';
   this.context_.font = "14px Helvetica";
-  var text = '$' + this.insertNumericalCommas(total) + ' / mo';
+  var text = '$' + insertNumericalCommas(total) + ' / mo';
   var box = this.context_.measureText(text);
   if ((box.width + 20) < regionWidth) {
     this.context_.fillText(
@@ -444,7 +428,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
         this.canvasLowerY(total) + 15);
   } else {
     // Try again with shorter text.
-    text = '$' + this.insertNumericalCommas(total);
+    text = '$' + insertNumericalCommas(total);
     box = this.context_.measureText(text);
     if ((box.width + 10) < regionWidth)
       this.context_.fillText(
@@ -454,10 +438,10 @@ SpousalChart.prototype.renderLowerEarner = function() {
   }
 
   // We may need to render text for the left leg of the lower recipients chart.
-  if (personal > 0 && startDate < spousalStartDate) {
+  if (personal > 0 && startDate.lessThan(spousalStartDate)) {
     var leftRegionWidth = 
       this.canvasX(spousalStartDate) - this.canvasX(startDate);
-    text = '$' + this.insertNumericalCommas(personal) + ' / mo';
+    text = '$' + insertNumericalCommas(personal) + ' / mo';
     box = this.context_.measureText(text);
     if ((box.width + 20) < leftRegionWidth) {
       this.context_.fillText(
@@ -466,7 +450,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
           this.canvasLowerY(personal) + 15);
     } else {
       // Try again with shorter text.
-      text = '$' + this.insertNumericalCommas(personal);
+      text = '$' + insertNumericalCommas(personal);
       text = '$' + personal;
       box = this.context_.measureText(text);
       if ((box.width + 10) < leftRegionWidth)
@@ -482,6 +466,9 @@ SpousalChart.prototype.renderLowerEarner = function() {
 
 /** Render the spousal chart. */
 SpousalChart.prototype.render = function() {
+  if (!this.isInitialized())
+    return;
+
   // Canvas tutorial:
   // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
   this.context_.save();
@@ -504,13 +491,15 @@ SpousalChart.prototype.render = function() {
  * @return {Number}
  */
 SpousalChart.prototype.maxRenderedYDollars = function() {
-  return this.higherEarner_.benefitAtAge(70, 0) +
-         this.lowerEarner_.totalBenefitWithSpousal(70, 0);
+  const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
+  return this.higherEarner_.benefitAtAge(maxAge) +
+         this.lowerEarner_.totalBenefitWithSpousal(maxAge);
 };
 
 SpousalChart.prototype.midpointYValue = function() {
   // The midpoint line is the canvas y position of the 0 benefit line.
-  var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(70, 0);
+  const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
+  var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(maxAge);
   var midpointYValue = this.canvas_.height -
       Math.floor(spousalDollars / this.maxRenderedYDollars()
           * this.chartHeight()) - 45;
@@ -554,6 +543,7 @@ SpousalChart.prototype.mouseOutListener = function() {
   return function(e) {
     if (self.mouseToggle == 'OFF')
       return;
+    self.updateSelectedDate(new MonthDate());
     self.render();
   };
 };
@@ -564,7 +554,7 @@ SpousalChart.prototype.mouseClickListener = function() {
   return function(e) {
     var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
     if (canvasY < 180) {
-      self.updateSelectedDate(-1);
+      self.updateSelectedDate(new MonthDate());
       return;
     }
     if (self.mouseToggle === 'ON') {
@@ -586,7 +576,7 @@ SpousalChart.prototype.mouseMoveListener = function() {
       self.render();
       var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
       if (canvasY < 180) {
-        self.updateSelectedDate(-1);
+        self.updateSelectedDate(new MonthDate());
         return;
       }
       var canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
