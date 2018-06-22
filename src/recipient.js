@@ -462,7 +462,8 @@ Recipient.prototype.spousalBenefitMultiplierAtAge = function(age) {
  * Age is specified as a year and month index (0-11) since birth.
  * @param {MonthDuration} startAge
  */
-Recipient.prototype.totalBenefitWithSpousal = function(startAge) {
+Recipient.prototype.totalBenefitWithSpousal = function(startAge,
+                                                       spousalStartAge) {
   const personalBenefit = this.benefitAtAge(startAge);
 
   // The spousal benefit at full retirement is half the spouse's PIA minus
@@ -471,7 +472,8 @@ Recipient.prototype.totalBenefitWithSpousal = function(startAge) {
       (this.spouse.primaryInsuranceAmount() / 2.0) -
       this.primaryInsuranceAmount());
 
-  const spousalBenefitMultiplier = this.spousalBenefitMultiplierAtAge(startAge);
+  const spousalBenefitMultiplier = this.spousalBenefitMultiplierAtAge(
+      spousalStartAge);
   const spousalBenefit = spousalBenefitAtFRA * (1 + spousalBenefitMultiplier);
 
   return Math.floor(personalBenefit + spousalBenefit);

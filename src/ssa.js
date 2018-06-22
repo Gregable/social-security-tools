@@ -706,10 +706,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
             $scope.lowerEarner().benefitAtAge(
                 this.lowerEarnerSlider.selectedAge());
       } else {
+        spousalDate = (this.lowerEarnerSlider.selectedDate().greaterThan(
+            this.higherEarnerSlider.selectedDate())
+          ? this.lowerEarnerSlider.selectedDate()
+          : this.higherEarnerSlider.selectedDate());
+
         // both earners have filed
         $scope.spousalSelection.lowerEarnerBenefit =
             $scope.lowerEarner().totalBenefitWithSpousal(
-                this.lowerEarnerSlider.selectedAge());
+                this.lowerEarnerSlider.selectedAge(),
+                this.lowerlowerEarner().ageAtDate(spousalDate));
       };
       $scope.spousalSelection.lowerEarnerBenefit = 
         Math.floor($scope.spousalSelection.lowerEarnerBenefit);

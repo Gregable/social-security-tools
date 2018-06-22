@@ -352,7 +352,9 @@ SpousalChart.prototype.lowerEarnerPersonalBenefit = function() {
  * Compute the lower earner's total benefit (personal + spousal) in dollars.
  */
 SpousalChart.prototype.lowerEarnerTotalBenefit = function() {
-  return this.lowerEarner_.totalBenefitWithSpousal(this.lowerEarnerStartAge());
+  return this.lowerEarner_.totalBenefitWithSpousal(
+      this.lowerEarnerStartAge(),
+      this.lowerEarner_.ageAtDate(this.spousalStartDate()));
 };
 
 /**
@@ -493,13 +495,14 @@ SpousalChart.prototype.render = function() {
 SpousalChart.prototype.maxRenderedYDollars = function() {
   const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
   return this.higherEarner_.benefitAtAge(maxAge) +
-         this.lowerEarner_.totalBenefitWithSpousal(maxAge);
+         this.lowerEarner_.totalBenefitWithSpousal(maxAge, maxAge);
 };
 
 SpousalChart.prototype.midpointYValue = function() {
   // The midpoint line is the canvas y position of the 0 benefit line.
   const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
-  var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(maxAge);
+  var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(
+      maxAge, maxAge);
   var midpointYValue = this.canvas_.height -
       Math.floor(spousalDollars / this.maxRenderedYDollars()
           * this.chartHeight()) - 45;
