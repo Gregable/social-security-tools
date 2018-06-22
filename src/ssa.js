@@ -715,7 +715,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         $scope.spousalSelection.lowerEarnerBenefit =
             $scope.lowerEarner().totalBenefitWithSpousal(
                 this.lowerEarnerSlider.selectedAge(),
-                this.lowerlowerEarner().ageAtDate(spousalDate));
+                $scope.lowerEarner().ageAtDate(spousalDate));
       };
       $scope.spousalSelection.lowerEarnerBenefit = 
         Math.floor($scope.spousalSelection.lowerEarnerBenefit);
