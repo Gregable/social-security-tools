@@ -701,47 +701,55 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.spousalSelection = {};
     // Zero is used as a sentinel to indicate no selected date.
     $scope.spousalSelection.show = (date.monthsSinceEpoch() > 0);
-    if ($scope.spousalSelection.show) {
-      $scope.spousalSelection.dateText =
-        date.monthName() + ' ' + date.year();
-
-      var lowerAge = $scope.lowerEarner().ageAtDate(date);
-
-      // Compute the lower earner benefit.
-      if ($scope.lowerEarnerSlider.selectedDate().greaterThan(date)) {
-        // the lower earner has not filed
-        $scope.spousalSelection.lowerEarnerBenefit = 0;
-      } else if ($scope.higherEarnerSlider.selectedDate().greaterThan(date)) {
-        // only the lower earner has filed
-        $scope.spousalSelection.lowerEarnerBenefit =
-            $scope.lowerEarner().benefitAtAge(
-                this.lowerEarnerSlider.selectedAge());
-      } else {
-        spousalDate = (this.lowerEarnerSlider.selectedDate().greaterThan(
-            this.higherEarnerSlider.selectedDate())
-          ? this.lowerEarnerSlider.selectedDate()
-          : this.higherEarnerSlider.selectedDate());
-
-        // both earners have filed
-        $scope.spousalSelection.lowerEarnerBenefit =
-            $scope.lowerEarner().totalBenefitWithSpousal(
-                this.lowerEarnerSlider.selectedAge(),
-                $scope.lowerEarner().ageAtDate(spousalDate));
-      };
-      $scope.spousalSelection.lowerEarnerBenefit = 
-        Math.floor($scope.spousalSelection.lowerEarnerBenefit);
-      
-      // Compute the higher earner benefit.
-      if ($scope.higherEarnerSlider.selectedDate().greaterThan(date)) {
-        $scope.spousalSelection.higherEarnerBenefit = 0;
-      } else {
-        $scope.spousalSelection.higherEarnerBenefit =
-          $scope.higherEarner().benefitAtAge(
-                this.higherEarnerSlider.selectedAge());
-      };
-      $scope.spousalSelection.higherEarnerBenefit = 
-        Math.floor($scope.spousalSelection.higherEarnerBenefit);
+    if (!$scope.spousalSelection.show) {
+      $scope.$apply();
+      return;
     }
+
+    // Determine the displayed date.
+    $scope.spousalSelection.dateText =
+      date.monthName() + ' ' + date.year();
+
+    // Compute the higher earner benefit.
+    if ($scope.higherEarnerSlider.selectedDate().greaterThan(date)) {
+      $scope.spousalSelection.higherEarnerBenefit = 0;
+    } else {
+      $scope.spousalSelection.higherEarnerBenefit =
+        $scope.higherEarner().benefitAtAge(
+              this.higherEarnerSlider.selectedAge());
+    };
+    // Round down.
+    $scope.spousalSelection.higherEarnerBenefit = 
+      Math.floor($scope.spousalSelection.higherEarnerBenefit);
+
+
+    var lowerAge = $scope.lowerEarner().ageAtDate(date);
+
+    // Compute the lower earner benefit.
+    if ($scope.lowerEarnerSlider.selectedDate().greaterThan(date)) {
+      // the lower earner has not filed
+      $scope.spousalSelection.lowerEarnerBenefit = 0;
+    } else if ($scope.higherEarnerSlider.selectedDate().greaterThan(date)) {
+      // only the lower earner has filed
+      $scope.spousalSelection.lowerEarnerBenefit =
+          $scope.lowerEarner().benefitAtAge(
+              this.lowerEarnerSlider.selectedAge());
+    } else { // both earners have filed
+      // Spousal benefits begin at the later of the two sliders.
+      spousalDate = (this.lowerEarnerSlider.selectedDate().greaterThan(
+          this.higherEarnerSlider.selectedDate())
+        ? this.lowerEarnerSlider.selectedDate()
+        : this.higherEarnerSlider.selectedDate());
+
+      $scope.spousalSelection.lowerEarnerBenefit =
+          $scope.lowerEarner().totalBenefitWithSpousal(
+              this.lowerEarnerSlider.selectedAge(),
+              $scope.lowerEarner().ageAtDate(spousalDate));
+    }
+    // Round down.
+    $scope.spousalSelection.lowerEarnerBenefit = 
+      Math.floor($scope.spousalSelection.lowerEarnerBenefit);
+    
     $scope.$apply();
   }
 })

@@ -468,13 +468,25 @@ Recipient.prototype.totalBenefitWithSpousal = function(startAge,
 
   // The spousal benefit at full retirement is half the spouse's PIA minus
   // the spouses PIA, or 0.
-  const spousalBenefitAtFRA = Math.max(0, 
-      (this.spouse.primaryInsuranceAmount() / 2.0) -
-      this.primaryInsuranceAmount());
+  const maxBenefitWithSpousal = this.spouse.primaryInsuranceAmount() / 2.0;
+  const spousalBenefitAtFRA = 
+      Math.max(0, maxBenefitWithSpousal - this.primaryInsuranceAmount());
 
   const spousalBenefitMultiplier = this.spousalBenefitMultiplierAtAge(
       spousalStartAge);
   const spousalBenefit = spousalBenefitAtFRA * (1 + spousalBenefitMultiplier);
 
-  return Math.floor(personalBenefit + spousalBenefit);
+
+  // You can't go above spousalBenefitAtFRA with a spousal benefit. If your
+  // personal benefit is already higher than spousalBenefitAtFRA, you get your
+  // personal benefit. If your combined benefit is greater than the
+  // spousalBenefitAtFRA you cap out at spousalBenefitAtFRA. If not, you get
+  // the sum.
+  if (personalBenefit > maxBenefitWithSpousal) {
+    return Math.floor(personalBenefit);
+  } else if ((personalBenefit + spousalBenefit) > maxBenefitWithSpousal) {
+    return Math.floor(maxBenefitWithSpousal)
+  } else {
+    return Math.floor(personalBenefit + spousalBenefit);
+  }
 }
