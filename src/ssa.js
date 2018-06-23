@@ -409,8 +409,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   $scope.spousalBenefit = function() {
-    return Math.max(0, 
-        $scope.spousalMax() - $scope.lowerEarner().primaryInsuranceAmount());
+    return Math.floor(Math.max(0, 
+        $scope.spousalMax() - $scope.lowerEarner().primaryInsuranceAmount()));
   }
 
   $scope.spousalBenefitFraction = function() {
