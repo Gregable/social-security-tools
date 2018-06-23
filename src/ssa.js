@@ -512,13 +512,24 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
 
   $scope.updateSliderMin = function() {
-    if ($scope.lowerEarner().primaryInsuranceAmountFloored() == 0) {
+    // If the lower earner will be 70 before the higher earner turns 62, then
+    // we bail.
+    const ageDiff = $scope.higherEarner().birthDate.subtractDate(
+          $scope.lowerEarner().birthDate);
+    if (ageDiff.greaterThan(new MonthDuration().initFromYearsMonths(8, 0))) {
+      $scope.lowerEarnerSlider.options.minLimit = 0;
+    } else if ($scope.lowerEarner().primaryInsuranceAmountFloored() == 0) {
       // If the lower earner does not have a personal benefit, it makes no
       // sense for that earner to file for benefits before the higher earner.
       // In this specific case, we set the date of the higher earner's slider
       // as the minimum date for the lower earner's slider.
       var lowerAgeAtDate = $scope.lowerEarner().ageAtDate(
           $scope.higherEarnerSlider.selectedDate()).asMonths();
+      if (lowerAgeAtDate > new MonthDuration().initFromYearsMonths(70, 0)) {
+        $scope.lowerEarnerSlider.options.minLimit = 0;
+        return;
+      }
+
       if ($scope.lowerEarnerSlider.value < lowerAgeAtDate)
         $scope.lowerEarnerSlider.value = lowerAgeAtDate;
       // options.minLimit is relative to options.floor for some reason.
