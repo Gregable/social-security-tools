@@ -318,8 +318,15 @@ SpousalChart.prototype.renderHigherEarner = function() {
     // Try again with shorter text.
     var text = '$' + insertNumericalCommas(dollars);
     var box = this.context_.measureText(text);
-    if ((box.width + 10) < regionWidth)
+    if ((box.width + 10) < regionWidth) {
       this.context_.fillText(text, leftX + 5, this.canvasHigherY(dollars) - 4);
+    } else {
+      // Give up and place the text to the left, rather than above.
+      var text = '$' + insertNumericalCommas(dollars) + ' / mo';
+      var box = this.context_.measureText(text);
+      this.context_.fillText(text, leftX - 5 - box.width,
+                             this.canvasHigherY(dollars / 2) + 7);
+    }
   }
   this.context_.restore();
 };
@@ -432,11 +439,20 @@ SpousalChart.prototype.renderLowerEarner = function() {
     // Try again with shorter text.
     text = '$' + insertNumericalCommas(total);
     box = this.context_.measureText(text);
-    if ((box.width + 10) < regionWidth)
+    if ((box.width + 10) < regionWidth) {
       this.context_.fillText(
           text,
           leftX + 5,
           this.canvasLowerY(total) + 15);
+    } else {
+      // Give up and drop the text to the left hand side instead of below.
+      var text = '$' + insertNumericalCommas(total) + ' / mo';
+      var box = this.context_.measureText(text);
+      this.context_.fillText(
+        text,
+        leftX - 5 - box.width,
+        this.canvasLowerY(((total - personal) / 2) + personal) + 7);
+    }
   }
 
   // We may need to render text for the left leg of the lower recipients chart.
@@ -455,11 +471,20 @@ SpousalChart.prototype.renderLowerEarner = function() {
       text = '$' + insertNumericalCommas(personal);
       text = '$' + personal;
       box = this.context_.measureText(text);
-      if ((box.width + 10) < leftRegionWidth)
+      if ((box.width + 10) < leftRegionWidth) {
         this.context_.fillText(
             text,
             this.canvasX(startDate) + 5,
             this.canvasLowerY(personal) + 15);
+      } else {
+        // Give up and drop the text to the left hand side instead of above.
+        text = '$' + insertNumericalCommas(personal) + ' / mo';
+        box = this.context_.measureText(text);
+        this.context_.fillText(
+            text,
+            this.canvasX(startDate) - 5 - box.width,
+            this.canvasLowerY(personal / 2) + 7);
+      }
     }
   }
   
