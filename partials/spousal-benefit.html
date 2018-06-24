@@ -51,8 +51,36 @@
     values.
   </p>
  
+  <h3>
+    Enter <span class=names>{{spouse.name}}'s</span>
+    Primary Insurance Amount
+  </h3>
+  <p>
+    You can compute <span class=names>{{spouse.name}}'s</span>
+    <u>primary insurance amount</u> by using this tool once for
+    <span class=names>{{spouse.name}}</span>, note down the value, and then
+    reload using this tool for <span class=names>{{recipient.name}}</span>,
+    entering <span class=names>{{spouse.name}}'s</span>
+    <u>primary insurance amount</u> below.
+  </p>
 
-  <h3>Select <span class=names>{{spouse.name}}'s</span> Birthdate</h3>
+  <p>
+    <span class=names>{{recipient.name}}'s</span>
+    Primary Insurance Amount:
+    <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
+  </p>
+
+  <p>
+    <span class=names>{{spouse.name}}'s</span>
+    Primary Insurance Amount: <b>$</b>
+    <input type="number" min=0 size=6 style="width: 60px"
+           name="spousalPia" cast-to-integer
+           ng-model="spouse.primaryInsuranceAmountValue"
+           ng-change="refreshSlider()">
+    / month
+  </p>
+
+  <h3>Enter <span class=names>{{spouse.name}}'s</span> Birthdate</h3>
   <div class=agePicker>
     <div class=monthPicker>
       <span ng-repeat="month in all_months | limitTo:6">
@@ -84,35 +112,6 @@
     </div>
   </div>
   <br class=clear>
-
-  <h3>
-    Enter <span class=names>{{spouse.name}}'s</span>
-    Primary Insurance Amount
-  </h3>
-  <p>
-    You can compute <span class=names>{{spouse.name}}'s</span>
-    <u>primary insurance amount</u> by using this tool once for
-    <span class=names>{{spouse.name}}</span>, note down the value, and then
-    reload using this tool for <span class=names>{{recipient.name}}</span>,
-    entering <span class=names>{{spouse.name}}'s</span>
-    <u>primary insurance amount</u> below.
-  </p>
-
-  <p>
-    <span class=names>{{recipient.name}}'s</span>
-    Primary Insurance Amount:
-    <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
-  </p>
-
-  <p>
-    <span class=names>{{spouse.name}}'s</span>
-    Primary Insurance Amount: <b>$</b>
-    <input type="number" min=0 size=6 style="width: 60px"
-           name="spousalPia" cast-to-integer
-           ng-model="spouse.primaryInsuranceAmountValue"
-           ng-change="refreshSlider()">
-    / month
-  </p>
 
 
   <h2>Spousal Benefit Calculation</h2>
@@ -205,9 +204,6 @@
   <p>
   </div><!-- !isSpousalBenefit() -->
 
-  <!--
-    TODO: Convert this CSS into a stylesheet format.
-  -->
   <div ng-show="isSpousalBenefit() && lowerEarner().primaryInsuranceAmountFloored() > 0">
     <div style="width: 100%">
       <div style="width: {{Math.min(75, spousalBenefitFraction())}}%; text-align: center; float:left; white-space:nowrap;">
@@ -223,7 +219,6 @@
       </div>
     </div>
     <img style="width: 100%; max-height: 30px; padding-top: 2px;" src="static/horiz-curly.png">
-    <!-- TODO: Create a sideways { that points to total -->
     <div style="width: 100%; text-align: center;">
       Total: <b>${{spousalMax() | number:0}}</b>
     </div>
@@ -243,11 +238,50 @@
 
   <h2>Early and Delayed Spousal Retirement</h3>
   <p>
-    Just like the personal benefit, the spousal benefit can be collected earlier
-    than <u>normal retirement age</u> with a <u>permanently</u> <i>reduced</i>
-    benefit amount. Unlike the personal benefit, delaying the collection date of
-    the spousal benefit until later than <u>normal retirement age</u> will not
-    increase the spousal benefit, only the personal benefit.
+    The personal benefit section at the top of this document describes how
+    personal benefits are adjusted for beginning benefits earlier than the
+    Normal Retirement Age (NRA) or delaying past Normal Retirement Age.
+  </p>
+  <p>
+    The spousal benefit does not increase after Normal Retirement Age, but it
+    is reduced before Normal Retirement Age 
+    (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
+         {{recipient.normalRetirementDate.year()}}</b>) at the same rate.
+  </p>
+  <p>
+    If <span class=names>{{lowerEarner().name}}</span> begins spousal
+    benefits before Normal Retirement Age
+    (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
+         {{recipient.normalRetirementDate.year()}}</b>),
+    the spousal benefit will be <u>permanently</u> <i>reduced</i> per year you
+    start early by:
+  </p>
+  <ul>
+    <li><b>6.67%</b> per year after
+      <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
+         {{lowerEarner().normalRetirement.ageMonths}} months</b>
+      (<b>
+         {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).monthName()}}
+        {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).year()}}
+       </b>)
+    </li>
+    <li><b>5.00%</b> per year before
+      <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
+         {{lowerEarner().normalRetirement.ageMonths}} months</b>
+      (<b>
+         {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).monthName()}}
+        {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).year()}}
+       </b>)
+    </li>
+  </ul>
+
+  <p>
+    The date that <span class=names>{{lowerEarner().name}}'s</span> spousal
+    benefits start is the later of either
+    <span class=names>{{lowerEarner().name}}</span>'s benefits start date or
+    <span class=names>{{higherEarner().name}}</span>'s benefits start date. This
+    can lead to a different reduction multiplier for the personal and spousal
+    benefit.
   </p>
 
   <p>
@@ -274,8 +308,8 @@
 
   <h2>Early and Delayed Combined Retirement</h3>
   <p>
-    Use the sliders below to see how different starting benefit dates affect
-    the final monthly benefit for both you and your spouse.
+    You can see how the starting benefit dates for both spouses will affect
+    affect the final monthly benefits, using the sliders below.
   </p>
 
   <div id=spousal-box>
@@ -345,48 +379,6 @@
       </tr>
     </table>
   </div>
-
-  <p>
-    As you can see, if you file for your monthly benefit later in
-    life, the actual benefit is larger. Whether it is better to collect
-    earlier or later in life depends on several factors:
-  <ul>
-    <li>
-      If you need income earlier in life, that may be an overriding factor
-      leading you to file for Social Security <u>earlier</u>.
-    </li>
-    <li>
-      If you are concerned about running out of retirement savings at an age
-      where returning to work may no longer be possible, you may choose to
-      file <u>later</u> in order to have a higher monthly income later in life.
-    <li>
-      If you are in good health and feel like you may live longer than average,
-      it may be better to ensure a high monthly benefit <u>later</u> in your
-      life rather than income in your early retirement years.
-    </li>
-    <li>
-      If you are in poor health, it may be the right choice to file
-      <u>earlier</u> because payments stop upon death.
-    </li>
-  </ul>  
-  </p>
-
-  <p>
-    In fact, the Social Security Administration designed the increases from
-    delaying benefits to be financially neutral to the program. The expected
-    payments are the same to the average person regardless of when that person
-    first begins taking his or her benefit. This is done using actuarial tables
-    of average American life expectancies.
-  </p>
-
-  <p>
-    Despite many web pages with strong opinions offering the "perfect strategy"
-    for maximizing benefits, this is a very personal decision. The financially
-    optimal date to begin benefits depends on the age at which the recipient
-    dies, which is a date no website can predict. Most such sites simply select
-    an average life expectancy and use that, but you are unlikely to live to a
-    precisely average age.
-  </p>
 
   </div><!-- isSpousalBenefit() -->
 </div>
