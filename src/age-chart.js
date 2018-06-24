@@ -346,7 +346,6 @@ AgeChart.prototype.mouseMoveListener = function() {
     self.context_.save();
     self.context_.strokeStyle = '#337ab7';
     var canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
-    console.log(self.ageAtX(canvasX));
     self.renderAgePoint(self.ageAtX(canvasX));
     self.context_.restore();
   };

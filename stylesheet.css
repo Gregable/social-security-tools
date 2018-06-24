@@ -665,6 +665,25 @@ span.rz-bubble:not([style*="left: 5px;"]),  {
   padding-right: 20px !important;
 }
 
+/* Married / Not Married options */
+.married-options input {
+  display: none;
+}
+.married-options label {
+  font-size: 18px;
+  padding: 10px 16px;
+  line-height: 1.33;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 6px;
+  border-color: #777;          
+
+}
+.married-options input:checked+label {
+  border-color: #6969a4;
+  background: #dfdff0;
+}
+
 /* Frequent Question Expando boxes */
 .frequent-questions {
   margin: 20px 0;

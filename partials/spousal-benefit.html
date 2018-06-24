@@ -2,10 +2,25 @@
      ng-show="showReport()" ng-cloak>
 
   <h2>Spousal Benefit</h2>
-  <p>
-    If you are not married, skip this section.
-    <!--TODO: Add some UI element for choosing to hide this section -->
+  <p ng-show="isMarried()">
+    If you are not married, you can hide this section.
   </p>
+  <p ng-show="!isMarried()">
+    If you are married, you can expand this section.
+  </p>
+
+  <div class=married-options>
+    <input type=radio ng-model="married.value" value=false id=not-married checked>
+    <label for=not-married>Not Married</label>
+    <input type=radio ng-model="married.value" value=true id=married>
+    <label for=married>Married</label>
+  </div>
+
+</div>
+
+<div id=isMarried class="benefit-estimate fixed-center-column"
+     ng-show="showReport() && isMarried()" ng-cloak>
+
   <p>
     In addition to your own <u>primary</u> benefit, married couples may earn
     <u>spousal</u> social security benefits based on each other's records.

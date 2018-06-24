@@ -56,6 +56,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.futureIsTopValue = false;
     $scope.all_months = ALL_MONTHS;
     $scope.demoId = -1;
+    $scope.married = {
+        value: "false"
+    };
   
     $scope.showMedicare = true;
     $scope.showIndexedEarnings = false;
@@ -78,6 +81,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.maxPossibleYear = 1950;
       $scope.updateBirthdate();
       $scope.fetchTestData('averagepaste.txt');
+      $scope.married.value = "true";
     }
     if (demoId === 1) {
       $scope.demoId = 1;
@@ -86,6 +90,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.maxPossibleYear = 1950;
       $scope.updateBirthdate();
       $scope.fetchTestData('millionpaste.txt');
+      $scope.married.value = "true";
     }
     if (demoId === 2) {
       $scope.demoId = 2;
@@ -94,6 +99,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.maxPossibleYear = 1985;
       $scope.updateBirthdate();
       $scope.fetchTestData('youngpaste.txt');
+      $scope.married.value = "true";
     }
   }
 
@@ -169,6 +175,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
   $scope.showReport = function() {
     return $scope.pasteArea.mode === ModeEnum.RENDER_EARNINGS;
+  };
+  $scope.isMarried = function() {
+    return $scope.married.value == "true";
   };
 
   $scope.earningsRecords = function() {
