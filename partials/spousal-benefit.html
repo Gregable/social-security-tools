@@ -259,14 +259,15 @@
 
   <h2>Early and Delayed Combined Retirement</h3>
   <p>
-    Use the sliders below to see how different filing dates affect the
-    final monthly benefit for both you and your spouse.
+    Use the sliders below to see how different starting benefit dates affect
+    the final monthly benefit for both you and your spouse.
   </p>
 
   <div id=spousal-box>
     <canvas id=spousal-chart-canvas width=620 height=620></canvas>
     <p style="margin-bottom: 2px; z-index: 2">
-      <b><span class=names>{{higherEarner().name}}</span> files at age:</b>
+      <b><span class=names>{{higherEarner().name}}</span> starts benefits
+        at age:</b>
     </p>
 
     <!-- See http://angular-slider.github.io/angularjs-slider/ -->
@@ -278,7 +279,8 @@
 
     <p style="margin-bottom: 2px; z-index: 2">
       <b style="background-color: white">
-        <span class=names>{{lowerEarner().name}}</span> files at age:
+        <span class=names>{{lowerEarner().name}}</span> starts benefits
+        at age:
       </b>
     </p>
 
@@ -365,10 +367,10 @@
   <p>
     Despite many web pages with strong opinions offering the "perfect strategy"
     for maximizing benefits, this is a very personal decision. The financially
-    optimal filing date depends on the age at which the recipient dies, which is
-    a date no website can predict. Most such sites simply select an average
-    life expectancy and use that, but you are unlikely to live to a precisely
-    average age.
+    optimal date to begin benefits depends on the age at which the recipient
+    dies, which is a date no website can predict. Most such sites simply select
+    an average life expectancy and use that, but you are unlikely to live to a
+    precisely average age.
   </p>
 
   </div><!-- isSpousalBenefit() -->
