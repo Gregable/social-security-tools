@@ -525,11 +525,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
 
   $scope.updateSliderMin = function() {
-    // If the lower earner will be 70 before the higher earner turns 62, then
-    // we bail.
-    const ageDiff = $scope.higherEarner().birthDate.subtractDate(
-          $scope.lowerEarner().birthDate);
-    if (ageDiff.greaterThan(new MonthDuration().initFromYearsMonths(8, 0))) {
+    // If the lower earner will be 70 before the higher earner files, bail.
+    if ($scope.lowerEarner().dateAtAge(new MonthDuration(70, 0)).lessThan(
+          $scope.higherEarnerSlider.selectedDate())) {
       $scope.lowerEarnerSlider.options.minLimit = 0;
     } else if ($scope.lowerEarner().primaryInsuranceAmountFloored() == 0) {
       // If the lower earner does not have a personal benefit, it makes no

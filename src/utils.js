@@ -256,9 +256,6 @@ function wageRatioInYear(indexingYear) {
  * @return {number} first annual bend point dollar amount
  */
 function firstBendPoint(indexingYear) {
-  console.log(wageRatioInYear(indexingYear));
-  console.log(BENDPOINT1_IN_1977);
-  console.log(Math.round(BENDPOINT1_IN_1977 * wageRatioInYear(indexingYear)));
   return Math.round(BENDPOINT1_IN_1977 * wageRatioInYear(indexingYear));
 }
 

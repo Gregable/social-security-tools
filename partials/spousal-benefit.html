@@ -10,9 +10,9 @@
   </p>
 
   <div class=married-options>
-    <input type=radio ng-model="married.value" value=false id=not-married checked>
+    <input type=radio ng-model="married.value" value=false id=not-married checked ng-change="refreshSlider()">
     <label for=not-married>Not Married</label>
-    <input type=radio ng-model="married.value" value=true id=married>
+    <input type=radio ng-model="married.value" value=true id=married ng-change="refreshSlider()">
     <label for=married>Married</label>
   </div>
 
