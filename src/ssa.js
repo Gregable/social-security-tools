@@ -526,8 +526,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   $scope.updateSliderMin = function() {
     // If the lower earner will be 70 before the higher earner files, bail.
-    if ($scope.lowerEarner().dateAtAge(new MonthDuration(70, 0)).lessThan(
-          $scope.higherEarnerSlider.selectedDate())) {
+    if ($scope.lowerEarner().dateAtAge(
+          new MonthDuration().initFromYearsMonths(70, 0)).lessThan(
+              $scope.higherEarnerSlider.selectedDate())) {
       $scope.lowerEarnerSlider.options.minLimit = 0;
     } else if ($scope.lowerEarner().primaryInsuranceAmountFloored() == 0) {
       // If the lower earner does not have a personal benefit, it makes no
