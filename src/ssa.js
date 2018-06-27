@@ -184,6 +184,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return $scope.recipient.earningsRecords;
   };
 
+  // Functions in utils.js.
+  $scope.firstBendPoint = firstBendPoint;
+  $scope.secondBendPoint = secondBendPoint;
+
   /**
    * Special case method for init'ing an 'Age'. Ages are durations, and this
    * is syntactical sugar usable in template expressions.

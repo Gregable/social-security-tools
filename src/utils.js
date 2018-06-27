@@ -241,7 +241,7 @@ function insertNumericalCommas(num) {
 /**
  * Returns the ratio of the average wage in indexingYear to the
  * average wage in 1977.
- * @param {indexingYear} year for which index values are used
+ * @param {number} indexingYear year for which index values are used
  * @return {number} wage ratio
  */
 function wageRatioInYear(indexingYear) {
@@ -252,10 +252,13 @@ function wageRatioInYear(indexingYear) {
 
 /**
  * Returns the first monthly bend point in the PIA formula.
- * @param {indexingYear} year for which index values are used
+ * @param {number} indexingYear year for which index values are used
  * @return {number} first annual bend point dollar amount
  */
 function firstBendPoint(indexingYear) {
+  console.log(wageRatioInYear(indexingYear));
+  console.log(BENDPOINT1_IN_1977);
+  console.log(Math.round(BENDPOINT1_IN_1977 * wageRatioInYear(indexingYear)));
   return Math.round(BENDPOINT1_IN_1977 * wageRatioInYear(indexingYear));
 }
 
