@@ -722,46 +722,18 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.spousalSelection.dateText =
       date.monthName() + ' ' + date.year();
 
-    // Compute the higher earner benefit.
-    if ($scope.higherEarnerSlider.selectedDate().greaterThan(date)) {
-      $scope.spousalSelection.higherEarnerBenefit = 0;
-    } else {
-      $scope.spousalSelection.higherEarnerBenefit =
-        $scope.higherEarner().benefitAtAge(
-              this.higherEarnerSlider.selectedAge());
-    };
-    // Round down.
+    // Determine the displayed benefit dollar values.
     $scope.spousalSelection.higherEarnerBenefit = 
-      Math.floor($scope.spousalSelection.higherEarnerBenefit);
-
-
-    var lowerAge = $scope.lowerEarner().ageAtDate(date);
-
-    // Compute the lower earner benefit.
-    if ($scope.lowerEarnerSlider.selectedDate().greaterThan(date)) {
-      // the lower earner has not filed
-      $scope.spousalSelection.lowerEarnerBenefit = 0;
-    } else if ($scope.higherEarnerSlider.selectedDate().greaterThan(date)) {
-      // only the lower earner has filed
-      $scope.spousalSelection.lowerEarnerBenefit =
-          $scope.lowerEarner().benefitAtAge(
-              this.lowerEarnerSlider.selectedAge());
-    } else { // both earners have filed
-      // Spousal benefits begin at the later of the two sliders.
-      spousalDate = (this.lowerEarnerSlider.selectedDate().greaterThan(
-          this.higherEarnerSlider.selectedDate())
-        ? this.lowerEarnerSlider.selectedDate()
-        : this.higherEarnerSlider.selectedDate());
-
-      $scope.spousalSelection.lowerEarnerBenefit =
-          $scope.lowerEarner().totalBenefitWithSpousal(
-              this.lowerEarnerSlider.selectedAge(),
-              $scope.lowerEarner().ageAtDate(spousalDate));
-    }
-    // Round down.
+        $scope.higherEarner().totalBenefitAtDate(
+            date,
+            $scope.higherEarnerSlider.selectedDate(),
+            $scope.lowerEarnerSlider.selectedDate());
     $scope.spousalSelection.lowerEarnerBenefit = 
-      Math.floor($scope.spousalSelection.lowerEarnerBenefit);
-    
+        $scope.lowerEarner().totalBenefitAtDate(
+            date,
+            $scope.lowerEarnerSlider.selectedDate(),
+            $scope.higherEarnerSlider.selectedDate());
+
     $scope.$apply();
   }
 })

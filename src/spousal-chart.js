@@ -277,8 +277,18 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.beginPath();
   this.context_.moveTo(this.canvas_.width - 1, this.canvasHigherY(0));
   this.context_.lineTo(this.canvasX(startDate), this.canvasHigherY(0));
-  this.context_.lineTo(this.canvasX(startDate), this.canvasHigherY(dollars));
-  this.context_.lineTo(this.canvas_.width - 1, this.canvasHigherY(dollars));
+
+  const maxDate = this.dateX(this.canvas_.width - 1);
+  var yDollars;
+  for (i = startDate; i.lessThanOrEqual(maxDate);) {
+    yDollars =  this.higherEarner_.totalBenefitAtDate(
+        i, this.higherEarnerStartDate(), this.lowerEarnerStartDate());
+    this.context_.lineTo(this.canvasX(i), this.canvasHigherY(yDollars));
+    i = i.addDuration(new MonthDuration().initFromMonths(1));
+    this.context_.lineTo(this.canvasX(i), this.canvasHigherY(yDollars));
+  }
+  // Make sure we draw all of the way to the edge of the chart.
+  this.context_.lineTo(this.canvas_.width - 1, this.canvasHigherY(yDollars));
   this.context_.fillStyle = '#f6dfad';
   this.context_.fill();
   this.context_.stroke();
@@ -376,20 +386,28 @@ SpousalChart.prototype.renderLowerEarner = function() {
   var spousalStartDate = this.spousalStartDate();
   var personal = this.lowerEarnerPersonalBenefit();
   var total = this.lowerEarnerTotalBenefit();
+
+  var actualStartDate = startDate;
+  if (personal == 0 && startDate.lessThan(spousalStartDate))
+    actualStartDate = spousalStartDate;
  
   this.context_.strokeStyle = '#060';
   this.context_.beginPath();
   this.context_.moveTo(this.canvas_.width - 1, this.canvasLowerY(0));
-  this.context_.lineTo(this.canvasX(spousalStartDate), this.canvasLowerY(0));
-  if (personal > 0 && startDate.lessThan(spousalStartDate)) {
-    this.context_.lineTo(this.canvasX(startDate), this.canvasLowerY(0));
-    this.context_.lineTo(this.canvasX(startDate), this.canvasLowerY(personal));
+  this.context_.lineTo(this.canvasX(actualStartDate), this.canvasLowerY(0));
+
+  const maxDate = this.dateX(this.canvas_.width - 1);
+  var yDollars;
+  for (i = actualStartDate; i.lessThanOrEqual(maxDate);) {
+    yDollars =  this.lowerEarner_.totalBenefitAtDate(
+        i, actualStartDate, this.higherEarnerStartDate());
+    this.context_.lineTo(this.canvasX(i), this.canvasLowerY(yDollars));
+    i = i.addDuration(new MonthDuration().initFromMonths(1));
+    this.context_.lineTo(this.canvasX(i), this.canvasLowerY(yDollars));
   }
-  this.context_.lineTo(this.canvasX(spousalStartDate),
-                       this.canvasLowerY(personal));
-  this.context_.lineTo(this.canvasX(spousalStartDate),
-                       this.canvasLowerY(total));
-  this.context_.lineTo(this.canvas_.width - 1, this.canvasLowerY(total));
+  // Make sure we draw all of the way to the edge of the chart.
+  this.context_.lineTo(this.canvas_.width - 1, this.canvasLowerY(yDollars));
+
   this.context_.fillStyle = '#d9ebd9';
   this.context_.fill();
   this.context_.stroke();

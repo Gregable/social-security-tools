@@ -490,3 +490,100 @@ Recipient.prototype.totalBenefitWithSpousal = function(startAge,
     return Math.floor(personalBenefit + spousalBenefit);
   }
 }
+
+/**
+ * For delayed retirement credits only, you only collect your credits for the
+ * first year you were recieving benefits for the entire year, with the
+ * exception of when you turn 70. This method computes the personal benefits at
+ * a given date, given also what date you filed. Does not compute spousal
+ * effects.
+ * @param {MonthDate} atDate date of the received benefits.
+ * @param {MonthDate} filingDate date that this recipient filed.
+ */
+Recipient.prototype.benefitAtDateGivenFiling = function(atDate, filingDate) {
+  // If recipient hasn't filed yet, no benefit:
+  if (filingDate.greaterThan(atDate))
+    return 0;
+  // 70 is an explicit exception because the SSA likes to make my life harder.
+  if (this.ageAtDate(filingDate).years() >= 70)
+    return this.benefitAtAge(this.ageAtDate(filingDate));
+  // If you are filing before normal retirement, no delayed credits anyway.
+  if (filingDate.lessThanOrEqual(this.normalRetirementDate))
+    return this.benefitAtAge(this.ageAtDate(filingDate));
+  // If you file in January, you are receiving benefits for the entire year.
+  if (filingDate.monthIndex() === 0)
+    return this.benefitAtAge(this.ageAtDate(filingDate));
+  // If this is the year after filing, you are receiving benefits for this
+  // entire year.
+  if (filingDate.year() < atDate.year())
+    return this.benefitAtAge(this.ageAtDate(filingDate));
+  // Otherwise, you only get credits up to december of the previous year,
+  // or NRA, whichever is later.
+  var prevDec =
+      new MonthDate().initFromYearsMonths(filingDate.year() - 1, 11);
+  var benefitComputationDate = 
+    this.normalRetirementDate.greaterThan(prevDec) ?
+        this.normalRetirementDate : prevDec;
+  return this.benefitAtAge(this.ageAtDate(benefitComputationDate));
+}
+
+/**
+ * Computes the total benefit amount for this recipient at the date `atDate`
+ * given their spouse's data, and each recipient's filing date.
+ * @param {MonthDate} atDate date of the received benefits.
+ * @param {MonthDate} filingDate date that this recipient filed.
+ * @param {MonthDate} spouseFilingDAte date that the spouse filed.
+ */
+Recipient.prototype.totalBenefitAtDate = function(
+    atDate, filingDate, spouseFilingDate) {
+  // Each recipient should file between 62 and 70 inclusive. If their PIA is 0,
+  // they should file sometime after 62, since they may just file at the date
+  // the spouse files.
+  console.assert(
+      this.ageAtDate(filingDate).greaterThan(new MonthDuration(61, 11)));
+  if (this.primaryInsuranceAmountFloored() > 0)
+    console.assert(this.ageAtDate(filingDate)
+        .lessThan(new MonthDuration().initFromYearsMonths(70, 1)));
+  console.assert(this.spouse.ageAtDate(spouseFilingDate)
+      .greaterThan(new MonthDuration(61, 11)));
+  if (this.spouse.primaryInsuranceAmountFloored() > 0)
+    console.assert(this.spouse.ageAtDate(spouseFilingDate).lessThan(
+          new MonthDuration().initFromYearsMonths(70, 1)));
+
+  // If recipient hasn't filed yet, no benefit:
+  if (filingDate.greaterThan(atDate))
+    return 0;
+
+  // Simple case, no spousal effects. My earnings are greater than spouse's.
+  if (this.primaryInsuranceAmount() >= this.spouse.primaryInsuranceAmount()) {
+    return this.benefitAtDateGivenFiling(atDate, filingDate);
+  }
+ 
+  if (spouseFilingDate.greaterThan(atDate)) {
+    // Only this recipient has filed, no spousal effects.
+    return this.benefitAtDateGivenFiling(atDate, filingDate);
+  }
+
+  // Both earners have filed. Spousal benefits begin at the later of the two
+  // filing dates
+  var spousalDate = filingDate.greaterThan(spouseFilingDate) ?
+    filingDate : spouseFilingDate;
+  
+  // This is complicated. If the total is just half of the spouse's PIA
+  // or no delayed retirement credits are involved, then the total is correct.
+  const maxBenefitWithSpousal = Math.floor(
+      this.spouse.primaryInsuranceAmount() / 2.0);
+  var total = this.totalBenefitWithSpousal(this.ageAtDate(filingDate),
+                                           this.ageAtDate(spousalDate));
+  if (total == maxBenefitWithSpousal ||
+      filingDate.lessThanOrEqual(this.normalRetirementDate))
+    return total;
+  // Otherwise, this is a user with delayed retirement credits in play, so we
+  // may need to reduce the benefit for the first year.
+  var justPersonal = this.benefitAtDateGivenFiling(atDate, filingDate);
+  if (justPersonal > maxBenefitWithSpousal)
+    return justPersonal;
+  // But this should drop them back below the spousal rate.
+  return maxBenefitWithSpousal;
+}
+

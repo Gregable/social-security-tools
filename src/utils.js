@@ -134,6 +134,23 @@ class MonthDate {
   lessThan(other) {
     return this.monthsSinceEpoch() < other.monthsSinceEpoch();
   }
+
+  /*
+   * @param {MonthDate} other
+   * @return {boolean}
+   */
+  lessThanOrEqual(other) {
+    return this.monthsSinceEpoch() <= other.monthsSinceEpoch();
+  }
+
+  /*
+   * @param {MonthDate} other
+   * @return {boolean}
+   */
+  greaterThanOrEqual(other) {
+    return this.monthsSinceEpoch() >= other.monthsSinceEpoch();
+  }
+
 }
 
 /**
