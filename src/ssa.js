@@ -66,8 +66,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
-
-    $scope.loadDemoData(0);
   };
 
 

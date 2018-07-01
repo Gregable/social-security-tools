@@ -827,3 +827,21 @@ div.totalSpousalAtDate {
   padding: 8px;
   font-size: 16px;
 }
+
+div.insetTextBox {
+  box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  -webkit-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  -moz-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  -o-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  margin: 0 0 10px;
+  padding: 10px;
+}
+div.insetTextBox h4 {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+div.insetTextBox p {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
