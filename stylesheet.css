@@ -657,10 +657,9 @@ input.radio:focus ~ label.radio:before {
 span.rz-bubble {
   background-color: rgba(255, 255, 255, 1.0);
   z-index: 2;
-  /*color: #339 !important;*/
 }
 /* Add some padding for the transparency, excluding the left hand side */
-span.rz-bubble {
+#spousal-box span.rz-bubble {
   padding-left: 10px !important;
   padding-right: 10px !important;
 }
