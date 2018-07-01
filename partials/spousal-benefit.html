@@ -380,5 +380,24 @@
     </table>
   </div>
 
+  <h2>Survivor Benefits</h2>
+  <p>
+    Upon the death of <span class=names>{{higherEarner().name}}</span>,
+    <span class=names>{{lowerEarner().name}}</span> will recieve Survivor
+    Benefits. Survivor Benefits for
+    <span class=names>{{lowerEarner().name}}</span> will replace
+    <span class=names>{{lowerEarner().name}}</span>'s own benefit, if
+    the Survivor Benefit is a higher value.
+  </p>
+  <p>
+    The amount of the Survivor Benefit is typically the amount of
+    <span class=names>{{higherEarner().name}}</span>'s own benefit at the
+    date of death. This will be reduced if
+    <span class=names>{{lowerEarner().name}}</span> begins collecting the
+    Survivor Benefit before <span class=names>{{lowerEarner().name}}</span>'s
+    Normal Retirement Age at 
+    (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
+         {{recipient.normalRetirementDate.year()}}</b>).
+  </p>
   </div><!-- isSpousalBenefit() -->
 </div>

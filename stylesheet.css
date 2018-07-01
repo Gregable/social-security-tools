@@ -653,16 +653,16 @@ input.radio:focus ~ label.radio:before {
   top: -30px;
   bottom: unset;
 }
-/* Then make the pointer text hide the tick text with 70% transparency */
+/* Then make the pointer text hide the tick text with 100% transparency */
 span.rz-bubble {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 1.0);
   z-index: 2;
   /*color: #339 !important;*/
 }
 /* Add some padding for the transparency, excluding the left hand side */
-span.rz-bubble:not([style*="left: 5px;"]),  {
-  padding-left: 20px !important;
-  padding-right: 20px !important;
+span.rz-bubble {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
 }
 
 /* Married / Not Married options */
