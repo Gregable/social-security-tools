@@ -280,37 +280,62 @@ SpousalChart.prototype.renderHigherEarner = function() {
 
   const maxDate = this.dateX(this.canvas_.width - 1);
   var yDollars;
+  var lastY = -1;
+  var boxes = [];
   for (i = startDate; i.lessThanOrEqual(maxDate);) {
+    var thisX = this.canvasX(i);
     yDollars =  this.higherEarner_.totalBenefitAtDate(
         i, this.higherEarnerStartDate(), this.lowerEarnerStartDate());
-    this.context_.lineTo(this.canvasX(i), this.canvasHigherY(yDollars));
+    var thisY = this.canvasHigherY(yDollars);
+
+    if (yDollars !== lastY) {
+      boxes.push([thisX, thisY, yDollars]);
+      lastY = yDollars;
+    }
+
+    // Vertical line first, often 0 height;
+    this.context_.lineTo(thisX, this.canvasHigherY(yDollars));
+
+    // Horizontal line to next month.
     i = i.addDuration(new MonthDuration().initFromMonths(1));
-    this.context_.lineTo(this.canvasX(i), this.canvasHigherY(yDollars));
+    this.context_.lineTo(this.canvasX(i), thisY);
   }
   // Make sure we draw all of the way to the edge of the chart.
   this.context_.lineTo(this.canvas_.width - 1, this.canvasHigherY(yDollars));
+
   this.context_.fillStyle = '#f6dfad';
   this.context_.fill();
   this.context_.stroke();
-
   this.context_.restore();
+
+    // Find the box with the largest minimum dimension.
+  var rootX = this.canvas_.width - 1;
+  var rootY = this.canvasHigherY(0);
+  var bestBox = [rootX, rootY];
+  for (var i = 0; i < boxes.length; ++i) {
+    if (boxMinimumDimension(bestBox, rootX, rootY) <
+        boxMinimumDimension(boxes[i], rootX, rootY))
+      bestBox = boxes[i];
+  }
+
+  var regionWidth = rootX - bestBox[0];
+  var regionHeight = rootY - bestBox[1];
+  var centerX = rootX - regionWidth / 2;
+  var centerY = rootY - regionHeight / 2;
 
   // Add the user's name to the box:
   this.context_.save();
-  var leftX = this.canvasX(startDate);
-  var regionWidth = this.canvas_.width - leftX;
-  var regionHeight = this.canvasHigherY(0) - this.canvasHigherY(dollars);
-  var centerX = regionWidth / 2 + leftX;
-  var centerY = regionHeight / 2 + this.canvasHigherY(dollars);
   this.context_.fillStyle = '#5e4000';
   for (font_height = 24; font_height >= 10; font_height--) {
     this.context_.font = font_height + "px Helvetica";
-    var box = this.context_.measureText(this.higherEarner_.name);
-    // If there is enough space at this font size, draw the user's name.
-    if ((box.width + 20) < regionWidth && (font_height + 20) < regionHeight) {
+    var textBox = this.context_.measureText(this.higherEarner_.name);
+    // If there is enough space at this font size, draw the user's name,
+    // else try a smaller font.
+    if ((textBox.width + 20) < regionWidth &&
+        (font_height + 20) < regionHeight) {
       this.context_.fillText(this.higherEarner_.name,
-                             centerX - (box.width / 2),
-                             centerY + (font_height * 0.4));
+                             centerX - (textBox.width / 2),
+                             centerY - (font_height * 0.4));
       break;
     }
   }
@@ -320,25 +345,76 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.save();
   this.context_.fillStyle = '#5e4000';
   this.context_.font = "14px Helvetica";
-  var text = '$' + insertNumericalCommas(dollars) + ' / mo';
-  var box = this.context_.measureText(text);
-  if ((box.width + 20) < regionWidth) {
-    this.context_.fillText(text, leftX + 10, this.canvasHigherY(dollars) - 4);
-  } else {
-    // Try again with shorter text.
-    var text = '$' + insertNumericalCommas(dollars);
-    var box = this.context_.measureText(text);
-    if ((box.width + 10) < regionWidth) {
-      this.context_.fillText(text, leftX + 5, this.canvasHigherY(dollars) - 4);
-    } else {
-      // Give up and place the text to the left, rather than above.
-      var text = '$' + insertNumericalCommas(dollars) + ' / mo';
-      var box = this.context_.measureText(text);
-      this.context_.fillText(text, leftX - 5 - box.width,
-                             this.canvasHigherY(dollars / 2) + 7);
+  var font_height = 12;
+
+  var nextBoxMinX = 1;
+  var nextBoxMaxY = rootY;
+  
+  for (var boxIt = 0; boxIt < boxes.length; ++boxIt) {
+    var boxMinX = nextBoxMinX;
+    var boxMaxY = nextBoxMaxY;
+    // Default is the edge of our box.
+    var nextBoxMinX = boxes[boxIt][0];
+    var nextBoxMaxY = boxes[boxIt][1];
+
+    // Prefer to fix text above, rather than left.
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var textBox = this.context_.measureText(text);
+    var horizSpace = rootX - boxes[boxIt][0];
+    if (boxes.length - 1 > boxIt)
+      horizSpace = boxes[boxIt + 1][0] - boxes[boxIt][0];
+    var vertSpace = 100;  // typically have plenty to top of chart.
+    if (boxes.length - 1 > boxIt)
+      vertSpace = boxes[boxIt][1] - boxes[boxIt + 1][1];
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 10 < vertSpace)) {
+      this.context_.fillText(
+          text, boxes[boxIt][0] + 5, boxes[boxIt][1] - 5);
+      // We need to bound the area for the next box, so we don't overlap.
+      nextBoxMinX = boxes[boxIt][0] + 10 + textBox.width;
+      nextBoxMaxY = boxes[boxIt][1] + 10 + font_height;
+      continue;
     }
+    // Again above, using shorter text.
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var textBox = this.context_.measureText(text);
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 10 < vertSpace)) {
+      foundFit = true;
+      this.context_.fillText(
+          text, boxes[boxIt][0] + 5, boxes[boxIt][1] - 5);
+      // We need to bound the area for the next box, so we don't overlap.
+      nextBoxMinX = boxes[boxIt][0] + 10 + textBox.width;
+      nextBoxMaxY = boxes[boxIt][1] + 10 + font_height;
+      continue;
+    }
+
+    // Attempt to fix box 0 to the left of the text
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var textBox = this.context_.measureText(text);
+    var horizSpace = boxes[boxIt][0] - boxMinX;
+    var vertSpace = boxMaxY - boxes[boxIt][1];
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 15 < vertSpace)) {
+      this.context_.fillText(
+          text,
+          boxes[boxIt][0] - 5 - textBox.width,
+          boxMaxY - ((vertSpace - font_height) / 2) - font_height);
+      continue;
+    }
+    // Try again with shorter text, removing ' / mo';
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var textBox = this.context_.measureText(text);
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 15 < vertSpace)) {
+      this.context_.fillText(
+          text,
+          boxes[boxIt][0] - 5 - textBox.width,
+          boxMaxY - ((vertSpace - font_height) / 2) - font_height);
+      continue;
+    }
+    // Give up and move to next box.
   }
-  this.context_.restore();
 };
 
 /**
@@ -374,6 +450,12 @@ SpousalChart.prototype.lowerEarnerTotalBenefit = function() {
       this.lowerEarner_.ageAtDate(this.spousalStartDate()));
 };
 
+function boxMinimumDimension(box, rootX, rootY) {
+  const xDim = Math.abs(box[0] - rootX);
+  const yDim = Math.abs(box[1] - rootY);
+  return Math.min(xDim, yDim);
+}
+
 /**
  * Render the earnings of the lower earner.
  */
@@ -398,12 +480,25 @@ SpousalChart.prototype.renderLowerEarner = function() {
 
   const maxDate = this.dateX(this.canvas_.width - 1);
   var yDollars;
+  var lastY = -1;
+  var boxes = [];
   for (i = actualStartDate; i.lessThanOrEqual(maxDate);) {
+    var thisX = this.canvasX(i);
     yDollars =  this.lowerEarner_.totalBenefitAtDate(
         i, actualStartDate, this.higherEarnerStartDate());
-    this.context_.lineTo(this.canvasX(i), this.canvasLowerY(yDollars));
+    var thisY = this.canvasLowerY(yDollars);
+
+    if (yDollars !== lastY) {
+      boxes.push([thisX, thisY, yDollars]);
+      lastY = yDollars;
+    }
+
+    // vertical line first, often 0 height.
+    this.context_.lineTo(thisX, thisY);
+
+    // horizontal line to next month.
     i = i.addDuration(new MonthDuration().initFromMonths(1));
-    this.context_.lineTo(this.canvasX(i), this.canvasLowerY(yDollars));
+    this.context_.lineTo(this.canvasX(i), thisY);
   }
   // Make sure we draw all of the way to the edge of the chart.
   this.context_.lineTo(this.canvas_.width - 1, this.canvasLowerY(yDollars));
@@ -413,99 +508,116 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.stroke();
   this.context_.restore();
 
-  // regionWidth/regionHeight and centerX/centerY describe the box that forms
-  // the larger dollar amount region in the lower earner section. This may be
-  // the entire lower earner region, or may be the right hand section.
-  if (startDate.lessThan(spousalStartDate)) {
-    var leftX = this.canvasX(spousalStartDate);
-  } else {
-    var leftX = this.canvasX(startDate);
+  // Find the box with the largest minimum dimension.
+  var rootX = this.canvas_.width - 1;
+  var rootY = this.canvasLowerY(0);
+  var bestBox = [rootX, rootY];
+  for (var i = 0; i < boxes.length; ++i) {
+    if (boxMinimumDimension(bestBox, rootX, rootY) <
+        boxMinimumDimension(boxes[i], rootX, rootY))
+      bestBox = boxes[i];
   }
-  var regionWidth = this.canvas_.width - leftX;
-  var regionHeight = this.canvasLowerY(total) - this.canvasLowerY(0);
-  var centerX = regionWidth / 2 + leftX;
-  var centerY = regionHeight / 2 + this.canvasLowerY(0);
+
+  var regionWidth = rootX - bestBox[0];
+  var regionHeight = bestBox[1] - rootY;
+  var centerX = rootX - regionWidth / 2;
+  var centerY = rootY + regionHeight / 2;
 
   // Add the user's name to the box:
   this.context_.save();
   this.context_.fillStyle = '#004000';
   for (font_height = 24; font_height >= 10; font_height--) {
     this.context_.font = font_height + "px Helvetica";
-    var box = this.context_.measureText(this.lowerEarner_.name);
-    // If there is enough space at this font size, draw the user's name.
-    if ((box.width + 20) < regionWidth && (font_height + 20) < regionHeight) {
+    var textBox = this.context_.measureText(this.lowerEarner_.name);
+    // If there is enough space at this font size, draw the user's name,
+    // else try a smaller font.
+    if ((textBox.width + 20) < regionWidth &&
+        (font_height + 20) < regionHeight) {
       this.context_.fillText(this.lowerEarner_.name,
-                             centerX - (box.width / 2),
+                             centerX - (textBox.width / 2),
                              centerY + (font_height * 0.4));
       break;
     }
   }
   this.context_.restore();
 
-  // Add the dollar amounts below the box.
   this.context_.save();
   this.context_.fillStyle = '#004000';
   this.context_.font = "14px Helvetica";
-  var text = '$' + insertNumericalCommas(total) + ' / mo';
-  var box = this.context_.measureText(text);
-  if ((box.width + 20) < regionWidth) {
-    this.context_.fillText(
-        text,
-        leftX + 10,
-        this.canvasLowerY(total) + 15);
-  } else {
-    // Try again with shorter text.
-    text = '$' + insertNumericalCommas(total);
-    box = this.context_.measureText(text);
-    if ((box.width + 10) < regionWidth) {
-      this.context_.fillText(
-          text,
-          leftX + 5,
-          this.canvasLowerY(total) + 15);
-    } else {
-      // Give up and drop the text to the left hand side instead of below.
-      var text = '$' + insertNumericalCommas(total) + ' / mo';
-      var box = this.context_.measureText(text);
-      this.context_.fillText(
-        text,
-        leftX - 5 - box.width,
-        this.canvasLowerY(((total - personal) / 2) + personal) + 7);
-    }
-  }
+  var font_height = 12;
 
-  // We may need to render text for the left leg of the lower recipients chart.
-  if (personal > 0 && startDate.lessThan(spousalStartDate)) {
-    var leftRegionWidth = 
-      this.canvasX(spousalStartDate) - this.canvasX(startDate);
-    text = '$' + insertNumericalCommas(personal) + ' / mo';
-    box = this.context_.measureText(text);
-    if ((box.width + 20) < leftRegionWidth) {
+  var nextBoxMinX = 1;
+  var nextBoxMinY = rootY;
+
+  for (var boxIt = 0; boxIt < boxes.length; ++boxIt) {
+    var boxMinX = nextBoxMinX;
+    var boxMinY = nextBoxMinY;
+    // Default is the edge of our box.
+    var nextBoxMinX = boxes[boxIt][0];
+    var nextBoxMinY = boxes[boxIt][1];
+
+    // Prefer to fix text below, rather than left.
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var textBox = this.context_.measureText(text);
+    var horizSpace = rootX - boxes[boxIt][0];
+    if (boxes.length - 1 > boxIt)
+      horizSpace = boxes[boxIt + 1][0] - boxes[boxIt][0];
+    var vertSpace = 100;  // typically have plenty to bottom of chart.
+    if (boxes.length - 1 > boxIt)
+      vertSpace = boxes[boxIt + 1][1] - boxes[boxIt][1];
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 10 < vertSpace)) {
       this.context_.fillText(
           text,
-          this.canvasX(startDate) + 10,
-          this.canvasLowerY(personal) + 15);
-    } else {
-      // Try again with shorter text.
-      text = '$' + insertNumericalCommas(personal);
-      text = '$' + personal;
-      box = this.context_.measureText(text);
-      if ((box.width + 10) < leftRegionWidth) {
-        this.context_.fillText(
-            text,
-            this.canvasX(startDate) + 5,
-            this.canvasLowerY(personal) + 15);
-      } else {
-        // Give up and drop the text to the left hand side instead of above.
-        text = '$' + insertNumericalCommas(personal) + ' / mo';
-        box = this.context_.measureText(text);
-        this.context_.fillText(
-            text,
-            this.canvasX(startDate) - 5 - box.width,
-            this.canvasLowerY(personal / 2) + 7);
-      }
+          boxes[boxIt][0] + 5,
+          boxes[boxIt][1] + font_height + 5);
+      // We need to bound the area for the next box, so we don't overlap.
+      nextBoxMinX = boxes[boxIt][0] + 10 + textBox.width;
+      nextBoxMinY = boxes[boxIt][1] + 10 + font_height;
+      continue;
     }
+    // Again below, using shorter text.
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var textBox = this.context_.measureText(text);
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 10 < vertSpace)) {
+      foundFit = true;
+      this.context_.fillText(
+          text,
+          boxes[boxIt][0] + 5,
+          boxes[boxIt][1] + font_height + 5);
+      // We need to bound the area for the next box, so we don't overlap.
+      nextBoxMinX = boxes[boxIt][0] + 10 + textBox.width;
+      nextBoxMinY = boxes[boxIt][1] + 10 + font_height;
+      continue;
+    }
+
+    // Attempt to fix box 0 to the left of the text
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var textBox = this.context_.measureText(text);
+    var horizSpace = boxes[boxIt][0] - boxMinX;
+    var vertSpace = boxes[boxIt][1] - boxMinY;
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 15 < vertSpace)) {
+      this.context_.fillText(
+          text,
+          boxes[boxIt][0] - 5 - textBox.width,
+          boxMinY + ((vertSpace - font_height) / 2) + font_height);
+      continue;
+    }
+    // Try again with shorter text, removing ' / mo';
+    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var textBox = this.context_.measureText(text);
+    if ((textBox.width + 10) < horizSpace &&
+        (font_height + 15 < vertSpace)) {
+      this.context_.fillText(
+          text,
+          boxes[boxIt][0] - 5 - textBox.width,
+          (vertSpace - font_height) / 2 + boxMinY + font_height);
+      continue;
+    }
+    // Give up and move to next box.
   }
-  
   this.context_.restore();
 };
 
