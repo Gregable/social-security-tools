@@ -494,22 +494,7 @@ div.agePicker {
   font-size: 14px;
 }
 
-div.monthPicker {
-  max-width: 620px;
-  display: -webkit-flex;
-  display: -moz-flex;
-  display: -ms-flex;
-  display: flex;
-  flex-direction: row;
-  -webkit-flex-direction: row;
-  flex-flow: space-between;
-  -webkit-flex-flow: space-between;
-  justify-content: space-between;
-  -webkit-justify-content: space-between;
-  flex-wrap: wrap;
-  -webkit-flex-wrap: wrap;
-}
-div.yearPicker {
+div.picker {
   max-width: 620px;
   display: -webkit-flex;
   display: -moz-flex;
@@ -529,7 +514,7 @@ input.radio {
   display: none;
 }
 label.radio {
-  width: 75px;
+  width: 76px;
   border-radius: 4px;
   border: 1px solid #D1D3D4;
   position: relative;
@@ -544,14 +529,30 @@ label.radio {
   color: #999;
   display: block;
 }
+label.radio.day {
+  width: 65px;
+  text-align: center;
+}
+label.radio.day span {
+  width: 29px;
+  display: inline-block;
+  text-indent: 0px;  /* override the label */
+  margin-left:33px;
+}
+label.radio.month span,label.radio.year span {
+  width: 40px;
+  text-align: center;
+  display: inline-block;
+  text-indent: 0px;  /* override the label */
+  margin-left:33px;
+}
 label.radio.month {
-  text-indent: 3em;
-  margin-right: 0.85em;
+  width: 79px;
+  text-align: center;
 }
 label.radio.year {
-  text-indent: 2.8em;
-  line-height: 2em;
-  margin-right: 0.8em;
+  width: 79px;
+  text-align: center;
 }
 label.radio:before {
   position: absolute;
@@ -566,7 +567,6 @@ label.radio:before {
 }
 input.radio:hover:not(:checked) ~ label.radio:before {
   content:'\2714';
-  text-indent: .9em;
   color: #C2C2C2;
 }
 input.radio:hover:not(:checked) ~ label.radio {
@@ -574,7 +574,6 @@ input.radio:hover:not(:checked) ~ label.radio {
 }
 input.radio:checked ~ label.radio:before {
   content:'\2714';
-  text-indent: .9em;
   color: #9CE2AE;
   background-color: #4DCB6D;
 }
@@ -843,4 +842,6 @@ div.insetTextBox p {
   margin-left: 20px;
   margin-right: 20px;
 }
-
+.onlyHidden {
+  visibility: hidden;
+}

@@ -55,6 +55,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.futureYears = [];
     $scope.futureIsTopValue = false;
     $scope.all_months = ALL_MONTHS;
+    $scope.all_days = [];
+    for (var i = 1; i < 32; ++i)
+      $scope.all_days.push(i);
     $scope.demoId = -1;
     $scope.married = {
         value: "false"
@@ -355,11 +358,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
 
   $scope.birth = {
+    day: 1,
     month: "Jan",
     year: 0
   }
 
   $scope.spouseBirth = {
+    day: 1,
     month: "Jan",
     year: 0,
   }
