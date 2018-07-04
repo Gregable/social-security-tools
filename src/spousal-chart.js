@@ -308,7 +308,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.stroke();
   this.context_.restore();
 
-    // Find the box with the largest minimum dimension.
+  // Find the box with the largest minimum dimension.
   var rootX = this.canvas_.width - 1;
   var rootY = this.canvasHigherY(0);
   var bestBox = [rootX, rootY];
@@ -335,7 +335,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
         (font_height + 20) < regionHeight) {
       this.context_.fillText(this.higherEarner_.name,
                              centerX - (textBox.width / 2),
-                             centerY - (font_height * 0.4));
+                             centerY + (font_height * 0.4));
       break;
     }
   }

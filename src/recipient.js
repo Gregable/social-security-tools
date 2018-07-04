@@ -517,13 +517,13 @@ Recipient.prototype.benefitAtDateGivenFiling = function(atDate, filingDate) {
   // entire year.
   if (filingDate.year() < atDate.year())
     return this.benefitAtAge(this.ageAtDate(filingDate));
-  // Otherwise, you only get credits up to december of the previous year,
+  // Otherwise, you only get credits up to January of this year,
   // or NRA, whichever is later.
-  var prevDec =
-      new MonthDate().initFromYearsMonths(filingDate.year() - 1, 11);
+  var thisJan =
+      new MonthDate().initFromYearsMonths(filingDate.year(), 0);
   var benefitComputationDate = 
-    this.normalRetirementDate.greaterThan(prevDec) ?
-        this.normalRetirementDate : prevDec;
+    this.normalRetirementDate.greaterThan(thisJan) ?
+        this.normalRetirementDate : thisJan;
   return this.benefitAtAge(this.ageAtDate(benefitComputationDate));
 }
 
