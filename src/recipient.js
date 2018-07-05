@@ -109,9 +109,8 @@ Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
 /*
  * Update this recipient's birthdate.
  * @param {monthDate} birthdate
- * @param {number} dayOfMonth
  */
-Recipient.prototype.updateBirthdate = function(birthdate, dayOfMonth) {
+Recipient.prototype.updateBirthdate = function(birthdate) {
   this.birthDate.initFromMonthDate(birthdate);
 
   // Find the retirement age bracket data for this recipient.

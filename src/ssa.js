@@ -437,8 +437,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (!$scope.birthDateSelected($scope.birth))
       return; 
     $scope.birth.year = parseInt($scope.birth.year);
-    $scope.recipient.updateBirthdate(new MonthDate().initFromYearsMonthsStr(
-          $scope.birth.year, $scope.birth.month), $scope.birth.day);
+
+    // If birthdate day of month is not on the 1st or 2nd, we use the next
+    // month for all calculations. 
+    // See https://secure.ssa.gov/poms.nsf/lnx/0300615015
+    var ssaBirth = new MonthDate().initFromYearsMonthsStr(
+          $scope.birth.year, $scope.birth.month);
+    if ($scope.birth.day > 2)
+      ssaBirth = ssaBirth.addDuration(new MonthDuration().initFromMonths(1));
+    $scope.recipient.updateBirthdate(ssaBirth);
 
     // Also set the spouses birthdate to the same, which is a
     // reasonable default to start with, until the user selects
@@ -455,8 +462,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (!$scope.birthDateSelected($scope.spouseBirth))
       return; 
     $scope.spouseBirth.year = parseInt($scope.spouseBirth.year);
-    $scope.spouse.updateBirthdate(new MonthDate().initFromYearsMonthsStr(
-          $scope.spouseBirth.year, $scope.spouseBirth.month));
+
+    // If birthdate day of month is not on the 1st or 2nd, we use the next
+    // month for all calculations. 
+    // See https://secure.ssa.gov/poms.nsf/lnx/0300615015
+    var ssaBirth = new MonthDate().initFromYearsMonthsStr(
+          $scope.spouseBirth.year, $scope.spouseBirth.month);
+    if ($scope.spouseBirth.day > 2)
+      ssaBirth = ssaBirth.addDuration(new MonthDuration().initFromMonths(1));
+    $scope.spouse.updateBirthdate(ssaBirth);
     
     $scope.higherEarnerSlider.updateBirthDate();
     $scope.lowerEarnerSlider.updateBirthDate();
