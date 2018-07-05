@@ -79,30 +79,47 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     if (demoId === 0) {
       $scope.demoId = 0;
+      $scope.spouse.primaryInsuranceAmountValue = 400;
+      $scope.birth.day = 1;
       $scope.birth.month = "Jul";
       $scope.birth.year = 1950;
       $scope.birth.maxPossibleYear = 1950;
       $scope.updateBirthdate();
+      $scope.spouseBirth.day = 1;
+      $scope.spouseBirth.month = "Mar";
+      $scope.spouseBirth.year = 1949;
+      $scope.spouseBirth.maxPossibleYear = 1949;
+      $scope.updateSpouseBirthdate();
       $scope.fetchTestData('averagepaste.txt');
       $scope.married.value = "true";
+      $scope.lowerEarnerSlider.value = 66 * 12;
     }
     if (demoId === 1) {
       $scope.demoId = 1;
+      $scope.spouse.primaryInsuranceAmountValue = 600;
+      $scope.birth.day = 1;
       $scope.birth.month = "Aug";
       $scope.birth.year = 1950;
       $scope.birth.maxPossibleYear = 1950;
       $scope.updateBirthdate();
+      $scope.spouseBirth.day = 1;
+      $scope.spouseBirth.month = "Dec";
+      $scope.spouseBirth.year = 1951;
+      $scope.spouseBirth.maxPossibleYear = 1951;
+      $scope.updateSpouseBirthdate();
       $scope.fetchTestData('millionpaste.txt');
       $scope.married.value = "true";
+      $scope.lowerEarnerSlider.value = 66 * 12;
     }
     if (demoId === 2) {
       $scope.demoId = 2;
+      $scope.birth.day = 1;
       $scope.birth.month = "Sep";
       $scope.birth.year = 1985;
       $scope.birth.maxPossibleYear = 1985;
       $scope.updateBirthdate();
+      $scope.updateSpouseBirthdate();
       $scope.fetchTestData('youngpaste.txt');
-      $scope.married.value = "true";
     }
   }
 
@@ -369,6 +386,48 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     year: 0,
   }
 
+  // Subtracts 1 day from birthdate. This is the only place we work with days.
+  // Return format is the same as the two birthday objects above.
+  $scope.englishLawBirthday = function(birthdate) {
+    var day = birthdate.day;
+    var monthIndex = ALL_MONTHS.indexOf(birthdate.month);
+    var year = birthdate.year;
+
+    var commonDate = new Date(year, monthIndex, day);
+    // We subtract 12 hours. 24 or 1 could get into trouble with daylight
+    // savings time changes. Why doesn't javascript have better date libraries?
+    var englishDate = new Date(commonDate.getTime() - (12 * 60 * 60 * 1000));
+
+    return {
+      day: englishDate.getDate(),
+      month: ALL_MONTHS[englishDate.getMonth()],
+      year: englishDate.getFullYear(),
+    };
+  }
+
+  // This returns the date in the current year that it is considered a person's
+  // birthday, as well as their age.
+  $scope.exampleAge = function() {
+    var zeroDate = $scope.englishLawBirthday($scope.birth);
+    zeroDate['age'] = CURRENT_YEAR - zeroDate.year;
+    zeroDate['year'] = CURRENT_YEAR;
+    return zeroDate;
+  }
+  $scope.exampleSpouseAge = function() {
+    var zeroDate = $scope.englishLawBirthday($scope.spouseBirth);
+    zeroDate['age'] = CURRENT_YEAR - zeroDate.year;
+    zeroDate['year'] = CURRENT_YEAR;
+    return zeroDate;
+  }
+  $scope.followingMonth = function(input) {
+    var out = {};
+    out.month = ALL_MONTHS[ALL_MONTHS.indexOf(input.month) + 1 % 12];
+    out.year = input.year;
+    if (ALL_MONTHS.indexOf(input.month) === 11)
+      out.year += 1;
+    return out;
+  }
+
   $scope.birthDateSelected = function(birthdate) {
     return birthdate.year !== 0 && birthdate.month !== "";
   }
@@ -379,7 +438,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       return; 
     $scope.birth.year = parseInt($scope.birth.year);
     $scope.recipient.updateBirthdate(new MonthDate().initFromYearsMonthsStr(
-          $scope.birth.year, $scope.birth.month));
+          $scope.birth.year, $scope.birth.month), $scope.birth.day);
 
     // Also set the spouses birthdate to the same, which is a
     // reasonable default to start with, until the user selects

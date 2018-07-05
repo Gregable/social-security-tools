@@ -214,13 +214,11 @@ ul.demos button > ico {
   font-weight: bold;
   font-size: 22px;
 }
-
 div.confirmation-prompt {
   margin-top: 20px;
   margin-right: 60px;
   font-size: 18px;
 }
-
 div.confirmation-prompt > div.confirmation-left {
   float: left;
   margin: 0;
@@ -253,6 +251,9 @@ div.confirmation-prompt button.failure:hover {
 div.confirmation-prompt button > ico {
   font-weight: bold;
   font-size: 22px;
+}
+p.birthdate {
+  font-size: 18px;
 }
 
 /* earnings-record table styles match the SSA.gov site so that the table looks

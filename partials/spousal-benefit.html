@@ -162,6 +162,31 @@
   </div>
   <br class=clear>
 
+  <p class=birthdate>
+    <span class=names>{{spouse.name}}</span> was born on
+    <b>{{spouseBirth.month}} {{spouseBirth.day}}, {{spouseBirth.year}}</b>.
+  </p>
+
+  <div class=insetTextBox ng-show="spouseBirth.day > 2">
+    <h4>Special Rule</h4>
+    <p>
+      Your birthday affects when you can receive benefits as well as the amount
+      of the benefits. Retirement benefits are calculated based on the first
+      month that you are a particular age throughout the <u>entire</u> month.
+    </p>
+    <p>
+      Social Security follows English common law that finds that a person
+      attains an age on the day before the birthday. This means
+      that you attain age <b>{{exampleSpouseAge().age}}</b> on
+      <b>{{exampleSpouseAge().month}} {{exampleSpouseAge().day}},
+         {{exampleSpouseAge().year}}</b>
+      The first month that you are <b>{{exampleSpouseAge().age}}</b> throughout
+      the <u>entire</u> month is
+      <b>{{followingMonth(exampleSpouseAge()).month}}
+         {{followingMonth(exampleSpouseAge()).year}}</b>.
+    </p>
+  </div>
+
 
   <h2>Spousal Benefit Calculation</h2>
   <h3>{{higherEarner().name}}</h3>
