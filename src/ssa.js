@@ -187,6 +187,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.maybeRenderCharts();
   }
 
+
   $scope.showPastePrompt = function() {
     return $scope.pasteArea.mode === ModeEnum.INITIAL;
   };
@@ -237,6 +238,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if ($scope.ageChart_.isInitialized())
       $scope.ageChart_.render();
     $scope.refreshSlider();
+  };
+
+  $scope.affixNavbar = function() {
+    $('#navbar').affix({offset: {top: 80} });
   };
 
   /**

@@ -1,6 +1,6 @@
 <div ng-show="showReport()" class="fixed-left-column" class="ng-cloak"
-  class="nav navbar-inverse navbar-fixed-top" data-spy=affix
-  data-offset-top="80" id=navbar>
+  class="nav navbar-inverse navbar-fixed-top"
+  id=navbar ng-init="affixNavbar()">
   <ul class="nav">
     <li ng-show="demoId > -1">
       <a href="#nav-demodata" data-ng-click="scrollTo('nav-demodata')">
