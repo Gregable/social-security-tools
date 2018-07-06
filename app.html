@@ -16,6 +16,7 @@
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.2.2/rzslider.min.js"></script>
@@ -32,9 +33,10 @@
 </head>
 
 <body ng-controller="SSAController"
-      ng-init="init()">
+      ng-init="init()" data-spy="scroll" data-target="#navbar">
   <div class="fixedcontainer">
     <ng-include src="'partials/header.html'"></ng-include>
+    <ng-include src="'partials/navbar.html'"></ng-include>
 
     <ng-include src="'partials/paste-prompt.html'"></ng-include>
     <ng-include src="'partials/paste-confirm.html'"></ng-include>

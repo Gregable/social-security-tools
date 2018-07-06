@@ -21,6 +21,12 @@ var ModeEnum = {
 };
 
 ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
+  $scope.scrollTo = function(id) {
+    var el = $('#' + id);
+    var pos = el.position();
+    window.scrollTo(pos.left, pos.top + 10);
+  };
+
   $scope.pasteArea = {
     contents: '',
     mode: ModeEnum.INITIAL,

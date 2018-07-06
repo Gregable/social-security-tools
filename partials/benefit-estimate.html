@@ -1,7 +1,7 @@
 <div id=benefitEstimate class="benefit-estimate fixed-center-column"
      ng-show="showReport()" ng-cloak>
 
-  <h2>Normal Retirement Age</h2>
+  <h2 id=nav-nra>Normal Retirement Age</h2>
   <p>
     Your primary insurance amount rounded down to the next lower whole dollar
     is <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
@@ -34,7 +34,7 @@
     </ul>
   </p>
 
-  <h2>Early and Delayed Retirement</h2>
+  <h2 id="nav-early-delayed">Early and Delayed Retirement</h2>
   <p>
     You can also begin taking benefits as early as 62 years old
     (<b>{{recipient.dateAtYearsOld(62).monthName()}}

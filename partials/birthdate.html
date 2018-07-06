@@ -1,0 +1,28 @@
+<div ng-show="showReport() && demoId === -1"
+     class="fixed-center-column ng-cloak">
+
+  <h2 id="nav-birthdate">Birth Date</h2>
+
+  <p class=birthdate>
+    You were born on <b>{{birth.month}} {{birth.day}}, {{birth.year}}</b>.
+  </p>
+
+  <div class=insetTextBox ng-show="birth.day > 2">
+    <h4>Special Rule</h4>
+    <p>
+      Your birthday affects when you can receive benefits as well as the amount
+      of the benefits. Retirement benefits are calculated based on the first
+      month that you are a particular age throughout the <u>entire</u> month.
+    </p>
+    <p>
+      Social Security follows English common law that finds that a person
+      attains an age on the day before the birthday. This means
+      that you attain age <b>{{exampleAge().age}}</b> on
+      <b>{{exampleAge().month}} {{exampleAge().day}}, {{exampleAge().year}}</b>.
+      The first month that you are <b>{{exampleAge().age}}</b> throughout
+      the <u>entire</u> month is
+      <b>{{followingMonth(exampleAge()).month}}
+         {{followingMonth(exampleAge()).year}}</b>.
+    </p>
+  </div>
+</div>

@@ -19,7 +19,7 @@ body {
 
 .fixedcontainer {
   /* horizontally center */
-  max-width: 970px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
@@ -132,6 +132,8 @@ body {
   
 div#pastePrompt > div.instructions {
   display: inline-block;
+  max-width: 620px;
+  margin: auto;
 }
 
 h4 {
@@ -470,8 +472,8 @@ table.combinedBenefit tr:last-child td:last-child {
 }
 
 .chart-ylabel > .vertical-text {
-  transform: rotate(-90deg) translateY(-86px) translateX(-166px);
-  -webkit-transform: rotate(-90deg) translateY(-86px) translateX(-166px);
+  transform: rotate(-90deg) translateY(-82px) translateX(-166px);
+  -webkit-transform: rotate(-90deg) translateY(-82px) translateX(-166px);
   float: left;
 }
 
@@ -485,9 +487,75 @@ table.combinedBenefit tr:last-child td:last-child {
 canvas {
   float: left;
 }
+div.fixed-left-column {
+  max-width: 220px;
+  float: left;
+}
 div.fixed-center-column {
-  max-width: 620px;
+  max-width: 660px;
   margin: auto;
+}
+
+@media (min-width: 1121px) {
+  div.fixed-center-column {
+    padding-left: 40px;
+  }
+}
+
+ul.nav {
+  margin: 30px 0 0;
+  border-radius: 6px;
+  max-width: 220px;
+  list-style: none;
+  padding: 0px;
+}
+#navbar.affix {
+  top: 10px;
+}
+ul.nav li {
+  line-height: 20px;
+  margin-top: 0px;
+}
+ul.nav li a {
+  color: #0088cc;
+  text-decoration: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid #e5e5e5;
+  padding: 8px 14px;
+  margin: 0 0 -1px;
+  display: block;
+}
+ul.nav li:first-child a {
+  border-radius: 6px 6px 0 0;
+}
+ul.nav li:last-child a {
+  border-radius: 0 0 6px 6px;
+}
+ul.nav li.active a {
+  background-color: #08c;
+  color: #fff;
+}
+ul.nav .glyphicon {
+  float: right;
+}
+ul.nav li:not(.active) .glyphicon {
+  color: black;
+  opacity: .25;
+}
+ul.nav .navlabel {
+  display: inline-block;
+  max-width: 175px;
+  padding-right: 20px;
+}
+@media print {
+  ul.nav {
+    display: none;
+  }
+}
+@media (max-width: 1120px) {
+  ul.nav {
+    display: none;
+  }
 }
 
 /* The Age Picker buttons are simply heavily CSS'ed radio buttons. */

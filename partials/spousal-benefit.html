@@ -1,7 +1,7 @@
 <div id=spousalBenefit class="benefit-estimate fixed-center-column"
      ng-show="showReport()" ng-cloak>
 
-  <h2>Spousal Benefit</h2>
+  <h2 id="nav-spouse">Spouse's Data</h2>
   <p ng-show="isMarried()">
     If you are not married, you can hide this section.
   </p>
@@ -188,7 +188,7 @@
   </div>
 
 
-  <h2>Spousal Benefit Calculation</h2>
+  <h2 id="nav-spouse-benefit">Spousal Benefit</h2>
   <h3>{{higherEarner().name}}</h3>
   <p>
     <span class=names>{{higherEarner().name}}</span> has the higher
@@ -310,7 +310,7 @@
     <span class=names>{{higherEarner().name}}'s</span> personal benefit.
   </p>     
 
-  <h2>Early and Delayed Spousal Retirement</h3>
+  <h2 id="nav-early-delayed-spouse">Early and Delayed Spouse Retirement</h3>
   <p>
     The personal benefit section at the top of this document describes how
     personal benefits are adjusted for beginning benefits earlier than the
@@ -380,7 +380,7 @@
   </ul>
   </p>
 
-  <h2>Early and Delayed Combined Retirement</h3>
+  <h2 id="nav-early-delayed-combined">Early and Delayed Combined Retirement</h3>
   <p>
     You can see how the starting benefit dates for both spouses will affect
     affect the final monthly benefits, using the sliders below.
@@ -454,7 +454,7 @@
     </table>
   </div>
 
-  <h2>Survivor Benefits</h2>
+  <h2 id="nav-survivor">Survivor Benefits</h2>
   <p>
     Upon the death of <span class=names>{{higherEarner().name}}</span>,
     <span class=names>{{lowerEarner().name}}</span> will recieve Survivor
