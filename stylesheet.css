@@ -471,7 +471,13 @@ table.combinedBenefit tr:last-child td:last-child {
   float: left;
 }
 
-.chart-ylabel > .vertical-text {
+.benefit-estimate.chart-ylabel > .vertical-text {
+  transform: rotate(-90deg) translateY(-52px) translateX(-166px);
+  -webkit-transform: rotate(-90deg) translateY(-52px) translateX(-166px);
+  float: left;
+}
+
+.pia.chart-ylabel > .vertical-text {
   transform: rotate(-90deg) translateY(-82px) translateX(-166px);
   -webkit-transform: rotate(-90deg) translateY(-82px) translateX(-166px);
   float: left;
