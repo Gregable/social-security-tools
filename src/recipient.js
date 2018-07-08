@@ -129,17 +129,6 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
   this.processIndexedEarnings_();
 }
 
-/*
- * Subtracts one month for this user's Normal Retirement Age.
- * Used when the birthdate is on the first of the month.
- * @param {monthDate} birthdate
- */
-Recipient.prototype.offsetNra = function() {
-  var offset = new MonthDuration().initFromMonths(1);
-  this.normalRetirementAge.subtract(offset);
-  this.normalRetirementDate.subtractDuration(offset);
-}
-
 /**
  * Returns the date at a given age. Age is specified as a year and
  * month index (0-11). Month can be left off and will be assumed 0.

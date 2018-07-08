@@ -697,8 +697,8 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.beginPath();
   this.context_.globalAlpha = 0.3;
   var start = this.lowerEarner_.dateAtYearsOld(62);
-  if (personal === 0)
-    start = spousalStartDate;
+  if (personal === 0 && start.lessThan(this.higherEarnerStartDate()))
+    start = this.higherEarnerStartDate();
   var end = this.lowerEarner_.dateAtYearsOld(70);
   for (i = start; i.lessThanOrEqual(end);) {
     var thisX = this.canvasX(i);
