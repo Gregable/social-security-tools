@@ -739,26 +739,26 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // These represent the start and end date for the entire spousal chart.
     var chartStartDate;
     var chartEndDate;
-    if (higherBirth.greaterThan(lowerBirth)) {  // Higher earner is older
+    if (higherBirth.greaterThan(lowerBirth)) {  // Higher earner is younger
       higherSlider.setAttribute('style',
-          "margin-left: " + newMargin + 40 + "px");
+          "margin-left: " + (newMargin + 40) + "px");
       lowerSlider.setAttribute('style',
-          "margin-right: " + newMargin + "px; margin-left: 40px;");
+          "margin-right: " + (newMargin) + "px; margin-left: 40px;");
       chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
       chartEndDate = $scope.higherEarner().dateAtYearsOld(70);
     } else if (higherBirth.lessThan(lowerBirth)) {
-      // Higher earner is younger
+      // Higher earner is older
       higherSlider.setAttribute('style',
-          "margin-right: " + newMargin + "px; margin-left: 40px;");
+          "margin-right: " + (newMargin) + "px; margin-left: 40px;");
       lowerSlider.setAttribute('style',
-          "margin-left: " + newMargin + 40 + "px");
+          "margin-left: " + (newMargin + 40) + "px");
       chartStartDate = $scope.higherEarner().dateAtYearsOld(62);
       chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     } else { // both earners same birth month and year
       higherSlider.setAttribute('style',
-          "margin-left: " + newMargin + 40 + "px");
+          "margin-left: " + (newMargin + 40) + "px");
       lowerSlider.setAttribute('style',
-          "margin-left: " + newMargin + 40 + "px");
+          "margin-left: " + (newMargin + 40) + "px");
       chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
       chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     }
