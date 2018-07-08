@@ -711,7 +711,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // ages. The spousal chart will align with the years on the slider.
   $scope.layoutSliderChart = function() {
     // Return early if the spousalBenefit section hasn't been rendered yet.
-    var section = document.getElementById('spousalBenefit');
+    var section = document.getElementById('spousal-box');
     if (section === null) return;
 
     var higherSlider = document.getElementById('higherEarnerSlider');

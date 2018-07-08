@@ -204,10 +204,10 @@ SpousalChart.prototype.renderAxes = function() {
   this.context_.lineWidth = 1;
 
   this.context_.beginPath();
-  this.context_.moveTo(0, 260);
-  this.context_.lineTo(0, 600);
+  //this.context_.moveTo(0, 260);
+  this.context_.moveTo(0, 600);
   this.context_.lineTo(620, 600);
-  this.context_.lineTo(620, 260);
+  //this.context_.lineTo(620, 260);
   this.context_.stroke();
 
   this.context_.restore();
