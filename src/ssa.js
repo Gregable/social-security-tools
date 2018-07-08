@@ -728,8 +728,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     var numMonths = Math.abs(higherBirth.subtractDate(lowerBirth).asMonths()) +
       (8 * 12);
     // Each slider has a small 'tail' on each side of the slider which is
-    // 16px wide that we must ignore in the total width.
-    var totalWidth = $scope.absoluteBoundingRect(section).width - 32;
+    // 16px wide that we must ignore in the total width. We also want to save
+    // off 40px on the left for dollar labels.
+    var totalWidth = $scope.absoluteBoundingRect(section).width - 32 - 40;
     // Each slider should be 8*12 months wide and the whole thing
     // is totalWidth wide. The margin is the width that each slider will
     // not occupy.
@@ -739,19 +740,25 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     var chartStartDate;
     var chartEndDate;
     if (higherBirth.greaterThan(lowerBirth)) {  // Higher earner is older
-      higherSlider.setAttribute('style', "margin-left: " + newMargin + "px");
-      lowerSlider.setAttribute('style', "margin-right: " + newMargin + "px");
+      higherSlider.setAttribute('style',
+          "margin-left: " + newMargin + 40 + "px");
+      lowerSlider.setAttribute('style',
+          "margin-right: " + newMargin + "px; margin-left: 40px;");
       chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
       chartEndDate = $scope.higherEarner().dateAtYearsOld(70);
     } else if (higherBirth.lessThan(lowerBirth)) {
       // Higher earner is younger
-      higherSlider.setAttribute('style', "margin-right: " + newMargin + "px");
-      lowerSlider.setAttribute('style', "margin-left: " + newMargin + "px");
+      higherSlider.setAttribute('style',
+          "margin-right: " + newMargin + "px; margin-left: 40px;");
+      lowerSlider.setAttribute('style',
+          "margin-left: " + newMargin + 40 + "px");
       chartStartDate = $scope.higherEarner().dateAtYearsOld(62);
       chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     } else { // both earners same birth month and year
-      higherSlider.setAttribute('style', "");
-      lowerSlider.setAttribute('style', "");
+      higherSlider.setAttribute('style',
+          "margin-left: " + newMargin + 40 + "px");
+      lowerSlider.setAttribute('style',
+          "margin-left: " + newMargin + 40 + "px");
       chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
       chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     }

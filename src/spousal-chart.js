@@ -73,7 +73,9 @@ SpousalChart.prototype.setDateRange = function(startDate, endDate) {
  * @return {number}
  */
 SpousalChart.prototype.chartWidth = function() {
-  return this.canvas_.width - 32;
+  // We use the width of the sliders, which reserves 40 pixels on the left for
+  // dollar labels and 32 pixels to account for the slider tails.
+  return this.canvas_.width - 32 - 40;
 };
 
 /**
@@ -92,9 +94,10 @@ SpousalChart.prototype.chartHeight = function() {
 SpousalChart.prototype.canvasX = function(date) {
   var xValue = ((date.subtractDate(this.startDate_).asMonths() /
                  this.endDate_.subtractDate(this.startDate_).asMonths())
-                * this.chartWidth()) + 16;
+                * this.chartWidth()) + 16 + 40;
   // To deal with rounding errors, clip to the usable range.
-  return Math.round(Math.max(16, Math.min(this.chartWidth() + 16, xValue)));
+  return Math.round(
+      Math.max(16, Math.min(this.chartWidth() + 16 + 40, xValue)));
 };
 
 /**
@@ -104,14 +107,27 @@ SpousalChart.prototype.canvasX = function(date) {
  */
 SpousalChart.prototype.dateX = function(x) {
   // Clip x to a range smaller than the chart.
-  x = Math.max(16, Math.min(this.chartWidth() + 16, x));
-  var percent = (x - 16) / this.chartWidth();
+  x = Math.max(16 + 40, Math.min(this.chartWidth() + 16 + 40, x));
+  var percent = (x - 16 - 40) / this.chartWidth();
   var numMonths = Math.round(
       this.endDate_.subtractDate(this.startDate_).asMonths() * percent);
   return this.startDate_.addDuration(
       new MonthDuration().initFromMonths(numMonths));
 };
- 
+
+SpousalChart.prototype.renderTextInWhiteBox = function(text, x, y) {
+  var textWidth = this.context_.measureText(text).width;
+
+  // First, draw the white box.
+  this.context_.save();
+  this.context_.fillStyle = '#FFF';
+  this.context_.fillRect(x - 7, y - 14, textWidth + 14, 18);
+  this.context_.restore();
+
+  // Then draw the text.
+  this.context_.fillText(text, x, y);
+}
+
 /**
  * Render a series of vertical lines, one per year in the date range.
  */
@@ -146,14 +162,65 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
     this.context_.save();
     this.context_.translate(this.canvasX(date) + 5, xpos);
     this.context_.rotate(-90 * Math.PI / 180);
-    this.context_.fillStyle = '#FFF';
-    this.context_.fillRect(-8, -13, textWidth + 16, 16);
     this.context_.fillStyle = '#999';
-    this.context_.fillText(text, 0, 0);
+    this.renderTextInWhiteBox(text, 0, 0);
     this.context_.restore();
   }
   this.context_.restore();
 };
+
+SpousalChart.prototype.renderHorizontalLine = function(dollarY, canvasY) {
+  this.context_.beginPath();
+  this.context_.moveTo(0, canvasY);
+  this.context_.lineTo(600, canvasY);
+  this.context_.stroke();
+
+  var text = '$' + insertNumericalCommas(dollarY);
+
+  this.context_.save();
+  this.context_.fillStyle = '#AAA';
+  this.renderTextInWhiteBox(text, 6, canvasY + 5);
+  this.context_.restore();
+}
+
+/**
+ * Render a series of horizontal lines representing the dollar amounts at
+ * each y-level.
+ */
+SpousalChart.prototype.renderHorizontalLines = function() {
+  this.context_.save();
+  // Grey dashed lines.
+  this.context_.strokeStyle = '#BBB';
+  this.context_.lineWidth = 1;
+  this.context_.setLineDash([2,2]);
+
+  // Render the $0 line.
+  this.renderHorizontalLine(0, this.midpointYValue());
+
+  if (this.maxRenderedYDollars() < 500) {
+    this.context_.restore();
+    return;
+  }
+
+  // Work out a reasonable increment to show dollar lines.
+  var increment = 100;
+  if (this.maxRenderedYDollars() > 1000)
+    increment = 250;
+  if (this.maxRenderedYDollars() > 1500)
+    increment = 500;
+  if (this.maxRenderedYDollars() > 3000)
+    increment = 1000;
+
+  const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
+  const higherMaxY = this.higherEarner_.benefitAtAge(maxAge);
+  const lowerMaxY = this.lowerEarner_.totalBenefitWithSpousal(maxAge, maxAge);
+  for (var i = increment; i < higherMaxY; i += increment)
+    this.renderHorizontalLine(i, this.canvasHigherY(i));
+  for (var i = increment; i < lowerMaxY; i += increment)
+    this.renderHorizontalLine(i, this.canvasLowerY(i));
+
+  this.context_.restore();
+}
 
 /**
  * Renders a single vertical line at the user's selected date.
@@ -186,29 +253,9 @@ SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
   this.context_.save();
   this.context_.translate(canvasX + 5, xpos);
   this.context_.rotate(-90 * Math.PI / 180);
-  this.context_.fillStyle = '#FFF';
-  this.context_.fillRect(-8, -13, textWidth + 16, 16);
   this.context_.fillStyle = '#337ab7';
-  this.context_.fillText(text, 0, 0);
+  this.renderTextInWhiteBox(text, 0, 0);
   this.context_.restore();
-
-  this.context_.restore();
-};
-
-/**
- * Render a pair of Axis in the bottom and left side of the chart.
- */
-SpousalChart.prototype.renderAxes = function() {
-  this.context_.save();
-  this.context_.strokeStyle = '#000';
-  this.context_.lineWidth = 1;
-
-  this.context_.beginPath();
-  //this.context_.moveTo(0, 260);
-  this.context_.moveTo(0, 600);
-  this.context_.lineTo(620, 600);
-  //this.context_.lineTo(620, 260);
-  this.context_.stroke();
 
   this.context_.restore();
 };
@@ -268,16 +315,17 @@ SpousalChart.prototype.lowerEarnerStartAge = function() {
  */
 SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.save();
+  this.context_.strokeStyle = '#e69f00';
   this.context_.lineWidth = 2;
   var startDate = this.higherEarnerStartDate();
   var startAge = this.higherEarnerStartAge();
   var dollars = this.higherEarnerPersonalBenefit();
-  
+ 
+  // Draw a shaded box showing the earnings per year given the selection.
   this.context_.strokeStyle = '#e69f00';
   this.context_.beginPath();
   this.context_.moveTo(this.canvas_.width - 1, this.canvasHigherY(0));
   this.context_.lineTo(this.canvasX(startDate), this.canvasHigherY(0));
-
   const maxDate = this.dateX(this.canvas_.width - 1);
   var yDollars;
   var lastY = -1;
@@ -294,7 +342,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
     }
 
     // Vertical line first, often 0 height;
-    this.context_.lineTo(thisX, this.canvasHigherY(yDollars));
+    this.context_.lineTo(thisX, thisY);
 
     // Horizontal line to next month.
     i = i.addDuration(new MonthDuration().initFromMonths(1));
@@ -368,7 +416,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
       vertSpace = boxes[boxIt][1] - boxes[boxIt + 1][1];
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text, boxes[boxIt][0] + 5, boxes[boxIt][1] - 5);
       // We need to bound the area for the next box, so we don't overlap.
       nextBoxMinX = boxes[boxIt][0] + 10 + textBox.width;
@@ -381,7 +429,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
       foundFit = true;
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text, boxes[boxIt][0] + 5, boxes[boxIt][1] - 5);
       // We need to bound the area for the next box, so we don't overlap.
       nextBoxMinX = boxes[boxIt][0] + 10 + textBox.width;
@@ -394,27 +442,52 @@ SpousalChart.prototype.renderHigherEarner = function() {
     var textBox = this.context_.measureText(text);
     var horizSpace = boxes[boxIt][0] - boxMinX;
     var vertSpace = boxMaxY - boxes[boxIt][1];
-    if ((textBox.width + 10) < horizSpace &&
+    if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text,
-          boxes[boxIt][0] - 5 - textBox.width,
+          boxes[boxIt][0] - 8 - textBox.width,
           boxMaxY - ((vertSpace - font_height) / 2) - font_height);
       continue;
     }
     // Try again with shorter text, removing ' / mo';
     var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
     var textBox = this.context_.measureText(text);
-    if ((textBox.width + 10) < horizSpace &&
+    if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text,
-          boxes[boxIt][0] - 5 - textBox.width,
+          boxes[boxIt][0] - 8 - textBox.width,
           boxMaxY - ((vertSpace - font_height) / 2) - font_height);
       continue;
     }
     // Give up and move to next box.
   }
+
+  // Draw a thin line showing the earnings per year for other selections.
+  this.context_.save();
+  this.context_.strokeStyle = '#e69f00';
+  this.context_.globalAlpha = 0.6;
+  this.context_.beginPath();
+  var start = this.higherEarner_.dateAtYearsOld(62);
+  var end = this.higherEarner_.dateAtYearsOld(70);
+  for (i = start; i.lessThanOrEqual(end);) {
+    var thisX = this.canvasX(i);
+    var yDollars =  this.higherEarner_.totalBenefitAtDate(
+        this.higherEarner_.dateAtYearsOld(71),
+        i, this.lowerEarnerStartDate());
+    var thisY = this.canvasHigherY(yDollars);
+    if (i.monthsSinceEpoch() === start.monthsSinceEpoch()) {
+      this.context_.moveTo(thisX, thisY);
+    } else {
+      this.context_.lineTo(thisX, thisY);
+    }
+    i = i.addDuration(new MonthDuration().initFromMonths(1));
+  }
+  this.context_.stroke();
+  this.context_.restore();
+
+  this.context_.restore();
 };
 
 /**
@@ -470,7 +543,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
   var total = this.lowerEarnerTotalBenefit();
 
   var actualStartDate = startDate;
-  if (personal == 0 && startDate.lessThan(spousalStartDate))
+  if (personal === 0 && startDate.lessThan(spousalStartDate))
     actualStartDate = spousalStartDate;
  
   this.context_.strokeStyle = '#060';
@@ -567,7 +640,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
       vertSpace = boxes[boxIt + 1][1] - boxes[boxIt][1];
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text,
           boxes[boxIt][0] + 5,
           boxes[boxIt][1] + font_height + 5);
@@ -582,7 +655,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
       foundFit = true;
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text,
           boxes[boxIt][0] + 5,
           boxes[boxIt][1] + font_height + 5);
@@ -597,27 +670,56 @@ SpousalChart.prototype.renderLowerEarner = function() {
     var textBox = this.context_.measureText(text);
     var horizSpace = boxes[boxIt][0] - boxMinX;
     var vertSpace = boxes[boxIt][1] - boxMinY;
-    if ((textBox.width + 10) < horizSpace &&
+    if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text,
-          boxes[boxIt][0] - 5 - textBox.width,
+          boxes[boxIt][0] - 8 - textBox.width,
           boxMinY + ((vertSpace - font_height) / 2) + font_height);
       continue;
     }
     // Try again with shorter text, removing ' / mo';
     var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
     var textBox = this.context_.measureText(text);
-    if ((textBox.width + 10) < horizSpace &&
+    if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
-      this.context_.fillText(
+      this.renderTextInWhiteBox(
           text,
-          boxes[boxIt][0] - 5 - textBox.width,
+          boxes[boxIt][0] - 8 - textBox.width,
           (vertSpace - font_height) / 2 + boxMinY + font_height);
       continue;
     }
     // Give up and move to next box.
   }
+
+  // Draw a thin line showing the earnings per year for other selections.
+  this.context_.save();
+  this.context_.beginPath();
+  this.context_.globalAlpha = 0.3;
+  var start = this.lowerEarner_.dateAtYearsOld(62);
+  if (personal === 0)
+    start = spousalStartDate;
+  var end = this.lowerEarner_.dateAtYearsOld(70);
+  for (i = start; i.lessThanOrEqual(end);) {
+    var thisX = this.canvasX(i);
+    var shownDate = (personal === 0 ||
+        i.greaterThanOrEqual(this.higherEarnerStartDate())) ?
+      this.lowerEarner_.dateAtYearsOld(71) :
+      this.higherEarnerStartDate().subtractDuration(
+          new MonthDuration().initFromMonths(1)) ;
+    var yDollars =  this.lowerEarner_.totalBenefitAtDate(
+        shownDate, i, this.higherEarnerStartDate());
+    var thisY = this.canvasLowerY(yDollars);
+    if (i.monthsSinceEpoch() === start.monthsSinceEpoch()) {
+      this.context_.moveTo(thisX, thisY);
+    } else {
+      this.context_.lineTo(thisX, thisY);
+    }
+    i = i.addDuration(new MonthDuration().initFromMonths(1));
+  }
+  this.context_.stroke();
+  this.context_.restore();
+
   this.context_.restore();
 };
 
@@ -631,8 +733,8 @@ SpousalChart.prototype.render = function() {
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
   
+  this.renderHorizontalLines();
   this.renderYearVerticalLines();
-  this.renderAxes();
   this.renderHigherEarner();
   this.renderLowerEarner();
 
