@@ -457,6 +457,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if ($scope.birth.day > 2)
       ssaBirth = ssaBirth.addDuration(new MonthDuration().initFromMonths(1));
     $scope.recipient.updateBirthdate(ssaBirth);
+    // If the birthdate day of month is the 1st, we use the previous month
+    // for calculating the full retirement age.
+    if ($scope.birth.day === 1)
+      $scope.recipient.offsetNra();
 
     // Also set the spouses birthdate to the same, which is a
     // reasonable default to start with, until the user selects
@@ -482,7 +486,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if ($scope.spouseBirth.day > 2)
       ssaBirth = ssaBirth.addDuration(new MonthDuration().initFromMonths(1));
     $scope.spouse.updateBirthdate(ssaBirth);
-    
+    // If the birthdate day of month is the 1st, we use the previous month
+    // for calculating the full retirement age.
+    if ($scope.spouseBirth.day === 1)
+      $scope.recipient.offsetNra();
+
+   
     $scope.higherEarnerSlider.updateBirthDate();
     $scope.lowerEarnerSlider.updateBirthDate();
     $scope.refreshSlider();
