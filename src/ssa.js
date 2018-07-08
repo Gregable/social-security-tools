@@ -432,7 +432,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
   $scope.followingMonth = function(input) {
     var out = {};
-    out.month = ALL_MONTHS[ALL_MONTHS.indexOf(input.month) + 1 % 12];
+    out.month = ALL_MONTHS[(ALL_MONTHS.indexOf(input.month) + 1) % 12];
     out.year = input.year;
     if (ALL_MONTHS.indexOf(input.month) === 11)
       out.year += 1;
