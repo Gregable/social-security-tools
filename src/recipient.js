@@ -67,6 +67,10 @@ function Recipient(name) {
   // This is a tuple of:
   // minYear, maxYear, ageYears, ageMonths, delatedIncreaseAnnual
   this.normalRetirement = FULL_RETIREMENT_AGE[0];
+  
+  // If true, the user's birthday is on the first, so they can recieve full
+  // benefits on the month they turn 62.
+  this.isFullMonth = false;
 }
 
 /**
@@ -107,12 +111,12 @@ Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
 };
 
 /*
- * Update this recipient's birthdate.
+ * Update this recipient's birthdate. Caller should provide the SSA birthdate,
+ * which is the day prior to the day of birth.
  * @param {monthDate} birthdate
  */
 Recipient.prototype.updateBirthdate = function(birthdate) {
   this.birthDate.initFromMonthDate(birthdate);
-
   // Find the retirement age bracket data for this recipient.
   for (var i = 0; i < FULL_RETIREMENT_AGE.length; ++i) {
     var ageBracket = FULL_RETIREMENT_AGE[i];
@@ -124,14 +128,26 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
 
   var normalRetirementAge = this.normalRetirementAge();
   this.normalRetirementDate = this.birthDate.addDuration(normalRetirementAge);
+  console.log(normalRetirementAge);
+  console.log(this.normalRetirementDate);
+  console.log(this.normalRetirementDate.monthName());
 
   // Birthdate can affect indexed earnings.
   this.processIndexedEarnings_();
 }
 
+/*
+ * If set to true, considers this person as born on the first of the month
+ * in the updated "SSA" birthday. This is used to determine the first month
+ * which they are eligible for benefits.
+ * @param {boolean} isFullMonth
+ */
+Recipient.prototype.setIsFullMonth = function(isFullMonth) {
+  this.isFullMonth = isFullMonth;
+}
+
 /**
- * Returns the date at a given age. Age is specified as a year and
- * month index (0-11). Month can be left off and will be assumed 0.
+ * Returns the date at a given age.
  * @param {MonthDuration} age
  * @return {MonthDate}
  */
@@ -149,7 +165,6 @@ Recipient.prototype.dateAtAge = function(age) {
 Recipient.prototype.dateAtYearsOld = function(years) {
   return this.dateAtAge(new MonthDuration().initFromYearsMonths(years, 0));
 };
-
 
 /**
  * Returns the age at a given date.

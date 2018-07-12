@@ -240,6 +240,9 @@ AgeChart.prototype.roundedBox =
  */
 AgeChart.prototype.renderAgePoint = function(age) {
   this.context_.save();
+  
+  if (age.asMonths() === 12 * 62 && !this.recipient_.isFullMonth)
+    age.addDuration(new MonthDuration().initFromMonths(1));
 
   var benefit = this.recipient_.benefitAtAge(age);
 

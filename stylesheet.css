@@ -406,6 +406,13 @@ table.fancy-table td[headers='age'] {
 table.fancy-table td[headers='age'] {
   text-align: center;
 }
+table.fancy-table.wide-age th#age,
+table.fancy-table.wide-age td[headers='age'] {
+  width: 7em;
+}
+table.fancy-table.wide-age td[headers='age'] {
+  text-align: left;
+}
 table.fancy-table th#date,
 table.fancy-table td[headers='date'] {
   text-align: left;

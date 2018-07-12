@@ -20,9 +20,21 @@
     {{recipient.normalRetirementDate.year()}}</b>.
   </p>
 
+  <div class=insetTextBox ng-show="birth.day === 1">
+    <h4>Special Rule</h4>
+    <p>
+      The month you reach specific ages may seem off by one from what
+      you entered. Social Security follows English common law that finds that a
+      person attains an age on the day before the birthday. Since you were born
+      on the first of the month, this means for example
+      that you attain age <b>{{exampleAge().age}}</b> on
+      <b>{{exampleAge().month}} {{exampleAge().day}}, {{exampleAge().year}}</b>.
+    </p>
+  </div>
+
   <p>
-    If you start collecting benefits then, your benefit will be the primary
-    insurance amount, rounded down:
+    If you start collecting benefits at your normal retirement age, your
+    benefit will be the primary insurance amount, rounded down:
     <ul>
       <li>
         <b>${{recipient.primaryInsuranceAmountFloored() | number}}</b> / month
@@ -36,15 +48,38 @@
 
   <h2 id="nav-early-delayed">Early and Delayed Retirement</h2>
   <p>
-    You can also begin taking benefits as early as 62 years old
-    (<b>{{recipient.dateAtYearsOld(62).monthName()}}
-        {{recipient.dateAtYearsOld(62).year()}}</b>),
+		<span ng-show="birth.day === 2">
+    	You can also begin taking benefits as early as 62 years old
+	    (<b>{{recipient.dateAtYearsOld(62).monthName()}}
+  	      {{recipient.dateAtYearsOld(62).year()}}</b>),
+    </span>
+    <span ng-show="birth.day !== 2">
+    	You can also begin taking benefits as early as 62 years and 1 month old
+	    (<b>{{recipient.dateAtAge(initAge(62, 1)).monthName()}}
+  	      {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
+		</span>
     wait until as late as 70 years old
     (<b>{{recipient.dateAtYearsOld(70).monthName()}}
         {{recipient.dateAtYearsOld(70).year()}}</b>),
     or start any month in between. The longer you wait, the higher your
     actual benefit will be.
   </p>
+  <div class=insetTextBox ng-show="birth.day > 2">
+    <h4>Special Rule</h4>
+    <p>
+      You may find it oddly specific that the earliest you can actually
+      begin benefits is at age 62 and 1 month. Benefit eligibility
+      is calculated based on the first month that you are a particular age
+      throughout the <u>entire</u> month. For most, this is the month
+      <i>after</i> their birthday.
+    </p>
+    <p>
+      For example, the first month that you are <b>{{exampleAge().age}}</b>
+      throughout the <u>entire</u> month is
+      <b>{{followingMonth(exampleAge()).month}}
+         {{followingMonth(exampleAge()).year}}</b>.
+    </p>
+  </div>
   <p>
     If you choose to take benefits earlier than normal retirement age
     (<b>{{recipient.normalRetirementDate.monthName()}} 
@@ -78,23 +113,11 @@
     <b>{{recipient.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
     you delay.
   </p>
-  <div class=insetTextBox>
-    <h4>Special Rule</h4>
-    <p>
-      Delayed "credits" are calculated based on the number of months earned in
-      the previous calendar year, unless you wait until age 70.
-    </p>
-    <p>
-      If you begin delayed benefits in the middle of the year, you will have a
-      few percent smaller benefit than the full delayed benefit. This
-      difference will go away beginning January of the following year.
-    </p>
-  </div>
   <p>
     For a few examples, here's how much your benefit would be at different
     starting ages:
   </p>
-  <table class=fancy-table>
+  <table ng-class="{'fancy-table': true, 'wide-age': birth.day !== 2}">
     <thead>
       <tr>
         <th colspan=3></th>
@@ -109,7 +132,39 @@
       </tr>
     </thead> 
     <tbody>
-      <tr ng-repeat="age in [62, 63, 64, 65, 66, 67, 68, 69, 70]">
+		  <tr ng-show="birth.day === 2">
+        <td headers="age">62</td>
+        <td headers="date">
+          {{recipient.dateAtYearsOld(62).monthName()}}
+          {{recipient.dateAtYearsOld(62).year()}}
+        </td>
+        <td headers="adjustment">
+          {{recipient.benefitMultiplierAtAge(initAge(62)) * 100 | number:2}}%
+        </td>
+        <td headers="monthlybenefit">
+          ${{recipient.benefitAtAge(initAge(62)) | number:0}}
+        </td>
+        <td headers="annualbenefit">
+          ${{recipient.benefitAtAge(initAge(62)) * 12 | number:0}}
+        </td>
+      </tr>
+      <tr ng-show="birth.day !== 2">
+        <td headers="age">62 + 1m</td>
+        <td headers="date">
+          {{recipient.dateAtAge(initAge(62, 1)).monthName()}}
+          {{recipient.dateAtAge(initAge(62, 1)).year()}}
+        </td>
+        <td headers="adjustment">
+          {{recipient.benefitMultiplierAtAge(initAge(62, 1)) * 100 | number:2}}%
+        </td>
+        <td headers="monthlybenefit">
+          ${{recipient.benefitAtAge(initAge(62, 1)) | number:0}}
+        </td>
+        <td headers="annualbenefit">
+          ${{recipient.benefitAtAge(initAge(62, 1)) * 12 | number:0}}
+        </td>
+      </tr>
+      <tr ng-repeat="age in [63, 64, 65, 66, 67, 68, 69, 70]">
         <td headers="age">{{age}}</td>
         <td headers="date">
           {{recipient.dateAtYearsOld(age).monthName()}}
@@ -149,6 +204,19 @@
     <div class="chart-xlabel">
       Age Starting Benefits
     </div>
+  </div>
+
+  <div class=insetTextBox>
+    <h4>Special Rule</h4>
+    <p>
+      Delayed "credits" are calculated based on the number of months earned in
+      the previous calendar year, unless you wait until age 70.
+    </p>
+    <p>
+      If you begin delayed benefits in the middle of the year, you will have a
+      few percent smaller benefit than the full delayed benefit. This
+      difference will disappear beginning January of the following year.
+    </p>
   </div>
 </div>
 

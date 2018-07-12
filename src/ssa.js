@@ -449,21 +449,18 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       return; 
     $scope.birth.year = parseInt($scope.birth.year);
 
-    // If birthdate day of month is not on the 1st or 2nd, we use the next
-    // month for all calculations. 
-    // See https://secure.ssa.gov/poms.nsf/lnx/0300615015
-    var ssaBirth = new MonthDate().initFromYearsMonthsStr(
-          $scope.birth.year, $scope.birth.month);
-    if ($scope.birth.day > 2)
-      ssaBirth = ssaBirth.addDuration(new MonthDuration().initFromMonths(1));
-    $scope.recipient.updateBirthdate(ssaBirth);
+    englishLawBirthday = $scope.englishLawBirthday($scope.birth);
+
+    birth = new MonthDate().initFromYearsMonthsStr(
+          englishLawBirthday.year, englishLawBirthday.month);
+    $scope.recipient.updateBirthdate(birth);
+    $scope.recipient.setIsFullMonth(englishLawBirthday.day === 1);
 
     // Also set the spouses birthdate to the same, which is a
     // reasonable default to start with, until the user selects
     // differently.
     $scope.spouseBirth.month = $scope.birth.month;
     $scope.spouseBirth.year = $scope.birth.year;
-
     $scope.updateSpouseBirthdate();
   }
  
@@ -473,15 +470,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (!$scope.birthDateSelected($scope.spouseBirth))
       return; 
     $scope.spouseBirth.year = parseInt($scope.spouseBirth.year);
+    
+    englishLawBirthday = $scope.englishLawBirthday($scope.spouseBirth);
 
-    // If birthdate day of month is not on the 1st or 2nd, we use the next
-    // month for all calculations. 
-    // See https://secure.ssa.gov/poms.nsf/lnx/0300615015
-    var ssaBirth = new MonthDate().initFromYearsMonthsStr(
-          $scope.spouseBirth.year, $scope.spouseBirth.month);
-    if ($scope.spouseBirth.day > 2)
-      ssaBirth = ssaBirth.addDuration(new MonthDuration().initFromMonths(1));
-    $scope.spouse.updateBirthdate(ssaBirth);
+    birth = new MonthDate().initFromYearsMonthsStr(
+          englishLawBirthday.year, englishLawBirthday.month);
+    $scope.spouse.updateBirthdate(birth);
+    $scope.spouse.setIsFullMonth(englishLawBirthday.day === 1);
    
     $scope.higherEarnerSlider.updateBirthDate();
     $scope.lowerEarnerSlider.updateBirthDate();
@@ -600,6 +595,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       this.options.ticksTooltip =
         $scope.ticksTooltip.bind(null, normalRetirementAge);
       this.value = normalRetirementAge.asMonths();
+      this.options.minLimit = 0;
+      if (!this.earnerFn().isFullMonth)
+        this.options.minLimit = 1;
       $scope.refreshSlider();
     }
     this.selectedAge = function() {
@@ -614,11 +612,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
 
   $scope.updateSliderMin = function() {
+    var regularMin = $scope.lowerEarner().isFullMonth ? 0 : 1;
     // If the lower earner will be 70 before the higher earner files, bail.
     if ($scope.lowerEarner().dateAtAge(
           new MonthDuration().initFromYearsMonths(70, 0)).lessThan(
               $scope.higherEarnerSlider.selectedDate())) {
-      $scope.lowerEarnerSlider.options.minLimit = 0;
+      $scope.lowerEarnerSlider.options.minLimit = regularMin;
     } else if ($scope.lowerEarner().primaryInsuranceAmountFloored() == 0) {
       // If the lower earner does not have a personal benefit, it makes no
       // sense for that earner to file for benefits before the higher earner.
@@ -627,7 +626,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       var lowerAgeAtDate = $scope.lowerEarner().ageAtDate(
           $scope.higherEarnerSlider.selectedDate()).asMonths();
       if (lowerAgeAtDate > new MonthDuration().initFromYearsMonths(70, 0)) {
-        $scope.lowerEarnerSlider.options.minLimit = 0;
+        $scope.lowerEarnerSlider.options.minLimit = regularMin;
         return;
       }
 
@@ -636,7 +635,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       // options.minLimit is relative to options.floor for some reason.
       $scope.lowerEarnerSlider.options.minLimit = lowerAgeAtDate - (62 * 12);
     } else {
-      $scope.lowerEarnerSlider.options.minLimit = 0;
+      $scope.lowerEarnerSlider.options.minLimit = regularMin;
     }
   }
 

@@ -167,27 +167,6 @@
     <b>{{spouseBirth.month}} {{spouseBirth.day}}, {{spouseBirth.year}}</b>.
   </p>
 
-  <div class=insetTextBox ng-show="spouseBirth.day > 2">
-    <h4>Special Rule</h4>
-    <p>
-      Your birthday affects when you can receive benefits as well as the amount
-      of the benefits. Retirement benefits are calculated based on the first
-      month that you are a particular age throughout the <u>entire</u> month.
-    </p>
-    <p>
-      Social Security follows English common law that finds that a person
-      attains an age on the day before the birthday. This means
-      that you attain age <b>{{exampleSpouseAge().age}}</b> on
-      <b>{{exampleSpouseAge().month}} {{exampleSpouseAge().day}},
-         {{exampleSpouseAge().year}}</b>
-      The first month that you are <b>{{exampleSpouseAge().age}}</b> throughout
-      the <u>entire</u> month is
-      <b>{{followingMonth(exampleSpouseAge()).month}}
-         {{followingMonth(exampleSpouseAge()).year}}</b>.
-    </p>
-  </div>
-
-
   <h2 id="nav-spouse-benefit">Spousal Benefit</h2>
   <h3>{{higherEarner().name}}</h3>
   <p>
@@ -310,7 +289,7 @@
     <span class=names>{{higherEarner().name}}'s</span> personal benefit.
   </p>     
 
-  <h2 id="nav-early-delayed-spouse">Early and Delayed Spouse Retirement</h3>
+  <h2 id="nav-early-delayed-spouse">Early and Delayed Spouse Retirement</h2>
   <p>
     The personal benefit section at the top of this document describes how
     personal benefits are adjusted for beginning benefits earlier than the
@@ -322,6 +301,20 @@
     (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
          {{recipient.normalRetirementDate.year()}}</b>) at the same rate.
   </p>
+  <div class=insetTextBox ng-show="spouseBirth.day === 1 && birth.day !== 1">
+    <h4>Special Rule</h4>
+    <p>
+      The month <span class=names>{{spouse.name}}</span> reaches specific ages
+      may seem off by one from what you entered. Social Security follows
+      English common law that finds that a person attains an age on the day
+      before the birthday. Since <span class=names>{{spouse.name}}</span> was
+      born on the first of the month, this means for example
+      that <span class=names>{{spouse.name}}</span> attains age
+			<b>{{exampleSpouseAge().age}}</b> on
+      <b>{{exampleSpouseAge().month}} {{exampleSpouseAge().day}},
+         {{exampleSpouseAge().year}}</b>.
+    </p>
+  </div>
   <p>
     If <span class=names>{{lowerEarner().name}}</span> begins spousal
     benefits before Normal Retirement Age
@@ -380,7 +373,7 @@
   </ul>
   </p>
 
-  <h2 id="nav-early-delayed-combined">Early and Delayed Combined Retirement</h3>
+  <h2 id="nav-early-delayed-combined">Early and Delayed Combined Retirement</h2>
   <p>
     You can see how the starting benefit dates for both spouses will affect
     affect the final monthly benefits, using the sliders below.
@@ -452,6 +445,24 @@
         </td>
       </tr>
     </table>
+  </div>
+
+  <div class=insetTextBox ng-show="spouseBirth.day > 1 && birth.day <= 2">
+    <h4>Special Rule</h4>
+    <p>
+      You may find it oddly specific that the earliest 
+      <span class=names>{{spouse.name}}</span> can actually
+      begin benefits is at age 62 and 1 month. Benefit eligibility
+      is calculated based on the first month that you are a particular age
+      throughout the <u>entire</u> month. For most, this is the month
+      <i>after</i> their birthday.
+    </p>
+    <p>
+      For example, the first month that <span class=names>{{spouse.name}}</span>
+      is <b>{{exampleSpouseAge().age}}</b> throughout the <u>entire</u> month is
+      <b>{{followingMonth(exampleSpouseAge()).month}}
+         {{followingMonth(exampleSpouseAge()).year}}</b>.
+    </p>
   </div>
 
   <h2 id="nav-survivor">Survivor Benefits</h2>

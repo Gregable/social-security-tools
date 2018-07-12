@@ -470,6 +470,8 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.globalAlpha = 0.6;
   this.context_.beginPath();
   var start = this.higherEarner_.dateAtYearsOld(62);
+  if (!this.higherEarner_.isFullMonth)
+    start = start.addDuration(new MonthDuration().initFromMonths(1));
   var end = this.higherEarner_.dateAtYearsOld(70);
   for (i = start; i.lessThanOrEqual(end);) {
     var thisX = this.canvasX(i);
@@ -697,6 +699,8 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.beginPath();
   this.context_.globalAlpha = 0.3;
   var start = this.lowerEarner_.dateAtYearsOld(62);
+  if (!this.lowerEarner_.isFullMonth)
+    start = start.addDuration(new MonthDuration().initFromMonths(1));
   if (personal === 0 && start.lessThan(this.higherEarnerStartDate()))
     start = this.higherEarnerStartDate();
   var end = this.lowerEarner_.dateAtYearsOld(70);
