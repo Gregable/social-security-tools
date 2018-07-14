@@ -7,7 +7,7 @@
     Social Security will pay you every month starting at your
     <u>normal retirement age</u> (NRA). Sometimes this is also referred to as
     the <u>full retirement age</u> (FRA). We are going to walk you through the
-    calculation of your PIA, and ultimately to your actual estimated benefit.
+    calculation of your PIA, and ultimately your actual estimated benefit.
     If applicable, we will also walk you through how your Social Security
     record will earn a benefit for your spouse.
   </p>
@@ -73,13 +73,11 @@
   </p>
 
   <p>
+    <!-- ugly alignment to avoid a space appearing between months
+         and period/comma. -->
     Your Average Indexed Montly Earnings is calculated as your total indexed
-    earnings divided by 35 years divided by 12 months
-    <span ng-if="recipient.numEarningsYears() >= 35">
-      , as follows:
-    </span>
-    <span ng-if="recipient.numEarningsYears() < 35">
-      . As you have fewer than 35 years of earnings, this average is calculated
+    earnings divided by 35 years divided by 12 months<span ng-if="recipient.numEarningsYears() >= 35">, as follows:
+    </span><span ng-if="recipient.numEarningsYears() < 35">. As you have fewer than 35 years of earnings, this average is calculated
       using zeroes for the additional years, as follows:
     </span>
   </p>
@@ -142,7 +140,7 @@
       <td>
         <b>${{recipient.primaryInsuranceAmountUnadjusted() | number:2}}</b>
       </td>
-      <td>/ month</td>
+      <td>&nbsp;/ month</td>
     </tr>
   </table>  
 

@@ -371,8 +371,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     options: {
      showSelectionBar: true,
      floor: 1000,
-     ceil: MAXIMUM_EARNINGS[CURRENT_YEAR - 1],
-     step: 1000,
+     ceil: MAXIMUM_EARNINGS[CURRENT_YEAR],
+     //step: 1000,
+     stepsArray: (function() {
+       out = [];
+       for (i = 1000; i < MAXIMUM_EARNINGS[CURRENT_YEAR]; i += 1000) {
+         out.push({value: i});
+       }
+       out.push({value: MAXIMUM_EARNINGS[CURRENT_YEAR]});
+       return out;
+     })(),
      translate: function(value, sliderId, label) {
       if (label === 'model') {
        if (value === this.options.ceil)
