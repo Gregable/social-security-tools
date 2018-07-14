@@ -43,10 +43,10 @@
   </p>
 
   <p>
-    For <span class=names>{{recipient.name}}</span>, we will use the values in
-    this report for <u>primary insurance amount</u>
+    For <span class=names>{{recipient.name}}</span>, we will use the values
+   based on your <u>primary insurance amount</u> of
     (<b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month)
-    and birthdate (<b>{{birth.month}}, {{birth.year}}</b>).
+    and your birthdate (<b>{{birth.month}}, {{birth.year}}</b>).
     For <span class=names>{{spouse.name}}</span>, you must enter these two
     values.
   </p>
@@ -171,12 +171,12 @@
   <h3>{{higherEarner().name}}</h3>
   <p>
     <span class=names>{{higherEarner().name}}</span> has the higher
-    Primary Insurance Amount, therefore
-    <span class=names>{{higherEarner().name}}</span> is not eligible to
-    collect spousal benefits. This is because the benefit one recieves is
+    Primary Insurance Amount, which means that
+    <span class=names>{{higherEarner().name}}</span> is not eligible for
+    any spousal benefits. This is because the benefit one receives is
     always the larger of the personal or spousal benefit and
     <span class=names>{{higherEarner().name}}'s</span> own benefit is 
-    larger than <span class=names>{{higherEarner().name}}'s</span>
+    already larger than <span class=names>{{higherEarner().name}}'s</span>
     spousal benefit.
   </p>
 
@@ -186,10 +186,10 @@
     <span class=names>{{lowerEarner().name}}</span> has the lower
     Primary Insurance Amount, therefore
     <span class=names>{{lowerEarner().name}}</span> may be eligible to
-    recieve a <u>spousal benefit</u> based on
+    receive a <u>spousal benefit</u> based on
     <span class=names>{{higherEarner().name}}'s</span> personal benefit.
     However, in this case, <span class=names>{{lowerEarner().name}}</span>
-    will not recieve a <u>spousal benefit</u> as 
+    will not receive a <u>spousal benefit</u> as 
     <span class=names>{{lowerEarner().name}}'s</span> own personal benefit
     is more than the spousal benefit earned on
     <span class=names>{{higherEarner().name}}'s</span> social security record.
@@ -201,7 +201,7 @@
     <span class=names>{{lowerEarner().name}}</span> has the lower
     Primary Insurance Amount, therefore
     <span class=names>{{lowerEarner().name}}</span> may be eligible to
-    recieve a <u>spousal benefit</u> based on
+    receive a <u>spousal benefit</u> based on
     <span class=names>{{higherEarner().name}}'s</span> personal benefit.
   <p>
  
@@ -239,7 +239,7 @@
 
   <p ng-show="isSpousalBenefit()">
     This spousal benefit (<b>${{spousalBenefit() | number:0}}</b>) is the amount
-    <span class=names>{{lowerEarner().name}}</span> will recieve in addition to
+    <span class=names>{{lowerEarner().name}}</span> will receive in addition to
     <span class=names>{{lowerEarner().name}}'s</span> own personal benefit of
     <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>.
   </p>
@@ -293,20 +293,21 @@
   <p>
     The personal benefit section at the top of this document describes how
     personal benefits are adjusted for beginning benefits earlier than the
-    Normal Retirement Age (NRA) or delaying past Normal Retirement Age.
+    Normal Retirement Age (NRA) or delaying past NRA.
   </p>
   <p>
-    The spousal benefit does not increase after Normal Retirement Age, but it
-    is reduced before Normal Retirement Age 
-    (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
-         {{recipient.normalRetirementDate.year()}}</b>) at the same rate.
+    Spousal benefits do not increase after Normal Retirement Age, but are
+    reduced before Normal Retirement Age 
+    (<b>{{lowerEarner().normalRetirementDate.monthName()}}
+         {{recipient.normalRetirementDate.year()}}</b>) at the same rate as
+    personal benefits.
   </p>
   <div class=insetTextBox ng-show="spouseBirth.day === 1 && birth.day !== 1">
     <h4>Special Rule</h4>
     <p>
       The month <span class=names>{{spouse.name}}</span> reaches specific ages
-      may seem off by one from what you entered. Social Security follows
-      English common law that finds that a person attains an age on the day
+      may seem "off by one" from what you entered. Social Security follows
+      English common law that finds that a person "attains" an age on the day
       before the birthday. Since <span class=names>{{spouse.name}}</span> was
       born on the first of the month, this means for example
       that <span class=names>{{spouse.name}}</span> attains age
@@ -324,7 +325,7 @@
     start early by:
   </p>
   <ul>
-    <li><b>6.67%</b> per year after
+    <li><b>6.67%</b> per year if starting AFTER
       <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
          {{lowerEarner().normalRetirement.ageMonths}} months</b>
       (<b>
@@ -332,7 +333,7 @@
         {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).year()}}
        </b>)
     </li>
-    <li><b>5.00%</b> per year before
+    <li><b>5.00%</b> per year if starting BEFORE
       <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
          {{lowerEarner().normalRetirement.ageMonths}} months</b>
       (<b>
@@ -347,8 +348,8 @@
     benefits start is the later of either
     <span class=names>{{lowerEarner().name}}</span>'s benefits start date or
     <span class=names>{{higherEarner().name}}</span>'s benefits start date. This
-    can lead to a different reduction multiplier for the personal and spousal
-    benefit.
+    can lead to different reduction multipliers for the personal and spousal
+    benefits.
   </p>
 
   <p>
@@ -364,11 +365,12 @@
     <li>
       <span class=names>{{lowerEarner().name}}</span> must elect to collect
       all of the benefits <span class=names>{{lowerEarner().name}}</span> is
-      eligible for or none the benefits.
+      eligible for, or none at all.
       For example, <span class=names>{{lowerEarner().name}}</span> cannot
       choose to delay personal benefits but collect spousal benefits if
       eligible for both benefits. This is known as the <u>deeming</u> rule:
-      you are deemed to be filing for all benefits you are eligible for.
+      you are deemed to be filing for all benefits you are eligible for once
+      one decides to file.
     </li>
   </ul>
   </p>
@@ -468,8 +470,8 @@
   <h2 id="nav-survivor">Survivor Benefits</h2>
   <p>
     Upon the death of <span class=names>{{higherEarner().name}}</span>,
-    <span class=names>{{lowerEarner().name}}</span> will recieve Survivor
-    Benefits. Survivor Benefits for
+    <span class=names>{{lowerEarner().name}}</span> will receive Survivor
+    Benefits. Survivor benefits for
     <span class=names>{{lowerEarner().name}}</span> will replace
     <span class=names>{{lowerEarner().name}}</span>'s own benefit, if
     the Survivor Benefit is a higher value.
@@ -480,7 +482,7 @@
     date of death. This will be reduced if
     <span class=names>{{lowerEarner().name}}</span> begins collecting the
     Survivor Benefit before <span class=names>{{lowerEarner().name}}</span>'s
-    Normal Retirement Age at 
+    Normal Retirement Age
     (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
          {{recipient.normalRetirementDate.year()}}</b>).
   </p>
@@ -494,7 +496,7 @@
     choosing initial benefit dates for both spouses, but especially 
     <span class=names>{{higherEarner().name}}</span>. Delaying current 
     benefits can have an effect similar to life insurance by providing a higher
-    Survivor Benefit.
+    Survivor Benefit which will persist throughout the surviving spouse's life.
   </p>
   </div><!-- isSpousalBenefit() -->
 </div>
