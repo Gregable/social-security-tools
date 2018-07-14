@@ -103,12 +103,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (demoId === 1) {
       $scope.demoId = 1;
       $scope.spouse.primaryInsuranceAmountValue = 600;
-      $scope.birth.day = 1;
+      $scope.birth.day = 2;
       $scope.birth.month = "Aug";
       $scope.birth.year = 1950;
       $scope.birth.maxPossibleYear = 1950;
       $scope.updateBirthdate();
-      $scope.spouseBirth.day = 1;
+      $scope.spouseBirth.day = 2;
       $scope.spouseBirth.month = "Dec";
       $scope.spouseBirth.year = 1951;
       $scope.spouseBirth.maxPossibleYear = 1951;
@@ -119,7 +119,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
     if (demoId === 2) {
       $scope.demoId = 2;
-      $scope.birth.day = 1;
+      $scope.birth.day = 3;
       $scope.birth.month = "Sep";
       $scope.birth.year = 1985;
       $scope.birth.maxPossibleYear = 1985;
