@@ -7,7 +7,8 @@
     is <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
     and is the benefit you will earn if you retire at your
     <u>normal retirement age</u> (NRA). Normal Retirement Age is between 65
-    and 67, depending on when you were born.
+    and 67, depending on when you were born. You may also see this
+    referred to as the <u>full retirement age</u> (FRA).
   </p>
 
   <p>
@@ -25,9 +26,9 @@
     <p>
       The month you reach specific ages may seem "off by one" from what
       you entered. Social Security follows English common law that finds that a
-      person "attains" an age on the day before the birthday. Since you were
-      born on the first of the month, this means for example
-      that you attain age <b>{{exampleAge().age}}</b> on
+      person "attains" an age on the day before the birthday. Because you were
+      born on the first of the month, this means that you attain age
+      <b>{{exampleAge().age}}</b> on
       <b>{{exampleAge().month}} {{exampleAge().day}}, {{exampleAge().year}}</b>.
     </p>
   </div>
@@ -49,12 +50,12 @@
   <h2 id="nav-early-delayed">Early and Delayed Retirement</h2>
   <p>
 		<span ng-show="birth.day === 2">
-    	You can also begin taking benefits as early as 62 years old
+    	You can begin taking benefits as early as 62 years old
 	    (<b>{{recipient.dateAtYearsOld(62).monthName()}}
   	      {{recipient.dateAtYearsOld(62).year()}}</b>),
     </span>
     <span ng-show="birth.day !== 2">
-    	You can also begin taking benefits as early as 62 years and 1 month old
+    	You can begin taking benefits as early as 62 years and 1 month old
 	    (<b>{{recipient.dateAtAge(initAge(62, 1)).monthName()}}
   	      {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
 		</span>
@@ -62,7 +63,7 @@
     (<b>{{recipient.dateAtYearsOld(70).monthName()}}
         {{recipient.dateAtYearsOld(70).year()}}</b>),
     or start any month in between. The longer you wait, the higher your
-    actual benefit will be.
+    benefit will be.
   </p>
   <div class=insetTextBox ng-show="birth.day > 2">
     <h4>Special Rule</h4>
@@ -216,7 +217,7 @@
     <p>
       This means that if you begin delayed benefits in a month other than
       January, your initial benefit will be a little smaller than the full
-      delayed benefit, at first. This difference will disappear beginning
+      delayed benefit, at first. This difference will disappear beginning in
       January of the following year, at which point your benefit will increase
       to the full benefit amount. If you wait until age 70, your delayed
       credits are applied immediately.

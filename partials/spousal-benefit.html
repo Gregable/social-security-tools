@@ -58,7 +58,7 @@
   <p>
     You can compute <span class=names>{{spouse.name}}'s</span>
     <u>primary insurance amount</u> by using this tool once for
-    <span class=names>{{spouse.name}}</span>, note down the value, and then
+    <span class=names>{{spouse.name}}</span>. Note the value, and then
     reload using this tool for <span class=names>{{recipient.name}}</span>,
     entering <span class=names>{{spouse.name}}'s</span>
     <u>primary insurance amount</u> below.
@@ -174,10 +174,11 @@
     Primary Insurance Amount, which means that
     <span class=names>{{higherEarner().name}}</span> is not eligible for
     any spousal benefits. This is because the benefit one receives is
-    always the larger of the personal or spousal benefit and
+    always the larger of the personal or spousal benefit. Because
     <span class=names>{{higherEarner().name}}'s</span> own benefit is 
-    already larger than <span class=names>{{higherEarner().name}}'s</span>
-    spousal benefit.
+    larger than <span class=names>{{higherEarner().name}}'s</span>
+    spousal benefit, <span class=names>{{higherEarner().name}}</span> does not
+    get any spousal benefit.
   </p>
 
   <h3>{{lowerEarner().name}}</h3>
@@ -292,12 +293,12 @@
   <h2 id="nav-early-delayed-spouse">Early and Delayed Spouse Retirement</h2>
   <p>
     The personal benefit section at the top of this document describes how
-    personal benefits are adjusted for beginning benefits earlier than the
-    Normal Retirement Age (NRA) or delaying past NRA.
+    personal benefits are adjusted when beginning benefits earlier than the
+    Normal Retirement Age (NRA) or alternately, delaying past NRA.
   </p>
   <p>
-    Spousal benefits do not increase after Normal Retirement Age, but are
-    reduced before Normal Retirement Age 
+    Spousal benefits do not increase if claimed after Normal Retirement Age,
+    but are reduced before Normal Retirement Age 
     (<b>{{lowerEarner().normalRetirementDate.monthName()}}
          {{recipient.normalRetirementDate.year()}}</b>) at the same rate as
     personal benefits.
@@ -308,9 +309,9 @@
       The month <span class=names>{{spouse.name}}</span> reaches specific ages
       may seem "off by one" from what you entered. Social Security follows
       English common law that finds that a person "attains" an age on the day
-      before the birthday. Since <span class=names>{{spouse.name}}</span> was
-      born on the first of the month, this means for example
-      that <span class=names>{{spouse.name}}</span> attains age
+      before the birthday. Because <span class=names>{{spouse.name}}</span> was
+      born on the first of the month, this means that
+      <span class=names>{{spouse.name}}</span> attains age
 			<b>{{exampleSpouseAge().age}}</b> on
       <b>{{exampleSpouseAge().month}} {{exampleSpouseAge().day}},
          {{exampleSpouseAge().year}}</b>.
@@ -474,11 +475,11 @@
     Benefits. Survivor benefits for
     <span class=names>{{lowerEarner().name}}</span> will replace
     <span class=names>{{lowerEarner().name}}</span>'s own benefit, if
-    the Survivor Benefit is a higher value.
+    the Survivor Benefit is larger.
   </p>
   <p>
     The amount of the Survivor Benefit is typically the amount of
-    <span class=names>{{higherEarner().name}}</span>'s own benefit at the
+    <span class=names>{{higherEarner().name}}</span>'s personal benefit at the
     date of death. This will be reduced if
     <span class=names>{{lowerEarner().name}}</span> begins collecting the
     Survivor Benefit before <span class=names>{{lowerEarner().name}}</span>'s

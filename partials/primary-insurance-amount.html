@@ -5,8 +5,7 @@
     Your Social Security benefits are best thought of in terms of your 
     <u>primary insurance amount</u> (PIA). This is the dollar amount that
     Social Security will pay you every month starting at your
-    <u>normal retirement age</u> (NRA). Sometimes this is also referred to as
-    the <u>full retirement age</u> (FRA). We are going to walk you through the
+    <u>normal retirement age</u> (NRA). We are going to walk you through the
     calculation of your PIA, and ultimately your actual estimated benefit.
     If applicable, we will also walk you through how your Social Security
     record will earn a benefit for your spouse.
@@ -24,7 +23,7 @@
   <p>
     You have social security earnings recorded for
     <b>{{recipient.numEarningsYears()}}</b> total years. Your PIA is based on
-    your <u>Averaged Indexed Monthly Earnings</u> AIME, a straightfoward
+    your <u>Averaged Indexed Monthly Earnings</u> AIME, a straightforward
     calculation from your lifetime earnings record. So that's our first step.
   </p>
 
@@ -45,9 +44,9 @@
   <p ng-if="recipient.numEarningsYears() < 35">
     The top 35 <u>indexed earnings</u> values are used in the calculation of
     your Averaged Indexed Monthly Earnings (and thus, your Primary Insurance
-    Amount). Indexed earnings are simply the payroll wages you earned in a
-    year multiplied by a number that adjusts for wage growth (similar to an
-    inflation adjustment). As you don't have 35 years of earnings yet, every
+    Amount). Indexed earnings are simply the capped payroll wages you earned
+    in a year multiplied by a number that adjusts for wage growth (similar to
+    an inflation adjustment). As you don't have 35 years of earnings yet, every
     additional year you work will increase your benefit a little more. Once
     you reach 35 years of earnings values, increasing your Averaged Indexed
     Monthly Earnings amount requires earning more than previous years' indexed
@@ -75,7 +74,7 @@
   <p>
     <!-- ugly alignment to avoid a space appearing between months
          and period/comma. -->
-    Your Average Indexed Montly Earnings is calculated as your total indexed
+    Your Average Indexed Monthly Earnings is simply your total indexed
     earnings divided by 35 years divided by 12 months<span ng-if="recipient.numEarningsYears() >= 35">, as follows:
     </span><span ng-if="recipient.numEarningsYears() < 35">. As you have fewer than 35 years of earnings, this average is calculated
       using zeroes for the additional years, as follows:
