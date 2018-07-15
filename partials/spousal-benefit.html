@@ -11,9 +11,9 @@
 
   <div class=married-options>
     <input type=radio ng-model="married.value" value=false id=not-married checked ng-change="refreshSlider()">
-    <label for=not-married>Not Married</label>
+    <label for=not-married class=clickCursor>Not Married</label>
     <input type=radio ng-model="married.value" value=true id=married ng-change="refreshSlider()">
-    <label for=married>Married</label>
+    <label for=married class=clickCursor>Married</label>
   </div>
 
 </div>
@@ -73,7 +73,7 @@
   <p>
     <span class=names>{{spouse.name}}'s</span>
     Primary Insurance Amount: <b>$</b>
-    <input type="number" min=0 size=6 style="width: 60px"
+    <input type="number" min=0 size=6 style="width: 68px"
            name="spousalPia" cast-to-integer
            ng-model="spouse.primaryInsuranceAmountValue"
            ng-change="refreshSlider()">
