@@ -21,10 +21,10 @@
   </p>
 
   <p>
-    You have social security earnings recorded for
+    You have Social Security earnings recorded for
     <b>{{recipient.numEarningsYears()}}</b> total years. Your PIA is based on
-    your <u>Averaged Indexed Monthly Earnings</u> AIME, a straightforward
-    calculation from your lifetime earnings record. So that's our first step.
+    your <u>Averaged Indexed Monthly Earnings</u> (AIME), a straightforward
+    calculation from your lifetime earnings record. So, that's our first step.
   </p>
 
   <p ng-if="recipient.numEarningsYears() >= 35">
@@ -37,7 +37,7 @@
     falls below <b>${{recipient.cutoffIndexedEarnings | number}}</b> do not
     affect your benefit calculation because they are not among the top 35. If
     you were to earn additional years of wages in the future, they would only
-    affect your social security if you earned more than
+    affect your Social Security if you earned more than
     <b>${{recipient.cutoffIndexedEarnings | number}}</b> in those years.
   </p>
 
@@ -175,7 +175,7 @@
     (<b>${{recipient.primaryInsuranceAmount() | number:2}}</b> / month) is
     your primary insurance amount. In the chart below, you can see what your
     primary insurance amount would be if your indexed earnings were to
-    increase. Move your mouse over the chart to watch how the primary insurance
+    increase. Move your mouse over the chart to see how the primary insurance
     amount changes.
   </p>
 
