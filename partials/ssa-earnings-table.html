@@ -29,7 +29,7 @@
     <tbody>
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
-        <td headers="age">62</td>
+        <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
         <td colspan=5 ng-show="earningRecord.taxedEarnings < 0" style="text-align:center">
           Not yet recorded
         </td>
@@ -91,7 +91,7 @@
   <tbody>
     <tr ng-repeat="year in futureYears">
       <td headers="workyear">{{year}}</td>
-      <td headers="age">62</td>
+      <td headers="age">{{recipient.exampleAge(year).age}}</td>
       <td headers="taxedearnings">
         ${{futureWageWorkSlider.minValue | number:0}}
       </td>

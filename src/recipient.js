@@ -134,14 +134,16 @@ ssaBirthDate = function(layBirthdate) {
 }
 
 /**
- * This returns the date in the current year that it is considered a person's
+ * This returns the date in the given year that it is considered a person's
  * birthday, as well as their age.
  */
 Recipient.prototype.exampleAge = function(year) {
+  if (year === undefined)
+    year = CURRENT_YEAR;
   var example = {
-    'age': CURRENT_YEAR - this.birthDate.year(),
+    'age': year - this.birthDate.year(),
     'month': this.birthDate.monthFullName(),
-    'year': CURRENT_YEAR
+    'year': year
   };
   example['day'] = new Date(
       this.layBirthDate - (12 * 60 * 60 * 1000)).getDate();
