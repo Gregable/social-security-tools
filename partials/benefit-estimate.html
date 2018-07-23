@@ -28,10 +28,10 @@
       you entered. Social Security follows English common law that finds that a
       person "attains" an age on the day before the birthday. Because you were
       born on the first of the month, this means that you attain age
-      <b>{{recipient.exampleAge(CURRENT_YEAR).age}}</b> on
-      <b>{{recipient.exampleAge(CURRENT_YEAR).month}} 
-         {{recipient.exampleAge(CURRENT_YEAR).day}},
-         {{recipient.exampleAge(CURRENT_YEAR).year}}</b>.
+      <b>{{recipient.exampleAge().age}}</b> on
+      <b>{{recipient.exampleAge().month}} 
+         {{recipient.exampleAge().day}},
+         {{recipient.exampleAge().year}}</b>.
     </p>
   </div>
 
@@ -78,10 +78,10 @@
     </p>
     <p>
       For example, the first month that you are
-      <b>{{recipient.exampleAge(CURRENT_YEAR).age}}</b>
+      <b>{{recipient.exampleAge().age}}</b>
       throughout the <u>entire</u> month is
-      <b>{{followingMonth(recipient.exampleAge(CURRENT_YEAR)).month}}
-         {{followingMonth(recipient.exampleAge(CURRENT_YEAR)).year}}</b>.
+      <b>{{followingMonth(recipient.exampleAge()).month}}
+         {{followingMonth(recipient.exampleAge()).year}}</b>.
     </p>
   </div>
   <p>

@@ -129,6 +129,22 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   }
 
+  // Returns an upper
+  $scope.maxPIA = function() {
+    bpYear = CURRENT_YEAR - 2;
+    const maxAime = MAXIMUM_EARNINGS[CURRENT_YEAR] / 12;
+    console.log(maxAime);
+    console.log(firstBendPoint(bpYear) * BEFORE_BENDPOINT1_MULTIPLIER);
+    console.log(secondBendPoint(bpYear) * BEFORE_BENDPOINT2_MULTIPLIER);
+    console.log((maxAime - firstBendPoint(bpYear) -
+          secondBendPoint(bpYear)) * AFTER_BENDPOINT2_MULTIPLIER);
+    return Math.floor(
+        (firstBendPoint(bpYear) * BEFORE_BENDPOINT1_MULTIPLIER) +
+        (secondBendPoint(bpYear) * BEFORE_BENDPOINT2_MULTIPLIER) +
+        ((maxAime - firstBendPoint(bpYear) -
+          secondBendPoint(bpYear)) * AFTER_BENDPOINT2_MULTIPLIER));
+  }
+
   // Rather that using copy/paste, this fn immediately loads an example test
   // paste via a json request. This allows the user to try out the interface
   // before committing to the effort of retrieving their earnings record from

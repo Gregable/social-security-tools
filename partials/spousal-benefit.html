@@ -73,7 +73,7 @@
   <p>
     <span class=names>{{spouse.name}}'s</span>
     Primary Insurance Amount: <b>$</b>
-    <input type="number" min=0 size=6 style="width: 68px"
+    <input type="number" min=0 max={{maxPIA()}} size=6 style="width: 68px"
            name="spousalPia" cast-to-integer
            ng-model="spouse.primaryInsuranceAmountValue"
            ng-change="refreshSlider()">
@@ -312,9 +312,9 @@
       before the birthday. Because <span class=names>{{spouse.name}}</span> was
       born on the first of the month, this means that
       <span class=names>{{spouse.name}}</span> attains age
-			<b>{{spouse.exampleAge(CURRENT_YEAR).age}}</b> on
-      <b>{{spouse.exampleAge(CURRENT_YEAR).month}} {{spouse.exampleAge(CURRENT_YEAR).day}},
-         {{spouse.exampleAge(CURRENT_YEAR).year}}</b>.
+			<b>{{spouse.exampleAge().age}}</b> on
+      <b>{{spouse.exampleAge().month}} {{spouse.exampleAge().day}},
+         {{spouse.exampleAge().year}}</b>.
     </p>
   </div>
   <p>
@@ -458,9 +458,9 @@
     </p>
     <p>
       For example, the first month that <span class=names>{{spouse.name}}</span>
-      is <b>{{spouse.exampleAge(CURRENT_YEAR).age}}</b> throughout the <u>entire</u> month is
-      <b>{{followingMonth(spouse.exampleAge(CURRENT_YEAR)).month}}
-         {{followingMonth(spouse.exampleAge(CURRENT_YEAR)).year}}</b>.
+      is <b>{{spouse.exampleAge().age}}</b> throughout the <u>entire</u> month is
+      <b>{{followingMonth(spouse.exampleAge()).month}}
+         {{followingMonth(spouse.exampleAge()).year}}</b>.
     </p>
   </div>
 
