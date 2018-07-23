@@ -405,44 +405,21 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     year: 0,
   }
 
-  // Subtracts 1 day from birthdate. This is the only place we work with days.
-  // Return format is the same as the two birthday objects above.
-  $scope.englishLawBirthday = function(birthdate) {
-    var day = birthdate.day;
-    var monthIndex = ALL_MONTHS.indexOf(birthdate.month);
-    var year = birthdate.year;
+  // Given an input array above, returns a Date object representing the same.
+  $scope.dateFromInputArray = function(inputDate) {
+    var day = inputDate.day;
+    var monthIndex = ALL_MONTHS.indexOf(inputDate.month);
+    var year = inputDate.year;
 
-    var commonDate = new Date(year, monthIndex, day);
-    // We subtract 12 hours. 24 or 1 could get into trouble with daylight
-    // savings time changes. Why doesn't javascript have better date libraries?
-    var englishDate = new Date(commonDate.getTime() - (12 * 60 * 60 * 1000));
-
-    return {
-      day: englishDate.getDate(),
-      month: ALL_MONTHS[englishDate.getMonth()],
-      year: englishDate.getFullYear(),
-    };
+    return new Date(year, monthIndex, day);
   }
 
-  // This returns the date in the current year that it is considered a person's
-  // birthday, as well as their age.
-  $scope.exampleAge = function() {
-    var zeroDate = $scope.englishLawBirthday($scope.birth);
-    zeroDate['age'] = CURRENT_YEAR - zeroDate.year;
-    zeroDate['year'] = CURRENT_YEAR;
-    return zeroDate;
-  }
-  $scope.exampleSpouseAge = function() {
-    var zeroDate = $scope.englishLawBirthday($scope.spouseBirth);
-    zeroDate['age'] = CURRENT_YEAR - zeroDate.year;
-    zeroDate['year'] = CURRENT_YEAR;
-    return zeroDate;
-  }
   $scope.followingMonth = function(input) {
     var out = {};
-    out.month = ALL_MONTHS[(ALL_MONTHS.indexOf(input.month) + 1) % 12];
+    out.month = ALL_MONTHS_FULL[
+      (ALL_MONTHS_FULL.indexOf(input.month) + 1) % 12];
     out.year = input.year;
-    if (ALL_MONTHS.indexOf(input.month) === 11)
+    if (ALL_MONTHS_FULL.indexOf(input.month) === 11)
       out.year += 1;
     return out;
   }
@@ -451,22 +428,21 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return birthdate.year !== 0 && birthdate.month !== "";
   }
 
+  // Called when the primary birthdate is modified.
   $scope.updateBirthdate = function() {
     // Only update once there are some non-default values set.
     if (!$scope.birthDateSelected($scope.birth))
       return; 
     $scope.birth.year = parseInt($scope.birth.year);
+    $scope.birth.day = parseInt($scope.birth.day);
 
-    englishLawBirthday = $scope.englishLawBirthday($scope.birth);
-
-    birth = new MonthDate().initFromYearsMonthsStr(
-          englishLawBirthday.year, englishLawBirthday.month);
-    $scope.recipient.updateBirthdate(birth);
-    $scope.recipient.setIsFullMonth(englishLawBirthday.day === 1);
+    const layBirthday = $scope.dateFromInputArray($scope.birth);
+    $scope.recipient.updateBirthdate(layBirthday);
 
     // Also set the spouses birthdate to the same, which is a
     // reasonable default to start with, until the user selects
     // differently.
+    $scope.spouseBirth.day = $scope.birth.day;
     $scope.spouseBirth.month = $scope.birth.month;
     $scope.spouseBirth.year = $scope.birth.year;
     $scope.updateSpouseBirthdate();
@@ -478,13 +454,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (!$scope.birthDateSelected($scope.spouseBirth))
       return; 
     $scope.spouseBirth.year = parseInt($scope.spouseBirth.year);
+    $scope.spouseBirth.day = parseInt($scope.spouseBirth.day);
     
-    englishLawBirthday = $scope.englishLawBirthday($scope.spouseBirth);
-
-    birth = new MonthDate().initFromYearsMonthsStr(
-          englishLawBirthday.year, englishLawBirthday.month);
-    $scope.spouse.updateBirthdate(birth);
-    $scope.spouse.setIsFullMonth(englishLawBirthday.day === 1);
+    const layBirthday = $scope.dateFromInputArray($scope.spouseBirth);
+    $scope.spouse.updateBirthdate(layBirthday);
    
     $scope.higherEarnerSlider.updateBirthDate();
     $scope.lowerEarnerSlider.updateBirthDate();

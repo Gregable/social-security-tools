@@ -18,6 +18,7 @@
     <thead>
       <tr>
         <th id="workyear">Year</th>
+        <th id="age">Age</th>
         <th id="taxedearnings">Taxed Earnings</th>
         <th id="multsymbol"></th>
         <th id="multiplier">Multiplier</th>
@@ -28,6 +29,7 @@
     <tbody>
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
+        <td headers="age">62</td>
         <td colspan=5 ng-show="earningRecord.taxedEarnings < 0" style="text-align:center">
           Not yet recorded
         </td>
@@ -78,6 +80,7 @@
   <thead>
     <tr>
       <th id="workyear">Year</th>
+      <th id="age">Age</th>
       <th id="taxedearnings">Taxed Earnings</th>
       <th id="multsymbol"></th>
       <th id="multiplier">Multiplier</th>
@@ -88,6 +91,7 @@
   <tbody>
     <tr ng-repeat="year in futureYears">
       <td headers="workyear">{{year}}</td>
+      <td headers="age">62</td>
       <td headers="taxedearnings">
         ${{futureWageWorkSlider.minValue | number:0}}
       </td>

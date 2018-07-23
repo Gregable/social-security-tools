@@ -312,9 +312,9 @@
       before the birthday. Because <span class=names>{{spouse.name}}</span> was
       born on the first of the month, this means that
       <span class=names>{{spouse.name}}</span> attains age
-			<b>{{exampleSpouseAge().age}}</b> on
-      <b>{{exampleSpouseAge().month}} {{exampleSpouseAge().day}},
-         {{exampleSpouseAge().year}}</b>.
+			<b>{{spouse.exampleAge(CURRENT_YEAR).age}}</b> on
+      <b>{{spouse.exampleAge(CURRENT_YEAR).month}} {{spouse.exampleAge(CURRENT_YEAR).day}},
+         {{spouse.exampleAge(CURRENT_YEAR).year}}</b>.
     </p>
   </div>
   <p>
@@ -458,9 +458,9 @@
     </p>
     <p>
       For example, the first month that <span class=names>{{spouse.name}}</span>
-      is <b>{{exampleSpouseAge().age}}</b> throughout the <u>entire</u> month is
-      <b>{{followingMonth(exampleSpouseAge()).month}}
-         {{followingMonth(exampleSpouseAge()).year}}</b>.
+      is <b>{{spouse.exampleAge(CURRENT_YEAR).age}}</b> throughout the <u>entire</u> month is
+      <b>{{followingMonth(spouse.exampleAge(CURRENT_YEAR)).month}}
+         {{followingMonth(spouse.exampleAge(CURRENT_YEAR)).year}}</b>.
     </p>
   </div>
 

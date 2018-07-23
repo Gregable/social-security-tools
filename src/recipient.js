@@ -59,8 +59,13 @@ function Recipient(name) {
   // monthlyIndexedEarnings or set directly.
   this.primaryInsuranceAmountValue = 0;
 
-  // Recipient's birth date and normal retirement date in year and month.
+  // This is the recipient's "lay" birthdate, which is the day they were born.
+  this.layBirthDate = new Date(1980, 0, 1);
+
+  // Recipient's birth date and normal retirement date in year and month. This
+  // is the "SSA" birthdate, based on the day before the "lay" birthdate.
   this.birthDate = new MonthDate().initFromYearsMonths(1970, 0);
+
   // TODO(gregable): Compute this on the fly.
   this.normalRetirementDate = new MonthDate(2037, 0);
 
@@ -110,13 +115,49 @@ Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
   this.processIndexedEarnings_();
 };
 
+
+/**
+ * Takes a javascript Date object of layBirthdate and converts it to an SSA
+ * birthdate. The SSA birthdate is one day earlier, and we drop the day of month
+ * at that point, because SSA cares only about month and year.
+ * @param {layBirthDate} Date
+ * @return {MonthDate}
+ */
+ssaBirthDate = function(layBirthdate) {
+  // We subtract 12 hours. 24 or 1 could get into trouble with daylight
+  // savings time changes. Why doesn't javascript have better date libraries?
+  var englishBirthdate = new Date(
+      layBirthdate.getTime() - (12 * 60 * 60 * 1000));
+
+  return new MonthDate().initFromYearsMonths(
+      englishBirthdate.getFullYear(), englishBirthdate.getMonth());
+}
+
+/**
+ * This returns the date in the current year that it is considered a person's
+ * birthday, as well as their age.
+ */
+Recipient.prototype.exampleAge = function(year) {
+  var example = {
+    'age': CURRENT_YEAR - this.birthDate.year(),
+    'month': this.birthDate.monthFullName(),
+    'year': CURRENT_YEAR
+  };
+  example['day'] = new Date(
+      this.layBirthDate - (12 * 60 * 60 * 1000)).getDate();
+  return example;
+}
+
 /*
- * Update this recipient's birthdate. Caller should provide the SSA birthdate,
- * which is the day prior to the day of birth.
- * @param {monthDate} birthdate
+ * Update this recipient's birthdate. Caller should provide the lay birthdate
+ * as a JavaScript Date object.
+ * @param {Date} birthdate
  */
 Recipient.prototype.updateBirthdate = function(birthdate) {
-  this.birthDate.initFromMonthDate(birthdate);
+  this.layBirthDate = birthdate;
+  this.birthDate = ssaBirthDate(birthdate);
+  this.isFullMonth = birthdate.getDate() === 1;
+
   // Find the retirement age bracket data for this recipient.
   for (var i = 0; i < FULL_RETIREMENT_AGE.length; ++i) {
     var ageBracket = FULL_RETIREMENT_AGE[i];
@@ -125,25 +166,11 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
       this.normalRetirement = ageBracket;
     }
   }
-
   var normalRetirementAge = this.normalRetirementAge();
   this.normalRetirementDate = this.birthDate.addDuration(normalRetirementAge);
-  console.log(normalRetirementAge);
-  console.log(this.normalRetirementDate);
-  console.log(this.normalRetirementDate.monthName());
 
   // Birthdate can affect indexed earnings.
   this.processIndexedEarnings_();
-}
-
-/*
- * If set to true, considers this person as born on the first of the month
- * in the updated "SSA" birthday. This is used to determine the first month
- * which they are eligible for benefits.
- * @param {boolean} isFullMonth
- */
-Recipient.prototype.setIsFullMonth = function(isFullMonth) {
-  this.isFullMonth = isFullMonth;
 }
 
 /**
