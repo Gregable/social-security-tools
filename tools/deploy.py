@@ -46,6 +46,7 @@ RELEASE_FILES = [
   '*.html',
   '*paste.txt',
   'favicon.ico',
+  'bootstrap.min.css',
   'stylesheet.css',
   'partials/*.html',
   'src/*.js',
