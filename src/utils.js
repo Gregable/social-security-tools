@@ -93,6 +93,14 @@ class MonthDate {
   }
 
   /*
+   * Returns the full month name, such as "January".
+   * @return {number}
+   */
+  monthFullName() {
+    return ALL_MONTHS_FULL[this.monthsSinceEpoch_ % 12];
+  }
+
+  /*
    * @param {monthDate} other
    * @return {MonthDuration}
    */

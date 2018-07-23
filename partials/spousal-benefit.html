@@ -299,7 +299,7 @@
   <p>
     Spousal benefits do not increase if claimed after Normal Retirement Age,
     but are reduced before Normal Retirement Age 
-    (<b>{{lowerEarner().normalRetirementDate.monthName()}}
+    (<b>{{lowerEarner().normalRetirementDate.monthFullName()}}
          {{recipient.normalRetirementDate.year()}}</b>) at the same rate as
     personal benefits.
   </p>
@@ -320,7 +320,7 @@
   <p>
     If <span class=names>{{lowerEarner().name}}</span> begins spousal
     benefits before Normal Retirement Age
-    (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
+    (<b>{{lowerEarner().normalRetirementDate.monthFullName()}} 
          {{recipient.normalRetirementDate.year()}}</b>),
     the spousal benefit will be <u>permanently</u> <i>reduced</i> per year you
     start early by:
@@ -329,18 +329,14 @@
     <li><b>6.67%</b> per year if starting AFTER
       <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
          {{lowerEarner().normalRetirement.ageMonths}} months</b>
-      (<b>
-         {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).monthName()}}
-        {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).year()}}
-       </b>)
+      (<b>{{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).monthFullName()}}
+          {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).year()}}</b>)
     </li>
     <li><b>5.00%</b> per year if starting BEFORE
       <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
          {{lowerEarner().normalRetirement.ageMonths}} months</b>
-      (<b>
-         {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).monthName()}}
-        {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).year()}}
-       </b>)
+      (<b>{{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).monthFullName()}}
+          {{lowerEarner().dateAtYearsOld(lowerEarner().normalRetirement.ageYears - 3).year()}}</b>)
     </li>
   </ul>
 
@@ -484,7 +480,7 @@
     <span class=names>{{lowerEarner().name}}</span> begins collecting the
     Survivor Benefit before <span class=names>{{lowerEarner().name}}</span>'s
     Normal Retirement Age
-    (<b>{{lowerEarner().normalRetirementDate.monthName()}} 
+    (<b>{{lowerEarner().normalRetirementDate.monthFullName()}} 
          {{recipient.normalRetirementDate.year()}}</b>).
   </p>
   <p>

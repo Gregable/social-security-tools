@@ -17,7 +17,7 @@
     {{recipient.normalRetirement.ageMonths}} months</b>.
 
     This puts your normal retirement date at
-    <b>{{recipient.normalRetirementDate.monthName()}}, 
+    <b>{{recipient.normalRetirementDate.monthFullName()}}, 
     {{recipient.normalRetirementDate.year()}}</b>.
   </p>
 
@@ -51,16 +51,16 @@
   <p>
 		<span ng-show="birth.day === 2">
     	You can begin taking benefits as early as 62 years old
-	    (<b>{{recipient.dateAtYearsOld(62).monthName()}}
+	    (<b>{{recipient.dateAtYearsOld(62).monthFullName()}}
   	      {{recipient.dateAtYearsOld(62).year()}}</b>),
     </span>
     <span ng-show="birth.day !== 2">
     	You can begin taking benefits as early as 62 years and 1 month old
-	    (<b>{{recipient.dateAtAge(initAge(62, 1)).monthName()}}
+	    (<b>{{recipient.dateAtAge(initAge(62, 1)).monthFullName()}}
   	      {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
 		</span>
     or wait until as late as 70 years old
-    (<b>{{recipient.dateAtYearsOld(70).monthName()}}
+    (<b>{{recipient.dateAtYearsOld(70).monthFullName()}}
         {{recipient.dateAtYearsOld(70).year()}}</b>),
     or start any month in between. The longer you wait, the higher your
     benefit will be.
@@ -83,33 +83,29 @@
   </div>
   <p>
     If you choose to take benefits earlier than normal retirement age
-    (<b>{{recipient.normalRetirementDate.monthName()}} 
+    (<b>{{recipient.normalRetirementDate.monthFullName()}} 
         {{recipient.normalRetirementDate.year()}}</b>),
     your benefit amount will be <u>permanently</u> <i>reduced</i> 
     per year you start early by:
     <ul>
-      <li><b>6.67%</b> per year if starting AFTER
+      <li><b>6.67%</b> per year if starting <i>after</i>
         <b>{{recipient.normalRetirement.ageYears - 3}} years and 
            {{recipient.normalRetirement.ageMonths}} months</b>
-        (<b>
-           {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthName()}}
-          {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}
-         </b>)
+        (<b>{{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthFullName()}}
+            {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}</b>)
       </li>
-      <li><b>5.00%</b> per year if starting BEFORE
+      <li><b>5.00%</b> per year if starting <i>before</i>
         <b>{{recipient.normalRetirement.ageYears - 3}} years and 
            {{recipient.normalRetirement.ageMonths}} months</b>
-        (<b>
-           {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthName()}}
-          {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}
-         </b>)
+        (<b>{{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthFullName()}}
+            {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}</b>)
       </li>
     </ul>
   </p> 
   <p>
     If you choose instead to wait until later than normal retirement age to
     start your benefits,
-    (<b>{{recipient.normalRetirementDate.monthName()}}
+    (<b>{{recipient.normalRetirementDate.monthFullName()}}
         {{recipient.normalRetirementDate.year()}}</b>),
      your amount will be <u>permanently</u> <i>increased</i> by
     <b>{{recipient.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
