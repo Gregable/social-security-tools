@@ -383,7 +383,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
      showSelectionBar: true,
      floor: 1000,
      ceil: MAXIMUM_EARNINGS[CURRENT_YEAR],
-     //step: 1000,
      stepsArray: (function() {
        out = [];
        for (i = 1000; i < MAXIMUM_EARNINGS[CURRENT_YEAR]; i += 1000) {
