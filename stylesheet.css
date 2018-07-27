@@ -19,7 +19,7 @@ body {
 
 .fixedcontainer {
   /* horizontally center */
-  max-width: 970px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
@@ -132,6 +132,8 @@ body {
   
 div#pastePrompt > div.instructions {
   display: inline-block;
+  max-width: 620px;
+  margin: auto;
 }
 
 h4 {
@@ -214,13 +216,11 @@ ul.demos button > ico {
   font-weight: bold;
   font-size: 22px;
 }
-
 div.confirmation-prompt {
   margin-top: 20px;
   margin-right: 60px;
   font-size: 18px;
 }
-
 div.confirmation-prompt > div.confirmation-left {
   float: left;
   margin: 0;
@@ -253,6 +253,9 @@ div.confirmation-prompt button.failure:hover {
 div.confirmation-prompt button > ico {
   font-weight: bold;
   font-size: 22px;
+}
+p.birthdate {
+  font-size: 18px;
 }
 
 /* earnings-record table styles match the SSA.gov site so that the table looks
@@ -364,6 +367,9 @@ table.fancy-table td[headers='multsymbol'] {
   padding-right: 0px;
   color: #6B6BBF;
 }
+.multsymbol {  
+  color: #6B6BBF;
+}
 table.fancy-table th#multiplier,
 table.fancy-table td[headers='multiplier'] {
   text-align: center;
@@ -400,6 +406,13 @@ table.fancy-table td[headers='age'] {
 table.fancy-table td[headers='age'] {
   text-align: center;
 }
+table.fancy-table.wide-age th#age,
+table.fancy-table.wide-age td[headers='age'] {
+  width: 7em;
+}
+table.fancy-table.wide-age td[headers='age'] {
+  text-align: left;
+}
 table.fancy-table th#date,
 table.fancy-table td[headers='date'] {
   text-align: left;
@@ -427,6 +440,27 @@ table.benefitBrackets tr td:nth-last-child(2) {
 table.benefitBrackets tr:last-child td:nth-child(2) {
   border-top: 1px solid;
 }
+.clickCursor {
+  cursor: pointer;
+}
+
+/* Spousal Combined benefit table */
+table.combinedBenefit {
+  margin: auto;
+}
+table.combinedBenefit tr:first-child td:first-child {
+  text-align: left;
+}
+table.combinedBenefit tr:not(:first-child) td:first-child {
+  width: 18px;
+}
+table.combinedBenefit tr:not(:first-child) td:nth-child(2) {
+  text-align: right;
+  padding-right: 6px;
+}
+table.combinedBenefit tr:last-child td:last-child {
+  border-top: 1px solid;
+}
 
 /* Canvas Chart CSS */
 .chart-container {
@@ -447,9 +481,15 @@ table.benefitBrackets tr:last-child td:nth-child(2) {
   float: left;
 }
 
-.chart-ylabel > .vertical-text {
-  transform: rotate(-90deg) translateY(-86px) translateX(-166px);
-  -webkit-transform: rotate(-90deg) translateY(-86px) translateX(-166px);
+.benefit-estimate.chart-ylabel > .vertical-text {
+  transform: rotate(-90deg) translateY(-52px) translateX(-166px);
+  -webkit-transform: rotate(-90deg) translateY(-52px) translateX(-166px);
+  float: left;
+}
+
+.pia.chart-ylabel > .vertical-text {
+  transform: rotate(-90deg) translateY(-82px) translateX(-166px);
+  -webkit-transform: rotate(-90deg) translateY(-82px) translateX(-166px);
   float: left;
 }
 
@@ -463,32 +503,83 @@ table.benefitBrackets tr:last-child td:nth-child(2) {
 canvas {
   float: left;
 }
+div.fixed-left-column {
+  max-width: 220px;
+  float: left;
+}
 div.fixed-center-column {
-  max-width: 620px;
+  max-width: 660px;
   margin: auto;
 }
 
+@media (min-width: 1121px) {
+  div.fixed-center-column {
+    padding-left: 40px;
+  }
+}
+
+ul.nav {
+  margin: 30px 0 0;
+  border-radius: 6px;
+  max-width: 220px;
+  list-style: none;
+  padding: 0px;
+}
+#navbar.affix {
+  top: 10px;
+}
+ul.nav li {
+  line-height: 20px;
+  margin-top: 0px;
+}
+ul.nav li a {
+  color: #0088cc;
+  text-decoration: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid #e5e5e5;
+  padding: 8px 14px;
+  margin: 0 0 -1px;
+  display: block;
+}
+ul.nav li:first-child a {
+  border-radius: 6px 6px 0 0;
+}
+ul.nav li:last-child a {
+  border-radius: 0 0 6px 6px;
+}
+ul.nav li.active a {
+  background-color: #08c;
+  color: #fff;
+}
+ul.nav .glyphicon {
+  float: right;
+}
+ul.nav li:not(.active) .glyphicon {
+  color: black;
+  opacity: .25;
+}
+ul.nav .navlabel {
+  display: inline-block;
+  max-width: 175px;
+  padding-right: 20px;
+}
+@media print {
+  ul.nav {
+    display: none;
+  }
+}
+@media (max-width: 1120px) {
+  ul.nav {
+    display: none;
+  }
+}
+
 /* The Age Picker buttons are simply heavily CSS'ed radio buttons. */
-div#agePicker {
+div.agePicker {
   font-size: 14px;
 }
 
-div.monthPicker {
-  max-width: 620px;
-  display: -webkit-flex;
-  display: -moz-flex;
-  display: -ms-flex;
-  display: flex;
-  flex-direction: row;
-  -webkit-flex-direction: row;
-  flex-flow: space-between;
-  -webkit-flex-flow: space-between;
-  justify-content: space-between;
-  -webkit-justify-content: space-between;
-  flex-wrap: wrap;
-  -webkit-flex-wrap: wrap;
-}
-div.yearPicker {
+div.picker {
   max-width: 620px;
   display: -webkit-flex;
   display: -moz-flex;
@@ -508,7 +599,7 @@ input.radio {
   display: none;
 }
 label.radio {
-  width: 75px;
+  width: 76px;
   border-radius: 4px;
   border: 1px solid #D1D3D4;
   position: relative;
@@ -523,14 +614,30 @@ label.radio {
   color: #999;
   display: block;
 }
+label.radio.day {
+  width: 65px;
+  text-align: center;
+}
+label.radio.day span {
+  width: 29px;
+  display: inline-block;
+  text-indent: 0px;  /* override the label */
+  margin-left:33px;
+}
+label.radio.month span,label.radio.year span {
+  width: 40px;
+  text-align: center;
+  display: inline-block;
+  text-indent: 0px;  /* override the label */
+  margin-left:33px;
+}
 label.radio.month {
-  text-indent: 3em;
-  margin-right: 0.85em;
+  width: 79px;
+  text-align: center;
 }
 label.radio.year {
-  text-indent: 2.8em;
-  line-height: 2em;
-  margin-right: 0.8em;
+  width: 79px;
+  text-align: center;
 }
 label.radio:before {
   position: absolute;
@@ -545,7 +652,6 @@ label.radio:before {
 }
 input.radio:hover:not(:checked) ~ label.radio:before {
   content:'\2714';
-  text-indent: .9em;
   color: #C2C2C2;
 }
 input.radio:hover:not(:checked) ~ label.radio {
@@ -553,7 +659,6 @@ input.radio:hover:not(:checked) ~ label.radio {
 }
 input.radio:checked ~ label.radio:before {
   content:'\2714';
-  text-indent: .9em;
   color: #9CE2AE;
   background-color: #4DCB6D;
 }
@@ -565,22 +670,105 @@ input.radio:focus ~ label.radio:before {
 }
 
 /* Table holding sliders for guessing at future years of work */
-#futureWorkYearsTable  {
+.sliderZ {
+  z-index: 2;
+}
+.sliderTable  {
   margin: 0 auto;
   padding-bottom: 15px;
 }
-#futureWorkYearsTable td:not(.sliderColumn) {
+.sliderTable td:not(.sliderColumn) {
   vertical-align: bottom;
   padding-bottom: 8px;
+  white-space: nowrap;
 }
-#futureWorkYearsTable td:nth-child(1) {
+.sliderTable td:nth-child(1) {
   text-align: right;
 }
-#futureWorkYearsTable td.sliderColumn {
+.sliderTable td.sliderColumn {
   vertical-align: bottom;
   width: 300px;
   padding-left: 5px;
   padding-right: 5px;
+}
+.sliderTable td.sliderColumnWide {
+  vertical-align: bottom;
+  width: 500px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+/* Slider for the custom earner start dates */
+#higherEarnerSlider .rz-tick,
+#higherEarnerSlider .rz-tick.selected,
+#higherEarnerSlider .rz-bar {
+  background: #f6dfad;
+}
+#higherEarnerSlider .rz-active,
+#higherEarnerSlider .rz-selection,
+#higherEarnerSlider .rz-selected {
+  background: #e69f00;
+}
+#higherEarnerSlider .rz-pointer {
+  background-color: #e69f00;
+}
+#higherEarnerSlider .rz-limit {
+  color: #e69f00;
+}
+#lowerEarnerSlider .rz-tick,
+#lowerEarnerSlider .rz-bar {
+  background: #d9ebd9;
+}
+#lowerEarnerSlider .rz-active,
+#lowerEarnerSlider .rz-selection,
+#lowerEarnerSlider .rz-selected {
+  background: #060;
+}
+#lowerEarnerSlider .rz-pointer {
+  background-color: #060;
+}
+#lowerEarnerSlider .rz-limit {
+  color: #060;
+}
+
+
+/* Override rz-slider's css for placing ticks below the slider
+ * when there are more steps than ticks.*/
+.force-ticks-above .rz-ticks-values-under .rz-tick-value {
+  top: -30px;
+  bottom: unset;
+}
+/* Then make the pointer text hide the tick text with 100% transparency */
+span.rz-bubble {
+  background-color: rgba(255, 255, 255, 1.0);
+  z-index: 2;
+}
+/* Add some padding for the transparency, excluding the left hand side */
+#spousal-box span.rz-bubble {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+#spousal-box span.rz-bar {
+  left: 16px;
+  width: calc(100% - 32px);
+}
+
+/* Married / Not Married options */
+.married-options input {
+  display: none;
+}
+.married-options label {
+  font-size: 18px;
+  padding: 10px 16px;
+  line-height: 1.33;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 6px;
+  border-color: #777;          
+
+}
+.married-options input:checked+label {
+  border-color: #6969a4;
+  background: #dfdff0;
 }
 
 /* Frequent Question Expando boxes */
@@ -630,6 +818,7 @@ input.radio:focus ~ label.radio:before {
   border-left: 3px solid #888;
   text-shadow: 0 1px 0 rgba(255,255,255,.5);
   transition: all .15s ease-out;          
+  box-sizing: initial;
 }
 
 /* Remove text selection when toggle-ing */
@@ -683,3 +872,65 @@ div.flashnotify:not(.ng-hide-animate) {
   100% { background-color: #ffffff; }
 }
 
+span.names {
+  color: #3B3B9F;
+  font-weight: 600;
+}
+span.higherEarner {
+  color: #5E4000;
+  font-weight: 600;
+}
+span.lowerEarner {
+  color: #004000;
+  font-weight: 600;
+}
+p.nameEntry {
+  text-align: center;
+}
+p.nameEntry input[name=yourName] {
+  margin-right: 12px;
+}
+
+div.lineElement {
+  border: 1px dashed #CCD;
+  height: 0px;
+  position: absolute;
+}
+
+canvas#spousal-chart-canvas {
+  position: absolute;
+  z-index: 1;
+  margin-top: 22px;
+}
+
+div.totalSpousalAtDate {
+  /* This attempts to match the canvas line selecting the date in the spousal
+   * chart.
+   */
+  border-color: #337ab7;
+  border-style: dashed;
+  border-width: 2px;
+  margin-bottom: 6px;
+  padding: 8px;
+  font-size: 16px;
+}
+
+div.insetTextBox {
+  box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  -webkit-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  -moz-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  -o-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  margin: 0 0 10px;
+  padding: 10px;
+}
+div.insetTextBox h4 {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+div.insetTextBox p {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.onlyHidden {
+  visibility: hidden;
+}

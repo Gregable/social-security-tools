@@ -8,11 +8,11 @@ function AgeChart() {
 
 /**
  * Returns true if the AgeChart has been initialized with a canvas element
- * and taxEngine.
+ * and recipient.
  * @return {boolean}
  */
 AgeChart.prototype.isInitialized = function() {
-  return this.canvas_ !== null && this.taxEngine !== null;
+  return this.canvas_ !== null && this.recipient !== null;
 };
 
 /**
@@ -32,11 +32,11 @@ AgeChart.prototype.setCanvas = function(canvas_element) {
 };
 
 /**
- * Set the taxEngine from which to pull financial data.
- * @param {TaxEngine} taxEngine
+ * Set the recipient from which to pull financial data.
+ * @param {Recipient} recipient
  */
-AgeChart.prototype.setTaxEngine = function(taxEngine) {
-  this.taxEngine_ = taxEngine;
+AgeChart.prototype.setRecipient = function(recipient) {
+  this.recipient_ = recipient;
 };
 
 /**
@@ -93,16 +93,16 @@ AgeChart.prototype.canvasY = function(benefitY) {
  * Compute the canvas age for an x-coordinate value.
  * Used for computations involving mouse interactions.
  * @param {number} canvasX
- * @return {number}
+ * @return {MonthDuration}
  */
-AgeChart.prototype.ageX = function(canvasX) {
+AgeChart.prototype.ageAtX = function(canvasX) {
+  // compute the number of months greater than 62 years old the canvasX
+  // corresponds to.
   var xValue = Math.floor(canvasX / this.chartWidth() * this.monthWidth);
-  var xClipped = this.monthWidth;
-  var months = Math.max(0, Math.min(xValue, xClipped));
-  return {
-    year: 62 + Math.floor(months / 12),
-    month: months % 12
-  };
+  var xClipped = Math.max(0, Math.min(xValue, this.monthWidth));
+  // Add 62 years to the age.
+  return new MonthDuration().initFromMonths(xClipped).add(
+      new MonthDuration().initFromYearsMonths(62, 0));
 };
 
 /**
@@ -111,7 +111,8 @@ AgeChart.prototype.ageX = function(canvasX) {
  * @return {Number}
  */
 AgeChart.prototype.maxRenderedYDollars = function() {
-  return this.taxEngine_.benefitAtAge(70, 0);
+  return this.recipient_.benefitAtAge(
+        new MonthDuration().initFromYearsMonths(70, 0));
 };
 
 /**
@@ -161,10 +162,12 @@ AgeChart.prototype.renderBenefitCurve = function() {
   this.context_.lineWidth = 4;
 
   this.context_.beginPath();
-  this.moveTo(12 * 62, this.taxEngine_.benefitAtAge(62, 0));
+  this.moveTo(12 * 62, this.recipient_.benefitAtAge(
+        new MonthDuration().initFromYearsMonths(62, 0)));
   for (var y = 62; y <= 70; ++y) {
     for (var m = 0; m < 12; ++m) {
-      this.lineTo(12 * y + m, this.taxEngine_.benefitAtAge(y, m));
+      var age = new MonthDuration().initFromYearsMonths(y, m)
+      this.lineTo(12 * y + m, this.recipient_.benefitAtAge(age));
     }
   }
   this.context_.stroke();
@@ -233,23 +236,17 @@ AgeChart.prototype.roundedBox =
 
 /**
  * Renders a point on the age curve.
- * @param {number} year
- * @param {number} month
+ * @param {MonthDuration} age
  */
-AgeChart.prototype.renderAgePoint = function(years, months) {
+AgeChart.prototype.renderAgePoint = function(age) {
   this.context_.save();
+  
+  if (age.asMonths() === 12 * 62 && !this.recipient_.isFullMonth)
+    age.addDuration(new MonthDuration().initFromMonths(1));
 
-  // Where on the breakpoint 'curve' the user's benefit values lie.
-  var userSSA = {
-    ageYears: years,
-    ageMonths: months,
-    x: years * 12 + months,
-    y: Math.round(this.taxEngine_.benefitAtAge(years, months))
-  };
+  var benefit = this.recipient_.benefitAtAge(age);
 
   // Add formatting to the text labels.
-  userSSA.xText = userSSA.ageYears + 'y ' + userSSA.ageMonths + 'mo';
-  userSSA.yText = ('$' + userSSA.y).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 
   // Thin dashed lines out from the user benefit point
   this.context_.lineWidth = 2;
@@ -259,13 +256,13 @@ AgeChart.prototype.renderAgePoint = function(years, months) {
   // Both lines starting at the point and radiating out makes a nifty
   // animation affect with the dashed lines at the edges of the chart.
   this.context_.beginPath();
-  this.moveTo(userSSA.x, userSSA.y);
-  this.lineTo(userSSA.x, 0);
+  this.moveTo(age.asMonths(), benefit);
+  this.lineTo(age.asMonths(), 0);
   this.context_.stroke();
   
   this.context_.beginPath();
-  this.moveTo(userSSA.x, userSSA.y);
-  this.lineTo(70 * 12, userSSA.y);
+  this.moveTo(age.asMonths(), benefit);
+  this.lineTo(70 * 12, benefit);
   this.context_.stroke();
 
   // White filled circle with black edge showing the user benefit point.
@@ -274,8 +271,8 @@ AgeChart.prototype.renderAgePoint = function(years, months) {
 
   this.context_.beginPath();
   this.context_.arc(
-      this.canvasX(userSSA.x),
-      this.canvasY(userSSA.y),
+      this.canvasX(age.asMonths()),
+      this.canvasY(benefit),
       /*radius=*/ 5,
       /*startAngle=*/ 0,
       /*endAngle=*/ 2 * Math.PI);
@@ -283,29 +280,28 @@ AgeChart.prototype.renderAgePoint = function(years, months) {
   this.context_.stroke();
 
   // Text at the edges showing the actual values, white on colored chip.
-
-  // TODO: Low Priority. Switch which edge of the chip the dotted line
-  // intersects with so as to avoid the two chips ever overlapping.
+  var xText = age.years() + 'y ' + age.modMonths() + 'mo';
+  var yText = insertNumericalCommas('$' + benefit);
 
   // Chip on the bottom edge
-  this.roundedBox(this.canvasX(userSSA.x), this.canvasY(0),
-                  this.context_.measureText(userSSA.xText).width + 6, 19,
+  this.roundedBox(this.canvasX(age.asMonths()), this.canvasY(0),
+                  this.context_.measureText(xText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
   // Chip on the right edge
   this.roundedBox(this.canvasX(70 * 12) + 1,
-                  this.canvasY(userSSA.y),
-                  this.context_.measureText(userSSA.yText).width + 6, 19,
+                  this.canvasY(benefit),
+                  this.context_.measureText(yText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
 
   this.context_.fillStyle = 'white'
   this.context_.fillText(  // Text on the bottom edge.
-      userSSA.xText,
-      this.canvasX(userSSA.x) + 2,
+      xText,
+      this.canvasX(age.asMonths()) + 2,
       this.canvasY(0) + 15);
   this.context_.fillText(  // Text on the right edge.
-      userSSA.yText, 
+      yText, 
       this.canvasX(70 * 12) + 3,
-      this.canvasY(userSSA.y) + 15);
+      this.canvasY(benefit) + 15);
 
   this.context_.restore();
 }
@@ -322,8 +318,7 @@ AgeChart.prototype.render = function() {
   this.renderBenefitCurve();
   this.context_.strokeStyle = '#5cb85c';
 
-  this.renderAgePoint(this.taxEngine_.fullRetirement.ageYears,
-                      this.taxEngine_.fullRetirement.ageMonths);
+  this.renderAgePoint(this.recipient_.normalRetirementAge());
 
   this.context_.restore();
 };
@@ -333,9 +328,9 @@ AgeChart.prototype.mouseClickListener = function() {
   var self = this;
   return function(e) {
     if (self.mouseToggle === 'ON') {
-      self.mouseToggle = 'OFF'
+      self.mouseToggle = 'OFF';
     } else {
-      self.mouseToggle = 'ON'
+      self.mouseToggle = 'ON';
       // Immediately trigger a rendering based on mouse location.
       self.mouseMoveListener()(e);
     }
@@ -354,8 +349,7 @@ AgeChart.prototype.mouseMoveListener = function() {
     self.context_.save();
     self.context_.strokeStyle = '#337ab7';
     var canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
-    var agePoint = self.ageX(canvasX);
-    self.renderAgePoint(agePoint.year, agePoint.month);
+    self.renderAgePoint(self.ageAtX(canvasX));
     self.context_.restore();
   };
 }

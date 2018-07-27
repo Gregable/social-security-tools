@@ -4,37 +4,75 @@
     <h3>Step 3 of 3: Select Birthdate Month and Year</h3>
     <p>
       Your birthdate determines when you can start
-      collecting social security benefits.
+      collecting Social Security benefits.
     </p>
   </div>
 
-  <div id=agePicker>
-    <div class=monthPicker>
+  <div class=agePicker>
+    <div class=picker>
+      <span ng-repeat="day in [1,2,3,4,5,6,7,8]">
+       <input type=radio value="{{day}}" id="day-{{day}}"
+              class=radio ng-model="birth.day" ng-change="updateBirthdate()">
+       <label class="radio day" for="day-{{day}}"><span>{{day}}</span></label>
+      </span>
+    </div>
+    <div class=picker>
+      <span ng-repeat="day in [9,10,11,12,13,14,15,16]">
+       <input type=radio value="{{day}}" id="day-{{day}}"
+              class=radio ng-model="birth.day" ng-change="updateBirthdate()">
+       <label class="radio day" for="day-{{day}}"><span>{{day}}</span></label>
+      </span>
+    </div>
+    <div class=picker>
+      <span ng-repeat="day in [17,18,19,20,21,22,23,24]">
+       <input type=radio value="{{day}}" id="day-{{day}}"
+              class=radio ng-model="birth.day" ng-change="updateBirthdate()">
+       <label class="radio day" for="day-{{day}}"><span>{{day}}</span></label>
+      </span>
+    </div>
+    <div class=picker>
+      <span ng-repeat="day in [25,26,27,28,29,30,31]">
+       <input type=radio value="{{day}}" id="day-{{day}}"
+              class=radio ng-model="birth.day" ng-change="updateBirthdate()">
+       <label class="radio day" for="day-{{day}}"><span>{{day}}</span></label>
+      </span>
+      <span ng-repeat="day in [32]" class=onlyHidden>
+       <input type=radio value="{{day}}" id="day-{{day}}"
+              class=radio ng-model="birth.day" ng-change="updateBirthdate()">
+       <label class="radio day" for="day-{{day}}"><span>{{day}}</span></label>
+      </span>
+    </div>
+    <p></p>
+    <div class=picker>
       <span ng-repeat="month in all_months | limitTo:6">
        <input type=radio value="{{month}}" id="month-{{month}}"
               class=radio ng-model="birth.month" ng-change="updateBirthdate()">
-        <label class="radio month" for="month-{{month}}">{{month}}</label>
+       <label class="radio month" for="month-{{month}}"
+         ><span>{{month}}</span></label>
       </span>
     </div>
-    <div class=monthPicker>
+    <div class=picker>
       <span ng-repeat="month in all_months | limitTo:6:6">
        <input type=radio value="{{month}}" id="month-{{month}}"
               class=radio ng-model="birth.month" ng-change="updateBirthdate()">
-        <label class="radio month" for="month-{{month}}">{{month}}</label>
+       <label class="radio month" for="month-{{month}}"
+         ><span>{{month}}</span></label>
       </span>
     </div>
-    <div class=yearPicker>
-      <span ng-repeat="year in pastYears()">
+    <p></p>
+    <div class=picker>
+      <span ng-repeat="year in primaryEarnerYears()">
         <input type=radio id="year-{{year}}" value="{{year}}"
                class=radio ng-model="birth.year" ng-change="updateBirthdate()">
-        <label class="radio year" for="year-{{year}}">{{year}}</label>
+        <label class="radio year" for="year-{{year}}"
+          ><span>{{year}}</span></label>
       </span>
     </div>
   </div>
   <br class=clear>
 
-  <div ng-show="birthDateSelected()">
-    You were born in <b>{{birth.month}}, {{birth.year}}</b>:
+  <div ng-show="birthDateSelected(birth)">
+    You were born on <b>{{birth.month}} {{birth.day}}, {{birth.year}}</b>:
     <button ng-click="confirmBirthDate()" class=success>
       <ico>&#10003;</ico> Yes
     </button>

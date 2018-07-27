@@ -1,8 +1,8 @@
-<div id="pastePrompt" ng-show="showPastePrompt()">
+<div id="pastePrompt" ng-show="showPastePrompt()" class=fixed-center-column>
   <div class="instructions">
     <p>
-      To use the calculator, you must provide some data from your social
-      security record.<br>
+      To use the calculator, you must provide some data from your Social
+      Security record.<br>
       If you aren't ready for that yet, select a demo data set at the
       bottom of the page.
     </p>
@@ -36,7 +36,7 @@
     <textarea id=pastearea wrap=off ng-model="pasteArea.contents"
               placeholder="{{pasteArea.placeholder}}"></textarea>
     <p>
-      <span class=lock>&#x1f512;</span> Your data never leaves you own
+      <span class=lock>&#x1f512;</span> Your data never leaves your own
       computer: the report is generated entirely by JavaScript in your browser.
     </p>
   </div>
@@ -44,18 +44,18 @@
   <div class="instructions">
     <h1>Try out some <u>demo</u> data instead:</h1>
     <p>
-      If you aren't ready to take a look at your own social security data, you
+      If you aren't ready to take a look at your own Social Security data, you
       can first play with some fictional account data.
     </p>
     <ul class=demos>
       <li>
-        Retiree born in 1950, who earned the roughly average US wage.
+        Retiree born in 1950, who earned roughly the average US wage.
         <br>
         <button ng-click="loadDemoData(0)">
           <ico>&#x261b;</ico> Try the Demo
         </button>
       <li>
-        Retiree born in 1950 who earned the maximum social security wages
+        Retiree born in 1950 who earned the maximum Social Security wages
         over five years, but nothing otherwise.
         <br>
         <button ng-click="loadDemoData(1)">

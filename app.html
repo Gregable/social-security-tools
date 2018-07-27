@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Social Security Calculator: Get Started</title>
 
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.5.1/rzslider.min.css">
+  <link rel="stylesheet" href="bootstrap.min.css">
   <link rel="stylesheet" href="stylesheet.css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.9.0/rzslider.min.css">
 
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
@@ -15,29 +16,37 @@
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.9.0/rzslider.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.2.2/rzslider.min.js"></script>
 
 
   <script type="text/javascript" src="src/constants.js"></script>
+  <script type="text/javascript" src="src/utils.js"></script>
   <script type="text/javascript" src="src/ssa-parse.js"></script>
-  <script type="text/javascript" src="src/tax-engine.js"></script>
+  <script type="text/javascript" src="src/recipient.js"></script>
   <script type="text/javascript" src="src/age-chart.js"></script>
   <script type="text/javascript" src="src/breakpoint-chart.js"></script>
+  <script type="text/javascript" src="src/spousal-chart.js"></script>
   <script type="text/javascript" src="src/ssa.js"></script>
 </head>
 
 <body ng-controller="SSAController"
-      ng-init="init()">
+      ng-init="init()" data-spy="scroll" data-target="#navbar">
   <div class="fixedcontainer">
     <ng-include src="'partials/header.html'"></ng-include>
+    <ng-include src="'partials/navbar.html'"></ng-include>
 
     <ng-include src="'partials/paste-prompt.html'"></ng-include>
     <ng-include src="'partials/paste-confirm.html'"></ng-include>
     <ng-include src="'partials/age-request.html'"></ng-include>
+    <ng-include src="'partials/birthdate.html'"></ng-include>
     <ng-include src="'partials/ssa-earnings-table.html'"></ng-include>
     <ng-include src="'partials/primary-insurance-amount.html'"></ng-include>
     <ng-include src="'partials/benefit-estimate.html'"></ng-include>
+    <ng-include src="'partials/spousal-benefit.html'"></ng-include>
+    <ng-include src="'partials/filing-date.html'"></ng-include>
     <ng-include src="'partials/frequent-questions.html'"></ng-include>
   </div>
 

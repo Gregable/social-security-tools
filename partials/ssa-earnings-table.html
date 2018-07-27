@@ -1,23 +1,24 @@
 <div ng-show="showReport()" class="fixed-center-column ng-cloak">
-  <h2 ng-show="demoId > -1">Demo Data</h2>
+  <h2 id="nav-demodata" ng-show="demoId > -1">Demo Data</h2>
   <p ng-show="demoId === 0">
-    Retiree born in July, 1950, who earned roughly the US average wage for
+    Retiree born on July 1st 1950, who earned roughly the average US wage for
     most of their career.
   </p>
   <p ng-show="demoId === 1">
-    Retiree born in August, 1950, who earned the maximum social security wages
-    over five years, but nothing otherwise.
+    Retiree born on August 2nd 1950, who earned the maximum Social Security
+    wages over five years, but nothing otherwise.
   </p>
   <p ng-show="demoId === 2">
-    Earner early in their career, born in September 1985, with a $40,000 per
+    Earner early in their career, born September 3rd 1985, with a $40,000 per
     year salary in 2005 and a 4% annual raise.
   </p>
 
-  <h2>Earnings Record</h2>
+  <h2 id=nav-earnings>Earnings Record</h2>
   <table class="fancy-table">
     <thead>
       <tr>
         <th id="workyear">Year</th>
+        <th id="age">Age</th>
         <th id="taxedearnings">Taxed Earnings</th>
         <th id="multsymbol"></th>
         <th id="multiplier">Multiplier</th>
@@ -28,6 +29,7 @@
     <tbody>
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
+        <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
         <td colspan=5 ng-show="earningRecord.taxedEarnings < 0" style="text-align:center">
           Not yet recorded
         </td>
@@ -53,7 +55,7 @@
     </tbody>
   </table>
 
-  <table id=futureWorkYearsTable>
+  <table class=sliderTable>
    <tr>
     <td>I plan to work for</td>
     <td class=sliderColumn>
@@ -78,6 +80,7 @@
   <thead>
     <tr>
       <th id="workyear">Year</th>
+      <th id="age">Age</th>
       <th id="taxedearnings">Taxed Earnings</th>
       <th id="multsymbol"></th>
       <th id="multiplier">Multiplier</th>
@@ -88,6 +91,7 @@
   <tbody>
     <tr ng-repeat="year in futureYears">
       <td headers="workyear">{{year}}</td>
+      <td headers="age">{{recipient.exampleAge(year).age}}</td>
       <td headers="taxedearnings">
         ${{futureWageWorkSlider.minValue | number:0}}
       </td>
