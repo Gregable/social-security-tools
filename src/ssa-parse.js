@@ -1,28 +1,5 @@
 
 /**
- * Determines if the given string seems like it could reasonably be a year
- * from a SSA website table.
- * @param {string} maybe_year
- * @return {boolean}
- */
-var IsStringSSAYearLine = function(maybe_year) {
-  // If not a number, it's not a year.
-  maybe_year = parseFloat(maybe_year);
-  if (!angular.isNumber(maybe_year))
-    return false;
-
-  // If not an integer, it's not a year.
-  if (!Math.floor(maybe_year) == maybe_year)
-    return false;
-
-  // According to http://goo.gl/2HEj1H, the oldest person alive may have been
-  // born as long back as 1887. This is debated, but it works for our simple
-  // validation purposes here.
-  // Note that this code has a Y2050 bug. Meh.
-  return (maybe_year >= 1887 && maybe_year <= 2050);
-}
-
-/**
  * Given a string which we know to be a number containing possibly a leading
  * dollar sign and internal commas, convert to an actual number.
  * @param {string} dollar_string
@@ -38,81 +15,121 @@ var dollarStringToNumber = function(dollar_string) {
   return Number(number_string);
 }
 
-/* Parses earnings records from a parse of user data from 
- * the SSA.gov website.
- * @param {string} earningsRecordsRaw
- * @return {!Array<!EarningRecord>}
- */
-var parseYearRecords = function(earningsRecordsRaw) {
-  earningsRecords = [];
-  var columnNames = ["year", "taxedEarnings", "taxedMedicareEarnings"];
+var parseSsaGovTable = function(lines) {
+  let earningsRecords = [];
+  for (let i = 0; i < lines.length; ++i) {
+    const line = lines[i];
+    const columns = line.split(' ');
+    var record = new EarningRecord();
+    record.year = Number.parseInt(columns[0]);
+    record.taxedEarnings = dollarStringToNumber(columns[1]);
+    record.taxedMedicareEarnings = dollarStringToNumber(columns[2]);
+    earningsRecords.push(record);
+  }
+  return earningsRecords;
+}
+var parseFormattedTable = function(lines) {
+  let earningsRecords = [];
+  for (let i = 0; i < lines.length; ++i) {
+    const line = lines[i];
+    const columns = line.split(' ');
+    var record = new EarningRecord();
+    record.year = Number.parseInt(columns[0]);
+    record.taxedEarnings = dollarStringToNumber(columns[1]);
+    earningsRecords.push(record);
+  }
+  return earningsRecords;
+}
+var parseThisSiteTable = function(lines) {
+  let earningsRecords = [];
+  for (let i = 0; i < lines.length; ++i) {
+    const line = lines[i];
+    const columns = line.split(' ');
+    var record = new EarningRecord();
+    record.year = Number.parseInt(columns[0]);
+    record.taxedEarnings = dollarStringToNumber(columns[2]);
+    earningsRecords.push(record);
+  }
+  return earningsRecords;
+}
+ 
+var parsePaste = function(paste) {
 
-  // Chrome appears to copy a table with each cell on a new line.
-  // Firefox attempts to put each row on a line and each column tab or space
-  // delimited.
+  // We first collapse whitespace on each line as
+  // different browsers insert different whitespace for column
+  // separation.
+
+  // Normalize and collapse whitespace.
+  let replacedStr = paste.replace(/[ \t]+/g, " ");
+  // Normalize and collapse newlines.
+  replacedStr = replacedStr.replace(/[\r\n]+/g, "\n");
+  // Split based on newlines.
+  let lines = replacedStr.split("\n");
+
+  // All valid lines will start with a year indicator.
+  let earningsLines = [];
+  for (let i = 0; i < lines.length; ++i) {
+    const line = lines[i];
+    const columns = line.split(' ');
+    // There must be at least a year and an earnings value.
+    if (columns.length < 2)
+      continue;
+ 
+    // If not an int, it's not a year.
+    maybeYear = Number.parseInt(columns[0]);
+    if (Number.isNaN(maybeYear))
+      continue;
+    // parseInt will ignore trailing garbage, so "1A" will be parsed as "1". 
+    // We don't want this as it could lead us to extract lines that aren't
+    // valid.
+    if (maybeYear.toString().length !== columns[0].length)
+      continue;
+
+    // According to http://goo.gl/2HEj1H, the oldest person alive may have been
+    // born as long back as 1887. This is debated, but it works for our simple
+    // validation purposes here.
+    if (maybeYear < 1887 || maybeYear > CURRENT_YEAR)
+      continue;
+  
+    earningsLines.push(line);
+  }
+  if (earningsLines.length === 0)
+    return [];
+    
+  // There are several different formats we are interested in:
+  // 1) The table at ssa.gov's website.
+  // 2) The table that we produce from our example data.
+  // 3) Simple row format with year + earnings.
+  // TODO: Add support for parsing the AnyPIA tool file format.
   //
-  // We try to make everything like Chrome. Replace all non-single-space
-  // whitespace with newlines, split lines, and ignore empty lines.
-  var replacedStr = earningsRecordsRaw;
-  // Replace any string of two or more spaces with 1 newline.
-  replacedStr = replacedStr.replace(/[ \t\r\n]{2,}/g, "\n");
-  // Replace any non-whitespace space with 1 newline.
-  replacedStr = replacedStr.replace(/[\t\r\n]/g, "\n");
-  var lines = replacedStr.split("\n");
+  // We make a determination which format it is based on the first line.
+  const firstLine = earningsLines[0];
+  const firstLineColumns = firstLine.split(' ');
 
-  var seenStartLine = false;
-  var column = 0;
-  var record = new EarningRecord();
-  for (var i = 0; i < lines.length; ++i) {
-    var line = lines[i];
-    if (line === '')
-      continue;
-
-    // We ignore lines until we see a line that looks like a SSA website year.
-    // At this point we begin processing all later lines.
-    if (!seenStartLine && IsStringSSAYearLine(line)) {
-      seenStartLine = true;
-    }
-
-    // If we haven't gotten to a start line yet, then just skip this line.
-    if (!seenStartLine)
-      continue;
-
-    // If the 1st column data isn't a year, we're past the earnings table and
-    // can ignore the rest of the input lines.
-    if (column == 0 && !IsStringSSAYearLine(line))
-      break;
-
-    // There are 3 columns, so we rotate through each one once for each year.
-    var value = dollarStringToNumber(line);
-    switch(column) {
-      case 0:
-        record.year = value;
-        break;
-      case 1:
-        record.taxedEarnings = value;
-        break;
-      case 2:
-        record.taxedMedicareEarnings = value;
-        break;
-      default:
-        console.error("Unknown column: " + column);
-    }
-
-
-    // A column of 3 indicates that we reached the end of the record.
-    column += 1;
-    if (column === 3) {
-      earningsRecords.push(record);
-      record = new EarningRecord();
-      column = 0;
-    }
+  let out = [];
+  // The SSA website format looks like:
+  //   1974 $500 $500
+  if (firstLineColumns.length === 3) {
+    out = parseSsaGovTable(earningsLines);
+  }
+  // User formatted input looks like:
+  //   1974 $500
+  if (firstLineColumns.length === 2) {
+    out = parseFormattedTable(earningsLines);
+  }
+  // The table that this tool produces has lines that look like:
+  //   1974 24 $500 x 5.19 = $2,595 Top 35 Value
+  if (firstLineColumns.length >= 7 && firstLineColumns[3] === 'x' &&
+      firstLineColumns[5] === '=') {
+    out = parseThisSiteTable(earningsLines);
   }
 
   // SSA's tables display years in reverse chronological order which makes
   // sense for display, but is not what code usually expects, so we sort
-  // output so that it's in chronological order.
-  earningsRecords.sort(function(a, b) { return a.year - b.year });
+  // output so that it's in chronological order. This also lets us handle
+  // errors in user formatted years or whatnot.
+  if (out.length > 1)
+    out.sort(function(a, b) { return a.year - b.year });
 
-  return earningsRecords;
+  return out;
 }

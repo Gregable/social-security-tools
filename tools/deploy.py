@@ -9,7 +9,7 @@ import tinys3  # https://www.smore.com/labs/tinys3/
 
 
 ROOT_DIR = os.path.expanduser("~/github/social-security-tools")
-REMOTE_DIR = "beta"
+REMOTE_DIR = ""
 S3_ACCESS_KEY = ""
 S3_SECRET_KEY = ""
 BUCKET = "socialsecurity.tools"

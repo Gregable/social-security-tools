@@ -147,7 +147,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.fetchTestData = function(filename) {
     $http.get(filename).then(
       function(contents) {
-        var records = parseYearRecords(contents.data);
+        var records = parsePaste(contents.data);
         $scope.recipient.initFromEarningsRecords(records);
         $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
         $scope.maybeRenderCharts();
@@ -162,7 +162,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   $scope.$watch('pasteArea.contents', function(newValue) {
     /** @type {!Array<!EarningRecord>} */
-    var records = parseYearRecords(newValue);
+    var records = parsePaste(newValue);
     if (records.length === 0)
       return;
 
@@ -220,6 +220,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   $scope.earningsRecords = function() {
     return $scope.recipient.earningsRecords;
+  };
+  
+  $scope.earningsRecordsIncludeMedicare = function() {
+    for (let i = 0; i < $scope.recipient.earningsRecords.length; ++i) {
+      if ($scope.recipient.earningsRecords[i].taxedMedicareEarnings >= 0)
+        return true;
+    }
+    return false;
   };
 
   // Functions in utils.js.
