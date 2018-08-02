@@ -222,7 +222,6 @@ div.confirmation-prompt {
   font-size: 18px;
 }
 div.confirmation-prompt > div.confirmation-left {
-  float: left;
   margin: 0;
   margin-top: 60px;
   text-align: center;
@@ -263,71 +262,40 @@ p.birthdate {
  * the user if we have entered the data correctly and making it a similar
  * style may help to visually verify the data. */
 table.earnings-record-table {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
   float: right;
-  border-left: 1px solid #CCC;
+  border: 1px solid #DDD;
+  border-collapse: collapse;
   border-spacing: 0;
   text-align: left;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
+  font-family: 'Arimo', sans-serif;
+  width: 700px;
+  font-size: 16px;
   line-height: 1.35;
   text-align: left;
+  color: #222;
 }
 
 table.earnings-record-table > thead th {
-  border-right: 1px solid #CCC;
-  border-top: 1px solid #CCC;
-  color: #FFF;
+  padding: 4px 10px;
+  border-bottom: 3px solid #CCC;
   font-weight: bold;
-  padding: 2px .3em;
-  background-color: #5a5757;
+  line-height:20px;
+  box-sizing: border-box;
+}
+
+table.earnings-record-table > tbody td:not(:last-child) {
+  border-right: solid 1px #DDD;
 }
 
 table.earnings-record-table > tbody td {
-  border-right: 1px solid #CCC;
-  border-bottom: 1px solid #CCC;
-  color: #000;
-  padding: .3em;
-}
-
-table.earnings-record-table > tbody tr:nth-of-type(even) td {
-  background-color: #eaeaea;
-}
-
-table.earnings-record-table > tbody tr:nth-of-type(odd) td {
-  background-color: #fff;
-}
-
-table.earnings-record-table > tbody td.indexed-earnings-col {
-  color: #039;
-  font-weight: bold;
-}
-
-/* Animage the indexed earnings and medicare columns.
- *  When hidden, they slide left for 0.5s underneath whatever is to their left.
- *  When shown, they slide right out from whatever they are hiding under.
- */
-table.earnings-record-table table .indexed-earnings-col,.medicare-col {
-  z-index: -1;
-  position:relative;
-
-  -webkit-transform: translateX(0%);
-}
-
-table.earnings-record-table table .indexed-earnings-col {
-  transition:all ease-out 0.5s;
-}
-table.earnings-record-table table .medicare-col {
-  transition:all ease-in 0.5s;
-}
-
-table.earnings-record-table table .indexed-earnings-col.ng-hide,.medicare-col.ng-hide {
-  -webkit-transform: translateX(-100%);
-}
-
-table.earnings-record-table.ng-hide {
-}
-
-table.earnings-confirmation.ng-hide:not(.ng-hide-animate) {
+  padding: 4px 10px;
+  vertical-align: top;
+  line-height: 20px;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 /* The earnings calc table displays similar information as from SSA.gov, but

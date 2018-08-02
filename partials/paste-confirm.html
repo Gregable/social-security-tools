@@ -17,7 +17,9 @@
       <tr>
         <th id="pasteworkyear">Work Year</th>
         <th id="pastessataxedearnings">Taxed Social Security Earnings</th>
-        <th id="pastetaxedmedicare">Taxed Medicare Earnings</th>
+        <th id="pastetaxedmedicare" ng-show="earningsRecordsIncludeMedicare()">
+          Taxed Medicare Earnings
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -31,7 +33,8 @@
             Not yet recorded
           </span>
         </td>
-        <td headers="pastetaxedmedicare">
+        <td headers=pastetaxedmediare"
+           ng-show="earningsRecordsIncludeMedicare()">
           <span ng-show="earningRecord.taxedMedicareEarnings >= 0">
             ${{earningRecord.taxedMedicareEarnings | number:0}}
           </span>
