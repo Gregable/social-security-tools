@@ -9,7 +9,7 @@ var dollarStringToNumber = function(dollar_string) {
   // For the current year, the SSA site will display 'Not yet recorded'
   // if the data is unavailable so far, presumably because taxes haven't
   // yet been filed. Record this as a -1 sentinel for now.
-  if (dollar_string === 'Not yet recorded')
+  if (dollar_string === 'NotYetRecorded')
     return -1;
   var number_string = dollar_string.replace(/[$,]/g, '');
   return Number(number_string);
@@ -63,6 +63,11 @@ var parsePaste = function(paste) {
   let replacedStr = paste.replace(/[ \t]+/g, " ");
   // Normalize and collapse newlines.
   replacedStr = replacedStr.replace(/[\r\n]+/g, "\n");
+  // Some columns will include the string "Not yet recorded" which breaks
+  // columns on spaces in the string. We replace these with "NotYetRecorded".
+  replacedStr = replacedStr.replace(/not yet recorded+/gi, "NotYetRecorded");
+  
+
   // Split based on newlines.
   let lines = replacedStr.split("\n");
 
