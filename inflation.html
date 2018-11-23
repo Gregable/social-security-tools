@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    How inflation affects Social Security benefit calculations.
+  </title>
+  <link rel="stylesheet" href="stylesheet.css" />
+</head>
+
+<body>
+  <div class="fixedcontainer">
+    <!-- partials/header.html -->
+    <div class="fixedheader">
+      <ul class="navpills">
+        <li role="presentation"><a href=".">Home</a></li>
+        <li role="presentation" class="active"><a href="#">About</a></li>
+        <li role="presentation"><a href="contributors.html">Contributors</a></li>
+        <li role="presentation"><a href="contact.html">Contact</a></li>
+      </ul>
+      <h3>Social Security Calculator</h3>
+    </div>
+
+   <!-- Main Contents -->
+   <div>
+     <h1>How inflation affects Social Security benefit calculations.</h1>
+     <p>
+      Many people know that inflation reduces the real value of their savings
+      every year. For example, using CPI data, $1 had the same spending power
+      in year 1950 as $7.13 did in year 2000. Therefore, when considering
+      benefits over multiple decades, it is worth understanding how inflation
+      will impact those benefits.
+    </p>
+    <p>
+      The short answer is that the Social Security program is designed to
+      account for inflation, as is this tool. The benefit estimates that
+      the Social Security Administration and this tool will give you are
+      in "today's dollars" meaning that the actual benefits will be higher
+      based on the inflation between today and the benefit date, but will
+      have the same purchasing power at that time as the estimate has today.
+    </p>
+    <p>
+      For example, if this tool estimates your benefit at $1,000 per year
+      starting in 20 years, but there is 350% inflation during those 20 years,
+      then the actual benefit will be $3,500.
+    </p>
+    <p>
+      While unnecessary, if you want to understand this in even more detail,
+      read on below to understand how different measures of inflation affect
+      different parts of the social security computation.
+    </p>
+    <h2>Wage Growth Adjustments during your working years</h2>
+    <p>
+     Consider the following example earnings record from 2005 to 2017:
+    </p>
+    <img src=static/example-earnings-record.png
+         style="margin: auto; display: block">
+    <p>
+      This person recieves a 2.5% raise every year to keep up with inflation.
+      In 2005, they earned $40,000 and in 2016 they earned $56,483, a 31.2%
+      increase.
+    </p>
+    <p>
+      The "Primary Insurance Amount" for this person, which is the earnings
+      computation upon which their benefit is based, is computed from the
+      rightmost column, labelled Indexed Earnings. Note that the indexed
+      earnings value in 2005 is roughly the same as in 2016.
+    </p>
+    <p>
+      This difference in Indexed Earnings is because of the multiplier applied.
+      That multiplier is 1.32 in 2005, representing the fact that there has
+      been ~32% inflation between 2005 and 2016. As such, older earnings
+      records get adjusted upwards for inflation. Every year until you first
+      collect your benefit, the multiplier for all previous years will be
+      adjusted upwards further.
+    </p>
+    <p>
+      This adjustment is made based on the
+      <a href="https://www.ssa.gov/oact/cola/awidevelop.html">
+        Average Wage Index (AWI).
+      </a> That is, if the average wage increased by 3% in a year, so will
+      the Average Wage Index and thus all of the prior year's indexed
+      earnings values.
+    </p>
+    <h2>Cost of Living Adjustments during your benefit years</h2>
+    <p>
+      Once you have filed for your benefit, you no longer recieve additional
+      Wage Growth Adjustments. At this point, your Primary Insurance amount,
+      and thus your benefit, are adjusted annually by
+      <a href="https://www.ssa.gov/cola">Cost of Living Adjustments</a>.
+    </p>
+    <p>
+      These adjustments are based on the
+      <a href="https://www.ssa.gov/oact/STATS/cpiw.html">
+        Consumer Price Index (CPI-W)</a>. Every year, benefits are increased
+      by a few percent. There has never been a decrease, but there have been
+      years with no increase when there was little to no actual inflation.
+    </p>
+    <p>
+      Future Cost of Living Adjustments are not shown in this calculator
+      since the actual adjustment value won't be known until the future.
+      Therefore any benefits shown by this calculator are displayed in
+      "today's dollars".
+    </p>
+  </div>
+
+<script async src="src/analytics.js"></script>
+
+</body></html>
