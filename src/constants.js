@@ -70,6 +70,7 @@ const MAXIMUM_EARNINGS = {
   2016: 118500,
   2017: 127200,
   2018: 128400,
+  2019: 132900,
 };
 
 // https://www.ssa.gov/oact/progdata/oasdiRates.html
@@ -137,6 +138,7 @@ const TAX_RATES = {
   2016: .0515,
   2017: .0515,
   2018: .0515,
+  2019: .053,
 };
 
 // Values from https://www.ssa.gov/oact/cola/piaformula.html
@@ -213,9 +215,10 @@ const WAGE_INDICES = {
   2014: 46481.52,
   2015: 48098.63,
   2016: 48642.15,
+  2017: 50321.89,
 };
 
-// Data from MAXIMUM_EARNINGS
+// Data from https://www.ssa.gov/OACT/COLA/colaseries.html
 const COLA = {
   1975: 8.0,
   1976: 6.4,
@@ -260,6 +263,7 @@ const COLA = {
   2015: 0.0,
   2016: 0.3,
   2017: 2.0,
+  2018: 2.8,
 };
 
 // Number of top years of earnings which contribute to SSA calculations.
