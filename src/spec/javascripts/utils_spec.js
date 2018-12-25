@@ -119,4 +119,60 @@ describe("MonthDuration", function() {
   });
 });
 
+describe("utils", function() {
+  it("rounds to the next lowest dime", function() {
+    expect(NearestDime(10.12)).toBe(10.1);
+    expect(NearestDime(10.19)).toBe(10.1);
+  });
+ it("rounds to the next lowest penny", function() {
+    expect(NearestPenny(10.123)).toBe(10.12);
+    expect(NearestPenny(10.129)).toBe(10.12);
+  });
 
+  it("inserts commas into numbers", function() {
+    expect(insertNumericalCommas(123)).toBe("123");
+    expect(insertNumericalCommas(1234)).toBe("1,234");
+    expect(insertNumericalCommas(123.4)).toBe("123.4");
+    expect(insertNumericalCommas(1234.5)).toBe("1,234.5");
+    expect(insertNumericalCommas(-1234.5)).toBe("-1,234.5");
+  });
+  it("returns wage watio by year", function() {
+    expect(Math.floor(wageRatioInYear(2000)*100)/100).toBe(3.28);
+  });
+  it("returns bend points by year", function() {
+    expect(firstBendPoint(2000)).toBe(592);
+    expect(secondBendPoint(2000)).toBe(3567);
+  });
+  it("returns pia amounts per bracket", function() {
+    // (indexingYear, earnings, bracket)
+    // Year 2000, $500 earnings. Entirely in the first bracket.
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 500, 0))
+      .toBe(450);
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 500, 1))
+      .toBe(0);
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 500, 2))
+      .toBe(0);
+
+    // Year 2000, $1000 earnings. In the first 2 brackets.
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 1000, 0))
+      .toBe(532.8);
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 1000, 1))
+      .toBe(130.56);
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 1000, 2))
+      .toBe(0);
+
+    // Year 2000, $5000 earnings. In all 3 brackets.
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 5000, 0))
+      .toBe(532.8);
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 5000, 1))
+      .toBe(952);
+    expect(primaryInsuranceAmountForEarningsByBracket(2000, 5000, 2))
+      .toBe(214.95);
+  });
+  it("returns unadjusted pia for earnings", function() {
+    // The sum should add up to the per-bracket values in the $5000 case
+    // in the previous test.
+    expect(primaryInsuranceAmountForEarningsUnadjusted(2000, 5000)).toBe(
+          NearestDime(214.95 + 952 + 532.8));
+  });
+});

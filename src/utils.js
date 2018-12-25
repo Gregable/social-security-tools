@@ -276,6 +276,25 @@ function wageRatioInYear(indexingYear) {
 }
 
 /**
+ * Floors a number to the nearest dime (1 significant figure).
+ * @param {number}
+ * @param {number} input floored to the nearest dime, so 1.26 -> 1.20
+ */
+function NearestDime(input) {
+  return Math.floor(input * 10) / 10;
+}
+
+/**
+ * Floors a number to the nearest penny (2 significant figures).
+ * @param {number}
+ * @param {number} input floored to the nearest dime, so 1.266 -> 1.26
+ */
+function NearestPenny(input) {
+  return Math.floor(input * 100) / 100;
+}
+
+
+/**
  * Returns the first monthly bend point in the PIA formula.
  * @param {number} indexingYear year for which index values are used
  * @return {number} first annual bend point dollar amount
@@ -308,13 +327,18 @@ function primaryInsuranceAmountForEarningsByBracket(
   var secondBend = secondBendPoint(indexingYear);
 
   if (bracket === 0) {
-    return Math.min(earnings, firstBend) * BEFORE_BENDPOINT1_MULTIPLIER;
+    console.log(earnings);
+    console.log(firstBend);
+    console.log(BEFORE_BENDPOINT1_MULTIPLIER);
+    return NearestPenny(
+        Math.min(earnings, firstBend) * BEFORE_BENDPOINT1_MULTIPLIER);
   } else if (bracket === 1) {
-    return (
+    return NearestPenny(
         Math.max(0, (Math.min(earnings, secondBend) - firstBend)) *
         BEFORE_BENDPOINT2_MULTIPLIER);
   } else if (bracket === 2) {
-    return Math.max(0, earnings - secondBend) * AFTER_BENDPOINT2_MULTIPLIER;
+    return NearestPenny(
+        Math.max(0, earnings - secondBend) * AFTER_BENDPOINT2_MULTIPLIER);
   }
 
   return -1;
@@ -334,7 +358,7 @@ function primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings) {
         indexingYear, earnings, i);
   // Primary Insurance amounts are always rounded down the the nearest dime.
   // Who decided this was an important step?
-  return Math.floor(sum * 10) / 10;
+  return NearestDime(sum);
 };
 
 /**
@@ -362,7 +386,7 @@ function colaAdjustment(yearTurn62, initialPIA) {
     if (COLA[year] !== undefined) {
       adjustedPIA = adjustedPIA * (1 + (COLA[year] / 100.0));
       // Primary Insurance amounts are always rounded down the the nearest dime.
-      adjustedPIA = Math.floor(adjustedPIA * 10) / 10;
+      adjustedPIA = NearestDime(adjustedPIA);
     }
   }
   return adjustedPIA;
