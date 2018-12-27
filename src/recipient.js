@@ -65,6 +65,9 @@ function Recipient(name) {
   // total credits = earnedCredits + planned credits
   this.totalCredits = 0;
 
+  // Have earnings before 1978
+  this.earningsBefore1978 = false;
+
   // Additional years of work needed, -1 means not earning enough to get a credit
   this.neededYears = -1;
 
@@ -259,6 +262,10 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   var allIndexedValues = [];
   for (var i = 0; i < this.earningsRecords.length; ++i) {
     var earningRecord = this.earningsRecords[i];
+
+    if (earningRecord.year < 1978) {
+      this.earningsBefore1978 = true;
+    }
 
     earningRecord.earningsCap = MAXIMUM_EARNINGS[earningRecord.year];
 

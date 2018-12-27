@@ -63,6 +63,16 @@
     </table>
   </span>
   
+  <div ng-if="recipient.earningsBefore1978" class=insetTextBox>
+      <h4>Special Rule</h4>
+      <p>
+        Earnings before 1978 were reported quarterly, and you earned one credit per quarter.
+        Because this website uses yearly earnings, credits may not be calculated correctly for
+        years before 1978.
+      </p>
+    </div>
+  
+
   <p>
     <span ng-if="recipient.earnedCredits >= 40">You have earned the required 40 credits to be 
       <u>permanently eligible</u> for retirement benefits on your own work record. 
