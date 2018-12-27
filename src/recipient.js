@@ -66,13 +66,10 @@ function Recipient(name) {
   this.totalCredits = 0;
 
   // Have earnings before 1978
-  this.earningsBefore1978 = false;
+  this.hasEarningsBefore1978 = false;
 
   // Additional years of work needed, -1 means not earning enough to get a credit
   this.neededYears = -1;
-
-  // Last year of credits needed to get to 40
-  this.lastYearOfEarnedCredits = 0;
 
   // This is the monthly primary insurance amount, calculated either from
   // monthlyIndexedEarnings or set directly.
@@ -258,13 +255,12 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   this.earnedCredits = 0;
   this.plannedCredits = 0;
   this.neededYears = -1;
-  this.lastNeededYear = 100000;
   var allIndexedValues = [];
   for (var i = 0; i < this.earningsRecords.length; ++i) {
     var earningRecord = this.earningsRecords[i];
 
     if (earningRecord.year < 1978) {
-      this.earningsBefore1978 = true;
+      this.hasEarningsBefore1978 = true;
     }
 
     earningRecord.earningsCap = MAXIMUM_EARNINGS[earningRecord.year];
@@ -289,15 +285,11 @@ Recipient.prototype.processIndexedEarnings_ = function() {
 
     earningRecord.credits = this.calculateCredits(earningRecord.taxedEarnings, earningRecord.year);
     this.earnedCredits = Math.min(40, this.earnedCredits + earningRecord.credits);
-    if (this.earnedCredits == 40) {
-      this.lastYearOfEarnedCredits = earningRecord.year;
-    }
   }
   var neededCredits = 40 - this.earnedCredits;
   if (this.futureEarningsWage > 0) {
     var credits = this.calculateCredits(this.futureEarningsWage, CURRENT_YEAR);
     this.neededYears = Math.ceil(neededCredits / credits);
-    this.lastNeededYear = CURRENT_YEAR + this.neededYears;
     for (var i = 0; i < this.futureEarningsYears; ++i) {
       allIndexedValues.push(this.futureEarningsWage);
       this.plannedCredits = Math.min(neededCredits, this.plannedCredits + credits);
@@ -685,4 +677,8 @@ Recipient.prototype.calculateCredits = function(earnings, year) {
   if (year === undefined)
     year = CURRENT_YEAR;
   return Math.min(4, Math.floor(earnings/this.getEarningsPerCreditForYear(year)))
+}
+
+Recipient.prototype.isEligible = function() {
+  return this.totalCredits >= 40;
 }
