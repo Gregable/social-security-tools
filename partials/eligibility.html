@@ -1,0 +1,92 @@
+<div id=Credits class="credits fixed-center-column"
+                        ng-show="showReport()" ng-cloak>
+  <h2 id="nav-credits">Retirement Benefits Eligibility</h2>
+
+  <p>
+    You must earn 40 <a href="https://www.ssa.gov/planners/credits.html">credits</a> to be eligible for for a normal 
+    retirement benefit from your own work history.  You can earn a maximum of four credits each year.
+    If you have a short work history, you may not be eligible to receive retirement benefits from
+    Social Security on your own work history.  You may still be eligible to receive spousal benefits.
+  </p>
+
+  <span ng-if="recipient.earnedCredits > 0">
+    <table class="fancy-table">
+    <thead>
+      <tr>
+        <th id="workyear">Year</th>
+        <th id="age">Age</th>
+        <th id="taxedearnings">Taxed Earnings</th>
+        <th id="epc">Earnings Per Credit</th>
+        <th id="credits">Credits<th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="earningRecord in earningsRecords()">
+        <td headers="workyear">{{earningRecord.year}}</td>
+        <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
+        <td headers="taxedearnings" ng-show="earningRecord.taxedEarnings >= 0">
+          ${{earningRecord.taxedEarnings | number:0}}</td>
+        <td headers="epc">${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}</td>
+        <td headers="credits" ng-show="earningRecord.credits >= 0">
+          {{earningRecord.credits | number:0}}</td>
+      </tr>
+    </tbody>
+    </table>
+  </span>
+
+  <p>
+    <span ng-if="futureYears.length > 0">If you work {{recipient.futureEarningsYears | number:0}} 
+      additional years, you will earn {{recipient.plannedCredits | number:0}} additional credits. 
+    </span>
+  </p>
+
+  <span ng-if="futureYears.length > 0">
+    <table class="fancy-table">
+    <thead>
+      <tr>
+        <th id="workyear">Year</th>
+        <th id="age">Age</th>
+        <th id="taxedearnings">Taxed Earnings</th>
+        <th id="epc">Earnings Per Credit</th>
+        <th id="credits">Credits<th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="year in futureYears">
+        <td headers="workyear">{{year}}</td>
+        <td headers="age">{{recipient.exampleAge(year).age}}</td>
+        <td headers="taxedearnings">${{futureWageWorkSlider.minValue | number:0}}</td>
+        <td headers="epc">${{recipient.getEarningsPerCreditForYear(2018) | number:0}}</td>
+        <td headers="credits">{{recipient.calculateCredits(futureWageWorkSlider.minValue, 2018) | number:0}}</td>
+      </tr>
+    </tbody>
+    </table>
+  </span>
+  
+  <p>
+    <span ng-if="recipient.earnedCredits >= 40">You have earned the required 40 credits to be 
+      <u>permanently eligible</u> for retirement benefits on your own work record. 
+    </span>
+    <span ng-if="40 > recipient.earnedCredits && recipient.totalCredits >= 40">You will have 40 credits
+      when you complete {{recipient.neededYears | number:0}} additional years of work earning 
+      ${{futureWageWorkSlider.minValue | number:0}} per year.  You will become <u>permanently eligible</u>
+      for retirement benefits on your own work record when you have earned 40 credits.
+    </span>
+    <span ng-if="40 > recipient.totalCredits">You have earned {{recipient.earnedCredits | number:0}} credits 
+      and will earn {{recipient.plannedCredits | number:0}} credits for a total of 
+      {{recipient.totalCredits | number:0}} credits, which is not enough to be eligible for retirement benefits 
+      on your own work record.  You may be eligible for spousal benefits.  You will become 
+      <u>permanently eligible</u> for retirement benefits on your own work record when you have earned 
+      40 credits.
+    </span>
+  </p>
+
+  <div class=insetTextBox>
+    <h4>Special Rule</h4>
+    <p>
+      You can earn enough credits to become eligible for social security retirement benefits
+      after age 70.  You will not be able to apply and receive benefits until you become eligible.
+    </p>
+  </div>
+    
+</div>
