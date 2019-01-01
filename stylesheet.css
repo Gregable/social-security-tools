@@ -130,7 +130,7 @@ body {
 }
 
   
-div#pastePrompt > div.instructions {
+span#pastePrompt > div.instructions {
   display: inline-block;
   max-width: 620px;
   margin: auto;
@@ -144,34 +144,34 @@ br.clear {
   clear: both;
 }
   
-div#pastePrompt {
+span#pastePrompt {
   margin-top: 10px;
 }
-div#pastePrompt > div.videocontainer > img {
+span#pastePrompt > div.videocontainer > img {
 }
-div#pastePrompt > div.videocontainer > p {
+span#pastePrompt > div.videocontainer > p {
   line-height: 1.1;
   margin: 4px auto;
   text-align: center;
 }
-div#pastePrompt > div.instructions {
+span#pastePrompt > div.instructions {
   line-height: 1.1;
   font-size: 18px;
 }
-div#pastePrompt > div.instructions > p{
+span#pastePrompt > div.instructions > p{
   line-height: 1.0;
   font-size: 16px;
 }
-div#pastePrompt > div.pastearea {
+span#pastePrompt > div.pastearea {
   width: 480px;
   margin: 16px auto;
 }
-div#pastePrompt > div.pastearea > #pastearea {
+span#pastePrompt > div.pastearea > #pastearea {
   width: 100%;
   height: 100px;
   resize: none;
 }
-div#pastePrompt > div.pastearea > #pastearea::-webkit-input-placeholder {
+span#pastePrompt > div.pastearea > #pastearea::-webkit-input-placeholder {
   text-align: center;
   vertical-align: bottom;
 }
@@ -188,7 +188,7 @@ div.instructions li > img {
   margin-right: auto;
   display: block;
 }
-div.confirmation-prompt button {
+span.confirmation-prompt button {
   border: 0 none;
   border-radius: 36px;
   color: #fff;
@@ -216,17 +216,17 @@ ul.demos button > ico {
   font-weight: bold;
   font-size: 22px;
 }
-div.confirmation-prompt {
+span.confirmation-prompt {
   margin-top: 20px;
   margin-right: 60px;
   font-size: 18px;
 }
-div.confirmation-prompt > div.confirmation-left {
+span.confirmation-prompt > div.confirmation-left {
   margin: 0;
   margin-top: 60px;
   text-align: center;
 }
-div.confirmation-prompt button {
+span.confirmation-prompt button {
   border: 0 none;
   border-radius: 36px;
   color: #fff;
@@ -236,20 +236,20 @@ div.confirmation-prompt button {
   min-width: 110px;
   cursor: pointer;
 }
-div.confirmation-prompt button.success {
+span.confirmation-prompt button.success {
   background: #4ac15a;
 }
-div.confirmation-prompt button.failure {
+span.confirmation-prompt button.failure {
   background: #d9534f;
 }
-div.confirmation-prompt button.success:hover {
+span.confirmation-prompt button.success:hover {
   background: #2aa13a;
 }
-div.confirmation-prompt button.failure:hover {
+span.confirmation-prompt button.failure:hover {
   background: #b9332f;
 }
 
-div.confirmation-prompt button > ico {
+span.confirmation-prompt button > ico {
   font-weight: bold;
   font-size: 22px;
 }
@@ -265,7 +265,6 @@ table.earnings-record-table {
   margin-left: auto;
   margin-right: auto;
   margin-top: 50px;
-  float: right;
   border: 1px solid #DDD;
   border-collapse: collapse;
   border-spacing: 0;
@@ -359,7 +358,6 @@ table.fancy-table td[headers='indexedearnings'] {
 table.fancy-table td[headers='indexedearnings'] {
   padding-right: 20px;
 }
-
 table.fancy-table td[headers='top35indicators'] {
   width: 81px;
   white-space: nowrap;
@@ -644,6 +642,8 @@ input.radio:focus ~ label.radio:before {
 .sliderTable  {
   margin: 0 auto;
   padding-bottom: 15px;
+  position: sticky;
+  top: 0;
 }
 .sliderTable td:not(.sliderColumn) {
   vertical-align: bottom;
