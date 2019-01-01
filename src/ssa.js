@@ -83,6 +83,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // we need to scroll back up to the top for them.
     window.scrollTo(0, 0);
 
+    // Record an generic analytics event that indicates user interaction.
+    // Don't even record which demo was loaded.
+    ga('send', 'event', 'DemoData', 'load');
+
     if (demoId === 0) {
       $scope.demoId = 0;
       $scope.spouse.primaryInsuranceAmountValue = 400;
@@ -163,8 +167,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.$watch('pasteArea.contents', function(newValue) {
     /** @type {!Array<!EarningRecord>} */
     var records = parsePaste(newValue);
-    if (records.length === 0)
+    if (records.length === 0) {
+      // Send basic event indicating that the user entered something and we
+      // failed in parsing it. Never records what a user entered.
+      ga('send', 'event', 'PasteData', 'FailParse');
       return;
+    }
+    // Send basic event indicating that the user entered something and we
+    // succeeded in parsing it. Never records what a user entered.
+    ga('send', 'event', 'PasteData', 'SucceedParse');
 
     $scope.recipient.initFromEarningsRecords(records);
     $scope.pasteArea.mode = ModeEnum.PASTE_CONFIRMATION;
@@ -187,12 +198,21 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.confirmEarningsParse = function(confirmationValue) {
     if (confirmationValue === 'incorrect') {
       $scope.pasteArea.mode = ModeEnum.PASTE_APOLOGY;
+      // Send basic event indicating that the user rejected the earnings
+      // data parsing results. Never records what a user entered.
+      ga('send', 'event', 'PasteData', 'RejectParse');
     } else if (confirmationValue === 'correct') {
+      // Send basic event indicating that the user accepted the earnings
+      // data parsing results. Never records what a user entered.
+      ga('send', 'event', 'PasteData', 'ConfirmParse');
       $scope.pasteArea.mode = ModeEnum.AGE_REQUEST;
     }
   };
   
   $scope.confirmBirthDate = function() {
+    // Send basic event indicating that the user entered their own birthdate.
+    // Never records what birthdate a user entered.
+    ga('send', 'event', 'PasteData', 'ConfirmBirthDate');
     $scope.updateBirthdate();
     $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
     $scope.maybeRenderCharts();
