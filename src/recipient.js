@@ -10,6 +10,7 @@ function EarningRecord() {
   this.earningsCap = -1;
   this.indexFactor = -1;
   this.isTopEarningsYear = null;
+  this.credits = 0;
 }
       
 /**
@@ -54,6 +55,21 @@ function Recipient(name) {
   // This value is the your average monthly earnings (floored) over the <= 35
   // years of earning history: total earnings / 35 / 12.
   this.monthlyIndexedEarnings = 0;
+
+  // The total credits earned, maximum of 40
+  this.earnedCredits = 0;
+
+  // The total of credits that would be earned in the planned work
+  this.plannedCredits = 0;
+
+  // total credits = earnedCredits + planned credits
+  this.totalCredits = 0;
+
+  // Have earnings before 1978
+  this.hasEarningsBefore1978 = false;
+
+  // Additional years of work needed, -1 means not earning enough to get a credit
+  this.neededYears = -1;
 
   // This is the monthly primary insurance amount, calculated either from
   // monthlyIndexedEarnings or set directly.
@@ -235,10 +251,17 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   if (this.monthlyIndexedEarnings === 0 &&
       this.earningsRecords.length === 0)
     return;
-
+  
+  this.earnedCredits = 0;
+  this.plannedCredits = 0;
+  this.neededYears = -1;
   var allIndexedValues = [];
   for (var i = 0; i < this.earningsRecords.length; ++i) {
     var earningRecord = this.earningsRecords[i];
+
+    if (earningRecord.year < 1978) {
+      this.hasEarningsBefore1978 = true;
+    }
 
     earningRecord.earningsCap = MAXIMUM_EARNINGS[earningRecord.year];
 
@@ -259,12 +282,20 @@ Recipient.prototype.processIndexedEarnings_ = function() {
     
     if (earningRecord.taxedEarnings !== -1)
       allIndexedValues.push(earningRecord.indexedEarning());
+
+    earningRecord.credits = this.calculateCredits(earningRecord.taxedEarnings, earningRecord.year);
+    this.earnedCredits = Math.min(40, this.earnedCredits + earningRecord.credits);
   }
+  var neededCredits = 40 - this.earnedCredits;
   if (this.futureEarningsWage > 0) {
+    var credits = this.calculateCredits(this.futureEarningsWage, CURRENT_YEAR);
+    this.neededYears = Math.ceil(neededCredits / credits);
     for (var i = 0; i < this.futureEarningsYears; ++i) {
       allIndexedValues.push(this.futureEarningsWage);
+      this.plannedCredits = Math.min(neededCredits, this.plannedCredits + credits);
     }
   }
+  this.totalCredits = this.earnedCredits + this.plannedCredits;
 
   // Reverse sort the indexed values. Yay javascript, sorting numbers
   // alphabetically!
@@ -631,3 +662,23 @@ Recipient.prototype.totalBenefitAtDate = function(
   return maxBenefitWithSpousal;
 }
 
+Recipient.prototype.getPlannedCredits = function() {
+  return this.plannedCredits;
+}
+
+Recipient.prototype.getEarningsPerCreditForYear = function(year) {
+  if (year > 1978)
+    return EARNINGS_PER_CREDIT[year];
+
+  return 50;
+}
+
+Recipient.prototype.calculateCredits = function(earnings, year) {
+  if (year === undefined)
+    year = CURRENT_YEAR;
+  return Math.min(4, Math.floor(earnings/this.getEarningsPerCreditForYear(year)))
+}
+
+Recipient.prototype.isEligible = function() {
+  return this.totalCredits >= 40;
+}
