@@ -21,58 +21,64 @@
       </a>
     </li>
     <li>
+      <a href="#nav-eligibility" data-ng-click="scrollTo('nav-eligibility')">
+        <div class=navlabel>Retirement Benefits Eligibility</div>
+        <i class="glyphicon glyphicon-chevron-right"></i>
+      </a>
+    </li>
+    <li>
       <a href="#nav-pia" data-ng-click="scrollTo('nav-pia')">
         <div class=navlabel>Primary Insurance Amount</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li>
+    <li ng-show="recipient.isEligible()">
       <a href="#nav-nra" data-ng-click="scrollTo('nav-nra')">
         <div class=navlabel>Normal Retirement Age</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li>
+    <li ng-show="recipient.isEligible()">
       <a href="#nav-early-delayed"
          data-ng-click="scrollTo('nav-early-delayed')">
         <div class=navlabel>Early and Delayed Retirement</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li>
+    <li ng-show="recipient.isEligible()">
       <a href="#nav-spouse" data-ng-click="scrollTo('nav-spouse')">
         <div class=navlabel>Spouse's Data</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li ng-show=isMarried()>
+    <li ng-show="recipient.isEligible() && isMarried()">
       <a href="#nav-spouse-benefit"
         data-ng-click="scrollTo('nav-spouse-benefit')">
         <div class=navlabel>Spousal Benefit</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li ng-show=isMarried()>
+    <li ng-show="recipient.isEligible() && isMarried()">
       <a href="#nav-early-delayed-spouse"
         data-ng-click="scrollTo('nav-early-delayed-spouse')">
         <div class=navlabel>Early and Delayed Spouse Retirement</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li ng-show=isMarried()>
+    <li ng-show="recipient.isEligible() && isMarried()">
       <a href="#nav-early-delayed-combined"
         data-ng-click="scrollTo('nav-early-delayed-combined')">
         <div class=navlabel>Early and Delayed Combined Retirement</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li ng-show=isMarried()>
+    <li ng-show="recipient.isEligible() && isMarried()">
       <a href="#nav-survivor" data-ng-click="scrollTo('nav-survivor')">
         <div class=navlabel>Survivor Benefits</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
-    <li>
+    <li ng-show="recipient.isEligible()">
       <a href="#nav-age-decision" data-ng-click="scrollTo('nav-age-decision')">
         <div class=navlabel>Deciding what age to start benefits</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
