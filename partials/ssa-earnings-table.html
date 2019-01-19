@@ -1,4 +1,4 @@
-<div ng-show="showReport()" class="fixed-center-column ng-cloak">
+<span ng-show="showReport()" class="ng-cloak">
   <h2 id="nav-demodata" ng-show="demoId > -1">Demo Data</h2>
   <p ng-show="demoId === 0">
     Retiree born on July 1st 1950, who earned roughly the average US wage for
@@ -55,25 +55,29 @@
     </tbody>
   </table>
 
-  <table class=sliderTable>
-   <tr>
-    <td>I plan to work for</td>
-    <td class=sliderColumn>
-      <!-- See http://angular-slider.github.io/angularjs-slider/ -->
-      <rzslider rz-slider-model="futureYearsWorkSlider.minValue"
-                rz-slider-options="futureYearsWorkSlider.options"></rzslider>
-    </td>
-    <td>more years,</td>
-   </tr>
-   <tr>
-    <td>Earning approximately</td>
-    <td class=sliderColumn>
-      <rzslider rz-slider-model="futureWageWorkSlider.minValue"
-                rz-slider-options="futureWageWorkSlider.options"></rzslider>
-    </td>
-    <td>per year.</td>
-   </tr>
-  </table>
+  <div style="display: inline">
+    <table class=sliderTable>
+     <tr>
+      <td>I plan to work for</td>
+      <td class=sliderColumn>
+        <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+        <rzslider rz-slider-model="futureYearsWorkSlider.minValue"
+                  rz-slider-options="futureYearsWorkSlider.options"></rzslider>
+      </td>
+      <td>more years,</td>
+     </tr>
+     <tr>
+      <td>Earning approximately</td>
+      <td class=sliderColumn>
+        <rzslider rz-slider-model="futureWageWorkSlider.minValue"
+                  rz-slider-options="futureWageWorkSlider.options"></rzslider>
+      </td>
+      <td>per year.</td>
+     </tr>
+    </table>
+  </div>
+  <div class=sticky-shadow></div>
+  <div class=sticky-shadow-cover></div>
 
   <span ng-if="futureYears.length > 0">
   <table class="fancy-table">
@@ -108,4 +112,4 @@
   </tbody>
   </table>
   </span>
-</div>
+</span>

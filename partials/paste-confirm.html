@@ -1,4 +1,4 @@
-<div id="earningsTable" class="confirmation-prompt"
+<span id="earningsTable" class="confirmation-prompt"
      ng-show="showPasteConfirmation()">
   <div class="confirmation-left">
     <h3>Step 2 of 3: Confirm Earnings Record</h3>
@@ -45,9 +45,10 @@
       </tr>
     </tbody>
   </table>
-</div>
+</span>
 
-<div id="earningsApology" class="confirmation-prompt" ng-show="showPasteApology()">
+<span id="earningsApology" class="confirmation-prompt"
+  ng-show="showPasteApology()">
   <p>Sorry about that, let's try again.</p>
   <button ng-click="reset()" class=success>Click to restart.</button>
-</div>
+</span>
