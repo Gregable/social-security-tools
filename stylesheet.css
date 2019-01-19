@@ -358,6 +358,22 @@ table.fancy-table td[headers='indexedearnings'] {
 table.fancy-table td[headers='indexedearnings'] {
   padding-right: 20px;
 }
+table.fancy-table th#epc, table.fancy-table td[headers='epc'] {
+  text-align: right;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+table.fancy-table td[headers='epc'] {
+  padding-right: 23px;
+}
+table.fancy-table th#credits,
+table.fancy-table td[headers='credits'] {
+  padding-left: 5px;
+  text-align: center;
+}
+table.fancy-table td[headers='credits'] {
+  padding-right: 8px;
+}
 table.fancy-table td[headers='top35indicators'] {
   width: 81px;
   white-space: nowrap;

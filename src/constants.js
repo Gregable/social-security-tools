@@ -4,6 +4,58 @@
  * regularly.
  */
 
+ // The number of credits needed to qualify for retirement benefits
+ // https://www.ssa.gov/planners/credits.html
+const MAX_CREDITS = 40
+
+ // Earnings required for one quarter of coverage
+ // https://www.ssa.gov/OACT/COLA/QC.html
+
+const EARNINGS_PER_CREDIT = {
+  1978:	250,
+  1979:	260,
+  1980:	290,
+  1981:	310,
+  1982:	340,
+  1983:	370,
+  1984:	390,
+  1985:	410,
+  1986:	440,
+  1987:	460,
+  1988:	470,
+  1989:	500,
+  1990:	520,
+  1991:	540,
+  1992:	570,
+  1993:	590,
+  1994:	620,
+  1995:	630,
+  1996:	640,
+  1997:	670,
+  1998:	700,
+  1999:	740,
+  2000:	780,
+  2001:	830,
+  2002:	870,
+  2003:	890,
+  2004:	900,
+  2005:	920,
+  2006:	970,
+  2007:	1000,
+  2008:	1050,
+  2009:	1090,
+  2010:	1120,
+  2011:	1120,
+  2012:	1130,
+  2013:	1160,
+  2014:	1200,
+  2015:	1220,
+  2016:	1260,
+  2017:	1300,
+  2018:	1320,
+  2019:	1360,
+};
+
 // Maximum earnings in each year which contribute to social security benefits.
 // https://www.ssa.gov/OACT/COLA/cbb.html
 const MAXIMUM_EARNINGS = {

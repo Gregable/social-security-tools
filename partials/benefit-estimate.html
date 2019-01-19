@@ -1,5 +1,5 @@
 <div id=benefitEstimate class="benefit-estimate fixed-center-column"
-     ng-show="showReport()" ng-cloak>
+    ng-show="recipient.isEligible() && showReport()" ng-cloak>
 
   <h2 id=nav-nra>Normal Retirement Age</h2>
   <p>
