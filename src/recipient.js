@@ -283,8 +283,10 @@ Recipient.prototype.processIndexedEarnings_ = function() {
     if (earningRecord.taxedEarnings !== -1)
       allIndexedValues.push(earningRecord.indexedEarning());
 
-    earningRecord.credits = this.calculateCredits(earningRecord.taxedEarnings, earningRecord.year);
-    this.earnedCredits = Math.min(40, this.earnedCredits + earningRecord.credits);
+    earningRecord.credits = this.calculateCredits(
+        earningRecord.taxedEarnings, earningRecord.year);
+    this.earnedCredits = Math.min(
+        40, this.earnedCredits + earningRecord.credits);
   }
   var neededCredits = 40 - this.earnedCredits;
   if (this.futureEarningsWage > 0) {
@@ -292,7 +294,8 @@ Recipient.prototype.processIndexedEarnings_ = function() {
     this.neededYears = Math.ceil(neededCredits / credits);
     for (var i = 0; i < this.futureEarningsYears; ++i) {
       allIndexedValues.push(this.futureEarningsWage);
-      this.plannedCredits = Math.min(neededCredits, this.plannedCredits + credits);
+      this.plannedCredits = Math.min(
+          neededCredits, this.plannedCredits + credits);
     }
   }
   this.totalCredits = this.earnedCredits + this.plannedCredits;
@@ -676,7 +679,12 @@ Recipient.prototype.getEarningsPerCreditForYear = function(year) {
 Recipient.prototype.calculateCredits = function(earnings, year) {
   if (year === undefined)
     year = CURRENT_YEAR;
-  return Math.min(4, Math.floor(earnings/this.getEarningsPerCreditForYear(year)))
+  // This can happen if the input contains a year with "Not yet recorded" in
+  // the earnings column, and we set a sentinel of -1.
+  if (earnings <= 0)
+    return 0;
+  return Math.min(4, 
+      Math.floor(earnings / this.getEarningsPerCreditForYear(year)));
 }
 
 Recipient.prototype.isEligible = function() {
