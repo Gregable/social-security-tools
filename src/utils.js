@@ -327,9 +327,6 @@ function primaryInsuranceAmountForEarningsByBracket(
   var secondBend = secondBendPoint(indexingYear);
 
   if (bracket === 0) {
-    console.log(earnings);
-    console.log(firstBend);
-    console.log(BEFORE_BENDPOINT1_MULTIPLIER);
     return NearestPenny(
         Math.min(earnings, firstBend) * BEFORE_BENDPOINT1_MULTIPLIER);
   } else if (bracket === 1) {

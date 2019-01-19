@@ -657,9 +657,13 @@ input.radio:focus ~ label.radio:before {
 }
 .sliderTable  {
   margin: 0 auto;
-  padding-bottom: 15px;
+  padding-bottom: 10px;
   position: sticky;
   top: 0;
+  background-color: #fff;
+  z-index: 5;
+  width: 675px;
+  border-collapse: unset;
 }
 .sliderTable td:not(.sliderColumn) {
   vertical-align: bottom;
@@ -668,6 +672,10 @@ input.radio:focus ~ label.radio:before {
 }
 .sliderTable td:nth-child(1) {
   text-align: right;
+  padding-left: 53px;
+}
+.sliderTable td:nth-child(3) {
+  padding-right: 90px;
 }
 .sliderTable td.sliderColumn {
   vertical-align: bottom;
@@ -680,6 +688,31 @@ input.radio:focus ~ label.radio:before {
   width: 500px;
   padding-left: 5px;
   padding-right: 5px;
+}
+/* Hack to create a bottom shadow on the slider when it stick's.
+ * The shadow is always there, but is covered by a white
+ *  sticky-shadow-cover. */
+div.sticky-shadow {
+  width: 675px;
+  height: 2px;
+  background-color: #BBB;
+  z-index: 3;
+  position: sticky;
+  top: 118px;
+}
+div.sticky-shadow-cover {
+  width: 675px;
+  height: 2px;
+  background-color: #FFF;
+  z-index: 4;
+  position: relative;
+  top: -2px;
+}
+@-mox-document url-prefix() {
+  div.sticky-shadow,
+  div.sticky-shadow-cover {
+    display: none;
+  }
 }
 /* Slider for the custom earner start dates */
 #higherEarnerSlider .rz-tick,
