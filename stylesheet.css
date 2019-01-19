@@ -708,12 +708,6 @@ div.sticky-shadow-cover {
   position: relative;
   top: -2px;
 }
-@-mox-document url-prefix() {
-  div.sticky-shadow,
-  div.sticky-shadow-cover {
-    display: none;
-  }
-}
 /* Slider for the custom earner start dates */
 #higherEarnerSlider .rz-tick,
 #higherEarnerSlider .rz-tick.selected,
