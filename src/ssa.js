@@ -165,6 +165,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
 
   $scope.$watch('pasteArea.contents', function(newValue) {
+    if (newValue == "") return;
     /** @type {!Array<!EarningRecord>} */
     var records = parsePaste(newValue);
     if (records.length === 0) {
