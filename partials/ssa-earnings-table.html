@@ -79,7 +79,7 @@
   <div class=sticky-shadow></div>
   <div class=sticky-shadow-cover></div>
 
-  <span ng-if="futureYears.length > 0">
+  <span ng-if="recipient.futureEarningsRecords.length > 0">
   <table class="fancy-table">
   <thead>
     <tr>
@@ -93,20 +93,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="year in futureYears">
-      <td headers="workyear">{{year}}</td>
-      <td headers="age">{{recipient.exampleAge(year).age}}</td>
+    <tr ng-repeat="earningRecord in recipient.futureEarningsRecords">
+      <td headers="workyear">{{earningRecord.year}}</td>
+      <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
       <td headers="taxedearnings">
-        ${{futureWageWorkSlider.minValue | number:0}}
-      </td>
+        ${{earningRecord.taxedEarnings | number:0}}</td>
       <td headers="multsymbol">x</th>
       <td headers="multiplier">1.00</td>
       <td headers="eqsymbol">=</th>
       <td headers="indexedearnings">
-        ${{futureWageWorkSlider.minValue | number:0}}
+        ${{earningRecord.indexedEarning() | number:0}}
       </td>
       <td headers="top35indicators">
-       <span ng-if="futureIsTopValue">Top 35 Value</span>
+        <span ng-if="earningRecord.isTopEarningYear">Top 35 Value</span>
       </td>
     </tr>
   </tbody>

@@ -24,11 +24,19 @@
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
         <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
+        <td colspan=3 ng-show="earningRecord.taxedEarnings < 0"
+            style="text-align: center">
+          Not yet recorded
+        </td>
         <td headers="taxedearnings" ng-show="earningRecord.taxedEarnings >= 0">
-          ${{earningRecord.taxedEarnings | number:0}}</td>
-        <td headers="epc">${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}</td>
-        <td headers="credits" ng-show="earningRecord.credits >= 0">
-          {{earningRecord.credits | number:0}}</td>
+          ${{earningRecord.taxedEarnings | number:0}}
+        </td>
+        <td headers="epc" ng-show="earningRecord.taxedEarnings >= 0">
+          ${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}
+        </td>
+        <td headers="credits" ng-show="earningRecord.taxedEarnings >= 0">
+          {{earningRecord.credits | number:0}}
+        </td>
       </tr>
     </tbody>
     </table>
