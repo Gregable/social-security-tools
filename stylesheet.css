@@ -948,3 +948,10 @@ div.insetTextBox p {
 .onlyHidden {
   visibility: hidden;
 }
+/* Some nav anchors get offset by the height of the future earnings header. */
+a.offset-nav {
+  top: -128px;
+  position: relative;
+  visibility: hidden;
+  display: block;
+}
