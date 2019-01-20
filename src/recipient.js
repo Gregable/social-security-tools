@@ -39,6 +39,10 @@ function Recipient(name) {
    * @type {!Array<EarningRecord>}
    */
   this.earningsRecords = [];
+  /* The recipient's planned future earning records, if any.
+   * @type {!Array<EarningRecord>}
+   */
+  this.futureEarningsRecords = [];
 
   // In addition, we allow the recipient to specify future earnings as two
   // values: number of years and wage per year.
@@ -237,6 +241,14 @@ Recipient.prototype.indexingYear = function() {
   return Math.min(this.dateAtYearsOld(62).year(), CURRENT_YEAR) - 2;
 }
 
+isLastYearIncomplete = function(records) {
+  for (var record of records) {
+    if (record.year === (CURRENT_YEAR - 1))
+      return record.taxedEarnings === -1;
+  }
+  return false;
+}
+
 /**
  * For each earnings record, match up the year with the MAXIMUM_EARNINGS
  * and WAGE_INDICES data, compute indexed earnings for that record, adding it
@@ -281,7 +293,7 @@ Recipient.prototype.processIndexedEarnings_ = function() {
     }
     
     if (earningRecord.taxedEarnings !== -1)
-      allIndexedValues.push(earningRecord.indexedEarning());
+      allIndexedValues.push(earningRecord);
 
     earningRecord.credits = this.calculateCredits(
         earningRecord.taxedEarnings, earningRecord.year);
@@ -289,11 +301,22 @@ Recipient.prototype.processIndexedEarnings_ = function() {
         40, this.earnedCredits + earningRecord.credits);
   }
   var neededCredits = 40 - this.earnedCredits;
+  this.futureEarningsRecords = [];
   if (this.futureEarningsWage > 0) {
     var credits = this.calculateCredits(this.futureEarningsWage, CURRENT_YEAR);
     this.neededYears = Math.ceil(neededCredits / credits);
+    start_year = CURRENT_YEAR;
+    if (isLastYearIncomplete(this.earningsRecords))
+      start_year = start_year - 1;
     for (var i = 0; i < this.futureEarningsYears; ++i) {
-      allIndexedValues.push(this.futureEarningsWage);
+      var futureRecord = new EarningRecord();
+      futureRecord.year = start_year + i;
+      futureRecord.taxedEarnings = this.futureEarningsWage;
+      futureRecord.taxedMedicareEarnings = this.futureEarningsWage;
+      futureRecord.earningsCap = this.futureEarningsWage;
+      futureRecord.indexFactor = 1.0;
+      allIndexedValues.push(futureRecord);
+      this.futureEarningsRecords.push(futureRecord);
       this.plannedCredits = Math.min(
           neededCredits, this.plannedCredits + credits);
     }
@@ -302,35 +325,32 @@ Recipient.prototype.processIndexedEarnings_ = function() {
 
   // Reverse sort the indexed values. Yay javascript, sorting numbers
   // alphabetically!
-  allIndexedValues.sort(function(a, b) {return a-b});
+  allIndexedValues.sort(function(a, b) {
+    // Prefer higher indexed values.
+    if (a.indexedEarning() != b.indexedEarning())
+      return a.indexedEarning() - b.indexedEarning();
+    // Break ties in favor of earlier years.
+    return b.year - a.year;
+  });
   allIndexedValues.reverse();
 
   // Your top N values are the only ones that 'count'. Compute the cutoff
   // value below which earnings don't count.
-  // TODO: Right now if there is a tie for the cutoff, we show all tied
-  // elements as a Top N value, leading to a situation where we could show
-  // more than N top-N values.
   if (allIndexedValues.length < SSA_EARNINGS_YEARS) {
     this.cutoffIndexedEarnings = 0;
   } else {
-    this.cutoffIndexedEarnings = allIndexedValues[SSA_EARNINGS_YEARS - 1];
+    this.cutoffIndexedEarnings =
+      allIndexedValues[SSA_EARNINGS_YEARS - 1].indexedEarning();
   }
 
-  // Set bits for all years above the top earning year.
-  for (var i = 0; i < this.earningsRecords.length; ++i) {
-    var earningRecord = this.earningsRecords[i];
-    if (earningRecord.indexedEarning() >= this.cutoffIndexedEarnings &&
-        earningRecord.taxedEarnings > 0) {
-      earningRecord.isTopEarningYear = true;
-    } else {
-      earningRecord.isTopEarningYear = false;
-    }
+  for (var i = 0; i < allIndexedValues.length; ++i) {
+    allIndexedValues[i].isTopEarningYear = i < SSA_EARNINGS_YEARS;
   }
 
   // Total indexed earnings is the sum of your top 35 indexed earnings.
   this.totalIndexedEarnings = 0;
   for (var i = 0; i < allIndexedValues.length && i < SSA_EARNINGS_YEARS; ++i) {
-    this.totalIndexedEarnings += allIndexedValues[i];
+    this.totalIndexedEarnings += allIndexedValues[i].indexedEarning();
   }
 
   // SSA floors the monthly indexed earnings value. This floored value

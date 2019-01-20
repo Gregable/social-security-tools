@@ -58,8 +58,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.$watch('spouseBirth', function() {$scope.refreshSlider});
 
     $scope.mode = ModeEnum.INITIAL;
-    $scope.futureYears = [];
-    $scope.futureIsTopValue = false;
     $scope.all_months = ALL_MONTHS;
     $scope.all_days = [];
     for (var i = 1; i < 32; ++i)
@@ -361,29 +359,11 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return pastYears;
   }
 
-  $scope.isLastYearIncomplete = function() {
-    for (var record of $scope.recipient.earningsRecords) {
-      if (record.year === (CURRENT_YEAR - 1))
-        return record.taxedEarnings === -1;
-    }
-    return false;
-  }
-
   $scope.updateFutureYears = function(id) {
     $scope.recipient.simulateFutureEarningsYears(
         /*numYears=*/$scope.futureYearsWorkSlider.minValue,
         /*wage=*/$scope.futureWageWorkSlider.minValue);
     $scope.maybeRenderCharts();
-    $scope.futureYears = [];
-    var incompleteAdj = $scope.isLastYearIncomplete() ? 1 : 0;
-    for (var i = 0; i < $scope.futureYearsWorkSlider.minValue; i++) {
-      $scope.futureYears.push(i + CURRENT_YEAR - incompleteAdj);
-    }
-
-    $scope.futureIsTopValue = (
-        ($scope.futureWageWorkSlider.minValue >=
-         $scope.recipient.cutoffIndexedEarnings) &&
-        ($scope.futureWageWorkSlider.minValue > 0));
   }
  
   $scope.futureYearsWorkSlider = {
