@@ -16,6 +16,9 @@ body {
   color: #333;
   background-color: #fff;
 }
+html {
+  scroll-behavior: smooth;
+}
 
 .fixedcontainer {
   /* horizontally center */
