@@ -52,6 +52,26 @@ var parseThisSiteTable = function(lines) {
   }
   return earningsRecords;
 }
+
+function isYearString(maybeYearStr) {
+  // If not an int, it's not a year.
+  maybeYear = Number.parseInt(maybeYearStr);
+  if (Number.isNaN(maybeYear))
+    return false;
+  // parseInt will ignore trailing garbage, so "1A" will be parsed as "1". 
+  // We don't want this as it could lead us to extract lines that aren't
+  // valid.
+  if (maybeYear.toString().length !== maybeYearStr.length)
+    return false;
+
+  // According to http://goo.gl/2HEj1H, the oldest person alive may have been
+  // born as long back as 1887. This is debated, but it works for our simple
+  // validation purposes here.
+  if (maybeYear < 1887 || maybeYear > CURRENT_YEAR)
+    return false;
+
+  return true;
+}
  
 var parsePaste = function(paste) {
 
@@ -76,27 +96,36 @@ var parsePaste = function(paste) {
   for (let i = 0; i < lines.length; ++i) {
     const line = lines[i].trim();
     const columns = line.split(' ');
-    // There must be at least a year and an earnings value.
-    if (columns.length < 2)
-      continue;
- 
-    // If not an int, it's not a year.
-    maybeYear = Number.parseInt(columns[0]);
-    if (Number.isNaN(maybeYear))
-      continue;
-    // parseInt will ignore trailing garbage, so "1A" will be parsed as "1". 
-    // We don't want this as it could lead us to extract lines that aren't
-    // valid.
-    if (maybeYear.toString().length !== columns[0].length)
+    if (!isYearString(columns[0]))
       continue;
 
-    // According to http://goo.gl/2HEj1H, the oldest person alive may have been
-    // born as long back as 1887. This is debated, but it works for our simple
-    // validation purposes here.
-    if (maybeYear < 1887 || maybeYear > CURRENT_YEAR)
-      continue;
-  
-    earningsLines.push(line);
+    // There must be at least a year and an earnings value.
+    if (columns.length < 2) {
+      // Some browsers use a newline for column delimiter. See if the next
+      // two lines look like dollar values, else, skip this line.
+      if (i + 2 >= lines.length)  // Must have 2 more lines.
+        continue;
+      // Construct a synthetic line with year, dollar dollar.
+      let constructedLine = columns[0];
+      let legitThreeLineValue = true;
+      for (let j = 1; j < 3; ++j) {
+        const colValue = lines[i + j].trim();
+        if (colValue === 'NotYetRecorded' ||
+            colValue[0] === '$') {
+          constructedLine += ' ' + colValue;
+        } else {
+          legitThreeLineValue = false;
+        }
+      }
+      // If we found three lines, add it to the list of earnings lines
+      // and advance 2 extra lines.
+      if (legitThreeLineValue) {
+        earningsLines.push(constructedLine);
+        i += 2;
+      }
+    } else {
+      earningsLines.push(line);
+    }
   }
   if (earningsLines.length === 0)
     return [];

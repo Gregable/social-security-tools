@@ -172,4 +172,85 @@ describe("parsePaste", function() {
         '2016\t$80,000\t$80,000 \n')
     parsePasteExpect(parsePaste(pasteData));
   });
+  it("Parses ssa.gov format (Edge, Windows, Full Page)", function() {
+    let pasteData = (
+        'K\n' +
+        'Skip to Content\n' +
+        'my Social Security\n' +
+        'Uncle Sam Sign Out \n' +
+        'My Home Message Center Security Settings \n' +
+        'Earnings Record\n' +
+        'Overview\n' +
+        'Estimated Benefits\n' +
+        'Earnings Record\n' +
+        'Replacement Documents\n' +
+        '\n' +
+        'Social Security Statement\n' +
+        'Your benefits are based on your earnings. If our records are wrong ' +
+        'you may not receive all the benefits to which you\'re entitled. \n' +
+        'Review your earnings record carefully... \n' +
+        'Limits on taxable earnings for Social Security... \n' +
+        'Contact us about errors... \n' +
+        'Work Year \n' +
+        'Taxed Social Security Earnings \n' +
+        'Taxed Medicare Earnings \n' +
+        '2018 \n' +
+        '$100,000 \n' +
+        '$100,000 \n' +
+        '2017 \n' +
+        '$90,000 \n' +
+        '$90,000 \n' +
+        '2016 \n' +
+        '$80,000 \n' +
+        '$80,000 \n' +
+        'Estimated Total Taxes Paid\n' +
+        'For Social Security \n' +
+        'Paid by you: \n' +
+        '$000,000 \n' +
+        'Paid by your employers: \n' +
+        '$000,000 \n' +
+        'For Medicare \n' +
+        'Paid by you: \n' +
+        '$000,000 \n' +
+        'Paid by your employers: \n' +
+        '$000,000 \n' +
+        'Print / Save Your Full Statement \n' +
+        'Get a copy of your Statement information in a convenient, ' +
+        'print-friendly format. \n' +
+        'Disclaimer \n' +
+        'Download Your Statement Data \n' +
+        'Save your Statement information as an XML file. \n' +
+        'How to use this file. \n' +
+        'Privacy PolicyAccessibility Help');
+    parsePasteExpect(parsePaste(pasteData));
+  });
+  it("Parses ssa.gov format (Edge, Windows, Full Table)", function() {
+    let pasteData = (
+        'Work Year \n' +
+        'Taxed Social Security Earnings \n' +
+        'Taxed Medicare Earnings \n' +
+        '2018 \n' +
+        '$100,000 \n' +
+        '$100,000 \n' +
+        '2017 \n' +
+        '$90,000 \n' +
+        '$90,000 \n' +
+        '2016 \n' +
+        '$80,000 \n' +
+        '$80,000')
+    parsePasteExpect(parsePaste(pasteData));
+  });
+  it("Parses ssa.gov format (Edge, Windows, Table Rows)", function() {
+    let pasteData = (
+        '2018 \n' +
+        '$100,000 \n' +
+        '$100,000 \n' +
+        '2017 \n' +
+        '$90,000 \n' +
+        '$90,000 \n' +
+        '2016 \n' +
+        '$80,000 \n' +
+        '$80,000')
+    parsePasteExpect(parsePaste(pasteData));
+  });
 });
