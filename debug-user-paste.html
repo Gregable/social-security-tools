@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset=utf-8>
+  <title>User Paste Debug Feedback Tool</title>
+  <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+  <style>
+  textarea {
+    width: 800px;
+    height: 400px;
+  }
+  </style>
+</head>
+<body>
+
+<h1>User Paste Debug Feedback Tool</h1>
+
+<p>
+If you are viewing this, you were probably sent here by the author of this site
+because your browser is pasting data into ssa.gov in a way that breaks the
+parsing functionality built into the site.
+</p>
+
+<p>
+For privacy reasons, none of the data entered into this site is ever stored or
+sent to the site. It remains on your own computer. As a result, it is difficult
+for me to learn more about why the data input sometimes fails users, because
+I don't have a failing input to test with. That's why you are here. If you are
+willing, you can send me the formatting your browser users for copy/pasting
+data without sending me the actual dollar numbers. This will be helpful for me
+to improve the website tool for you and other users.
+
+</p>
+<p>
+This page allows you to paste your ssa.gov data into a text box, and the page
+will process it in two steps:
+</p>
+
+<ol>
+  <li>It will replace all numerical characters with <code>0</code>s.
+      So "<code>1999 $12,500</code>" will become "<code>0000 $00,000</code>".
+      This is to protect your privacy.</li>
+  <li>It will <a href="https://en.wikipedia.org/wiki/Base64">encode</a> the
+      zeroed out data, so that spaces, tabs, and newlines won't be modified
+      by your email provider.
+  </li>
+</ol>
+
+<p>
+This tool will not send any data to me. If you feel comfortable with it's
+output, you can then send the final encoded zeroed out data to me privately
+in an email for testing.
+</p>
+
+<script>
+function zerodata() {
+  let pasteEl = document.getElementById('paste');
+  let value = pasteEl.value;
+  value = value.replace(/[0-9]/g, "0");
+  let zeroEl = document.getElementById('zero');
+  zeroEl.value = value;
+  b64data();
+}
+function b64data() {
+  let zeroEl = document.getElementById('zero');
+  let value = zeroEl.value;
+  value = btoa(value);
+  out = "-----BEGIN PASTE DATA-----\n"
+  for (var i = 0; i < value.length; i += 64) {
+    out += value.substr(i, 64) + '\n';
+  }
+  out += "-----END PASTE DATA-----\n"
+  
+  let base64El = document.getElementById('base64');
+  base64El.value = out;
+}
+function copyText() {
+  let base64El = document.getElementById('base64');
+  base64El.select();
+  document.execCommand("copy");
+  alert("'Copied the text:\n" + base64El.value);
+}
+
+</script>
+
+<h3>Step 1: Paste your "Earnings Record" into the box below, exactly as from ssa.gov:</h3>
+<textarea id=paste oninput="zerodata()"></textarea>
+
+<h3>Step 2: Inspect the zeroed out copy below:</h3>
+<p>
+Delete any data you feel shouldn't be shared with me such as your name, but
+try not to modify the formatting (number of lines, extra spaces between the
+lines, commas, etc).
+</p>
+<textarea id=zero oninput="b64data()"></textarea>
+
+<h3>Step 3: Copy the contents of this box and email to me.</h3>
+<textarea id=base64 disabled></textarea>
+<br>
+<button onclick="copyText()">Copy to Clipboard</button>
+
+</body>
+</html>
