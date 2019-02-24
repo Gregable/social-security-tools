@@ -13,6 +13,8 @@
     #
     src_files:
       - constants.js
+      - recipient.js
+      - ssa-parse.js
       - utils.js
 
     # stylesheets

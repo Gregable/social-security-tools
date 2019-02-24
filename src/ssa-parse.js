@@ -74,7 +74,7 @@ var parsePaste = function(paste) {
   // All valid lines will start with a year indicator.
   let earningsLines = [];
   for (let i = 0; i < lines.length; ++i) {
-    const line = lines[i];
+    const line = lines[i].trim();
     const columns = line.split(' ');
     // There must be at least a year and an earnings value.
     if (columns.length < 2)
