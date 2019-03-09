@@ -167,9 +167,11 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     /** @type {!Array<!EarningRecord>} */
     var records = parsePaste(newValue);
     if (records.length === 0) {
-      // Send basic event indicating that the user entered something and we
-      // failed in parsing it. Never records what a user entered.
-      ga('send', 'event', 'PasteData', 'FailParse');
+      // Ignore someone just typing in the field or otherwise broken input.
+      if (newValue.length > 50)
+        // Send basic event indicating that the user entered something and we
+        // failed in parsing it. Never records what a user entered.
+        ga('send', 'event', 'PasteData', 'FailParse');
       return;
     }
     // Send basic event indicating that the user entered something and we
