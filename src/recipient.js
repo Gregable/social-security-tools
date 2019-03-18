@@ -202,9 +202,7 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
  */
 Recipient.prototype.spousalInflectionDate = function() {
   var threeYears = new MonthDuration().initFromYearsMonths(3, 0);
-  var inflection = this.normalRetirementDate.subtractDuration(threeYears);
-  console.log(inflection);
-  return inflection;
+  return this.normalRetirementDate.subtractDuration(threeYears);
 }
 
 /**
