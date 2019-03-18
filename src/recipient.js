@@ -196,6 +196,18 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
 }
 
 /**
+ * Returns the date that spousal benefits inflect for reduction between 6.67%
+ * and 5%
+ * @return {MonthDate}
+ */
+Recipient.prototype.spousalInflectionDate = function() {
+  var threeYears = new MonthDuration().initFromYearsMonths(3, 0);
+  var inflection = this.normalRetirementDate.subtractDuration(threeYears);
+  console.log(inflection);
+  return inflection;
+}
+
+/**
  * Returns the date at a given age.
  * @param {MonthDuration} age
  * @return {MonthDate}
