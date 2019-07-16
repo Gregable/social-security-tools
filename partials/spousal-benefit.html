@@ -84,85 +84,9 @@
     </p>
 
     <h3>Enter <span class=names>{{spouse.name}}'s</span> Birthdate</h3>
-      <div class=agePicker>
-      <div class=picker>
-        <span ng-repeat="day in [1,2,3,4,5,6,7,8]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="day in [9,10,11,12,13,14,15,16]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="day in [17,18,19,20,21,22,23,24]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="day in [25,26,27,28,29,30,31]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-        <span ng-repeat="day in [32]" class=onlyHidden>
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <p></p>
-      <div class=picker>
-        <span ng-repeat="month in all_months | limitTo:6">
-        <input type=radio value="{{month}}" id="spouse-month-{{month}}"
-                class=radio ng-model="spouseBirth.month"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio month" for="spouse-month-{{month}}"
-          ><span>{{month}}</span></label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="month in all_months | limitTo:6:6">
-        <input type=radio value="{{month}}" id="spouse-month-{{month}}"
-                class=radio ng-model="spouseBirth.month"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio month" for="spouse-month-{{month}}"
-          ><span>{{month}}</span></label>
-        </span>
-      </div>
-      <p></p>
-      <div class=picker>
-        <span ng-repeat="year in allAgeYears()">
-          <input type=radio id="spouse-year-{{year}}" value="{{year}}"
-                class=radio ng-model="spouseBirth.year"
-                ng-change="updateSpouseBirthdate()">
-          <label class="radio year" for="spouse-year-{{year}}"
-            ><span>{{year}}</span></label>
-        </span>
-      </div>
-    </div>
+
+
+
     <br class=clear>
 
     <p class=birthdate>

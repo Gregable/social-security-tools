@@ -42,6 +42,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_ = new BreakPointChart();
     $scope.ageChart_ = new AgeChart();
     $scope.spousalChartSelectedDate = new MonthDate();
+    
+    $scope.selfBirthdayInput = '0000-01-01'
+    $scope.spouseBirthdayInput = '0000-01-01'
 
     $scope.recipient = new Recipient("Self");
     $scope.spouse = new Recipient("Spouse");
@@ -54,8 +57,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.$watch('recipient', function() {$scope.spousalChart_.render()});
     $scope.$watch('spouse', function() {$scope.spousalChart_.render()});
-    $scope.$watch('birth', function() {$scope.refreshSlider});
-    $scope.$watch('spouseBirth', function() {$scope.refreshSlider});
+    $scope.$watch('selfBirthdayInput', function() {$scope.refreshSlider});
+    $scope.$watch('spouseBirthdayInput', function() {$scope.refreshSlider});
 
     $scope.mode = ModeEnum.INITIAL;
     $scope.all_months = ALL_MONTHS;
@@ -88,15 +91,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (demoId === 0) {
       $scope.demoId = 0;
       $scope.spouse.primaryInsuranceAmountValue = 400;
-      $scope.birth.day = 1;
-      $scope.birth.month = "Jul";
-      $scope.birth.year = 1950;
-      $scope.birth.maxPossibleYear = 1950;
+      $scope.selfBirthdayInput = "1950-07-01";
       $scope.updateBirthdate();
-      $scope.spouseBirth.day = 1;
-      $scope.spouseBirth.month = "Mar";
-      $scope.spouseBirth.year = 1949;
-      $scope.spouseBirth.maxPossibleYear = 1949;
+      $scope.spouseBirthdayInput = "1949-03-01";
       $scope.updateSpouseBirthdate();
       $scope.fetchTestData('averagepaste.txt');
       $scope.married.value = "true";
@@ -105,15 +102,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (demoId === 1) {
       $scope.demoId = 1;
       $scope.spouse.primaryInsuranceAmountValue = 600;
-      $scope.birth.day = 2;
-      $scope.birth.month = "Aug";
-      $scope.birth.year = 1950;
-      $scope.birth.maxPossibleYear = 1950;
+      $scope.selfBirthdayInput = "1950-08-02";
       $scope.updateBirthdate();
-      $scope.spouseBirth.day = 2;
-      $scope.spouseBirth.month = "Dec";
-      $scope.spouseBirth.year = 1951;
-      $scope.spouseBirth.maxPossibleYear = 1951;
+      $scope.spouseBirthdayInput = "1951-12-02";
       $scope.updateSpouseBirthdate();
       $scope.fetchTestData('millionpaste.txt');
       $scope.married.value = "true";
@@ -121,10 +112,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
     if (demoId === 2) {
       $scope.demoId = 2;
-      $scope.birth.day = 3;
-      $scope.birth.month = "Sep";
-      $scope.birth.year = 1985;
-      $scope.birth.maxPossibleYear = 1985;
+      $scope.selfBirthdayInput = "1985-09-03";
       $scope.updateBirthdate();
       $scope.updateSpouseBirthdate();
       $scope.fetchTestData('youngpaste.txt');
@@ -181,11 +169,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.recipient.initFromEarningsRecords(records);
     $scope.pasteArea.mode = ModeEnum.PASTE_CONFIRMATION;
     $scope.pasteArea.contents = '';
-
-    // This is conservative as it assumes the user had wage income the
-    // year they were born. I'm not sure if this is even possible, but
-    // who knows.
-    $scope.birth.maxPossibleYear = records[0].year;
   });
 
   $scope.refreshSlider = function() {
@@ -286,7 +269,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   /**
    * Runs as the various partial html files have loaded. Runs code
-   * specific to initializting them.
+   * specific to initializing them.
    */
   $scope.$on("$includeContentLoaded", function(event, templateName) {
     var tryRender = false;
@@ -309,57 +292,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.recipient = new Recipient();
     $scope.pasteArea.mode = ModeEnum.INITIAL;
   };
-
-  /** 
-   * Used to produce the birthdate picker for the primary earner. Enumerates
-   * possible birth years for the primary earner. Always returns a multiple of
-   * 7 number of years, so that the picker is a grid.
-   * @return {Array<number>}
-   */
-  $scope.primaryEarnerYears = function() {
-    var pastYears = [];
-    // We want a multiple of 7 years, want to be sure to include the user's
-    // birth year, and don't want to include more than we need to.
-    
-    // Start at 70 years ago, anyone older than that is already collecting
-    // social security (and can just pick 70 for example).
-    const start = CURRENT_YEAR - 70;
-    // End at the first year we have earnings records for. I don't think anyone
-    // could have earnings records before they were born.
-    var end = $scope.birth.maxPossibleYear;
-    // Add a few years to make sure we have a multiple of 7:
-    end += (7 - (end - start + 1) % 7)
-
-    for (var i = start; i <= end; ++i) {
-      pastYears.push(i);
-    }
-    return pastYears;
-  }
-
-  /**
-   * Used to produce the birthdate picker for the spouse earner.
-   * @return {Array<number>}
-   */
-  $scope.allAgeYears = function() {
-    var pastYears = [];
-    // We want a multiple of 7 years, want to be sure to include the user's
-    // birth year, and don't want to include more than we need to.
-    
-    // Start at 70 years ago, anyone older than that is already collecting
-    // social security (and can just pick 70 for example).
-    const start = CURRENT_YEAR - 70;
-    // I'm going to assume that anyone married is at least 18. While it's
-    // possibly incorrect technically, I think it's close enough for our
-    // purposes here.
-    var end = CURRENT_YEAR - 18;
-    // Add a few years to make sure we have a multiple of 7:
-    end += (7 - (end - start + 1) % 7)
-
-    for (var i = start; i <= end; ++i) {
-      pastYears.push(i);
-    }
-    return pastYears;
-  }
 
   $scope.updateFutureYears = function(id) {
     $scope.recipient.simulateFutureEarningsYears(
@@ -414,26 +346,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-  $scope.birth = {
-    day: 1,
-    month: "Jan",
-    year: 0
-  }
-
-  $scope.spouseBirth = {
-    day: 1,
-    month: "Jan",
-    year: 0,
-  }
-
-  // Given an input array above, returns a Date object representing the same.
-  $scope.dateFromInputArray = function(inputDate) {
-    var day = inputDate.day;
-    var monthIndex = ALL_MONTHS.indexOf(inputDate.month);
-    var year = inputDate.year;
-
-    return new Date(year, monthIndex, day);
-  }
+  $scope.selfBirthdateInput = "";
+  $scope.spouseBirthdateInput = "";
 
   $scope.followingMonth = function(input) {
     var out = {};
@@ -445,39 +359,27 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return out;
   }
 
-  $scope.birthDateSelected = function(birthdate) {
-    return birthdate.year !== 0 && birthdate.month !== "";
-  }
-
   // Called when the primary birthdate is modified.
   $scope.updateBirthdate = function() {
     // Only update once there are some non-default values set.
-    if (!$scope.birthDateSelected($scope.birth))
+    if ($scope.selfBirthdayInput == "0000-01-01")
       return; 
-    $scope.birth.year = parseInt($scope.birth.year);
-    $scope.birth.day = parseInt($scope.birth.day);
-
-    const layBirthday = $scope.dateFromInputArray($scope.birth);
+    const layBirthday = new Date($scope.selfBirthdateInput);
     $scope.recipient.updateBirthdate(layBirthday);
 
     // Also set the spouses birthdate to the same, which is a
     // reasonable default to start with, until the user selects
     // differently.
-    $scope.spouseBirth.day = $scope.birth.day;
-    $scope.spouseBirth.month = $scope.birth.month;
-    $scope.spouseBirth.year = $scope.birth.year;
+    $scope.spouseBirthdateInput = $scope.selfBirthdayInput;
     $scope.updateSpouseBirthdate();
   }
  
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function() {
     // Only update once there are some non-default values set.
-    if (!$scope.birthDateSelected($scope.spouseBirth))
+    if ($scope.spouseBirthdayInput == "")
       return; 
-    $scope.spouseBirth.year = parseInt($scope.spouseBirth.year);
-    $scope.spouseBirth.day = parseInt($scope.spouseBirth.day);
-    
-    const layBirthday = $scope.dateFromInputArray($scope.spouseBirth);
+    const layBirthday = new Date($scope.spouseBirthdateInput);
     $scope.spouse.updateBirthdate(layBirthday);
    
     $scope.higherEarnerSlider.updateBirthDate();
