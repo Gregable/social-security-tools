@@ -1,5 +1,5 @@
 <div id="ageRequest" class="confirmation-prompt"
-     ng-show="showAgeRequest()">
+     ng-if="showAgeRequest()">
   <div>
     <h3>Step 3 of 3: Select Birthdate Month and Year</h3>
     <p>
@@ -71,7 +71,7 @@
   </div>
   <br class=clear>
 
-  <div ng-show="birthDateSelected(birth)">
+  <div ng-if="birthDateSelected(birth)">
     You were born on <b>{{birth.month}} {{birth.day}}, {{birth.year}}</b>:
     <button ng-click="confirmBirthDate()" class=success>
       <ico>&#10003;</ico> Yes

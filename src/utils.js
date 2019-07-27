@@ -401,3 +401,14 @@ function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
   return colaAdjustment(yearTurn62, 
       primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings));
 };
+
+function maximumPIA() { 
+  bpYear = CURRENT_YEAR - 2;
+  const maxAime = MAXIMUM_EARNINGS[CURRENT_YEAR] / 12;
+  return Math.floor(
+      (firstBendPoint(bpYear) * BEFORE_BENDPOINT1_MULTIPLIER) +
+      (secondBendPoint(bpYear) * BEFORE_BENDPOINT2_MULTIPLIER) +
+      ((maxAime - firstBendPoint(bpYear) -
+        secondBendPoint(bpYear)) * AFTER_BENDPOINT2_MULTIPLIER));
+}
+

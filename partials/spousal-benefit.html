@@ -1,14 +1,14 @@
-<div ng-show="recipient.isEligible()">
+<div ng-if="recipient.isEligible()">
 
   <div id=spousalBenefit class="benefit-estimate fixed-center-column"
-     ng-show="showReport()" ng-cloak>
+     ng-if="showReport()" ng-cloak>
 
     <a class=offset-nav id=nav-spouse></a>
     <h2>Spouse's Data</h2>
-    <p ng-show="isMarried()">
+    <p ng-if="isMarried()">
       If you are not married, you can hide this section.
     </p>
-    <p ng-show="!isMarried()">
+    <p ng-if="!isMarried()">
       If you are married, you can expand this section.
     </p>
 
@@ -22,7 +22,7 @@
   </div>
 
   <div id=isMarried class="benefit-estimate fixed-center-column"
-      ng-show="showReport() && isMarried()" ng-cloak>
+      ng-if="showReport() && isMarried()" ng-cloak>
 
     <p>
       In addition to your own <u>primary</u> benefit, married couples may earn
@@ -76,7 +76,7 @@
     <p>
       <span class=names>{{spouse.name}}'s</span>
       Primary Insurance Amount: <b>$</b>
-      <input type="number" min=0 max={{maxPIA()}} size=6 style="width: 68px"
+      <input type="number" min=0 max={{maxPIA}} size=6 style="width: 68px"
             name="spousalPia" cast-to-integer
             ng-model="spouse.primaryInsuranceAmountValue"
             ng-change="refreshSlider()">
@@ -186,7 +186,7 @@
     </p>
 
     <h3>{{lowerEarner().name}}</h3>
-    <div ng-show="!isSpousalBenefit()">
+    <div ng-if="!isSpousalBenefit()">
     <p>
       <span class=names>{{lowerEarner().name}}</span> has the lower
       Primary Insurance Amount, therefore
@@ -201,7 +201,7 @@
     </p>
     </div><!-- !isSpousalBenefit() -->
 
-    <div ng-show="isSpousalBenefit()">
+    <div ng-if="isSpousalBenefit()">
     <p>
       <span class=names>{{lowerEarner().name}}</span> has the lower
       Primary Insurance Amount, therefore
@@ -242,14 +242,14 @@
       <span class=multsymbol>=</span> <b>${{spousalBenefit() | number:0}}</b>
     </pi>
 
-    <p ng-show="isSpousalBenefit()">
+    <p ng-if="isSpousalBenefit()">
       This spousal benefit (<b>${{spousalBenefit() | number:0}}</b>) is the amount
       <span class=names>{{lowerEarner().name}}</span> will receive in addition to
       <span class=names>{{lowerEarner().name}}'s</span> own personal benefit of
       <b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>.
     </p>
 
-    <div ng-show="!isSpousalBenefit()">
+    <div ng-if="!isSpousalBenefit()">
     <h3>Final Conclusion</h3>
     <p>
       Since neither <span class=names>{{recipient.name}}</span> nor
@@ -262,7 +262,7 @@
     <p>
     </div><!-- !isSpousalBenefit() -->
 
-    <div ng-show="isSpousalBenefit() && lowerEarner().primaryInsuranceAmountFloored() > 0">
+    <div ng-if="isSpousalBenefit() && lowerEarner().primaryInsuranceAmountFloored() > 0">
       <div style="width: 100%">
         <div style="width: {{Math.min(75, spousalBenefitFraction())}}%; text-align: center; float:left; white-space:nowrap;">
           Personal (<b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>)
@@ -304,11 +304,11 @@
     <p>
       Spousal benefits do not increase if claimed after Normal Retirement Age,
       but are reduced before Normal Retirement Age 
-      (<b>{{lowerEarner().normalRetirementDate.monthFullName()}}
-          {{lowerEarner().normalRetirementDate.year()}}</b>) at the same rate as
+      (<b>{{lowerEarner().normalRetirementDate().monthFullName()}}
+          {{lowerEarner().normalRetirementDate().year()}}</b>) at the same rate as
       personal benefits.
     </p>
-    <div class=insetTextBox ng-show="spouseBirth.day === 1 && birth.day !== 1">
+    <div class=insetTextBox ng-if="spouseBirth.day === 1 && birth.day !== 1">
       <h4>Special Rule</h4>
       <p>
         The month <span class=names>{{spouse.name}}</span> reaches specific ages
@@ -325,8 +325,8 @@
     <p>
       If <span class=names>{{lowerEarner().name}}</span> begins spousal
       benefits before Normal Retirement Age
-      (<b>{{lowerEarner().normalRetirementDate.monthFullName()}} 
-          {{lowerEarner().normalRetirementDate.year()}}</b>),
+      (<b>{{lowerEarner().normalRetirementDate().monthFullName()}} 
+          {{lowerEarner().normalRetirementDate().year()}}</b>),
       the spousal benefit will be <u>permanently</u> <i>reduced</i> per year you
       start early by:
     </p>
@@ -417,7 +417,7 @@
       canvas element -->
     <div style="height: 436px;"></div>
 
-    <div ng-show="spousalSelection.show" class=totalSpousalAtDate> 
+    <div ng-if="spousalSelection.show" class=totalSpousalAtDate> 
       <table class=combinedBenefit>
         <tr>
           <td colspan=3>
@@ -452,7 +452,7 @@
       </table>
     </div>
 
-    <div class=insetTextBox ng-show="spouseBirth.day > 2 && birth.day <= 2">
+    <div class=insetTextBox ng-if="spouseBirth.day > 2 && birth.day <= 2">
       <h4>Special Rule</h4>
       <p>
         You may find it oddly specific that the earliest 
@@ -487,8 +487,8 @@
       <span class=names>{{lowerEarner().name}}</span> begins collecting the
       Survivor Benefit before <span class=names>{{lowerEarner().name}}</span>'s
       Normal Retirement Age
-      (<b>{{lowerEarner().normalRetirementDate.monthFullName()}} 
-          {{lowerEarner().normalRetirementDate.year()}}</b>).
+      (<b>{{lowerEarner().normalRetirementDate().monthFullName()}} 
+          {{lowerEarner().normalRetirementDate().year()}}</b>).
     </p>
     <p>
       More detail on Survivor Benefits can be found at

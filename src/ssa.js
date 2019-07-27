@@ -20,17 +20,23 @@ var ModeEnum = {
   RENDER_EARNINGS: 'RENDER_EARNINGS'
 };
 
-ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
+ssaApp.controller("NavbarController", function ($scope) {
+  // scollTo scrolls the window to position the element `id` at the top of the
+  // page. It is used in the navbar partial to jump to different sections of the
+  // document using data-ng-click.
   $scope.scrollTo = function(id) {
+    console.log('scope.scrollTo');
     var el = $('#' + id);
     var pos = el.position();
     window.scrollTo(pos.left, pos.top + 10);
   };
+});
 
+ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.pasteArea = {
     contents: '',
-    mode: ModeEnum.INITIAL,
-    // Cleaner here than newlines in the actual template.
+    // This is just a constant, but it's cleaner here than newlines in the
+    // actual template.
     placeholder: '\n\nPaste Result Here'
   };
 
@@ -38,6 +44,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    * Initialization
    */
   $scope.init = function() {
+    console.log('scope.init');
     $scope.Math = window.Math;
     $scope.breakPointChart_ = new BreakPointChart();
     $scope.ageChart_ = new AgeChart();
@@ -72,12 +79,36 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
+    // The maximum PIA that can be achieved for a user. Used in the spousal
+    //  chart inputs to set a maximum value for the user-entered PIA value.
+    $scope.maxPIA = maximumPIA();
     $scope.maybeRenderCharts();
   };
 
+  // Rather that using copy/paste, this fn immediately loads an example test
+  // paste via a json request. This allows the user to try out the interface
+  // before committing to the effort of retrieving their earnings record from
+  // ssa.gov.
+  fetchTestData = function(filename) {
+    console.log('fetchTestData');
+    $http.get(filename).then(
+      function(contents) {
+        var records = parsePaste(contents.data);
+        $scope.recipient.initFromEarningsRecords(records);
+        $scope.mode = ModeEnum.RENDER_EARNINGS;
+        $scope.maybeRenderCharts();
+      }, 
+      function(jqxhr, textStatus, error) {
+        console.log("Error loading Test Data");
+        console.log(textStatus);
+        console.log(error);
+      }
+    );
+  };
 
   $scope.loadDemoData = function(demoId) {
-    // User may have scrolled down. Since we aren't actually chaning URL,
+    console.log('scope.loadDemoData');
+    // User may have scrolled down. Since we aren't actually changing URL,
     // we need to scroll back up to the top for them.
     window.scrollTo(0, 0);
 
@@ -98,7 +129,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.spouseBirth.year = 1949;
       $scope.spouseBirth.maxPossibleYear = 1949;
       $scope.updateSpouseBirthdate();
-      $scope.fetchTestData('averagepaste.txt');
+      fetchTestData('averagepaste.txt');
       $scope.married.value = "true";
       $scope.lowerEarnerSlider.value = 66 * 12;
     }
@@ -115,7 +146,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.spouseBirth.year = 1951;
       $scope.spouseBirth.maxPossibleYear = 1951;
       $scope.updateSpouseBirthdate();
-      $scope.fetchTestData('millionpaste.txt');
+      fetchTestData('millionpaste.txt');
       $scope.married.value = "true";
       $scope.lowerEarnerSlider.value = 66 * 12;
     }
@@ -127,43 +158,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.birth.maxPossibleYear = 1985;
       $scope.updateBirthdate();
       $scope.updateSpouseBirthdate();
-      $scope.fetchTestData('youngpaste.txt');
+      fetchTestData('youngpaste.txt');
     }
   }
 
-  // Returns an upper
-  $scope.maxPIA = function() {
-    bpYear = CURRENT_YEAR - 2;
-    const maxAime = MAXIMUM_EARNINGS[CURRENT_YEAR] / 12;
-    return Math.floor(
-        (firstBendPoint(bpYear) * BEFORE_BENDPOINT1_MULTIPLIER) +
-        (secondBendPoint(bpYear) * BEFORE_BENDPOINT2_MULTIPLIER) +
-        ((maxAime - firstBendPoint(bpYear) -
-          secondBendPoint(bpYear)) * AFTER_BENDPOINT2_MULTIPLIER));
-  }
-
-  // Rather that using copy/paste, this fn immediately loads an example test
-  // paste via a json request. This allows the user to try out the interface
-  // before committing to the effort of retrieving their earnings record from
-  // ssa.gov.
-  $scope.fetchTestData = function(filename) {
-    $http.get(filename).then(
-      function(contents) {
-        var records = parsePaste(contents.data);
-        $scope.recipient.initFromEarningsRecords(records);
-        $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
-        $scope.maybeRenderCharts();
-      }, 
-      function(jqxhr, textStatus, error) {
-        console.log("Error loading Test Data");
-        console.log(textStatus);
-        console.log(error);
-      }
-    );
-  };
-
+  // Called whenever a user modifies the contents of the pasteArea textarea.
   $scope.$watch('pasteArea.contents', function(newValue) {
+    console.log('watch pasteArea.contents');
     if (newValue == "") return;
+    console.log('watch pasteArea.contents with newValue');
     /** @type {!Array<!EarningRecord>} */
     var records = parsePaste(newValue);
     if (records.length === 0) {
@@ -179,8 +182,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     ga('send', 'event', 'PasteData', 'SucceedParse');
 
     $scope.recipient.initFromEarningsRecords(records);
-    $scope.pasteArea.mode = ModeEnum.PASTE_CONFIRMATION;
-    $scope.pasteArea.contents = '';
+    $scope.mode = ModeEnum.PASTE_CONFIRMATION;
 
     // This is conservative as it assumes the user had wage income the
     // year they were born. I'm not sure if this is even possible, but
@@ -189,16 +191,20 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   });
 
   $scope.refreshSlider = function() {
+    console.log('refreshSlider');
     $scope.updateSliderMin();
     $timeout(function () {
+      console.log("$scope.$broadcast('rzSliderForceRender')");
       $scope.$broadcast('rzSliderForceRender');
 		  $scope.layoutSliderChart();
     });
   };
   
   $scope.confirmEarningsParse = function(confirmationValue) {
+    console.log('confirmEarningsParse');
     if (confirmationValue === 'incorrect') {
-      $scope.pasteArea.mode = ModeEnum.PASTE_APOLOGY;
+      $scope.mode = ModeEnum.PASTE_APOLOGY;
+      $scope.pasteArea.contents = '';
       // Send basic event indicating that the user rejected the earnings
       // data parsing results. Never records what a user entered.
       ga('send', 'event', 'PasteData', 'RejectParse');
@@ -206,34 +212,35 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       // Send basic event indicating that the user accepted the earnings
       // data parsing results. Never records what a user entered.
       ga('send', 'event', 'PasteData', 'ConfirmParse');
-      $scope.pasteArea.mode = ModeEnum.AGE_REQUEST;
+      $scope.mode = ModeEnum.AGE_REQUEST;
     }
   };
   
   $scope.confirmBirthDate = function() {
+    console.log('confirmBirthDate');
     // Send basic event indicating that the user entered their own birthdate.
     // Never records what birthdate a user entered.
     ga('send', 'event', 'PasteData', 'ConfirmBirthDate');
     $scope.updateBirthdate();
-    $scope.pasteArea.mode = ModeEnum.RENDER_EARNINGS;
+    $scope.mode = ModeEnum.RENDER_EARNINGS;
     $scope.maybeRenderCharts();
   }
 
 
   $scope.showPastePrompt = function() {
-    return $scope.pasteArea.mode === ModeEnum.INITIAL;
+    return $scope.mode === ModeEnum.INITIAL;
   };
   $scope.showPasteConfirmation = function() {
-    return $scope.pasteArea.mode === ModeEnum.PASTE_CONFIRMATION;
+    return $scope.mode === ModeEnum.PASTE_CONFIRMATION;
   };
   $scope.showPasteApology = function() {
-    return $scope.pasteArea.mode === ModeEnum.PASTE_APOLOGY;
+    return $scope.mode === ModeEnum.PASTE_APOLOGY;
   };
   $scope.showAgeRequest = function() {
-    return $scope.pasteArea.mode === ModeEnum.AGE_REQUEST;
+    return $scope.mode === ModeEnum.AGE_REQUEST;
   };
   $scope.showReport = function() {
-    return $scope.pasteArea.mode === ModeEnum.RENDER_EARNINGS;
+    return $scope.mode === ModeEnum.RENDER_EARNINGS;
   };
   $scope.isMarried = function() {
     return $scope.married.value == "true";
@@ -244,6 +251,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
   
   $scope.earningsRecordsIncludeMedicare = function() {
+    console.log('earningsRecordsIncludeMedicare');
     for (let i = 0; i < $scope.recipient.earningsRecords.length; ++i) {
       if ($scope.recipient.earningsRecords[i].taxedMedicareEarnings >= 0)
         return true;
@@ -273,6 +281,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    * requirements have all been met, otherwise does nothing.
    */
   $scope.maybeRenderCharts = function() {
+    console.log('maybeRenderCharts');
     if ($scope.breakPointChart_.isInitialized())
       $scope.breakPointChart_.render();
     if ($scope.ageChart_.isInitialized())
@@ -281,14 +290,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
 
   $scope.affixNavbar = function() {
+    console.log('affixNavbar');
     $('#navbar').affix({offset: {top: 80} });
   };
 
   /**
    * Runs as the various partial html files have loaded. Runs code
-   * specific to initializting them.
+   * specific to initializing them.
    */
   $scope.$on("$includeContentLoaded", function(event, templateName) {
+    console.log('includeContentLoaded');
     var tryRender = false;
     if (templateName == 'partials/primary-insurance-amount.html') {
       $scope.breakPointChart_.setCanvas(
@@ -306,8 +317,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   });
 
   $scope.reset = function() {
+    console.log('reset');
     $scope.recipient = new Recipient();
-    $scope.pasteArea.mode = ModeEnum.INITIAL;
+    $scope.mode = ModeEnum.INITIAL;
   };
 
   /** 
@@ -317,6 +329,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    * @return {Array<number>}
    */
   $scope.primaryEarnerYears = function() {
+    console.log('primaryEarnerYears');
     var pastYears = [];
     // We want a multiple of 7 years, want to be sure to include the user's
     // birth year, and don't want to include more than we need to.
@@ -341,6 +354,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    * @return {Array<number>}
    */
   $scope.allAgeYears = function() {
+    console.log('allAgeYears');
     var pastYears = [];
     // We want a multiple of 7 years, want to be sure to include the user's
     // birth year, and don't want to include more than we need to.
@@ -362,6 +376,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   $scope.updateFutureYears = function(id) {
+    console.log('updateFutureYears');
     $scope.recipient.simulateFutureEarningsYears(
         /*numYears=*/$scope.futureYearsWorkSlider.minValue,
         /*wage=*/$scope.futureWageWorkSlider.minValue);
@@ -428,6 +443,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   // Given an input array above, returns a Date object representing the same.
   $scope.dateFromInputArray = function(inputDate) {
+    console.log('dateFromInputArray');
     var day = inputDate.day;
     var monthIndex = ALL_MONTHS.indexOf(inputDate.month);
     var year = inputDate.year;
@@ -446,11 +462,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   $scope.birthDateSelected = function(birthdate) {
+    console.log('birthDateSelected');
     return birthdate.year !== 0 && birthdate.month !== "";
   }
 
   // Called when the primary birthdate is modified.
   $scope.updateBirthdate = function() {
+    console.log('updateBirthdate');
     // Only update once there are some non-default values set.
     if (!$scope.birthDateSelected($scope.birth))
       return; 
@@ -471,6 +489,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
  
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function() {
+    console.log('updateSpouseBirthdate');
     // Only update once there are some non-default values set.
     if (!$scope.birthDateSelected($scope.spouseBirth))
       return; 
@@ -537,7 +556,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // year of age and the legend 'NRA' at the user's Normal Retirement
   // Age.
   // @param {MonthDuration} normalRetirementAge
-  $scope.stepsArray = function(normalRetirementAge) {
+  stepsArray = function(normalRetirementAge) {
+    console.log('stepsArray');
     out = [];
     for (i = 62 * 12; i <= 70 * 12; i += 1) {
       if (i === normalRetirementAge.asMonths()) {
@@ -551,6 +571,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Ticks tooltip function for the spousalSlider below.
   // @param {MonthDuration} normalRetirementAge
   $scope.ticksTooltip = function(normalRetirementAge, value) {
+    console.log('ticksTooltip');
     if (value === normalRetirementAge.asMonths())
       return 'Normal Retirement Age';
   };
@@ -584,7 +605,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       // Show every 12th tick, so yearly.
       showTicksValues: 12,
       ticksTooltip: $scope.ticksTooltip.bind(null, new MonthDuration()),
-      stepsArray: $scope.stepsArray(new MonthDuration()),
+      stepsArray: stepsArray(new MonthDuration()),
       onChange: function(id) {
         $scope.updateSliderMin();
         $scope.spousalChart_.render();
@@ -593,7 +614,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Called on age changes for some events to cause redraw.
     this.updateBirthDate = function() {
       var normalRetirementAge = this.earnerFn().normalRetirementAge();
-      this.options.stepsArray = $scope.stepsArray(normalRetirementAge);
+      this.options.stepsArray = stepsArray(normalRetirementAge);
       this.options.ticksTooltip =
         $scope.ticksTooltip.bind(null, normalRetirementAge);
       this.value = normalRetirementAge.asMonths();
@@ -614,6 +635,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
 
   $scope.updateSliderMin = function() {
+    console.log('updateSliderMin');
     var regularMin = $scope.lowerEarner().isFullMonth ? 0 : 1;
     // If the lower earner will be 70 before the higher earner files, bail.
     if ($scope.lowerEarner().dateAtAge(

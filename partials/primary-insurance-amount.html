@@ -1,5 +1,5 @@
 <div id=topEarningsData class="top-earnings-data fixed-center-column"
-                        ng-show="showReport()" ng-cloak>
+                        ng-if="showReport()" ng-cloak>
   <a class=offset-nav id=nav-pia></a>
   <h2>Primary Insurance Amount</h2>
 
@@ -13,7 +13,7 @@
     </p>
   </div>
 
-  <div ng-show="recipient.isEligible()">
+  <div ng-if="recipient.isEligible()">
     <p>
       Your Social Security benefits are best thought of in terms of your 
       <u>primary insurance amount</u> (PIA). This is the dollar amount that
