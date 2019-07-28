@@ -1,9 +1,9 @@
 <div id=topEarningsData class="top-earnings-data fixed-center-column"
-                        ng-if="showReport()" ng-cloak>
+                        ng-show="showReport()" ng-cloak>
   <a class=offset-nav id=nav-pia></a>
   <h2>Primary Insurance Amount</h2>
 
-  <div ng-if="!recipient.isEligible()">
+  <div ng-show="!recipient.isEligible()">
     <p>You do not have enough credits for to be eligible to receive retirement benefits
       on your own earnings.  You may be eligible to receive benefits on your spouse's 
       earnings.
@@ -13,7 +13,7 @@
     </p>
   </div>
 
-  <div ng-if="recipient.isEligible()">
+  <div ng-show="recipient.isEligible()">
     <p>
       Your Social Security benefits are best thought of in terms of your 
       <u>primary insurance amount</u> (PIA). This is the dollar amount that
