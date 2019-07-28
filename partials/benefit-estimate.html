@@ -1,5 +1,5 @@
 <div id=benefitEstimate class="benefit-estimate fixed-center-column"
-    ng-show="recipient.isEligible() && showReport()" ng-cloak>
+    ng-if="recipient.isEligible() && showReport()" ng-cloak>
 
   <a class=offset-nav id=nav-nra></a>
   <h2>Normal Retirement Age</h2>
@@ -22,7 +22,7 @@
     {{recipient.normalRetirementDate.year()}}</b>.
   </p>
 
-  <div class=insetTextBox ng-show="birth.day === 1">
+  <div class=insetTextBox ng-if="birth.day === 1">
     <h4>Special Rule</h4>
     <p>
       The month you reach specific ages may seem "off by one" from what
@@ -53,12 +53,12 @@
   <a class=offset-nav id=nav-early-delayed></a>
   <h2>Early and Delayed Retirement</h2>
   <p>
-		<span ng-show="birth.day === 2">
+		<span ng-if="birth.day === 2">
     	You can begin taking benefits as early as 62 years old
 	    (<b>{{recipient.dateAtYearsOld(62).monthFullName()}}
   	      {{recipient.dateAtYearsOld(62).year()}}</b>),
     </span>
-    <span ng-show="birth.day !== 2">
+    <span ng-if="birth.day !== 2">
     	You can begin taking benefits as early as 62 years and 1 month old
 	    (<b>{{recipient.dateAtAge(initAge(62, 1)).monthFullName()}}
   	      {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
@@ -69,7 +69,7 @@
     or start any month in between. The longer you wait, the higher your
     benefit will be.
   </p>
-  <div class=insetTextBox ng-show="birth.day > 2">
+  <div class=insetTextBox ng-if="birth.day > 2">
     <h4>Special Rule</h4>
     <p>
       You may find it oddly specific that the earliest you can actually
@@ -135,7 +135,7 @@
       </tr>
     </thead> 
     <tbody>
-		  <tr ng-show="birth.day === 2">
+		  <tr ng-if="birth.day === 2">
         <td headers="age">62</td>
         <td headers="date">
           {{recipient.dateAtYearsOld(62).monthName()}}
@@ -151,7 +151,7 @@
           ${{recipient.benefitAtAge(initAge(62)) * 12 | number:0}}
         </td>
       </tr>
-      <tr ng-show="birth.day !== 2">
+      <tr ng-if="birth.day !== 2">
         <td headers="age">62 + 1m</td>
         <td headers="date">
           {{recipient.dateAtAge(initAge(62, 1)).monthName()}}
