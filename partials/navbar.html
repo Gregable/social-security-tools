@@ -1,7 +1,7 @@
 <div ng-if="showReport()" class="fixed-left-column" class="ng-cloak"
   class="nav navbar-inverse navbar-fixed-top"
   id=navbar ng-init="affixNavbar()">
-  <ul class="nav">
+  <ul class="nav" ng-controller=NavbarController>
     <li ng-if="demoId > -1">
       <a href="#nav-demodata" data-ng-click="scrollTo('nav-demodata')">
         <div class=navlabel>Demo Data</div>

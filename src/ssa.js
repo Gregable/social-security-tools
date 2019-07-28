@@ -20,17 +20,24 @@ var ModeEnum = {
   RENDER_EARNINGS: 'RENDER_EARNINGS'
 };
 
-ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
+ssaApp.controller("NavbarController", function ($scope) {
+  // scollTo scrolls the window to position the element `id` at the top of the
+  // page. It is used in the navbar partial to jump to different sections of the
+  // document using data-ng-click.
   $scope.scrollTo = function(id) {
     var el = $('#' + id);
     var pos = el.position();
     window.scrollTo(pos.left, pos.top + 10);
   };
+});
+
+ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   $scope.pasteArea = {
     contents: '',
     mode: ModeEnum.INITIAL,
-    // Cleaner here than newlines in the actual template.
+    // This is just a constant, but it's cleaner here than newlines in the
+    // actual template.
     placeholder: '\n\nPaste Result Here'
   };
 
