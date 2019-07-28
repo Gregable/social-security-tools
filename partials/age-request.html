@@ -1,5 +1,6 @@
 <div id="ageRequest" class="confirmation-prompt"
-     ng-if="showAgeRequest()">
+     ng-if="mode === ModeEnum.AGE_REQUEST"
+     ng-controller=AgeRequestController>
   <div>
     <h3>Step 3 of 3: Select Birthdate Month and Year</h3>
     <p>
@@ -71,7 +72,7 @@
   </div>
   <br class=clear>
 
-  <div ng-if="birthDateSelected(birth)">
+  <div ng-if="birth.isSelected()">
     You were born on <b>{{birth.month}} {{birth.day}}, {{birth.year}}</b>:
     <button ng-click="confirmBirthDate()" class=success>
       <ico>&#10003;</ico> Yes

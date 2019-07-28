@@ -27,7 +27,7 @@ class MonthDate {
     this.monthsSinceEpoch_ = monthsSinceEpoch;
     return this;
   }
- 
+
   /*
    * Initializer from a date. So (2000, 0) would be Jan, 2000.
    * @param {number} years
@@ -398,11 +398,11 @@ function colaAdjustment(yearTurn62, initialPIA) {
  * @return {number} primary insurance amount
  */
 function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
-  return colaAdjustment(yearTurn62, 
+  return colaAdjustment(yearTurn62,
       primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings));
 };
 
-function maximumPIA() { 
+function maximumPIA() {
   bpYear = CURRENT_YEAR - 2;
   const maxAime = MAXIMUM_EARNINGS[CURRENT_YEAR] / 12;
   return Math.floor(

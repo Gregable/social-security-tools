@@ -1,5 +1,5 @@
-<div ng-if="showReport()" class="fixed-left-column" class="ng-cloak"
-  class="nav navbar-inverse navbar-fixed-top"
+<div ng-if="mode === ModeEnum.RENDER_EARNINGS"
+     class="fixed-left-column ng-cloak"
   id=navbar ng-init="affixNavbar()">
   <ul class="nav" ng-controller=NavbarController>
     <li ng-if="demoId > -1">
