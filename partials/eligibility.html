@@ -1,5 +1,5 @@
 <div id=Credits class="credits fixed-center-column"
-                        ng-show="showReport()" ng-cloak>
+                        ng-if="showReport()" ng-cloak>
   <a class=offset-nav id=nav-eligibility></a>
   <h2>Retirement Benefits Eligibility</h2>
 
@@ -25,17 +25,17 @@
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
         <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
-        <td colspan=3 ng-show="earningRecord.taxedEarnings < 0"
+        <td colspan=3 ng-if="earningRecord.taxedEarnings < 0"
             style="text-align: center">
           Not yet recorded
         </td>
-        <td headers="taxedearnings" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="taxedearnings" ng-if="earningRecord.taxedEarnings >= 0">
           ${{earningRecord.taxedEarnings | number:0}}
         </td>
-        <td headers="epc" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="epc" ng-if="earningRecord.taxedEarnings >= 0">
           ${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}
         </td>
-        <td headers="credits" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="credits" ng-if="earningRecord.taxedEarnings >= 0">
           {{earningRecord.credits | number:0}}
         </td>
       </tr>
@@ -99,7 +99,7 @@
     </span>
   </p>
 
-  <div class=insetTextBox ng-show="40 > recipient.earnedCredits">
+  <div class=insetTextBox ng-if="40 > recipient.earnedCredits">
     <h4>Special Rule</h4>
     <p>
       You can earn enough credits to become eligible for social security retirement benefits

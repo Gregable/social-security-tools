@@ -1,5 +1,5 @@
 <span id="earningsTable" class="confirmation-prompt"
-     ng-show="showPasteConfirmation()">
+     ng-if="showPasteConfirmation()">
   <div class="confirmation-left">
     <h3>Step 2 of 3: Confirm Earnings Record</h3>
     <p>Is this the same table you copied from ssa.gov?</p>
@@ -17,7 +17,7 @@
       <tr>
         <th id="pasteworkyear">Work Year</th>
         <th id="pastessataxedearnings">Taxed Social Security Earnings</th>
-        <th id="pastetaxedmedicare" ng-show="earningsRecordsIncludeMedicare()">
+        <th id="pastetaxedmedicare" ng-if="earningsRecordsIncludeMedicare()">
           Taxed Medicare Earnings
         </th>
       </tr>
@@ -26,19 +26,19 @@
       <tr ng-repeat="earningRecord in earningsRecords() | orderBy:'-'">
         <td headers="pasteworkyear">{{earningRecord.year}}</td>
         <td headers="pastetaxedearnings">
-          <span ng-show="earningRecord.taxedEarnings >= 0">
+          <span ng-if="earningRecord.taxedEarnings >= 0">
             ${{earningRecord.taxedEarnings | number:0}}
           </span>
-          <span ng-show="earningRecord.taxedEarnings < 0">
+          <span ng-if="earningRecord.taxedEarnings < 0">
             Not yet recorded
           </span>
         </td>
         <td headers=pastetaxedmedicare
-           ng-show="earningsRecordsIncludeMedicare()">
-          <span ng-show="earningRecord.taxedMedicareEarnings >= 0">
+           ng-if="earningsRecordsIncludeMedicare()">
+          <span ng-if="earningRecord.taxedMedicareEarnings >= 0">
             ${{earningRecord.taxedMedicareEarnings | number:0}}
           </span>
-          <span ng-show="earningRecord.taxedMedicareEarnings < 0">
+          <span ng-if="earningRecord.taxedMedicareEarnings < 0">
             Not yet recorded
           </span>
         </td>
@@ -48,7 +48,7 @@
 </span>
 
 <span id="earningsApology" class="confirmation-prompt"
-  ng-show="showPasteApology()">
+  ng-if="showPasteApology()">
   <p>Sorry about that, let's try again.</p>
   <button ng-click="reset()" class=success>Click to restart.</button>
 </span>

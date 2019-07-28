@@ -1,15 +1,15 @@
-<span ng-show="showReport()" class="ng-cloak">
+<span ng-if="showReport()" class="ng-cloak">
   <a id=nav-demodata></a>
-  <h2 ng-show="demoId > -1">Demo Data</h2>
-  <p ng-show="demoId === 0">
+  <h2 ng-if="demoId > -1">Demo Data</h2>
+  <p ng-if="demoId === 0">
     Retiree born on July 1st 1950, who earned roughly the average US wage for
     most of their career.
   </p>
-  <p ng-show="demoId === 1">
+  <p ng-if="demoId === 1">
     Retiree born on August 2nd 1950, who earned the maximum Social Security
     wages over five years, but nothing otherwise.
   </p>
-  <p ng-show="demoId === 2">
+  <p ng-if="demoId === 2">
     Earner early in their career, born September 3rd 1985, with a $40,000 per
     year salary in 2005 and a 4% annual raise.
   </p>
@@ -32,22 +32,22 @@
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
         <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
-        <td colspan=5 ng-show="earningRecord.taxedEarnings < 0" style="text-align:center">
+        <td colspan=5 ng-if="earningRecord.taxedEarnings < 0" style="text-align:center">
           Not yet recorded
         </td>
-        <td headers="taxedearnings" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="taxedearnings" ng-if="earningRecord.taxedEarnings >= 0">
           ${{earningRecord.taxedEarnings | number:0}}</td>
-        <td headers="multsymbol" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="multsymbol" ng-if="earningRecord.taxedEarnings >= 0">
           x
         </td>
-        <td headers="multiplier" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="multiplier" ng-if="earningRecord.taxedEarnings >= 0">
           {{earningRecord.indexFactor | number:2}}
         </td>
-        <td headers="eqsymbol" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="eqsymbol" ng-if="earningRecord.taxedEarnings >= 0">
           =
           </td>
         <td headers="indexedearnings"
-            ng-show="earningRecord.taxedEarnings >= 0">
+            ng-if="earningRecord.taxedEarnings >= 0">
           ${{earningRecord.indexedEarning() | number:0}}
         </td>
         <td headers="top35indicators">
