@@ -12,7 +12,7 @@ ROOT_DIR = os.path.expanduser("~/github/social-security-tools")
 REMOTE_DIR = ""
 S3_ACCESS_KEY = ""
 S3_SECRET_KEY = ""
-BUCKET = "socialsecurity.tools"
+BUCKET = "ssa.tools"
 
 
 def LoadKeys(filename):
