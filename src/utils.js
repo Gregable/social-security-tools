@@ -402,6 +402,11 @@ function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
       primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings));
 };
 
+/**
+ * Returns the maximum montly PIA that any person can have. This is determined
+ * by computing the SSA value given the maximum AIME for the current year.
+ * @return {number} maximum primary insurance amount
+ */
 function maximumPIA() {
   bpYear = CURRENT_YEAR - 2;
   const maxAime = MAXIMUM_EARNINGS[CURRENT_YEAR] / 12;
@@ -411,4 +416,3 @@ function maximumPIA() {
       ((maxAime - firstBendPoint(bpYear) -
         secondBendPoint(bpYear)) * AFTER_BENDPOINT2_MULTIPLIER));
 }
-

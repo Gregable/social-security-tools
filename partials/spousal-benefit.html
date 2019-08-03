@@ -76,7 +76,7 @@
     <p>
       <span class=names>{{spouse.name}}'s</span>
       Primary Insurance Amount: <b>$</b>
-      <input type="number" min=0 max={{maxPIA}} size=6 style="width: 68px"
+      <input type="number" min=0 max={{maximumPIA}} size=6 style="width: 68px"
             name="spousalPia" cast-to-integer
             ng-model="spouse.primaryInsuranceAmountValue"
             ng-change="refreshSlider()">
