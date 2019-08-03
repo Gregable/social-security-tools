@@ -86,9 +86,6 @@ function Recipient(name) {
   // is the "SSA" birthdate, based on the day before the "lay" birthdate.
   this.birthDate = new MonthDate().initFromYearsMonths(1970, 0);
 
-  // TODO(gregable): Compute this on the fly.
-  this.normalRetirementDate = new MonthDate(2037, 0);
-
   // This is a tuple of:
   // minYear, maxYear, ageYears, ageMonths, delatedIncreaseAnnual
   this.normalRetirement = FULL_RETIREMENT_AGE[0];
@@ -189,10 +186,17 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
     }
   }
   var normalRetirementAge = this.normalRetirementAge();
-  this.normalRetirementDate = this.birthDate.addDuration(normalRetirementAge);
 
   // Birthdate can affect indexed earnings.
   this.processIndexedEarnings_();
+}
+
+/*
+ * Returns this recipient's normal retirement date
+ * @return {MonthDate}
+ */
+Recipient.prototype.normalRetirementDate = function() {
+  return this.birthDate.addDuration(this.normalRetirementAge());
 }
 
 /**
@@ -202,7 +206,7 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
  */
 Recipient.prototype.spousalInflectionDate = function() {
   var threeYears = new MonthDuration().initFromYearsMonths(3, 0);
-  return this.normalRetirementDate.subtractDuration(threeYears);
+  return this.normalRetirementDate().subtractDuration(threeYears);
 }
 
 /**
@@ -616,7 +620,7 @@ Recipient.prototype.benefitAtDateGivenFiling = function(atDate, filingDate) {
   if (this.ageAtDate(filingDate).years() >= 70)
     return this.benefitAtAge(this.ageAtDate(filingDate));
   // If you are filing before normal retirement, no delayed credits anyway.
-  if (filingDate.lessThanOrEqual(this.normalRetirementDate))
+  if (filingDate.lessThanOrEqual(this.normalRetirementDate()))
     return this.benefitAtAge(this.ageAtDate(filingDate));
   // If you file in January, you are receiving benefits for the entire year.
   if (filingDate.monthIndex() === 0)
@@ -630,8 +634,8 @@ Recipient.prototype.benefitAtDateGivenFiling = function(atDate, filingDate) {
   var thisJan =
       new MonthDate().initFromYearsMonths(filingDate.year(), 0);
   var benefitComputationDate = 
-    this.normalRetirementDate.greaterThan(thisJan) ?
-        this.normalRetirementDate : thisJan;
+    this.normalRetirementDate().greaterThan(thisJan) ?
+        this.normalRetirementDate() : thisJan;
   return this.benefitAtAge(this.ageAtDate(benefitComputationDate));
 }
 
@@ -684,7 +688,7 @@ Recipient.prototype.totalBenefitAtDate = function(
   var total = this.totalBenefitWithSpousal(this.ageAtDate(filingDate),
                                            this.ageAtDate(spousalDate));
   if (total == maxBenefitWithSpousal ||
-      filingDate.lessThanOrEqual(this.normalRetirementDate))
+      filingDate.lessThanOrEqual(this.normalRetirementDate()))
     return total;
   // Otherwise, this is a user with delayed retirement credits in play, so we
   // may need to reduce the benefit for the first year.

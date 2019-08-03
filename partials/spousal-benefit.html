@@ -1,7 +1,7 @@
 <div ng-if="recipient.isEligible()">
 
   <div id=spousalBenefit class="benefit-estimate fixed-center-column"
-     ng-if="showReport()" ng-cloak>
+     ng-if="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
 
     <a class=offset-nav id=nav-spouse></a>
     <h2>Spouse's Data</h2>
@@ -22,7 +22,7 @@
   </div>
 
   <div id=isMarried class="benefit-estimate fixed-center-column"
-      ng-if="showReport() && isMarried()" ng-cloak>
+      ng-if="mode === ModeEnum.RENDER_EARNINGS && isMarried()" ng-cloak>
 
     <p>
       In addition to your own <u>primary</u> benefit, married couples may earn
@@ -53,7 +53,7 @@
       For <span class=names>{{spouse.name}}</span>, you must enter these two
       values.
     </p>
-  
+
     <h3>
       Enter <span class=names>{{spouse.name}}'s</span>
       Primary Insurance Amount
@@ -76,7 +76,7 @@
     <p>
       <span class=names>{{spouse.name}}'s</span>
       Primary Insurance Amount: <b>$</b>
-      <input type="number" min=0 max={{maxPIA()}} size=6 style="width: 68px"
+      <input type="number" min=0 max={{maximumPIA}} size=6 style="width: 68px"
             name="spousalPia" cast-to-integer
             ng-model="spouse.primaryInsuranceAmountValue"
             ng-change="refreshSlider()">
@@ -179,7 +179,7 @@
       <span class=names>{{higherEarner().name}}</span> is not eligible for
       any spousal benefits. This is because the benefit one receives is
       always the larger of the personal or spousal benefit. Because
-      <span class=names>{{higherEarner().name}}'s</span> own benefit is 
+      <span class=names>{{higherEarner().name}}'s</span> own benefit is
       larger than <span class=names>{{higherEarner().name}}'s</span>
       spousal benefit, <span class=names>{{higherEarner().name}}</span> does not
       get any spousal benefit.
@@ -194,7 +194,7 @@
       receive a <u>spousal benefit</u> based on
       <span class=names>{{higherEarner().name}}'s</span> personal benefit.
       However, in this case, <span class=names>{{lowerEarner().name}}</span>
-      will not receive a <u>spousal benefit</u> as 
+      will not receive a <u>spousal benefit</u> as
       <span class=names>{{lowerEarner().name}}'s</span> own personal benefit
       is more than the spousal benefit earned on
       <span class=names>{{higherEarner().name}}'s</span> Social Security record.
@@ -209,7 +209,7 @@
       receive a <u>spousal benefit</u> based on
       <span class=names>{{higherEarner().name}}'s</span> personal benefit.
     <p>
-  
+
     <p>
       <!-- TODO: Compute NRA here. -->
       Let's start by calculating
@@ -290,9 +290,9 @@
       <span class=names>{{lowerEarner().name}}'s</span> <i>personal</i> benefit.
       This is the case, as long as
       <span class=names>{{lowerEarner().name}}'s</span>
-      personal benefit is less than 50% of 
+      personal benefit is less than 50% of
       <span class=names>{{higherEarner().name}}'s</span> personal benefit.
-    </p>     
+    </p>
 
     <a class=offset-nav id=nav-early-delayed-spouse></a>
     <h2>Early and Delayed Spouse Retirement</h2>
@@ -303,9 +303,9 @@
     </p>
     <p>
       Spousal benefits do not increase if claimed after Normal Retirement Age,
-      but are reduced before Normal Retirement Age 
-      (<b>{{lowerEarner().normalRetirementDate.monthFullName()}}
-          {{lowerEarner().normalRetirementDate.year()}}</b>) at the same rate as
+      but are reduced before Normal Retirement Age
+      (<b>{{lowerEarner().normalRetirementDate().monthFullName()}}
+          {{lowerEarner().normalRetirementDate().year()}}</b>) at the same rate as
       personal benefits.
     </p>
     <div class=insetTextBox ng-if="spouseBirth.day === 1 && birth.day !== 1">
@@ -325,20 +325,20 @@
     <p>
       If <span class=names>{{lowerEarner().name}}</span> begins spousal
       benefits before Normal Retirement Age
-      (<b>{{lowerEarner().normalRetirementDate.monthFullName()}} 
-          {{lowerEarner().normalRetirementDate.year()}}</b>),
+      (<b>{{lowerEarner().normalRetirementDate().monthFullName()}}
+          {{lowerEarner().normalRetirementDate().year()}}</b>),
       the spousal benefit will be <u>permanently</u> <i>reduced</i> per year you
       start early by:
     </p>
     <ul>
       <li><b>6.67%</b> per year if starting AFTER
-        <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
+        <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and
           {{lowerEarner().normalRetirement.ageMonths}} months</b>
         (<b>{{lowerEarner().spousalInflectionDate().monthFullName()}}
             {{lowerEarner().spousalInflectionDate().year()}}</b>)
       </li>
       <li><b>5.00%</b> per year if starting BEFORE
-        <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and 
+        <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and
           {{lowerEarner().normalRetirement.ageMonths}} months</b>
         (<b>{{lowerEarner().spousalInflectionDate().monthFullName()}}
             {{lowerEarner().spousalInflectionDate().year()}}</b>)
@@ -417,7 +417,7 @@
       canvas element -->
     <div style="height: 436px;"></div>
 
-    <div ng-if="spousalSelection.show" class=totalSpousalAtDate> 
+    <div ng-if="spousalSelection.show" class=totalSpousalAtDate>
       <table class=combinedBenefit>
         <tr>
           <td colspan=3>
@@ -445,7 +445,7 @@
           <td>
             <b>Total Benefit</b>:
           </td><td>
-            ${{(spousalSelection.higherEarnerBenefit + 
+            ${{(spousalSelection.higherEarnerBenefit +
                 spousalSelection.lowerEarnerBenefit) | number:0}}
           </td>
         </tr>
@@ -455,7 +455,7 @@
     <div class=insetTextBox ng-if="spouseBirth.day > 2 && birth.day <= 2">
       <h4>Special Rule</h4>
       <p>
-        You may find it oddly specific that the earliest 
+        You may find it oddly specific that the earliest
         <span class=names>{{spouse.name}}</span> can actually
         begin benefits is at age 62 and 1 month. Benefit eligibility
         is calculated based on the first month that you are a particular age
@@ -487,8 +487,8 @@
       <span class=names>{{lowerEarner().name}}</span> begins collecting the
       Survivor Benefit before <span class=names>{{lowerEarner().name}}</span>'s
       Normal Retirement Age
-      (<b>{{lowerEarner().normalRetirementDate.monthFullName()}} 
-          {{lowerEarner().normalRetirementDate.year()}}</b>).
+      (<b>{{lowerEarner().normalRetirementDate().monthFullName()}}
+          {{lowerEarner().normalRetirementDate().year()}}</b>).
     </p>
     <p>
       More detail on Survivor Benefits can be found at
@@ -497,8 +497,8 @@
     </p>
     <p>
       The value of the Survivor Benefit may be something to consider when
-      choosing initial benefit dates for both spouses, but especially 
-      <span class=names>{{higherEarner().name}}</span>. Delaying current 
+      choosing initial benefit dates for both spouses, but especially
+      <span class=names>{{higherEarner().name}}</span>. Delaying current
       benefits can have an effect similar to life insurance by providing a higher
       Survivor Benefit which will persist throughout the surviving spouse's life.
     </p>

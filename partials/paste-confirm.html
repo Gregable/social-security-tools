@@ -1,5 +1,5 @@
 <span id="earningsTable" class="confirmation-prompt"
-     ng-if="showPasteConfirmation()">
+      ng-if="mode === ModeEnum.PASTE_CONFIRMATION">
   <div class="confirmation-left">
     <h3>Step 2 of 3: Confirm Earnings Record</h3>
     <p>Is this the same table you copied from ssa.gov?</p>
@@ -48,7 +48,7 @@
 </span>
 
 <span id="earningsApology" class="confirmation-prompt"
-  ng-if="showPasteApology()">
+  ng-if="mode === ModeEnum.PASTE_APOLOGY">
   <p>Sorry about that, let's try again.</p>
   <button ng-click="reset()" class=success>Click to restart.</button>
 </span>
