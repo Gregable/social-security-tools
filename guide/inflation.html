@@ -5,9 +5,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
-    How inflation affects Social Security benefit calculations.
+    Social Security Inflation Calculator
   </title>
-  <link rel="stylesheet" href="stylesheet.css" />
+  <link rel="stylesheet" href="/stylesheet.css" />
 </head>
 
 <body>
@@ -15,47 +15,50 @@
     <!-- partials/header.html -->
     <div class="fixedheader">
       <ul class="navpills">
-        <li role="presentation"><a href=".">Home</a></li>
-        <li role="presentation" class="active"><a href="#">About</a></li>
-        <li role="presentation"><a href="contributors.html">Contributors</a></li>
-        <li role="presentation"><a href="contact.html">Contact</a></li>
+        <li role="presentation"><a href="/">Home</a></li>
+        <li role="presentation"><a href="/about.html">About</a></li>
+        <li role="presentation" class="active"><a href="/guides.html">Guides</a></li>
+        <li role="presentation"><a href="/contributors.html">Contributors</a></li>
+        <li role="presentation"><a href="/contact.html">Contact</a></li>
       </ul>
-      <h3>Social Security Calculator</h3>
+      <h3>Social Security Inflation Calculations</h3>
     </div>
 
    <!-- Main Contents -->
    <div>
-     <h1>How inflation affects Social Security benefit calculations.</h1>
+     <h1>How inflation rate affects Social Security benefit calculations.</h1>
      <p>
-      Many people know that inflation reduces the real value of their savings
-      every year. For example, using CPI data, $1 had the same spending power
-      in year 1950 as $7.13 did in year 2000. Therefore, when considering
-      benefits over multiple decades, it is worth understanding how inflation
-      will impact those benefits.
+      Many people know that the inflation rate reduces the real value of their
+      savings every year. For example, using CPI data, $1 had the same spending
+      power in year 1950 as $7.13 did in year 2000. Therefore, when considering
+      social security benefits over multiple decades, it is worth understanding
+      how the inflation index will impact those benefits.
     </p>
     <p>
       The short answer is that the Social Security program is designed to
-      account for inflation, as is this tool. The benefit estimates that
-      the Social Security Administration and this tool will give you are
+      account for inflation, as is this site's
+      <a href="/">social security calculator tool</a>. The benefit estimates
+      that the Social Security Administration and this tool will give you are
       in "today's dollars" meaning that the actual benefits will be higher
-      based on the inflation between today and the benefit date, but will
-      have the same purchasing power at that time as the estimate has today.
+      to match the increase in inflation between today and the benefit date,
+      but will have the same purchasing power at that time as the estimate has
+      today.
     </p>
     <p>
       For example, if this tool estimates your benefit at $1,000 per year
       starting in 20 years, but there is 350% inflation during those 20 years,
-      then the actual benefit will be $3,500.
+      then the actual benefit will be $3,500 ($1,000 x 350%).
     </p>
     <p>
-      While unnecessary, if you want to understand this in even more detail,
-      read on below to understand how different measures of inflation affect
-      different parts of the social security computation.
+      If you want to understand this in even more detail, read on below to
+      understand how different measures of inflation affect different parts of
+      the social security computation.
     </p>
     <h2>Wage Growth Adjustments during your working years</h2>
     <p>
      Consider the following example earnings record from 2005 to 2017:
     </p>
-    <img src=static/example-earnings-record.png
+    <img src=/static/example-earnings-record-simplified.png
          style="margin: auto; display: block">
     <p>
       This person recieves a 2.5% raise every year to keep up with inflation.
@@ -84,6 +87,15 @@
       the Average Wage Index and thus all of the prior year's indexed
       earnings values.
     </p>
+    <p>
+      The Social Security Administration maintains estimated (a guess) indexing
+      factors for future years. You can see the estimates
+      <a href="https://www.ssa.gov/oact/TR/TRassum.html">here</a> and calculate
+      your estimated indexing factors based on your year of eligibility
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html">here</a>. If you
+      don't know which year you are eligible for benefits, use the
+      <a href="/">social security calculator tool</a> to compute it.
+    </p>
     <h2>Cost of Living Adjustments during your benefit years</h2>
     <p>
       Once you have filed for your benefit, you no longer recieve additional
@@ -99,13 +111,28 @@
       years with no increase when there was little to no actual inflation.
     </p>
     <p>
-      Future Cost of Living Adjustments are not shown in this calculator
-      since the actual adjustment value won't be known until the future.
+      Future Cost of Living Adjustments are not shown in the
+      <a href="/">social security calculator tool</a> since the actual
+      adjustment value won't be known until the future.
       Therefore any benefits shown by this calculator are displayed in
       "today's dollars".
     </p>
   </div>
+  
+  <div id=homelink style="display: flex; justify-content: center">
+    <div>
+    <h1>Try SSA.tools to see your personalized benefit</h1>
+    <span style="font-size: 16px;">
+      <p>See your personal benefit data and ask 'What If?' Questions.
+         The tool is absolutely free.
+      </p>
+      <p style="text-align: center">
+        <a class="bigbtn" href="/calculator.html" role="button">Get Started</a>
+      </p>
+    </span>
+    </div>
+  </div>
 
-<script async src="src/analytics.js"></script>
+<script async src="/src/analytics.js"></script>
 
 </body></html>

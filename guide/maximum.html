@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" ng-app=guidesApp>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    Social Security Maximum
+  </title>
+  <link rel="stylesheet" href="/stylesheet.css" />
+
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+
+  <script type="text/javascript" src="/src/constants.js"></script>
+  <script type="text/javascript" src="/src/utils.js"></script>
+  <script type="text/javascript" src="/src/recipient.js"></script>
+  <script type="text/javascript" src="maximum.js"></script>
+</head>
+
+<body ng-controller="MaximumGuideController" ng-init="init()">
+  <div class="fixedcontainer">
+    <!-- partials/header.html -->
+    <div class="fixedheader">
+      <ul class="navpills">
+        <li role="presentation"><a href="/">Home</a></li>
+        <li role="presentation"><a href="/about.html">About</a></li>
+        <li role="presentation" class="active"><a href="/guides.html">Guides</a></li>
+        <li role="presentation"><a href="/contributors.html">Contributors</a></li>
+        <li role="presentation"><a href="/contact.html">Contact</a></li>
+      </ul>
+      <h3>Social Security Maximum</h3>
+    </div>
+
+   <!-- Main Contents -->
+   <div>
+     <h1>Maximum possible Social Security benefit in {{CURRENT_YEAR}}</h1>
+     <p>
+       Few people will recieve the maximum possible benefit, but how high is
+       the maximum? The short answer is that the maximum monthly Social Security
+       benefit that an individual who files a claim in {{CURRENT_YEAR}} can
+       receive is:
+     </p>
+     <blockquote style="font-size: 18px">
+       <b>${{maximumMonthlyBenefit | number}} / month</b>
+     </blockquote>
+     <p>
+       In order to reach this high of a benefit, someone must have:
+     </p>
+     <ul>
+       <li>Waited until age 70 to file for benefits</li>
+       <li>Earned at least the maximum taxable earnings for at least 35 years
+           of their life.</li>
+     </ul>
+     <p>You can see what the per-year maximum taxable earnings are from the
+     Social Security Adminstration's 
+     <a href="https://www.ssa.gov/OACT/COLA/cbb.html">maximum taxble income table</a>.
+     </p>
+
+     <h2>Different filing ages</h2>
+     <p>
+       At other filing ages, the maximum possible benefit would be smaller:
+     <p>
+     <ul>
+       <li>${{normalMaximumMonthlyBenefit | number}} / month at age 66</li>
+       <li>${{earlyMaximumMonthlyBenefit | number}} / month at age 62</li>
+     </ul>
+     <p>
+       The <a href="/">social security calculator</a> will allow you to see
+       the benefit at any starting age, for any earnings record.
+     </p>
+     <h2>Spousal benefit</h2>
+     <p>
+       The spouse of someone earning the maximum monthly benefit would also be
+       eligible to earn a spousal benefit on the same record of as much as half
+       of the primary earner's benefit.
+     </p>
+     <p>
+       In the case of the primary earner earning the maximum benefit of
+       ${{maximumMonthlyBenefit | number}} / month, the spouse would also
+       be eligible for an additional maximum benefit of 
+       ${{spouseMax | number}} / month. This would take the total benefit for
+       this family to ${{familyMax | number}} / month. If the spouse also had
+       maxed out his or her own record, the total benefit for the two maximum
+       personal benefits is simply double a single personal benefit, which is
+       ${{maximumMonthlyBenefit * 2 | number}} / month.
+     </p>
+
+     <h2>Fewer working years</h2>
+     <p>
+       Should someone who had high taxable income work more years to increase
+       their social security benefit? The answer is usually no. Benefits grow
+       more slowly as they approach the maximum. For example, imagine the same
+       person earned fewer than 35 years at the maximum income:
+     </p>
+     <ul>
+       <li>30 Years: ${{max30 | number}} / month, only ${{maximumMonthlyBenefit - max30}} less</li>
+       <li>25 Years: ${{max25 | number}} / month, only ${{maximumMonthlyBenefit - max25}} less</li>
+     </ul>
+        
+  </div>
+  
+  <div id=homelink style="display: flex; justify-content: center">
+    <div>
+    <h1>Try SSA.tools to see your personalized maximum</h1>
+    <span style="font-size: 16px;">
+      <p>Look at your personal benefit data find out how it will compare
+         to these maximums.
+      </p>
+      <p>Ask other 'What If?' questions. The tool is absolutely free.</p>
+      <p style="text-align: center">
+        <a class="bigbtn" href="/calculator.html" role="button">Get Started</a>
+      </p>
+    </span>
+    </div>
+  </div>
+
+<script async src="/src/analytics.js"></script>
+
+</body></html>
