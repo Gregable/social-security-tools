@@ -403,16 +403,23 @@ function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
 };
 
 /**
- * Returns the maximum montly PIA that any person can have. This is determined
+ * Returns the maximum monthly PIA that any person can have. This is determined
  * by computing the SSA value given the maximum AIME for the current year.
  * @return {number} maximum primary insurance amount
  */
 function maximumPIA() {
-  bpYear = CURRENT_YEAR - 2;
-  const maxAime = MAXIMUM_EARNINGS[CURRENT_YEAR] / 12;
-  return Math.floor(
-      (firstBendPoint(bpYear) * BEFORE_BENDPOINT1_MULTIPLIER) +
-      (secondBendPoint(bpYear) * BEFORE_BENDPOINT2_MULTIPLIER) +
-      ((maxAime - firstBendPoint(bpYear) -
-        secondBendPoint(bpYear)) * AFTER_BENDPOINT2_MULTIPLIER));
+  r = new Recipient('')
+  r.updateBirthdate(new Date(CURRENT_YEAR - 70, 2, 1));
+
+  earningsRecords = []
+  // Loop over most recent 35 years, not including the current year.
+  for (var year = CURRENT_YEAR - 35; year <= CURRENT_YEAR - 1; year++) {
+    record = new EarningRecord();
+    record.year = year;
+    record.taxedEarnings = MAXIMUM_EARNINGS[year];
+    earningsRecords.push(record);
+  }
+  r.initFromEarningsRecords(earningsRecords);
+
+	return r.primaryInsuranceAmountFloored();
 }
