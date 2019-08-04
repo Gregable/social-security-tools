@@ -49,6 +49,8 @@ RELEASE_FILES = [
   'bootstrap.min.css',
   'stylesheet.css',
   'partials/*.html',
+  'guide/*.html',
+  'guide/*.js',
   'src/*.js',
   'static/*'
 ]
