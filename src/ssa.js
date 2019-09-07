@@ -276,7 +276,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
 
   $scope.earningsRecords = function() {
-    return $scope.recipient.earningsRecords;
+    return $scope.recipient.earningsRecords();
   };
   
   $scope.earningsRecordsIncludeMedicare = function() {
@@ -618,7 +618,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       return new MonthDuration().initFromMonths(this.value);
     }
     this.selectedDate = function() {
-      return earnerFn().birthDate.addDuration(this.selectedAge());
+      return earnerFn().birthDate().ssaBirthDate().addDuration(
+          this.selectedAge());
     }
   }
 
@@ -736,8 +737,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     // The number of months spanned is 8 years (age 62 - 70) plus the
     // difference in ages of the two earners.
-    var higherBirth = $scope.higherEarner().birthDate;
-    var lowerBirth = $scope.lowerEarner().birthDate;
+    var higherBirth = $scope.higherEarner().birthDate().ssaBirthDate();
+    var lowerBirth = $scope.lowerEarner().birthDate().ssaBirthDate();
     var numMonths = Math.abs(higherBirth.subtractDate(lowerBirth).asMonths()) +
       (8 * 12);
     // Each slider has a small 'tail' on each side of the slider which is

@@ -81,7 +81,7 @@
   <div class=sticky-shadow></div>
   <div class=sticky-shadow-cover></div>
 
-  <span ng-if="recipient.futureEarningsRecords.length > 0">
+  <span ng-if="recipient.futureEarningsRecords().length > 0">
   <table class="fancy-table">
   <thead>
     <tr>
@@ -95,7 +95,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="earningRecord in recipient.futureEarningsRecords">
+    <tr ng-repeat="earningRecord in recipient.futureEarningsRecords()">
       <td headers="workyear">{{earningRecord.year}}</td>
       <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
       <td headers="taxedearnings">
