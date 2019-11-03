@@ -105,7 +105,7 @@ html {
   line-height: 1.4;
   margin: 0 0 15px 0;
 }
-.jumbotron > p > a.btn {
+a.bigbtn {
   background-color: #5cb85c;
   border-color: #4cae4c;
   border-radius: 6px;
@@ -126,10 +126,9 @@ html {
   display: inline-block;
   margin-bottom: 0;
 }
-.jumbotron > p > .btn:hover {
+a.bigbtn:hover {
   background-color: #449d44;
   border-color: #398439;
-
 }
 
   

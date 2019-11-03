@@ -1,5 +1,5 @@
 <div id=Credits class="credits fixed-center-column"
-                        ng-show="showReport()" ng-cloak>
+                        ng-if="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
   <a class=offset-nav id=nav-eligibility></a>
   <h2>Retirement Benefits Eligibility</h2>
 
@@ -10,7 +10,7 @@
     Social Security on your own work history.  You may still be eligible to receive spousal benefits.
   </p>
 
-  <span ng-if="recipient.earnedCredits > 0">
+  <span ng-if="recipient.earnedCredits() > 0">
     <table class="fancy-table">
     <thead>
       <tr>
@@ -22,20 +22,20 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="earningRecord in earningsRecords()">
+      <tr ng-repeat="earningRecord in recipient.earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
         <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
-        <td colspan=3 ng-show="earningRecord.taxedEarnings < 0"
+        <td colspan=3 ng-if="earningRecord.taxedEarnings < 0"
             style="text-align: center">
           Not yet recorded
         </td>
-        <td headers="taxedearnings" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="taxedearnings" ng-if="earningRecord.taxedEarnings >= 0">
           ${{earningRecord.taxedEarnings | number:0}}
         </td>
-        <td headers="epc" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="epc" ng-if="earningRecord.taxedEarnings >= 0">
           ${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}
         </td>
-        <td headers="credits" ng-show="earningRecord.taxedEarnings >= 0">
+        <td headers="credits" ng-if="earningRecord.taxedEarnings >= 0">
           {{earningRecord.credits | number:0}}
         </td>
       </tr>
@@ -44,29 +44,32 @@
   </span>
 
   <p>
-    <span ng-if="futureYears.length > 0">If you work {{recipient.futureEarningsYears | number:0}} 
-      additional years, you will earn {{recipient.plannedCredits | number:0}} additional credits. 
+    <span ng-if="recipient.hasFutureEarnings()">
+    If you work {{recipient.futureEarningsYears() | number:0}} additional years,
+    you will earn {{recipient.plannedCredits() | number:0}} additional credits. 
     </span>
   </p>
 
-  <span ng-if="futureYears.length > 0">
+  <span ng-if="recipient.hasFutureEarnings()">
     <table class="fancy-table">
     <thead>
       <tr>
         <th id="workyear">Year</th>
         <th id="age">Age</th>
         <th id="taxedearnings">Taxed Earnings</th>
-        <th id="epc">Earnings Per Credit</th>
-        <th id="credits">Credits<th>
+        <th id="epc">Est. Earnings Per Credit</th>
+        <th id="credits">Est. Credits<th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="year in futureYears">
-        <td headers="workyear">{{year}}</td>
-        <td headers="age">{{recipient.exampleAge(year).age}}</td>
-        <td headers="taxedearnings">${{futureWageWorkSlider.minValue | number:0}}</td>
-        <td headers="epc">${{recipient.getEarningsPerCreditForYear(2018) | number:0}}</td>
-        <td headers="credits">{{recipient.calculateCredits(futureWageWorkSlider.minValue, 2018) | number:0}}</td>
+      <tr ng-repeat="earningRecord in recipient.futureEarningsRecords()">
+        <td headers="workyear">{{earningRecord.year}}</td>
+        <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
+        <td headers="taxedearnings">
+          ${{earningRecord.taxedEarnings | number:0}}
+        </td>
+        <td headers="epc">${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}</td>
+        <td headers="credits">{{recipient.calculateCredits(earningRecord.taxedEarnings, earningRecord.year) | number:0}}</td>
       </tr>
     </tbody>
     </table>
@@ -75,31 +78,31 @@
   <div ng-if="recipient.hasEarningsBefore1978" class=insetTextBox>
     <h4>Special Rule</h4>
     <p>
-      Earnings before 1978 were reported quarterly, and you earned one credit per quarter.
-      Because this website uses yearly earnings, credits may not be calculated correctly for
-      years before 1978.
+      Earnings before 1978 were reported quarterly, and you earned one credit
+      per quarter. Because the SSA earnings record only reports yearly
+      earnings, credits may not be calculated correctly for years before 1978.
     </p>
   </div>
 
   <p>
-    <span ng-if="recipient.earnedCredits >= 40">You have earned the required <b>40</b> credits to be 
+    <span ng-if="recipient.earnedCredits() >= 40">You have earned the required <b>40</b> credits to be 
       <u>permanently eligible</u> for retirement benefits on your own work record. 
     </span>
-    <span ng-if="40 > recipient.earnedCredits && recipient.totalCredits >= 40">You will have <b>40</b> credits
-      when you complete <b>{{recipient.neededYears | number:0}}</b> additional years of work earning 
+    <span ng-if="40 > recipient.earnedCredits() && recipient.totalCredits() >= 40">You will have <b>40</b> credits
+      when you complete <b>{{recipient.neededYears() | number:0}}</b> additional years of work earning 
       <b>${{futureWageWorkSlider.minValue | number:0}}</b> per year.  You will become <u>permanently eligible</u>
       for retirement benefits on your own work record when you have earned 40 credits.
     </span>
-    <span ng-if="40 > recipient.totalCredits">You have earned <b>{{recipient.earnedCredits | number:0}}</b> credits 
-      and will earn <b>{{recipient.plannedCredits | number:0}}</b> credits for a total of 
-      <b>{{recipient.totalCredits | number:0}}</b> credits, which is not enough to be eligible for retirement benefits 
+    <span ng-if="40 > recipient.totalCredits()">You have earned <b>{{recipient.earnedCredits() | number:0}}</b> credits 
+      and will earn <b>{{recipient.plannedCredits() | number:0}}</b> credits for a total of 
+      <b>{{recipient.totalCredits() | number:0}}</b> credits, which is not enough to be eligible for retirement benefits 
       on your own work record.  You may be eligible for spousal benefits.  You will become 
       <u>permanently eligible</u> for retirement benefits on your own work record when you have earned 
       40 credits.
     </span>
   </p>
 
-  <div class=insetTextBox ng-show="40 > recipient.earnedCredits">
+  <div class=insetTextBox ng-if="40 > recipient.earnedCredits()">
     <h4>Special Rule</h4>
     <p>
       You can earn enough credits to become eligible for social security retirement benefits

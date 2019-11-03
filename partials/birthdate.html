@@ -1,8 +1,11 @@
-<span ng-show="showReport() && demoId === -1" class="ng-cloak">
-  <a id=nav-birthdate></a>
-  <h2>Birth Date</h2>
+<span class="ng-cloak"
+      ng-controller=BirthdateController>
+  <span ng-if="ShouldRender()">
+    <a id=nav-birthdate></a>
+    <h2>Birth Date</h2>
 
-  <p class=birthdate>
-    You were born on <b>{{birth.month}} {{birth.day}}, {{birth.year}}</b>.
-  </p>
+    <p class=birthdate>
+      You were born on <b>{{birth.month}} {{birth.day}}, {{birth.year}}</b>.
+    </p>
+  </span>
 </span>
