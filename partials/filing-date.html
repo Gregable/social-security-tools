@@ -1,4 +1,4 @@
-<div id=filingDate class="fixed-center-column" ng-show="recipient.isEligible() && showReport()" ng-cloak>
+<div id=filingDate class="fixed-center-column" ng-if="recipient.isEligible() && mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
 
   <a class=offset-nav id=nav-age-decision></a>
   <h2>Deciding what age to start benefits</h2>
@@ -84,7 +84,7 @@
     is the primary concern.
   </p>
   <p>
-    SocialSecurity.Tools does not currently provide a mathematical optimizer
+    This tool does not currently provide a mathematical optimizer
     feature, but we can recommend the calculator at
     <a href="https://opensocialsecurity.com/" target=_blank
       >Open Social Security</a>.

@@ -12,6 +12,7 @@
     #   - dist/**/*.js
     #
     src_files:
+      - birthday.js
       - constants.js
       - recipient.js
       - ssa-parse.js

@@ -1,5 +1,6 @@
-<span id="pastePrompt" ng-show="showPastePrompt()">
+<span id="pastePrompt" ng-if="mode === ModeEnum.INITIAL">
   <div class="instructions">
+    <br>
     <p>
       To use the calculator, you must provide some data from your Social
       Security record.<br>
@@ -11,7 +12,7 @@
     <ol>
       <li>
         Login to 
-        <a target="_blank" href="https://secure.ssa.gov/RIL/SiView.do">ssa.gov</a>.
+        <a target="_blank" href="https://secure.ssa.gov/RIL/SiView.action">ssa.gov</a>.
         You may need to create an account if you haven't already.
       </li>
       <li>
@@ -20,7 +21,7 @@
       <li>
         Copy the earnings table. It should look similar to the example below,
         with different numbers and years.
-        <img src="static/earnings-table-example.png" width=318 height=270>
+        <img src="static/earnings-table-example.png" width=477 height=405>
         You can select the table by dragging your mouse over the entire table to
         select, or you can just use 'Control+A' to select the entire page.
         Either way will work. Copy the text with 'Control+C'.
@@ -34,7 +35,7 @@
 
   <div class="pastearea">
     <textarea id=pastearea wrap=off ng-model="pasteArea.contents"
-              placeholder="{{pasteArea.placeholder}}"></textarea>
+              placeholder="{{::pasteArea.placeholder}}"></textarea>
     <p>
       <span class=lock>&#x1f512;</span> Your data never leaves your own
       computer: the report is generated entirely by JavaScript in your browser.

@@ -27,7 +27,7 @@ class MonthDate {
     this.monthsSinceEpoch_ = monthsSinceEpoch;
     return this;
   }
- 
+
   /*
    * Initializer from a date. So (2000, 0) would be Jan, 2000.
    * @param {number} years
@@ -398,6 +398,28 @@ function colaAdjustment(yearTurn62, initialPIA) {
  * @return {number} primary insurance amount
  */
 function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
-  return colaAdjustment(yearTurn62, 
+  return colaAdjustment(yearTurn62,
       primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings));
 };
+
+/**
+ * Returns the maximum monthly PIA that any person can have. This is determined
+ * by computing the SSA value given the maximum AIME for the current year.
+ * @return {number} maximum primary insurance amount
+ */
+function maximumPIA() {
+  r = new Recipient('')
+  r.updateBirthdate(new Date(CURRENT_YEAR - 70, 2, 1));
+
+  earningsRecords = []
+  // Loop over most recent 35 years, not including the current year.
+  for (var year = CURRENT_YEAR - 35; year <= CURRENT_YEAR - 1; year++) {
+    record = new EarningRecord();
+    record.year = year;
+    record.taxedEarnings = MAXIMUM_EARNINGS[year];
+    earningsRecords.push(record);
+  }
+  r.initFromEarningsRecords(earningsRecords);
+
+	return r.primaryInsuranceAmountFloored();
+}
