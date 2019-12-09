@@ -414,7 +414,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function() {
     // Only update once there are some non-default values set.
-    if ($scope.spouseBirthdayInput == "")
+    if ($scope.spouseBirthdayInput == "0000-01-01")
       return; 
     const layBirthday = new Date($scope.spouseBirthdateInput);
     $scope.spouse.updateBirthdate(layBirthday);
