@@ -1,12 +1,10 @@
 """This simple python script will deploy the github files to an S3 store."""
 
+import boto3
 import datetime
 import glob
 import mimetypes
 import os
-
-import tinys3  # https://www.smore.com/labs/tinys3/
-
 
 ROOT_DIR = os.path.expanduser("~/github/social-security-tools")
 REMOTE_DIR = ""
@@ -27,16 +25,14 @@ def PutS3(filename):
   content_type = mimetypes.guess_type(filename)[0]
   localfile = os.path.join(ROOT_DIR, filename)
   remotefile = os.path.join(REMOTE_DIR, filename)
-  conn = tinys3.Connection(S3_ACCESS_KEY, S3_SECRET_KEY)
+  client = boto3.client('s3', aws_access_key_id=S3_ACCESS_KEY,
+                        aws_secret_access_key=S3_SECRET_KEY)
   datestr = datetime.datetime.now().strftime("%a, %d %b %Y %T %z")
   fp = open(localfile, 'rb')
   print localfile, content_type
-  conn.upload(
-      remotefile, fp, BUCKET, content_type=content_type,
-      headers = {
-        'x-amz-acl': 'public-read',
-      })
-
+  client.upload_fileobj(fp, BUCKET, remotefile, ExtraArgs=
+          {'ContentType': content_type,
+           'ACL': 'public-read'})
 
 LoadKeys(os.path.expanduser('~/.s3keys'))
 

@@ -216,17 +216,20 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     ga('send', 'event', 'PasteData', 'SucceedParse');
 
     $scope.recipient.initFromEarningsRecords(records);
-<<<<<<< HEAD
+#< HEAD
+#< HEAD
     $scope.pasteArea.mode = ModeEnum.PASTE_CONFIRMATION;
     $scope.pasteArea.contents = '';
-=======
+#=
+#=
+#> master
     $scope.mode = ModeEnum.PASTE_CONFIRMATION;
 
     // This is conservative as it assumes the user had wage income the
     // year they were born. I'm not sure if this is even possible, but
     // who knows.
     $scope.birth.maxPossibleYear = records[0].year;
->>>>>>> master
+#> master
   });
 
   $scope.refreshSlider = function() {
@@ -339,8 +342,11 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.mode = ModeEnum.INITIAL;
   };
 
-<<<<<<< HEAD
-=======
+#< HEAD
+#< HEAD
+#=
+#=
+#> master
  /**
    * Used to produce the birthdate picker for the spouse earner.
    * @return {Array<number>}
@@ -366,7 +372,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return pastYears;
   }
 
->>>>>>> master
+#> master
   $scope.updateFutureYears = function(id) {
     $scope.recipient.simulateFutureEarningsYears(
         /*numYears=*/$scope.futureYearsWorkSlider.minValue,
@@ -420,10 +426,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-<<<<<<< HEAD
+#< HEAD
   $scope.selfBirthdateInput = "";
   $scope.spouseBirthdateInput = "";
-=======
+#=
   $scope.birth = {
     day: 1,
     month: "Jan",
@@ -450,7 +456,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     return new Date(year, monthIndex, day);
   }
->>>>>>> master
+#> master
 
   $scope.followingMonth = function(input) {
     var out = {};
@@ -465,11 +471,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Called when the primary birthdate is modified.
   $scope.updateBirthdate = function() {
     // Only update once there are some non-default values set.
-<<<<<<< HEAD
+#< HEAD
+#< HEAD
     if ($scope.selfBirthdayInput == "0000-01-01")
-=======
+#=
     if (!$scope.birth.isSelected())
->>>>>>> master
+#> master
+#=
+    if (!$scope.birth.isSelected())
+#> master
       return; 
     const layBirthday = new Date($scope.selfBirthdateInput);
     $scope.recipient.updateBirthdate(layBirthday);
@@ -484,11 +494,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function() {
     // Only update once there are some non-default values set.
-<<<<<<< HEAD
+#< HEAD
+#< HEAD
     if ($scope.spouseBirthdayInput == "")
-=======
+#=
     if (!$scope.spouseBirth.isSelected())
->>>>>>> master
+#> master
+#=
+    if (!$scope.spouseBirth.isSelected())
+#> master
       return; 
     const layBirthday = new Date($scope.spouseBirthdateInput);
     $scope.spouse.updateBirthdate(layBirthday);
