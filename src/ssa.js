@@ -383,9 +383,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-  $scope.selfBirthdateInput = "";
-  $scope.spouseBirthdateInput = "";
-
   $scope.followingMonth = function(input) {
     var out = {};
     out.month = ALL_MONTHS_FULL[
@@ -401,13 +398,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Only update once there are some non-default values set.
     if ($scope.selfBirthdayInput == "0000-01-01")
       return; 
-    const layBirthday = new Date($scope.selfBirthdateInput);
+    const layBirthday = new Date($scope.selfBirthdayInput);
     $scope.recipient.updateBirthdate(layBirthday);
 
     // Also set the spouses birthdate to the same, which is a
     // reasonable default to start with, until the user selects
     // differently.
-    $scope.spouseBirthdateInput = $scope.selfBirthdayInput;
+    $scope.spouseBirthdayInput = $scope.selfBirthdayInput;
     $scope.updateSpouseBirthdate();
   }
  
@@ -416,7 +413,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Only update once there are some non-default values set.
     if ($scope.spouseBirthdayInput == "0000-01-01")
       return; 
-    const layBirthday = new Date($scope.spouseBirthdateInput);
+    const layBirthday = new Date($scope.spouseBirthdayInput);
     $scope.spouse.updateBirthdate(layBirthday);
    
     $scope.higherEarnerSlider.updateBirthDate();
