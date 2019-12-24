@@ -54,6 +54,7 @@ const EARNINGS_PER_CREDIT = {
   2017:	1300,
   2018:	1320,
   2019:	1360,
+  2020:	1410,
 };
 
 // Maximum earnings in each year which contribute to social security benefits.
@@ -123,6 +124,7 @@ const MAXIMUM_EARNINGS = {
   2017: 127200,
   2018: 128400,
   2019: 132900,
+  2020: 137700,
 };
 
 // https://www.ssa.gov/oact/progdata/oasdiRates.html
@@ -191,6 +193,7 @@ const TAX_RATES = {
   2017: .0515,
   2018: .0515,
   2019: .053,
+  2020: .053,
 };
 
 // Values from https://www.ssa.gov/oact/cola/piaformula.html
@@ -268,6 +271,7 @@ const WAGE_INDICES = {
   2015: 48098.63,
   2016: 48642.15,
   2017: 50321.89,
+  2018: 52145.80,
 };
 
 // Data from https://www.ssa.gov/OACT/COLA/colaseries.html
@@ -316,12 +320,13 @@ const COLA = {
   2016: 0.3,
   2017: 2.0,
   2018: 2.8,
+  2019: 1.6,
 };
 
 // Number of top years of earnings which contribute to SSA calculations.
 const SSA_EARNINGS_YEARS = 35;
 
-const CURRENT_YEAR = 2019;
+const CURRENT_YEAR = new Date().getFullYear();
 
 const ALL_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
