@@ -957,3 +957,6 @@ a.offset-nav {
   visibility: hidden;
   display: block;
 }
+input.birthdate-input {
+  font-size: 26px;
+}
