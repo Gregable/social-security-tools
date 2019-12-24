@@ -1,10 +1,10 @@
 /**
- * User birthdays in social security have some unique properties. We manage
+ * User birthdates in social security have some unique properties. We manage
  * them with instances of this class.
  */
-class Birthday {
+class Birthdate {
   constructor() {
-    // Internally a Birthday tracks time from January 1, Year 0.
+    // Internally a Birthdate tracks time from January 1, Year 0.
     this.birthdate_ = new Date(1980, 0, 1);
   }
 
@@ -21,8 +21,26 @@ class Birthday {
   }
 
   /**
+   * Returns true iff the lay birthdate lies on the first of the month,
+   * for example Jan 1.
+   */
+  isFirstOfMonth() {
+    return this.birthdate_.getDate() === 1;
+  }
+
+  /**
+   * Returns a string version of the user's lay birthdate.
+   */
+  HumanBirthdate() {
+    if (this.birthdate_ === undefined)
+      return "Unknown";
+    const options = {month: "short", year: "numeric", day: "numeric" };
+    return this.birthdate_.toLocaleDateString('en-us', options);
+  }
+
+  /**
    * SSA follows English common law that finds that a person "attains" an age
-   * on the day before their birthday. This function subtracts 1 day.
+   * on the day before their birthdate. This function subtracts 1 day.
    */
   englishBirthdate() {
     // We subtract 12 hours. 24 or 1 could get into trouble with daylight
@@ -32,10 +50,10 @@ class Birthday {
 
   /**
    * Returns a birthdate to an SSA birthdate. SSA follows English common law
-   * that finds that a person "attains" an age on the day before the birthday.
+   * that finds that a person "attains" an age on the day before the birthdate.
    * This function subtracts 1 day, and returns the result as a MontDate.
    */
-  ssaBirthDate() {
+  ssaBirthdate() {
     const ebd = this.englishBirthdate();
     return new MonthDate().initFromYearsMonths(
         ebd.getFullYear(), ebd.getMonth());
@@ -56,11 +74,11 @@ class Birthday {
 
   // Returns a 4 digit number representing the year
   ssaBirthYear() {
-    return this.ssaBirthDate().year();
+    return this.ssaBirthdate().year();
   }
   // Returns a number representing the month. January is 0, Feb is 1, and so on.
   ssaBirthMonth() {
-    return this.ssaBirthDate().monthIndex();
+    return this.ssaBirthdate().monthIndex();
   }
 
   /**
@@ -73,7 +91,7 @@ class Birthday {
     var example = {
       'age': year - this.ssaBirthYear(),
       'day': this.englishBirthdate().getDate(),
-      'month': this.ssaBirthDate().monthFullName(),
+      'month': this.ssaBirthdate().monthFullName(),
       'year': year
     };
     return example;

@@ -77,13 +77,13 @@ function Recipient(name) {
   // monthlyIndexedEarnings or set directly.
   this.primaryInsuranceAmountValue = 0;
 
-  this.birthdate_ = new Birthday();
+  this.birthdate_ = new Birthdate();
 
   // This is a tuple of:
   // minYear, maxYear, ageYears, ageMonths, delatedIncreaseAnnual
   this.normalRetirement = FULL_RETIREMENT_AGE[0];
   
-  // If true, the user's birthday is on the first, so they can recieve full
+  // If true, the user's birthdate is on the first, so they can recieve full
   // benefits on the month they turn 62.
   this.isFullMonth = false;
 }
@@ -174,13 +174,13 @@ Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
 
 /**
  * This returns the date in the given year that it is considered a person's
- * birthday, as well as their age.
+ * birthdate, as well as their age.
  */
 Recipient.prototype.exampleAge = function(year) {
   return this.birthdate_.exampleSsaAge(year);
 }
 
-Recipient.prototype.birthDate = function() {
+Recipient.prototype.birthdate = function() {
   return this.birthdate_;
 }
 
@@ -212,7 +212,7 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
  * @return {MonthDate}
  */
 Recipient.prototype.normalRetirementDate = function() {
-  return this.birthdate_.ssaBirthDate().addDuration(
+  return this.birthdate_.ssaBirthdate().addDuration(
       this.normalRetirementAge());
 }
 
@@ -233,7 +233,7 @@ Recipient.prototype.spousalInflectionDate = function() {
  */
 Recipient.prototype.dateAtAge = function(age) {
   console.assert(typeof age === typeof new MonthDate(), age);
-  return this.birthdate_.ssaBirthDate().addDuration(age);
+  return this.birthdate_.ssaBirthdate().addDuration(age);
 };
 
 /**
@@ -252,7 +252,7 @@ Recipient.prototype.dateAtYearsOld = function(years) {
  * @return {MonthDuration}
  */
 Recipient.prototype.ageAtDate = function(date) {
-  return date.subtractDate(this.birthdate_.ssaBirthDate());
+  return date.subtractDate(this.birthdate_.ssaBirthdate());
 };
 
 // Used for displaying text for earners whose indexing factors are still

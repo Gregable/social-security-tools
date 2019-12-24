@@ -558,26 +558,6 @@ ul.nav .navlabel {
   }
 }
 
-/* The Age Picker buttons are simply heavily CSS'ed radio buttons. */
-div.agePicker {
-  font-size: 14px;
-}
-
-div.picker {
-  max-width: 620px;
-  display: -webkit-flex;
-  display: -moz-flex;
-  display: -ms-flex;
-  display: flex;
-  flex-direction: row;
-  -webkit-flex-direction: row;
-  flex-flow: space-between;
-  -webkit-flex-flow: space-between;
-  justify-content: space-between;
-  -webkit-justify-content: space-between;
-  flex-wrap: wrap;
-  -webkit-flex-wrap: wrap;
-}
 /* hide the actual radio buttons */
 input.radio {
   display: none;
@@ -597,31 +577,6 @@ label.radio {
   user-select: none;
   color: #999;
   display: block;
-}
-label.radio.day {
-  width: 65px;
-  text-align: center;
-}
-label.radio.day span {
-  width: 29px;
-  display: inline-block;
-  text-indent: 0px;  /* override the label */
-  margin-left:33px;
-}
-label.radio.month span,label.radio.year span {
-  width: 40px;
-  text-align: center;
-  display: inline-block;
-  text-indent: 0px;  /* override the label */
-  margin-left:33px;
-}
-label.radio.month {
-  width: 79px;
-  text-align: center;
-}
-label.radio.year {
-  width: 79px;
-  text-align: center;
 }
 label.radio:before {
   position: absolute;
@@ -956,4 +911,7 @@ a.offset-nav {
   position: relative;
   visibility: hidden;
   display: block;
+}
+input.birthdate-input {
+  font-size: 26px;
 }

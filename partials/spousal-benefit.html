@@ -49,7 +49,7 @@
       For <span class=names>{{recipient.name}}</span>, we will use the values
     based on your <u>primary insurance amount</u> of
       (<b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month)
-      and your birthdate (<b>{{birth.month}}, {{birth.year}}</b>).
+      and your birthdate (<b>{{recipient.birthdate().HumanBirthdate()}}</b>).
       For <span class=names>{{spouse.name}}</span>, you must enter these two
       values.
     </p>
@@ -84,90 +84,27 @@
     </p>
 
     <h3>Enter <span class=names>{{spouse.name}}'s</span> Birthdate</h3>
-      <div class=agePicker>
-      <div class=picker>
-        <span ng-repeat="day in [1,2,3,4,5,6,7,8]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="day in [9,10,11,12,13,14,15,16]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="day in [17,18,19,20,21,22,23,24]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="day in [25,26,27,28,29,30,31]">
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-        <span ng-repeat="day in [32]" class=onlyHidden>
-        <input type=radio value="{{day}}" id="spouse-day-{{day}}"
-                class=radio ng-model="spouseBirth.day"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio day" for="spouse-day-{{day}}">
-          <span>{{day}}</span>
-        </label>
-        </span>
-      </div>
-      <p></p>
-      <div class=picker>
-        <span ng-repeat="month in all_months | limitTo:6">
-        <input type=radio value="{{month}}" id="spouse-month-{{month}}"
-                class=radio ng-model="spouseBirth.month"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio month" for="spouse-month-{{month}}"
-          ><span>{{month}}</span></label>
-        </span>
-      </div>
-      <div class=picker>
-        <span ng-repeat="month in all_months | limitTo:6:6">
-        <input type=radio value="{{month}}" id="spouse-month-{{month}}"
-                class=radio ng-model="spouseBirth.month"
-                ng-change="updateSpouseBirthdate()">
-        <label class="radio month" for="spouse-month-{{month}}"
-          ><span>{{month}}</span></label>
-        </span>
-      </div>
-      <p></p>
-      <div class=picker>
-        <span ng-repeat="year in allAgeYears()">
-          <input type=radio id="spouse-year-{{year}}" value="{{year}}"
-                class=radio ng-model="spouseBirth.year"
-                ng-change="updateSpouseBirthdate()">
-          <label class="radio year" for="spouse-year-{{year}}"
-            ><span>{{year}}</span></label>
-        </span>
-      </div>
+    <span ng-if="demoId === -1">
+    <div id="spouseAgeRequest" class="confirmation-prompt"
+         ng-controller="SpouseAgeRequestController"
+         ng-init="init()">
+        <input type=date class=birthdate-input ng-model="spouseBirthdateInput">
+        <br class=clear>
+        <div>
+        <!-- TODO: Style this in a way that the disabled bit is visibly
+                   obvious -->
+          <button ng-click="confirmBirthdate()" class=success
+                  ng-disabled="isInvalidBirthdate()">
+            <ico>&#10003;</ico> Next
+          </button>
+        </div>
     </div>
-    <br class=clear>
+    </span>
 
+    <span ng-if="showSpousalBenefit">
     <p class=birthdate>
       <span class=names>{{spouse.name}}</span> was born on
-      <b>{{spouseBirth.month}} {{spouseBirth.day}}, {{spouseBirth.year}}</b>.
+      <b>{{spouse.birthdate().HumanBirthdate()}}</b>.
     </p>
 
     <a class=offset-nav id=nav-spouse-benefit></a>
@@ -308,13 +245,17 @@
           {{lowerEarner().normalRetirementDate().year()}}</b>) at the same rate as
       personal benefits.
     </p>
-    <div class=insetTextBox ng-if="spouseBirth.day === 1 && birth.day !== 1">
+    <!-- Don't repeat the inset box if we already showed it once for
+         recipient -->
+    <div class=insetTextBox
+         ng-if="spouse.birthdate().layBirthDayOfMonth() === 1 && recipient.birthdate().layBirthDayOfMonth() !== 1">
       <h4>Special Rule</h4>
       <p>
         The month <span class=names>{{spouse.name}}</span> reaches specific ages
         may seem "off by one" from what you entered. Social Security follows
         English common law that finds that a person "attains" an age on the day
-        before the birthday. Because <span class=names>{{spouse.name}}</span> was
+        before their birthdate. Because
+	<span class=names>{{spouse.name}}</span> was
         born on the first of the month, this means that
         <span class=names>{{spouse.name}}</span> attains age
         <b>{{spouse.exampleAge().age}}</b> on
@@ -452,7 +393,7 @@
       </table>
     </div>
 
-    <div class=insetTextBox ng-if="spouseBirth.day > 2 && birth.day <= 2">
+    <div class=insetTextBox ng-if="spouse.birthdate().layBirthDayOfMonth() > 2 && recipient.birthdate().layBirthDayOfMonth() <= 2">
       <h4>Special Rule</h4>
       <p>
         You may find it oddly specific that the earliest
@@ -460,7 +401,7 @@
         begin benefits is at age 62 and 1 month. Benefit eligibility
         is calculated based on the first month that you are a particular age
         throughout the <u>entire</u> month. For most, this is the month
-        <i>after</i> their birthday.
+        <i>after</i> their birthdate.
       </p>
       <p>
         For example, the first month that <span class=names>{{spouse.name}}</span>
@@ -502,6 +443,7 @@
       benefits can have an effect similar to life insurance by providing a higher
       Survivor Benefit which will persist throughout the surviving spouse's life.
     </p>
+    </span><!-- showSpousalBenefit -->
     </div><!-- isSpousalBenefit() -->
   </div>
 </div><!-- recipient.isEligible() -->

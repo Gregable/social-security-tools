@@ -38,44 +38,90 @@ ssaApp.controller("AgeRequestController", function ($scope) {
    * Initialization
    */
   $scope.init = function() {
-    $scope.all_months = ALL_MONTHS;
+    // This causes the date picker to display "mm/dd/yyy" which seems more
+    // useful than guessing the user's birthdate.
+    $scope.selfBirthdateInput = null;
+    $scope.$on('selfBirthdateSetDemo', $scope.selfBirthdateSetDemo);
+  }
+  $scope.init();
+
+  $scope.selfBirthdateSetDemo = function(event, date) {
+    $scope.selfBirthdateInput = date;
   }
 
-  /** 
-   * Used to produce the birthdate picker for the primary earner. Enumerates
-   * possible birth years for the primary earner. Always returns a multiple of
-   * 7 number of years, so that the picker is a grid.
-   * @return {Array<number>}
-   */
-  $scope.primaryEarnerYears = function() {
-    var pastYears = [];
-    // We want a multiple of 7 years, want to be sure to include the user's
-    // birth year, and don't want to include more than we need to.
-    
-    // Start at 70 years ago, anyone older than that is already collecting
-    // social security (and can just pick 70 for example).
-    const start = CURRENT_YEAR - 70;
-    // End at the first year we have earnings records for. I don't think anyone
-    // could have earnings records before they were born.
-    var end = $scope.birth.maxPossibleYear;
-    // Add a few years to make sure we have a multiple of 7:
-    end += (7 - (end - start + 1) % 7)
+  // Double negative required because angular expression in template can't
+  // evaluate a not (!).
+  $scope.isInvalidBirthdate = function() {
+    if ($scope.selfBirthdateInput === undefined) return true;
+    if ($scope.selfBirthdateInput === null) return true;
+    // TODO: Check that the date is in the past, isn't too far in the past, etc.
+    return false;
+  }
 
-    for (var i = start; i <= end; ++i) {
-      pastYears.push(i);
-    }
-    return pastYears;
-  };
+  // User button click triggered function which confirms the user's birthdate
+  // selection.
+  $scope.confirmBirthdate = function() {
+    if ($scope.isInvalidBirthdate())
+      return;
+    // Send basic analytics event indicating that the user entered their
+    // own birthdate. Never records what birthdate a user entered.
+    ga('send', 'event', 'PasteData', 'ConfirmBirthdate');
+    $scope.$emit('birthdateChange', $scope.selfBirthdateInput);
+  }
+});
+
+// partials/spousal-benefit.html
+ssaApp.controller("SpouseAgeRequestController", function ($scope) {
+ /**
+   * Initialization
+   */
+  $scope.init = function() {
+    // This causes the date picker to display "mm/dd/yyy" which seems more
+    // useful than guessing the user's birthdate.
+    $scope.spouseBirthdateInput = null;
+    $scope.$on('spouseBirthdateSetDemo', $scope.spouseBirthdateSetDemo);
+  }
+  $scope.init();
+    
+  $scope.spouseBirthdateSetDemo = function(event, date) {
+    $scope.spouseBirthdateInput = date;
+  }
+
+  // Double negative required because angular expression in template can't
+  // evaluate a not (!).
+  $scope.isInvalidBirthdate = function() {
+    if ($scope.spouseBirthdateInput === undefined) return true;
+    if ($scope.spouseBirthdateInput === null) return true;
+    // TODO: Check that the date is in the past, isn't too far in the past, etc.
+    return false;
+  }
+
+  // User button click triggered function which confirms the user's birthdate
+  // selection.
+  $scope.confirmBirthdate = function() {
+    if ($scope.isInvalidBirthdate())
+      return;
+    $scope.$emit('spouseBirthdateChange', $scope.spouseBirthdateInput);
+  }
 });
 
 // partials/birthdate.html
 ssaApp.controller("BirthdateController", function ($scope) {
+  // Displays the user's birthdate in the report if true.
   $scope.ShouldRender = function() {
     // Only render in the report mode.
     if ($scope.mode !== ModeEnum.RENDER_EARNINGS)
       return false;
     // Only render if not a demo.
     return $scope.demoId === -1;
+  };
+
+  // Human-readable birthdate.
+  $scope.HumanBirthdate = function() {
+    if ($scope.selfLayBirthdate === undefined)
+      return "Unknown";
+    const options = {month: "short", year: "numeric", day: "numeric" };
+    return $scope.selfLayBirthdate.toLocaleDateString('en-us', options);
   };
 });
 
@@ -88,6 +134,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_ = new BreakPointChart();
     $scope.ageChart_ = new AgeChart();
     $scope.spousalChartSelectedDate = new MonthDate();
+    
+    $scope.selfLayBirthdate = null;
+    $scope.spouseLayBirthdate = null;
 
     $scope.recipient = new Recipient("Self");
     $scope.spouse = new Recipient("Spouse");
@@ -100,14 +149,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.$watch('recipient', function() {$scope.spousalChart_.render()});
     $scope.$watch('spouse', function() {$scope.spousalChart_.render()});
-    $scope.$watch('birth', function() {$scope.refreshSlider});
-    $scope.$watch('spouseBirth', function() {$scope.refreshSlider});
+    $scope.$on('birthdateChange', $scope.updateBirthdateEvent);
+    $scope.$on('spouseBirthdateChange', $scope.updateSpouseBirthdateEvent);
 
     $scope.mode = ModeEnum.INITIAL;
-    $scope.all_months = ALL_MONTHS;
-    $scope.all_days = [];
-    for (var i = 1; i < 32; ++i)
-      $scope.all_days.push(i);
     $scope.demoId = -1;
     $scope.married = {
         value: "false"
@@ -115,11 +160,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   
     $scope.showMedicare = true;
     $scope.showIndexedEarnings = false;
+    // Enabled once the user has entered a valid spousal birthdate
+    $scope.showSpousalBenefit = false;
 
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
     // The maximum PIA that can be achieved for a user. Used in the spousal
-    //  chart inputs to set a maximum value for the user-entered PIA value.
+    // chart inputs to set a maximum value for the user-entered PIA value.
     $scope.maximumPIA = maximumPIA();
     $scope.maybeRenderCharts();
   };
@@ -164,19 +211,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Don't even record which demo was loaded.
     ga('send', 'event', 'DemoData', 'load');
 
+    // Note that bizarrely, these dates can show up in the tool one day earlier
+    // due to DST changes. See 
+    // https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off
     if (demoId === 0) {
       $scope.demoId = 0;
       $scope.spouse.primaryInsuranceAmountValue = 400;
-      $scope.birth.day = 1;
-      $scope.birth.month = "Jul";
-      $scope.birth.year = 1950;
-      $scope.birth.maxPossibleYear = 1950;
-      $scope.updateBirthdate();
-      $scope.spouseBirth.day = 1;
-      $scope.spouseBirth.month = "Mar";
-      $scope.spouseBirth.year = 1949;
-      $scope.spouseBirth.maxPossibleYear = 1949;
-      $scope.updateSpouseBirthdate();
+      $scope.updateBirthdate(new Date("1950-07-01"));
+      $scope.updateSpouseBirthdate(new Date("1949-03-01"));
       fetchTestData('averagepaste.txt');
       $scope.married.value = "true";
       $scope.lowerEarnerSlider.value = 66 * 12;
@@ -184,28 +226,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     if (demoId === 1) {
       $scope.demoId = 1;
       $scope.spouse.primaryInsuranceAmountValue = 600;
-      $scope.birth.day = 2;
-      $scope.birth.month = "Aug";
-      $scope.birth.year = 1950;
-      $scope.birth.maxPossibleYear = 1950;
-      $scope.updateBirthdate();
-      $scope.spouseBirth.day = 2;
-      $scope.spouseBirth.month = "Dec";
-      $scope.spouseBirth.year = 1951;
-      $scope.spouseBirth.maxPossibleYear = 1951;
-      $scope.updateSpouseBirthdate();
+      $scope.updateBirthdate(new Date("1950-08-02"));
+      $scope.updateSpouseBirthdate(new Date("1951-12-02"));
       fetchTestData('millionpaste.txt');
       $scope.married.value = "true";
       $scope.lowerEarnerSlider.value = 66 * 12;
     }
     if (demoId === 2) {
       $scope.demoId = 2;
-      $scope.birth.day = 3;
-      $scope.birth.month = "Sep";
-      $scope.birth.year = 1985;
-      $scope.birth.maxPossibleYear = 1985;
-      $scope.updateBirthdate();
-      $scope.updateSpouseBirthdate();
+      $scope.updateBirthdate(new Date("1985-09-03"));
       fetchTestData('youngpaste.txt');
     }
   }
@@ -229,11 +258,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.recipient.initFromEarningsRecords(records);
     $scope.mode = ModeEnum.PASTE_CONFIRMATION;
-
-    // This is conservative as it assumes the user had wage income the
-    // year they were born. I'm not sure if this is even possible, but
-    // who knows.
-    $scope.birth.maxPossibleYear = records[0].year;
+    $scope.pasteArea.contents = '';
   });
 
   $scope.refreshSlider = function() {
@@ -243,7 +268,40 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 		  $scope.layoutSliderChart();
     });
   };
-  
+ 
+  // Called when the primary birthdate is modified.
+  $scope.updateBirthdate = function(birthdate) {
+    $scope.selfLayBirthdate = birthdate
+    $scope.$broadcast('selfBirthdateSetDemo', birthdate);
+    $scope.recipient.updateBirthdate(birthdate);
+
+    $scope.higherEarnerSlider.updateBirthdate();
+    $scope.lowerEarnerSlider.updateBirthdate();
+    $scope.refreshSlider();
+    $scope.maybeRenderCharts();
+    $scope.mode = ModeEnum.RENDER_EARNINGS;
+  }
+  $scope.updateBirthdateEvent = function(event, birthdate) {
+    $scope.updateBirthdate(birthdate);
+  }
+ 
+  // Called whenever the spousal birthdate is modified.
+  $scope.updateSpouseBirthdate = function(birthdate) {
+    $scope.showSpousalBenefit = true;
+    console.log(birthdate);
+    $scope.$broadcast('spouseBirthdateSetDemo', birthdate);
+    $scope.spouseLayBirthdate = birthdate;
+    $scope.spouse.updateBirthdate(birthdate);
+
+    $scope.higherEarnerSlider.updateBirthdate();
+    $scope.lowerEarnerSlider.updateBirthdate();
+    $scope.refreshSlider();
+    $scope.maybeRenderCharts();
+  }
+  $scope.updateSpouseBirthdateEvent = function(event, birthdate) {
+    $scope.updateSpouseBirthdate(birthdate);
+  }
+ 
   $scope.confirmEarningsParse = function(confirmationValue) {
     if (confirmationValue === 'incorrect') {
       $scope.mode = ModeEnum.PASTE_APOLOGY;
@@ -259,18 +317,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
   
-  // User button click triggered function which confirms the user's birthdate
-  // selection.
-  $scope.confirmBirthDate = function() {
-    // Send basic event indicating that the user entered their own birthdate.
-    // Never records what birthdate a user entered.
-    ga('send', 'event', 'PasteData', 'ConfirmBirthDate');
-    $scope.updateBirthdate();
-    $scope.mode = ModeEnum.RENDER_EARNINGS;
-    $scope.maybeRenderCharts();
-    $scope.$emit('mode');
-  }
-
   $scope.isMarried = function() {
     return $scope.married.value == "true";
   };
@@ -346,31 +392,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.mode = ModeEnum.INITIAL;
   };
 
- /**
-   * Used to produce the birthdate picker for the spouse earner.
-   * @return {Array<number>}
-   */
-  $scope.allAgeYears = function() {
-    var pastYears = [];
-    // We want a multiple of 7 years, want to be sure to include the user's
-    // birth year, and don't want to include more than we need to.
-    
-    // Start at 70 years ago, anyone older than that is already collecting
-    // social security (and can just pick 70 for example).
-    const start = CURRENT_YEAR - 70;
-    // I'm going to assume that anyone married is at least 18. While it's
-    // possibly incorrect technically, I think it's close enough for our
-    // purposes here.
-    var end = CURRENT_YEAR - 18;
-    // Add a few years to make sure we have a multiple of 7:
-    end += (7 - (end - start + 1) % 7)
-
-    for (var i = start; i <= end; ++i) {
-      pastYears.push(i);
-    }
-    return pastYears;
-  }
-
   $scope.updateFutureYears = function(id) {
     $scope.recipient.simulateFutureEarningsYears(
         /*numYears=*/$scope.futureYearsWorkSlider.minValue,
@@ -424,33 +445,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-  $scope.birth = {
-    day: 1,
-    month: "Jan",
-    year: 0,
-    isSelected: function() {
-      return this.year !== 0 && this.month !== "";
-    }
-  }
-
-  $scope.spouseBirth = {
-    day: 1,
-    month: "Jan",
-    year: 0,
-    isSelected: function() {
-      return this.year !== 0 && this.month !== "";
-    }
-  }
-
-  // Given an input array above, returns a Date object representing the same.
-  $scope.dateFromInputArray = function(inputDate) {
-    var day = inputDate.day;
-    var monthIndex = ALL_MONTHS.indexOf(inputDate.month);
-    var year = inputDate.year;
-
-    return new Date(year, monthIndex, day);
-  }
-
+  // Given a MonthDate, returns a new MonthDate one month later.
   $scope.followingMonth = function(input) {
     var out = {};
     out.month = ALL_MONTHS_FULL[
@@ -461,41 +456,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return out;
   }
 
-  // Called when the primary birthdate is modified.
-  $scope.updateBirthdate = function() {
-    // Only update once there are some non-default values set.
-    if (!$scope.birth.isSelected())
-      return; 
-    $scope.birth.year = parseInt($scope.birth.year);
-    $scope.birth.day = parseInt($scope.birth.day);
-
-    const layBirthday = $scope.dateFromInputArray($scope.birth);
-    $scope.recipient.updateBirthdate(layBirthday);
-
-    // Also set the spouses birthdate to the same, which is a
-    // reasonable default to start with, until the user selects
-    // differently.
-    $scope.spouseBirth.day = $scope.birth.day;
-    $scope.spouseBirth.month = $scope.birth.month;
-    $scope.spouseBirth.year = $scope.birth.year;
-    $scope.updateSpouseBirthdate();
-  }
- 
-  // Called whenever the spousal birthdate is modified.
-  $scope.updateSpouseBirthdate = function() {
-    // Only update once there are some non-default values set.
-    if (!$scope.spouseBirth.isSelected())
-      return; 
-    $scope.spouseBirth.year = parseInt($scope.spouseBirth.year);
-    $scope.spouseBirth.day = parseInt($scope.spouseBirth.day);
-    
-    const layBirthday = $scope.dateFromInputArray($scope.spouseBirth);
-    $scope.spouse.updateBirthdate(layBirthday);
-   
-    $scope.higherEarnerSlider.updateBirthDate();
-    $scope.lowerEarnerSlider.updateBirthDate();
-    $scope.refreshSlider();
-  }
 
   $scope.higherEarner = function() {
     if ($scope.recipient.primaryInsuranceAmount() >=
@@ -603,7 +563,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       },
     },
     // Called on age changes for some events to cause redraw.
-    this.updateBirthDate = function() {
+    this.updateBirthdate = function() {
       var normalRetirementAge = this.earnerFn().normalRetirementAge();
       this.options.stepsArray = stepsArray(normalRetirementAge);
       this.options.ticksTooltip =
@@ -618,7 +578,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       return new MonthDuration().initFromMonths(this.value);
     }
     this.selectedDate = function() {
-      return earnerFn().birthDate().ssaBirthDate().addDuration(
+      return earnerFn().birthdate().ssaBirthdate().addDuration(
           this.selectedAge());
     }
   }
@@ -737,8 +697,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     // The number of months spanned is 8 years (age 62 - 70) plus the
     // difference in ages of the two earners.
-    var higherBirth = $scope.higherEarner().birthDate().ssaBirthDate();
-    var lowerBirth = $scope.lowerEarner().birthDate().ssaBirthDate();
+    var higherBirth = $scope.higherEarner().birthdate().ssaBirthdate();
+    var lowerBirth = $scope.lowerEarner().birthdate().ssaBirthdate();
     var numMonths = Math.abs(higherBirth.subtractDate(lowerBirth).asMonths()) +
       (8 * 12);
     // Each slider has a small 'tail' on each side of the slider which is

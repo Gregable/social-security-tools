@@ -13,22 +13,22 @@
   </p>
 
   <p>
-    For those born in <b>{{birth.year}}</b>, normal retirement age is
-    <b>{{recipient.normalRetirement.ageYears}} years and
-    {{recipient.normalRetirement.ageMonths}} months</b>.
+    For those born in <b>{{selfLayBirthdate.getFullYear()}}</b>,
+    normal retirement age is <b>{{recipient.normalRetirement.ageYears}} years
+    and {{recipient.normalRetirement.ageMonths}} months</b>.
 
     This puts your normal retirement date at
     <b>{{recipient.normalRetirementDate().monthFullName()}},
     {{recipient.normalRetirementDate().year()}}</b>.
   </p>
 
-  <div class=insetTextBox ng-if="birth.day === 1">
+  <div class=insetTextBox ng-if="recipient.birthdate().isFirstOfMonth()">
     <h4>Special Rule</h4>
     <p>
       The month you reach specific ages may seem "off by one" from what
       you entered. Social Security follows English common law that finds that a
-      person "attains" an age on the day before the birthday. Because you were
-      born on the first of the month, this means that you attain age
+      person "attains" an age on the day before their birthdate. Because you
+      were born on the first of the month, this means that you attain age
       <b>{{recipient.exampleAge().age}}</b> on
       <b>{{recipient.exampleAge().month}}
          {{recipient.exampleAge().day}},
@@ -53,12 +53,12 @@
   <a class=offset-nav id=nav-early-delayed></a>
   <h2>Early and Delayed Retirement</h2>
   <p>
-		<span ng-if="birth.day === 2">
+		<span ng-if="recipient.birthdate().layBirthDayOfMonth() === 2">
     	You can begin taking benefits as early as 62 years old
 	    (<b>{{recipient.dateAtYearsOld(62).monthFullName()}}
   	      {{recipient.dateAtYearsOld(62).year()}}</b>),
     </span>
-    <span ng-if="birth.day !== 2">
+		<span ng-if="recipient.birthdate().layBirthDayOfMonth() !== 2">
     	You can begin taking benefits as early as 62 years and 1 month old
 	    (<b>{{recipient.dateAtAge(initAge(62, 1)).monthFullName()}}
   	      {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
@@ -69,14 +69,15 @@
     or start any month in between. The longer you wait, the higher your
     benefit will be.
   </p>
-  <div class=insetTextBox ng-if="birth.day > 2">
+  <div class=insetTextBox
+       ng-if="recipient.birthdate().layBirthDayOfMonth() > 2">
     <h4>Special Rule</h4>
     <p>
       You may find it oddly specific that the earliest you can actually
       begin benefits is at age 62 and 1 month. Benefit eligibility
       is calculated based on the first month that you are a particular age
       throughout the <u>entire</u> month. For most, this is the month
-      <i>after</i> their birthday.
+      <i>after</i> their birthdate.
     </p>
     <p>
       For example, the first month that you are
@@ -120,7 +121,7 @@
     Here is a table which shows how much your benefit would be at different
     starting ages:
   </p>
-  <table ng-class="{'fancy-table': true, 'wide-age': birth.day !== 2}">
+  <table ng-class="{'fancy-table': true, 'wide-age': recipient.birthdate().layBirthDayOfMonth() !== 2}">
     <thead>
       <tr>
         <th colspan=3></th>
@@ -135,7 +136,7 @@
       </tr>
     </thead>
     <tbody>
-		  <tr ng-if="birth.day === 2">
+		  <tr ng-if="recipient.birthdate().layBirthDayOfMonth() === 2">
         <td headers="age">62</td>
         <td headers="date">
           {{recipient.dateAtYearsOld(62).monthName()}}
@@ -151,7 +152,7 @@
           ${{recipient.benefitAtAge(initAge(62)) * 12 | number:0}}
         </td>
       </tr>
-      <tr ng-if="birth.day !== 2">
+      <tr ng-if="recipient.birthdate().layBirthDayOfMonth() !== 2">
         <td headers="age">62 + 1m</td>
         <td headers="date">
           {{recipient.dateAtAge(initAge(62, 1)).monthName()}}

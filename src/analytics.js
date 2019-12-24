@@ -27,7 +27,7 @@ if (document.location.hostname.search('socialsecurity.tools') !== -1 ||
   // non-user-data tracking. For example an simple event that indicates a
   // user entered data, to determine what kind of success rate users have
   // with the copy/paste functionality. None of these send any user-entered
-  // data, such as an earnings value or user birthday, however.
+  // data, such as an earnings value or user birthdate, however.
   //
   // We register a dummy function here so that these calls don't throw
   // exceptions.
