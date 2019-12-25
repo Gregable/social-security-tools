@@ -349,7 +349,7 @@ Recipient.prototype.processIndexedEarnings_ = function() {
         this.futureEarningsRecords_[0].year);
     this.neededYears_ = Math.ceil(neededCredits / credits);
     for (var i = 0; i < this.futureEarningsRecords_.length; ++i) {
-      var futureRecord = this.futureEarningsRecords_[0];
+      var futureRecord = this.futureEarningsRecords_[i];
       allIndexedValues.push(futureRecord);
       this.plannedCredits_ = Math.min(
           neededCredits, this.plannedCredits_ + credits);
