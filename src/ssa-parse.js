@@ -67,14 +67,21 @@ function isYearString(maybeYearStr) {
   // According to http://goo.gl/2HEj1H, the oldest person alive may have been
   // born as long back as 1887. This is debated, but it works for our simple
   // validation purposes here.
-  if (maybeYear < 1887 || maybeYear > CURRENT_YEAR)
+  if (maybeYear < 1887)
+    return false;
+
+  // If the pasted data is from ssa.gov, it won't have records greater than
+  // last year, because the data comes from tax returns, which isn't processed
+  // until the following year. However, some users would like to manufacture
+  // data to paste into the tool, so we accept any year up to 70y in the future.
+  // See https://github.com/Gregable/social-security-tools/issues/130
+  if (maybeYear > CURRENT_YEAR + 70)
     return false;
 
   return true;
 }
  
 var parsePaste = function(paste) {
-
   // We first collapse whitespace on each line as
   // different browsers insert different whitespace for column
   // separation.
@@ -86,7 +93,6 @@ var parsePaste = function(paste) {
   // Some columns will include the string "Not yet recorded" which breaks
   // columns on spaces in the string. We replace these with "NotYetRecorded".
   replacedStr = replacedStr.replace(/not yet recorded+/gi, "NotYetRecorded");
-  
 
   // Split based on newlines.
   let lines = replacedStr.split("\n");

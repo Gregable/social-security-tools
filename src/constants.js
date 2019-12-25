@@ -8,6 +8,12 @@
  // https://www.ssa.gov/planners/credits.html
 const MAX_CREDITS = 40
 
+// This is the maximum year for which SSA constants, such as
+// EARNINGS_PER_CREDIT and MAXIMUM_EARNINGS, have been published.
+// This year's values are applied to years in the future if the user
+// manually manipulates the input string.
+const MAX_YEAR = 2020;
+
  // Earnings required for one quarter of coverage
  // https://www.ssa.gov/OACT/COLA/QC.html
 
