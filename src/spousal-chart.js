@@ -228,8 +228,7 @@ SpousalChart.prototype.renderHorizontalLines = function() {
  */
 SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
   var date = this.dateX(canvasX);
-  if (this.mouseToggle === 'ON')
-    this.updateSelectedDate(date);
+  this.updateSelectedDate(date);
   var text = date.monthName() + ' ' + date.year();
 
   this.context_.save();
