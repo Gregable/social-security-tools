@@ -155,15 +155,13 @@ Recipient.prototype.initFromEarningsRecords = function(records) {
 Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
   this.futureEarningsRecords_ = [];
   if (wage > 0) {
-    start_year = CURRENT_YEAR
+    start_year = CURRENT_YEAR;
     for (var record of this.earningsRecords_) {
       if (record.year >= start_year)
-        start_year = record.year + 1
+        start_year = record.year + 1;
     }
-    console.log(start_year)
     if (isLastYearIncomplete(this.earningsRecords_))
       start_year = start_year - 1;
-    console.log(start_year)
 
     for (var i = 0; i < numYears; ++i) {
       var futureRecord = new EarningRecord();
