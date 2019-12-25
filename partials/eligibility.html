@@ -88,17 +88,23 @@
     <span ng-if="recipient.earnedCredits() >= 40">You have earned the required <b>40</b> credits to be 
       <u>permanently eligible</u> for retirement benefits on your own work record. 
     </span>
-    <span ng-if="40 > recipient.earnedCredits() && recipient.totalCredits() >= 40">You will have <b>40</b> credits
-      when you complete <b>{{recipient.neededYears() | number:0}}</b> additional years of work earning 
-      <b>${{futureWageWorkSlider.minValue | number:0}}</b> per year.  You will become <u>permanently eligible</u>
-      for retirement benefits on your own work record when you have earned 40 credits.
+    <span ng-if="40 > recipient.earnedCredits() && recipient.totalCredits() >= 40">
+      You have not yet earned <b>40</b> credits, but based on your plan you will
+      have earned <b>40</b> credits at the time you have complete
+      <b>{{recipient.neededYears() | number:0}}</b> additional years of work
+      earning <b>${{futureWageWorkSlider.minValue | number:0}}</b> per year.
+      You will become <u>permanently eligible</u> for retirement benefits on
+      your own work record when you have earned 40 credits.
     </span>
-    <span ng-if="40 > recipient.totalCredits()">You have earned <b>{{recipient.earnedCredits() | number:0}}</b> credits 
-      and will earn <b>{{recipient.plannedCredits() | number:0}}</b> credits for a total of 
-      <b>{{recipient.totalCredits() | number:0}}</b> credits, which is not enough to be eligible for retirement benefits 
-      on your own work record.  You may be eligible for spousal benefits.  You will become 
-      <u>permanently eligible</u> for retirement benefits on your own work record when you have earned 
-      40 credits.
+    <span ng-if="40 > recipient.totalCredits()">
+      You have earned <b>{{recipient.earnedCredits() | number:0}}</b> credits 
+      and your plan will earn you an additional 
+      <b>{{recipient.plannedCredits() | number:0}}</b> credits for a total of
+      <b>{{recipient.totalCredits() | number:0}}</b> credits. This is not
+      enough to be eligible for retirement benefits on your own work record.
+      To become <u>permanently eligible</u> for retirement benefits on your
+      own work record, you will need to earn <b>40</b> credits.
+      You may be eligible for spousal benefits.
     </span>
   </p>
 
