@@ -155,9 +155,16 @@ Recipient.prototype.initFromEarningsRecords = function(records) {
 Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
   this.futureEarningsRecords_ = [];
   if (wage > 0) {
-    start_year = CURRENT_YEAR;
+    start_year = CURRENT_YEAR
+    for (var record of this.earningsRecords_) {
+      if (record.year >= start_year)
+        start_year = record.year + 1
+    }
+    console.log(start_year)
     if (isLastYearIncomplete(this.earningsRecords_))
       start_year = start_year - 1;
+    console.log(start_year)
+
     for (var i = 0; i < numYears; ++i) {
       var futureRecord = new EarningRecord();
       futureRecord.year = start_year + i;
@@ -272,6 +279,8 @@ Recipient.prototype.indexingYear = function() {
   return Math.min(this.dateAtYearsOld(62).year(), CURRENT_YEAR) - 2;
 }
 
+// ssa.gov records a specific sentinel string if the last year has incomplete
+// records. This shows up in an earningRecord list as a -1.
 isLastYearIncomplete = function(records) {
   for (var record of records) {
     if (record.year === (CURRENT_YEAR - 1))
@@ -306,7 +315,11 @@ Recipient.prototype.processIndexedEarnings_ = function() {
       this.hasEarningsBefore1978 = true;
     }
 
-    earningRecord.earningsCap = MAXIMUM_EARNINGS[earningRecord.year];
+    if (earningRecord.year > MAX_YEAR) {
+      earningRecord.earningsCap = MAXIMUM_EARNINGS[MAX_YEAR];
+    } else {
+      earningRecord.earningsCap = MAXIMUM_EARNINGS[earningRecord.year];
+    }
 
     // https://www.ssa.gov/oact/ProgData/retirebenefit1.html
     // Starting in the year the user turns 60, their index factor
@@ -334,7 +347,8 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   var neededCredits = 40 - this.earnedCredits_;
   if (this.hasFutureEarnings()) {
     var credits = this.calculateCredits(
-        this.futureEarningsRecords_[0].taxedEarnings, CURRENT_YEAR);
+        this.futureEarningsRecords_[0].taxedEarnings,
+        this.futureEarningsRecords_[0].year);
     this.neededYears_ = Math.ceil(neededCredits / credits);
     for (var i = 0; i < this.futureEarningsRecords_.length; ++i) {
       var futureRecord = this.futureEarningsRecords_[0];
@@ -704,8 +718,8 @@ Recipient.prototype.totalBenefitAtDate = function(
 }
 
 Recipient.prototype.getEarningsPerCreditForYear = function(year) {
-  if (year > CURRENT_YEAR)
-    year = CURRENT_YEAR;
+  if (year > MAX_YEAR)
+    year = MAX_YEAR;
   if (year > 1978)
     return EARNINGS_PER_CREDIT[year];
 
@@ -715,6 +729,8 @@ Recipient.prototype.getEarningsPerCreditForYear = function(year) {
 Recipient.prototype.calculateCredits = function(earnings, year) {
   if (year === undefined)
     year = CURRENT_YEAR;
+  if (year > MAX_YEAR)
+    year = MAX_YEAR
   // This can happen if the input contains a year with "Not yet recorded" in
   // the earnings column, and we set a sentinel of -1.
   if (earnings <= 0)
