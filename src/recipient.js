@@ -621,7 +621,7 @@ Recipient.prototype.totalBenefitWithSpousal = function(startAge,
 
 /**
  * For delayed retirement credits only, you only collect your credits for the
- * first year you were recieving benefits for the entire year, with the
+ * first year you were receiving benefits for the entire year, with the
  * exception of when you turn 70. This method computes the personal benefits at
  * a given date, given also what date you filed. Does not compute spousal
  * effects.
