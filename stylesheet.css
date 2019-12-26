@@ -31,6 +31,7 @@ html {
   padding-bottom: 20px;
   border-bottom: 1px solid #e5e5e5;
   line-height: 1.1;
+  min-height: 50px;
 }
 .fixedheader > h3 {
   margin-top: 0;
@@ -130,12 +131,11 @@ a.bigbtn:hover {
   background-color: #449d44;
   border-color: #398439;
 }
-
   
-span#pastePrompt > div.instructions {
+span#pastePrompt div.instructions {
   display: inline-block;
-  max-width: 620px;
   margin: auto;
+  min-width: 597px;
 }
 
 h4 {
@@ -149,31 +149,34 @@ br.clear {
 span#pastePrompt {
   margin-top: 10px;
 }
-span#pastePrompt > div.videocontainer > img {
+span#pastePrompt div.videocontainer > img {
 }
-span#pastePrompt > div.videocontainer > p {
+span#pastePrompt div.videocontainer > p {
   line-height: 1.1;
   margin: 4px auto;
   text-align: center;
 }
-span#pastePrompt > div.instructions {
+span#pastePrompt div.instructions {
   line-height: 1.1;
   font-size: 18px;
+  padding: 20px;
 }
-span#pastePrompt > div.instructions > p{
+span#pastePrompt div.instructions p{
   line-height: 1.0;
   font-size: 16px;
+  margin-left: 14px;
 }
-span#pastePrompt > div.pastearea {
+span#pastePrompt div.pastearea {
   width: 480px;
-  margin: 16px auto;
+  margin: 16px 90px 16px 90px;
+  padding: 20px;
 }
-span#pastePrompt > div.pastearea > #pastearea {
+span#pastePrompt div.pastearea #pastearea {
   width: 100%;
   height: 100px;
   resize: none;
 }
-span#pastePrompt > div.pastearea > #pastearea::-webkit-input-placeholder {
+span#pastePrompt div.pastearea #pastearea::-webkit-input-placeholder {
   text-align: center;
   vertical-align: bottom;
 }
@@ -183,7 +186,7 @@ span.lock {
 div.instructions li {
   margin: 20px;
 }
-div.instructions li > img {
+div.instructions li img {
   margin-top: 20px;
   margin-bottom: 20px;
   margin-left: auto;
@@ -494,6 +497,12 @@ div.fixed-left-column {
 div.fixed-center-column {
   max-width: 660px;
   margin: auto;
+}
+
+@media (max-width: 520px) {
+  #title-header {
+    display: none;
+  }
 }
 
 @media (min-width: 1121px) {
