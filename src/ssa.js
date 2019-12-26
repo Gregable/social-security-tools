@@ -165,9 +165,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
-    // The maximum PIA that can be achieved for a user. Used in the spousal
-    // chart inputs to set a maximum value for the user-entered PIA value.
-    $scope.maximumPIA = maximumPIA();
     $scope.maybeRenderCharts();
   };
 
