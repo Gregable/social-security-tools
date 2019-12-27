@@ -36,11 +36,11 @@
 
 <body ng-controller="SSAController"
       ng-init="init()" data-spy="scroll" data-target="#navbar">
-  <div class="fixedcontainer">
+  <div id="bodychildcontainer">
     <ng-include src="'partials/header.html'"></ng-include>
     <ng-include src="'partials/navbar.html'"></ng-include>
 
-    <div class="fixed-center-column">
+    <div id="fixed-center-column">
       <ng-include src="'partials/paste-prompt.html'"></ng-include>
       <ng-include src="'partials/paste-confirm.html'"></ng-include>
       <ng-include src="'partials/age-request.html'"></ng-include>

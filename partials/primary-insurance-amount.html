@@ -79,7 +79,7 @@
       <b>${{recipient.totalIndexedEarnings | number:0}}</b>
     </p>
 
-    </p>
+    <p>
       This is simply the sum of the highest 35 values in the indexed earnings
       column above.
     </p>
@@ -133,10 +133,10 @@
           <b>${{recipient.primaryInsuranceAmountByBracket(1) | number:2}}</b>
         </td>
         <td></td>
-      <tr>
       </tr>
+      <tr>
         <td>
-          Any remaining amount more than
+          Any <span class="onlydisplay600">remaining</span> amount more than
           ${{secondBendPoint(recipient.indexingYear()) | number: 0}}
           is multiplied by 15%:
         </td>

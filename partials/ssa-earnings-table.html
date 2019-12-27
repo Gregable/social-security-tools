@@ -20,7 +20,7 @@
     <thead>
       <tr>
         <th id="workyear">Year</th>
-        <th id="age">Age</th>
+        <th id="age" class="onlydisplay500">Age</th>
         <th id="taxedearnings">Taxed Earnings</th>
         <th id="multsymbol"></th>
         <th id="multiplier">Multiplier</th>
@@ -31,7 +31,7 @@
     <tbody>
       <tr ng-repeat="earningRecord in earningsRecords()">
         <td headers="workyear">{{earningRecord.year}}</td>
-        <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
+        <td headers="age" class="onlydisplay500">{{recipient.exampleAge(earningRecord.year).age}}</td>
         <td colspan=5 ng-if="earningRecord.taxedEarnings < 0" style="text-align:center">
           Not yet recorded
         </td>
@@ -51,7 +51,10 @@
           ${{earningRecord.indexedEarning() | number:0}}
         </td>
         <td headers="top35indicators">
-          <span ng-if="earningRecord.isTopEarningYear">Top 35 Value</span>
+          <span ng-if="earningRecord.isTopEarningYear">
+            Top 35
+            <span class=onlydisplay500> Value</span>
+          </span>
         </td>
       </tr>
     </tbody>
@@ -60,21 +63,25 @@
   <div style="display: inline">
     <table class=sliderTable>
      <tr>
-      <td>I plan to work for</td>
-      <td class=sliderColumn>
-        <!-- See http://angular-slider.github.io/angularjs-slider/ -->
-        <rzslider rz-slider-model="futureYearsWorkSlider.minValue"
-                  rz-slider-options="futureYearsWorkSlider.options"></rzslider>
-      </td>
-      <td>more years,</td>
+       <td>
+        <span class="sliderColumn columnA">I plan to work for</span>
+        <span class="sliderColumn columnB">
+          <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+          <rzslider rz-slider-model="futureYearsWorkSlider.minValue"
+                    rz-slider-options="futureYearsWorkSlider.options"></rzslider>
+        </span>
+        <span class="sliderColumn columnC">more years,</span>
+       </td>
      </tr>
      <tr>
-      <td>Earning approximately</td>
-      <td class=sliderColumn>
-        <rzslider rz-slider-model="futureWageWorkSlider.minValue"
-                  rz-slider-options="futureWageWorkSlider.options"></rzslider>
-      </td>
-      <td>per year.</td>
+       <td>
+        <span class="sliderColumn columnA">Earning approximately</span>
+        <span class="sliderColumn columnB">
+          <rzslider rz-slider-model="futureWageWorkSlider.minValue"
+                    rz-slider-options="futureWageWorkSlider.options"></rzslider>
+        </span>
+        <span class="sliderColumn columnC">per year.</span>
+       <td>
      </tr>
     </table>
   </div>
@@ -86,7 +93,7 @@
   <thead>
     <tr>
       <th id="workyear">Year</th>
-      <th id="age">Age</th>
+      <th id="age" class="onlydisplay500">Age</th>
       <th id="taxedearnings">Taxed Earnings</th>
       <th id="multsymbol"></th>
       <th id="multiplier">Multiplier</th>
@@ -97,7 +104,7 @@
   <tbody>
     <tr ng-repeat="earningRecord in recipient.futureEarningsRecords()">
       <td headers="workyear">{{earningRecord.year}}</td>
-      <td headers="age">{{recipient.exampleAge(earningRecord.year).age}}</td>
+      <td headers="age" class="onlydisplay500">{{recipient.exampleAge(earningRecord.year).age}}</td>
       <td headers="taxedearnings">
         ${{earningRecord.taxedEarnings | number:0}}</td>
       <td headers="multsymbol">x</th>
@@ -107,7 +114,12 @@
         ${{earningRecord.indexedEarning() | number:0}}
       </td>
       <td headers="top35indicators">
-        <span ng-if="earningRecord.isTopEarningYear">Top 35 Value</span>
+        <span ng-if="earningRecord.isTopEarningYear">
+          <span ng-if="earningRecord.isTopEarningYear">
+            Top 35
+            <span class=onlydisplay500> Value</span>
+          </span>
+        </span>
       </td>
     </tr>
   </tbody>
