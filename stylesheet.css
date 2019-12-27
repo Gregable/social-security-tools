@@ -22,8 +22,8 @@ html {
 
 /** Desktop **/
 @media screen and (min-width: 1025px) {
-  div.fixed-center-column {
-    padding-left: 40px;
+  div#fixed-center-column {
+    padding-left: 45px;
     max-width: 660px;
   }
   div.instructions {
