@@ -61,29 +61,31 @@
   </table>
 
   <div style="display: inline">
+    <div id=stickycontainer>
     <table class=sliderTable>
      <tr>
-       <td>
-        <span class="sliderColumn columnA">I plan to work for</span>
-        <span class="sliderColumn columnB">
-          <!-- See http://angular-slider.github.io/angularjs-slider/ -->
-          <rzslider rz-slider-model="futureYearsWorkSlider.minValue"
-                    rz-slider-options="futureYearsWorkSlider.options"></rzslider>
-        </span>
-        <span class="sliderColumn columnC">more years,</span>
-       </td>
-     </tr>
-     <tr>
-       <td>
-        <span class="sliderColumn columnA">Earning approximately</span>
-        <span class="sliderColumn columnB">
-          <rzslider rz-slider-model="futureWageWorkSlider.minValue"
-                    rz-slider-options="futureWageWorkSlider.options"></rzslider>
-        </span>
-        <span class="sliderColumn columnC">per year.</span>
-       <td>
-     </tr>
-    </table>
+         <td>
+          <span class="sliderColumn columnA">I plan to work for</span>
+          <span class="sliderColumn columnB">
+            <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+            <rzslider rz-slider-model="futureYearsWorkSlider.minValue"
+                      rz-slider-options="futureYearsWorkSlider.options"></rzslider>
+          </span>
+          <span class="sliderColumn columnC">more years,</span>
+         </td>
+       </tr>
+       <tr>
+         <td>
+          <span class="sliderColumn columnA">Earning approximately</span>
+          <span class="sliderColumn columnB">
+            <rzslider rz-slider-model="futureWageWorkSlider.minValue"
+                      rz-slider-options="futureWageWorkSlider.options"></rzslider>
+          </span>
+          <span class="sliderColumn columnC">per year.</span>
+         <td>
+       </tr>
+      </table>
+    </div>
   </div>
   <div class=sticky-shadow></div>
   <div class=sticky-shadow-cover></div>

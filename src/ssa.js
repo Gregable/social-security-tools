@@ -166,7 +166,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
-    $scope.loadDemoData(0);
+    //$scope.loadDemoData(0);
   };
 
   // Aliased so ModeEnum can be used in template conditionals, such as:

@@ -24,6 +24,19 @@ html {
 @media screen and (min-width: 1025px) {
   div.fixed-center-column {
     padding-left: 40px;
+    max-width: 660px;
+  }
+  div.instructions {
+    font-size: 18px;
+  }
+  div.instructions li {
+    margin: 20px;
+  }
+  div.pasteareaoffsetleft {
+    margin: 0px 40px 0px 40px;
+  }
+  h1 {
+    font-size: 28px;
   }
 }
 
@@ -723,13 +736,18 @@ input.radio:focus ~ label.radio:before {
 .sliderZ {
   z-index: 2;
 }
-.sliderTable  {
-  margin: 0 auto;
-  padding-bottom: 10px;
+#stickycontainer {
   position: sticky;
   top: 0;
-  background-color: #fff;
   z-index: 5;
+  width: 100%;
+  background-color: #fff;
+}
+.sliderTable  {
+  top: 0;
+  z-index: 5;
+  margin: 0 auto;
+  padding-bottom: 10px;
   max-width: 675px;
   border-collapse: unset;
 }
@@ -760,7 +778,7 @@ input.radio:focus ~ label.radio:before {
  * The shadow is always there, but is covered by a white
  *  sticky-shadow-cover. */
 div.sticky-shadow {
-  width: 675px;
+  width: 660px;
   height: 2px;
   background-color: #BBB;
   z-index: 3;
@@ -789,7 +807,7 @@ div.sticky-shadow-cover {
   }
 
   /* This takes up a lot of vertical space now, so don't stick to the top. */
-  .sliderTable  {
+  #stickycontainer,.sliderTable  {
     position: static;
   }
   div.sticky-shadow,div.sticky-shadow-cover {
@@ -1023,7 +1041,7 @@ div.insetTextBox {
   -webkit-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
   -moz-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
   -o-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
-  margin: 6px 6px 10px 6px;
+  margin: 6px 11px 10px 6px;
   padding: 10px;
 }
 div.insetTextBox h4 {
