@@ -3,12 +3,14 @@
     <br>
     <p>
       To use the calculator, you must provide some data from your Social
-      Security record.<br>
+      Security record.
+    </p>
+    <p>
       If you aren't ready for that yet, select a demo data set at the
       bottom of the page.
     </p>
        
-    <h1>How to retrieve <u>your</u> Social Security data:</h1>
+    <h1>Retrieve <u>your</u> Social Security data:</h1>
     <ol>
       <li>
         Login to 
@@ -21,7 +23,7 @@
       <li>
         Copy the earnings table. It should look similar to the example below,
         with different numbers and years.
-        <img src="static/earnings-table-example.png" width=477 height=405>
+        <img src="static/earnings-table-example.png" id=earnings-table-img>
         You can select the table by dragging your mouse over the entire table to
         select, or you can just use 'Control+A' to select the entire page.
         Either way will work. Copy the text with 'Control+C'.
@@ -34,17 +36,21 @@
   </div>
 
   <div class="pastearea">
-    <textarea id=pastearea wrap=off ng-model="pasteArea.contents"
-              placeholder="{{::pasteArea.placeholder}}"></textarea>
-    <p>
+    <div class=pasteareaoffsetleft>
+      <textarea id=pastearea wrap=off ng-model="pasteArea.contents"
+                placeholder="{{::pasteArea.placeholder}}"></textarea>
+      <p>
       <span class=lock>&#x1f512;</span> Your data never leaves your own
       computer: the report is generated entirely by JavaScript in your browser.
-    </p>
+      </p>
+    </div>
   </div>
 
   <div class="instructions">
-    Alternatively, just paste any text formatted string with year and earnings
-    in the same line, for example:
+    <p>
+      Alternatively, just paste any text formatted string with year and
+      earnings in the same line, for example:
+    </p>
     <pre style="margin: auto; width: 140px">2000 $10,000
 2001 $15,000</pre>
   </div>

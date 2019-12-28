@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Social Security Calculator: Get Started</title>
 
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.5.1/rzslider.min.css">
@@ -36,11 +36,11 @@
 
 <body ng-controller="SSAController"
       ng-init="init()" data-spy="scroll" data-target="#navbar">
-  <div class="fixedcontainer">
+  <div id="bodychildcontainer">
     <ng-include src="'partials/header.html'"></ng-include>
     <ng-include src="'partials/navbar.html'"></ng-include>
 
-    <div class="fixed-center-column">
+    <div id="fixed-center-column">
       <ng-include src="'partials/paste-prompt.html'"></ng-include>
       <ng-include src="'partials/paste-confirm.html'"></ng-include>
       <ng-include src="'partials/age-request.html'"></ng-include>

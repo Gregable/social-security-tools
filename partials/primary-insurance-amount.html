@@ -1,16 +1,20 @@
-<div id=topEarningsData class="top-earnings-data fixed-center-column"
-                        ng-show="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
+<div id=topEarningsData
+     class="top-earnings-data fixed-center-column"
+     ng-show="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
   <a class=offset-nav id=nav-pia></a>
-  <h2>Primary Insurance Amount</h2>
+  <div class=pageBreakAvoid>
+    <h2>Primary Insurance Amount</h2>
 
-  <div ng-show="!recipient.isEligible()">
-    <p>You do not have enough credits for to be eligible to receive retirement benefits
-      on your own earnings.  You may be eligible to receive benefits on your spouse's 
-      earnings.
-    </p>
-    <p>
-      Your <u>primary insurance amount</u> (PIA) is <b>${{0 | number}}</b>
-    </p>
+    <div ng-show="!recipient.isEligible()">
+      <p>
+        You do not have enough credits for to be eligible to receive
+        retirement benefits on your own earnings. You may be eligible to receive
+        benefits on your spouse's earnings.
+      </p>
+      <p>
+        Your <u>primary insurance amount</u> (PIA) is <b>${{0 | number}}</b>
+      </p>
+    </div>
   </div>
 
   <div ng-show="recipient.isEligible()">
@@ -75,11 +79,12 @@
     </p>
 
     <p>
-    Currently, your total indexed earnings:
+      Currently, your total indexed earnings:
+      <br class=onlydisplayunder500>
       <b>${{recipient.totalIndexedEarnings | number:0}}</b>
     </p>
 
-    </p>
+    <p>
       This is simply the sum of the highest 35 values in the indexed earnings
       column above.
     </p>
@@ -96,6 +101,7 @@
 
     <p>
       Monthly average indexed earnings:
+      <br class=onlydisplayunder500>
       <b>${{recipient.totalIndexedEarnings | number:0}}</b> / 35 / 12 =
       <b>${{recipient.monthlyIndexedEarnings | number:0}}</b>
     </p>
@@ -109,7 +115,7 @@
       Amount is calculated from your monthly indexed earnings as follows:
     </p>
 
-    <table class=benefitBrackets>
+    <table class="benefitBrackets pageBreakAvoid">
       <tr>
         <td>
           Any amount less than
@@ -133,10 +139,10 @@
           <b>${{recipient.primaryInsuranceAmountByBracket(1) | number:2}}</b>
         </td>
         <td></td>
-      <tr>
       </tr>
+      <tr>
         <td>
-          Any remaining amount more than
+          Any <span class="onlydisplay600">remaining</span> amount more than
           ${{secondBendPoint(recipient.indexingYear()) | number: 0}}
           is multiplied by 15%:
         </td>
@@ -165,7 +171,7 @@
       </p>
     </div>
 
-    <div ng-if="recipient.shouldAdjustForCOLA()">
+    <div ng-if="recipient.shouldAdjustForCOLA()" class=pageBreakAvoid>
       <p>
         After attaining age 62, your primary insurance amount will increase
         annually in proportion to the consumer price index (CPI-W), a measure of
@@ -192,12 +198,14 @@
       amount changes.
     </p>
 
-    <div class="chart-container">
+    <div class="chart-container pageBreakAvoid">
       <div class="chart-ylabel pia" >
         <span class="vertical-text">Primary Insurance Amount</span>
       </div>
 
-      <!-- canvas width/height must be set explicitly in HTML rather than CSS -->
+      <!-- canvas width/height must be set explicitly in HTML rather than CSS
+           these are modified by javascript anyway to scale with window size. 
+      -->
       <canvas id="breakpoint-chart-canvas" width=600 height=400>
         Your browser does not support HTML canvas.
       </canvas>
@@ -206,7 +214,5 @@
         Monthly Indexed Earnings
       </div>
     </div>
-
   </div>
-
 </div>

@@ -308,8 +308,7 @@ AgeChart.prototype.renderAgePoint = function(age) {
 
 /** Render the breakpoint chart. */
 AgeChart.prototype.render = function() {
-  // Canvas tutorial:
-  // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
+  this.context_.font = "bold 14px Helvetica"
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
   

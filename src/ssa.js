@@ -166,6 +166,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
+    window.addEventListener('resize', function() { $scope.maybeRenderCharts() });
+    // Add an event listener that can catch the "print" event. This resizes
+    // the charts on the page to match the print screen width. Canvases can't
+    // be resized with CSS alone.
+    if (window.matchMedia) {
+      var mediaQueryList = window.matchMedia('print');
+      mediaQueryList.addListener(function(mql) { $scope.maybeRenderCharts(); });
+    }
+
   };
 
   // Aliased so ModeEnum can be used in template conditionals, such as:
@@ -285,7 +294,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function(birthdate) {
     $scope.showSpousalBenefit = true;
-    console.log(birthdate);
     $scope.$broadcast('spouseBirthdateSetDemo', birthdate);
     $scope.spouseLayBirthdate = birthdate;
     $scope.spouse.updateBirthdate(birthdate);
@@ -352,10 +360,20 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    * requirements have all been met, otherwise does nothing.
    */
   $scope.maybeRenderCharts = function() {
-    if ($scope.breakPointChart_.isInitialized())
+    if ($scope.breakPointChart_.isInitialized()) {
+      let breakPointCanvas = document.getElementById('breakpoint-chart-canvas');
+      let parentWidth = breakPointCanvas.parentNode.clientWidth;
+      // Leave 50px for the y-axis label.
+      breakPointCanvas.setAttribute('width',  parentWidth - 50);
       $scope.breakPointChart_.render();
-    if ($scope.ageChart_.isInitialized())
+    }
+    if ($scope.ageChart_.isInitialized()) {
+      let ageCanvas = document.getElementById('age-chart-canvas');
+      let parentWidth = ageCanvas.parentNode.clientWidth;
+      // Leave 50px for the y-axis label.
+      ageCanvas.setAttribute('width',  parentWidth - 50);
       $scope.ageChart_.render();
+    }
     $scope.refreshSlider();
   };
 

@@ -83,7 +83,7 @@ function Recipient(name) {
   // minYear, maxYear, ageYears, ageMonths, delatedIncreaseAnnual
   this.normalRetirement = FULL_RETIREMENT_AGE[0];
   
-  // If true, the user's birthdate is on the first, so they can recieve full
+  // If true, the user's birthdate is on the first, so they can receive full
   // benefits on the month they turn 62.
   this.isFullMonth = false;
 }

@@ -11,7 +11,6 @@ body {
   padding-top: 20px;
   padding-bottom: 20px;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 14px;
   line-height: 1.42857143;
   color: #333;
   background-color: #fff;
@@ -20,19 +19,122 @@ html {
   scroll-behavior: smooth;
 }
 
-.fixedcontainer {
-  /* horizontally center */
+
+/** Desktop **/
+@media screen and (min-width: 1025px) {
+  div#fixed-center-column {
+    padding-left: 45px;
+    max-width: 660px;
+  }
+  div.instructions {
+    font-size: 18px;
+  }
+  div.instructions li {
+    margin: 20px;
+  }
+  div.pasteareaoffsetleft {
+    margin: 0px 40px 0px 40px;
+  }
+  h1 {
+    font-size: 28px;
+  }
+}
+
+/** Ipad **/
+@media screen and (max-width: 1024px) {
+  /* Only display navigation side buttons on large screens. */
+  ul.nav {
+    display: none;
+  }
+  div#fixed-center-column {
+    max-width: 660px;
+  }
+  div.instructions {
+    font-size: 16px;
+  }
+  div.instructions li {
+    margin: 20px;
+  }
+  div.pasteareaoffsetleft {
+    margin: 0px 40px 0px 40px;
+  }
+  h1 {
+    font-size: 28px;
+  }
+}
+
+/** iPhone */
+@media screen and (max-width: 420px) {
+  /* Don't display the top title header "Social Security Calculator" on
+   * tiny screens. */
+  div#fixed-center-column {
+    max-width: 100%;
+  }
+  div.instructions {
+    font-size: 12px;
+  }
+  div.instructions li {
+    margin: 10px;
+  }
+  div.pasteareaoffsetleft {
+    margin: 0px 20px 0px 20px;
+  }
+  ol {
+    padding-inline-start: 20px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+}
+/** Define some classes useful for specifically hiding elements on width */
+@media screen and (max-width: 600px) { .onlydisplay600 { display: none; } }
+@media screen and (max-width: 500px) { .onlydisplay500 { display: none; } }
+@media screen and (max-width: 400px) { .onlydisplay400 { display: none; } }
+@media screen and (max-width: 300px) { .onlydisplay300 { display: none; } }
+@media screen and (min-width: 500px) { .onlydisplayunder500 { display: none; } }
+
+@media screen { .onlyDisplayPrint { display: none !important; } }
+@media print { .onlyDisplayScreen { display: none !important; } }
+
+/** Print configuration */
+@media print {
+  .insetTextBox,.pageBreakAvoid {
+    page-break-inside: avoid;
+  }
+  p.pageBreakBefore {
+    page-break-before: always;
+  }
+  .earningsRecordHeader {
+    margin-top: 0px;
+  }
+  body {
+    padding-top: 0px;
+  }
+}
+@page {
+  size: 8.5in 11in portrait;
+}
+
+/* Single div child of body. Prevents content column from getting wider
+ * than 1080px regardless of device width. */
+div#bodychildcontainer {
   max-width: 1080px;
   margin: 0 auto;
 }
+div#fixed-center-column {
+  max-width: 660px;
+  margin: auto;
+}
 
 /* Page Header with title and static links */
-.fixedheader {
+div#topheader {
   padding-bottom: 20px;
-  border-bottom: 1px solid #e5e5e5;
-  line-height: 1.1;
+  border-bottom: 1px solid #c5c5c5;
+  min-height: 50px;
+  white-space: nowrap;
 }
-.fixedheader > h3 {
+
+div#topheader > h3 {
   margin-top: 0;
   margin-bottom: 0 !important;
   line-height: 40px;
@@ -41,39 +143,64 @@ html {
   font-size: 24px;
   font-family: inherit;
 }
+  
+div#topheader h3#title-header {
+  padding-left: 40px;
+}
+
 /* Navigation Pills */
-.fixedheader>ul.navpills {
+div#topheader ul.navpills {
   list-style-image: none; 
-  list-style-position: none; 
   list-style-type: none; 
-  line-height: 20px;
   list-style: none;
+  font-size: 14px;
   float: right;
   display: block;
+  margin: 0;
   margin-top: 0;
   margin-bottom: 10px;
 }
-.fixedheader>ul.navpills>li {
+div#topheader ul.navpills li {
   float: left;
   position: relative;
   display: block;
 }
-.fixedheader>ul.navpills>li>a {
+div#topheader ul.navpills li a {
   border-radius: 4px;
   position: relative;
   display: block;
   padding: 10px 15px;
   text-decoration: none;
 }
-.fixedheader>ul.navpills>li.active>a {
+div#topheader ul.navpills li.active a {
   color: #fff;
   background-color: #337ab7;
+}
+@media screen and (max-width: 675px) {
+  /* Below 650px the pills and header start to collide, so
+   * we move them to separate lines and center. */
+  div#topheader h3#title-header {
+    clear:both;
+    padding-top: 10px;
+    margin: 0;
+  }
+  div#topheader ul.navpills {
+    float: left;
+  }
+}
+
+div.fixed-left-column {
+  max-width: 220px;
+  float: left;
+}
+
+div.fixed-center-column {
+  max-width: 660px;
+  margin: auto;
 }
 
 /* Frontpage message and get started button */
 .jumbotron {
-  height: 480
-  text-align: left;
   /* @license
    * CC BY-SA 2.0: Creative Commons Attribution-Share Alike 2.0
    * https://creativecommons.org/licenses/by-sa/2.0/
@@ -84,25 +211,14 @@ html {
   background-image: url("static/piggybanks.jpg");
   background-size: contain;
   background-repeat: no-repeat;
-  background-color: #fff;
-  height: 500px;
-  padding: 80px;
+  text-align: left;
+  height: 507px;
 }
 .jumbotron > h1 {
-  font-size: 63px;
-  font-family: inherit;
-  color: inherit;
   font-weight: 500;
-  line-height: 1.1;
-  margin: 0.67em 0;
-
 }
 .jumbotron > p {
-  font-size: 21px;
-  font-family: inherit;
-  color: inherit;
   font-weight: 200;
-  line-height: 1.4;
   margin: 0 0 15px 0;
 }
 a.bigbtn {
@@ -111,33 +227,87 @@ a.bigbtn {
   border-radius: 6px;
   border: 1px solid transparent;
   cursor: pointer;
-  vertical-align: middle;
   color: #fff;
-  text-align: center;
-  vertical-align: middle;
   white-space: nowrap;
-  display: inline-block;
   padding: 14px 24px;
-  font-size: 21px;
   font-weight: 400;
-  font-family: inherit;
   text-decoration: none;
-  line-height: 1.3;
   display: inline-block;
-  margin-bottom: 0;
 }
 a.bigbtn:hover {
   background-color: #449d44;
   border-color: #398439;
 }
-
-  
-span#pastePrompt > div.instructions {
-  display: inline-block;
-  max-width: 620px;
-  margin: auto;
+@media screen and (min-width: 921px) {
+  .jumbotron {
+    padding: 80px;
+  }
+  .jumbotron > h1 {
+    font-size: 63px;
+    line-height: 1.1;
+  }
+  .jumbotron > p {
+    font-size: 21px;
+  }
+  a.bigbtn {
+    font-size: 21px;
+    line-height: 1.3;
+  }
+}
+@media screen and (max-width: 920px) and (min-width: 701px) {
+  .jumbotron {
+    padding: 30px;
+  }
+  .jumbotron > h1 {
+    font-size: 50px;
+    line-height: 1.1;
+  }
+  .jumbotron > p {
+    font-size: 20px;
+  }
+  a.bigbtn {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+}
+@media screen and (max-width: 700px) and (min-width: 520px) {
+  .jumbotron {
+    padding: 20px;
+  }
+  .jumbotron > h1 {
+    font-size: 35px;
+    line-height: 1.1;
+  }
+  .jumbotron > p {
+    font-size: 16px;
+  }
+  a.bigbtn {
+    font-size: 16px;
+    line-height: 1.2;
+  }
 }
 
+@media screen and (max-width: 520px) {
+  .jumbotron {
+    padding: 5px;
+  }
+  .jumbotron > h1 {
+    font-size: 28px;
+    line-height: 1.0;
+    margin: 6px;
+  }
+  .jumbotron > p {
+    font-size: 16px;
+    line-height: 1.0;
+    font-weight: 400;
+  }
+  a.bigbtn {
+    font-size: 16px;
+    line-height: 1.0;
+    padding: 7px 12px;
+  }
+}
+ 
 h4 {
  margin-bottom: 5px;
 }
@@ -145,50 +315,53 @@ h4 {
 br.clear {
   clear: both;
 }
-  
+ 
+h2,p {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 span#pastePrompt {
   margin-top: 10px;
 }
-span#pastePrompt > div.videocontainer > img {
+span#pastePrompt div.instructions {
+  display: inline-block;
+  margin: auto;
+  padding: 10px 20px 0px 20px;
 }
-span#pastePrompt > div.videocontainer > p {
-  line-height: 1.1;
-  margin: 4px auto;
-  text-align: center;
-}
-span#pastePrompt > div.instructions {
-  line-height: 1.1;
-  font-size: 18px;
-}
-span#pastePrompt > div.instructions > p{
+span#pastePrompt div.instructions p{
   line-height: 1.0;
-  font-size: 16px;
+  margin-left: 14px;
 }
-span#pastePrompt > div.pastearea {
-  width: 480px;
-  margin: 16px auto;
+span#pastePrompt div.pastearea {
+  display: flex;
+  justify-content: center;
+  max-width: 480px;
+  margin: 0 auto 0 auto;
 }
-span#pastePrompt > div.pastearea > #pastearea {
+span#pastePrompt div.pasteareaoffsetleft {
+  width: 100%;
+}
+span#pastePrompt div.pastearea textarea#pastearea {
   width: 100%;
   height: 100px;
   resize: none;
 }
-span#pastePrompt > div.pastearea > #pastearea::-webkit-input-placeholder {
+span#pastePrompt div.pastearea textarea#pastearea::-webkit-input-placeholder {
   text-align: center;
   vertical-align: bottom;
 }
 span.lock {
   color: green;
 }
-div.instructions li {
-  margin: 20px;
+span.nowrap {
+  white-space: nowrap;
 }
-div.instructions li > img {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  margin-left: auto;
-  margin-right: auto;
+div.instructions img#earnings-table-img {
   display: block;
+  margin: 10px auto;
+  height: auto;
+  max-width: 100%;
 }
 span.confirmation-prompt button {
   border: 0 none;
@@ -272,7 +445,7 @@ table.earnings-record-table {
   border-spacing: 0;
   text-align: left;
   font-family: 'Arimo', sans-serif;
-  width: 700px;
+  max-width: 700px;
   font-size: 16px;
   line-height: 1.35;
   text-align: left;
@@ -305,8 +478,16 @@ table.earnings-record-table > tbody td {
  */
 table.fancy-table {
   border-collapse: collapse;
-  min-width: 400px;
   margin: 10px auto;
+  width: 100%;
+}
+
+/* We must shrink down the earnings table. Don't display some bits.
+ * This hides the age column, and changes "Top 35 Value" to "Top 35" */
+@media screen and (max-width: 500px) {
+  table.fancy-table .onlydisplaywide {
+    display: none;
+  }
 }
 
 table.fancy-table tr:not(:last-child) td {
@@ -325,6 +506,7 @@ table.fancy-table td[headers='workyear'] {
 table.fancy-table th#taxedearnings,
 table.fancy-table td[headers='taxedearnings'] {
   text-align: right;
+  min-width: 67px;
 }
 table.fancy-table td[headers='taxedearnings'] {
   padding-right: 8px;
@@ -342,20 +524,20 @@ table.fancy-table td[headers='multsymbol'] {
 table.fancy-table th#multiplier,
 table.fancy-table td[headers='multiplier'] {
   text-align: center;
-  width: 75px;
+  min-width: 60px;
 }
 table.fancy-table th#eqsymbol,
 table.fancy-table td[headers='eqsymbol'] {
-  padding: 80px, 0;
   text-align: center;
-  padding-left: 20px;
+  /*padding-left: 20px;*/
   padding-right: 0px;
   color: #6B6BBF;
 }
 table.fancy-table th#indexedearnings,
 table.fancy-table td[headers='indexedearnings'] {
   text-align: right;
-  padding-left: 20px;
+  /*padding-left: 20px;*/
+  min-width: 90px;
 }
 table.fancy-table td[headers='indexedearnings'] {
   padding-right: 20px;
@@ -377,7 +559,7 @@ table.fancy-table td[headers='credits'] {
   padding-right: 8px;
 }
 table.fancy-table td[headers='top35indicators'] {
-  width: 81px;
+  min-width: 48px;
   white-space: nowrap;
 }
 table.fancy-table th#age,
@@ -413,17 +595,50 @@ table.fancy-table td[headers='monthlybenefit'] {
 }
 
 /* Benefit breakpoint brackets calculation table */
-table.benefitBrackets tr td:first-child {
-  text-align: right;
-  padding-right: 6px;
-}
-table.benefitBrackets tr td:nth-last-child(2) {
-  text-align: right;
-  padding-right: 0px;
+table.benefitBrackets {
+  margin: 0 auto;
 }
 table.benefitBrackets tr:last-child td:nth-child(2) {
+  text-align: left;
   border-top: 1px solid;
 }
+@media screen and (min-width: 600px) {
+  table.benefitBrackets tr td {
+    text-align: right;
+    padding-right: 6px;
+  }
+}
+@media screen and (max-width: 599px) {
+  table.benefitBrackets tr td {
+    padding: 8px;
+  }
+  table.benefitBrackets td:first-child {
+    text-align: left;
+    max-width: 200px;
+  }
+  table.benefitBrackets tr:first-child td:first-child,
+  table.benefitBrackets tr:nth-child(2) td:first-child,
+  table.benefitBrackets tr:first-child td:nth-child(2),
+  table.benefitBrackets tr:nth-child(2) td:nth-child(2) {
+    border-bottom: 1px solid #d0d0d0;
+  }
+  table.benefitBrackets tr td:nth-child(2) {
+    text-align: right;
+    padding-right: 0;
+  }
+  table.benefitBrackets tr:last-child td:first-child {
+    text-align: right;
+    padding-right: 14px;
+  }
+  table.benefitBrackets tr:last-child td:nth-child(2) {
+    text-align: right;
+  }
+  table.benefitBrackets tr:last-child td:nth-child(3) {
+    text-align: left;
+    padding-left: 0;
+  }
+}
+
 .clickCursor {
   cursor: pointer;
 }
@@ -449,7 +664,7 @@ table.combinedBenefit tr:last-child td:last-child {
 /* Canvas Chart CSS */
 .chart-container {
   position: relative;
-  width: 650px;
+  max-width: 650px;
   height: 430px;
   padding: 0px;
   margin-top: 20px;
@@ -478,7 +693,7 @@ table.combinedBenefit tr:last-child td:last-child {
 }
 
 .chart-xlabel {
-  width: 650px;
+  max-width: 650px;
   height: 30px;
   clear: both;
   text-align: center;
@@ -486,20 +701,6 @@ table.combinedBenefit tr:last-child td:last-child {
 
 canvas {
   float: left;
-}
-div.fixed-left-column {
-  max-width: 220px;
-  float: left;
-}
-div.fixed-center-column {
-  max-width: 660px;
-  margin: auto;
-}
-
-@media (min-width: 1121px) {
-  div.fixed-center-column {
-    padding-left: 40px;
-  }
 }
 
 ul.nav {
@@ -548,11 +749,6 @@ ul.nav .navlabel {
   padding-right: 20px;
 }
 @media print {
-  ul.nav {
-    display: none;
-  }
-}
-@media (max-width: 1120px) {
   ul.nav {
     display: none;
   }
@@ -612,45 +808,49 @@ input.radio:focus ~ label.radio:before {
 .sliderZ {
   z-index: 2;
 }
-.sliderTable  {
-  margin: 0 auto;
-  padding-bottom: 10px;
+#stickycontainer {
   position: sticky;
   top: 0;
-  background-color: #fff;
   z-index: 5;
-  width: 675px;
+  width: 100%;
+  background-color: #fff;
+}
+.sliderTable  {
+  top: 0;
+  z-index: 5;
+  margin: 0 auto;
+  padding-bottom: 10px;
+  max-width: 675px;
   border-collapse: unset;
 }
-.sliderTable td:not(.sliderColumn) {
+.sliderTable span {
+  display: inline-block;
+}
+.sliderTable span.sliderColumn {
   vertical-align: bottom;
-  padding-bottom: 8px;
   white-space: nowrap;
 }
-.sliderTable td:nth-child(1) {
+.sliderTable span.sliderColumn:not(.columnB) {
+  vertical-align: bottom;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.sliderTable span.sliderColumn.columnA {
   text-align: right;
-  padding-left: 53px;
+  min-width: 150px;
 }
-.sliderTable td:nth-child(3) {
-  padding-right: 90px;
+.sliderTable span.sliderColumn.columnB {
+  min-width: 240px;
 }
-.sliderTable td.sliderColumn {
-  vertical-align: bottom;
-  width: 300px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-.sliderTable td.sliderColumnWide {
-  vertical-align: bottom;
-  width: 500px;
-  padding-left: 5px;
-  padding-right: 5px;
+.sliderTable span.sliderColumn.columnC {
+  text-align: left;
 }
 /* Hack to create a bottom shadow on the slider when it stick's.
  * The shadow is always there, but is covered by a white
  *  sticky-shadow-cover. */
 div.sticky-shadow {
-  width: 675px;
+  width: 660px;
   height: 2px;
   background-color: #BBB;
   z-index: 3;
@@ -665,6 +865,28 @@ div.sticky-shadow-cover {
   position: relative;
   top: -2px;
 }
+/* We must rearrange the sliders below a certain width. */
+@media screen and (max-width: 550px) {
+  /* Each column now falls on a different row. */
+  .sliderTable span.sliderColumn {
+    display: block;
+    text-align: left !important;
+    padding: 0px !important;
+  }
+  /* Add some more space between each slider. */
+  .sliderTable tr:nth-child(1) span.sliderColumn.columnC {
+    margin-bottom: 20px;
+  }
+
+  /* This takes up a lot of vertical space now, so don't stick to the top. */
+  #stickycontainer,.sliderTable  {
+    position: static;
+  }
+  div.sticky-shadow,div.sticky-shadow-cover {
+    display: none;
+  }
+}
+
 /* Slider for the custom earner start dates */
 #higherEarnerSlider .rz-tick,
 #higherEarnerSlider .rz-tick.selected,
@@ -710,6 +932,19 @@ span.rz-bubble {
   background-color: rgba(255, 255, 255, 1.0);
   z-index: 2;
 }
+
+/* The spousal visualization just isn't going to work well on a 375px phone
+ * screen. There aren't many devices with a 500px screen either, so not much
+ * point in trying to make it work for that. Instead, we just hide the
+ * visualization if the screen is too narrow and display a warning instead.*/
+@media screen and (min-width: 621px) {
+ #spousal-visualization-screensize-warning { display: none }
+}
+@media screen and (max-width: 620px) {
+ #spousal-visualization { display: none; }
+ #spousal-visualization-screensize-warning { display: block }
+}
+
 /* Add some padding for the transparency, excluding the left hand side */
 #spousal-box span.rz-bubble {
   padding-left: 10px !important;
@@ -791,6 +1026,10 @@ span.rz-bubble {
   transition: all .15s ease-out;          
   box-sizing: initial;
 }
+/* Label texts wraps outside of the label box on small widths*/
+@media screen and (max-width: 450px) {
+  .frequent-questions label { font-size: 0.9em; }
+}
 
 /* Remove text selection when toggle-ing */
 .frequent-questions label::selection {
@@ -856,7 +1095,7 @@ span.lowerEarner {
   font-weight: 600;
 }
 p.nameEntry {
-  text-align: center;
+  padding-left: 40px;
 }
 p.nameEntry input[name=yourName] {
   margin-right: 12px;
@@ -891,7 +1130,7 @@ div.insetTextBox {
   -webkit-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
   -moz-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
   -o-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
-  margin: 0 0 10px;
+  margin: 6px 11px 10px 6px;
   padding: 10px;
 }
 div.insetTextBox h4 {
