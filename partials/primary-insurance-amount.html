@@ -5,18 +5,19 @@
   <div class=pageBreakAvoid>
     <h2>Primary Insurance Amount</h2>
 
-    <p ng-show="!recipient.isEligible()">
-      <p>You do not have enough credits for to be eligible to receive retirement benefits
-        on your own earnings.  You may be eligible to receive benefits on your spouse's 
-        earnings.
+    <div ng-show="!recipient.isEligible()">
+      <p>
+        You do not have enough credits for to be eligible to receive
+        retirement benefits on your own earnings. You may be eligible to receive
+        benefits on your spouse's earnings.
       </p>
       <p>
         Your <u>primary insurance amount</u> (PIA) is <b>${{0 | number}}</b>
       </p>
-    </p>
+    </div>
   </div>
 
-  <p ng-show="recipient.isEligible()">
+  <div ng-show="recipient.isEligible()">
     <p>
       Your Social Security benefits are best thought of in terms of your 
       <u>primary insurance amount</u> (PIA). This is the dollar amount that
