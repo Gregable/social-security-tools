@@ -167,7 +167,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
     window.addEventListener('resize', function() { $scope.maybeRenderCharts() });
-    //$scope.loadDemoData(0);
+    $scope.loadDemoData(0);
   };
 
   // Aliased so ModeEnum can be used in template conditionals, such as:
@@ -287,7 +287,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function(birthdate) {
     $scope.showSpousalBenefit = true;
-    console.log(birthdate);
     $scope.$broadcast('spouseBirthdateSetDemo', birthdate);
     $scope.spouseLayBirthdate = birthdate;
     $scope.spouse.updateBirthdate(birthdate);
@@ -355,15 +354,19 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    */
   $scope.maybeRenderCharts = function() {
     if ($scope.breakPointChart_.isInitialized()) {
-      canvas = document.getElementById('breakpoint-chart-canvas');
-      parentWidth = canvas.parentNode.clientWidth;
+      let breakPointCanvas = document.getElementById('breakpoint-chart-canvas');
+      let parentWidth = breakPointCanvas.parentNode.clientWidth;
       // Leave 50px for the y-axis label.
-      canvas.setAttribute('width',  parentWidth - 50);
+      breakPointCanvas.setAttribute('width',  parentWidth - 50);
       $scope.breakPointChart_.render();
-      console.log(parentWidth);
     }
-    if ($scope.ageChart_.isInitialized())
+    if ($scope.ageChart_.isInitialized()) {
+      let ageCanvas = document.getElementById('age-chart-canvas');
+      let parentWidth = ageCanvas.parentNode.clientWidth;
+      // Leave 50px for the y-axis label.
+      ageCanvas.setAttribute('width',  parentWidth - 50);
       $scope.ageChart_.render();
+    }
     $scope.refreshSlider();
   };
 

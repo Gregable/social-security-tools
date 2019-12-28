@@ -329,73 +329,94 @@
       affect the final monthly benefits, using the sliders below.
     </p>
 
-    <div id=spousal-box>
-      <canvas id=spousal-chart-canvas width=620 height=620></canvas>
-      <p style="margin-bottom: 2px; z-index: 2">
-        <b><span class=names>{{higherEarner().name}}</span> starts benefits
-          at age:</b>
+    <div class=insetTextBox id=spousal-visualization-screensize-warning>
+      <h4>Small Screen Detected</h4>
+      <p>
+        Your device's small screen will not display the combined retirement
+        benefit interface correctly, so it has been hidden to avoid breaking
+        the rest of this page. To view, you can:
+        <ul>
+          <li>
+            Use a larger screen such as a tablet or PC.
+          </li>
+          <li>
+            Select "View as Desktop" in your browser.
+          </li>
+          <li>
+            Rotate your device horizontally.
+          </li>
       </p>
+    </div id=spousal-visualization-screensize-warning>
 
-      <!-- See http://angular-slider.github.io/angularjs-slider/ -->
-      <div class="force-ticks-above" id="higherEarnerSlider">
-        <rzslider rz-slider-model="higherEarnerSlider.value"
-                  rz-slider-options="higherEarnerSlider.options"
+    <div id=spousal-visualization>
+      <div id=spousal-box>
+        <canvas id=spousal-chart-canvas width=620 height=620></canvas>
+        <p style="margin-bottom: 2px; z-index: 2">
+          <b><span class=names>{{higherEarner().name}}</span> starts benefits
+            at age:</b>
+        </p>
+
+        <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+        <div class="force-ticks-above" id="higherEarnerSlider">
+          <rzslider rz-slider-model="higherEarnerSlider.value"
+                    rz-slider-options="higherEarnerSlider.options"
+                    class="with-legend sliderZ"></rzslider>
+        </div>
+
+        <p style="margin-bottom: 2px; z-index: 2">
+          <b style="background-color: white">
+            <span class=names>{{lowerEarner().name}}</span> starts benefits
+            at age:
+          </b>
+        </p>
+
+        <!-- See http://angular-slider.github.io/angularjs-slider/ -->
+        <div class="force-ticks-above" id="lowerEarnerSlider">
+        <rzslider rz-slider-model="lowerEarnerSlider.value"
+                  rz-slider-options="lowerEarnerSlider.options"
                   class="with-legend sliderZ"></rzslider>
+        </div>
       </div>
 
-      <p style="margin-bottom: 2px; z-index: 2">
-        <b style="background-color: white">
-          <span class=names>{{lowerEarner().name}}</span> starts benefits
-          at age:
-        </b>
-      </p>
+      <!-- Div which positions text at the correct y-position below the spousal
+        canvas element -->
+      <div style="height: 436px;"></div>
 
-      <!-- See http://angular-slider.github.io/angularjs-slider/ -->
-      <div class="force-ticks-above" id="lowerEarnerSlider">
-      <rzslider rz-slider-model="lowerEarnerSlider.value"
-                rz-slider-options="lowerEarnerSlider.options"
-                class="with-legend sliderZ"></rzslider>
+      <div ng-if="spousalSelection.show" class=totalSpousalAtDate>
+        <table class=combinedBenefit>
+          <tr>
+            <td colspan=3>
+              <b>In {{spousalSelection.dateText}},</b>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <span class=higherEarner>{{higherEarner().name}}'s Benefit</span>:
+            </td><td>
+              ${{spousalSelection.higherEarnerBenefit | number:0}}
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <span class=lowerEarner>{{lowerEarner().name}}'s Benefit</span>:
+            </td><td>
+              ${{spousalSelection.lowerEarnerBenefit | number:0}}
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <b>Total Benefit</b>:
+            </td><td>
+              ${{(spousalSelection.higherEarnerBenefit +
+                  spousalSelection.lowerEarnerBenefit) | number:0}}
+            </td>
+          </tr>
+        </table>
       </div>
-    </div>
-
-    <!-- Div which positions text at the correct y-position below the spousal
-      canvas element -->
-    <div style="height: 436px;"></div>
-
-    <div ng-if="spousalSelection.show" class=totalSpousalAtDate>
-      <table class=combinedBenefit>
-        <tr>
-          <td colspan=3>
-            <b>In {{spousalSelection.dateText}},</b>
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>
-            <span class=higherEarner>{{higherEarner().name}}'s Benefit</span>:
-          </td><td>
-            ${{spousalSelection.higherEarnerBenefit | number:0}}
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>
-            <span class=lowerEarner>{{lowerEarner().name}}'s Benefit</span>:
-          </td><td>
-            ${{spousalSelection.lowerEarnerBenefit | number:0}}
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>
-            <b>Total Benefit</b>:
-          </td><td>
-            ${{(spousalSelection.higherEarnerBenefit +
-                spousalSelection.lowerEarnerBenefit) | number:0}}
-          </td>
-        </tr>
-      </table>
-    </div>
+    </div id=spousal-visualization>
 
     <div class=insetTextBox ng-if="spouse.birthdate().layBirthDayOfMonth() > 2 && recipient.birthdate().layBirthDayOfMonth() <= 2">
       <h4>Special Rule</h4>

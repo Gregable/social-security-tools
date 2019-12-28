@@ -860,6 +860,19 @@ span.rz-bubble {
   background-color: rgba(255, 255, 255, 1.0);
   z-index: 2;
 }
+
+/* The spousal visualization just isn't going to work well on a 375px phone
+ * screen. There aren't many devices with a 500px screen either, so not much
+ * point in trying to make it work for that. Instead, we just hide the
+ * visualization if the screen is too narrow and display a warning instead.*/
+@media screen and (min-width: 621px) {
+ #spousal-visualization-screensize-warning { display: none }
+}
+@media screen and (max-width: 620px) {
+ #spousal-visualization { display: none; }
+ #spousal-visualization-screensize-warning { display: block }
+}
+
 /* Add some padding for the transparency, excluding the left hand side */
 #spousal-box span.rz-bubble {
   padding-left: 10px !important;
