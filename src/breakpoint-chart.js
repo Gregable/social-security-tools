@@ -268,7 +268,9 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   pixelY = this.canvasY(dollarY);
   // If this is too close to the top of the chart, flip it to below the line.
   if (pixelY < 100)
-    pixelY += 20;
+    // This just happens to work pretty well for positioning below the line.
+    pixelY += 10 + 5 * chartAngle;
+
   this.context_.translate(
       this.canvasX(dollarX) - textWidth, pixelY);
   this.context_.rotate(-1 * Math.atan(.15 * chartAngle));
@@ -421,6 +423,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
 BreakPointChart.prototype.render = function() {
   if (!this.isInitialized())
     return;
+  this.context_.font = "bold 14px Helvetica"
 
   // Canvas tutorial:
   // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/

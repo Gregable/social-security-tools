@@ -592,7 +592,7 @@ table.combinedBenefit tr:last-child td:last-child {
 /* Canvas Chart CSS */
 .chart-container {
   position: relative;
-  width: 650px;
+  max-width: 650px;
   height: 430px;
   padding: 0px;
   margin-top: 20px;
@@ -621,7 +621,7 @@ table.combinedBenefit tr:last-child td:last-child {
 }
 
 .chart-xlabel {
-  width: 650px;
+  max-width: 650px;
   height: 30px;
   clear: both;
   text-align: center;

@@ -166,6 +166,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
+    window.addEventListener('resize', function() { $scope.maybeRenderCharts() });
     //$scope.loadDemoData(0);
   };
 
@@ -353,8 +354,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    * requirements have all been met, otherwise does nothing.
    */
   $scope.maybeRenderCharts = function() {
-    if ($scope.breakPointChart_.isInitialized())
+    if ($scope.breakPointChart_.isInitialized()) {
+      canvas = document.getElementById('breakpoint-chart-canvas');
+      parentWidth = canvas.parentNode.clientWidth;
+      // Leave 50px for the y-axis label.
+      canvas.setAttribute('width',  parentWidth - 50);
       $scope.breakPointChart_.render();
+      console.log(parentWidth);
+    }
     if ($scope.ageChart_.isInitialized())
       $scope.ageChart_.render();
     $scope.refreshSlider();
