@@ -110,12 +110,14 @@
       </span>
 
       <span ng-if="showSpousalBenefit">
-      <p class=birthdate>
-        <span class=names>{{spouse.name}}</span> was born on
-        <b>{{spouse.birthdate().HumanBirthdate()}}</b>.
-      </p>
+        <p class=birthdate>
+          <span class=names>{{spouse.name}}</span> was born on
+          <b>{{spouse.birthdate().HumanBirthdate()}}</b>.
+        </p>
+      </span ng-if="showSpousalBenefit">
     </div class=onlyDisplayScreen>
 
+    <span ng-if="showSpousalBenefit">
     <a class=offset-nav id=nav-spouse-benefit></a>
     <h2>Spousal Benefit</h2>
     <h3>{{higherEarner().name}}</h3>
