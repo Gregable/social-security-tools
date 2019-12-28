@@ -1,19 +1,22 @@
-<div id=topEarningsData class="top-earnings-data fixed-center-column"
-                        ng-show="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
+<div id=topEarningsData
+     class="top-earnings-data fixed-center-column"
+     ng-show="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
   <a class=offset-nav id=nav-pia></a>
-  <h2>Primary Insurance Amount</h2>
+  <div class=pageBreakAvoid>
+    <h2>Primary Insurance Amount</h2>
 
-  <div ng-show="!recipient.isEligible()">
-    <p>You do not have enough credits for to be eligible to receive retirement benefits
-      on your own earnings.  You may be eligible to receive benefits on your spouse's 
-      earnings.
-    </p>
-    <p>
-      Your <u>primary insurance amount</u> (PIA) is <b>${{0 | number}}</b>
+    <p ng-show="!recipient.isEligible()">
+      <p>You do not have enough credits for to be eligible to receive retirement benefits
+        on your own earnings.  You may be eligible to receive benefits on your spouse's 
+        earnings.
+      </p>
+      <p>
+        Your <u>primary insurance amount</u> (PIA) is <b>${{0 | number}}</b>
+      </p>
     </p>
   </div>
 
-  <div ng-show="recipient.isEligible()">
+  <p ng-show="recipient.isEligible()">
     <p>
       Your Social Security benefits are best thought of in terms of your 
       <u>primary insurance amount</u> (PIA). This is the dollar amount that
@@ -75,7 +78,8 @@
     </p>
 
     <p>
-    Currently, your total indexed earnings:
+      Currently, your total indexed earnings:
+      <br class=onlydisplayunder500>
       <b>${{recipient.totalIndexedEarnings | number:0}}</b>
     </p>
 
@@ -96,6 +100,7 @@
 
     <p>
       Monthly average indexed earnings:
+      <br class=onlydisplayunder500>
       <b>${{recipient.totalIndexedEarnings | number:0}}</b> / 35 / 12 =
       <b>${{recipient.monthlyIndexedEarnings | number:0}}</b>
     </p>
@@ -109,7 +114,7 @@
       Amount is calculated from your monthly indexed earnings as follows:
     </p>
 
-    <table class=benefitBrackets>
+    <table class="benefitBrackets pageBreakAvoid">
       <tr>
         <td>
           Any amount less than
@@ -165,7 +170,7 @@
       </p>
     </div>
 
-    <div ng-if="recipient.shouldAdjustForCOLA()">
+    <div ng-if="recipient.shouldAdjustForCOLA()" class=pageBreakAvoid>
       <p>
         After attaining age 62, your primary insurance amount will increase
         annually in proportion to the consumer price index (CPI-W), a measure of
@@ -192,7 +197,7 @@
       amount changes.
     </p>
 
-    <div class="chart-container">
+    <div class="chart-container pageBreakAvoid">
       <div class="chart-ylabel pia" >
         <span class="vertical-text">Primary Insurance Amount</span>
       </div>
@@ -208,7 +213,5 @@
         Monthly Indexed Earnings
       </div>
     </div>
-
   </div>
-
 </div>

@@ -86,10 +86,34 @@ html {
     font-size: 20px;
   }
 }
+/** Define some classes useful for specifically hiding elements on width */
 @media screen and (max-width: 600px) { .onlydisplay600 { display: none; } }
 @media screen and (max-width: 500px) { .onlydisplay500 { display: none; } }
 @media screen and (max-width: 400px) { .onlydisplay400 { display: none; } }
 @media screen and (max-width: 300px) { .onlydisplay300 { display: none; } }
+@media screen and (min-width: 500px) { .onlydisplayunder500 { display: none; } }
+
+@media screen { .onlyDisplayPrint { display: none !important; } }
+@media print { .onlyDisplayScreen { display: none !important; } }
+
+/** Print configuration */
+@media print {
+  .insetTextBox,.pageBreakAvoid {
+    page-break-inside: avoid;
+  }
+  p.pageBreakBefore {
+    page-break-before: always;
+  }
+  .earningsRecordHeader {
+    margin-top: 0px;
+  }
+  body {
+    padding-top: 0px;
+  }
+}
+@page {
+  size: 8.5in 11in portrait;
+}
 
 /* Single div child of body. Prevents content column from getting wider
  * than 1080px regardless of device width. */
@@ -127,9 +151,9 @@ div#topheader h3#title-header {
 /* Navigation Pills */
 div#topheader ul.navpills {
   list-style-image: none; 
-  list-style-position: none; 
   list-style-type: none; 
   list-style: none;
+  font-size: 14px;
   float: right;
   display: block;
   margin: 0;
@@ -177,8 +201,6 @@ div.fixed-center-column {
 
 /* Frontpage message and get started button */
 .jumbotron {
-  height: 480
-  text-align: left;
   /* @license
    * CC BY-SA 2.0: Creative Commons Attribution-Share Alike 2.0
    * https://creativecommons.org/licenses/by-sa/2.0/
@@ -189,25 +211,14 @@ div.fixed-center-column {
   background-image: url("static/piggybanks.jpg");
   background-size: contain;
   background-repeat: no-repeat;
-  background-color: #fff;
-  height: 500px;
-  padding: 80px;
+  text-align: left;
+  height: 507px;
 }
 .jumbotron > h1 {
-  font-size: 63px;
-  font-family: inherit;
-  color: inherit;
   font-weight: 500;
-  line-height: 1.1;
-  margin: 0.67em 0;
-
 }
 .jumbotron > p {
-  font-size: 21px;
-  font-family: inherit;
-  color: inherit;
   font-weight: 200;
-  line-height: 1.4;
   margin: 0 0 15px 0;
 }
 a.bigbtn {
@@ -216,26 +227,87 @@ a.bigbtn {
   border-radius: 6px;
   border: 1px solid transparent;
   cursor: pointer;
-  vertical-align: middle;
   color: #fff;
-  text-align: center;
-  vertical-align: middle;
   white-space: nowrap;
-  display: inline-block;
   padding: 14px 24px;
-  font-size: 21px;
   font-weight: 400;
-  font-family: inherit;
   text-decoration: none;
-  line-height: 1.3;
   display: inline-block;
-  margin-bottom: 0;
 }
 a.bigbtn:hover {
   background-color: #449d44;
   border-color: #398439;
 }
-  
+@media screen and (min-width: 921px) {
+  .jumbotron {
+    padding: 80px;
+  }
+  .jumbotron > h1 {
+    font-size: 63px;
+    line-height: 1.1;
+  }
+  .jumbotron > p {
+    font-size: 21px;
+  }
+  a.bigbtn {
+    font-size: 21px;
+    line-height: 1.3;
+  }
+}
+@media screen and (max-width: 920px) and (min-width: 701px) {
+  .jumbotron {
+    padding: 30px;
+  }
+  .jumbotron > h1 {
+    font-size: 50px;
+    line-height: 1.1;
+  }
+  .jumbotron > p {
+    font-size: 20px;
+  }
+  a.bigbtn {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+}
+@media screen and (max-width: 700px) and (min-width: 520px) {
+  .jumbotron {
+    padding: 20px;
+  }
+  .jumbotron > h1 {
+    font-size: 35px;
+    line-height: 1.1;
+  }
+  .jumbotron > p {
+    font-size: 16px;
+  }
+  a.bigbtn {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .jumbotron {
+    padding: 5px;
+  }
+  .jumbotron > h1 {
+    font-size: 28px;
+    line-height: 1.0;
+    margin: 6px;
+  }
+  .jumbotron > p {
+    font-size: 16px;
+    line-height: 1.0;
+    font-weight: 400;
+  }
+  a.bigbtn {
+    font-size: 16px;
+    line-height: 1.0;
+    padding: 7px 12px;
+  }
+}
+ 
 h4 {
  margin-bottom: 5px;
 }
@@ -373,7 +445,7 @@ table.earnings-record-table {
   border-spacing: 0;
   text-align: left;
   font-family: 'Arimo', sans-serif;
-  width: 700px;
+  max-width: 700px;
   font-size: 16px;
   line-height: 1.35;
   text-align: left;
@@ -953,6 +1025,10 @@ span.rz-bubble {
   text-shadow: 0 1px 0 rgba(255,255,255,.5);
   transition: all .15s ease-out;          
   box-sizing: initial;
+}
+/* Label texts wraps outside of the label box on small widths*/
+@media screen and (max-width: 450px) {
+  .frequent-questions label { font-size: 0.9em; }
 }
 
 /* Remove text selection when toggle-ing */

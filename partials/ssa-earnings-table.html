@@ -1,66 +1,69 @@
 <span ng-if="mode === ModeEnum.RENDER_EARNINGS" class="ng-cloak">
   <a id=nav-demodata></a>
-  <h2 ng-if="demoId > -1">Demo Data</h2>
-  <p ng-if="demoId === 0">
-    Retiree born on July 1st 1950, who earned roughly the average US wage for
-    most of their career.
-  </p>
-  <p ng-if="demoId === 1">
-    Retiree born on August 2nd 1950, who earned the maximum Social Security
-    wages over five years, but nothing otherwise.
-  </p>
-  <p ng-if="demoId === 2">
-    Earner early in their career, born September 3rd 1985, with a $40,000 per
-    year salary in 2005 and a 4% annual raise.
-  </p>
-
+  <div class=onlyDisplayScreen>
+    <h2 ng-if="demoId > -1">Demo Data</h2>
+    <p ng-if="demoId === 0">
+      Retiree born on July 1st 1950, who earned roughly the average US wage for
+      most of their career.
+    </p>
+    <p ng-if="demoId === 1">
+      Retiree born on August 2nd 1950, who earned the maximum Social Security
+      wages over five years, but nothing otherwise.
+    </p>
+    <p ng-if="demoId === 2">
+      Earner early in their career, born September 3rd 1985, with a $40,000 per
+      year salary in 2005 and a 4% annual raise.
+    </p>
+  </div>
   <a id=nav-earnings></a>
-  <h2>Earnings Record</h2>
-  <table class="fancy-table">
-    <thead>
-      <tr>
-        <th id="workyear">Year</th>
-        <th id="age" class="onlydisplay500">Age</th>
-        <th id="taxedearnings">Taxed Earnings</th>
-        <th id="multsymbol"></th>
-        <th id="multiplier">Multiplier</th>
-        <th id="indexedearnings" colspan=2>Indexed Earnings<th>
-        <th id="top35indicators"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat="earningRecord in earningsRecords()">
-        <td headers="workyear">{{earningRecord.year}}</td>
-        <td headers="age" class="onlydisplay500">{{recipient.exampleAge(earningRecord.year).age}}</td>
-        <td colspan=5 ng-if="earningRecord.taxedEarnings < 0" style="text-align:center">
-          Not yet recorded
-        </td>
-        <td headers="taxedearnings" ng-if="earningRecord.taxedEarnings >= 0">
-          ${{earningRecord.taxedEarnings | number:0}}</td>
-        <td headers="multsymbol" ng-if="earningRecord.taxedEarnings >= 0">
-          x
-        </td>
-        <td headers="multiplier" ng-if="earningRecord.taxedEarnings >= 0">
-          {{earningRecord.indexFactor | number:2}}
-        </td>
-        <td headers="eqsymbol" ng-if="earningRecord.taxedEarnings >= 0">
-          =
+  <span class=pageBreakAvoid>
+    <h2 class=earningsRecordHeader>Earnings Record</h2>
+    <table class="fancy-table">
+      <thead>
+        <tr>
+          <th id="workyear">Year</th>
+          <th id="age" class="onlydisplay500">Age</th>
+          <th id="taxedearnings">Taxed Earnings</th>
+          <th id="multsymbol"></th>
+          <th id="multiplier">Multiplier</th>
+          <th id="indexedearnings" colspan=2>Indexed Earnings<th>
+          <th id="top35indicators"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="earningRecord in earningsRecords()">
+          <td headers="workyear">{{earningRecord.year}}</td>
+          <td headers="age" class="onlydisplay500">{{recipient.exampleAge(earningRecord.year).age}}</td>
+          <td colspan=5 ng-if="earningRecord.taxedEarnings < 0" style="text-align:center">
+            Not yet recorded
           </td>
-        <td headers="indexedearnings"
-            ng-if="earningRecord.taxedEarnings >= 0">
-          ${{earningRecord.indexedEarning() | number:0}}
-        </td>
-        <td headers="top35indicators">
-          <span ng-if="earningRecord.isTopEarningYear">
-            Top 35
-            <span class=onlydisplay500> Value</span>
-          </span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          <td headers="taxedearnings" ng-if="earningRecord.taxedEarnings >= 0">
+            ${{earningRecord.taxedEarnings | number:0}}</td>
+          <td headers="multsymbol" ng-if="earningRecord.taxedEarnings >= 0">
+            x
+          </td>
+          <td headers="multiplier" ng-if="earningRecord.taxedEarnings >= 0">
+            {{earningRecord.indexFactor | number:2}}
+          </td>
+          <td headers="eqsymbol" ng-if="earningRecord.taxedEarnings >= 0">
+            =
+            </td>
+          <td headers="indexedearnings"
+              ng-if="earningRecord.taxedEarnings >= 0">
+            ${{earningRecord.indexedEarning() | number:0}}
+          </td>
+          <td headers="top35indicators">
+            <span ng-if="earningRecord.isTopEarningYear">
+              Top 35
+              <span class=onlydisplay500> Value</span>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  <span class=pageBreakAvoid>
 
-  <div style="display: inline">
+  <div style="display: inline" class=onlyDisplayScreen>
     <div id=stickycontainer>
     <table class=sliderTable>
      <tr>
@@ -87,44 +90,46 @@
       </table>
     </div>
   </div>
-  <div class=sticky-shadow></div>
-  <div class=sticky-shadow-cover></div>
+  <div class="sticky-shadow onlyDisplayScreen"></div>
+  <div class="sticky-shadow-cover onlyDisplayScreen"></div>
 
-  <span ng-if="recipient.futureEarningsRecords().length > 0">
-  <table class="fancy-table">
-  <thead>
-    <tr>
-      <th id="workyear">Year</th>
-      <th id="age" class="onlydisplay500">Age</th>
-      <th id="taxedearnings">Taxed Earnings</th>
-      <th id="multsymbol"></th>
-      <th id="multiplier">Multiplier</th>
-      <th id="indexedearnings" colspan=2>Indexed Earnings<th>
-      <th id="top35indicators"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr ng-repeat="earningRecord in recipient.futureEarningsRecords()">
-      <td headers="workyear">{{earningRecord.year}}</td>
-      <td headers="age" class="onlydisplay500">{{recipient.exampleAge(earningRecord.year).age}}</td>
-      <td headers="taxedearnings">
-        ${{earningRecord.taxedEarnings | number:0}}</td>
-      <td headers="multsymbol">x</th>
-      <td headers="multiplier">1.00</td>
-      <td headers="eqsymbol">=</th>
-      <td headers="indexedearnings">
-        ${{earningRecord.indexedEarning() | number:0}}
-      </td>
-      <td headers="top35indicators">
-        <span ng-if="earningRecord.isTopEarningYear">
+  <span ng-if="recipient.futureEarningsRecords().length > 0"
+        class=pageBreakAvoid>
+    <h2 class=onlyDisplayPrint>Expected Future Earnings</h2>
+    <table class="fancy-table">
+    <thead>
+      <tr>
+        <th id="workyear">Year</th>
+        <th id="age" class="onlydisplay500">Age</th>
+        <th id="taxedearnings">Taxed Earnings</th>
+        <th id="multsymbol"></th>
+        <th id="multiplier">Multiplier</th>
+        <th id="indexedearnings" colspan=2>Indexed Earnings<th>
+        <th id="top35indicators"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="earningRecord in recipient.futureEarningsRecords()">
+        <td headers="workyear">{{earningRecord.year}}</td>
+        <td headers="age" class="onlydisplay500">{{recipient.exampleAge(earningRecord.year).age}}</td>
+        <td headers="taxedearnings">
+          ${{earningRecord.taxedEarnings | number:0}}</td>
+        <td headers="multsymbol">x</th>
+        <td headers="multiplier">1.00</td>
+        <td headers="eqsymbol">=</th>
+        <td headers="indexedearnings">
+          ${{earningRecord.indexedEarning() | number:0}}
+        </td>
+        <td headers="top35indicators">
           <span ng-if="earningRecord.isTopEarningYear">
-            Top 35
-            <span class=onlydisplay500> Value</span>
+            <span ng-if="earningRecord.isTopEarningYear">
+              Top 35
+              <span class=onlydisplay500> Value</span>
+            </span>
           </span>
-        </span>
-      </td>
-    </tr>
-  </tbody>
-  </table>
+        </td>
+      </tr>
+    </tbody>
+    </table>
   </span>
 </span>

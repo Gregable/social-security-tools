@@ -1,24 +1,24 @@
 <div ng-if="recipient.isEligible()">
-
   <div id=spousalBenefit class="benefit-estimate fixed-center-column"
      ng-if="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
 
     <a class=offset-nav id=nav-spouse></a>
     <h2>Spouse's Data</h2>
-    <p ng-if="isMarried()">
-      If you are not married, you can hide this section.
-    </p>
-    <p ng-if="!isMarried()">
-      If you are married, you can expand this section.
-    </p>
+    <div class=onlyDisplayScreen>
+      <p ng-if="isMarried()">
+        If you are not married, you can hide this section.
+      </p>
+      <p ng-if="!isMarried()">
+        If you are married, you can expand this section.
+      </p>
 
-    <div class=married-options>
-      <input type=radio ng-model="married.value" value=false id=not-married checked ng-change="refreshSlider()">
-      <label for=not-married class=clickCursor>Not Married</label>
-      <input type=radio ng-model="married.value" value=true id=married ng-change="refreshSlider()">
-      <label for=married class=clickCursor>Married</label>
+      <div class=married-options>
+        <input type=radio ng-model="married.value" value=false id=not-married checked ng-change="refreshSlider()">
+        <label for=not-married class=clickCursor>Not Married</label>
+        <input type=radio ng-model="married.value" value=true id=married ng-change="refreshSlider()">
+        <label for=married class=clickCursor>Married</label>
+      </div>
     </div>
-
   </div>
 
   <div id=isMarried class="benefit-estimate fixed-center-column"
@@ -29,87 +29,92 @@
       <u>spousal</u> Social Security benefits based on each other's records.
     <p>
 
-    <p>
-      To make it easier to read this section of the report, please enter
-      a name for yourself and for your spouse below. The names need not be real,
-      just something you can use to keep track of who is who in the remainder
-      of the report.
-    </p>
+    <div class=onlyDisplayScreen>
+      <p>
+        To make it easier to read this section of the report, please enter
+        a name for yourself and for your spouse below. The names need not be real,
+        just something you can use to keep track of who is who in the remainder
+        of the report.
+      </p>
 
-    <p class=nameEntry>
-      <span class=nowrap style="min-width: 280px">
-        Your name: <input type="text"
-                          name="yourName"
-                          ng-model="recipient.name">
+      <p class=nameEntry>
+        <span class=nowrap style="min-width: 280px">
+          Your name: <input type="text"
+                            name="yourName"
+                            ng-model="recipient.name">
+        </span>
+        <span class=nowrap style="min-width: 280px">
+          Spouse's name: <input type="text"
+                                name="spouseName"
+                                ng-model="spouse.name">
+        </span>
+      </p>
+
+      <p>
+        For <span class=names>{{recipient.name}}</span>, we will use the values
+      based on your <u>primary insurance amount</u> of
+        (<b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month)
+        and your birthdate (<b>{{recipient.birthdate().HumanBirthdate()}}</b>).
+        For <span class=names>{{spouse.name}}</span>, you must enter these two
+        values.
+      </p>
+
+      <h3>
+        Enter <span class=names>{{spouse.name}}'s</span>
+        Primary Insurance Amount
+      </h3>
+      <p>
+        You can compute <span class=names>{{spouse.name}}'s</span>
+        <u>primary insurance amount</u> by using this tool once for
+        <span class=names>{{spouse.name}}</span>. Note the value, and then
+        reload using this tool for <span class=names>{{recipient.name}}</span>,
+        entering <span class=names>{{spouse.name}}'s</span>
+        <u>primary insurance amount</u> below.
+      </p>
+
+      <p>
+        <span class=names>{{recipient.name}}'s</span>
+        Primary Insurance Amount:
+        <br class=onlydisplayunder500>
+        <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
+      </p>
+
+      <p>
+        <span class=names>{{spouse.name}}'s</span>
+        Primary Insurance Amount: 
+        <br class=onlydisplayunder500>
+        <b>$</b>
+        <input type="number" min=0 size=6 style="width: 68px"
+              name="spousalPia" cast-to-integer
+              ng-model="spouse.primaryInsuranceAmountValue"
+              ng-change="refreshSlider()">
+        / month
+      </p>
+
+      <h3>Enter <span class=names>{{spouse.name}}'s</span> Birthdate</h3>
+      <span ng-if="demoId === -1">
+      <div id="spouseAgeRequest" class="confirmation-prompt"
+           ng-controller="SpouseAgeRequestController"
+           ng-init="init()">
+          <input type=date class=birthdate-input ng-model="spouseBirthdateInput">
+          <br class=clear>
+          <div>
+          <!-- TODO: Style this in a way that the disabled bit is visibly
+                     obvious -->
+            <button ng-click="confirmBirthdate()" class=success
+                    ng-disabled="isInvalidBirthdate()">
+              <ico>&#10003;</ico> Next
+            </button>
+          </div>
+      </div>
       </span>
-      <span class=nowrap style="min-width: 280px">
-        Spouse's name: <input type="text"
-                              name="spouseName"
-                              ng-model="spouse.name">
-      </span>
-    </p>
 
-    <p>
-      For <span class=names>{{recipient.name}}</span>, we will use the values
-    based on your <u>primary insurance amount</u> of
-      (<b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month)
-      and your birthdate (<b>{{recipient.birthdate().HumanBirthdate()}}</b>).
-      For <span class=names>{{spouse.name}}</span>, you must enter these two
-      values.
-    </p>
-
-    <h3>
-      Enter <span class=names>{{spouse.name}}'s</span>
-      Primary Insurance Amount
-    </h3>
-    <p>
-      You can compute <span class=names>{{spouse.name}}'s</span>
-      <u>primary insurance amount</u> by using this tool once for
-      <span class=names>{{spouse.name}}</span>. Note the value, and then
-      reload using this tool for <span class=names>{{recipient.name}}</span>,
-      entering <span class=names>{{spouse.name}}'s</span>
-      <u>primary insurance amount</u> below.
-    </p>
-
-    <p>
-      <span class=names>{{recipient.name}}'s</span>
-      Primary Insurance Amount:
-      <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
-    </p>
-
-    <p>
-      <span class=names>{{spouse.name}}'s</span>
-      Primary Insurance Amount: <b>$</b>
-      <input type="number" min=0 size=6 style="width: 68px"
-            name="spousalPia" cast-to-integer
-            ng-model="spouse.primaryInsuranceAmountValue"
-            ng-change="refreshSlider()">
-      / month
-    </p>
-
-    <h3>Enter <span class=names>{{spouse.name}}'s</span> Birthdate</h3>
-    <span ng-if="demoId === -1">
-    <div id="spouseAgeRequest" class="confirmation-prompt"
-         ng-controller="SpouseAgeRequestController"
-         ng-init="init()">
-        <input type=date class=birthdate-input ng-model="spouseBirthdateInput">
-        <br class=clear>
-        <div>
-        <!-- TODO: Style this in a way that the disabled bit is visibly
-                   obvious -->
-          <button ng-click="confirmBirthdate()" class=success
-                  ng-disabled="isInvalidBirthdate()">
-            <ico>&#10003;</ico> Next
-          </button>
-        </div>
-    </div>
-    </span>
-
-    <span ng-if="showSpousalBenefit">
-    <p class=birthdate>
-      <span class=names>{{spouse.name}}</span> was born on
-      <b>{{spouse.birthdate().HumanBirthdate()}}</b>.
-    </p>
+      <span ng-if="showSpousalBenefit">
+      <p class=birthdate>
+        <span class=names>{{spouse.name}}</span> was born on
+        <b>{{spouse.birthdate().HumanBirthdate()}}</b>.
+      </p>
+    </div class=onlyDisplayScreen>
 
     <a class=offset-nav id=nav-spouse-benefit></a>
     <h2>Spousal Benefit</h2>
@@ -176,6 +181,7 @@
 
     <p>
       <span class=names>{{lowerEarner().name}}'s</span> Spousal Benefit:
+      <br class=onlydisplayunder500>
       ( <b>${{higherEarner().primaryInsuranceAmountFloored() | number:0}}</b>
         <span class=multsymbol>x</span>
         50%
@@ -325,11 +331,13 @@
     <a class=offset-nav id=nav-early-delayed-combined></a>
     <h2>Early and Delayed Combined Retirement</h2>
     <p>
-      You can see how the starting benefit dates for both spouses will affect
-      affect the final monthly benefits, using the sliders below.
+      You can see how the selected starting benefit dates for both spouses
+      will affect the final monthly benefits<span class=onlyDisplayScreen>,
+      using the sliders</span> in the chart below:
     </p>
 
-    <div class=insetTextBox id=spousal-visualization-screensize-warning>
+    <div class="insetTextBox onlyDisplayScreen"
+         id=spousal-visualization-screensize-warning>
       <h4>Small Screen Detected</h4>
       <p>
         Your device's small screen will not display the combined retirement
@@ -348,7 +356,7 @@
       </p>
     </div id=spousal-visualization-screensize-warning>
 
-    <div id=spousal-visualization>
+    <div id=spousal-visualization class="pageBreakAvoid">
       <div id=spousal-box>
         <canvas id=spousal-chart-canvas width=620 height=620></canvas>
         <p style="margin-bottom: 2px; z-index: 2">

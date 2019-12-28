@@ -1,74 +1,78 @@
 <div id=benefitEstimate class="benefit-estimate fixed-center-column"
     ng-show="recipient.isEligible() && mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
 
-  <a class=offset-nav id=nav-nra></a>
-  <h2>Normal Retirement Age</h2>
-  <p>
-    Your primary insurance amount rounded down to the next lower whole dollar
-    is <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
-    and is the benefit you will earn if you retire at your
-    <u>normal retirement age</u> (NRA). Normal Retirement Age is between 65
-    and 67, depending on when you were born. You may also see this
-    referred to as the <u>full retirement age</u> (FRA).
-  </p>
-
-  <p>
-    For those born in <b>{{selfLayBirthdate.getFullYear()}}</b>,
-    normal retirement age is <b>{{recipient.normalRetirement.ageYears}} years
-    and {{recipient.normalRetirement.ageMonths}} months</b>.
-
-    This puts your normal retirement date at
-    <b>{{recipient.normalRetirementDate().monthFullName()}},
-    {{recipient.normalRetirementDate().year()}}</b>.
-  </p>
-
-  <div class=insetTextBox ng-if="recipient.birthdate().isFirstOfMonth()">
-    <h4>Special Rule</h4>
+  <div class=pageBreakAvoid>
+    <a class=offset-nav id=nav-nra></a>
+    <h2>Normal Retirement Age</h2>
     <p>
-      The month you reach specific ages may seem "off by one" from what
-      you entered. Social Security follows English common law that finds that a
-      person "attains" an age on the day before their birthdate. Because you
-      were born on the first of the month, this means that you attain age
-      <b>{{recipient.exampleAge().age}}</b> on
-      <b>{{recipient.exampleAge().month}}
-         {{recipient.exampleAge().day}},
-         {{recipient.exampleAge().year}}</b>.
+      Your primary insurance amount rounded down to the next lower whole dollar
+      is <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
+      and is the benefit you will earn if you retire at your
+      <u>normal retirement age</u> (NRA). Normal Retirement Age is between 65
+      and 67, depending on when you were born. You may also see this
+      referred to as the <u>full retirement age</u> (FRA).
+    </p>
+
+    <p>
+      For those born in <b>{{selfLayBirthdate.getFullYear()}}</b>,
+      normal retirement age is <b>{{recipient.normalRetirement.ageYears}} years
+      and {{recipient.normalRetirement.ageMonths}} months</b>.
+
+      This puts your normal retirement date at
+      <b>{{recipient.normalRetirementDate().monthFullName()}},
+      {{recipient.normalRetirementDate().year()}}</b>.
+    </p>
+
+    <div class=insetTextBox ng-if="recipient.birthdate().isFirstOfMonth()">
+      <h4>Special Rule</h4>
+      <p>
+        The month you reach specific ages may seem "off by one" from what
+        you entered. Social Security follows English common law that finds that a
+        person "attains" an age on the day before their birthdate. Because you
+        were born on the first of the month, this means that you attain age
+        <b>{{recipient.exampleAge().age}}</b> on
+        <b>{{recipient.exampleAge().month}}
+           {{recipient.exampleAge().day}},
+           {{recipient.exampleAge().year}}</b>.
+      </p>
+    </div>
+
+    <p>
+      If you start collecting benefits at your normal retirement age, your
+      benefit will be the primary insurance amount, rounded down:
+      <ul>
+        <li>
+          <b>${{recipient.primaryInsuranceAmountFloored() | number}}</b> / month
+        </li>
+        <li>
+          <b>${{recipient.primaryInsuranceAmountFloored() * 12 | number}}</b>
+          / year
+        </li>
+      </ul>
     </p>
   </div>
 
-  <p>
-    If you start collecting benefits at your normal retirement age, your
-    benefit will be the primary insurance amount, rounded down:
-    <ul>
-      <li>
-        <b>${{recipient.primaryInsuranceAmountFloored() | number}}</b> / month
-      </li>
-      <li>
-        <b>${{recipient.primaryInsuranceAmountFloored() * 12 | number}}</b>
-        / year
-      </li>
-    </ul>
-  </p>
-
-  <a class=offset-nav id=nav-early-delayed></a>
-  <h2>Early and Delayed Retirement</h2>
-  <p>
-		<span ng-if="recipient.birthdate().layBirthDayOfMonth() === 2">
-    	You can begin taking benefits as early as 62 years old
-	    (<b>{{recipient.dateAtYearsOld(62).monthFullName()}}
-  	      {{recipient.dateAtYearsOld(62).year()}}</b>),
-    </span>
-		<span ng-if="recipient.birthdate().layBirthDayOfMonth() !== 2">
-    	You can begin taking benefits as early as 62 years and 1 month old
-	    (<b>{{recipient.dateAtAge(initAge(62, 1)).monthFullName()}}
-  	      {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
-		</span>
-    or wait until as late as 70 years old
-    (<b>{{recipient.dateAtYearsOld(70).monthFullName()}}
-        {{recipient.dateAtYearsOld(70).year()}}</b>),
-    or start any month in between. The longer you wait, the higher your
-    benefit will be.
-  </p>
+  <div class=pageBreakAvoid>
+    <a class=offset-nav id=nav-early-delayed></a>
+    <h2>Early and Delayed Retirement</h2>
+    <p>
+      <span ng-if="recipient.birthdate().layBirthDayOfMonth() === 2">
+        You can begin taking benefits as early as 62 years old
+        (<b>{{recipient.dateAtYearsOld(62).monthFullName()}}
+            {{recipient.dateAtYearsOld(62).year()}}</b>),
+      </span>
+      <span ng-if="recipient.birthdate().layBirthDayOfMonth() !== 2">
+        You can begin taking benefits as early as 62 years and 1 month old
+        (<b>{{recipient.dateAtAge(initAge(62, 1)).monthFullName()}}
+            {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
+      </span>
+      or wait until as late as 70 years old
+      (<b>{{recipient.dateAtYearsOld(70).monthFullName()}}
+          {{recipient.dateAtYearsOld(70).year()}}</b>),
+      or start any month in between. The longer you wait, the higher your
+      benefit will be.
+    </p>
+  </div>
   <div class=insetTextBox
        ng-if="recipient.birthdate().layBirthDayOfMonth() > 2">
     <h4>Special Rule</h4>
@@ -121,7 +125,8 @@
     Here is a table which shows how much your benefit would be at different
     starting ages:
   </p>
-  <table ng-class="{'fancy-table': true, 'wide-age': recipient.birthdate().layBirthDayOfMonth() !== 2}">
+  <table ng-class="{'fancy-table': true, 'wide-age': recipient.birthdate().layBirthDayOfMonth() !== 2}"
+         class=pageBreakAvoid>
     <thead>
       <tr>
         <th id="age">Age</th>
@@ -191,7 +196,7 @@
   </p>
 
 
-  <div class="chart-container">
+  <div class="chart-container pageBreakAvoid">
     <div class="chart-ylabel benefit-estimate" >
       <span class="vertical-text">Adjusted Benefit</span>
     </div>

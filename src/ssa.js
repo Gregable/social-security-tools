@@ -167,7 +167,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.ageChart_.setRecipient($scope.recipient);
     $scope.maybeRenderCharts();
     window.addEventListener('resize', function() { $scope.maybeRenderCharts() });
-    $scope.loadDemoData(0);
+    // Add an event listener that can catch the "print" event. This resizes
+    // the charts on the page to match the print screen width. Canvases can't
+    // be resized with CSS alone.
+    if (window.matchMedia) {
+      var mediaQueryList = window.matchMedia('print');
+      mediaQueryList.addListener(function(mql) { $scope.maybeRenderCharts(); });
+    }
+
   };
 
   // Aliased so ModeEnum can be used in template conditionals, such as:
