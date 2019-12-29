@@ -272,9 +272,9 @@ Recipient.prototype.isOver60 = function() {
 // depends on the year at which an individual first becomes eligible for
 // benefits, (when they turn 62). The computation is based on the wage
 // index from two years prior. If the user is not yet 62, we use the
-// most up to date bend points, which are for the current year.
+// most up to date bend points, which are for the max year we have data for.
 Recipient.prototype.indexingYear = function() {  
-  return Math.min(this.dateAtYearsOld(62).year(), CURRENT_YEAR) - 2;
+  return Math.min(this.dateAtYearsOld(62).year(), MAX_YEAR) - 2;
 }
 
 // ssa.gov records a specific sentinel string if the last year has incomplete
