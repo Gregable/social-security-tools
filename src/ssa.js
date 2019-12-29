@@ -174,7 +174,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       var mediaQueryList = window.matchMedia('print');
       mediaQueryList.addListener(function(mql) { $scope.maybeRenderCharts(); });
     }
-
   };
 
   // Aliased so ModeEnum can be used in template conditionals, such as:
@@ -364,14 +363,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       let breakPointCanvas = document.getElementById('breakpoint-chart-canvas');
       let parentWidth = breakPointCanvas.parentNode.clientWidth;
       // Leave 50px for the y-axis label.
-      breakPointCanvas.setAttribute('width',  parentWidth - 50);
+      if (parentWidth > 0)
+        breakPointCanvas.setAttribute('width',  parentWidth - 50);
       $scope.breakPointChart_.render();
     }
     if ($scope.ageChart_.isInitialized()) {
       let ageCanvas = document.getElementById('age-chart-canvas');
       let parentWidth = ageCanvas.parentNode.clientWidth;
       // Leave 50px for the y-axis label.
-      ageCanvas.setAttribute('width',  parentWidth - 50);
+      if (parentWidth > 0)
+        ageCanvas.setAttribute('width',  parentWidth - 50);
       $scope.ageChart_.render();
     }
     $scope.refreshSlider();
