@@ -424,7 +424,3 @@ function parseDateInputValue(dateInputValue) {
   }
   return parsedDate;
 }
-
-
-
-
