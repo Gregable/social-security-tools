@@ -401,3 +401,26 @@ function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
   return colaAdjustment(yearTurn62,
       primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings));
 };
+
+/**
+ * Parses the value from a date input field. The value may be a Date object
+ * or a string, and may be invalid. Caller should verify the output is valid.
+ * @param {object} dateInputValue
+ * @return {Date} date object
+ */
+function parseDateInputValue(dateInputValue) {
+  // Safari Desktop and IE don't have native date input types, so we parse
+  // these as strings or at least try to.
+  let parsedDate = new Date('invalid');
+  if (typeof(dateInputValue) === 'string') {
+    parsedDate = new Date(dateInputValue);
+    // Javascript parses dates in UTC, but converts to local time.
+    // This can cause dates to add/subract a day from what's entered because
+    // of daylight savings. This line normalizes that. Fun times.
+    parsedDate = new Date(parsedDate.getTime() +
+                          Math.abs(parsedDate.getTimezoneOffset() * 60000));
+  } else if (dateInputValue instanceof Date) {
+    parsedDate = dateInputValue;
+  }
+  return parsedDate;
+}
