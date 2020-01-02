@@ -96,7 +96,10 @@
       <div id="spouseAgeRequest" class="confirmation-prompt"
            ng-controller="SpouseAgeRequestController"
            ng-init="init()">
-          <input type=date class=birthdate-input ng-model="spouseBirthdateInput">
+          <input type=date 
+                 class=birthdate-input
+                 ng-model="spouseBirthdateInput"
+                 placeholder="YYYY-MM-DD">
           <br class=clear>
           <div>
           <!-- TODO: Style this in a way that the disabled bit is visibly

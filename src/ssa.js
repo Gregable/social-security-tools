@@ -38,22 +38,21 @@ ssaApp.controller("AgeRequestController", function ($scope) {
    * Initialization
    */
   $scope.init = function() {
-    // This causes the date picker to display "mm/dd/yyy" which seems more
-    // useful than guessing the user's birthdate.
+    // This causes a native date picker to display "mm/dd/yyy".
     $scope.selfBirthdateInput = null;
-    $scope.$on('selfBirthdateSetDemo', $scope.selfBirthdateSetDemo);
   }
   $scope.init();
-
-  $scope.selfBirthdateSetDemo = function(event, date) {
-    $scope.selfBirthdateInput = date;
-  }
 
   // Double negative required because angular expression in template can't
   // evaluate a not (!).
   $scope.isInvalidBirthdate = function() {
     if ($scope.selfBirthdateInput === undefined) return true;
     if ($scope.selfBirthdateInput === null) return true;
+    // Safari Desktop and IE don't have native date input types, so we parse
+    // these as strings or at least try to.
+    let parsedDate = parseDateInputValue($scope.selfBirthdateInput);
+    if (parsedDate.getTime() === NaN)
+      return true;
     // TODO: Check that the date is in the past, isn't too far in the past, etc.
     return false;
   }
@@ -63,10 +62,11 @@ ssaApp.controller("AgeRequestController", function ($scope) {
   $scope.confirmBirthdate = function() {
     if ($scope.isInvalidBirthdate())
       return;
+    let parsedDate = parseDateInputValue($scope.selfBirthdateInput);
+    $scope.$emit('birthdateChange', parsedDate);
     // Send basic analytics event indicating that the user entered their
     // own birthdate. Never records what birthdate a user entered.
     ga('send', 'event', 'PasteData', 'ConfirmBirthdate');
-    $scope.$emit('birthdateChange', $scope.selfBirthdateInput);
   }
 });
 
@@ -79,19 +79,17 @@ ssaApp.controller("SpouseAgeRequestController", function ($scope) {
     // This causes the date picker to display "mm/dd/yyy" which seems more
     // useful than guessing the user's birthdate.
     $scope.spouseBirthdateInput = null;
-    $scope.$on('spouseBirthdateSetDemo', $scope.spouseBirthdateSetDemo);
   }
   $scope.init();
     
-  $scope.spouseBirthdateSetDemo = function(event, date) {
-    $scope.spouseBirthdateInput = date;
-  }
-
   // Double negative required because angular expression in template can't
   // evaluate a not (!).
   $scope.isInvalidBirthdate = function() {
     if ($scope.spouseBirthdateInput === undefined) return true;
     if ($scope.spouseBirthdateInput === null) return true;
+    let parsedDate = parseDateInputValue($scope.spouseBirthdateInput);
+    if (parsedDate.getTime() === NaN)
+      return true;
     // TODO: Check that the date is in the past, isn't too far in the past, etc.
     return false;
   }
@@ -101,7 +99,8 @@ ssaApp.controller("SpouseAgeRequestController", function ($scope) {
   $scope.confirmBirthdate = function() {
     if ($scope.isInvalidBirthdate())
       return;
-    $scope.$emit('spouseBirthdateChange', $scope.spouseBirthdateInput);
+    let parsedDate = parseDateInputValue($scope.spouseBirthdateInput);
+    $scope.$emit('spouseBirthdateChange', parsedDate);
   }
 });
 
@@ -277,7 +276,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Called when the primary birthdate is modified.
   $scope.updateBirthdate = function(birthdate) {
     $scope.selfLayBirthdate = birthdate
-    $scope.$broadcast('selfBirthdateSetDemo', birthdate);
     $scope.recipient.updateBirthdate(birthdate);
 
     $scope.higherEarnerSlider.updateBirthdate();
@@ -293,7 +291,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function(birthdate) {
     $scope.showSpousalBenefit = true;
-    $scope.$broadcast('spouseBirthdateSetDemo', birthdate);
     $scope.spouseLayBirthdate = birthdate;
     $scope.spouse.updateBirthdate(birthdate);
 
