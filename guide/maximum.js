@@ -31,7 +31,8 @@ guidesApp.controller("MaximumGuideController", function ($scope) {
     $scope.earlyMaximumMonthlyBenefit = monthlyBenefit(62);
     $scope.normalMaximumMonthlyBenefit = monthlyBenefit(66);
     $scope.maximumMonthlyBenefit = monthlyBenefit(70);
-    $scope.spouseMax = Math.floor(monthlyBenefit(70) / 2.0);
+    // spouseMax is half of the NRA benefit.
+    $scope.spouseMax = Math.floor(monthlyBenefit(66) / 2.0);
     $scope.familyMax = $scope.maximumMonthlyBenefit + $scope.spouseMax;
     document.title += ' for ' + CURRENT_YEAR;
 
