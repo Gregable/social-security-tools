@@ -1,3 +1,5 @@
+const utils = require('./utils');
+
 /**
  * User birthdates in social security have some unique properties. We manage
  * them with instances of this class.
@@ -55,7 +57,7 @@ class Birthdate {
    */
   ssaBirthdate() {
     const ebd = this.englishBirthdate();
-    return new MonthDate().initFromYearsMonths(
+    return new utils.MonthDate().initFromYearsMonths(
         ebd.getFullYear(), ebd.getMonth());
   }
 
@@ -97,3 +99,5 @@ class Birthdate {
     return example;
   }
 };
+
+module.exports = Birthdate;

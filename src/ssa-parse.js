@@ -1,3 +1,5 @@
+const constants = require('./constants');
+const EarningRecord = require('./recipient').EarningRecord;
 
 /**
  * Given a string which we know to be a number containing possibly a leading
@@ -14,6 +16,7 @@ var dollarStringToNumber = function(dollar_string) {
   var number_string = dollar_string.replace(/[$,]/g, '');
   return Number(number_string);
 }
+module.exports.dollarStringToNumber = dollarStringToNumber;
 
 var parseSsaGovTable = function(lines) {
   let earningsRecords = [];
@@ -58,7 +61,7 @@ function isYearString(maybeYearStr) {
   maybeYear = Number.parseInt(maybeYearStr);
   if (Number.isNaN(maybeYear))
     return false;
-  // parseInt will ignore trailing garbage, so "1A" will be parsed as "1". 
+  // parseInt will ignore trailing garbage, so "1A" will be parsed as "1".
   // We don't want this as it could lead us to extract lines that aren't
   // valid.
   if (maybeYear.toString().length !== maybeYearStr.length)
@@ -75,12 +78,12 @@ function isYearString(maybeYearStr) {
   // until the following year. However, some users would like to manufacture
   // data to paste into the tool, so we accept any year up to 70y in the future.
   // See https://github.com/Gregable/social-security-tools/issues/130
-  if (maybeYear > CURRENT_YEAR + 70)
+  if (maybeYear > constants.CURRENT_YEAR + 70)
     return false;
 
   return true;
 }
- 
+
 var parsePaste = function(paste) {
   // We first collapse whitespace on each line as
   // different browsers insert different whitespace for column
@@ -135,7 +138,7 @@ var parsePaste = function(paste) {
   }
   if (earningsLines.length === 0)
     return [];
-    
+
   // There are several different formats we are interested in:
   // 1) The table at ssa.gov's website.
   // 2) The table that we produce from our example data.
@@ -173,3 +176,4 @@ var parsePaste = function(paste) {
 
   return out;
 }
+module.exports.parsePaste = parsePaste;

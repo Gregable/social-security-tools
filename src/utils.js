@@ -1,3 +1,5 @@
+const constants = require('./constants');
+
 /**
  * In social security calculations, days don't really matter for much.
  * Everything is computed on month scales, not days. Days or smaller
@@ -52,7 +54,7 @@ class MonthDate {
     console.assert(Number.isInteger(years), years);
     console.assert(typeof monthStr === 'string');
     console.assert(years >= 0, years);
-    var monthIndex = ALL_MONTHS.indexOf(monthStr)
+    var monthIndex = constants.ALL_MONTHS.indexOf(monthStr)
     console.assert(monthIndex >= 0, monthStr);
     console.assert(monthIndex < 12, monthStr);
 
@@ -89,7 +91,7 @@ class MonthDate {
    * @return {number}
    */
   monthName() {
-    return ALL_MONTHS[this.monthsSinceEpoch_ % 12];
+    return constants.ALL_MONTHS[this.monthsSinceEpoch_ % 12];
   }
 
   /*
@@ -97,7 +99,7 @@ class MonthDate {
    * @return {number}
    */
   monthFullName() {
-    return ALL_MONTHS_FULL[this.monthsSinceEpoch_ % 12];
+    return constants.ALL_MONTHS_FULL[this.monthsSinceEpoch_ % 12];
   }
 
   /*
@@ -158,8 +160,8 @@ class MonthDate {
   greaterThanOrEqual(other) {
     return this.monthsSinceEpoch() >= other.monthsSinceEpoch();
   }
-
 }
+module.exports.MonthDate = MonthDate;
 
 /**
  * In social security calculations, days don't really matter for much.
@@ -253,6 +255,7 @@ class MonthDuration {
         this.asMonths() + other.asMonths());
   }
 }
+module.exports.MonthDuration = MonthDuration;
 
 /**
  * Converts a number to a string such as 1200 to '1,200'.
@@ -262,6 +265,7 @@ class MonthDuration {
 function insertNumericalCommas(num) {
  return num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
+module.exports.insertNumericalCommas = insertNumericalCommas;
 
 /**
  * Returns the ratio of the average wage in indexingYear to the
@@ -270,10 +274,11 @@ function insertNumericalCommas(num) {
  * @return {number} wage ratio
  */
 function wageRatioInYear(indexingYear) {
-  const wage_in_1977 = WAGE_INDICES[1977];
-  const wage = WAGE_INDICES[indexingYear];
+  const wage_in_1977 = constants.WAGE_INDICES[1977];
+  const wage = constants.WAGE_INDICES[indexingYear];
   return wage / wage_in_1977;
 }
+module.exports.wageRatioInYear = wageRatioInYear;
 
 /**
  * Floors a number to the nearest dime (1 significant figure).
@@ -283,6 +288,7 @@ function wageRatioInYear(indexingYear) {
 function NearestDime(input) {
   return Math.floor(input * 10) / 10;
 }
+module.exports.NearestDime = NearestDime;
 
 /**
  * Floors a number to the nearest penny (2 significant figures).
@@ -292,7 +298,7 @@ function NearestDime(input) {
 function NearestPenny(input) {
   return Math.floor(input * 100) / 100;
 }
-
+module.exports.NearestPenny = NearestPenny;
 
 /**
  * Returns the first monthly bend point in the PIA formula.
@@ -300,8 +306,9 @@ function NearestPenny(input) {
  * @return {number} first annual bend point dollar amount
  */
 function firstBendPoint(indexingYear) {
-  return Math.round(BENDPOINT1_IN_1977 * wageRatioInYear(indexingYear));
+  return Math.round(constants.BENDPOINT1_IN_1977 * wageRatioInYear(indexingYear));
 }
+module.exports.firstBendPoint = firstBendPoint;
 
 /**
  * Returns the second monthly bend point in the PIA formula.
@@ -309,8 +316,9 @@ function firstBendPoint(indexingYear) {
  * @return {number} first annual bend point dollar amount
  */
 function secondBendPoint(indexingYear) {
-  return Math.round(BENDPOINT2_IN_1977 * wageRatioInYear(indexingYear));
+  return Math.round(constants.BENDPOINT2_IN_1977 * wageRatioInYear(indexingYear));
 }
+module.exports.secondBendPoint = secondBendPoint;
 
 /**
  * Returns the PIA component for a specific breakpoint bracket for any
@@ -328,18 +336,19 @@ function primaryInsuranceAmountForEarningsByBracket(
 
   if (bracket === 0) {
     return NearestPenny(
-        Math.min(earnings, firstBend) * BEFORE_BENDPOINT1_MULTIPLIER);
+        Math.min(earnings, firstBend) * constants.BEFORE_BENDPOINT1_MULTIPLIER);
   } else if (bracket === 1) {
     return NearestPenny(
         Math.max(0, (Math.min(earnings, secondBend) - firstBend)) *
-        BEFORE_BENDPOINT2_MULTIPLIER);
+        constants.BEFORE_BENDPOINT2_MULTIPLIER);
   } else if (bracket === 2) {
     return NearestPenny(
-        Math.max(0, earnings - secondBend) * AFTER_BENDPOINT2_MULTIPLIER);
+        Math.max(0, earnings - secondBend) * constants.AFTER_BENDPOINT2_MULTIPLIER);
   }
 
   return -1;
 };
+module.exports.primaryInsuranceAmountForEarningsByBracket = primaryInsuranceAmountForEarningsByBracket;
 
 /**
  * Returns the total monthly full benefit summed across all benefit brackets,
@@ -357,6 +366,7 @@ function primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings) {
   // Who decided this was an important step?
   return NearestDime(sum);
 };
+module.exports.primaryInsuranceAmountForEarningsUnadjusted = primaryInsuranceAmountForEarningsUnadjusted;
 
 /**
  * Returns the set of years for which the primary insurance amount needs
@@ -366,10 +376,11 @@ function primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings) {
  */
 function colaAdjustmentYears(yearTurn62) {
   var adjustmentYears = [];
-  for (var year = yearTurn62; year < CURRENT_YEAR; ++year)
+  for (var year = yearTurn62; year < constants.CURRENT_YEAR; ++year)
     adjustmentYears.push(year);
   return adjustmentYears;
 }
+module.exports.colaAdjustmentYears = colaAdjustmentYears;
 
 /**
  * Returns the final COLA adjusted primary insurance amount.
@@ -381,13 +392,14 @@ function colaAdjustment(yearTurn62, initialPIA) {
   var adjustedPIA = initialPIA;
   for (var year of colaAdjustmentYears(yearTurn62)) {
     if (COLA[year] !== undefined) {
-      adjustedPIA = adjustedPIA * (1 + (COLA[year] / 100.0));
+      adjustedPIA = adjustedPIA * (1 + (constants.COLA[year] / 100.0));
       // Primary Insurance amounts are always rounded down the the nearest dime.
       adjustedPIA = NearestDime(adjustedPIA);
     }
   }
   return adjustedPIA;
 }
+module.exports.colaAdjustment = colaAdjustment;
 
 /**
  * Returns the primary insurance amount (monthly benefit) summed across all
@@ -401,6 +413,7 @@ function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
   return colaAdjustment(yearTurn62,
       primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings));
 };
+module.exports.primaryInsuranceAmountForEarnings = primaryInsuranceAmountForEarnings;
 
 /**
  * Parses the value from a date input field. The value may be a Date object
@@ -424,3 +437,4 @@ function parseDateInputValue(dateInputValue) {
   }
   return parsedDate;
 }
+module.exports.parseDateInputValue = parseDateInputValue;
