@@ -1,6 +1,6 @@
 <div ng-if="mode === ModeEnum.RENDER_EARNINGS"
-     class="fixed-left-column ng-cloak onlyDisplayScreen"
-     id=navbar ng-init="affixNavbar()">
+  class="fixed-left-column ng-cloak onlyDisplayScreen" id=navbar
+  ng-init="affixNavbar()">
   <ul class="nav" ng-controller=NavbarController>
     <li ng-if="demoId > -1">
       <a href="#nav-demodata" data-ng-click="scrollTo('nav-demodata')">
@@ -40,7 +40,7 @@
     </li>
     <li ng-if="recipient.isEligible()">
       <a href="#nav-early-delayed"
-         data-ng-click="scrollTo('nav-early-delayed')">
+        data-ng-click="scrollTo('nav-early-delayed')">
         <div class=navlabel>Early and Delayed Retirement</div>
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>

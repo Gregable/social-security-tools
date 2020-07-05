@@ -1,6 +1,6 @@
-/* 
- * Allow angular.js to be loaded in body, hiding cloaked elements until 
- * templates compile.  The !important is important given that there may be 
+/*
+ * Allow angular.js to be loaded in body, hiding cloaked elements until
+ * templates compile.  The !important is important given that there may be
  * other selectors that are more specific or come later and might alter display.
  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
@@ -11,14 +11,28 @@ body {
   padding-top: 20px;
   padding-bottom: 20px;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:14px;
   line-height: 1.42857143;
   color: #333;
   background-color: #fff;
+  margin: 0;
 }
 html {
   scroll-behavior: smooth;
+  font-size:10px;
+  -webkit-tap-highlight-color:rgba(0,0,0,0)
 }
 
+*{
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  box-sizing:border-box
+}
+:after,:before{
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  box-sizing:border-box
+}
 
 /** Desktop **/
 @media screen and (min-width: 1025px) {
@@ -143,15 +157,15 @@ div#topheader > h3 {
   font-size: 24px;
   font-family: inherit;
 }
-  
+
 div#topheader h3#title-header {
   padding-left: 40px;
 }
 
 /* Navigation Pills */
 div#topheader ul.navpills {
-  list-style-image: none; 
-  list-style-type: none; 
+  list-style-image: none;
+  list-style-type: none;
   list-style: none;
   font-size: 14px;
   float: right;
@@ -307,7 +321,7 @@ a.bigbtn:hover {
     padding: 7px 12px;
   }
 }
- 
+
 h4 {
  margin-bottom: 5px;
 }
@@ -315,7 +329,7 @@ h4 {
 br.clear {
   clear: both;
 }
- 
+
 h2,p {
   padding-left: 20px;
   padding-right: 20px;
@@ -518,7 +532,7 @@ table.fancy-table td[headers='multsymbol'] {
   padding-right: 0px;
   color: #6B6BBF;
 }
-.multsymbol {  
+.multsymbol {
   color: #6B6BBF;
 }
 table.fancy-table th#multiplier,
@@ -969,7 +983,7 @@ span.rz-bubble {
   border-style: solid;
   border-width: 2px;
   border-radius: 6px;
-  border-color: #777;          
+  border-color: #777;
 
 }
 .married-options input:checked+label {
@@ -984,20 +998,20 @@ span.rz-bubble {
 }
 .frequent-questions p, .frequent-questions ul {
   display: none;
-}   
+}
 .frequent-questions input {
   display: none;
 }
 /* Show only the clipped intro */
 .frequent-questions label+p {
-  display: block; 
+  display: block;
   color: #999;
   font-size: .85em;
   transition: all .15s ease-out;
   /* Clipping text */
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;                       
+  overflow: hidden;
 }
 /* If the checkbox is checked, show all paragraphs */
 .frequent-questions input[type=checkbox]:checked~p,
@@ -1006,9 +1020,9 @@ span.rz-bubble {
   color: #444;
   font-size: 1em;
   /* restore clipping defaults */
-  text-overflow: clip; 
+  text-overflow: clip;
   white-space: normal;
-  overflow: visible;  
+  overflow: visible;
 }
 
 /* Style the label */
@@ -1023,7 +1037,7 @@ span.rz-bubble {
   border: 1px solid #ddd;
   border-left: 3px solid #888;
   text-shadow: 0 1px 0 rgba(255,255,255,.5);
-  transition: all .15s ease-out;          
+  transition: all .15s ease-out;
   box-sizing: initial;
 }
 /* Label texts wraps outside of the label box on small widths*/
@@ -1042,10 +1056,10 @@ span.rz-bubble {
 
 /* If the checkbox is checked, style the label accordingly */
 .frequent-questions input[type=checkbox]:checked~label {
-  border-color: #ff7f50;          
+  border-color: #ff7f50;
   background: #f5deb4;
   background-image: linear-gradient(to bottom, #fff, #f5deb4);
-  box-shadow: 0 0 1px rgba(0,0,0,.4);             
+  box-shadow: 0 0 1px rgba(0,0,0,.4);
 }
 
 /* Label's arrow - default state */
@@ -1056,7 +1070,7 @@ span.rz-bubble {
   top: 50%;
   margin-top: -6px;
   border: 6px solid transparent;
-  border-left-color: inherit; 
+  border-left-color: inherit;
 }
 
 /* Update the right arrow */
@@ -1064,7 +1078,7 @@ span.rz-bubble {
   border: 6px solid transparent;
   border-top-color: inherit;
   margin-top: -3px;
-  right: 10px;    
+  right: 10px;
 }
 
 /* Small animation to notify that a div just appeared */
@@ -1153,4 +1167,8 @@ a.offset-nav {
 }
 input.birthdate-input {
   font-size: 26px;
+}
+.affixed {
+  position: fixed;
+  top: 0px;
 }
