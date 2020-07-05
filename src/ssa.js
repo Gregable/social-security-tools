@@ -26,7 +26,7 @@ ssaApp.controller("NavbarController", function ($scope) {
   // page. It is used in the navbar partial to jump to different sections of the
   // document using data-ng-click.
   $scope.scrollTo = function(id) {
-    var el = $('#' + id);
+    var el = document.getElementById(id);
     var pos = el.position();
     window.scrollTo(pos.left, pos.top + 10);
   };
@@ -81,7 +81,7 @@ ssaApp.controller("SpouseAgeRequestController", function ($scope) {
     $scope.spouseBirthdateInput = null;
   }
   $scope.init();
-    
+
   // Double negative required because angular expression in template can't
   // evaluate a not (!).
   $scope.isInvalidBirthdate = function() {
@@ -133,7 +133,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.breakPointChart_ = new BreakPointChart();
     $scope.ageChart_ = new AgeChart();
     $scope.spousalChartSelectedDate = new MonthDate();
-    
+
     $scope.selfLayBirthdate = null;
     $scope.spouseLayBirthdate = null;
 
@@ -156,7 +156,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.married = {
         value: "false"
     };
-  
+
     $scope.showMedicare = true;
     $scope.showIndexedEarnings = false;
     // Enabled once the user has entered a valid spousal birthdate
@@ -197,7 +197,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         $scope.recipient.initFromEarningsRecords(records);
         $scope.mode = ModeEnum.RENDER_EARNINGS;
         $scope.maybeRenderCharts();
-      }, 
+      },
       function(jqxhr, textStatus, error) {
         console.error("Error loading Test Data");
         console.error(textStatus);
@@ -216,7 +216,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     ga('send', 'event', 'DemoData', 'load');
 
     // Note that bizarrely, these dates can show up in the tool one day earlier
-    // due to DST changes. See 
+    // due to DST changes. See
     // https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off
     if (demoId === 0) {
       $scope.demoId = 0;
@@ -272,7 +272,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 		  $scope.layoutSliderChart();
     });
   };
- 
+
   // Called when the primary birthdate is modified.
   $scope.updateBirthdate = function(birthdate) {
     $scope.selfLayBirthdate = birthdate
@@ -287,7 +287,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.updateBirthdateEvent = function(event, birthdate) {
     $scope.updateBirthdate(birthdate);
   }
- 
+
   // Called whenever the spousal birthdate is modified.
   $scope.updateSpouseBirthdate = function(birthdate) {
     $scope.showSpousalBenefit = true;
@@ -302,7 +302,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.updateSpouseBirthdateEvent = function(event, birthdate) {
     $scope.updateSpouseBirthdate(birthdate);
   }
- 
+
   $scope.confirmEarningsParse = function(confirmationValue) {
     if (confirmationValue === 'incorrect') {
       $scope.mode = ModeEnum.PASTE_APOLOGY;
@@ -317,7 +317,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.mode = ModeEnum.AGE_REQUEST;
     }
   };
-  
+
   $scope.isMarried = function() {
     return $scope.married.value == "true";
   };
@@ -325,7 +325,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.earningsRecords = function() {
     return $scope.recipient.earningsRecords();
   };
-  
+
   $scope.earningsRecordsIncludeMedicare = function() {
     for (let i = 0; i < $scope.recipient.earningsRecords.length; ++i) {
       if ($scope.recipient.earningsRecords[i].taxedMedicareEarnings >= 0)
@@ -376,7 +376,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
 
   $scope.affixNavbar = function() {
-    $('#navbar').affix({offset: {top: 80} });
+    let navbar = document.getElementById('navbar');
+    if (navbar === null) return;
+    window.addEventListener('scroll', function () {
+      const top = document.documentElement.scrollTop;
+      if (top > 80) {
+        navbar.classList.add('affixed');
+      } else {
+        navbar.classList.remove('affixed')
+      }
+    });
   };
 
   /**
@@ -411,7 +420,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         /*wage=*/$scope.futureWageWorkSlider.minValue);
     $scope.maybeRenderCharts();
   }
- 
+
   $scope.futureYearsWorkSlider = {
     minValue: 0,
     options: {
@@ -493,12 +502,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   $scope.spousalBenefit = function() {
-    return Math.floor(Math.max(0, 
+    return Math.floor(Math.max(0,
         $scope.spousalMax() - $scope.lowerEarner().primaryInsuranceAmount()));
   }
 
   $scope.spousalBenefitFraction = function() {
-    var actualFraction = Math.min(1.0, 
+    var actualFraction = Math.min(1.0,
           ($scope.lowerEarner().primaryInsuranceAmount() /
            $scope.spousalMax())) * 100.0;
     // If the actual number is > 0, return at least 1%.
@@ -668,11 +677,11 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     var styles = 'width: ' + length + 'px; '
                + '-moz-transform: rotate(' + angle + 'rad); '
                + '-webkit-transform: rotate(' + angle + 'rad); '
-               + '-o-transform: rotate(' + angle + 'rad); '  
-               + '-ms-transform: rotate(' + angle + 'rad); '  
+               + '-o-transform: rotate(' + angle + 'rad); '
+               + '-ms-transform: rotate(' + angle + 'rad); '
                + 'top: ' + y + 'px; '
                + 'left: ' + x + 'px; ';
-    line.setAttribute('style', styles);  
+    line.setAttribute('style', styles);
     line.setAttribute('class', 'lineElement');
     return line;
 	}
@@ -766,25 +775,25 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.spousalChart_.setDateRange(chartStartDate, chartEndDate);
     $scope.spousalChart_.render();
   }
- 
+
   /*
    * @return {MonthDate}
-   */ 
+   */
   $scope.filingDate = function(sliderValue, earner) {
     return earner.dateAtAge(new MonthDuration().initFromMonths(sliderValue));
   }
 
   /*
    * @return {MonthDate}
-   */ 
+   */
   $scope.higherEarnerFilingDate = function() {
     return $scope.filingDate(
         $scope.higherEarnerSlider.value, $scope.higherEarner());
   }
- 
+
   /*
    * @return {MonthDate}
-   */ 
+   */
   $scope.lowerEarnerFilingDate = function() {
     return $scope.filingDate(
         $scope.lowerEarnerSlider.value, $scope.lowerEarner());
@@ -806,12 +815,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       date.monthName() + ' ' + date.year();
 
     // Determine the displayed benefit dollar values.
-    $scope.spousalSelection.higherEarnerBenefit = 
+    $scope.spousalSelection.higherEarnerBenefit =
         $scope.higherEarner().totalBenefitAtDate(
             date,
             $scope.higherEarnerSlider.selectedDate(),
             $scope.lowerEarnerSlider.selectedDate());
-    $scope.spousalSelection.lowerEarnerBenefit = 
+    $scope.spousalSelection.lowerEarnerBenefit =
         $scope.lowerEarner().totalBenefitAtDate(
             date,
             $scope.lowerEarnerSlider.selectedDate(),
