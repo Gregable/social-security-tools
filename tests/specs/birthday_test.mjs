@@ -1,5 +1,5 @@
-const utils = require('../../src/utils');
-const Birthdate = require('../../src/birthday');
+import * as utils from '../../src/utils.mjs'
+import { Birthdate } from '../../src/birthday.mjs'
 
 describe("Birthdate Initialization", function () {
   it ("FromLayBirthdate", function() {

@@ -12,11 +12,17 @@
   },
   "main": "ssa.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "node tests/jasmine-run.mjs"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "jasmine": "^3.5.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "glob": "^7.1.6",
+    "node": "^12.18.2",
+    "node-version": "^2.0.0"
   }
 }

@@ -1,4 +1,4 @@
-const utils = require('./utils');
+import * as utils from './utils.mjs'
 
 /**
  * User birthdates in social security have some unique properties. We manage
@@ -100,4 +100,4 @@ class Birthdate {
   }
 };
 
-module.exports = Birthdate;
+export { Birthdate };

@@ -1,6 +1,6 @@
-const constants = require('./constants');
-const utils = require('./utils');
-const Birthdate = require('./birthday');
+import * as constants from './constants.mjs';
+import * as utils from './utils.mjs';
+import { Birthdate } from './birthday.mjs';
 
 /**
  * An EarningRecord represents one year of Social Security earning data.
@@ -25,7 +25,7 @@ EarningRecord.prototype.indexedEarning = function() {
   var cappedEarning = Math.min(this.earningsCap, this.taxedEarnings);
   return Math.round(100 * cappedEarning * this.indexFactor) / 100;
 };
-module.exports.EarningRecord = EarningRecord;
+export { EarningRecord };
 
 /**
  * A Recipient object manages calculating a user's SSA and IRS data.
@@ -160,17 +160,17 @@ Recipient.prototype.initFromEarningsRecords = function(records) {
 Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
   this.futureEarningsRecords_ = [];
   if (wage > 0) {
-    start_year = constants.CURRENT_YEAR;
+    let startYear = constants.CURRENT_YEAR;
     for (var record of this.earningsRecords_) {
-      if (record.year >= start_year)
-        start_year = record.year + 1;
+      if (record.year >= startYear)
+        startYear = record.year + 1;
     }
     if (isLastYearIncomplete(this.earningsRecords_))
-      start_year = start_year - 1;
+      startYear = startYear - 1;
 
     for (var i = 0; i < numYears; ++i) {
       var futureRecord = new EarningRecord();
-      futureRecord.year = start_year + i;
+      futureRecord.year = startYear + i;
       futureRecord.taxedEarnings = wage;
       futureRecord.taxedMedicareEarnings = wage;
       futureRecord.earningsCap = wage;
@@ -281,11 +281,11 @@ Recipient.prototype.isOver60 = function() {
 Recipient.prototype.indexingYear = function() {
   return Math.min(this.dateAtYearsOld(62).year(), constants.MAX_YEAR) - 2;
 }
-module.exports.Recipient = Recipient;
+export { Recipient };
 
 // ssa.gov records a specific sentinel string if the last year has incomplete
 // records. This shows up in an earningRecord list as a -1.
-isLastYearIncomplete = function(records) {
+const isLastYearIncomplete = function(records) {
   for (var record of records) {
     if (record.year === (constants.CURRENT_YEAR - 1))
       return record.taxedEarnings === -1;
@@ -497,7 +497,7 @@ Recipient.prototype.colaAdjustments = function() {
 Recipient.prototype.primaryInsuranceAmount = function() {
   // Handle user input in the spousal case. Angular enforces that the input is
   // a number-formatted string, but not that it's a number.
-  parsed = parseFloat(this.primaryInsuranceAmountValue);
+  let parsed = parseFloat(this.primaryInsuranceAmountValue);
   if (isNaN(parsed))
     return 0;
   // Primary Insurance amounts are always rounded down the the nearest dime.

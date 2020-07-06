@@ -1,13 +1,11 @@
-const Recipient = require('../../src/recipient').Recipient;
-const EarningRecord = require('../../src/recipient').EarningRecord;
-const parsePaste = require('../../src/ssa-parse').parsePaste;
-const Birthdate = require('../../src/birthday').Birthdate;
+import { Recipient } from '../../src/recipient.mjs';
+import { EarningRecord } from '../../src/recipient.mjs';
 
 let earningRecord = new EarningRecord();
 earningRecord.year = 1960;
 earningRecord.taxedEarnings = 19123;
 earningRecord.taxedMedicareEarnings = 19123;
-testEarnings = [];
+let testEarnings = [];
 testEarnings.push(earningRecord);
 
 describe("Recipient Initialization", function() {

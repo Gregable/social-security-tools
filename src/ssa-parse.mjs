@@ -1,5 +1,5 @@
-const constants = require('./constants');
-const EarningRecord = require('./recipient').EarningRecord;
+import * as constants from './constants.mjs';
+import { EarningRecord } from './recipient.mjs';
 
 /**
  * Given a string which we know to be a number containing possibly a leading
@@ -16,7 +16,7 @@ var dollarStringToNumber = function(dollar_string) {
   var number_string = dollar_string.replace(/[$,]/g, '');
   return Number(number_string);
 }
-module.exports.dollarStringToNumber = dollarStringToNumber;
+export { dollarStringToNumber };
 
 var parseSsaGovTable = function(lines) {
   let earningsRecords = [];
@@ -58,7 +58,7 @@ var parseThisSiteTable = function(lines) {
 
 function isYearString(maybeYearStr) {
   // If not an int, it's not a year.
-  maybeYear = Number.parseInt(maybeYearStr);
+  let maybeYear = Number.parseInt(maybeYearStr);
   if (Number.isNaN(maybeYear))
     return false;
   // parseInt will ignore trailing garbage, so "1A" will be parsed as "1".
@@ -176,4 +176,4 @@ var parsePaste = function(paste) {
 
   return out;
 }
-module.exports.parsePaste = parsePaste;
+export { parsePaste };

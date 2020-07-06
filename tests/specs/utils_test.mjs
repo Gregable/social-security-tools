@@ -1,4 +1,4 @@
-const utils = require('../../src/utils');
+import * as utils from '../../src/utils.mjs';
 
 describe("MonthDate Initialization", function () {
   it("FromMonths", function() {

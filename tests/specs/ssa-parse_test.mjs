@@ -1,4 +1,7 @@
-describe("dollarStringToNumber", function() {
+import { dollarStringToNumber } from '../../src/ssa-parse.mjs';
+import { parsePaste } from '../../src/ssa-parse.mjs';
+
+describe("dollarStringToNumber", function () {
   it("Parses Number", function() {
     expect(dollarStringToNumber("123")).toBe(123);
   });
