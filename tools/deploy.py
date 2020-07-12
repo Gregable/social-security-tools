@@ -18,7 +18,7 @@ def LoadKeys(filename):
   fp = open(filename, 'r')
   contents = fp.read()
   lines = contents.splitlines()
-  S3_ACCESS_KEY, S3_SECRET_KEY = lines 
+  S3_ACCESS_KEY, S3_SECRET_KEY = lines
 
 
 def PutS3(filename):
@@ -30,25 +30,24 @@ def PutS3(filename):
   datestr = datetime.datetime.now().strftime("%a, %d %b %Y %T %z")
   fp = open(localfile, 'rb')
   print localfile, content_type
-  client.upload_fileobj(fp, BUCKET, remotefile, ExtraArgs=
-          {'ContentType': content_type,
-           'ACL': 'public-read'})
+  client.upload_fileobj(fp, BUCKET, remotefile, ExtraArgs={'ContentType': content_type,
+                                                           'ACL': 'public-read'})
+
 
 LoadKeys(os.path.expanduser('~/.s3keys'))
 
 # Values are paths relative to ROOT_DIR / REMOTE_DIR.
 # Both keys and values represent globs.
 RELEASE_FILES = [
-  '*.html',
-  '*paste.txt',
-  'favicon.ico',
-  'bootstrap.min.css',
-  'stylesheet.css',
-  'partials/*.html',
-  'guide/*.html',
-  'guide/*.js',
-  'src/*.js',
-  'static/*'
+    '*.html',
+    '*paste.txt',
+    'favicon.ico',
+    'stylesheet.css',
+    'partials/*.html',
+    'guide/*.html',
+    'guide/*.js',
+    'src/*.mjs',
+    'static/*'
 ]
 
 for globstr in RELEASE_FILES:
