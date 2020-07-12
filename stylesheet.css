@@ -1032,6 +1032,9 @@ span.rz-bubble {
 }
 
 /* Married / Not Married options */
+div.married-options {
+  margin: 22px 0px;
+}
 .married-options input {
   display: none;
 }
