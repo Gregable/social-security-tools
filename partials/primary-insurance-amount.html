@@ -1,7 +1,6 @@
-<div id=topEarningsData
-     class="top-earnings-data fixed-center-column"
-     ng-show="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
-  <a class=offset-nav id=nav-pia></a>
+<div id=topEarningsData class="top-earnings-data fixed-center-column"
+  ng-show="mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
+  <a class="nav offset-nav" id=nav-pia></a>
   <div class=pageBreakAvoid>
     <h2>Primary Insurance Amount</h2>
 
@@ -19,7 +18,7 @@
 
   <div ng-show="recipient.isEligible()">
     <p>
-      Your Social Security benefits are best thought of in terms of your 
+      Your Social Security benefits are best thought of in terms of your
       <u>primary insurance amount</u> (PIA). This is the dollar amount that
       Social Security will pay you every month starting at your
       <u>normal retirement age</u> (NRA). We are going to walk you through the
@@ -29,10 +28,11 @@
     </p>
 
     <p>
-      Don't let the government mandated acronyms confuse you. Think of the primary
-      insurance amount like a salary: it's the amount of money you can expect to
-      earn in retirement every month starting at your normal retirement age. Your
-      normal retirement age is between 65 and 67, depending on what year you were
+      Don't let the government mandated acronyms confuse you. Think of the
+      primary insurance amount like a salary: it's the amount of money you can
+      expect to earn in retirement every month starting at your normal
+      retirement age. Your normal retirement age is between 65 and 67, depending
+      on what year you were
       born. We'll look at normal retirement age in more detail later in this
       report.
     </p>
@@ -63,17 +63,18 @@
       your Averaged Indexed Monthly Earnings (and thus, your Primary Insurance
       Amount). Indexed earnings are simply the capped payroll wages you earned
       in a year multiplied by a number that adjusts for wage growth (similar to
-      an inflation adjustment). As you don't have 35 years of earnings yet, every
-      additional year you work will increase your benefit a little more. Once
+      an inflation adjustment). As you don't have 35 years of earnings yet,
+      every additional year you work will increase your benefit a little more.
+      Once
       you reach 35 years of earnings values, increasing your Averaged Indexed
       Monthly Earnings amount requires earning more than previous years' indexed
       values.
     </p>
-    
+
     <p ng-if="!recipient.isOver60()">
-      The multipliers in the above table will increase every year through age 60,
-      at which point they are fixed at 1.0 for everyone. The increase in the
-      multipliers through age 60 is determined by US wage growth. Thus, your 
+      The multipliers in the above table will increase every year through age
+      60, at which point they are fixed at 1.0 for everyone. The increase in the
+      multipliers through age 60 is determined by US wage growth. Thus, your
       indexed earnings in a given year are scaled to be equivalent to modern
       wages.
     </p>
@@ -93,9 +94,11 @@
       <!-- ugly alignment to avoid a space appearing between months
           and period/comma. -->
       Your Average Indexed Monthly Earnings is simply your total indexed
-      earnings divided by 35 years divided by 12 months<span ng-if="recipient.numEarningsYears() >= 35">, as follows:
-      </span><span ng-if="recipient.numEarningsYears() < 35">. As you have fewer than 35 years of earnings, this average is calculated
-        using zeroes for the additional years, as follows:
+      earnings divided by 35 years divided by 12 months<span
+        ng-if="recipient.numEarningsYears() >= 35">, as follows:
+      </span><span ng-if="recipient.numEarningsYears() < 35">. As you have fewer
+        than 35 years of earnings, this average is calculated using zeroes for
+        the additional years, as follows:
       </span>
     </p>
 
@@ -107,12 +110,13 @@
     </p>
 
     <p>
-      Your primary insurance amount is based on your monthly indexed earnings 
+      Your primary insurance amount is based on your monthly indexed earnings
       using <a href="https://www.ssa.gov/oact/cola/piaformula.html"
-              target="_blank">a formula</a>
+        target="_blank">a formula</a>
       that increases your Primary Insurance Amount as your earnings increase,
-      but increases more slowly for higher total earnings. Your Primary Insurance
-      Amount is calculated from your monthly indexed earnings as follows:
+      but increases more slowly for higher total earnings. Your Primary
+      Insurance Amount is calculated from your monthly indexed earnings as
+      follows:
     </p>
 
     <table class="benefitBrackets pageBreakAvoid">
@@ -160,7 +164,7 @@
         </td>
         <td>&nbsp;/ month</td>
       </tr>
-    </table>  
+    </table>
 
     <div class=insetTextBox>
       <h4>Special Rule</h4>
@@ -176,12 +180,13 @@
         After attaining age 62, your primary insurance amount will increase
         annually in proportion to the consumer price index (CPI-W), a measure of
         inflation. This will continue every year, even after beginning
-        to collect your benefit. These adjustments are called 
+        to collect your benefit. These adjustments are called
         <u>Cost of Living Adjustments</u> (COLA). Here are the adjustments
         in past years which affect your current Primary Insurance Amount.
       </p>
       <ul>
-        <li ng-repeat="adjustment in recipient.colaAdjustments() | orderBy : adjustment.year">
+        <li
+          ng-repeat="adjustment in recipient.colaAdjustments() | orderBy : adjustment.year">
           {{adjustment.year}}: <b>{{adjustment.start | number:2}}</b>
           increased by {{adjustment.cola | number:1 }}% =
           <b>{{adjustment.end | number:2}}</b>
@@ -199,12 +204,12 @@
     </p>
 
     <div class="chart-container pageBreakAvoid">
-      <div class="chart-ylabel pia" >
+      <div class="chart-ylabel pia">
         <span class="vertical-text">Primary Insurance Amount</span>
       </div>
 
       <!-- canvas width/height must be set explicitly in HTML rather than CSS
-           these are modified by javascript anyway to scale with window size. 
+           these are modified by javascript anyway to scale with window size.
       -->
       <canvas id="breakpoint-chart-canvas" width=600 height=400>
         Your browser does not support HTML canvas.

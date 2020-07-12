@@ -1,3 +1,5 @@
+import * as utils from './utils.mjs';
+
 /**
  * Code for driving a breakpoint chart. See partials/breakpoint-chart.html
  * @constructor
@@ -8,6 +10,8 @@ function BreakPointChart() {
   this.lastRenderedXDollars = -1;
   this.maxRenderedXDollars = -1;
 }
+
+export { BreakPointChart };
 
 /**
  * Returns true if the BreakPointChart has been initialized with a canvas
@@ -49,9 +53,9 @@ BreakPointChart.prototype.chartWidth = function() {
   // A 6-digit social security payment would be about the highest we
   // would imagine someone receiving, so we reserve space on the right
   // to display such a value with a little added padding.
-  var reservedWidth = Math.ceil(
+  let reservedWidth = Math.ceil(
       this.context_.measureText('$999,999').width) + 10;
-  var usableWidth = this.canvas_.width - reservedWidth;
+  let usableWidth = this.canvas_.width - reservedWidth;
   return usableWidth;
 };
 
@@ -61,8 +65,8 @@ BreakPointChart.prototype.chartWidth = function() {
  */
 BreakPointChart.prototype.chartHeight = function() {
   // A 12pt font is 16 pixels high. We reserve a little extra for padding.
-  var reservedHeight = 16 + 10;
-  var usableHeight = this.canvas_.height - reservedHeight;
+  let reservedHeight = 16 + 10;
+  let usableHeight = this.canvas_.height - reservedHeight;
   return usableHeight;
 };
 
@@ -72,9 +76,9 @@ BreakPointChart.prototype.chartHeight = function() {
  * @return {number}
  */
 BreakPointChart.prototype.canvasX = function(earningsX) {
-  var xValue = Math.floor(
+  let xValue = Math.floor(
       earningsX / this.maxRenderedXDollars * this.chartWidth());
-  var xClipped = Math.min(xValue, this.chartWidth());
+  let xClipped = Math.min(xValue, this.chartWidth());
   return xClipped;
 };
 
@@ -84,9 +88,9 @@ BreakPointChart.prototype.canvasX = function(earningsX) {
  * @return {number}
  */
 BreakPointChart.prototype.canvasY = function(benefitY) {
-  var yValue = this.chartHeight() -
+  let yValue = this.chartHeight() -
       Math.floor(benefitY / this.maxRenderedYDollars * this.chartHeight());
-  var yClipped = Math.min(yValue, this.chartHeight());
+  let yClipped = Math.min(yValue, this.chartHeight());
   return yClipped;
 };
 
@@ -97,9 +101,9 @@ BreakPointChart.prototype.canvasY = function(benefitY) {
  * @return {number}
  */
 BreakPointChart.prototype.earningsX = function(canvasX) {
-  var xValue = Math.floor(
+  let xValue = Math.floor(
       Math.max(0, canvasX / this.chartWidth()) * this.maxRenderedXDollars);
-  var xClipped = this.maxRenderedXDollars;
+  let xClipped = this.maxRenderedXDollars;
   return Math.min(xValue, xClipped);
 };
 
@@ -110,12 +114,12 @@ BreakPointChart.prototype.recomputeBounds = function() {
   // There are a few goals here when selecting this value:
   // 1) Show all of the breakpoints so the user can get a feel visually
   //    for how these breakpoints affect the computation.
-  var breakpoint_min = secondBendPoint(this.recipient_.indexingYear()) * 1.25;
+  let breakpoint_min = utils.secondBendPoint(this.recipient_.indexingYear()) * 1.25;
   // 2) Show the user's current earnings with some space on either side
   //    so that they can explore the graph to either direction.
-  var user_min = this.recipient_.monthlyIndexedEarnings * 2;
+  let user_min = this.recipient_.monthlyIndexedEarnings * 2;
 
-  var computed = Math.max(breakpoint_min, user_min);
+  let computed = Math.max(breakpoint_min, user_min);
 
   // We would prefer to keep the viewport fixed as the user changes
   // the benefit, so that it's easier to see what is going on. However
@@ -126,7 +130,7 @@ BreakPointChart.prototype.recomputeBounds = function() {
    this.lastRenderedXDollars = computed;
 
   this.maxRenderedXDollars = this.lastRenderedXDollars;
-  
+
   this.maxRenderedYDollars = this.primaryInsuranceAmount(
       this.maxRenderedXDollars);
 }
@@ -182,11 +186,11 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.context_.beginPath();
   this.moveTo(0, 0);
 
-  const firstBend = firstBendPoint(this.recipient_.indexingYear());
-  const secondBend = secondBendPoint(this.recipient_.indexingYear());
+  const firstBend = utils.firstBendPoint(this.recipient_.indexingYear());
+  const secondBend = utils.secondBendPoint(this.recipient_.indexingYear());
 
-  var dollarX;
-  var dollarY;
+  let dollarX;
+  let dollarY;
 
   // Origin to first bend point
   dollarX = firstBend;
@@ -265,7 +269,7 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.context_.save();
   dollarX = ((this.maxRenderedXDollars - secondBend) / 2) + secondBend;
   dollarY = this.primaryInsuranceAmount(dollarX);
-  pixelY = this.canvasY(dollarY);
+  let pixelY = this.canvasY(dollarY);
   // If this is too close to the top of the chart, flip it to below the line.
   if (pixelY < 100)
     // This just happens to work pretty well for positioning below the line.
@@ -341,7 +345,7 @@ BreakPointChart.prototype.roundedBox =
 
 
 BreakPointChart.prototype.primaryInsuranceAmount = function(earningsX) {
-  return primaryInsuranceAmountForEarnings(
+  return utils.primaryInsuranceAmountForEarnings(
       this.recipient_.indexingYear(),
       this.recipient_.dateAtYearsOld(62).year(),
       earningsX);
@@ -353,7 +357,7 @@ BreakPointChart.prototype.primaryInsuranceAmount = function(earningsX) {
  */
 BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   this.context_.save();
-    
+
   // Where on the breakpoint 'curve' the user's benefit values lie.
   const x = Math.floor(earningsX);
   const y = Math.floor(this.primaryInsuranceAmount(earningsX));
@@ -370,7 +374,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   this.moveTo(x, y);
   this.lineTo(x, 0);
   this.context_.stroke();
-  
+
   this.context_.beginPath();
   this.moveTo(x, y);
   this.lineTo(this.maxRenderedXDollars, y);
@@ -393,8 +397,8 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
   // Text at the edges showing the actual values, white on colored chip.
 
   // Add dollar sign and commas for better looking formatting.
-  const xText = '$' + insertNumericalCommas(x);
-  const yText = '$' + insertNumericalCommas(y);
+  const xText = '$' + utils.insertNumericalCommas(x);
+  const yText = '$' + utils.insertNumericalCommas(y);
 
   // Chip on the bottom edge
   this.roundedBox(this.canvasX(x), this.canvasY(0),
@@ -412,7 +416,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
       this.canvasX(x) + 2,
       this.canvasY(0) + 15);
   this.context_.fillText(  // Text on the right edge.
-      yText, 
+      yText,
       this.canvasX(this.maxRenderedXDollars) + 3,
       this.canvasY(y) + 15);
 
@@ -429,7 +433,7 @@ BreakPointChart.prototype.render = function() {
   // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
-  
+
   this.context_.strokeStyle = '#666';
   this.renderBoundingBox();
   this.renderBreakPoints();
@@ -442,7 +446,7 @@ BreakPointChart.prototype.render = function() {
 
 /** Toggles on/off functionality of mouseMoveListener. */
 BreakPointChart.prototype.mouseClickListener = function() {
-  var self = this;
+  let self = this;
   return function(e) {
     if (self.mouseToggle === 'ON') {
       self.mouseToggle = 'OFF'
@@ -456,7 +460,7 @@ BreakPointChart.prototype.mouseClickListener = function() {
 
 /** Renders a 2nd earnings value based on mouse location. */
 BreakPointChart.prototype.mouseMoveListener = function() {
-  var self = this;
+  let self = this;
   return function(e) {
     if (self.mouseToggle == 'OFF')
       return;
@@ -465,7 +469,7 @@ BreakPointChart.prototype.mouseMoveListener = function() {
 
     self.context_.save();
     self.context_.strokeStyle = '#337ab7';
-    var canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
+    let canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
     self.renderEarningsPoint(self.earningsX(canvasX));
     self.context_.restore();
   };

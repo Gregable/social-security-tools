@@ -15,12 +15,12 @@ body {
   line-height: 1.42857143;
   color: #333;
   background-color: #fff;
-  margin: 0;
+  position: relative;
 }
 html {
   scroll-behavior: smooth;
   font-size:10px;
-  -webkit-tap-highlight-color:rgba(0,0,0,0)
+  -webkit-tap-highlight-color:rgba(0,0,0,0);
 }
 
 *{
@@ -32,6 +32,40 @@ html {
   -webkit-box-sizing:border-box;
   -moz-box-sizing:border-box;
   box-sizing:border-box
+}
+a {
+  color: #337ab7;
+  text-decoration: none;
+}
+h1,h2,h3,h4 {
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+  color:inherit
+}
+h1 {
+  font-size: 36px;
+}
+h2 {
+  font-size: 30px;
+  margin-top: 20px;
+  margin-bottom: 10px;;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+td,th {
+  padding: 0;
+}
+p {
+  margin:0 0 10px;
 }
 
 /** Desktop **/
@@ -717,6 +751,28 @@ canvas {
   float: left;
 }
 
+/* Right angle chevron next to navigation elements */
+@font-face {
+   font-family: 'Glyphicons Halflings';
+   src:url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.eot);
+   src:url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),
+   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.woff2) format('woff2'),
+   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.woff) format('woff'),
+   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.ttf) format('truetype'),
+   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')
+}
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+.glyphicon-chevron-right:before{content:"\e080"}
+
 ul.nav {
   margin: 30px 0 0;
   border-radius: 6px;
@@ -730,6 +786,8 @@ ul.nav {
 ul.nav li {
   line-height: 20px;
   margin-top: 0px;
+  position: relative;
+  display: block;
 }
 ul.nav li a {
   color: #0088cc;
@@ -739,6 +797,7 @@ ul.nav li a {
   padding: 8px 14px;
   margin: 0 0 -1px;
   display: block;
+  position: relative;
 }
 ul.nav li:first-child a {
   border-radius: 6px 6px 0 0;
@@ -1159,11 +1218,13 @@ div.insetTextBox p {
   visibility: hidden;
 }
 /* Some nav anchors get offset by the height of the future earnings header. */
-a.offset-nav {
-  top: -128px;
+a.nav {
   position: relative;
   visibility: hidden;
   display: block;
+}
+a.offset-nav {
+  top: -128px;
 }
 input.birthdate-input {
   font-size: 26px;

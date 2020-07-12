@@ -1,3 +1,14 @@
+import * as constants from './constants.mjs';
+import * as utils from './utils.mjs';
+import { dollarStringToNumber } from './ssa-parse.mjs';
+import { parsePaste } from './ssa-parse.mjs';
+import { Birthdate } from './birthday.mjs';
+import { AgeChart } from './age-chart.mjs';
+import { BreakPointChart } from './breakpoint-chart.mjs';
+import { SpousalChart } from './spousal-chart.mjs';
+import { EarningRecord, Recipient } from './recipient.mjs';
+import './analytics.mjs';
+
 var ssaApp = angular.module("ssaApp", ['ngAnimate', 'rzModule', 'ui.bootstrap']);
 
 // The app has 5 modes which the user can be in, based on the information
@@ -27,7 +38,7 @@ ssaApp.controller("NavbarController", function ($scope) {
   // document using data-ng-click.
   $scope.scrollTo = function(id) {
     var el = document.getElementById(id);
-    var pos = el.position();
+    var pos = utils.getElementOffset(el);
     window.scrollTo(pos.left, pos.top + 10);
   };
 });
@@ -132,7 +143,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.Math = window.Math;
     $scope.breakPointChart_ = new BreakPointChart();
     $scope.ageChart_ = new AgeChart();
-    $scope.spousalChartSelectedDate = new MonthDate();
+    $scope.spousalChartSelectedDate = new utils.MonthDate();
 
     $scope.selfLayBirthdate = null;
     $scope.spouseLayBirthdate = null;
@@ -190,7 +201,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // paste via a json request. This allows the user to try out the interface
   // before committing to the effort of retrieving their earnings record from
   // ssa.gov.
-  fetchTestData = function(filename) {
+  const fetchTestData = function(filename) {
     $http.get(filename).then(
       function(contents) {
         var records = parsePaste(contents.data);
@@ -334,21 +345,20 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return false;
   };
 
-  // Functions in utils.js.
-  $scope.firstBendPoint = firstBendPoint;
-  $scope.secondBendPoint = secondBendPoint;
+  $scope.firstBendPoint = utils.firstBendPoint;
+  $scope.secondBendPoint = utils.secondBendPoint;
 
   /**
    * Special case method for init'ing an 'Age'. Ages are durations, and this
    * is syntactical sugar usable in template expressions.
    * @param {number} years
    * @param {number} months
-   * @return {MonthDuration}
+   * @return {utils.MonthDuration}
    */
   $scope.initAge = function(years, months) {
     if (months === undefined)
       months = 0;
-    return new MonthDuration().initFromYearsMonths(years, months);
+    return new utils.MonthDuration().initFromYearsMonths(years, months);
   }
 
   /**
@@ -446,13 +456,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     options: {
      showSelectionBar: true,
      floor: 1000,
-     ceil: MAXIMUM_EARNINGS[CURRENT_YEAR],
+     ceil: constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR],
      stepsArray: (function() {
-       out = [];
-       for (i = 1000; i < MAXIMUM_EARNINGS[CURRENT_YEAR]; i += 1000) {
+       let out = [];
+       for (let i = 1000;
+            i < constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR];
+            i += 1000) {
          out.push({value: i});
        }
-       out.push({value: MAXIMUM_EARNINGS[CURRENT_YEAR]});
+       out.push({value: constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR]});
        return out;
      })(),
      translate: function(value, sliderId, label) {
@@ -467,13 +479,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-  // Given a MonthDate, returns a new MonthDate one month later.
+  // Given a utils.MonthDate, returns a new utils.MonthDate one month later.
   $scope.followingMonth = function(input) {
     var out = {};
-    out.month = ALL_MONTHS_FULL[
-      (ALL_MONTHS_FULL.indexOf(input.month) + 1) % 12];
+    out.month = constants.ALL_MONTHS_FULL[
+      (constants.ALL_MONTHS_FULL.indexOf(input.month) + 1) % 12];
     out.year = input.year;
-    if (ALL_MONTHS_FULL.indexOf(input.month) === 11)
+    if (constants.ALL_MONTHS_FULL.indexOf(input.month) === 11)
       out.year += 1;
     return out;
   }
@@ -530,10 +542,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // each month between 62 and 70 years of age. Adds ticks at every
   // year of age and the legend 'NRA' at the user's Normal Retirement
   // Age.
-  // @param {MonthDuration} normalRetirementAge
-  stepsArray = function(normalRetirementAge) {
-    out = [];
-    for (i = 62 * 12; i <= 70 * 12; i += 1) {
+  // @param {utils.MonthDuration} normalRetirementAge
+  const stepsArray = function(normalRetirementAge) {
+    let out = [];
+    for (let i = 62 * 12; i <= 70 * 12; i += 1) {
       if (i === normalRetirementAge.asMonths()) {
         out.push({ value: i, legend: 'NRA' });
       } else {
@@ -543,7 +555,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     return out;
   }
   // Ticks tooltip function for the spousalSlider below.
-  // @param {MonthDuration} normalRetirementAge
+  // @param {utils.MonthDuration} normalRetirementAge
   $scope.ticksTooltip = function(normalRetirementAge, value) {
     if (value === normalRetirementAge.asMonths())
       return 'Normal Retirement Age';
@@ -562,7 +574,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       minLimit: 0,
       showSelectionBarEnd: true,
       translate: function(value, sliderId, label) {
-        const age = new MonthDuration().initFromMonths(value);
+        const age = new utils.MonthDuration().initFromMonths(value);
         // model is the text above the slider pointer
         if (label === 'model') {
           if (age.modMonths() === 0)
@@ -577,8 +589,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       },
       // Show every 12th tick, so yearly.
       showTicksValues: 12,
-      ticksTooltip: $scope.ticksTooltip.bind(null, new MonthDuration()),
-      stepsArray: stepsArray(new MonthDuration()),
+      ticksTooltip: $scope.ticksTooltip.bind(null, new utils.MonthDuration()),
+      stepsArray: stepsArray(new utils.MonthDuration()),
       onChange: function(id) {
         $scope.updateSliderMin();
         $scope.spousalChart_.render();
@@ -597,7 +609,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.refreshSlider();
     }
     this.selectedAge = function() {
-      return new MonthDuration().initFromMonths(this.value);
+      return new utils.MonthDuration().initFromMonths(this.value);
     }
     this.selectedDate = function() {
       return earnerFn().birthdate().ssaBirthdate().addDuration(
@@ -612,7 +624,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     var regularMin = $scope.lowerEarner().isFullMonth ? 0 : 1;
     // If the lower earner will be 70 before the higher earner files, bail.
     if ($scope.lowerEarner().dateAtAge(
-          new MonthDuration().initFromYearsMonths(70, 0)).lessThan(
+          new utils.MonthDuration().initFromYearsMonths(70, 0)).lessThan(
               $scope.higherEarnerSlider.selectedDate())) {
       $scope.lowerEarnerSlider.options.minLimit = regularMin;
     } else if ($scope.lowerEarner().primaryInsuranceAmountFloored() == 0) {
@@ -622,7 +634,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       // as the minimum date for the lower earner's slider.
       var lowerAgeAtDate = $scope.lowerEarner().ageAtDate(
           $scope.higherEarnerSlider.selectedDate()).asMonths();
-      if (lowerAgeAtDate > new MonthDuration().initFromYearsMonths(70, 0)) {
+      if (lowerAgeAtDate > new utils.MonthDuration().initFromYearsMonths(70, 0)) {
         $scope.lowerEarnerSlider.options.minLimit = regularMin;
         return;
       }
@@ -777,14 +789,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   /*
-   * @return {MonthDate}
+   * @return {utils.MonthDate}
    */
   $scope.filingDate = function(sliderValue, earner) {
-    return earner.dateAtAge(new MonthDuration().initFromMonths(sliderValue));
+    return earner.dateAtAge(new utils.MonthDuration().initFromMonths(sliderValue));
   }
 
   /*
-   * @return {MonthDate}
+   * @return {utils.MonthDate}
    */
   $scope.higherEarnerFilingDate = function() {
     return $scope.filingDate(
@@ -792,7 +804,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   /*
-   * @return {MonthDate}
+   * @return {utils.MonthDate}
    */
   $scope.lowerEarnerFilingDate = function() {
     return $scope.filingDate(
@@ -800,7 +812,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   }
 
   // Callback from spousal chart's mouse handlers.
-  // @param {MonthDate} date
+  // @param {utils.MonthDate} date
   $scope.updateSpousalChartSelectedDate = function(date) {
     $scope.spousalSelection = {};
     // Zero is used as a sentinel to indicate no selected date.

@@ -65,4 +65,3 @@ if (window.matchMedia) {
       ga('send', 'event', 'PrintIntent', 'true');
   });
 }
-

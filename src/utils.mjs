@@ -54,7 +54,7 @@ class MonthDate {
     console.assert(Number.isInteger(years), years);
     console.assert(typeof monthStr === 'string');
     console.assert(years >= 0, years);
-    var monthIndex = constants.ALL_MONTHS.indexOf(monthStr)
+    let monthIndex = constants.ALL_MONTHS.indexOf(monthStr)
     console.assert(monthIndex >= 0, monthStr);
     console.assert(monthIndex < 12, monthStr);
 
@@ -161,7 +161,6 @@ class MonthDate {
     return this.monthsSinceEpoch() >= other.monthsSinceEpoch();
   }
 }
-//module.exports.MonthDate = MonthDate;
 export { MonthDate };
 
 /**
@@ -256,7 +255,6 @@ class MonthDuration {
         this.asMonths() + other.asMonths());
   }
 }
-//module.exports.MonthDuration = MonthDuration;
 export { MonthDuration };
 
 /**
@@ -267,7 +265,6 @@ export { MonthDuration };
 function insertNumericalCommas(num) {
  return num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
-//module.exports.insertNumericalCommas = insertNumericalCommas;
 export { insertNumericalCommas };
 /**
  * Returns the ratio of the average wage in indexingYear to the
@@ -280,7 +277,6 @@ function wageRatioInYear(indexingYear) {
   const wage = constants.WAGE_INDICES[indexingYear];
   return wage / wage_in_1977;
 }
-//module.exports.wageRatioInYear = wageRatioInYear;
 export { wageRatioInYear };
 
 /**
@@ -291,7 +287,6 @@ export { wageRatioInYear };
 function NearestDime(input) {
   return Math.floor(input * 10) / 10;
 }
-//module.exports.NearestDime = NearestDime;
 export { NearestDime };
 
 /**
@@ -302,7 +297,6 @@ export { NearestDime };
 function NearestPenny(input) {
   return Math.floor(input * 100) / 100;
 }
-//module.exports.NearestPenny = NearestPenny;
 export { NearestPenny };
 
 /**
@@ -313,7 +307,6 @@ export { NearestPenny };
 function firstBendPoint(indexingYear) {
   return Math.round(constants.BENDPOINT1_IN_1977 * wageRatioInYear(indexingYear));
 }
-//module.exports.firstBendPoint = firstBendPoint;
 export { firstBendPoint };
 
 /**
@@ -324,7 +317,6 @@ export { firstBendPoint };
 function secondBendPoint(indexingYear) {
   return Math.round(constants.BENDPOINT2_IN_1977 * wageRatioInYear(indexingYear));
 }
-//module.exports.secondBendPoint = secondBendPoint;
 export { secondBendPoint };
 
 /**
@@ -338,8 +330,8 @@ export { secondBendPoint };
 function primaryInsuranceAmountForEarningsByBracket(
     indexingYear, earnings, bracket) {
   earnings = Math.round(earnings);
-  var firstBend = firstBendPoint(indexingYear);
-  var secondBend = secondBendPoint(indexingYear);
+  let firstBend = firstBendPoint(indexingYear);
+  let secondBend = secondBendPoint(indexingYear);
 
   if (bracket === 0) {
     return NearestPenny(
@@ -355,7 +347,6 @@ function primaryInsuranceAmountForEarningsByBracket(
 
   return -1;
 };
-//module.exports.primaryInsuranceAmountForEarningsByBracket = primaryInsuranceAmountForEarningsByBracket;
 export { primaryInsuranceAmountForEarningsByBracket };
 
 /**
@@ -366,15 +357,14 @@ export { primaryInsuranceAmountForEarningsByBracket };
  * @return {number} annual benefit across all benefit brackets.
  */
 function primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings) {
-  var sum = 0;
-  for (var i = 0; i < 3; ++i)
+  let sum = 0;
+  for (let i = 0; i < 3; ++i)
     sum += primaryInsuranceAmountForEarningsByBracket(
         indexingYear, earnings, i);
   // Primary Insurance amounts are always rounded down the the nearest dime.
   // Who decided this was an important step?
   return NearestDime(sum);
 };
-//module.exports.primaryInsuranceAmountForEarningsUnadjusted = primaryInsuranceAmountForEarningsUnadjusted;
 export { primaryInsuranceAmountForEarningsUnadjusted };
 
 /**
@@ -384,12 +374,11 @@ export { primaryInsuranceAmountForEarningsUnadjusted };
  * @return {Array<number>}
  */
 function colaAdjustmentYears(yearTurn62) {
-  var adjustmentYears = [];
-  for (var year = yearTurn62; year < constants.CURRENT_YEAR; ++year)
+  let adjustmentYears = [];
+  for (let year = yearTurn62; year < constants.CURRENT_YEAR; ++year)
     adjustmentYears.push(year);
   return adjustmentYears;
 }
-//module.exports.colaAdjustmentYears = colaAdjustmentYears;
 export { colaAdjustmentYears };
 
 /**
@@ -399,9 +388,9 @@ export { colaAdjustmentYears };
  * @return {number}
  */
 function colaAdjustment(yearTurn62, initialPIA) {
-  var adjustedPIA = initialPIA;
-  for (var year of colaAdjustmentYears(yearTurn62)) {
-    if (COLA[year] !== undefined) {
+  let adjustedPIA = initialPIA;
+  for (let year of colaAdjustmentYears(yearTurn62)) {
+    if (constants.COLA[year] !== undefined) {
       adjustedPIA = adjustedPIA * (1 + (constants.COLA[year] / 100.0));
       // Primary Insurance amounts are always rounded down the the nearest dime.
       adjustedPIA = NearestDime(adjustedPIA);
@@ -409,7 +398,6 @@ function colaAdjustment(yearTurn62, initialPIA) {
   }
   return adjustedPIA;
 }
-//module.exports.colaAdjustment = colaAdjustment;
 export { colaAdjustment };
 
 /**
@@ -424,7 +412,6 @@ function primaryInsuranceAmountForEarnings(indexingYear, yearTurn62, earnings) {
   return colaAdjustment(yearTurn62,
       primaryInsuranceAmountForEarningsUnadjusted(indexingYear, earnings));
 };
-//module.exports.primaryInsuranceAmountForEarnings = primaryInsuranceAmountForEarnings;
 export { primaryInsuranceAmountForEarnings };
 
 /**
@@ -449,5 +436,17 @@ function parseDateInputValue(dateInputValue) {
   }
   return parsedDate;
 }
-//module.exports.parseDateInputValue = parseDateInputValue;
 export { parseDateInputValue };
+
+/*
+ * Returns the offset of the given element relative to the current scroll
+ * position of the window. Equivalent to jquery's .position()
+ */
+function getElementOffset(element) {
+    var de = document.documentElement;
+    var box = element.getBoundingClientRect();
+    var top = box.top + window.pageYOffset - de.clientTop;
+    var left = box.left + window.pageXOffset - de.clientLeft;
+    return { top: top, left: left };
+}
+export { getElementOffset };

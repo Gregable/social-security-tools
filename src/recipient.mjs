@@ -22,7 +22,7 @@ function EarningRecord() {
  * @return {number}
  */
 EarningRecord.prototype.indexedEarning = function() {
-  var cappedEarning = Math.min(this.earningsCap, this.taxedEarnings);
+  let cappedEarning = Math.min(this.earningsCap, this.taxedEarnings);
   return Math.round(100 * cappedEarning * this.indexFactor) / 100;
 };
 export { EarningRecord };
@@ -161,15 +161,15 @@ Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
   this.futureEarningsRecords_ = [];
   if (wage > 0) {
     let startYear = constants.CURRENT_YEAR;
-    for (var record of this.earningsRecords_) {
+    for (let record of this.earningsRecords_) {
       if (record.year >= startYear)
         startYear = record.year + 1;
     }
     if (isLastYearIncomplete(this.earningsRecords_))
       startYear = startYear - 1;
 
-    for (var i = 0; i < numYears; ++i) {
-      var futureRecord = new EarningRecord();
+    for (let i = 0; i < numYears; ++i) {
+      let futureRecord = new EarningRecord();
       futureRecord.year = startYear + i;
       futureRecord.taxedEarnings = wage;
       futureRecord.taxedMedicareEarnings = wage;
@@ -204,14 +204,14 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
   this.isFullMonth = birthdate.getDate() === 1;
 
   // Find the retirement age bracket data for this recipient.
-  for (var i = 0; i < FULL_RETIREMENT_AGE.length; ++i) {
-    var ageBracket = FULL_RETIREMENT_AGE[i];
+  for (let i = 0; i < constants.FULL_RETIREMENT_AGE.length; ++i) {
+    let ageBracket = constants.FULL_RETIREMENT_AGE[i];
     if (this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
         this.birthdate_.ssaBirthYear() <= ageBracket.maxYear) {
       this.normalRetirement = ageBracket;
     }
   }
-  var normalRetirementAge = this.normalRetirementAge();
+  let normalRetirementAge = this.normalRetirementAge();
 
   // Birthdate can affect indexed earnings.
   this.processIndexedEarnings_();
@@ -232,7 +232,7 @@ Recipient.prototype.normalRetirementDate = function() {
  * @return {MonthDate}
  */
 Recipient.prototype.spousalInflectionDate = function() {
-  var threeYears = new utils.MonthDuration().initFromYearsMonths(3, 0);
+  let threeYears = new utils.MonthDuration().initFromYearsMonths(3, 0);
   return this.normalRetirementDate().subtractDuration(threeYears);
 }
 
@@ -268,8 +268,8 @@ Recipient.prototype.ageAtDate = function(date) {
 // Used for displaying text for earners whose indexing factors are still
 // changing.
 Recipient.prototype.isOver60 = function() {
-  var age = this.ageAtDate(
-      new utils.MonthDate().initFromYearsMonths(CURRENT_YEAR, 0));
+  let age = this.ageAtDate(
+      new utils.MonthDate().initFromYearsMonths(constants.CURRENT_YEAR, 0));
   return age.years > 60;
 }
 
@@ -286,7 +286,7 @@ export { Recipient };
 // ssa.gov records a specific sentinel string if the last year has incomplete
 // records. This shows up in an earningRecord list as a -1.
 const isLastYearIncomplete = function(records) {
-  for (var record of records) {
+  for (let record of records) {
     if (record.year === (constants.CURRENT_YEAR - 1))
       return record.taxedEarnings === -1;
   }
@@ -311,9 +311,9 @@ Recipient.prototype.processIndexedEarnings_ = function() {
   this.earnedCredits_ = 0;
   this.plannedCredits_ = 0;
   this.neededYears_ = -1;
-  var allIndexedValues = [];
-  for (var i = 0; i < this.earningsRecords_.length; ++i) {
-    var earningRecord = this.earningsRecords_[i];
+  let allIndexedValues = [];
+  for (let i = 0; i < this.earningsRecords_.length; ++i) {
+    let earningRecord = this.earningsRecords_[i];
 
     if (earningRecord.year < 1978) {
       this.hasEarningsBefore1978 = true;
@@ -348,14 +348,14 @@ Recipient.prototype.processIndexedEarnings_ = function() {
     this.earnedCredits_ = Math.min(
         40, this.earnedCredits_ + earningRecord.credits);
   }
-  var neededCredits = 40 - this.earnedCredits_;
+  let neededCredits = 40 - this.earnedCredits_;
   if (this.hasFutureEarnings()) {
-    var credits = this.calculateCredits(
+    let credits = this.calculateCredits(
         this.futureEarningsRecords_[0].taxedEarnings,
         this.futureEarningsRecords_[0].year);
     this.neededYears_ = Math.ceil(neededCredits / credits);
-    for (var i = 0; i < this.futureEarningsRecords_.length; ++i) {
-      var futureRecord = this.futureEarningsRecords_[i];
+    for (let i = 0; i < this.futureEarningsRecords_.length; ++i) {
+      let futureRecord = this.futureEarningsRecords_[i];
       allIndexedValues.push(futureRecord);
       this.plannedCredits_ = Math.min(
           neededCredits, this.plannedCredits_ + credits);
@@ -383,13 +383,13 @@ Recipient.prototype.processIndexedEarnings_ = function() {
       allIndexedValues[constants.SSA_EARNINGS_YEARS - 1].indexedEarning();
   }
 
-  for (var i = 0; i < allIndexedValues.length; ++i) {
+  for (let i = 0; i < allIndexedValues.length; ++i) {
     allIndexedValues[i].isTopEarningYear = i < constants.SSA_EARNINGS_YEARS;
   }
 
   // Total indexed earnings is the sum of your top 35 indexed earnings.
   this.totalIndexedEarnings = 0;
-  for (var i = 0; i < allIndexedValues.length && i < constants.SSA_EARNINGS_YEARS; ++i) {
+  for (let i = 0; i < allIndexedValues.length && i < constants.SSA_EARNINGS_YEARS; ++i) {
     this.totalIndexedEarnings += allIndexedValues[i].indexedEarning();
   }
 
@@ -413,8 +413,8 @@ Recipient.prototype.processIndexedEarnings_ = function() {
  * @return {number}
  */
 Recipient.prototype.numEarningsYears = function() {
-  var nonNegativeRecords = 0;
-  for (var i = 0; i < this.earningsRecords_.length; ++i) {
+  let nonNegativeRecords = 0;
+  for (let i = 0; i < this.earningsRecords_.length; ++i) {
     if (this.earningsRecords_[i].taxedEarnings >= 0)
       nonNegativeRecords += 1;
   }
@@ -458,8 +458,8 @@ Recipient.prototype.shouldAdjustForCOLA = function() {
  * @return {Array<Object>}
  */
 Recipient.prototype.colaAdjustments = function() {
-  const years = colaAdjustmentYears(this.dateAtYearsOld(62).year());
-  var adjusted = this.primaryInsuranceAmountUnadjusted();
+  const years = utils.colaAdjustmentYears(this.dateAtYearsOld(62).year());
+  let adjusted = this.primaryInsuranceAmountUnadjusted();
 
   if (this.adjustments_ !== undefined) {
     if (this.adjustments_.length === 0 && years.length === 0)
@@ -469,16 +469,16 @@ Recipient.prototype.colaAdjustments = function() {
   }
 
   this.adjustments_ = [];
-  for (var year of years) {
-    if (COLA[year] !== undefined) {
-      var newadjusted = adjusted * (1 + (COLA[year] / 100.0));
+  for (let year of years) {
+    if (constants.COLA[year] !== undefined) {
+      let newadjusted = adjusted * (1 + (constants.COLA[year] / 100.0));
       // Primary Insurance amounts are always rounded down the the nearest dime.
       newadjusted = Math.floor(newadjusted * 10) / 10;
 
       this.adjustments_.push(
           {
             'year': year,
-            'cola': COLA[year],
+            'cola': constants.COLA[year],
             'start': adjusted,
             'end': newadjusted,
           });
@@ -542,7 +542,7 @@ Recipient.prototype.benefitMultiplierAtAge = function(age) {
   // Compute the number of total months between birth and full retirement age.
   if (nra.greaterThan(age)) {
     // Reduced benefits due to taking benefits early.
-    var before = nra.subtract(age);
+    let before = nra.subtract(age);
     return -1.0 * ((Math.min(36, before.asMonths()) * 5.0 / 900.0) +
                    (Math.max(0, before.asMonths() - 36) * 5.0 / 1200.0));
   } else {
@@ -580,7 +580,7 @@ Recipient.prototype.spousalBenefitMultiplierAtAge = function(age) {
   const nra = this.normalRetirementAge();
   if (nra.greaterThan(age)) {
     // Reduced benefits due to taking benefits early.
-    var before = nra.subtract(age);
+    let before = nra.subtract(age);
     return -1.0 * ((Math.min(36, before.asMonths()) * 25.0 / 3600.0) +
                    (Math.max(0, before.asMonths() - 36) * 5.0 / 1200.0));
   } else {
@@ -653,9 +653,9 @@ Recipient.prototype.benefitAtDateGivenFiling = function(atDate, filingDate) {
     return this.benefitAtAge(this.ageAtDate(filingDate));
   // Otherwise, you only get credits up to January of this year,
   // or NRA, whichever is later.
-  var thisJan =
+  let thisJan =
       new utils.MonthDate().initFromYearsMonths(filingDate.year(), 0);
-  var benefitComputationDate =
+  let benefitComputationDate =
     this.normalRetirementDate().greaterThan(thisJan) ?
         this.normalRetirementDate() : thisJan;
   return this.benefitAtAge(this.ageAtDate(benefitComputationDate));
@@ -700,21 +700,21 @@ Recipient.prototype.totalBenefitAtDate = function(
 
   // Both earners have filed. Spousal benefits begin at the later of the two
   // filing dates
-  var spousalDate = filingDate.greaterThan(spouseFilingDate) ?
+  let spousalDate = filingDate.greaterThan(spouseFilingDate) ?
     filingDate : spouseFilingDate;
 
   // This is complicated. If the total is just half of the spouse's PIA
   // or no delayed retirement credits are involved, then the total is correct.
   const maxBenefitWithSpousal = Math.floor(
       this.spouse.primaryInsuranceAmount() / 2.0);
-  var total = this.totalBenefitWithSpousal(this.ageAtDate(filingDate),
+  let total = this.totalBenefitWithSpousal(this.ageAtDate(filingDate),
                                            this.ageAtDate(spousalDate));
   if (total == maxBenefitWithSpousal ||
       filingDate.lessThanOrEqual(this.normalRetirementDate()))
     return total;
   // Otherwise, this is a user with delayed retirement credits in play, so we
   // may need to reduce the benefit for the first year.
-  var justPersonal = this.benefitAtDateGivenFiling(atDate, filingDate);
+  let justPersonal = this.benefitAtDateGivenFiling(atDate, filingDate);
   if (justPersonal > maxBenefitWithSpousal)
     return justPersonal;
   // But this should drop them back below the spousal rate.

@@ -1,3 +1,4 @@
+import * as constants from './constants.mjs';
 import * as utils from './utils.mjs'
 
 /**
@@ -89,7 +90,7 @@ class Birthdate {
    */
   exampleSsaAge(year) {
 		if (year === undefined)
-      year = CURRENT_YEAR;
+      year = constants.CURRENT_YEAR;
     var example = {
       'age': year - this.ssaBirthYear(),
       'day': this.englishBirthdate().getDate(),

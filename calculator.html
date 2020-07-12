@@ -8,6 +8,8 @@
   <title>Social Security Calculator: Get Started</title>
 
   <link rel="stylesheet"
+    href="//cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <link rel="stylesheet"
     href="//cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.5.1/rzslider.min.css">
   <link rel="stylesheet" href="stylesheet.css" />
 
@@ -19,23 +21,29 @@
     src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
   <script type="text/javascript"
     src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+  <!-- Bootstrap included for scrollspy navbar interactions. Bootstrap requires jquery -->
+  <script type="text/javascript"
+    src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript"
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
   <script type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
   <script type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.2.2/rzslider.min.js"></script>
 
-
-  <script type="text/javascript" src="src/constants.js"></script>
-  <script type="text/javascript" src="src/utils.js"></script>
-  <script type="text/javascript" src="src/ssa-parse.js"></script>
-  <script type="text/javascript" src="src/birthday.js"></script>
-  <script type="text/javascript" src="src/recipient.js"></script>
-  <script type="text/javascript" src="src/age-chart.js"></script>
-  <script type="text/javascript" src="src/breakpoint-chart.js"></script>
-  <script type="text/javascript" src="src/spousal-chart.js"></script>
-  <script type="text/javascript" src="src/analytics.js"></script>
-  <script type="text/javascript" src="src/ssa.js"></script>
+  <!-- preloads will start the network fetches sooner than the recursive fetch
+  via ssa.mjs, which will improve performance on high bandwidth, high latency,
+  connections -->
+  <link rel="modulepreload" href="src/constants.mjs">
+  <link rel="modulepreload" href="src/utils.mjs">
+  <link rel="modulepreload" href="src/ssa-parse.mjs">
+  <link rel="modulepreload" href="src/birthday.mjs">
+  <link rel="modulepreload" href="src/recipient.mjs">
+  <link rel="modulepreload" href="src/age-chart.mjs">
+  <link rel="modulepreload" href="src/breakpoint-chart.mjs">
+  <link rel="modulepreload" href="src/spousal-chart.mjs">
+  <script type="module" src="src/ssa.mjs"></script>
 </head>
 
 <body ng-controller="SSAController" ng-init="init()" data-spy="scroll"
@@ -58,8 +66,6 @@
       <ng-include src="'partials/frequent-questions.html'"></ng-include>
     </div>
   </div>
-
-
 </body>
 
 </html>
