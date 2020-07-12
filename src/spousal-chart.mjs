@@ -96,7 +96,7 @@ SpousalChart.prototype.chartHeight = function() {
  * @return {number}
  */
 SpousalChart.prototype.canvasX = function(date) {
-  var xValue = ((date.subtractDate(this.startDate_).asMonths() /
+  let xValue = ((date.subtractDate(this.startDate_).asMonths() /
                  this.endDate_.subtractDate(this.startDate_).asMonths())
                 * this.chartWidth()) + 16 + 40;
   // To deal with rounding errors, clip to the usable range.
@@ -112,15 +112,15 @@ SpousalChart.prototype.canvasX = function(date) {
 SpousalChart.prototype.dateX = function(x) {
   // Clip x to a range smaller than the chart.
   x = Math.max(16 + 40, Math.min(this.chartWidth() + 16 + 40, x));
-  var percent = (x - 16 - 40) / this.chartWidth();
-  var numMonths = Math.round(
+  let percent = (x - 16 - 40) / this.chartWidth();
+  let numMonths = Math.round(
       this.endDate_.subtractDate(this.startDate_).asMonths() * percent);
   return this.startDate_.addDuration(
       new utils.MonthDuration().initFromMonths(numMonths));
 };
 
 SpousalChart.prototype.renderTextInWhiteBox = function(text, x, y) {
-  var textWidth = this.context_.measureText(text).width;
+  let textWidth = this.context_.measureText(text).width;
 
   // First, draw the white box.
   this.context_.save();
@@ -148,7 +148,7 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
     firstYear = new utils.MonthDate().initFromYearsMonths(firstYear.year() + 1, 0);
 
   // Iterate over each year within the date range.
-  for (var date = new utils.MonthDate().initFromMonthDate(firstYear);
+  for (let date = new utils.MonthDate().initFromMonthDate(firstYear);
        !this.endDate_.lessThan(date);
        date = date.addDuration(new utils.MonthDuration().initFromMonths(12))) {
     // Draw vertical line.
@@ -160,8 +160,8 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
     // Print the year vertically atop the line, with a white rectangle behind
     // the text, so that the line isn't going through the text.
     const text = '' + date.year();
-    var textWidth = this.context_.measureText(text).width;
-    var xpos = 210 + textWidth;
+    let textWidth = this.context_.measureText(text).width;
+    let xpos = 210 + textWidth;
 
     this.context_.save();
     this.context_.translate(this.canvasX(date) + 5, xpos);
@@ -179,7 +179,7 @@ SpousalChart.prototype.renderHorizontalLine = function(dollarY, canvasY) {
   this.context_.lineTo(600, canvasY);
   this.context_.stroke();
 
-  var text = '$' + utils.insertNumericalCommas(dollarY);
+  let text = '$' + utils.insertNumericalCommas(dollarY);
 
   this.context_.save();
   this.context_.fillStyle = '#AAA';
@@ -207,7 +207,7 @@ SpousalChart.prototype.renderHorizontalLines = function() {
   }
 
   // Work out a reasonable increment to show dollar lines.
-  var increment = 100;
+  let increment = 100;
   if (this.maxRenderedYDollars() > 1000)
     increment = 250;
   if (this.maxRenderedYDollars() > 1500)
@@ -218,9 +218,9 @@ SpousalChart.prototype.renderHorizontalLines = function() {
   const maxAge = new utils.MonthDuration().initFromYearsMonths(70, 0);
   const higherMaxY = this.higherEarner_.benefitAtAge(maxAge);
   const lowerMaxY = this.lowerEarner_.totalBenefitWithSpousal(maxAge, maxAge);
-  for (var i = increment; i < higherMaxY; i += increment)
+  for (let i = increment; i < higherMaxY; i += increment)
     this.renderHorizontalLine(i, this.canvasHigherY(i));
-  for (var i = increment; i < lowerMaxY; i += increment)
+  for (let i = increment; i < lowerMaxY; i += increment)
     this.renderHorizontalLine(i, this.canvasLowerY(i));
 
   this.context_.restore();
@@ -231,9 +231,9 @@ SpousalChart.prototype.renderHorizontalLines = function() {
  * @param {number} canvasX x-coordinate of vertical line we should render.
  */
 SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
-  var date = this.dateX(canvasX);
+  let date = this.dateX(canvasX);
   this.updateSelectedDate(date);
-  var text = date.monthName() + ' ' + date.year();
+  let text = date.monthName() + ' ' + date.year();
 
   this.context_.save();
   // Bluish dashed lines.
@@ -248,8 +248,8 @@ SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
   this.context_.lineTo(canvasX, 620);
   this.context_.stroke();
 
-  var textWidth = this.context_.measureText(text).width;
-  var xpos = 210 + textWidth;
+  let textWidth = this.context_.measureText(text).width;
+  let xpos = 210 + textWidth;
 
   // Print the year vertically atop the line, with a white rectangle behind
   // the text, so that the line isn't going through the text.
@@ -320,9 +320,9 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.save();
   this.context_.strokeStyle = '#e69f00';
   this.context_.lineWidth = 2;
-  var startDate = this.higherEarnerStartDate();
-  var startAge = this.higherEarnerStartAge();
-  var dollars = this.higherEarnerPersonalBenefit();
+  let startDate = this.higherEarnerStartDate();
+  let startAge = this.higherEarnerStartAge();
+  let dollars = this.higherEarnerPersonalBenefit();
 
   // Draw a shaded box showing the earnings per year given the selection.
   this.context_.strokeStyle = '#e69f00';
@@ -330,14 +330,14 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.moveTo(this.canvas_.width - 1, this.canvasHigherY(0));
   this.context_.lineTo(this.canvasX(startDate), this.canvasHigherY(0));
   const maxDate = this.dateX(this.canvas_.width - 1);
-  var yDollars;
-  var lastY = -1;
-  var boxes = [];
-  for (i = startDate; i.lessThanOrEqual(maxDate);) {
-    var thisX = this.canvasX(i);
+  let yDollars;
+  let lastY = -1;
+  let boxes = [];
+  for (let i = startDate; i.lessThanOrEqual(maxDate);) {
+    let thisX = this.canvasX(i);
     yDollars =  this.higherEarner_.totalBenefitAtDate(
         i, this.higherEarnerStartDate(), this.lowerEarnerStartDate());
-    var thisY = this.canvasHigherY(yDollars);
+    let thisY = this.canvasHigherY(yDollars);
 
     if (yDollars !== lastY) {
       boxes.push([thisX, thisY, yDollars]);
@@ -360,26 +360,26 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.restore();
 
   // Find the box with the largest minimum dimension.
-  var rootX = this.canvas_.width - 1;
-  var rootY = this.canvasHigherY(0);
-  var bestBox = [rootX, rootY];
-  for (var i = 0; i < boxes.length; ++i) {
+  let rootX = this.canvas_.width - 1;
+  let rootY = this.canvasHigherY(0);
+  let bestBox = [rootX, rootY];
+  for (let i = 0; i < boxes.length; ++i) {
     if (boxMinimumDimension(bestBox, rootX, rootY) <
         boxMinimumDimension(boxes[i], rootX, rootY))
       bestBox = boxes[i];
   }
 
-  var regionWidth = rootX - bestBox[0];
-  var regionHeight = rootY - bestBox[1];
-  var centerX = rootX - regionWidth / 2;
-  var centerY = rootY - regionHeight / 2;
+  let regionWidth = rootX - bestBox[0];
+  let regionHeight = rootY - bestBox[1];
+  let centerX = rootX - regionWidth / 2;
+  let centerY = rootY - regionHeight / 2;
 
   // Add the user's name to the box:
   this.context_.save();
   this.context_.fillStyle = '#5e4000';
-  for (font_height = 24; font_height >= 10; font_height--) {
+  for (let font_height = 24; font_height >= 10; font_height--) {
     this.context_.font = font_height + "px Helvetica";
-    var textBox = this.context_.measureText(this.higherEarner_.name);
+    let textBox = this.context_.measureText(this.higherEarner_.name);
     // If there is enough space at this font size, draw the user's name,
     // else try a smaller font.
     if ((textBox.width + 20) < regionWidth &&
@@ -396,25 +396,25 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.save();
   this.context_.fillStyle = '#5e4000';
   this.context_.font = "14px Helvetica";
-  var font_height = 12;
+  let font_height = 12;
 
-  var nextBoxMinX = 1;
-  var nextBoxMaxY = rootY;
+  let nextBoxMinX = 1;
+  let nextBoxMaxY = rootY;
 
-  for (var boxIt = 0; boxIt < boxes.length; ++boxIt) {
-    var boxMinX = nextBoxMinX;
-    var boxMaxY = nextBoxMaxY;
+  for (let boxIt = 0; boxIt < boxes.length; ++boxIt) {
+    let boxMinX = nextBoxMinX;
+    let boxMaxY = nextBoxMaxY;
     // Default is the edge of our box.
-    var nextBoxMinX = boxes[boxIt][0];
-    var nextBoxMaxY = boxes[boxIt][1];
+    nextBoxMinX = boxes[boxIt][0];
+    nextBoxMaxY = boxes[boxIt][1];
 
     // Prefer to fix text above, rather than left.
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
-    var textBox = this.context_.measureText(text);
-    var horizSpace = rootX - boxes[boxIt][0];
+    let text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    let textBox = this.context_.measureText(text);
+    let horizSpace = rootX - boxes[boxIt][0];
     if (boxes.length - 1 > boxIt)
       horizSpace = boxes[boxIt + 1][0] - boxes[boxIt][0];
-    var vertSpace = 100;  // typically have plenty to top of chart.
+    let vertSpace = 100;  // typically have plenty to top of chart.
     if (boxes.length - 1 > boxIt)
       vertSpace = boxes[boxIt][1] - boxes[boxIt + 1][1];
     if ((textBox.width + 10) < horizSpace &&
@@ -427,11 +427,10 @@ SpousalChart.prototype.renderHigherEarner = function() {
       continue;
     }
     // Again above, using shorter text.
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
-    var textBox = this.context_.measureText(text);
+    text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
+    textBox = this.context_.measureText(text);
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
-      foundFit = true;
       this.renderTextInWhiteBox(
           text, boxes[boxIt][0] + 5, boxes[boxIt][1] - 5);
       // We need to bound the area for the next box, so we don't overlap.
@@ -441,10 +440,10 @@ SpousalChart.prototype.renderHigherEarner = function() {
     }
 
     // Attempt to fix box 0 to the left of the text
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
-    var textBox = this.context_.measureText(text);
-    var horizSpace = boxes[boxIt][0] - boxMinX;
-    var vertSpace = boxMaxY - boxes[boxIt][1];
+    text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    textBox = this.context_.measureText(text);
+    horizSpace = boxes[boxIt][0] - boxMinX;
+    vertSpace = boxMaxY - boxes[boxIt][1];
     if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
       this.renderTextInWhiteBox(
@@ -454,8 +453,8 @@ SpousalChart.prototype.renderHigherEarner = function() {
       continue;
     }
     // Try again with shorter text, removing ' / mo';
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
-    var textBox = this.context_.measureText(text);
+    text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
+    textBox = this.context_.measureText(text);
     if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
       this.renderTextInWhiteBox(
@@ -472,16 +471,16 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.strokeStyle = '#e69f00';
   this.context_.globalAlpha = 0.6;
   this.context_.beginPath();
-  var start = this.higherEarner_.dateAtYearsOld(62);
+  let start = this.higherEarner_.dateAtYearsOld(62);
   if (!this.higherEarner_.isFullMonth)
     start = start.addDuration(new utils.MonthDuration().initFromMonths(1));
-  var end = this.higherEarner_.dateAtYearsOld(70);
-  for (i = start; i.lessThanOrEqual(end);) {
-    var thisX = this.canvasX(i);
-    var yDollars =  this.higherEarner_.totalBenefitAtDate(
+  let end = this.higherEarner_.dateAtYearsOld(70);
+  for (let i = start; i.lessThanOrEqual(end);) {
+    let thisX = this.canvasX(i);
+    let yDollars =  this.higherEarner_.totalBenefitAtDate(
         this.higherEarner_.dateAtYearsOld(71),
         i, this.lowerEarnerStartDate());
-    var thisY = this.canvasHigherY(yDollars);
+    let thisY = this.canvasHigherY(yDollars);
     if (i.monthsSinceEpoch() === start.monthsSinceEpoch()) {
       this.context_.moveTo(thisX, thisY);
     } else {
@@ -500,8 +499,8 @@ SpousalChart.prototype.renderHigherEarner = function() {
  * @return {utils.MonthDate}
  */
 SpousalChart.prototype.spousalStartDate = function() {
-  var dateA = this.lowerEarnerStartDate();
-  var dateB = this.higherEarnerStartDate();
+  let dateA = this.lowerEarnerStartDate();
+  let dateB = this.higherEarnerStartDate();
   return dateA.greaterThan(dateB) ? dateA : dateB;
 };
 
@@ -542,12 +541,12 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.lineWidth = 2;
 
   // Compute the various bend point dates and dollar values.
-  var startDate = this.lowerEarnerStartDate();
-  var spousalStartDate = this.spousalStartDate();
-  var personal = this.lowerEarnerPersonalBenefit();
-  var total = this.lowerEarnerTotalBenefit();
+  let startDate = this.lowerEarnerStartDate();
+  let spousalStartDate = this.spousalStartDate();
+  let personal = this.lowerEarnerPersonalBenefit();
+  let total = this.lowerEarnerTotalBenefit();
 
-  var actualStartDate = startDate;
+  let actualStartDate = startDate;
   if (personal === 0 && startDate.lessThan(spousalStartDate))
     actualStartDate = spousalStartDate;
 
@@ -557,14 +556,14 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.lineTo(this.canvasX(actualStartDate), this.canvasLowerY(0));
 
   const maxDate = this.dateX(this.canvas_.width - 1);
-  var yDollars;
-  var lastY = -1;
-  var boxes = [];
-  for (i = actualStartDate; i.lessThanOrEqual(maxDate);) {
-    var thisX = this.canvasX(i);
+  let yDollars;
+  let lastY = -1;
+  let boxes = [];
+  for (let i = actualStartDate; i.lessThanOrEqual(maxDate);) {
+    let thisX = this.canvasX(i);
     yDollars =  this.lowerEarner_.totalBenefitAtDate(
         i, actualStartDate, this.higherEarnerStartDate());
-    var thisY = this.canvasLowerY(yDollars);
+    let thisY = this.canvasLowerY(yDollars);
 
     if (yDollars !== lastY) {
       boxes.push([thisX, thisY, yDollars]);
@@ -587,26 +586,26 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.restore();
 
   // Find the box with the largest minimum dimension.
-  var rootX = this.canvas_.width - 1;
-  var rootY = this.canvasLowerY(0);
-  var bestBox = [rootX, rootY];
-  for (var i = 0; i < boxes.length; ++i) {
+  let rootX = this.canvas_.width - 1;
+  let rootY = this.canvasLowerY(0);
+  let bestBox = [rootX, rootY];
+  for (let i = 0; i < boxes.length; ++i) {
     if (boxMinimumDimension(bestBox, rootX, rootY) <
         boxMinimumDimension(boxes[i], rootX, rootY))
       bestBox = boxes[i];
   }
 
-  var regionWidth = rootX - bestBox[0];
-  var regionHeight = bestBox[1] - rootY;
-  var centerX = rootX - regionWidth / 2;
-  var centerY = rootY + regionHeight / 2;
+  let regionWidth = rootX - bestBox[0];
+  let regionHeight = bestBox[1] - rootY;
+  let centerX = rootX - regionWidth / 2;
+  let centerY = rootY + regionHeight / 2;
 
   // Add the user's name to the box:
   this.context_.save();
   this.context_.fillStyle = '#004000';
-  for (font_height = 24; font_height >= 10; font_height--) {
+  for (let font_height = 24; font_height >= 10; font_height--) {
     this.context_.font = font_height + "px Helvetica";
-    var textBox = this.context_.measureText(this.lowerEarner_.name);
+    let textBox = this.context_.measureText(this.lowerEarner_.name);
     // If there is enough space at this font size, draw the user's name,
     // else try a smaller font.
     if ((textBox.width + 20) < regionWidth &&
@@ -622,25 +621,25 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.save();
   this.context_.fillStyle = '#004000';
   this.context_.font = "14px Helvetica";
-  var font_height = 12;
+  let font_height = 12;
 
-  var nextBoxMinX = 1;
-  var nextBoxMinY = rootY;
+  let nextBoxMinX = 1;
+  let nextBoxMinY = rootY;
 
-  for (var boxIt = 0; boxIt < boxes.length; ++boxIt) {
-    var boxMinX = nextBoxMinX;
-    var boxMinY = nextBoxMinY;
+  for (let boxIt = 0; boxIt < boxes.length; ++boxIt) {
+    let boxMinX = nextBoxMinX;
+    let boxMinY = nextBoxMinY;
     // Default is the edge of our box.
-    var nextBoxMinX = boxes[boxIt][0];
-    var nextBoxMinY = boxes[boxIt][1];
+    nextBoxMinX = boxes[boxIt][0];
+    nextBoxMinY = boxes[boxIt][1];
 
     // Prefer to fix text below, rather than left.
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
-    var textBox = this.context_.measureText(text);
-    var horizSpace = rootX - boxes[boxIt][0];
+    let text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    let textBox = this.context_.measureText(text);
+    let horizSpace = rootX - boxes[boxIt][0];
     if (boxes.length - 1 > boxIt)
       horizSpace = boxes[boxIt + 1][0] - boxes[boxIt][0];
-    var vertSpace = 100;  // typically have plenty to bottom of chart.
+    let vertSpace = 100;  // typically have plenty to bottom of chart.
     if (boxes.length - 1 > boxIt)
       vertSpace = boxes[boxIt + 1][1] - boxes[boxIt][1];
     if ((textBox.width + 10) < horizSpace &&
@@ -655,11 +654,10 @@ SpousalChart.prototype.renderLowerEarner = function() {
       continue;
     }
     // Again below, using shorter text.
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
-    var textBox = this.context_.measureText(text);
+    text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
+    textBox = this.context_.measureText(text);
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
-      foundFit = true;
       this.renderTextInWhiteBox(
           text,
           boxes[boxIt][0] + 5,
@@ -671,10 +669,10 @@ SpousalChart.prototype.renderLowerEarner = function() {
     }
 
     // Attempt to fix box 0 to the left of the text
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
-    var textBox = this.context_.measureText(text);
-    var horizSpace = boxes[boxIt][0] - boxMinX;
-    var vertSpace = boxes[boxIt][1] - boxMinY;
+    text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    textBox = this.context_.measureText(text);
+    horizSpace = boxes[boxIt][0] - boxMinX;
+    vertSpace = boxes[boxIt][1] - boxMinY;
     if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
       this.renderTextInWhiteBox(
@@ -684,8 +682,8 @@ SpousalChart.prototype.renderLowerEarner = function() {
       continue;
     }
     // Try again with shorter text, removing ' / mo';
-    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
-    var textBox = this.context_.measureText(text);
+    text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
+    textBox = this.context_.measureText(text);
     if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
       this.renderTextInWhiteBox(
@@ -701,22 +699,22 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.save();
   this.context_.beginPath();
   this.context_.globalAlpha = 0.3;
-  var start = this.lowerEarner_.dateAtYearsOld(62);
+  let start = this.lowerEarner_.dateAtYearsOld(62);
   if (!this.lowerEarner_.isFullMonth)
     start = start.addDuration(new utils.MonthDuration().initFromMonths(1));
   if (personal === 0 && start.lessThan(this.higherEarnerStartDate()))
     start = this.higherEarnerStartDate();
-  var end = this.lowerEarner_.dateAtYearsOld(70);
-  for (i = start; i.lessThanOrEqual(end);) {
-    var thisX = this.canvasX(i);
-    var shownDate = (personal === 0 ||
+  let end = this.lowerEarner_.dateAtYearsOld(70);
+  for (let i = start; i.lessThanOrEqual(end);) {
+    let thisX = this.canvasX(i);
+    let shownDate = (personal === 0 ||
         i.greaterThanOrEqual(this.higherEarnerStartDate())) ?
       this.lowerEarner_.dateAtYearsOld(71) :
       this.higherEarnerStartDate().subtractDuration(
           new utils.MonthDuration().initFromMonths(1)) ;
-    var yDollars =  this.lowerEarner_.totalBenefitAtDate(
+    let yDollars =  this.lowerEarner_.totalBenefitAtDate(
         shownDate, i, this.higherEarnerStartDate());
-    var thisY = this.canvasLowerY(yDollars);
+    let thisY = this.canvasLowerY(yDollars);
     if (i.monthsSinceEpoch() === start.monthsSinceEpoch()) {
       this.context_.moveTo(thisX, thisY);
     } else {
@@ -765,9 +763,9 @@ SpousalChart.prototype.maxRenderedYDollars = function() {
 SpousalChart.prototype.midpointYValue = function() {
   // The midpoint line is the canvas y position of the 0 benefit line.
   const maxAge = new utils.MonthDuration().initFromYearsMonths(70, 0);
-  var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(
+  let spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(
       maxAge, maxAge);
-  var midpointYValue = this.canvas_.height -
+  let midpointYValue = this.canvas_.height -
       Math.floor(spousalDollars / this.maxRenderedYDollars()
           * this.chartHeight()) - 45;
 
@@ -783,7 +781,7 @@ SpousalChart.prototype.midpointYValue = function() {
 SpousalChart.prototype.canvasLowerY = function(benefitY) {
   // canvasYValue is the absolute number canvas pixels that this point
   // represents above 0.
-  var canvasYValue =
+  let canvasYValue =
       Math.floor(benefitY / this.maxRenderedYDollars() * this.chartHeight());
 
   return this.midpointYValue() + canvasYValue;
@@ -798,7 +796,7 @@ SpousalChart.prototype.canvasLowerY = function(benefitY) {
 SpousalChart.prototype.canvasHigherY = function(benefitY) {
   // canvasYValue is the absolute number canvas pixels that this point
   // represents above 0.
-  var canvasYValue =
+  let canvasYValue =
       Math.floor(benefitY / this.maxRenderedYDollars() * this.chartHeight());
 
   return this.midpointYValue() - canvasYValue - 1;
@@ -806,7 +804,7 @@ SpousalChart.prototype.canvasHigherY = function(benefitY) {
 
 /** Renders specific value boxes based on mouse location. */
 SpousalChart.prototype.mouseOutListener = function() {
-  var self = this;
+  let self = this;
   return function(e) {
     if (self.mouseToggle == 'OFF')
       return;
@@ -817,9 +815,9 @@ SpousalChart.prototype.mouseOutListener = function() {
 
 /** Toggles on/off functionality of mouseMoveListener. */
 SpousalChart.prototype.mouseClickListener = function() {
-  var self = this;
+  let self = this;
   return function(e) {
-    var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
+    let canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
     if (canvasY < 180) {
       self.updateSelectedDate(new utils.MonthDate());
       return;
@@ -837,16 +835,16 @@ SpousalChart.prototype.mouseClickListener = function() {
 
 /** Renders specific value boxes based on mouse location. */
 SpousalChart.prototype.mouseMoveListener = function() {
-  var self = this;
+  let self = this;
   return function(e) {
     if (self.mouseToggle == 'ON') {
       self.render();
-      var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
+      let canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
       if (canvasY < 180) {
         self.updateSelectedDate(new utils.MonthDate());
         return;
       }
-      var canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
+      let canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;
       self.renderSelectedDateVerticalLine(canvasX);
     }
   };
