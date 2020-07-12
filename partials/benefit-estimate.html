@@ -1,12 +1,14 @@
 <div id=benefitEstimate class="benefit-estimate fixed-center-column"
-    ng-show="recipient.isEligible() && mode === ModeEnum.RENDER_EARNINGS" ng-cloak>
+  ng-show="recipient.isEligible() && mode === ModeEnum.RENDER_EARNINGS"
+  ng-cloak>
 
   <div class=pageBreakAvoid>
-    <a class=offset-nav id=nav-nra></a>
+    <a class="nav offset-nav" id=nav-nra></a>
     <h2>Normal Retirement Age</h2>
     <p>
       Your primary insurance amount rounded down to the next lower whole dollar
-      is <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> / month
+      is <b>${{recipient.primaryInsuranceAmountFloored() | number:0}}</b> /
+      month
       and is the benefit you will earn if you retire at your
       <u>normal retirement age</u> (NRA). Normal Retirement Age is between 65
       and 67, depending on when you were born. You may also see this
@@ -16,65 +18,65 @@
     <p>
       For those born in <b>{{selfLayBirthdate.getFullYear()}}</b>,
       normal retirement age is <b>{{recipient.normalRetirement.ageYears}} years
-      and {{recipient.normalRetirement.ageMonths}} months</b>.
+        and {{recipient.normalRetirement.ageMonths}} months</b>.
 
       This puts your normal retirement date at
       <b>{{recipient.normalRetirementDate().monthFullName()}},
-      {{recipient.normalRetirementDate().year()}}</b>.
+        {{recipient.normalRetirementDate().year()}}</b>.
     </p>
 
     <div class=insetTextBox ng-if="recipient.birthdate().isFirstOfMonth()">
       <h4>Special Rule</h4>
       <p>
         The month you reach specific ages may seem "off by one" from what
-        you entered. Social Security follows English common law that finds that a
-        person "attains" an age on the day before their birthdate. Because you
+        you entered. Social Security follows English common law that finds that
+        a person "attains" an age on the day before their birthdate. Because you
         were born on the first of the month, this means that you attain age
         <b>{{recipient.exampleAge().age}}</b> on
         <b>{{recipient.exampleAge().month}}
-           {{recipient.exampleAge().day}},
-           {{recipient.exampleAge().year}}</b>.
+          {{recipient.exampleAge().day}},
+          {{recipient.exampleAge().year}}</b>.
       </p>
     </div>
 
     <p>
       If you start collecting benefits at your normal retirement age, your
       benefit will be the primary insurance amount, rounded down:
-      <ul>
-        <li>
-          <b>${{recipient.primaryInsuranceAmountFloored() | number}}</b> / month
-        </li>
-        <li>
-          <b>${{recipient.primaryInsuranceAmountFloored() * 12 | number}}</b>
-          / year
-        </li>
-      </ul>
+    <ul>
+      <li>
+        <b>${{recipient.primaryInsuranceAmountFloored() | number}}</b> / month
+      </li>
+      <li>
+        <b>${{recipient.primaryInsuranceAmountFloored() * 12 | number}}</b>
+        / year
+      </li>
+    </ul>
     </p>
   </div>
 
   <div class=pageBreakAvoid>
-    <a class=offset-nav id=nav-early-delayed></a>
+    <a class="nav offset-nav" id=nav-early-delayed></a>
     <h2>Early and Delayed Retirement</h2>
     <p>
       <span ng-if="recipient.birthdate().layBirthDayOfMonth() === 2">
         You can begin taking benefits as early as 62 years old
         (<b>{{recipient.dateAtYearsOld(62).monthFullName()}}
-            {{recipient.dateAtYearsOld(62).year()}}</b>),
+          {{recipient.dateAtYearsOld(62).year()}}</b>),
       </span>
       <span ng-if="recipient.birthdate().layBirthDayOfMonth() !== 2">
         You can begin taking benefits as early as 62 years and 1 month old
         (<b>{{recipient.dateAtAge(initAge(62, 1)).monthFullName()}}
-            {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
+          {{recipient.dateAtAge(initAge(62, 1)).year()}}</b>),
       </span>
       or wait until as late as 70 years old
       (<b>{{recipient.dateAtYearsOld(70).monthFullName()}}
-          {{recipient.dateAtYearsOld(70).year()}}</b>),
+        {{recipient.dateAtYearsOld(70).year()}}</b>),
       or start any month in between. The longer you wait, the higher your
       benefit will be.
     </p>
   </div>
   <div class=insetTextBox
-       ng-if="recipient.birthdate().layBirthDayOfMonth() > 2">
+    ng-if="recipient.birthdate().layBirthDayOfMonth() > 2">
     <h4>Special Rule</h4>
     <p>
       You may find it oddly specific that the earliest you can actually
@@ -88,36 +90,36 @@
       <b>{{recipient.exampleAge().age}}</b>
       throughout the <u>entire</u> month is
       <b>{{followingMonth(recipient.exampleAge()).month}}
-         {{followingMonth(recipient.exampleAge()).year}}</b>.
+        {{followingMonth(recipient.exampleAge()).year}}</b>.
     </p>
   </div>
   <p>
     If you choose to take benefits earlier than normal retirement age
     (<b>{{recipient.normalRetirementDate().monthFullName()}}
-        {{recipient.normalRetirementDate().year()}}</b>),
+      {{recipient.normalRetirementDate().year()}}</b>),
     your benefit amount will be <u>permanently</u> <i>reduced</i>
     per year you start early by:
-    <ul>
-      <li><b>6.67%</b> per year if starting <i>after</i>
-        <b>{{recipient.normalRetirement.ageYears - 3}} years and
-           {{recipient.normalRetirement.ageMonths}} months</b>
-        (<b>{{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthFullName()}}
-            {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}</b>)
-      </li>
-      <li><b>5.00%</b> per year if starting <i>before</i>
-        <b>{{recipient.normalRetirement.ageYears - 3}} years and
-           {{recipient.normalRetirement.ageMonths}} months</b>
-        (<b>{{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthFullName()}}
-            {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}</b>)
-      </li>
-    </ul>
+  <ul>
+    <li><b>6.67%</b> per year if starting <i>after</i>
+      <b>{{recipient.normalRetirement.ageYears - 3}} years and
+        {{recipient.normalRetirement.ageMonths}} months</b>
+      (<b>{{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthFullName()}}
+        {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}</b>)
+    </li>
+    <li><b>5.00%</b> per year if starting <i>before</i>
+      <b>{{recipient.normalRetirement.ageYears - 3}} years and
+        {{recipient.normalRetirement.ageMonths}} months</b>
+      (<b>{{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).monthFullName()}}
+        {{recipient.dateAtYearsOld(recipient.normalRetirement.ageYears - 3).year()}}</b>)
+    </li>
+  </ul>
   </p>
   <p>
     If you choose instead to wait until later than normal retirement age to
     start your benefits,
     (<b>{{recipient.normalRetirementDate().monthFullName()}}
-        {{recipient.normalRetirementDate().year()}}</b>),
-     your amount will be <u>permanently</u> <i>increased</i> by
+      {{recipient.normalRetirementDate().year()}}</b>),
+    your amount will be <u>permanently</u> <i>increased</i> by
     <b>{{recipient.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
     you delay.
   </p>
@@ -125,8 +127,9 @@
     Here is a table which shows how much your benefit would be at different
     starting ages:
   </p>
-  <table ng-class="{'fancy-table': true, 'wide-age': recipient.birthdate().layBirthDayOfMonth() !== 2}"
-         class=pageBreakAvoid>
+  <table
+    ng-class="{'fancy-table': true, 'wide-age': recipient.birthdate().layBirthDayOfMonth() !== 2}"
+    class=pageBreakAvoid>
     <thead>
       <tr>
         <th id="age">Age</th>
@@ -137,7 +140,7 @@
       </tr>
     </thead>
     <tbody>
-		  <tr ng-if="recipient.birthdate().layBirthDayOfMonth() === 2">
+      <tr ng-if="recipient.birthdate().layBirthDayOfMonth() === 2">
         <td headers="age">62</td>
         <td headers="date">
           {{recipient.dateAtYearsOld(62).monthName()}}
@@ -197,7 +200,7 @@
 
 
   <div class="chart-container pageBreakAvoid">
-    <div class="chart-ylabel benefit-estimate" >
+    <div class="chart-ylabel benefit-estimate">
       <span class="vertical-text">Adjusted Benefit</span>
     </div>
 
@@ -227,4 +230,3 @@
     </p>
   </div>
 </div>
-

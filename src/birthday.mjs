@@ -1,3 +1,6 @@
+import * as constants from './constants.mjs';
+import * as utils from './utils.mjs'
+
 /**
  * User birthdates in social security have some unique properties. We manage
  * them with instances of this class.
@@ -55,7 +58,7 @@ class Birthdate {
    */
   ssaBirthdate() {
     const ebd = this.englishBirthdate();
-    return new MonthDate().initFromYearsMonths(
+    return new utils.MonthDate().initFromYearsMonths(
         ebd.getFullYear(), ebd.getMonth());
   }
 
@@ -87,7 +90,7 @@ class Birthdate {
    */
   exampleSsaAge(year) {
 		if (year === undefined)
-      year = CURRENT_YEAR;
+      year = constants.CURRENT_YEAR;
     var example = {
       'age': year - this.ssaBirthYear(),
       'day': this.englishBirthdate().getDate(),
@@ -97,3 +100,5 @@ class Birthdate {
     return example;
   }
 };
+
+export { Birthdate };

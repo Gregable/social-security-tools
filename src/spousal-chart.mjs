@@ -1,3 +1,5 @@
+import * as utils from './utils.mjs';
+
 /**
  * Code for driving a chart displaying spousal benefits.
  * @constructor
@@ -7,13 +9,15 @@ function SpousalChart(selectedDateCb) {
   this.canvas_ = null;
 }
 
+export { SpousalChart };
+
 /**
  * Returns true if the SpousalChart has been initialized with a canvas element
  * and recipient.
  * @return {boolean}
  */
 SpousalChart.prototype.isInitialized = function() {
-  if (this.canvas_ === null || 
+  if (this.canvas_ === null ||
       this.lowerarner_ === null ||
       this.higherEarner_ === null)
     return false;
@@ -58,8 +62,8 @@ SpousalChart.prototype.setSliders = function(
 
 /**
  * Set the date range in months that this chart covers.
- * @param {MonthDate} startDate
- * @param {MonthDate} endDate
+ * @param {utils.MonthDate} startDate
+ * @param {utils.MonthDate} endDate
  */
 SpousalChart.prototype.setDateRange = function(startDate, endDate) {
   this.startDate_ = startDate;
@@ -88,7 +92,7 @@ SpousalChart.prototype.chartHeight = function() {
 
 /**
  * Compute the canvas x-coordinate for a date.
- * @param {MonthDate} date
+ * @param {utils.MonthDate} date
  * @return {number}
  */
 SpousalChart.prototype.canvasX = function(date) {
@@ -103,7 +107,7 @@ SpousalChart.prototype.canvasX = function(date) {
 /**
  * Inverse of canvasX, computes a date for a canvas x-coordinate.
  * @param {number} x
- * @return {MonthDate}
+ * @return {utils.MonthDate}
  */
 SpousalChart.prototype.dateX = function(x) {
   // Clip x to a range smaller than the chart.
@@ -112,7 +116,7 @@ SpousalChart.prototype.dateX = function(x) {
   var numMonths = Math.round(
       this.endDate_.subtractDate(this.startDate_).asMonths() * percent);
   return this.startDate_.addDuration(
-      new MonthDuration().initFromMonths(numMonths));
+      new utils.MonthDuration().initFromMonths(numMonths));
 };
 
 SpousalChart.prototype.renderTextInWhiteBox = function(text, x, y) {
@@ -137,25 +141,25 @@ SpousalChart.prototype.renderYearVerticalLines = function() {
   this.context_.strokeStyle = '#666';
   this.context_.setLineDash([2,2]);
 
-  firstYear = this.startDate_;
+  let firstYear = this.startDate_;
   // If the start date doesn't fall on a year value, move it forward until
   // it does.
   if (firstYear.monthIndex() !== 0)
-    firstYear = new MonthDate().initFromYearsMonths(firstYear.year() + 1, 0);
+    firstYear = new utils.MonthDate().initFromYearsMonths(firstYear.year() + 1, 0);
 
   // Iterate over each year within the date range.
-  for (var date = new MonthDate().initFromMonthDate(firstYear);
+  for (var date = new utils.MonthDate().initFromMonthDate(firstYear);
        !this.endDate_.lessThan(date);
-       date = date.addDuration(new MonthDuration().initFromMonths(12))) {
+       date = date.addDuration(new utils.MonthDuration().initFromMonths(12))) {
     // Draw vertical line.
     this.context_.beginPath();
     this.context_.moveTo(this.canvasX(date), 40);
     this.context_.lineTo(this.canvasX(date), 600);
     this.context_.stroke();
-  
+
     // Print the year vertically atop the line, with a white rectangle behind
     // the text, so that the line isn't going through the text.
-    text = '' + date.year();
+    const text = '' + date.year();
     var textWidth = this.context_.measureText(text).width;
     var xpos = 210 + textWidth;
 
@@ -175,7 +179,7 @@ SpousalChart.prototype.renderHorizontalLine = function(dollarY, canvasY) {
   this.context_.lineTo(600, canvasY);
   this.context_.stroke();
 
-  var text = '$' + insertNumericalCommas(dollarY);
+  var text = '$' + utils.insertNumericalCommas(dollarY);
 
   this.context_.save();
   this.context_.fillStyle = '#AAA';
@@ -211,7 +215,7 @@ SpousalChart.prototype.renderHorizontalLines = function() {
   if (this.maxRenderedYDollars() > 3000)
     increment = 1000;
 
-  const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
+  const maxAge = new utils.MonthDuration().initFromYearsMonths(70, 0);
   const higherMaxY = this.higherEarner_.benefitAtAge(maxAge);
   const lowerMaxY = this.lowerEarner_.totalBenefitWithSpousal(maxAge, maxAge);
   for (var i = increment; i < higherMaxY; i += increment)
@@ -261,7 +265,7 @@ SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
 
 /**
  * Computes the date that the higher earner starts receiving benefits.
- * @return {MonthDate}
+ * @return {utils.MonthDate}
  */
 SpousalChart.prototype.higherEarnerStartDate = function() {
   return this.higherEarnerSlider.selectedDate();
@@ -269,13 +273,13 @@ SpousalChart.prototype.higherEarnerStartDate = function() {
 
 /**
  * Computes the date that the lower earner starts receiving benefits.
- * @return {MonthDate}
+ * @return {utils.MonthDate}
  */
 SpousalChart.prototype.lowerEarnerStartDate = function() {
   // Typically this is the date of the lower earner's slider. However, if the
   // lower earner has no personal benefit, the lower earner will wait until
   // the higher earner has filed, or effectively 70, whichever is earlier.
-  
+
   // If the lower earner has a personal benefit, start at lower earner's date.
   if (this.lowerEarner_.primaryInsuranceAmountFloored() > 0)
     return this.lowerEarnerSlider.selectedDate();
@@ -287,7 +291,7 @@ SpousalChart.prototype.lowerEarnerStartDate = function() {
   // If the higher earner files after the lower earner is already 70, just use
   // the date the lower earner turns 70.
   if (this.lowerEarner_.ageAtDate(this.higherEarnerStartDate()).greaterThan(
-          new MonthDuration().initFromYearsMonths(70, 0)))
+          new utils.MonthDuration().initFromYearsMonths(70, 0)))
     return this.lowerEarner_.dateAtYearsOld(70);
   // Otherwise, use the date that the higher earner files.
   return this.higherEarnerStartDate();
@@ -295,7 +299,7 @@ SpousalChart.prototype.lowerEarnerStartDate = function() {
 
 /**
  * Computes the age that the higher earner starts receiving benefits.
- * @return {MonthDuration}
+ * @return {utils.MonthDuration}
  */
 SpousalChart.prototype.higherEarnerStartAge = function() {
   return this.higherEarnerSlider.selectedAge();
@@ -303,7 +307,7 @@ SpousalChart.prototype.higherEarnerStartAge = function() {
 
 /**
  * Computes the age that the lower earner starts receiving benefits.
- * @return {MonthDuration}
+ * @return {utils.MonthDuration}
  */
 SpousalChart.prototype.lowerEarnerStartAge = function() {
   return this.lowerEarner_.ageAtDate(this.lowerEarnerStartDate());
@@ -319,7 +323,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
   var startDate = this.higherEarnerStartDate();
   var startAge = this.higherEarnerStartAge();
   var dollars = this.higherEarnerPersonalBenefit();
- 
+
   // Draw a shaded box showing the earnings per year given the selection.
   this.context_.strokeStyle = '#e69f00';
   this.context_.beginPath();
@@ -344,7 +348,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
     this.context_.lineTo(thisX, thisY);
 
     // Horizontal line to next month.
-    i = i.addDuration(new MonthDuration().initFromMonths(1));
+    i = i.addDuration(new utils.MonthDuration().initFromMonths(1));
     this.context_.lineTo(this.canvasX(i), thisY);
   }
   // Make sure we draw all of the way to the edge of the chart.
@@ -396,7 +400,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
 
   var nextBoxMinX = 1;
   var nextBoxMaxY = rootY;
-  
+
   for (var boxIt = 0; boxIt < boxes.length; ++boxIt) {
     var boxMinX = nextBoxMinX;
     var boxMaxY = nextBoxMaxY;
@@ -405,7 +409,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
     var nextBoxMaxY = boxes[boxIt][1];
 
     // Prefer to fix text above, rather than left.
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
     var textBox = this.context_.measureText(text);
     var horizSpace = rootX - boxes[boxIt][0];
     if (boxes.length - 1 > boxIt)
@@ -423,7 +427,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
       continue;
     }
     // Again above, using shorter text.
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
     var textBox = this.context_.measureText(text);
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
@@ -437,7 +441,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
     }
 
     // Attempt to fix box 0 to the left of the text
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
     var textBox = this.context_.measureText(text);
     var horizSpace = boxes[boxIt][0] - boxMinX;
     var vertSpace = boxMaxY - boxes[boxIt][1];
@@ -450,7 +454,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
       continue;
     }
     // Try again with shorter text, removing ' / mo';
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
     var textBox = this.context_.measureText(text);
     if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
@@ -470,7 +474,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
   this.context_.beginPath();
   var start = this.higherEarner_.dateAtYearsOld(62);
   if (!this.higherEarner_.isFullMonth)
-    start = start.addDuration(new MonthDuration().initFromMonths(1));
+    start = start.addDuration(new utils.MonthDuration().initFromMonths(1));
   var end = this.higherEarner_.dateAtYearsOld(70);
   for (i = start; i.lessThanOrEqual(end);) {
     var thisX = this.canvasX(i);
@@ -483,7 +487,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
     } else {
       this.context_.lineTo(thisX, thisY);
     }
-    i = i.addDuration(new MonthDuration().initFromMonths(1));
+    i = i.addDuration(new utils.MonthDuration().initFromMonths(1));
   }
   this.context_.stroke();
   this.context_.restore();
@@ -493,7 +497,7 @@ SpousalChart.prototype.renderHigherEarner = function() {
 
 /**
  * Compute the start date when the spousal benefits start.
- * @return {MonthDate}
+ * @return {utils.MonthDate}
  */
 SpousalChart.prototype.spousalStartDate = function() {
   var dateA = this.lowerEarnerStartDate();
@@ -546,7 +550,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
   var actualStartDate = startDate;
   if (personal === 0 && startDate.lessThan(spousalStartDate))
     actualStartDate = spousalStartDate;
- 
+
   this.context_.strokeStyle = '#060';
   this.context_.beginPath();
   this.context_.moveTo(this.canvas_.width - 1, this.canvasLowerY(0));
@@ -571,7 +575,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
     this.context_.lineTo(thisX, thisY);
 
     // horizontal line to next month.
-    i = i.addDuration(new MonthDuration().initFromMonths(1));
+    i = i.addDuration(new utils.MonthDuration().initFromMonths(1));
     this.context_.lineTo(this.canvasX(i), thisY);
   }
   // Make sure we draw all of the way to the edge of the chart.
@@ -631,7 +635,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
     var nextBoxMinY = boxes[boxIt][1];
 
     // Prefer to fix text below, rather than left.
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
     var textBox = this.context_.measureText(text);
     var horizSpace = rootX - boxes[boxIt][0];
     if (boxes.length - 1 > boxIt)
@@ -651,7 +655,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
       continue;
     }
     // Again below, using shorter text.
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
     var textBox = this.context_.measureText(text);
     if ((textBox.width + 10) < horizSpace &&
         (font_height + 10 < vertSpace)) {
@@ -667,7 +671,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
     }
 
     // Attempt to fix box 0 to the left of the text
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]) + ' / mo';
     var textBox = this.context_.measureText(text);
     var horizSpace = boxes[boxIt][0] - boxMinX;
     var vertSpace = boxes[boxIt][1] - boxMinY;
@@ -680,7 +684,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
       continue;
     }
     // Try again with shorter text, removing ' / mo';
-    var text = '$' + insertNumericalCommas(boxes[boxIt][2]);
+    var text = '$' + utils.insertNumericalCommas(boxes[boxIt][2]);
     var textBox = this.context_.measureText(text);
     if ((textBox.width + 15) < horizSpace &&
         (font_height + 15 < vertSpace)) {
@@ -699,7 +703,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.globalAlpha = 0.3;
   var start = this.lowerEarner_.dateAtYearsOld(62);
   if (!this.lowerEarner_.isFullMonth)
-    start = start.addDuration(new MonthDuration().initFromMonths(1));
+    start = start.addDuration(new utils.MonthDuration().initFromMonths(1));
   if (personal === 0 && start.lessThan(this.higherEarnerStartDate()))
     start = this.higherEarnerStartDate();
   var end = this.lowerEarner_.dateAtYearsOld(70);
@@ -709,7 +713,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
         i.greaterThanOrEqual(this.higherEarnerStartDate())) ?
       this.lowerEarner_.dateAtYearsOld(71) :
       this.higherEarnerStartDate().subtractDuration(
-          new MonthDuration().initFromMonths(1)) ;
+          new utils.MonthDuration().initFromMonths(1)) ;
     var yDollars =  this.lowerEarner_.totalBenefitAtDate(
         shownDate, i, this.higherEarnerStartDate());
     var thisY = this.canvasLowerY(yDollars);
@@ -718,7 +722,7 @@ SpousalChart.prototype.renderLowerEarner = function() {
     } else {
       this.context_.lineTo(thisX, thisY);
     }
-    i = i.addDuration(new MonthDuration().initFromMonths(1));
+    i = i.addDuration(new utils.MonthDuration().initFromMonths(1));
   }
   this.context_.stroke();
   this.context_.restore();
@@ -735,7 +739,7 @@ SpousalChart.prototype.render = function() {
   // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
-  
+
   this.renderHorizontalLines();
   this.renderYearVerticalLines();
   this.renderHigherEarner();
@@ -753,14 +757,14 @@ SpousalChart.prototype.render = function() {
  * @return {Number}
  */
 SpousalChart.prototype.maxRenderedYDollars = function() {
-  const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
+  const maxAge = new utils.MonthDuration().initFromYearsMonths(70, 0);
   return this.higherEarner_.benefitAtAge(maxAge) +
          this.lowerEarner_.totalBenefitWithSpousal(maxAge, maxAge);
 };
 
 SpousalChart.prototype.midpointYValue = function() {
   // The midpoint line is the canvas y position of the 0 benefit line.
-  const maxAge = new MonthDuration().initFromYearsMonths(70, 0);
+  const maxAge = new utils.MonthDuration().initFromYearsMonths(70, 0);
   var spousalDollars = this.lowerEarner_.totalBenefitWithSpousal(
       maxAge, maxAge);
   var midpointYValue = this.canvas_.height -
@@ -806,7 +810,7 @@ SpousalChart.prototype.mouseOutListener = function() {
   return function(e) {
     if (self.mouseToggle == 'OFF')
       return;
-    self.updateSelectedDate(new MonthDate());
+    self.updateSelectedDate(new utils.MonthDate());
     self.render();
   };
 };
@@ -817,7 +821,7 @@ SpousalChart.prototype.mouseClickListener = function() {
   return function(e) {
     var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
     if (canvasY < 180) {
-      self.updateSelectedDate(new MonthDate());
+      self.updateSelectedDate(new utils.MonthDate());
       return;
     }
     if (self.mouseToggle === 'ON') {
@@ -839,7 +843,7 @@ SpousalChart.prototype.mouseMoveListener = function() {
       self.render();
       var canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
       if (canvasY < 180) {
-        self.updateSelectedDate(new MonthDate());
+        self.updateSelectedDate(new utils.MonthDate());
         return;
       }
       var canvasX = e.clientX - self.canvas_.getBoundingClientRect().left;

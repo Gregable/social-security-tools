@@ -2,10 +2,27 @@
   "name": "ssa",
   "version": "1.0.0",
   "description": "SSA Tool Website",
+  "homepage": "https://ssa.tools/",
+  "bugs": {
+    "url": "https://github.com/Gregable/social-security-tools/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gregable/social-security-tools/"
+  },
   "main": "ssa.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/jasmine-run.mjs"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^3.5.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "glob": "^7.1.6",
+    "node": "^12.18.2",
+    "node-version": "^2.0.0"
+  }
 }

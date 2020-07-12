@@ -1,8 +1,11 @@
+import { Recipient } from '../../src/recipient.mjs';
+import { EarningRecord } from '../../src/recipient.mjs';
+
 let earningRecord = new EarningRecord();
 earningRecord.year = 1960;
 earningRecord.taxedEarnings = 19123;
 earningRecord.taxedMedicareEarnings = 19123;
-testEarnings = [];
+let testEarnings = [];
 testEarnings.push(earningRecord);
 
 describe("Recipient Initialization", function() {
@@ -31,9 +34,9 @@ describe("Recipient Initialization", function() {
   it ("primaryInsuranceAmount", function() {
     // These will need to be updated when there are new wage indices /
     // index factors.
-    expect(r.totalIndexedEarnings).toBe(60278.97);
-    expect(r.primaryInsuranceAmount()).toBe(128.70);
-    expect(r.primaryInsuranceAmountFloored()).toBe(128);
+    expect(r.totalIndexedEarnings).toBe(62463.77);
+    expect(r.primaryInsuranceAmount()).toBe(133.2);
+    expect(r.primaryInsuranceAmountFloored()).toBe(133);
   });
 });
 
@@ -64,9 +67,9 @@ describe("Recipient simulateFutureEarnings", function() {
   it ("primaryInsuranceAmount", function() {
     // These will need to be updated when there are new wage indices /
     // index factors.
-    expect(r.totalIndexedEarnings).toBe(160278.97);
-    expect(r.primaryInsuranceAmount()).toBe(342.9);
-    expect(r.primaryInsuranceAmountFloored()).toBe(342);
+    expect(r.totalIndexedEarnings).toBe(162463.77);
+    expect(r.primaryInsuranceAmount()).toBe(347.4);
+    expect(r.primaryInsuranceAmountFloored()).toBe(347);
   });
   it ("hasFutureEarnings", function() {
     expect(r.hasFutureEarnings()).toBe(true);
@@ -78,5 +81,3 @@ describe("Recipient simulateFutureEarnings", function() {
     expect(r.isEligible()).toBe(false);
   });
 });
-
-

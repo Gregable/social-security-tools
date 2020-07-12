@@ -1,3 +1,5 @@
+import * as utils from './utils.mjs';
+
 /**
  * Code for driving a breakpoint chart. See partials/breakpoint-chart.html
  * @constructor
@@ -5,6 +7,8 @@
 function AgeChart() {
   this.canvas_ = null;
 }
+
+export { AgeChart };
 
 /**
  * Returns true if the AgeChart has been initialized with a canvas element
@@ -93,7 +97,7 @@ AgeChart.prototype.canvasY = function(benefitY) {
  * Compute the canvas age for an x-coordinate value.
  * Used for computations involving mouse interactions.
  * @param {number} canvasX
- * @return {MonthDuration}
+ * @return {utils.MonthDuration}
  */
 AgeChart.prototype.ageAtX = function(canvasX) {
   // compute the number of months greater than 62 years old the canvasX
@@ -101,8 +105,8 @@ AgeChart.prototype.ageAtX = function(canvasX) {
   var xValue = Math.floor(canvasX / this.chartWidth() * this.monthWidth);
   var xClipped = Math.max(0, Math.min(xValue, this.monthWidth));
   // Add 62 years to the age.
-  return new MonthDuration().initFromMonths(xClipped).add(
-      new MonthDuration().initFromYearsMonths(62, 0));
+  return new utils.MonthDuration().initFromMonths(xClipped).add(
+      new utils.MonthDuration().initFromYearsMonths(62, 0));
 };
 
 /**
@@ -112,7 +116,7 @@ AgeChart.prototype.ageAtX = function(canvasX) {
  */
 AgeChart.prototype.maxRenderedYDollars = function() {
   return this.recipient_.benefitAtAge(
-        new MonthDuration().initFromYearsMonths(70, 0));
+        new utils.MonthDuration().initFromYearsMonths(70, 0));
 };
 
 /**
@@ -163,10 +167,10 @@ AgeChart.prototype.renderBenefitCurve = function() {
 
   this.context_.beginPath();
   this.moveTo(12 * 62, this.recipient_.benefitAtAge(
-        new MonthDuration().initFromYearsMonths(62, 0)));
+        new utils.MonthDuration().initFromYearsMonths(62, 0)));
   for (var y = 62; y <= 70; ++y) {
     for (var m = 0; m < 12; ++m) {
-      var age = new MonthDuration().initFromYearsMonths(y, m)
+      var age = new utils.MonthDuration().initFromYearsMonths(y, m)
       this.lineTo(12 * y + m, this.recipient_.benefitAtAge(age));
     }
   }
@@ -236,13 +240,13 @@ AgeChart.prototype.roundedBox =
 
 /**
  * Renders a point on the age curve.
- * @param {MonthDuration} age
+ * @param {utils.MonthDuration} age
  */
 AgeChart.prototype.renderAgePoint = function(age) {
   this.context_.save();
-  
+
   if (age.asMonths() === 12 * 62 && !this.recipient_.isFullMonth)
-    age.addDuration(new MonthDuration().initFromMonths(1));
+    age.addDuration(new utils.MonthDuration().initFromMonths(1));
 
   var benefit = this.recipient_.benefitAtAge(age);
 
@@ -259,7 +263,7 @@ AgeChart.prototype.renderAgePoint = function(age) {
   this.moveTo(age.asMonths(), benefit);
   this.lineTo(age.asMonths(), 0);
   this.context_.stroke();
-  
+
   this.context_.beginPath();
   this.moveTo(age.asMonths(), benefit);
   this.lineTo(70 * 12, benefit);
@@ -281,7 +285,7 @@ AgeChart.prototype.renderAgePoint = function(age) {
 
   // Text at the edges showing the actual values, white on colored chip.
   var xText = age.years() + 'y ' + age.modMonths() + 'mo';
-  var yText = insertNumericalCommas('$' + benefit);
+  var yText = utils.insertNumericalCommas('$' + benefit);
 
   // Chip on the bottom edge
   this.roundedBox(this.canvasX(age.asMonths()), this.canvasY(0),
@@ -299,7 +303,7 @@ AgeChart.prototype.renderAgePoint = function(age) {
       this.canvasX(age.asMonths()) + 2,
       this.canvasY(0) + 15);
   this.context_.fillText(  // Text on the right edge.
-      yText, 
+      yText,
       this.canvasX(70 * 12) + 3,
       this.canvasY(benefit) + 15);
 
@@ -311,7 +315,7 @@ AgeChart.prototype.render = function() {
   this.context_.font = "bold 14px Helvetica"
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
-  
+
   this.context_.strokeStyle = '#666';
   this.renderBoundingBox();
   this.renderBenefitCurve();

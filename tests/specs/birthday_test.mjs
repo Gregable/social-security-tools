@@ -1,16 +1,19 @@
-describe("Birthdate Initialization", function() {
+import * as utils from '../../src/utils.mjs'
+import { Birthdate } from '../../src/birthday.mjs'
+
+describe("Birthdate Initialization", function () {
   it ("FromLayBirthdate", function() {
     let bd = new Birthdate().initFromLayBirthdate(2000, 1, 2);
     expect(bd.layBirthYear()).toBe(2000);
     expect(bd.layBirthMonth()).toBe(1);
-    expect(bd.layBirthDateOfMonth()).toBe(2);
+    expect(bd.layBirthDayOfMonth()).toBe(2);
   });
 
   it ("FromLayDateObj", function() {
     let bd = new Birthdate().initFromLayDateObj(new Date(2000, 1, 2));
     expect(bd.layBirthYear()).toBe(2000);
     expect(bd.layBirthMonth()).toBe(1);
-    expect(bd.layBirthDateOfMonth()).toBe(2);
+    expect(bd.layBirthDayOfMonth()).toBe(2);
   });
 });
 describe("englishBirthdate", function() {
@@ -25,7 +28,7 @@ describe("englishBirthdate", function() {
 describe("layBirth", function() {
   it ("is correct Day, Month and Year", function() {
     let bd = new Birthdate().initFromLayBirthdate(2000, 0, 1);
-    expect(bd.layBirthDateOfMonth()).toBe(1);
+    expect(bd.layBirthDayOfMonth()).toBe(1);
     expect(bd.layBirthYear()).toBe(2000);
     expect(bd.layBirthMonth()).toBe(0);
   });
