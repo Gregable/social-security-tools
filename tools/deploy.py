@@ -45,7 +45,7 @@ RELEASE_FILES = [
     'stylesheet.css',
     'partials/*.html',
     'guide/*.html',
-    'guide/*.js',
+    'guide/*.mjs',
     'src/*.mjs',
     'static/*'
 ]
