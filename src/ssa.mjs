@@ -61,7 +61,7 @@ ssaApp.controller("AgeRequestController", function ($scope) {
     if ($scope.selfBirthdateInput === null) return true;
     // Safari Desktop and IE don't have native date input types, so we parse
     // these as strings or at least try to.
-    let parsedDate = parseDateInputValue($scope.selfBirthdateInput);
+    let parsedDate = utils.parseDateInputValue($scope.selfBirthdateInput);
     if (parsedDate.getTime() === NaN)
       return true;
     // TODO: Check that the date is in the past, isn't too far in the past, etc.
@@ -73,7 +73,7 @@ ssaApp.controller("AgeRequestController", function ($scope) {
   $scope.confirmBirthdate = function() {
     if ($scope.isInvalidBirthdate())
       return;
-    let parsedDate = parseDateInputValue($scope.selfBirthdateInput);
+    let parsedDate = utils.parseDateInputValue($scope.selfBirthdateInput);
     $scope.$emit('birthdateChange', parsedDate);
     // Send basic analytics event indicating that the user entered their
     // own birthdate. Never records what birthdate a user entered.
@@ -98,7 +98,7 @@ ssaApp.controller("SpouseAgeRequestController", function ($scope) {
   $scope.isInvalidBirthdate = function() {
     if ($scope.spouseBirthdateInput === undefined) return true;
     if ($scope.spouseBirthdateInput === null) return true;
-    let parsedDate = parseDateInputValue($scope.spouseBirthdateInput);
+    let parsedDate = utils.parseDateInputValue($scope.spouseBirthdateInput);
     if (parsedDate.getTime() === NaN)
       return true;
     // TODO: Check that the date is in the past, isn't too far in the past, etc.
@@ -110,7 +110,7 @@ ssaApp.controller("SpouseAgeRequestController", function ($scope) {
   $scope.confirmBirthdate = function() {
     if ($scope.isInvalidBirthdate())
       return;
-    let parsedDate = parseDateInputValue($scope.spouseBirthdateInput);
+    let parsedDate = utils.parseDateInputValue($scope.spouseBirthdateInput);
     $scope.$emit('spouseBirthdateChange', parsedDate);
   }
 });
