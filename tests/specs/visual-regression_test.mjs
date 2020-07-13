@@ -6,12 +6,6 @@ import Differencify from 'differencify';
 import GlobalOptions from 'differencify';
 import express from 'express';
 
-//const servingConfig = express();
-//const differencify = new Differencify({ debug: true });
-
-//servingConfig.use(express.static('/'));
-//let server = servingConfig.listen(8000);
-
 describe("Visual Test", function () {
   let differencify = new Differencify({ debug: true });
   let servingConfig = express();
@@ -32,7 +26,7 @@ describe("Visual Test", function () {
       .init({testName: 'root'})
       .launch()
       .newPage()
-      // Note that / won't work - express doesn't explicitly map it.
+      // Note that a '/' path won't work - express doesn't implicitly map it.
       .goto('http://localhost:8000/index.html')
       .screenshot()
       .toMatchSnapshot()
