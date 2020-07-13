@@ -12,7 +12,7 @@
   },
   "main": "ssa.js",
   "scripts": {
-    "test": "node tests/jasmine-run.mjs --verbose"
+    "test": "node tests/jasmine-run.mjs"
   },
   "author": "",
   "license": "ISC",
