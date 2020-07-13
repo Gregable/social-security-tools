@@ -1,9 +1,9 @@
 <span id="earningsTable" class="confirmation-prompt"
-      ng-if="mode === ModeEnum.PASTE_CONFIRMATION">
+  ng-if="mode === ModeEnum.PASTE_CONFIRMATION">
   <div class="confirmation-left">
-    <h3>Step 2 of 3: Confirm Earnings Record</h3>
+    <h3 id=pasteStep2>Step 2 of 3: Confirm Earnings Record</h3>
     <p>Is this the same table you copied from ssa.gov?</p>
-    
+
     <button ng-click="confirmEarningsParse('correct')" class=success>
       <ico>&#10003;</ico> Yes
     </button>
@@ -33,8 +33,7 @@
             Not yet recorded
           </span>
         </td>
-        <td headers=pastetaxedmedicare
-           ng-if="earningsRecordsIncludeMedicare()">
+        <td headers=pastetaxedmedicare ng-if="earningsRecordsIncludeMedicare()">
           <span ng-if="earningRecord.taxedMedicareEarnings >= 0">
             ${{earningRecord.taxedMedicareEarnings | number:0}}
           </span>
