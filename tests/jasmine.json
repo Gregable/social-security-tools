@@ -4,5 +4,5 @@
     "**/*_test.mjs"
   ],
   "stopSpecOnExpectationFailure": false,
-  "random": true
+  "random": false
 }
