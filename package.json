@@ -21,8 +21,11 @@
   },
   "type": "module",
   "dependencies": {
+    "differencify": "^1.5.5",
+    "express": "^4.17.1",
     "glob": "^7.1.6",
     "node": "^12.18.2",
-    "node-version": "^2.0.0"
+    "node-version": "^2.0.0",
+    "puppeteer": "^5.0.0"
   }
 }
