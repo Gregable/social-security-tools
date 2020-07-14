@@ -133,6 +133,4 @@ describe("Visual Test", function () {
     await page.close();
     await differencify.cleanup();
   });
-
-
 });
