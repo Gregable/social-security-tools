@@ -13,7 +13,8 @@ async function snapshotDemo(diff, demoId) {
       .launch()
       .newPage()
       .setViewport({width: 1600, height: 1700})
-      .goto('http://localhost:8000/calculator.html')
+      .goto('http://localhost:8000/calculator.html',
+            { waitUntil: 'networkidle2' })
       .click('button#button-demo-' + demoId)
       .screenshot({fullPage: true})
       .toMatchSnapshot()
@@ -44,7 +45,8 @@ describe("Visual Test", function () {
       .launch()
       .newPage()
       // Note that a '/' path won't work - express doesn't implicitly map it.
-      .goto('http://localhost:8000/index.html')
+      .goto('http://localhost:8000/index.html',
+            { waitUntil: 'networkidle2' })
       .screenshot({ fullPage: true })
       .toMatchSnapshot()
       .result((result) => {
@@ -60,7 +62,8 @@ describe("Visual Test", function () {
       .launch()
       .newPage()
       .setViewport({ width: 1600, height: 1200 })
-      .goto('http://localhost:8000/calculator.html')
+      .goto('http://localhost:8000/calculator.html',
+            { waitUntil: 'networkidle2' })
       .screenshot({ fullPage: true })
       .toMatchSnapshot()
       .result((result) => {
@@ -89,7 +92,8 @@ describe("Visual Test", function () {
     await target.launch();
     const page = await target.newPage();
     await page.setViewport({ width: 1600, height: 1200 });
-    await page.goto('http://localhost:8000/calculator.html');
+    await page.goto('http://localhost:8000/calculator.html',
+                    { waitUntil: 'networkidle2' });
     await page.evaluate(function () {
       document.querySelector('textarea#pastearea').value = "1980 $25,900 $25,900\n1981 $29,700 $29,700\n1982 $32,400 $32,400\n1983 $35,700 $35,700\n1984 $37,800 $37,80";
     });
@@ -97,6 +101,32 @@ describe("Visual Test", function () {
     await page.keyboard.press('Enter');
     await page.waitForFunction(
       "document.querySelector('h3#pasteStep2') && document.querySelector('h3#pasteStep2').clientHeight != 0");
+    const image = await page.screenshot({ fullPage: true });
+    const result = await target.toMatchSnapshot(image);
+    expect(result).toBeTrue();
+    await page.close();
+    await differencify.cleanup();
+  });
+
+  it('confirmation page', async () => {
+    await differencify.launchBrowser();
+    const target = differencify.init(
+      { testName: 'paste-confirm', chain: false });
+    await target.launch();
+    const page = await target.newPage();
+    await page.setViewport({ width: 1600, height: 1200 });
+    await page.goto('http://localhost:8000/calculator.html',
+                    { waitUntil: 'networkidle2' });
+    await page.evaluate(function () {
+      document.querySelector('textarea#pastearea').value = "1980 $25,900 $25,900\n1981 $29,700 $29,700\n1982 $32,400 $32,400\n1983 $35,700 $35,700\n1984 $37,800 $37,80";
+    });
+    await page.focus('textarea#pastearea');
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(
+      "document.querySelector('h3#pasteStep2') && document.querySelector('h3#pasteStep2').clientHeight != 0");
+    await page.click('button#confirmPaste');
+    await page.waitForFunction(
+      "document.querySelector('h3#pasteStep3') && document.querySelector('h3#pasteStep3').clientHeight != 0");
     const image = await page.screenshot({ fullPage: true });
     const result = await target.toMatchSnapshot(image);
     expect(result).toBeTrue();
