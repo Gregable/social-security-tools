@@ -1,9 +1,8 @@
 <div id="ageRequest" class="confirmation-prompt"
-     ng-if="mode === ModeEnum.AGE_REQUEST"
-     ng-controller=AgeRequestController
-     ng-init="init()">
+  ng-if="mode === ModeEnum.AGE_REQUEST" ng-controller=AgeRequestController
+  ng-init="init()">
   <div>
-    <h3>Step 3 of 3: Select Birthdate</h3>
+    <h3 id=pasteStep3>Step 3 of 3: Select Birthdate</h3>
     <p>
       Your birthdate determines when you can start
       collecting Social Security benefits.
@@ -11,13 +10,13 @@
   </div>
 
   <input type=date class=birthdate-input ng-model="selfBirthdateInput"
-         placeholder="YYYY-MM-DD">
+    placeholder="YYYY-MM-DD">
   <br class=clear>
 
   <div>
     <!-- TODO: Style this in a way that the disabled bit is visibly obvious -->
     <button ng-click="confirmBirthdate()" class=success
-	    ng-disabled="isInvalidBirthdate()">
+      ng-disabled="isInvalidBirthdate()">
       <ico>&#10003;</ico> Next
     </button>
   </div>
