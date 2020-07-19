@@ -404,12 +404,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
    */
   $scope.$on("$includeContentLoaded", function(event, templateName) {
     var tryRender = false;
-    if (templateName == 'partials/primary-insurance-amount.html') {
+    if (templateName.endsWith('partials/primary-insurance-amount.html')) {
       $scope.breakPointChart_.setCanvas(
           document.getElementById('breakpoint-chart-canvas'));
       tryRender = true;
     }
-    if (templateName == 'partials/benefit-estimate.html') {
+    if (templateName.endsWith('partials/benefit-estimate.html')) {
       $scope.ageChart_.setCanvas(
           document.getElementById('age-chart-canvas'));
       tryRender = true;
