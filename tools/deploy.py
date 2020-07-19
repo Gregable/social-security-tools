@@ -84,10 +84,10 @@ RELEASE_FILES = [
     '*.html',
     '*paste.txt',
     'favicon.ico',
-    'stylesheet.css',
     'partials/*.html',
     'guide/*.html',
     'guide/*.mjs',
+    'src/stylesheet.css',
     'src/*.mjs',
     'static/*'
 ]
