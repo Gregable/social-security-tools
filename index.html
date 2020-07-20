@@ -22,7 +22,58 @@
   <link rel="modulepreload" href="src/ssa.mjs">
 </head>
 
-<body style="margin: 0">
+<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
+<style>
+  body {
+    margin: 0px;
+    font-family: 'Lato';
+  }
+
+  .grid-container {
+    display: grid;
+    grid-column-gap: 1rem;
+    grid-row-gap: 1rem;
+    grid-template-columns: auto auto;
+    width: 65%;
+    margin: .6rem auto;
+  }
+
+  .grid-container div {}
+
+  h1 {
+    color: #060606;
+    font-size: 3.8rem;
+    line-height: 4.8rem;
+    margin-bottom: 2.0rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    color: #a8a8a8;
+    letter-spacing: .2rem;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    padding: 0px;
+  }
+
+  p {
+    font-size: 1.6rem;
+    color: #4b4b4b;
+    margin-bottom: 1rem;
+    padding: 0px;
+  }
+
+  .grid-item {}
+
+  div.video {
+    display: inline-block;
+    /*border: 1px solid black;*/
+    padding: 1px;
+    filter: drop-shadow(4px 4px 8px #000);
+  }
+</style>
+
+<body>
   <!-- partials/header.html -->
   <div id="topheader">
     <ul class="navpills">
@@ -35,6 +86,7 @@
   </div>
 
   <!-- Introductory Jumbotron -->
+  <!--
   <div class="jumbotron">
     <h1>Understand Social Security</h1>
     <p class="lead">
@@ -47,6 +99,41 @@
       <a class="bigbtn" href="calculator.html" role="button">Get Started</a>
     </p>
   </div>
+  -->
+
+  <div class="grid-container">
+    <div class="example1 text">
+      <h2>Visual Charts</h2>
+      <h1>PIA Calculation</h1>
+      <p>
+        You can visually calculate how your Average Indexed Monthly Income
+        (AIME) affects your Primary Insurance Amount (PIA).
+        See how you compare to the two Social Security breakpoints.
+      </p>
+    </div>
+    <div class="example1 image">
+      <div class=video>
+        <video id=pia_vid autoplay playsinline loop muted width=608 height=448
+          poster="todo">
+          <source src="/static/pia-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- Preload these for the next page. They aren't modules though, so just
   reglar script include them. -->
