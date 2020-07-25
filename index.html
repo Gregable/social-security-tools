@@ -31,11 +31,12 @@
 
   .grid-container {
     display: grid;
-    grid-column-gap: 1rem;
-    grid-row-gap: 1rem;
+    grid-column-gap: 10rem;
+    grid-row-gap: 24rem;
     grid-template-columns: auto auto;
     width: 65%;
-    margin: .6rem auto;
+    margin: 8rem auto;
+    align-items: center;
   }
 
   .grid-container div {}
@@ -102,16 +103,53 @@
   -->
 
   <div class="grid-container">
+
     <div class="example1 text">
-      <h2>Visual Charts</h2>
-      <h1>PIA Calculation</h1>
+      <h2>Quick Data Entry</h2>
+      <h1>Direct Copy & Paste Records</h1>
       <p>
-        You can visually calculate how your Average Indexed Monthly Income
-        (AIME) affects your Primary Insurance Amount (PIA).
-        See how you compare to the two Social Security breakpoints.
+        Painlessly entry of your earnings records directly from the "<i>my</i>
+        Social Security" section at ssa.gov. Copy and paste your entire record
+        directly into the tool in a single quick step.
       </p>
     </div>
     <div class="example1 image">
+      <div class=video>
+        <video id=pia_vid autoplay playsinline loop muted width=576 height=294
+          poster="todo">
+          <source src="/static/copy-paste-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+
+    <div class="example2 image">
+      <div class=video>
+        <video id=earnings_vid autoplay playsinline loop muted width=608
+          height=208 poster="todo">
+          <source src="/static/future-earnings-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+    <div class="example2 text">
+      <h2>Highly Interactive</h2>
+      <h1>Future Benefits Formula</h1>
+      <p>
+        Working more years in the future can have an impact on your benefit.
+        Use the working years quick tool to estimate the impact of working more
+        or fewer years on your AIME, PIA, and benefit payments.
+      </p>
+    </div>
+
+    <div class="example3 text">
+      <h2>Visual Charts</h2>
+      <h1>PIA Calculation</h1>
+      <p>
+        Visually calculate how your Average Indexed Monthly Income
+        (AIME) affects your Primary Insurance Amount (PIA). See how you compare
+        to the two Social Security breakpoints.
+      </p>
+    </div>
+    <div class="example3 image">
       <div class=video>
         <video id=pia_vid autoplay playsinline loop muted width=608 height=448
           poster="todo">
@@ -119,21 +157,26 @@
         </video>
       </div>
     </div>
+
+    <div class="example5 image">
+      <div class=video>
+        <video id=combined_vid autoplay playsinline loop muted width=640
+          height=784 poster="todo">
+          <source src="/static/combined-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+    <div class="example5 text">
+      <h2>Visual Charts</h2>
+      <h1>PIA Calculation</h1>
+      <p>
+        Visually calculate how your Average Indexed Monthly Income
+        (AIME) affects your Primary Insurance Amount (PIA). See how you compare
+        to the two Social Security breakpoints.
+      </p>
+    </div>
+
   </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   <!-- Preload these for the next page. They aren't modules though, so just
   reglar script include them. -->
