@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Social Security Calculator</title>
 
-  <link rel="stylesheet" href="src/stylesheet.css" />
+  <link rel="stylesheet" href="src/stylesheet.css">
 
   <!-- not actually needed in this document, but start loading them so
        that the next page load will be faster -->
@@ -22,7 +22,193 @@
   <link rel="modulepreload" href="src/ssa.mjs">
 </head>
 
-<body style="margin: 0">
+<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
+
+<style>
+  /* Override a few styles on root page that we need nowhere else */
+  body {
+    margin: 0px 0px;
+    padding: 20px 0 0 0;
+    font-family: 'Lato';
+  }
+
+  .grid-container {
+    display: grid;
+    width: 85%;
+    align-items: center;
+  }
+
+  .jumbotron-grid {
+    display: grid;
+    width: 85%;
+    margin: 0 auto;
+    align-items: center;
+  }
+
+  h1 {
+    color: #060606;
+    margin-bottom: 2.8rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    color: #a8a8a8;
+    letter-spacing: .2rem;
+    text-transform: uppercase;
+    padding: 0px;
+  }
+
+  p {
+    color: #4b4b4b;
+    margin-bottom: 1rem;
+    padding: 0px;
+  }
+
+  div.shadow {
+    display: inline-block;
+    padding: 1px;
+    filter: drop-shadow(4px 4px 8px #000);
+  }
+
+  video {
+    width: 100%;
+    height: auto;
+  }
+
+  hr {
+    background: linear-gradient(90deg, #FFF, #687d88, #FFF);
+    clear: both;
+    border: 0;
+    height: 1px;
+    margin: 0 10vw;
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+  }
+
+  span#understand {
+    color: #081d88;
+  }
+
+  #footer {
+    background-color: #060606;
+    padding: 10px;
+    padding-bottom: 60px;
+  }
+
+  #footer a {
+    text-decoration: underline;
+  }
+
+  #footer-container {
+    margin: 0px auto;
+  }
+
+  #footer h1 {
+    color: #ddd;
+  }
+
+  #footer p,
+  #footer li {
+    color: #ccc;
+  }
+
+  @media screen and (min-width: 421px) {
+    .grid-container {
+      grid-column-gap: 6vw;
+      grid-row-gap: 10vw;
+      grid-template-columns: auto auto;
+      margin: 5vw auto;
+      grid-auto-flow: dense;
+    }
+
+    /* every other row, move text to the right col */
+    .grid-container>div:nth-child(4n+1) {
+      grid-column: 2;
+    }
+
+    .jumbotron-grid {
+      grid-column-gap: 10rem;
+      grid-template-columns: 30% 70%;
+    }
+
+    .jumbotron-grid h1 {
+      font-size: 5.5vw;
+      line-height: 8vw;
+    }
+
+    h1,
+    p {
+      font-size: 1.8vw;
+    }
+
+    #footer-container {
+      width: 50%;
+    }
+
+    #footer li {
+      font-size: 1.8vw;
+    }
+
+    #footer p {
+      margin-bottom: 6rem;
+    }
+
+    h2 {
+      font-size: 1.2vw;
+    }
+  }
+
+  @media screen and (max-width: 420px) {
+    .grid-container {
+      grid-column-gap: 6vw;
+      grid-row-gap: 10vw;
+      grid-template-columns: auto;
+      margin: 5vw auto;
+    }
+
+    .jumbotron-grid {
+      grid-column-gap: 10rem;
+      grid-template-columns: 100% 0%;
+      text-align: center;
+    }
+
+    .jumbotron-grid h1 {
+      font-size: 11vw;
+      line-height: 16vw;
+    }
+
+    span#understand {
+      font-size: 12vw;
+      letter-spacing: .4rem;
+    }
+
+    h1,
+    p {
+      font-size: 3.6vw;
+    }
+
+    #footer-container {
+      width: 70%;
+    }
+
+    #footer p {
+      margin-bottom: 3rem;
+    }
+
+    #footer li {
+      font-size: 3.6vw;
+    }
+
+    h2 {
+      font-size: 2.4vw;
+    }
+  }
+</style>
+
+<body>
   <!-- partials/header.html -->
   <div id="topheader">
     <ul class="navpills">
@@ -34,18 +220,123 @@
     <h3 id="title-header">Social Security Calculator</h3>
   </div>
 
-  <!-- Introductory Jumbotron -->
-  <div class="jumbotron">
-    <h1>Understand Social Security</h1>
-    <p class="lead">
-      This is a calculator that explains Social Security benefits.
-    </p>
-    <p class="lead">
-      Navigate your personal benefit data and ask 'What If?' questions.
-    </p>
-    <p>
-      <a class="bigbtn" href="calculator.html" role="button">Get Started</a>
-    </p>
+  <div class="jumbotron-grid">
+    <div>
+      <h1><span id=understand>Understand</span> Social Security</h1>
+      <p>
+        <a class="bigbtn" href="calculator.html" role="button">Get Started</a>
+      </p>
+    </div>
+    <div>
+      <div>
+        <img src="/static/laptop-piggybank.png" width=1134 height=712>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="grid-container">
+    <div>
+      <h2>Quick Data Entry</h2>
+      <h1>Directly Copy & Paste Records</h1>
+      <p>
+        Painlessly entry of your earnings records directly from the
+        "<i>my</i>
+        Social Security" section at ssa.gov. Copy and paste your entire
+        record
+        directly into the tool in a single quick step.
+      </p>
+    </div>
+    <div>
+      <div class=shadow>
+        <video id=pia_vid autoplay playsinline loop muted width=576 height=294
+          poster="/static/copy-paste-demo-poster.png">
+          <source src="/static/copy-paste-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+
+    <div>
+      <h2>Highly Interactive</h2>
+      <h1>Future Benefits Formula</h1>
+      <p>
+        Working more years in the future can have an impact on your benefit.
+        Use the working years quick tool to estimate the impact of working
+        more
+        or fewer years on your AIME, PIA, and benefit payments.
+      </p>
+    </div>
+    <div>
+      <div class=shadow>
+        <video id=earnings_vid autoplay playsinline loop muted width=608
+          height=208 poster="/static/future-earnings-demo-poster.png">
+          <source src="/static/future-earnings-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+
+    <div>
+      <h2>Visual Charts</h2>
+      <h1>PIA Calculation</h1>
+      <p>
+        Visually calculate how your Average Indexed Monthly Income
+        (AIME) affects your Primary Insurance Amount (PIA). See how you
+        compare
+        to the two Social Security breakpoints.
+      </p>
+    </div>
+    <div>
+      <div class=shadow>
+        <video id=pia_vid autoplay playsinline loop muted width=608 height=448
+          poster="/static/pia-demo-poster.png">
+          <source src="/static/pia-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+
+    <div>
+      <h2>Graphical Excellence</h2>
+      <h1>Filing Start Date Analysis</h1>
+      <p>
+        Intuitive interactive visual charts let you see the impact of the
+        choice
+        of filing dates on your benefits. See your detailed payment
+        schedule,
+        each month, specifically tailored to your own inputs. Unique unified
+        view of filing dates and how they both you and your spouse's
+        benefits.
+      </p>
+    </div>
+    <div>
+      <div class=shadow>
+        <video id=combined_vid autoplay playsinline loop muted width=640
+          height=784 poster="/static/combined-demo-poster.png">
+          <source src="/static/combined-demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <div id=footer>
+    <div id=footer-container>
+      <h2>What next</h2>
+      <h1>Want to try this now?</h1>
+      <p>
+        Cool. Click <a href="/calculator.html">here</a>.
+      </p>
+      <h1>Later?</h1>
+      <p>
+        Also cool. Here are some easy ways to remember.
+      </p>
+      <ol>
+        <li><a
+            href=mailto:your-email?body=Here%27s%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator.%0A%0A%20Greg%2C%20the%20creator%2C%20is%20CC%27d%20on%20this%20email.%20Maybe%20reply%20and%20let%20him%20know%20if%20you%20found%20it%20useful%20after%20you%20use%20it.%20He%27ll%20probably%20like%20that.&cc=ggrothau%40gmail.com&amp;subject=Read%20later%3A%20Social%20Security%20Calculator>Send
+            yourself an email</a>.</li>
+        <li>Leave this tab open. Get back to it later.</li>
+        <li>Bookmark this in your browser.</li>
+      </ol>
+    </div>
   </div>
 
   <!-- Preload these for the next page. They aren't modules though, so just
