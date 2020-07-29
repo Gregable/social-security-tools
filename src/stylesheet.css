@@ -67,6 +67,10 @@ td,th {
 p {
   margin:0 0 10px;
 }
+video {
+  width: 100%;
+  height: auto;
+}
 
 /** Desktop **/
 @media screen and (min-width: 1025px) {
