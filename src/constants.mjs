@@ -7,15 +7,13 @@
  // The number of credits needed to qualify for retirement benefits
  // https://www.ssa.gov/planners/credits.html
 const MAX_CREDITS = 40
-//module.exports.MAX_CREDITS = MAX_CREDITS;
 export { MAX_CREDITS };
 
 // This is the maximum year for which SSA constants, such as
 // EARNINGS_PER_CREDIT and MAXIMUM_EARNINGS, have been published.
 // This year's values are applied to years in the future if the user
 // manually manipulates the input string.
-const MAX_YEAR = 2020;
-//module.exports.MAX_YEAR = MAX_YEAR;
+const MAX_YEAR = 2021;
 export { MAX_YEAR };
 
  // Earnings required for one quarter of coverage
@@ -65,8 +63,8 @@ const EARNINGS_PER_CREDIT = {
   2018:	1320,
   2019:	1360,
   2020:	1410,
+  2021:	1470,
 };
-//module.exports.EARNINGS_PER_CREDIT = EARNINGS_PER_CREDIT;
 export { EARNINGS_PER_CREDIT };
 
 // Maximum earnings in each year which contribute to social security benefits.
@@ -137,8 +135,8 @@ const MAXIMUM_EARNINGS = {
   2018: 128400,
   2019: 132900,
   2020: 137700,
+  2021: 142800,
 };
-//module.exports.MAXIMUM_EARNINGS = MAXIMUM_EARNINGS;
 export { MAXIMUM_EARNINGS };
 
 // https://www.ssa.gov/oact/progdata/oasdiRates.html
@@ -208,8 +206,8 @@ const TAX_RATES = {
   2018: .0515,
   2019: .053,
   2020: .053,
+  2021: .053,
 };
-//module.exports.TAX_RATES = TAX_RATES;
 export { TAX_RATES };
 
 // Values from https://www.ssa.gov/oact/cola/piaformula.html
@@ -218,11 +216,6 @@ const BENDPOINT2_IN_1977 = 1085.0
 const BEFORE_BENDPOINT1_MULTIPLIER = 0.9
 const BEFORE_BENDPOINT2_MULTIPLIER = 0.32
 const AFTER_BENDPOINT2_MULTIPLIER = 0.15
-//module.exports.BENDPOINT1_IN_1977 = BENDPOINT1_IN_1977;
-//module.exports.BENDPOINT2_IN_1977 = BENDPOINT2_IN_1977;
-//module.exports.BEFORE_BENDPOINT1_MULTIPLIER = BEFORE_BENDPOINT1_MULTIPLIER;
-//module.exports.BEFORE_BENDPOINT2_MULTIPLIER = BEFORE_BENDPOINT2_MULTIPLIER;
-//module.exports.AFTER_BENDPOINT2_MULTIPLIER = AFTER_BENDPOINT2_MULTIPLIER;
 export { BENDPOINT1_IN_1977 };
 export { BENDPOINT2_IN_1977 };
 export { BEFORE_BENDPOINT1_MULTIPLIER };
@@ -298,8 +291,8 @@ const WAGE_INDICES = {
   2016: 48642.15,
   2017: 50321.89,
   2018: 52145.80,
+  2019: 54099.99,
 };
-//module.exports.WAGE_INDICES = WAGE_INDICES;
 export { WAGE_INDICES };
 
 // Data from https://www.ssa.gov/OACT/COLA/colaseries.html
@@ -349,17 +342,15 @@ const COLA = {
   2017: 2.0,
   2018: 2.8,
   2019: 1.6,
+  2020: 1.3,
 };
-//module.exports.COLA = COLA;
 export { COLA };
 
 // Number of top years of earnings which contribute to SSA calculations.
 const SSA_EARNINGS_YEARS = 35;
-//module.exports.SSA_EARNINGS_YEARS = SSA_EARNINGS_YEARS;
 export { SSA_EARNINGS_YEARS };
 
 const CURRENT_YEAR = new Date().getFullYear();
-//module.exports.CURRENT_YEAR = CURRENT_YEAR;
 export { CURRENT_YEAR };
 
 const ALL_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -378,8 +369,6 @@ const ALL_MONTHS_FULL = [
   "November",
   "December"
 ];
-//module.exports.ALL_MONTHS = ALL_MONTHS;
-//module.exports.ALL_MONTHS_FULL = ALL_MONTHS_FULL;
 export { ALL_MONTHS, ALL_MONTHS_FULL };
 
 // https://www.ssa.gov/planners/retire/retirechart.html
@@ -482,5 +471,4 @@ const FULL_RETIREMENT_AGE = [
     delayedIncreaseAnnual: 0.08
   },
 ];
-//module.exports.FULL_RETIREMENT_AGE = FULL_RETIREMENT_AGE;
 export { FULL_RETIREMENT_AGE };
