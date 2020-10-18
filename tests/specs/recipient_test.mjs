@@ -34,9 +34,9 @@ describe("Recipient Initialization", function() {
   it ("primaryInsuranceAmount", function() {
     // These will need to be updated when there are new wage indices /
     // index factors.
-    expect(r.totalIndexedEarnings).toBe(62463.77);
-    expect(r.primaryInsuranceAmount()).toBe(133.2);
-    expect(r.primaryInsuranceAmountFloored()).toBe(133);
+    expect(r.totalIndexedEarnings).toBe(64804.64);
+    expect(r.primaryInsuranceAmount()).toBe(138.6);
+    expect(r.primaryInsuranceAmountFloored()).toBe(138);
   });
 });
 
@@ -67,9 +67,9 @@ describe("Recipient simulateFutureEarnings", function() {
   it ("primaryInsuranceAmount", function() {
     // These will need to be updated when there are new wage indices /
     // index factors.
-    expect(r.totalIndexedEarnings).toBe(162463.77);
-    expect(r.primaryInsuranceAmount()).toBe(347.4);
-    expect(r.primaryInsuranceAmountFloored()).toBe(347);
+    expect(r.totalIndexedEarnings).toBe(164804.64);
+    expect(r.primaryInsuranceAmount()).toBe(352.8);
+    expect(r.primaryInsuranceAmountFloored()).toBe(352);
   });
   it ("hasFutureEarnings", function() {
     expect(r.hasFutureEarnings()).toBe(true);
