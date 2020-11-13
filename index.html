@@ -5,9 +5,19 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Social Security Calculator</title>
+  <meta name="description" content="A social security calculator that makes
+  understanding social security benefits simple.">
+  <link rel=canonical href="https://ssa.tools">
+  <link rel=author href="mailto:ggrothau@gmail.com">
+  <link rel="og:site_name" href="ssa.tools">
+  <link rel="og:type" href="website">
+  <meta property="og:url" content="https://ssa.tools">
 
   <link rel="stylesheet" href="src/stylesheet.css">
+  <link rel="shortcut icon" href="/favicon.ico">
+
 
   <!-- not actually needed in this document, but start loading them so
        that the next page load will be faster -->
@@ -203,11 +213,37 @@
   }
 </style>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Webpage",
+  "url": "https://ssa.tools/",
+  "name": "ssa.tools",
+  "headline": "Social Security Calculator",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":"https://ssa.tools"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": https://ssa.tools/static/laptop-piggybank.png",
+    "width": 1134,
+    "height": 882
+  },
+  "datePublished": "2017-01-07T08:00:00+08:00",
+  "dateModified": "2020-11-05T09:20:00+08:00",
+  "author": {
+    "@type": "Person",
+    "name": "Greg Grothaus"
+  },
+}
+</script>
+
 <body>
   <!-- partials/header.html -->
   <div id="topheader">
     <ul class="navpills">
-      <li role="presentation" class="active"><a href="#">Home</a></li>
+      <li role="presentation" class="active"><a href="#">Calculator</a></li>
       <li role="presentation"><a href="about.html">About</a></li>
       <li role="presentation"><a href="contributors.html">Contributors</a></li>
       <li role="presentation"><a href="contact.html">Contact</a></li>
@@ -238,7 +274,8 @@
       <p>
         Painless entry of your earnings records directly from the
         "<i>my</i> Social Security" section at ssa.gov. Copy and paste your
-        entire record directly into the tool in a single quick step.
+        entire record directly into the social security tool in a single quick
+        step.
       </p>
     </div>
     <div>
@@ -255,9 +292,8 @@
       <h1>Future Benefits Formula</h1>
       <p>
         Working more years in the future can have an impact on your benefit.
-        Use the working years quick tool to estimate the impact of working
-        more
-        or fewer years on your AIME, PIA, and benefit payments.
+        Use the working years quick calculator to estimate the impact of working
+        more or fewer years on your AIME, PIA, and benefit payments.
       </p>
     </div>
     <div>
@@ -276,8 +312,7 @@
       <p>
         Visually calculate how your Average Indexed Monthly Income
         (AIME) affects your Primary Insurance Amount (PIA). See how you
-        compare
-        to the two Social Security breakpoints.
+        compare to the two Social Security breakpoints.
       </p>
     </div>
     <div>
@@ -314,7 +349,7 @@
   <div id=footer>
     <div id=footer-container>
       <h2>What next</h2>
-      <h1>Want to try this now?</h1>
+      <h1>Want to try the calculator now?</h1>
       <p>
         Cool. Click <a href="/calculator.html">here</a>.
       </p>
@@ -323,11 +358,19 @@
         Also cool. Here are some easy ways to remember.
       </p>
       <ol>
+        <li>Leave this tab open. Get back to it later.</li>
+        <li>Bookmark this in your browser.</li>
         <li><a
             href=mailto:your-email?body=Here%27s%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator.%0A%0A%20Greg%2C%20the%20creator%2C%20is%20CC%27d%20on%20this%20email.%20Maybe%20reply%20and%20let%20him%20know%20if%20you%20found%20it%20useful%20after%20you%20use%20it.%20He%27ll%20probably%20like%20that.&cc=ggrothau%40gmail.com&amp;subject=Read%20later%3A%20Social%20Security%20Calculator>Send
             yourself an email</a>.</li>
-        <li>Leave this tab open. Get back to it later.</li>
-        <li>Bookmark this in your browser.</li>
+        <li>
+          <a
+            href="https://twitter.com/intent/tweet?text=I%20just%20calculated%20my%20own%20social%20security%20benefit%20with%20this%20super%20simple%20online%20calculator.%20Thanks%20%40Ssatools%20%E2%80%94%20http%3A%2F%2Fssa.tools%2F&amp;url=">Tweet
+            as though you read it read already</a> and I’ll reply and ask you
+          what you thought (at which point, you might try it so you can
+          respond).
+        </li>
+
       </ol>
     </div>
   </div>
