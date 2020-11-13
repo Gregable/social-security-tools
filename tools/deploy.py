@@ -83,6 +83,8 @@ LoadKeys(os.path.expanduser('~/.s3keys'))
 RELEASE_FILES = [
     '*.html',
     '*paste.txt',
+    'sitemap.xml',
+    'robots.txt',
     'favicon.ico',
     'partials/*.html',
     'guide/*.html',
