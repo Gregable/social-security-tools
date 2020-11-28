@@ -21,6 +21,32 @@
   <link rel="modulepreload" href="/src/birthday.mjs">
   <link rel="modulepreload" href="/src/recipient.mjs">
   <script type="module" src="./maximum.mjs"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://ssa.tools/guide/maximum.html"
+    },
+    "headline": "Article headline",
+    "datePublished": "2019-08-03T00:00:00+00:00",
+    "dateModified": "2020-11-12T00:00:00+00:00",
+    "author": {
+      "@type": "Person",
+      "name": "Greg Grothaus"
+    },
+      "publisher": {
+      "@type": "Organization",
+      "name": "SSA.Tools",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ssa.tools/static/laptop-piggybank.png"
+      }
+    }
+  }
+  </script>
 </head>
 
 <body ng-controller="MaximumGuideController" ng-init="init()">
@@ -42,6 +68,7 @@
     <!-- Main Contents -->
     <div>
       <h1>Maximum possible Social Security benefit in {{CURRENT_YEAR}}</h1>
+      <p class=postdate>August 3, 2019</p>
       <p>
         Few people will receive the maximum possible benefit, but how high is
         the maximum? The short answer is that the maximum monthly Social
