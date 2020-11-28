@@ -1150,3 +1150,27 @@ input.birthdate-input {
   position: fixed;
   top: 0px;
 }
+p.postdate {
+  font-size: 14px;
+  padding-left: 0px;
+  font-weight: 700;
+}
+ul.guides {
+  max-width: 720px;
+}
+ul.guides>li {
+  list-style-type: none;
+}
+ul.guides>li>span.postdate {
+  float: right;
+  color: #666;
+  font-size: 0.9em;
+  margin-left:30px;
+  vertical-align: text-top;
+}
+ul.guides>li>p {
+  font-size: 1.4em;
+}
+p.justify {
+  text-align: justify;
+}
