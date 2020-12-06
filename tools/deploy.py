@@ -91,6 +91,7 @@ RELEASE_FILES = [
     'guide/*.mjs',
     'src/stylesheet.css',
     'src/*.mjs',
+    'src/guide/*.mjs',
     'static/*'
 ]
 
