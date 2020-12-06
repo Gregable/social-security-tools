@@ -13,7 +13,7 @@
     href="//cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
   <link rel="stylesheet"
     href="//cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.5.1/rzslider.min.css">
-  <link rel="stylesheet" href="src/stylesheet.css" />
+  <link rel="stylesheet" href="/src/stylesheet.css" />
 
   <script type="text/javascript"
     src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
@@ -36,15 +36,15 @@
   <!-- preloads will start the network fetches sooner than the recursive fetch
   via ssa.mjs, which will improve performance on high bandwidth, high latency,
   connections -->
-  <link rel="modulepreload" href="src/constants.mjs">
-  <link rel="modulepreload" href="src/utils.mjs">
-  <link rel="modulepreload" href="src/ssa-parse.mjs">
-  <link rel="modulepreload" href="src/birthday.mjs">
-  <link rel="modulepreload" href="src/recipient.mjs">
-  <link rel="modulepreload" href="src/age-chart.mjs">
-  <link rel="modulepreload" href="src/breakpoint-chart.mjs">
-  <link rel="modulepreload" href="src/spousal-chart.mjs">
-  <script type="module" src="src/ssa.mjs"></script>
+  <link rel="modulepreload" href="/src/constants.mjs">
+  <link rel="modulepreload" href="/src/utils.mjs">
+  <link rel="modulepreload" href="/src/ssa-parse.mjs">
+  <link rel="modulepreload" href="/src/birthday.mjs">
+  <link rel="modulepreload" href="/src/recipient.mjs">
+  <link rel="modulepreload" href="/src/age-chart.mjs">
+  <link rel="modulepreload" href="/src/breakpoint-chart.mjs">
+  <link rel="modulepreload" href="/src/spousal-chart.mjs">
+  <script type="module" src="/src/ssa.mjs"></script>
 </head>
 
 <body ng-controller="SSAController" ng-init="init()" data-spy="scroll"
