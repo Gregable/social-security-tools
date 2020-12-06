@@ -25,7 +25,8 @@
         Copy the earnings table. It should look similar to the example below,
         with different numbers and years.
         <video id=pia_vid autoplay playsinline loop muted disableRemotePlayback
-          width=576 height=294 poster="/static/copy-paste-demo-poster.jpg">
+          width=576 height=294 poster="/static/copy-paste-demo-poster.jpg"
+          title="Animation showing a user copying a social security earnings record from ssa.gov.">
           <source src="/static/copy-paste-demo.mp4" type="video/mp4">
         </video>
         You can select the table by dragging your mouse over the entire table to
@@ -42,7 +43,7 @@
   <div class="pastearea">
     <div class=pasteareaoffsetleft>
       <textarea id=pastearea wrap=off ng-model="pasteArea.contents"
-        placeholder="{{::pasteArea.placeholder}}"></textarea>
+        placeholder="{{::pasteArea.placeholder}}" tabindex=1></textarea>
       <p>
         <span class=lock>&#x1f512;</span> Your data never leaves your own
         computer: the report is generated entirely by JavaScript in your
@@ -70,14 +71,14 @@
       <li>
         Retiree born in 1950, who earned roughly the average US wage.
         <br>
-        <button ng-click="loadDemoData(0)" id=button-demo-0>
+        <button ng-click="loadDemoData(0)" id=button-demo-0 tabindex=2>
           <ico>&#x261b;</ico> Try the Demo
         </button>
       <li>
         Retiree born in 1950 who earned the maximum Social Security wages
         over five years, but nothing otherwise.
         <br>
-        <button ng-click="loadDemoData(1)" id=button-demo-1>
+        <button ng-click="loadDemoData(1)" id=button-demo-1 tabindex=3>
           <ico>&#x261b;</ico> Try the Demo
         </button>
       </li>
@@ -85,7 +86,7 @@
         Early career, born in 1985, $40k/year starting salary in 2005 with
         4% annual raises.
         <br>
-        <button ng-click="loadDemoData(2)" id=button-demo-2>
+        <button ng-click="loadDemoData(2)" id=button-demo-2 tabindex=3>
           <ico>&#x261b;</ico> Try the Demo
         </button>
       </li>
