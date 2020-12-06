@@ -1,6 +1,6 @@
-import * as constants from "/src/constants.mjs"
-import * as utils from "/src/utils.mjs"
-import { EarningRecord, Recipient } from '/src/recipient.mjs';
+import * as constants from "../constants.mjs"
+import * as utils from "../utils.mjs"
+import { EarningRecord, Recipient } from '../recipient.mjs';
 
 let guidesApp = angular.module("guidesApp", []);
 

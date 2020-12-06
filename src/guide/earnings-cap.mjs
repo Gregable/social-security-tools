@@ -1,5 +1,5 @@
-import * as constants from "/src/constants.mjs"
-import * as utils from "/src/utils.mjs"
+import * as constants from "../constants.mjs"
+import * as utils from "../utils.mjs"
 
 let guidesApp = angular.module("guidesApp", []);
 
