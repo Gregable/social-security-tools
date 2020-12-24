@@ -1174,3 +1174,16 @@ ul.guides>li>p {
 p.justify {
   text-align: justify;
 }
+/* Social Media Buttons in FAQ */
+ul.socialmedia {
+  list-style: none;
+}
+ul.socialmedia li {
+  padding: 3px;
+  font-size: 1.8em;
+}
+ul.socialmedia img {
+  width: 2em;
+  height: 2em;
+  vertical-align: middle;
+}
