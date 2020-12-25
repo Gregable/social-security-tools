@@ -91,6 +91,12 @@ function Recipient(name) {
   // If true, the user's birthdate is on the first, so they can receive full
   // benefits on the month they turn 62.
   this.isFullMonth = false;
+
+  // This is updated to a new random number every time a relavant mutation is
+  // made. Code that reads values from the recipient can use this to memoize
+  // work by comparing the last version of the recipient's mutation id to this
+  // version.
+  this.lastMutation_ = 0;
 }
 
 /**
@@ -100,6 +106,14 @@ function Recipient(name) {
 Recipient.prototype.isInitialized = function() {
   return this.initialized_;
 };
+
+Recipient.prototype.recordMutation = function () {
+  this.lastMutation_ = Math.random();
+}
+
+Recipient.prototype.lastMutation = function () {
+  return this.lastMutation_;
+}
 
 Recipient.prototype.earningsRecords = function() {
   return this.earningsRecords_;
@@ -151,6 +165,7 @@ Recipient.prototype.initFromEarningsRecords = function(records) {
   this.earningsRecords_ = records;
   this.processIndexedEarnings_();
   this.initialized_ = true;
+  this.recordMutation();
   return this;
 };
 
@@ -179,6 +194,7 @@ Recipient.prototype.simulateFutureEarningsYears = function(numYears, wage) {
     }
   }
   this.processIndexedEarnings_();
+  this.recordMutation();
 };
 
 
@@ -215,6 +231,7 @@ Recipient.prototype.updateBirthdate = function(birthdate) {
 
   // Birthdate can affect indexed earnings.
   this.processIndexedEarnings_();
+  this.recordMutation();
 }
 
 /*
@@ -301,6 +318,7 @@ const isLastYearIncomplete = function(records) {
  * @private
  */
 Recipient.prototype.processIndexedEarnings_ = function() {
+  this.recordMutation();
   // If there are no earning records, the result will be 0. Don't recompute.
   // Note this case also occurs for recipients who have had their PIA set
   // directly, rather than via earnings records.
@@ -568,6 +586,7 @@ Recipient.prototype.benefitAtAge = function(age) {
  */
 Recipient.prototype.setSpouse = function(spouse) {
   this.spouse = spouse;
+  this.recordMutation();
 };
 
 /**

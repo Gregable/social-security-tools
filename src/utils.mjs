@@ -14,11 +14,13 @@ class MonthDate {
     // months from this date. Jan is considered month 0 of the year, and Dec
     // is month 11. So, an internal value of 12 would be January, Year 1.
     this.monthsSinceEpoch_ = 0;
+    this.$$hashKey = "MonthDate-" + this.monthsSinceEpoch();
   }
 
   /* @param {MonthDate} monthDate (copy initializer) */
   initFromMonthDate(monthDate) {
     this.monthsSinceEpoch_ = monthDate.monthsSinceEpoch_;
+    this.$$hashKey = "MonthDate-" + this.monthsSinceEpoch();
     return this;
   }
 
@@ -27,6 +29,7 @@ class MonthDate {
     console.assert(Number.isInteger(monthsSinceEpoch), monthsSinceEpoch);
     console.assert(monthsSinceEpoch >= 0, monthsSinceEpoch);
     this.monthsSinceEpoch_ = monthsSinceEpoch;
+    this.$$hashKey = "MonthDate-" + this.monthsSinceEpoch();
     return this;
   }
 
@@ -42,6 +45,7 @@ class MonthDate {
     console.assert(months >= 0, months);
     console.assert(months < 12, months);
     this.initFromMonths(years * 12 + months);
+    this.$$hashKey = "MonthDate-" + this.monthsSinceEpoch();
     return this;
   }
 
@@ -59,6 +63,7 @@ class MonthDate {
     console.assert(monthIndex < 12, monthStr);
 
     this.initFromYearsMonths(years, monthIndex);
+    this.$$hashKey = "MonthDate-" + this.monthsSinceEpoch();
     return this;
   }
 
@@ -174,12 +179,15 @@ class MonthDuration {
   // initFrom methods to construct different MonthDurations.
   constructor() {
     this.months_ = 0;
+    this.$$hashKey = "MonthDuration-" + this.months_;
   }
+
 
   /* @param {number} months */
   initFromMonths(months) {
     console.assert(Number.isInteger(months), months);
     this.months_ = months;
+    this.$$hashKey = "MonthDuration-" + this.months_;
     return this;
   }
 
@@ -192,6 +200,7 @@ class MonthDuration {
     // Negative durations are OK, but shouldn't have both positive and negative.
     console.assert(Math.sign(years) * Math.sign(months) >= 0, (years, months));
     this.months_ = years * 12 + months;
+    this.$$hashKey = "MonthDuration-" + this.months_;
     return this;
   }
 

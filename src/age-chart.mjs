@@ -6,6 +6,16 @@ import * as utils from './utils.mjs';
  */
 function AgeChart() {
   this.canvas_ = null;
+  // isDirty_ tracks if the chart has been rendered since the last relevant
+  // change to the inputs of the chart.
+  this.isDirty_ = true;
+  // lastRecipientMutation_ tracks the last time that this.recipient_ has
+  // changed. If this.recipient_.lastMutation() differes from
+  // lastRecipientMutation_, then the chart is dirty, even if isDirty_ is false.
+  this.lastRecipientMutation_ = -1;
+  // lastWidth_ tracks the last width of the AgeChart. If it differs from
+  // this.canvas.width, then the chart is dirty, even if isDirty_ is false.
+  this.lastWidth_ = -1;
 }
 
 export { AgeChart };
@@ -16,21 +26,22 @@ export { AgeChart };
  * @return {boolean}
  */
 AgeChart.prototype.isInitialized = function() {
-  return this.canvas_ !== null && this.recipient !== null;
+  return this.canvas_ !== null && this.recipient_ !== null;
 };
 
 /**
  * Sets the canvas on which to render the chart.
  * @param {Element} canvas_element
  */
-AgeChart.prototype.setCanvas = function(canvas_element) {
+AgeChart.prototype.setCanvas = function (canvas_element) {
+  this.isDirty_ = true;
   this.canvas_ = canvas_element;
   this.context_ = this.canvas_.getContext('2d');
   // Set the font we will use for labels early so we can measure it's width.
   this.context_.font = "bold 14px Helvetica"
-  this.mouseToggle = 'ON';
+  this.mouseToggle_ = 'ON';
 
-  //this.canvas_.addEventListener('mousedown', this.mouseClickListener());
+  this.canvas_.addEventListener('mousedown', this.mouseClickListener());
   this.canvas_.addEventListener('mousemove', this.mouseMoveListener());
   this.monthWidth = (70 - 62) * 12;
 };
@@ -41,6 +52,7 @@ AgeChart.prototype.setCanvas = function(canvas_element) {
  */
 AgeChart.prototype.setRecipient = function(recipient) {
   this.recipient_ = recipient;
+  this.isDirty_ = true;
 };
 
 /**
@@ -246,7 +258,7 @@ AgeChart.prototype.renderAgePoint = function(age) {
   this.context_.save();
 
   if (age.asMonths() === 12 * 62 && !this.recipient_.isFullMonth)
-    age.addDuration(new utils.MonthDuration().initFromMonths(1));
+    age.add(new utils.MonthDuration().initFromMonths(1));
 
   var benefit = this.recipient_.benefitAtAge(age);
 
@@ -310,8 +322,25 @@ AgeChart.prototype.renderAgePoint = function(age) {
   this.context_.restore();
 }
 
-/** Render the breakpoint chart. */
-AgeChart.prototype.render = function() {
+/** Determine if the last render is OK or dirty (needs to be re-rendered). */
+AgeChart.prototype.isDirty = function () {
+  if (this.lastRecipientMutation_ != this.recipient_.lastMutation())
+    this.isDirty_ = true;
+  this.lastRecipientMutation_ = this.recipient_.lastMutation();
+  if (this.lastWidth_ != this.canvas_.width)
+    this.isDirty_ = true;
+  this.lastWidth_ = this.canvas_.width;
+  return this.isDirty_;
+}
+
+/** Render the breakpoint chart.
+ *  Returns true iff there was some change to the render.
+ */
+AgeChart.prototype.render = function () {
+  if (!this.isInitialized()) return false;
+  // Nothing has changed, the last time we rendered this is still fine.
+  if (!this.isDirty()) return false;
+
   this.context_.font = "bold 14px Helvetica"
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
@@ -324,16 +353,18 @@ AgeChart.prototype.render = function() {
   this.renderAgePoint(this.recipient_.normalRetirementAge());
 
   this.context_.restore();
+  this.isDirty_ = false;
+  return true;
 };
 
 /** Toggles on/off functionality of mouseMoveListener. */
 AgeChart.prototype.mouseClickListener = function() {
   var self = this;
   return function(e) {
-    if (self.mouseToggle === 'ON') {
-      self.mouseToggle = 'OFF';
+    if (self.mouseToggle_ === 'ON') {
+      self.mouseToggle_ = 'OFF';
     } else {
-      self.mouseToggle = 'ON';
+      self.mouseToggle_ = 'ON';
       // Immediately trigger a rendering based on mouse location.
       self.mouseMoveListener()(e);
     }
@@ -344,9 +375,11 @@ AgeChart.prototype.mouseClickListener = function() {
 AgeChart.prototype.mouseMoveListener = function() {
   var self = this;
   return function(e) {
-    if (self.mouseToggle == 'OFF')
+    if (self.mouseToggle_ == 'OFF')
       return;
 
+    // The mouse just moved, we need to re-render.
+    self.isDirty_ = true;
     self.render();
 
     self.context_.save();

@@ -217,7 +217,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     );
   };
 
-  $scope.loadDemoData = function(demoId) {
+  $scope.loadDemoData = function (demoId) {
+    console.log('loadDemoData' + demoId);
     // User may have scrolled down. Since we aren't actually changing URL,
     // we need to scroll back up to the top for them.
     window.scrollTo(0, 0);
@@ -276,7 +277,9 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.pasteArea.contents = '';
   });
 
-  $scope.refreshSlider = function() {
+  $scope.refreshSlider = function () {
+    console.log('refreshSlider');
+    //console.trace();
     $scope.updateSliderMin();
     $timeout(function () {
       $scope.$broadcast('rzSliderForceRender');
@@ -285,7 +288,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   };
 
   // Called when the primary birthdate is modified.
-  $scope.updateBirthdate = function(birthdate) {
+  $scope.updateBirthdate = function (birthdate) {
+    console.log('updateBirdhdate');
     $scope.selfLayBirthdate = birthdate
     $scope.recipient.updateBirthdate(birthdate);
 
@@ -464,7 +468,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
             i += 1000) {
          out.push({value: i});
        }
-       out.push({value: constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR]});
+       out.push({ value: constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR] });
        return out;
      })(),
      translate: function(value, sliderId, label) {
@@ -479,7 +483,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-  // Given a utils.MonthDate, returns a new utils.MonthDate one month later.
+  $scope.countFoo = 0;
+
+  // Given an "example age" object containing (age, day, month, year), returns
+  // a new one, one month later.
   $scope.followingMonth = function(input) {
     var out = {};
     out.month = constants.ALL_MONTHS_FULL[
@@ -487,6 +494,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     out.year = input.year;
     if (constants.ALL_MONTHS_FULL.indexOf(input.month) === 11)
       out.year += 1;
+    out.$$hashKey = 'exampleSsaAge' + out.year + '-' + out.month;
+
+    /*
+    $scope.countFoo += 1;
+    console.log($scope.countFoo);  // 274
+    console.log(input.$$hashKey);
+    console.log(input);
+    console.trace();
+    */
     return out;
   }
 
@@ -718,6 +734,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // The sliders will be verically aligned by year, adjusting for the spouses
   // ages. The spousal chart will align with the years on the slider.
   $scope.layoutSliderChart = function() {
+    console.log('layoutSliderChart');
     // Return early if the spousalBenefit section hasn't been rendered yet.
     var section = document.getElementById('spousal-box');
     if (section === null) return;

@@ -7,6 +7,26 @@ import * as utils from './utils.mjs';
 function SpousalChart(selectedDateCb) {
   this.updateSelectedDate = selectedDateCb;
   this.canvas_ = null;
+  this.lowerEarner_ = null;
+  this.higherEarner_ = null;
+
+  // isDirty_ tracks if the chart has been rendered since the last relevant
+  // change to the inputs of the chart.
+  this.isDirty_ = true;
+  // lastXMutation_ tracks the last time that each recipient has
+  // changed. If the recipient's lastMutation() differs from
+  // lastRecipientMutation_, then the chart is dirty, even if isDirty_ is false.
+  this.lastLowerEarnerMutation_ = -1;
+  this.lastHigherEarnerMutation_ = -1;
+  // lastXEarnerSliderValue_ tracks the last slider valuesfor each recipient.
+  // If it differs from the slider values, then the chart is dirty, even if
+  // isDirty_ is false.
+  this.lastLowerEarnerSliderValue_ = -1;
+  this.lastHigherEarnerSliderValue_ = -1;
+  // lastWidth_ tracks the last width of the AgeChart. If it differs from this.
+  // canvas.width, then the chart is dirty, even if isDirty_ is false.
+  this.lastWidth_ = -1;
+
 }
 
 export { SpousalChart };
@@ -18,7 +38,7 @@ export { SpousalChart };
  */
 SpousalChart.prototype.isInitialized = function() {
   if (this.canvas_ === null ||
-      this.lowerarner_ === null ||
+      this.lowerEarner_ === null ||
       this.higherEarner_ === null)
     return false;
   return true;
@@ -28,12 +48,13 @@ SpousalChart.prototype.isInitialized = function() {
  * Sets the canvas on which to render the chart.
  * @param {Element} canvas_element
  */
-SpousalChart.prototype.setCanvas = function(canvas_element) {
+SpousalChart.prototype.setCanvas = function (canvas_element) {
+  this.isDirty_ = true;
   this.canvas_ = canvas_element;
   this.context_ = this.canvas_.getContext('2d');
   // Set the font we will use for labels early so we can measure it's width.
   this.context_.font = "bold 14px Helvetica";
-  this.mouseToggle = 'ON';
+  this.mouseToggle_ = 'ON';
   this.canvas_.addEventListener('mouseout', this.mouseOutListener());
   this.canvas_.addEventListener('mousemove', this.mouseMoveListener());
   this.canvas_.addEventListener('mousedown', this.mouseClickListener());
@@ -45,6 +66,7 @@ SpousalChart.prototype.setCanvas = function(canvas_element) {
  * @param {Recipient} higherEarner
  */
 SpousalChart.prototype.setRecipients = function(lowerEarner, higherEarner) {
+  this.isDirty_ = true;
   this.lowerEarner_ = lowerEarner;
   this.higherEarner_ = higherEarner;
 };
@@ -56,8 +78,9 @@ SpousalChart.prototype.setRecipients = function(lowerEarner, higherEarner) {
  */
 SpousalChart.prototype.setSliders = function(
     lowerEarnerSlider, higherEarnerSlider) {
-  this.lowerEarnerSlider = lowerEarnerSlider;
-  this.higherEarnerSlider = higherEarnerSlider;
+  this.isDirty_ = true;
+  this.lowerEarnerSlider_= lowerEarnerSlider;
+  this.higherEarnerSlider_ = higherEarnerSlider;
 };
 
 /**
@@ -66,6 +89,7 @@ SpousalChart.prototype.setSliders = function(
  * @param {utils.MonthDate} endDate
  */
 SpousalChart.prototype.setDateRange = function(startDate, endDate) {
+  this.isDirty_ = true;
   this.startDate_ = startDate;
   this.endDate_ = endDate;
 };
@@ -268,7 +292,7 @@ SpousalChart.prototype.renderSelectedDateVerticalLine = function(canvasX) {
  * @return {utils.MonthDate}
  */
 SpousalChart.prototype.higherEarnerStartDate = function() {
-  return this.higherEarnerSlider.selectedDate();
+  return this.higherEarnerSlider_.selectedDate();
 };
 
 /**
@@ -282,12 +306,12 @@ SpousalChart.prototype.lowerEarnerStartDate = function() {
 
   // If the lower earner has a personal benefit, start at lower earner's date.
   if (this.lowerEarner_.primaryInsuranceAmountFloored() > 0)
-    return this.lowerEarnerSlider.selectedDate();
+    return this.lowerEarnerSlider_.selectedDate();
   // If the lower earner files at or after the higher earner, start at lower
   // earner's date.
-  if (this.lowerEarnerSlider.selectedDate() >=
-      this.higherEarnerSlider.selectedDate())
-    return this.lowerEarnerSlider.selectedDate();
+  if (this.lowerEarnerSlider_.selectedDate() >=
+      this.higherEarnerSlider_.selectedDate())
+    return this.lowerEarnerSlider_.selectedDate();
   // If the higher earner files after the lower earner is already 70, just use
   // the date the lower earner turns 70.
   if (this.lowerEarner_.ageAtDate(this.higherEarnerStartDate()).greaterThan(
@@ -302,7 +326,7 @@ SpousalChart.prototype.lowerEarnerStartDate = function() {
  * @return {utils.MonthDuration}
  */
 SpousalChart.prototype.higherEarnerStartAge = function() {
-  return this.higherEarnerSlider.selectedAge();
+  return this.higherEarnerSlider_.selectedAge();
 };
 
 /**
@@ -728,10 +752,43 @@ SpousalChart.prototype.renderLowerEarner = function() {
   this.context_.restore();
 };
 
+/** Determine if the last render is OK or dirty (needs to be re-rendered). */
+SpousalChart.prototype.isDirty = function () {
+  if (this.lastHigherEarnerMutation_ != this.higherEarner_.lastMutation())
+    this.isDirty_ = true;
+  this.lastHigherEarnerMutation_ = this.higherEarner_.lastMutation();
+  if (this.lastLowerEarnerMutation_ != this.lowerEarner_.lastMutation())
+    this.isDirty_ = true;
+  this.lastLowerEarnerMutation_ = this.lowerEarner_.lastMutation();
+
+  if (this.lastHigherEarnerSliderValue_ !=
+      this.higherEarnerSlider_.selectedDate().$$hashKey)
+    this.isDirty_ = true;
+  this.lastHigherEarnerSliderValue_ =
+    this.higherEarnerSlider_.selectedDate().$$hashKey;
+  console.log(this.lastHigherEarnerSliderValue_);
+
+  if (this.lastLowerEarnerSliderValue_ !=
+      this.lowerEarnerSlider_.selectedDate().$$hashKey)
+    this.isDirty_ = true;
+  this.lastLowerEarnerSliderValue_ =
+    this.lowerEarnerSlider_.selectedDate().$$hashKey;
+
+  if (this.lastWidth_ != this.canvas_.width)
+    this.isDirty_ = true;
+  this.lastWidth_ = this.canvas_.width;
+
+  return this.isDirty_;
+}
+
+
 /** Render the spousal chart. */
 SpousalChart.prototype.render = function() {
-  if (!this.isInitialized())
-    return;
+  if (!this.isInitialized()) return;
+  console.log("renderme");
+  // Nothing has changed, the last time we rendered this is still fine.
+  if (!this.isDirty()) return false;
+  console.log("dirty");
 
   // Canvas tutorial:
   // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
@@ -743,10 +800,11 @@ SpousalChart.prototype.render = function() {
   this.renderHigherEarner();
   this.renderLowerEarner();
 
-  if (this.mouseToggle === 'OFF')
+  if (this.mouseToggle_ === 'OFF')
     this.renderSelectedDateVerticalLine(this.lastMouseX);
 
   this.context_.restore();
+  this.isDirty_ = false;
 };
 
 /**
@@ -806,7 +864,7 @@ SpousalChart.prototype.canvasHigherY = function(benefitY) {
 SpousalChart.prototype.mouseOutListener = function() {
   let self = this;
   return function(e) {
-    if (self.mouseToggle == 'OFF')
+    if (self.mouseToggle_ == 'OFF')
       return;
     self.updateSelectedDate(new utils.MonthDate());
     self.render();
@@ -819,14 +877,15 @@ SpousalChart.prototype.mouseClickListener = function() {
   return function(e) {
     let canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
     if (canvasY < 180) {
+      this.isDirty_ = true;
       self.updateSelectedDate(new utils.MonthDate());
       return;
     }
-    if (self.mouseToggle === 'ON') {
-      self.mouseToggle = 'OFF';
+    if (self.mouseToggle_ === 'ON') {
+      self.mouseToggle_ = 'OFF';
       self.lastMouseX = e.clientX - self.canvas_.getBoundingClientRect().left;
     } else {
-      self.mouseToggle = 'ON';
+      self.mouseToggle_ = 'ON';
       // Immediately trigger a rendering based on mouse location.
       self.mouseMoveListener()(e);
     }
@@ -837,7 +896,9 @@ SpousalChart.prototype.mouseClickListener = function() {
 SpousalChart.prototype.mouseMoveListener = function() {
   let self = this;
   return function(e) {
-    if (self.mouseToggle == 'ON') {
+    if (self.mouseToggle_ == 'ON') {
+      // The mouse just moved, we need to re-render.
+      self.isDirty_ = true;
       self.render();
       let canvasY = e.clientY - self.canvas_.getBoundingClientRect().top;
       if (canvasY < 180) {

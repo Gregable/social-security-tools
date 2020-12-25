@@ -7,8 +7,19 @@ import * as utils from './utils.mjs';
 function BreakPointChart() {
   this.canvas_ = null;
   this.recipient_ = null;
-  this.lastRenderedXDollars = -1;
-  this.maxRenderedXDollars = -1;
+  this.lastRenderedXDollars_ = -1;
+  this.maxRenderedXDollars_ = -1;
+
+  // isDirty_ tracks if the chart has been rendered since the last relevant
+  // change to the inputs of the chart.
+  this.isDirty_ = true;
+  // lastRecipientMutation_ tracks the last time that this.recipient_ has
+  // changed. If this.recipient_.lastMutation() differes from
+  // lastRecipientMutation_, then the chart is dirty, even if isDirty_ is false.
+  this.lastRecipientMutation_ = -1;
+  // lastWidth_ tracks the last width of the AgeChart. If it differs from
+  // this.canvas.width, then the chart is dirty, even if isDirty_ is false.
+  this.lastWidth_ = -1;
 }
 
 export { BreakPointChart };
@@ -19,7 +30,7 @@ export { BreakPointChart };
  * @return {boolean}
  */
 BreakPointChart.prototype.isInitialized = function() {
-  return this.canvas_ !== null && this.recipient !== null;
+  return this.canvas_ !== null && this.recipient_ !== null;
 };
 
 /**
@@ -27,11 +38,12 @@ BreakPointChart.prototype.isInitialized = function() {
  * @param {Element} canvas_element
  */
 BreakPointChart.prototype.setCanvas = function(canvas_element) {
+  this.isDirty_ = true;
   this.canvas_ = canvas_element;
   this.context_ = this.canvas_.getContext('2d');
   // Set the font we will use for labels early so we can measure it's width.
   this.context_.font = "bold 14px Helvetica"
-  this.mouseToggle = 'ON';
+  this.mouseToggle_ = 'ON';
 
   this.canvas_.addEventListener('mousedown', this.mouseClickListener());
   this.canvas_.addEventListener('mousemove', this.mouseMoveListener());
@@ -43,6 +55,7 @@ BreakPointChart.prototype.setCanvas = function(canvas_element) {
  */
 BreakPointChart.prototype.setRecipient = function(recipient) {
   this.recipient_ = recipient;
+  this.isDirty_ = true;
 };
 
 /**
@@ -77,7 +90,7 @@ BreakPointChart.prototype.chartHeight = function() {
  */
 BreakPointChart.prototype.canvasX = function(earningsX) {
   let xValue = Math.floor(
-      earningsX / this.maxRenderedXDollars * this.chartWidth());
+      earningsX / this.maxRenderedXDollars_ * this.chartWidth());
   let xClipped = Math.min(xValue, this.chartWidth());
   return xClipped;
 };
@@ -89,7 +102,7 @@ BreakPointChart.prototype.canvasX = function(earningsX) {
  */
 BreakPointChart.prototype.canvasY = function(benefitY) {
   let yValue = this.chartHeight() -
-      Math.floor(benefitY / this.maxRenderedYDollars * this.chartHeight());
+      Math.floor(benefitY / this.maxRenderedYDollars_ * this.chartHeight());
   let yClipped = Math.min(yValue, this.chartHeight());
   return yClipped;
 };
@@ -102,8 +115,8 @@ BreakPointChart.prototype.canvasY = function(benefitY) {
  */
 BreakPointChart.prototype.earningsX = function(canvasX) {
   let xValue = Math.floor(
-      Math.max(0, canvasX / this.chartWidth()) * this.maxRenderedXDollars);
-  let xClipped = this.maxRenderedXDollars;
+      Math.max(0, canvasX / this.chartWidth()) * this.maxRenderedXDollars_);
+  let xClipped = this.maxRenderedXDollars_;
   return Math.min(xValue, xClipped);
 };
 
@@ -124,15 +137,15 @@ BreakPointChart.prototype.recomputeBounds = function() {
   // We would prefer to keep the viewport fixed as the user changes
   // the benefit, so that it's easier to see what is going on. However
   // we will adjust if the value gets too close to the edges.
-  if (this.lastRenderedXDollars === -1 ||
-      this.lastRenderedXDollars > computed * 1.3 ||
-      this.lastRenderedXDollars < computed / 1.3)
-   this.lastRenderedXDollars = computed;
+  if (this.lastRenderedXDollars_ === -1 ||
+      this.lastRenderedXDollars_ > computed * 1.3 ||
+      this.lastRenderedXDollars_ < computed / 1.3)
+   this.lastRenderedXDollars_ = computed;
 
-  this.maxRenderedXDollars = this.lastRenderedXDollars;
+  this.maxRenderedXDollars_ = this.lastRenderedXDollars_;
 
-  this.maxRenderedYDollars = this.primaryInsuranceAmount(
-      this.maxRenderedXDollars);
+  this.maxRenderedYDollars_ = this.primaryInsuranceAmount(
+      this.maxRenderedXDollars_);
 }
 
 /**
@@ -166,9 +179,9 @@ BreakPointChart.prototype.renderBoundingBox = function() {
 
   this.context_.beginPath();
   this.moveTo(0, 0);
-  this.lineTo(0, this.maxRenderedYDollars);
-  this.lineTo(this.maxRenderedXDollars, this.maxRenderedYDollars);
-  this.lineTo(this.maxRenderedXDollars, 0);
+  this.lineTo(0, this.maxRenderedYDollars_);
+  this.lineTo(this.maxRenderedXDollars_, this.maxRenderedYDollars_);
+  this.lineTo(this.maxRenderedXDollars_, 0);
   this.lineTo(0, 0);
   this.context_.stroke();
 
@@ -203,7 +216,7 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.lineTo(dollarX, dollarY);
 
   // Second to third bend point
-  dollarX = this.maxRenderedXDollars;
+  dollarX = this.maxRenderedXDollars_;
   dollarY = this.primaryInsuranceAmount(dollarX);
   this.lineTo(dollarX, dollarY);
 
@@ -239,7 +252,7 @@ BreakPointChart.prototype.renderBreakPoints = function() {
 
   // Compute the angle at which the chart dimensions are distoring slopes.
   const chartAngle = (this.chartHeight() / this.chartWidth() *
-      this.maxRenderedXDollars / this.maxRenderedYDollars);
+      this.maxRenderedXDollars_ / this.maxRenderedYDollars_);
   this.context_.fillText('32%', 0, 0);
 
   this.context_.save();
@@ -267,7 +280,7 @@ BreakPointChart.prototype.renderBreakPoints = function() {
   this.context_.restore();
 
   this.context_.save();
-  dollarX = ((this.maxRenderedXDollars - secondBend) / 2) + secondBend;
+  dollarX = ((this.maxRenderedXDollars_ - secondBend) / 2) + secondBend;
   dollarY = this.primaryInsuranceAmount(dollarX);
   let pixelY = this.canvasY(dollarY);
   // If this is too close to the top of the chart, flip it to below the line.
@@ -377,7 +390,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
 
   this.context_.beginPath();
   this.moveTo(x, y);
-  this.lineTo(this.maxRenderedXDollars, y);
+  this.lineTo(this.maxRenderedXDollars_, y);
   this.context_.stroke();
 
   // White filled circle with black edge showing the user benefit point.
@@ -405,7 +418,7 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
                   this.context_.measureText(xText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
   // Chip on the right edge
-  this.roundedBox(this.canvasX(this.maxRenderedXDollars) + 1,
+  this.roundedBox(this.canvasX(this.maxRenderedXDollars_) + 1,
                   this.canvasY(y),
                   this.context_.measureText(yText).width + 6, 19,
                   5, /*squaredCorner=*/ 1);
@@ -417,16 +430,32 @@ BreakPointChart.prototype.renderEarningsPoint = function(earningsX) {
       this.canvasY(0) + 15);
   this.context_.fillText(  // Text on the right edge.
       yText,
-      this.canvasX(this.maxRenderedXDollars) + 3,
+      this.canvasX(this.maxRenderedXDollars_) + 3,
       this.canvasY(y) + 15);
 
   this.context_.restore();
 }
 
-/** Render the breakpoint chart. */
-BreakPointChart.prototype.render = function() {
-  if (!this.isInitialized())
-    return;
+/** Determine if the last render is OK or dirty (needs to be re-rendered).
+ */
+BreakPointChart.prototype.isDirty = function () {
+  if (this.lastRecipientMutation_ != this.recipient_.lastMutation())
+    this.isDirty_ = true;
+  this.lastRecipientMutation_ = this.recipient_.lastMutation();
+  if (this.lastWidth_ != this.canvas_.width)
+    this.isDirty_ = true;
+  this.lastWidth_ = this.canvas_.width;
+  return this.isDirty_;
+}
+
+/** Render the breakpoint chart.
+   Returns true iff there was some change to the render.
+ */
+BreakPointChart.prototype.render = function () {
+  if (!this.isInitialized()) return false;
+  // Nothing has changed, the last time we rendered this is still fine.
+  if (!this.isDirty()) return false;
+
   this.context_.font = "bold 14px Helvetica"
 
   // Canvas tutorial:
@@ -442,16 +471,18 @@ BreakPointChart.prototype.render = function() {
   this.renderEarningsPoint(this.recipient_.monthlyIndexedEarnings);
 
   this.context_.restore();
+  this.isDirty_ = false;
+  return true;
 };
 
 /** Toggles on/off functionality of mouseMoveListener. */
 BreakPointChart.prototype.mouseClickListener = function() {
   let self = this;
   return function(e) {
-    if (self.mouseToggle === 'ON') {
-      self.mouseToggle = 'OFF'
+    if (self.mouseToggle_ === 'ON') {
+      self.mouseToggle_ = 'OFF'
     } else {
-      self.mouseToggle = 'ON'
+      self.mouseToggle_ = 'ON'
       // Immediately trigger a rendering based on mouse location.
       self.mouseMoveListener()(e);
     }
@@ -462,9 +493,11 @@ BreakPointChart.prototype.mouseClickListener = function() {
 BreakPointChart.prototype.mouseMoveListener = function() {
   let self = this;
   return function(e) {
-    if (self.mouseToggle == 'OFF')
+    if (self.mouseToggle_ == 'OFF')
       return;
 
+    // The mouse just moved, we need to re-render.
+    self.isDirty_ = true;
     self.render();
 
     self.context_.save();
