@@ -49,6 +49,7 @@ SpousalChart.prototype.isInitialized = function() {
  * @param {Element} canvas_element
  */
 SpousalChart.prototype.setCanvas = function (canvas_element) {
+  if (this.canvas_ == canvas_element) return;
   this.isDirty_ = true;
   this.canvas_ = canvas_element;
   this.context_ = this.canvas_.getContext('2d');
@@ -65,10 +66,16 @@ SpousalChart.prototype.setCanvas = function (canvas_element) {
  * @param {Recipient} lowerEarner
  * @param {Recipient} higherEarner
  */
-SpousalChart.prototype.setRecipients = function(lowerEarner, higherEarner) {
+SpousalChart.prototype.setRecipients = function (lowerEarner, higherEarner) {
+  if (this.lastHigherEarnerMutation_ == higherEarner.lastMutation() &&
+    this.lastLowerEarnerMutation_ == lowerEarner.lastMutation())
+    return;
+
   this.isDirty_ = true;
   this.lowerEarner_ = lowerEarner;
   this.higherEarner_ = higherEarner;
+  this.lastHigherEarnerMutation_ = this.higherEarner_.lastMutation();
+  this.lastLowerEarnerMutation_ = this.lowerEarner_.lastMutation();
 };
 
 /**
@@ -85,13 +92,20 @@ SpousalChart.prototype.setSliders = function(
 
 /**
  * Set the date range in months that this chart covers.
- * @param {utils.MonthDate} startDate
- * @param {utils.MonthDate} endDate
  */
-SpousalChart.prototype.setDateRange = function(startDate, endDate) {
-  this.isDirty_ = true;
-  this.startDate_ = startDate;
-  this.endDate_ = endDate;
+SpousalChart.prototype.setDateRange = function() {
+  var higherBirth = this.higherEarner_.birthdate().ssaBirthdate();
+  var lowerBirth = this.lowerEarner_.birthdate().ssaBirthdate();
+  if (higherBirth.greaterThan(lowerBirth)) {  // Higher earner is younger
+    this.startDate_ = this.lowerEarner_.dateAtYearsOld(62);
+    this.endDate_ = this.higherEarner_.dateAtYearsOld(70);
+  } else if (higherBirth.lessThan(lowerBirth)) {  // Higher earner is older
+    this.startDate_ = this.higherEarner_.dateAtYearsOld(62);
+    this.endDate_ = this.lowerEarner_.dateAtYearsOld(70);
+  } else {  // both earners have the same birth month and year
+    this.startDate_ = this.lowerEarner_.dateAtYearsOld(62);
+    this.endDate_ = this.lowerEarner_.dateAtYearsOld(70);
+  }
 };
 
 // Note that with an HTML canvas, the origin (0, 0) is in the upper left.
@@ -754,6 +768,8 @@ SpousalChart.prototype.renderLowerEarner = function() {
 
 /** Determine if the last render is OK or dirty (needs to be re-rendered). */
 SpousalChart.prototype.isDirty = function () {
+  if (this.isDirty_)  return true;
+
   if (this.lastHigherEarnerMutation_ != this.higherEarner_.lastMutation())
     this.isDirty_ = true;
   this.lastHigherEarnerMutation_ = this.higherEarner_.lastMutation();
@@ -762,14 +778,13 @@ SpousalChart.prototype.isDirty = function () {
   this.lastLowerEarnerMutation_ = this.lowerEarner_.lastMutation();
 
   if (this.lastHigherEarnerSliderValue_ !=
-      this.higherEarnerSlider_.selectedDate().$$hashKey)
+    this.higherEarnerSlider_.selectedDate().$$hashKey)
     this.isDirty_ = true;
   this.lastHigherEarnerSliderValue_ =
     this.higherEarnerSlider_.selectedDate().$$hashKey;
-  console.log(this.lastHigherEarnerSliderValue_);
 
   if (this.lastLowerEarnerSliderValue_ !=
-      this.lowerEarnerSlider_.selectedDate().$$hashKey)
+    this.lowerEarnerSlider_.selectedDate().$$hashKey)
     this.isDirty_ = true;
   this.lastLowerEarnerSliderValue_ =
     this.lowerEarnerSlider_.selectedDate().$$hashKey;
@@ -785,16 +800,15 @@ SpousalChart.prototype.isDirty = function () {
 /** Render the spousal chart. */
 SpousalChart.prototype.render = function() {
   if (!this.isInitialized()) return;
-  console.log("renderme");
   // Nothing has changed, the last time we rendered this is still fine.
   if (!this.isDirty()) return false;
-  console.log("dirty");
 
   // Canvas tutorial:
   // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
 
+  this.setDateRange();
   this.renderHorizontalLines();
   this.renderYearVerticalLines();
   this.renderHigherEarner();

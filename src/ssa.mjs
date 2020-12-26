@@ -155,7 +155,11 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.spouse.setSpouse($scope.recipient);
 
     $scope.spousalChart_ = new SpousalChart(
-        $scope.updateSpousalChartSelectedDate);
+      $scope.updateSpousalChartSelectedDate);
+    $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
+    $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
+    $scope.spousalChart_.setSliders(
+      $scope.lowerEarnerSlider, $scope.higherEarnerSlider)
 
     $scope.$watch('recipient', function() {$scope.spousalChart_.render()});
     $scope.$watch('spouse', function() {$scope.spousalChart_.render()});
@@ -172,6 +176,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.showIndexedEarnings = false;
     // Enabled once the user has entered a valid spousal birthdate
     $scope.showSpousalBenefit = false;
+
+    // Tracks the last mutation which affected the spousal slider min. See
+    // UpdateSliderMin for usage.
+    $scope.lastSliderMinMutation = -1;
 
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
@@ -289,7 +297,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   // Called when the primary birthdate is modified.
   $scope.updateBirthdate = function (birthdate) {
-    console.log('updateBirdhdate');
     $scope.selfLayBirthdate = birthdate
     $scope.recipient.updateBirthdate(birthdate);
 
@@ -633,10 +640,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   }
 
-  $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
-  $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
+  // Updates the minimum limit (minimum date) selectable by the slider
+  // controlling the lower earner amount. If the lower earner has no PIA, then
+  // selecting a start date before the higher earner is not possible, since the
+  // lower earner will not have an earnings record to operate on.
+  $scope.updateSliderMin = function () {
+    // Early exit if the inputs haven't changed.
+    if ($scope.lowerEarner().lastMutation() == $scope.lastSliderMinMutation)
+      return;
+    $scope.lastSliderMinMutation = $scope.lastSliderMinMutation;
 
-  $scope.updateSliderMin = function() {
     var regularMin = $scope.lowerEarner().isFullMonth ? 0 : 1;
     // If the lower earner will be 70 before the higher earner files, bail.
     if ($scope.lowerEarner().dateAtAge(
@@ -799,9 +812,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
     $scope.spousalChart_.setRecipients(
         $scope.lowerEarner(), $scope.higherEarner());
-    $scope.spousalChart_.setSliders(
-        $scope.lowerEarnerSlider, $scope.higherEarnerSlider);
-    $scope.spousalChart_.setDateRange(chartStartDate, chartEndDate);
     $scope.spousalChart_.render();
   }
 
