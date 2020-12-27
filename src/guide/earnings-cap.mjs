@@ -8,7 +8,6 @@ function earningsCaps() {
   for (const year in constants.MAXIMUM_EARNINGS) {
     out.push({ 'year': year, 'amount': constants.MAXIMUM_EARNINGS[year] });
   }
-  console.log(out);
   return out;
 };
 

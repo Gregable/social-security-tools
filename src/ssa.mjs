@@ -294,7 +294,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
   $scope.refreshSpousalChart = function () {
     let cb = function () {
-      console.log('cb');
       // All of these function calls are inexpensive to call multiple times.
       // Each of them does dirty checking and doesn't update if the inputs
       // haven't changed. As a result, refreshSpousalChart may be called multiple
@@ -302,13 +301,11 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       $scope.updateSliderMin();
       $scope.layoutSliderChart();
       if (!$scope.spousalChart_.isInitialized()) {
-        console.log('!init');
         var canvas = document.getElementById('spousal-chart-canvas');
         $scope.spousalChart_.setCanvas(canvas);
       }
       $scope.spousalChart_.render();
     };
-    console.log('refresh');
     // Initially the section containing this canvas is not yet rendered. At this
     // time, the canvas isn't part of the DOM and the callback will not succeed
     // in rendering the chart. When the user completes the input steps,

@@ -818,7 +818,6 @@ SpousalChart.prototype.isDirty = function () {
 
 /** Render the spousal chart. */
 SpousalChart.prototype.render = function () {
-  console.log('render');
   if (!this.isInitialized()) return;
   // Nothing has changed, the last time we rendered this is still fine.
   if (!this.isDirty()) return false;
