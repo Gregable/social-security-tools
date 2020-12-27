@@ -95,7 +95,10 @@ class Birthdate {
       'age': year - this.ssaBirthYear(),
       'day': this.englishBirthdate().getDate(),
       'month': this.ssaBirthdate().monthFullName(),
-      'year': year
+      'year': year,
+      '$$hashKey': 'exampleSsaAge' + (year - this.ssaBirthYear()) + '-' +
+        this.englishBirthdate().getDate() + '-' +
+        this.ssaBirthdate().monthFullName() + '-' + year,
     };
     return example;
   }

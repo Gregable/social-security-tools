@@ -154,11 +154,18 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.recipient.setSpouse($scope.spouse);
     $scope.spouse.setSpouse($scope.recipient);
 
-    $scope.spousalChart_ = new SpousalChart(
-        $scope.updateSpousalChartSelectedDate);
+    $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
+    $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
 
-    $scope.$watch('recipient', function() {$scope.spousalChart_.render()});
-    $scope.$watch('spouse', function() {$scope.spousalChart_.render()});
+    $scope.spousalChart_ = new SpousalChart(
+      $scope.updateSpousalChartSelectedDate);
+    $scope.spousalChart_.setSliders(
+      $scope.lowerEarnerSlider, $scope.higherEarnerSlider)
+    $scope.spousalChart_.setRecipients(
+        $scope.recipient, $scope.spouse);
+
+    $scope.$watch('recipient.name', function() {$scope.spousalChart_.render()});
+    $scope.$watch('spouse.name', function() {$scope.spousalChart_.render()});
     $scope.$on('birthdateChange', $scope.updateBirthdateEvent);
     $scope.$on('spouseBirthdateChange', $scope.updateSpouseBirthdateEvent);
 
@@ -172,6 +179,14 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.showIndexedEarnings = false;
     // Enabled once the user has entered a valid spousal birthdate
     $scope.showSpousalBenefit = false;
+
+    // Tracks the last mutation which affected the spousal slider min. See
+    // UpdateSliderMin for usage.
+    $scope.lastSliderMinMutation = -1;
+    // Same idea, tracks the last mutation which affected the slider position
+    // and layout.
+    $scope.lastSliderSelfMutation = -1;
+    $scope.lastSliderSpouseMutation = -1;
 
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
@@ -217,7 +232,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     );
   };
 
-  $scope.loadDemoData = function(demoId) {
+  $scope.loadDemoData = function (demoId) {
+    console.log('loadDemoData' + demoId);
     // User may have scrolled down. Since we aren't actually changing URL,
     // we need to scroll back up to the top for them.
     window.scrollTo(0, 0);
@@ -276,22 +292,41 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.pasteArea.contents = '';
   });
 
-  $scope.refreshSlider = function() {
-    $scope.updateSliderMin();
-    $timeout(function () {
-      $scope.$broadcast('rzSliderForceRender');
-		  $scope.layoutSliderChart();
-    });
+  $scope.refreshSpousalChart = function () {
+    let cb = function () {
+      // All of these function calls are inexpensive to call multiple times.
+      // Each of them does dirty checking and doesn't update if the inputs
+      // haven't changed. As a result, refreshSpousalChart may be called multiple
+      // times during the angular lifecycle with minimal cost.
+      $scope.updateSliderMin();
+      $scope.layoutSliderChart();
+      if (!$scope.spousalChart_.isInitialized()) {
+        var canvas = document.getElementById('spousal-chart-canvas');
+        $scope.spousalChart_.setCanvas(canvas);
+      }
+      $scope.spousalChart_.render();
+    };
+    // Initially the section containing this canvas is not yet rendered. At this
+    // time, the canvas isn't part of the DOM and the callback will not succeed
+    // in rendering the chart. When the user completes the input steps,
+    // refreshSpousalChart will be called, but the canvas will only be rendered
+    // at the end of that angular cycle, after all the refreshSpousalChart
+    // calls, not before. To work around this, we put the refreshSpousalChart
+    // callback inside a timeout call until it has been successfully
+    // initialized. This makes it happen *after* the angular cycle has made
+    // the canvas visible. This appears to be the recommended workaround for
+    // angular 1.5: https://stackoverflow.com/questions/11125078/
+    if ($scope.spousalChart_.isInitialized()) cb();
+    else $timeout(cb);
   };
 
   // Called when the primary birthdate is modified.
-  $scope.updateBirthdate = function(birthdate) {
+  $scope.updateBirthdate = function (birthdate) {
     $scope.selfLayBirthdate = birthdate
     $scope.recipient.updateBirthdate(birthdate);
 
     $scope.higherEarnerSlider.updateBirthdate();
     $scope.lowerEarnerSlider.updateBirthdate();
-    $scope.refreshSlider();
     $scope.maybeRenderCharts();
     $scope.mode = ModeEnum.RENDER_EARNINGS;
   }
@@ -307,7 +342,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.higherEarnerSlider.updateBirthdate();
     $scope.lowerEarnerSlider.updateBirthdate();
-    $scope.refreshSlider();
     $scope.maybeRenderCharts();
   }
   $scope.updateSpouseBirthdateEvent = function(event, birthdate) {
@@ -382,7 +416,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         ageCanvas.setAttribute('width',  parentWidth - 50);
       $scope.ageChart_.render();
     }
-    $scope.refreshSlider();
+    $scope.refreshSpousalChart();
   };
 
   $scope.affixNavbar = function() {
@@ -464,7 +498,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
             i += 1000) {
          out.push({value: i});
        }
-       out.push({value: constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR]});
+       out.push({ value: constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR] });
        return out;
      })(),
      translate: function(value, sliderId, label) {
@@ -479,7 +513,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-  // Given a utils.MonthDate, returns a new utils.MonthDate one month later.
+  // Given an "example age" object containing (age, day, month, year), returns
+  // a new one, one month later.
   $scope.followingMonth = function(input) {
     var out = {};
     out.month = constants.ALL_MONTHS_FULL[
@@ -487,6 +522,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     out.year = input.year;
     if (constants.ALL_MONTHS_FULL.indexOf(input.month) === 11)
       out.year += 1;
+    out.$$hashKey = 'exampleSsaAge' + out.year + '-' + out.month;
+
     return out;
   }
 
@@ -606,7 +643,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       this.options.minLimit = 0;
       if (!this.earnerFn().isFullMonth)
         this.options.minLimit = 1;
-      $scope.refreshSlider();
+      $scope.refreshSpousalChart();
     }
     this.selectedAge = function() {
       return new utils.MonthDuration().initFromMonths(this.value);
@@ -617,10 +654,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   }
 
-  $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
-  $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
+  // Updates the minimum limit (minimum date) selectable by the slider
+  // controlling the lower earner amount. If the lower earner has no PIA, then
+  // selecting a start date before the higher earner is not possible, since the
+  // lower earner will not have an earnings record to operate on.
+  $scope.updateSliderMin = function () {
+    // Early exit if the inputs haven't changed.
+    if ($scope.lowerEarner().lastMutation() == $scope.lastSliderMinMutation)
+      return;
+    $scope.lastSliderMinMutation = $scope.lastSliderMinMutation;
 
-  $scope.updateSliderMin = function() {
     var regularMin = $scope.lowerEarner().isFullMonth ? 0 : 1;
     // If the lower earner will be 70 before the higher earner files, bail.
     if ($scope.lowerEarner().dateAtAge(
@@ -721,6 +764,16 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Return early if the spousalBenefit section hasn't been rendered yet.
     var section = document.getElementById('spousal-box');
     if (section === null) return;
+    var boundingRect = $scope.absoluteBoundingRect(section);
+    // Exit early if none of our inputs have changed.
+    if ($scope.lastSliderBoundingRect === boundingRect &&
+        $scope.lastSliderSelfMutation === $scope.recipient.lastMutation() &&
+        $scope.lastSliderSpouseMutation === $scope.spouse.lastMutation())
+      return;
+    // Remember the last inputs to avoid recalculations:
+    $scope.lastSliderBoundingRect = boundingRect;
+    $scope.lastSliderSelfMutation = $scope.recipient.lastMutation();
+    $scope.lastSliderSpouseMutation = $scope.spouse.lastMutation();
 
     var higherSlider = document.getElementById('higherEarnerSlider');
     var lowerSlider = document.getElementById('lowerEarnerSlider');
@@ -738,54 +791,36 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Each slider has a small 'tail' on each side of the slider which is
     // 16px wide that we must ignore in the total width. We also want to save
     // off 40px on the left for dollar labels.
-    var totalWidth = $scope.absoluteBoundingRect(section).width - 32 - 40;
+    var totalWidth = boundingRect.width - 32 - 40;
     // Each slider should be 8*12 months wide and the whole thing
     // is totalWidth wide. The margin is the width that each slider will
     // not occupy.
     var newMargin = (1 - (8*12 / numMonths)) * totalWidth;
 
-    // These represent the start and end date for the entire spousal chart.
-    var chartStartDate;
-    var chartEndDate;
+    // We need to adjust the position of the sliders horizontally to match the
+    // dates in the canvas chart. We do that with some margin css pixels.
     if (higherBirth.greaterThan(lowerBirth)) {  // Higher earner is younger
       higherSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
       lowerSlider.setAttribute('style',
           "margin-right: " + (newMargin) + "px; margin-left: 40px;");
-      chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
-      chartEndDate = $scope.higherEarner().dateAtYearsOld(70);
     } else if (higherBirth.lessThan(lowerBirth)) {
       // Higher earner is older
       higherSlider.setAttribute('style',
           "margin-right: " + (newMargin) + "px; margin-left: 40px;");
       lowerSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
-      chartStartDate = $scope.higherEarner().dateAtYearsOld(62);
-      chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     } else { // both earners same birth month and year
       higherSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
       lowerSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
-      chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
-      chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     }
 
     // We may have resized the element containing the sliders at this point.
     // We want to rebroadcast that the element's children should relayout one
     // more time.
     $scope.$broadcast('rzSliderForceRender');
-
-    var canvas = document.getElementById('spousal-chart-canvas');
-    if (!$scope.spousalChart_.isInitialized()) {
-      $scope.spousalChart_.setCanvas(canvas);
-    }
-    $scope.spousalChart_.setRecipients(
-        $scope.lowerEarner(), $scope.higherEarner());
-    $scope.spousalChart_.setSliders(
-        $scope.lowerEarnerSlider, $scope.higherEarnerSlider);
-    $scope.spousalChart_.setDateRange(chartStartDate, chartEndDate);
-    $scope.spousalChart_.render();
   }
 
   /*
