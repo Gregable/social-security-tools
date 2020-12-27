@@ -7,6 +7,12 @@ import * as utils from './utils.mjs';
 function SpousalChart(selectedDateCb) {
   this.updateSelectedDate = selectedDateCb;
   this.canvas_ = null;
+  // recipientA/B are references to the passed in recipients from the
+  // setRecipients call. lowerEarner / higherEarner are references to the same
+  // recipients relative to those recipient's PIAs. lowerEarner / higherEarner
+  // are updated at the start of each rendering loop in orderEarners()
+  this.recipientA_ = null;
+  this.recipientB_ = null;
   this.lowerEarner_ = null;
   this.higherEarner_ = null;
 
@@ -62,20 +68,16 @@ SpousalChart.prototype.setCanvas = function (canvas_element) {
 };
 
 /**
- * Set the earners from which to pull financial data.
- * @param {Recipient} lowerEarner
- * @param {Recipient} higherEarner
+ * Set the recipients from which to pull financial data. Ordering doesn't matter
+ * as we'll sort by higher earner before lower earner.
+ * @param {Recipient} recipientA
+ * @param {Recipient} recipientB
  */
-SpousalChart.prototype.setRecipients = function (lowerEarner, higherEarner) {
-  if (this.lastHigherEarnerMutation_ == higherEarner.lastMutation() &&
-    this.lastLowerEarnerMutation_ == lowerEarner.lastMutation())
-    return;
-
+SpousalChart.prototype.setRecipients = function(recipientA, recipientB) {
   this.isDirty_ = true;
-  this.lowerEarner_ = lowerEarner;
-  this.higherEarner_ = higherEarner;
-  this.lastHigherEarnerMutation_ = this.higherEarner_.lastMutation();
-  this.lastLowerEarnerMutation_ = this.lowerEarner_.lastMutation();
+  this.recipientA_ = recipientA;
+  this.recipientB_ = recipientB;
+  this.orderEarners();
 };
 
 /**
@@ -107,6 +109,23 @@ SpousalChart.prototype.setDateRange = function() {
     this.endDate_ = this.lowerEarner_.dateAtYearsOld(70);
   }
 };
+
+/**
+ * Sets this.higherEarner_ and this.lowerEarner_ to recipientA_ or recipientB_,
+ * depending on which has a higher PIA. Ties break to recipientA_ as
+ * higherEarner_.
+ */
+SpousalChart.prototype.orderEarners = function () {
+  if (this.recipientA_.primaryInsuranceAmount() >=
+    this.recipientB_.primaryInsuranceAmount()) {
+    this.higherEarner_ = this.recipientA_;
+    this.lowerEarner_ = this.recipientB_;
+  } else {
+    this.higherEarner_ = this.recipientB_;
+    this.lowerEarner_ = this.recipientA_;
+  }
+}
+
 
 // Note that with an HTML canvas, the origin (0, 0) is in the upper left.
 
@@ -808,6 +827,7 @@ SpousalChart.prototype.render = function() {
   this.context_.save();
   this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
 
+  this.orderEarners();
   this.setDateRange();
   this.renderHorizontalLines();
   this.renderYearVerticalLines();

@@ -154,12 +154,15 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.recipient.setSpouse($scope.spouse);
     $scope.spouse.setSpouse($scope.recipient);
 
-    $scope.spousalChart_ = new SpousalChart(
-      $scope.updateSpousalChartSelectedDate);
     $scope.lowerEarnerSlider = new spousalSlider($scope.lowerEarner);
     $scope.higherEarnerSlider = new spousalSlider($scope.higherEarner);
+
+    $scope.spousalChart_ = new SpousalChart(
+      $scope.updateSpousalChartSelectedDate);
     $scope.spousalChart_.setSliders(
       $scope.lowerEarnerSlider, $scope.higherEarnerSlider)
+    $scope.spousalChart_.setRecipients(
+        $scope.recipient, $scope.spouse);
 
     $scope.$watch('recipient', function() {$scope.spousalChart_.render()});
     $scope.$watch('spouse', function() {$scope.spousalChart_.render()});
@@ -180,6 +183,10 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Tracks the last mutation which affected the spousal slider min. See
     // UpdateSliderMin for usage.
     $scope.lastSliderMinMutation = -1;
+    // Same idea, tracks the last mutation which affected the slider position
+    // and layout.
+    $scope.lastSliderSelfMutation = -1;
+    $scope.lastSliderSpouseMutation = -1;
 
     $scope.breakPointChart_.setRecipient($scope.recipient);
     $scope.ageChart_.setRecipient($scope.recipient);
@@ -290,8 +297,12 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     //console.trace();
     $scope.updateSliderMin();
     $timeout(function () {
-      $scope.$broadcast('rzSliderForceRender');
-		  $scope.layoutSliderChart();
+      $scope.layoutSliderChart();
+      var canvas = document.getElementById('spousal-chart-canvas');
+      if (!$scope.spousalChart_.isInitialized()) {
+        $scope.spousalChart_.setCanvas(canvas);
+      }
+      $scope.spousalChart_.render();
     });
   };
 
@@ -747,10 +758,19 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   // The sliders will be verically aligned by year, adjusting for the spouses
   // ages. The spousal chart will align with the years on the slider.
   $scope.layoutSliderChart = function() {
-    console.log('layoutSliderChart');
     // Return early if the spousalBenefit section hasn't been rendered yet.
     var section = document.getElementById('spousal-box');
     if (section === null) return;
+    var boundingRect = $scope.absoluteBoundingRect(section);
+    // Exit early if none of our inputs have changed.
+    if ($scope.lastSliderBoundingRect === boundingRect &&
+        $scope.lastSliderSelfMutation === $scope.recipient.lastMutation() &&
+        $scope.lastSliderSpouseMutation === $scope.spouse.lastMutation())
+      return;
+    // Remember the last inputs to avoid recalculations:
+    $scope.lastSliderBoundingRect = boundingRect;
+    $scope.lastSliderSelfMutation = $scope.recipient.lastMutation();
+    $scope.lastSliderSpouseMutation = $scope.spouse.lastMutation();
 
     var higherSlider = document.getElementById('higherEarnerSlider');
     var lowerSlider = document.getElementById('lowerEarnerSlider');
@@ -768,51 +788,36 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     // Each slider has a small 'tail' on each side of the slider which is
     // 16px wide that we must ignore in the total width. We also want to save
     // off 40px on the left for dollar labels.
-    var totalWidth = $scope.absoluteBoundingRect(section).width - 32 - 40;
+    var totalWidth = boundingRect.width - 32 - 40;
     // Each slider should be 8*12 months wide and the whole thing
     // is totalWidth wide. The margin is the width that each slider will
     // not occupy.
     var newMargin = (1 - (8*12 / numMonths)) * totalWidth;
 
-    // These represent the start and end date for the entire spousal chart.
-    var chartStartDate;
-    var chartEndDate;
+    // We need to adjust the position of the sliders horizontally to match the
+    // dates in the canvas chart. We do that with some margin css pixels.
     if (higherBirth.greaterThan(lowerBirth)) {  // Higher earner is younger
       higherSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
       lowerSlider.setAttribute('style',
           "margin-right: " + (newMargin) + "px; margin-left: 40px;");
-      chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
-      chartEndDate = $scope.higherEarner().dateAtYearsOld(70);
     } else if (higherBirth.lessThan(lowerBirth)) {
       // Higher earner is older
       higherSlider.setAttribute('style',
           "margin-right: " + (newMargin) + "px; margin-left: 40px;");
       lowerSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
-      chartStartDate = $scope.higherEarner().dateAtYearsOld(62);
-      chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     } else { // both earners same birth month and year
       higherSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
       lowerSlider.setAttribute('style',
           "margin-left: " + (newMargin + 40) + "px");
-      chartStartDate = $scope.lowerEarner().dateAtYearsOld(62);
-      chartEndDate = $scope.lowerEarner().dateAtYearsOld(70);
     }
 
     // We may have resized the element containing the sliders at this point.
     // We want to rebroadcast that the element's children should relayout one
     // more time.
     $scope.$broadcast('rzSliderForceRender');
-
-    var canvas = document.getElementById('spousal-chart-canvas');
-    if (!$scope.spousalChart_.isInitialized()) {
-      $scope.spousalChart_.setCanvas(canvas);
-    }
-    $scope.spousalChart_.setRecipients(
-        $scope.lowerEarner(), $scope.higherEarner());
-    $scope.spousalChart_.render();
   }
 
   /*
