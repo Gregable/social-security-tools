@@ -164,8 +164,8 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.spousalChart_.setRecipients(
         $scope.recipient, $scope.spouse);
 
-    $scope.$watch('recipient', function() {$scope.spousalChart_.render()});
-    $scope.$watch('spouse', function() {$scope.spousalChart_.render()});
+    $scope.$watch('recipient.name', function() {$scope.spousalChart_.render()});
+    $scope.$watch('spouse.name', function() {$scope.spousalChart_.render()});
     $scope.$on('birthdateChange', $scope.updateBirthdateEvent);
     $scope.$on('spouseBirthdateChange', $scope.updateSpouseBirthdateEvent);
 
@@ -292,18 +292,35 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     $scope.pasteArea.contents = '';
   });
 
-  $scope.refreshSlider = function () {
-    console.log('refreshSlider');
-    //console.trace();
-    $scope.updateSliderMin();
-    $timeout(function () {
+  $scope.refreshSpousalChart = function () {
+    let cb = function () {
+      console.log('cb');
+      // All of these function calls are inexpensive to call multiple times.
+      // Each of them does dirty checking and doesn't update if the inputs
+      // haven't changed. As a result, refreshSpousalChart may be called multiple
+      // times during the angular lifecycle with minimal cost.
+      $scope.updateSliderMin();
       $scope.layoutSliderChart();
-      var canvas = document.getElementById('spousal-chart-canvas');
       if (!$scope.spousalChart_.isInitialized()) {
+        console.log('!init');
+        var canvas = document.getElementById('spousal-chart-canvas');
         $scope.spousalChart_.setCanvas(canvas);
       }
       $scope.spousalChart_.render();
-    });
+    };
+    console.log('refresh');
+    // Initially the section containing this canvas is not yet rendered. At this
+    // time, the canvas isn't part of the DOM and the callback will not succeed
+    // in rendering the chart. When the user completes the input steps,
+    // refreshSpousalChart will be called, but the canvas will only be rendered
+    // at the end of that angular cycle, after all the refreshSpousalChart
+    // calls, not before. To work around this, we put the refreshSpousalChart
+    // callback inside a timeout call until it has been successfully
+    // initialized. This makes it happen *after* the angular cycle has made
+    // the canvas visible. This appears to be the recommended workaround for
+    // angular 1.5: https://stackoverflow.com/questions/11125078/
+    if ($scope.spousalChart_.isInitialized()) cb();
+    else $timeout(cb);
   };
 
   // Called when the primary birthdate is modified.
@@ -313,7 +330,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.higherEarnerSlider.updateBirthdate();
     $scope.lowerEarnerSlider.updateBirthdate();
-    $scope.refreshSlider();
     $scope.maybeRenderCharts();
     $scope.mode = ModeEnum.RENDER_EARNINGS;
   }
@@ -329,7 +345,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
 
     $scope.higherEarnerSlider.updateBirthdate();
     $scope.lowerEarnerSlider.updateBirthdate();
-    $scope.refreshSlider();
     $scope.maybeRenderCharts();
   }
   $scope.updateSpouseBirthdateEvent = function(event, birthdate) {
@@ -404,7 +419,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
         ageCanvas.setAttribute('width',  parentWidth - 50);
       $scope.ageChart_.render();
     }
-    $scope.refreshSlider();
+    $scope.refreshSpousalChart();
   };
 
   $scope.affixNavbar = function() {
@@ -501,8 +516,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
     }
   };
 
-  $scope.countFoo = 0;
-
   // Given an "example age" object containing (age, day, month, year), returns
   // a new one, one month later.
   $scope.followingMonth = function(input) {
@@ -514,13 +527,6 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       out.year += 1;
     out.$$hashKey = 'exampleSsaAge' + out.year + '-' + out.month;
 
-    /*
-    $scope.countFoo += 1;
-    console.log($scope.countFoo);  // 274
-    console.log(input.$$hashKey);
-    console.log(input);
-    console.trace();
-    */
     return out;
   }
 
@@ -640,7 +646,7 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
       this.options.minLimit = 0;
       if (!this.earnerFn().isFullMonth)
         this.options.minLimit = 1;
-      $scope.refreshSlider();
+      $scope.refreshSpousalChart();
     }
     this.selectedAge = function() {
       return new utils.MonthDuration().initFromMonths(this.value);

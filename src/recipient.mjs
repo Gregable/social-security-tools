@@ -112,7 +112,8 @@ Recipient.prototype.recordMutation = function () {
 }
 
 Recipient.prototype.lastMutation = function () {
-  return this.lastMutation_;
+  // The name is sometimes changed directly by angular.
+  return this.name_ + this.lastMutation_;
 }
 
 Recipient.prototype.earningsRecords = function() {
