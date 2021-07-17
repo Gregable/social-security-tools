@@ -6,7 +6,7 @@
   <p>
     You must earn 40 <a
       href="https://www.ssa.gov/planners/credits.html">credits</a> to be
-    eligible for for a normal retirement benefit from your own work history. You
+    eligible for a normal retirement benefit from your own work history. You
     can earn a <u>maximum of 4 credits each year</u>. If you have a short work
     history, you may not be eligible to receive retirement benefits from
     Social Security on your own work history. You may still be eligible to
@@ -37,7 +37,8 @@
             ${{earningRecord.taxedEarnings | number:0}}
           </td>
           <td headers="epc" ng-if="earningRecord.taxedEarnings >= 0">
-            ${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}
+            ${{recipient.getEarningsPerCreditForYear(earningRecord.year) |
+            number:0}}
           </td>
           <td headers="credits" ng-if="earningRecord.taxedEarnings >= 0">
             {{earningRecord.credits | number:0}}
@@ -75,10 +76,12 @@
             ${{earningRecord.taxedEarnings | number:0}}
           </td>
           <td headers="epc">
-            ${{recipient.getEarningsPerCreditForYear(earningRecord.year) | number:0}}
+            ${{recipient.getEarningsPerCreditForYear(earningRecord.year) |
+            number:0}}
           </td>
           <td headers="credits">
-            {{recipient.calculateCredits(earningRecord.taxedEarnings, earningRecord.year) | number:0}}
+            {{recipient.calculateCredits(earningRecord.taxedEarnings,
+            earningRecord.year) | number:0}}
           </td>
         </tr>
       </tbody>
