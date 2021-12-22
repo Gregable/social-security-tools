@@ -383,16 +383,13 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.secondBendPoint = utils.secondBendPoint;
 
   $scope.futureCola = function() {
-    console.log('futureCola()');
     if (!(constants.CURRENT_YEAR in constants.COLA)) {
       // The future is unknown:
-      console.log('no future yet');
       return {
         'isAvailable': false,
       }
     } else {
       // We have a crystal ball:
-      console.log('future known');
       return {
         'isAvailable': true,
         'year': constants.CURRENT_YEAR,
