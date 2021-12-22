@@ -191,6 +191,11 @@
           increased by {{adjustment.cola | number:1 }}% =
           <b>{{adjustment.end | number:2}}</b>
         </li>
+        <li ng-if="futureCola.isAvailable">
+          {{futureCola.year}}: At the <b>end</b> of the year,
+          <b>${{recipient.primaryInsuranceAmount() | number:2}}</b>
+          will be increased by {{futureCola.adjustment | number:1}}%.
+        </li>
       </ul>
     </div>
 
