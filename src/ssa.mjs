@@ -382,6 +382,25 @@ ssaApp.controller("SSAController", function ($scope, $filter, $http, $timeout) {
   $scope.firstBendPoint = utils.firstBendPoint;
   $scope.secondBendPoint = utils.secondBendPoint;
 
+  $scope.futureCola = function() {
+    console.log('futureCola()');
+    if (!(constants.CURRENT_YEAR in constants.COLA)) {
+      // The future is unknown:
+      console.log('no future yet');
+      return {
+        'isAvailable': false,
+      }
+    } else {
+      // We have a crystal ball:
+      console.log('future known');
+      return {
+        'isAvailable': true,
+        'year': constants.CURRENT_YEAR,
+        'adjustment': constants.COLA[constants.CURRENT_YEAR],
+      }
+    }
+  }();
+
   /**
    * Special case method for init'ing an 'Age'. Ages are durations, and this
    * is syntactical sugar usable in template expressions.
