@@ -221,7 +221,8 @@
           <div
             style="width: {{Math.min(75, spousalBenefitFraction())}}%; text-align: center; float:left; white-space:nowrap;">
             Personal
-            (<b>${{lowerEarner().primaryInsuranceAmountFloored() | number:0}}</b>)
+            (<b>${{lowerEarner().primaryInsuranceAmountFloored() |
+              number:0}}</b>)
           </div>
           <div
             style="width: {{Math.max(25, 100 - spousalBenefitFraction())}}%; text-align: center; float:left; white-space:nowrap;">
@@ -300,7 +301,7 @@
         you start early by:
       </p>
       <ul>
-        <li><b>6.67%</b> per year if starting AFTER
+        <li><b>8.33%</b> per year if starting AFTER
           <b>{{lowerEarner().normalRetirement.ageYears - 3}} years and
             {{lowerEarner().normalRetirement.ageMonths}} months</b>
           (<b>{{lowerEarner().spousalInflectionDate().monthFullName()}}
@@ -442,7 +443,7 @@
               </td>
               <td>
                 ${{(spousalSelection.higherEarnerBenefit +
-                  spousalSelection.lowerEarnerBenefit) | number:0}}
+                spousalSelection.lowerEarnerBenefit) | number:0}}
               </td>
             </tr>
           </table>
