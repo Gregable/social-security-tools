@@ -13,6 +13,10 @@ var dollarStringToNumber = function(dollar_string) {
   // yet been filed. Record this as a -1 sentinel for now.
   if (dollar_string === 'NotYetRecorded')
     return -1;
+  if (dollar_string === 'MedicareBeganIn1966')
+    return 0;
+  if (dollar_string === '')
+    return 0;
   var number_string = dollar_string.replace(/[$,]/g, '');
   return Number(number_string);
 }
@@ -26,7 +30,11 @@ var parseSsaGovTable = function(lines) {
     var record = new EarningRecord();
     record.year = Number.parseInt(columns[0]);
     record.taxedEarnings = dollarStringToNumber(columns[1]);
-    record.taxedMedicareEarnings = dollarStringToNumber(columns[2]);
+    if (columns.length > 2) {
+      record.taxedMedicareEarnings = dollarStringToNumber(columns[2]);
+    } else {
+      record.taxedMedicareEarnings = 0;
+    }
     earningsRecords.push(record);
   }
   return earningsRecords;
@@ -96,6 +104,10 @@ var parsePaste = function(paste) {
   // Some columns will include the string "Not yet recorded" which breaks
   // columns on spaces in the string. We replace these with "NotYetRecorded".
   replacedStr = replacedStr.replace(/not yet recorded+/gi, "NotYetRecorded");
+  // Similarly, for records in 1965, the Medicare column will include the
+  // string "Medicare Began in 1966". We replace this with:
+  // "MedicareBeganIn1966".
+  replacedStr = replacedStr.replace(/medicare began in 1966+/gi, "MedicareBeganIn1966");
 
   // Split based on newlines.
   let lines = replacedStr.split("\n");
