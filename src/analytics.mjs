@@ -24,7 +24,6 @@ function sendToGoogleAnalytics({name, delta, id}) {
 
     dimension1: String(isSXG),
     dimension2: document.referrer,
-    // ...
   });
 }
 
