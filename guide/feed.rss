@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Social Security Tools</title>
+    <link>http://ssa.tools/</link>
+    <atom:link href="http://ssa.tools/guide/feed.rss" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 05 Jun 2022 17:55:15 +0000</lastBuildDate>
+    <description>
+      A Social Security calculator that makes understanding social security
+      benefits simple. Runs entirely in your browser making the entire process
+      secure and private.
+    </description>
+    <item>
+      <title>
+        Why does ssa.tools use the current year's indexing factors for
+        someone younger than 62?
+      </title>
+      <link>https://ssa.tools/guide/indexing-factors.html</link>
+      <guid isPermaLink="true">https://ssa.tools/guide/indexing-factors.html</guid>
+      <pubDate>Mon, 28 Dec 2020 00:00:00 +0000</pubDate>
+      <description>
+        SSA.gov publishes estimated future indexing factors based on economic projections. Should ssa.tools use these factors and why?
+      </description>
+    </item>
+    <item>
+      <title>
+        The effect of AWI declining in 2020 due to Covid
+      </title>
+      <link>https://ssa.tools/guide/covid-awi-drop.html</link>
+      <guid isPermaLink="true">https://ssa.tools/guide/covid-awi-drop.html</guid>
+      <pubDate>Tue, 1 Dec 2020 00:00:00 +0000</pubDate>
+      <description>
+        For earners who were born in 1960, the effect of a potentially much lower average wage in 2020 may have an outsized impact on their lifetime benefit.
+      </description>
+    </item>
+    <item>
+      <title>
+        Earnings Cap
+      </title>
+      <link>https://ssa.tools/guide/earnings-cap.html</link>
+      <guid isPermaLink="true">https://ssa.tools/guide/earnings-cap.html</guid>
+      <pubDate>Sat, 28 Nov 2020 00:00:00 +0000</pubDate>
+      <description>
+        How do Social Security annual earnings caps work?
+      </description>
+    </item>
+    <item>
+      <title>
+        Maximum Benefits
+      </title>
+      <link>https://ssa.tools/guide/maximum.html</link>
+      <guid isPermaLink="true">https://ssa.tools/guide/maximum.html</guid>
+      <pubDate>Sat, 3 Aug 2019 00:00:00 +0000</pubDate>
+      <description>
+        What is the maximum possible Social Security benefit that someone can recieve?
+      </description>
+    </item>
+    <item>
+       <title>
+        Social Security and Inflation
+      </title>
+      <link>https://ssa.tools/guide/inflation.html</link>
+      <guid isPermaLink="true">https://ssa.tools/guide/inflation.html</guid>
+      <pubDate>Fri, 23 Nov 2018 00:00:00 +0000</pubDate>
+      <description>
+        Learn how two different types of inflation, wage increase and consumer price index, each interact to affect your social security benefit.
+      </description>
+    </item>
+  </channel>
+</rss>
