@@ -49,6 +49,11 @@ def RewriteReleasePaths(contents):
 
 def PutS3(filename):
   content_type = mimetypes.guess_type(filename)[0]
+  # RSS feeds should be application/rss+xml according to W3C.
+  # mimetypes gets this wrong.
+  if content_type == "application/x-rss+xml":
+    content_type = "application/rss+xml"
+
   localfile = os.path.join(ROOT_DIR, filename)
   remotefile = os.path.join(REMOTE_DIR, ReleaseFilename(filename))
   client = boto3.client('s3', aws_access_key_id=S3_ACCESS_KEY,
@@ -89,6 +94,7 @@ RELEASE_FILES = [
     'partials/*.html',
     'guide/*.html',
     'guide/*.mjs',
+    'guide/feed.rss',
     'src/stylesheet.css',
     'src/*.mjs',
     'src/guide/*.mjs',

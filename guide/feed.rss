@@ -2,8 +2,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Social Security Tools</title>
-    <link>http://ssa.tools/</link>
-    <atom:link href="http://ssa.tools/guide/feed.rss" rel="self" type="application/rss+xml" />
+    <link>https://ssa.tools/</link>
+    <atom:link href="https://ssa.tools/guide/feed.rss" rel="self" type="application/rss+xml" />
     <lastBuildDate>Sun, 05 Jun 2022 17:55:15 +0000</lastBuildDate>
     <description>
       A Social Security calculator that makes understanding social security
