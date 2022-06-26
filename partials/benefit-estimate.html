@@ -97,16 +97,15 @@
     If you choose to take benefits earlier than normal retirement age
     (<b>{{recipient.normalRetirementDate().monthFullName()}}
       {{recipient.normalRetirementDate().year()}}</b>),
-    your benefit amount will be <u>permanently</u> <i>reduced</i>
-    per year you start early by:
+    your benefit amount will be <u>permanently</u> <i>reduced</i> by:
   <ul>
-    <li><b>6.67%</b> per year if starting <i>after</i>
+    <li><b>6.67%</b> per year (<b>0.56%</b> per month) if starting <i>after</i>
       <b>{{recipient.normalRetirement.ageYears - 3}} years and
         {{recipient.normalRetirement.ageMonths}} months</b>
       (<b>{{recipient.spousalInflectionDate().monthFullName()}}
         {{recipient.spousalInflectionDate().year()}}</b>)
     </li>
-    <li><b>5.00%</b> per year if starting <i>before</i>
+    <li><b>5.00%</b> per year (<b>0.42%</b> per month) if starting <i>before</i>
       <b>{{recipient.normalRetirement.ageYears - 3}} years and
         {{recipient.normalRetirement.ageMonths}} months</b>
       (<b>{{recipient.spousalInflectionDate().monthFullName()}}
@@ -120,12 +119,13 @@
     (<b>{{recipient.normalRetirementDate().monthFullName()}}
       {{recipient.normalRetirementDate().year()}}</b>),
     your amount will be <u>permanently</u> <i>increased</i> by
-    <b>{{recipient.delayIncreaseRate() * 100 | number: 2}}%</b> per year that
-    you delay.
+    <b>{{recipient.delayIncreaseRate() * 100 | number: 2}}%</b> per year
+    (<b>{{recipient.delayIncreaseRate() * 100 / 12 | number: 2}}%</b> per month)
+    that you delay.
   </p>
   <p>
-    Here is a table which shows how much your benefit would be at different
-    starting ages:
+    Here is a table which shows how much your benefit would be at a few
+    different starting ages. The benefit is assessed monthly:
   </p>
   <table
     ng-class="{'fancy-table': true, 'wide-age': recipient.birthdate().layBirthDayOfMonth() !== 2}"

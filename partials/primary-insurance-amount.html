@@ -200,9 +200,16 @@
     </div>
 
     <p>
-      This total
-      (<b>${{recipient.primaryInsuranceAmount() | number:2}}</b> / month) is
-      your primary insurance amount. In the chart below, you can see what your
+      This total is your <u>primary insurance amount (PIA)</u>.
+    </p>
+
+    <div class="pia-banner">
+      Primary Insurance Amount (PIA): <b>${{recipient.primaryInsuranceAmount() |
+        number:2}}</b> / month
+    </div>
+
+    <p>
+      In the chart below, you can see what your
       primary insurance amount would be if your indexed earnings were to
       increase. Move your mouse over the chart to see how the primary insurance
       amount changes.
