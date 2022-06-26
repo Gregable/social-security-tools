@@ -123,13 +123,33 @@
     </span>
   </p>
 
-  <div class=insetTextBox ng-if="40 > recipient.earnedCredits()">
+  <p ng-if="!recipient.isEligible()">
+    You can earn enough credits to become eligible for social security
+    retirement benefits after age 70. You will not be able to apply for and
+    receive retirement benefits on your own work record until you become
+    eligible.
+  </p>
+
+  <div class=insetTextBox ng-if="!recipient.isEligible()">
     <h4>Special Rule</h4>
-    <p>
-      You can earn enough credits to become eligible for social security
-      retirement benefits after age 70. You will not be able to apply for and
-      receive retirement benefits on your own work record until you become
-      eligible.
+    <p style="display: flex; align-items: center">
+      <img src="/static/handshake.svg" width=100px height=100px
+        style="margin-right: 18px;">
+      <span style="align-self: flex-end">
+        In some circumstances, recipients with fewer than 40 credits may still
+        be eligible. An example is for people who have worked in another country
+        that has a legal agreement with the US. Canadian Social Security credits
+        is one such example. This tool is not capable of evaluating these
+        situations directly. You may choose to disable the earned credits
+        requirement in this tool and look at the rest of the results by pressing
+        this button.
+      </span>
     </p>
+    <div style="display: flex; justify-content: center">
+      <button ng-click="recipient.disableEarnedCredits()"
+        id=disable-earned-credits>
+        <ico>&#x261b;</ico> Disable Earned Credits Requirement
+      </button>
+    </div>
   </div>
 </div>
