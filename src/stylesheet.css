@@ -403,6 +403,25 @@ div.pia-banner {
   color: #443378;
 }
 
+button#disable-earned-credits {
+  border: 0 none;
+  border-radius: 36px;
+  color: #fff;
+  font-size: 18px;
+  padding: 4px 16px;
+  margin: 0 10px;
+  min-width: 110px;
+  cursor: pointer;
+  background: #4ac15a;
+}
+button#disable-earned-credits:hover {
+  background: #2aa13a;
+}
+button#disable-earned-credits > ico {
+  font-weight: bold;
+  font-size: 22px;
+}
+
 /* earnings-record table styles match the SSA.gov site so that the table looks
  * similar when pasted in. The reason for consistency is that we are asking
  * the user if we have entered the data correctly and making it a similar
