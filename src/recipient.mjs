@@ -38,13 +38,13 @@ function Recipient(name) {
   /* The recipients name. Model variable.
    * @type {string}
    */
-  this.name = name
+  this.name = name;
 
-              /* The recipient's earning records over all years in the SSA
-               * database, if any.
-               * @type {!Array<EarningRecord>}
-               */
-              this.earningsRecords_ = [];
+  /* The recipient's earning records over all years in the SSA
+   * database, if any.
+   * @type {!Array<EarningRecord>}
+   */
+  this.earningsRecords_ = [];
 
   /* The recipient's planned future earning records, if any.
    * @type {!Array<EarningRecord>}
@@ -458,18 +458,17 @@ Recipient.prototype.primaryInsuranceAmountByBracket = function(bracket) {
  * benefit brackets, but not adjusted for COLA increases.
  * @return {number} unadjusted primary insurance amount
  */
-Recipient.prototype.primaryInsuranceAmountUnadjusted =
-    function() {
+Recipient.prototype.primaryInsuranceAmountUnadjusted = function() {
   return utils.primaryInsuranceAmountForEarningsUnadjusted(
       this.indexingYear(), this.monthlyIndexedEarnings);
-}
+};
 
-    /**
-     * Returns true iff the user's age is such that their PIA needs to be
-     * adjusted for COLA values. This boolean is used to show/hide a section.
-     * @return {boolean}
-     */
-    Recipient.prototype.shouldAdjustForCOLA = function() {
+/**
+ * Returns true iff the user's age is such that their PIA needs to be
+ * adjusted for COLA values. This boolean is used to show/hide a section.
+ * @return {boolean}
+ */
+Recipient.prototype.shouldAdjustForCOLA = function() {
   return this.dateAtYearsOld(62).year() <= constants.CURRENT_YEAR;
 };
 
@@ -750,10 +749,10 @@ Recipient.prototype.getEarningsPerCreditForYear = function(year) {
 
 Recipient.prototype.calculateCredits = function(earnings, year) {
   if (year === undefined) year = constants.CURRENT_YEAR;
-  if (year > constants.MAX_YEAR) year = constants.MAX_YEAR
-    // This can happen if the input contains a year with "Not yet recorded" in
-    // the earnings column, and we set a sentinel of -1.
-    if (earnings <= 0) return 0;
+  if (year > constants.MAX_YEAR) year = constants.MAX_YEAR;
+  // This can happen if the input contains a year with "Not yet recorded" in
+  // the earnings column, and we set a sentinel of -1.
+  if (earnings <= 0) return 0;
   return Math.min(
       4, Math.floor(earnings / this.getEarningsPerCreditForYear(year)));
 };
