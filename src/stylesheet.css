@@ -394,6 +394,15 @@ p.birthdate {
   font-size: 18px;
 }
 
+div.pia-banner {
+  padding-left: 40px;
+  margin: 20px 0 20px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04rem;
+  color: #443378;
+}
+
 /* earnings-record table styles match the SSA.gov site so that the table looks
  * similar when pasted in. The reason for consistency is that we are asking
  * the user if we have entered the data correctly and making it a similar
