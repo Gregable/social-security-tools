@@ -13,7 +13,7 @@ export { MAX_CREDITS };
 // EARNINGS_PER_CREDIT and MAXIMUM_EARNINGS, have been published.
 // This year's values are applied to years in the future if the user
 // manually manipulates the input string.
-const MAX_YEAR = 2022;
+const MAX_YEAR = 2023;
 export { MAX_YEAR };
 
  // Earnings required for one quarter of coverage
@@ -65,6 +65,7 @@ const EARNINGS_PER_CREDIT = {
   2020:	1410,
   2021:	1470,
   2022:	1510,
+  2023:	1640,
 };
 export { EARNINGS_PER_CREDIT };
 
@@ -138,6 +139,7 @@ const MAXIMUM_EARNINGS = {
   2020: 137700,
   2021: 142800,
   2022: 147000,
+  2023: 160200,
 };
 export { MAXIMUM_EARNINGS };
 
@@ -209,7 +211,8 @@ const TAX_RATES = {
   2019: .053,
   2020: .053,
   2021: .053,
-  2021: .053,
+  2022: .053,
+  2023: .053,
 };
 export { TAX_RATES };
 
@@ -296,6 +299,7 @@ const WAGE_INDICES = {
   2018: 52145.80,
   2019: 54099.99,
   2020: 55628.60,
+  2021: 60575.07,
 };
 export { WAGE_INDICES };
 
@@ -348,6 +352,7 @@ const COLA = {
   2019: 1.6,
   2020: 1.3,
   2021: 5.9,
+  2022: 8.7,
 };
 export { COLA };
 
