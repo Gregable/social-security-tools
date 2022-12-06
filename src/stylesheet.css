@@ -1215,3 +1215,12 @@ ul.socialmedia img {
   height: 2em;
   vertical-align: middle;
 }
+
+/* Guide Pages */
+div#homelink, div#homelink h1 {
+  display: flex;
+  justify-content: center;
+}
+.guide p, .guide li {
+  font-size: 18px;
+}
