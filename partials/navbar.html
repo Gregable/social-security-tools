@@ -83,6 +83,13 @@
         <i class="glyphicon glyphicon-chevron-right"></i>
       </a>
     </li>
+    <li ng-if="showSpousalBenefit">
+      <a href="#nav-sponsor" data-ng-click="scrollTo('nav-sponsor')"
+        class="sponsor-nav">
+        <div class=navlabel>ProjectionLab - Sponsor</div>
+        <i class="glyphicon glyphicon-chevron-right"></i>
+      </a>
+    </li>
     <li ng-if="recipient.isEligible()">
       <a href="#nav-age-decision" data-ng-click="scrollTo('nav-age-decision')">
         <div class=navlabel>Starting Age Decision</div>

@@ -893,6 +893,10 @@ ul.nav li a {
   position: relative;
 }
 
+ul.nav li a.sponsor-nav {
+  background-color: aliceblue;
+}
+
 ul.nav li:first-child a {
   border-radius: 6px 6px 0 0;
 }
@@ -1468,4 +1472,22 @@ div#homelink h1 {
 .guide p,
 .guide li {
   font-size: 18px;
+}
+
+#sponsor {
+  background-color: aliceblue;
+  padding-left: 20px;
+  cursor: pointer;
+}
+
+#sponsor p {
+  padding-left: 4px;
+}
+
+img.sponsor-image {}
+
+img.image-fit {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
