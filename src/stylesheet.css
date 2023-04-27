@@ -3,70 +3,90 @@
  * templates compile.  The !important is important given that there may be
  * other selectors that are more specific or come later and might alter display.
  */
-[ng\:cloak], [ng-cloak], .ng-cloak {
+[ng\:cloak],
+[ng-cloak],
+.ng-cloak {
   display: none !important;
 }
 
 body {
   padding-top: 20px;
   padding-bottom: 20px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size:14px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
   line-height: 1.42857143;
   color: #333;
   background-color: #fff;
   position: relative;
 }
+
 html {
   scroll-behavior: smooth;
-  font-size:10px;
-  -webkit-tap-highlight-color:rgba(0,0,0,0);
+  font-size: 10px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-*{
-  -webkit-box-sizing:border-box;
-  -moz-box-sizing:border-box;
-  box-sizing:border-box
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box
 }
-:after,:before{
-  -webkit-box-sizing:border-box;
-  -moz-box-sizing:border-box;
-  box-sizing:border-box
+
+:after,
+:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box
 }
+
 a {
   color: #337ab7;
   text-decoration: none;
 }
-h1,h2,h3,h4 {
+
+h1,
+h2,
+h3,
+h4 {
   font-family: inherit;
   font-weight: 500;
   line-height: 1.1;
-  color:inherit
+  color: inherit
 }
+
 h1 {
   font-size: 36px;
 }
+
 h2 {
   font-size: 30px;
   margin-top: 20px;
-  margin-bottom: 10px;;
+  margin-bottom: 10px;
+  ;
 }
+
 h3 {
   font-size: 24px;
 }
+
 h4 {
   font-size: 18px;
 }
+
 table {
   border-spacing: 0;
   border-collapse: collapse;
 }
-td,th {
+
+td,
+th {
   padding: 0;
 }
+
 p {
-  margin:0 0 10px;
+  margin: 0 0 10px;
 }
+
 video {
   width: 100%;
   height: auto;
@@ -78,15 +98,19 @@ video {
     padding-left: 45px;
     max-width: 660px;
   }
+
   div.instructions {
     font-size: 18px;
   }
+
   div.instructions li {
     margin: 20px;
   }
+
   div.pasteareaoffsetleft {
     margin: 0px 40px 0px 40px;
   }
+
   h1 {
     font-size: 28px;
   }
@@ -94,22 +118,28 @@ video {
 
 /** Ipad **/
 @media screen and (max-width: 1024px) {
+
   /* Only display navigation side buttons on large screens. */
   ul.nav {
     display: none;
   }
+
   div#fixed-center-column {
     max-width: 660px;
   }
+
   div.instructions {
     font-size: 16px;
   }
+
   div.instructions li {
     margin: 20px;
   }
+
   div.pasteareaoffsetleft {
     margin: 0px 40px 0px 40px;
   }
+
   h1 {
     font-size: 28px;
   }
@@ -117,52 +147,98 @@ video {
 
 /** iPhone */
 @media screen and (max-width: 420px) {
+
   /* Don't display the top title header "Social Security Calculator" on
    * tiny screens. */
   div#fixed-center-column {
     max-width: 100%;
   }
+
   div.instructions {
     font-size: 12px;
   }
+
   div.instructions li {
     margin: 10px;
   }
+
   div.pasteareaoffsetleft {
     margin: 0px 20px 0px 20px;
   }
+
   ol {
     padding-inline-start: 20px;
   }
+
   h1 {
     font-size: 20px;
   }
 }
-/** Define some classes useful for specifically hiding elements on width */
-@media screen and (max-width: 600px) { .onlydisplay600 { display: none; } }
-@media screen and (max-width: 500px) { .onlydisplay500 { display: none; } }
-@media screen and (max-width: 400px) { .onlydisplay400 { display: none; } }
-@media screen and (max-width: 300px) { .onlydisplay300 { display: none; } }
-@media screen and (min-width: 500px) { .onlydisplayunder500 { display: none; } }
 
-@media screen { .onlyDisplayPrint { display: none !important; } }
-@media print { .onlyDisplayScreen { display: none !important; } }
+/** Define some classes useful for specifically hiding elements on width */
+@media screen and (max-width: 600px) {
+  .onlydisplay600 {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .onlydisplay500 {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .onlydisplay400 {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .onlydisplay300 {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 500px) {
+  .onlydisplayunder500 {
+    display: none;
+  }
+}
+
+@media screen {
+  .onlyDisplayPrint {
+    display: none !important;
+  }
+}
+
+@media print {
+  .onlyDisplayScreen {
+    display: none !important;
+  }
+}
 
 /** Print configuration */
 @media print {
-  .insetTextBox,.pageBreakAvoid {
+
+  .insetTextBox,
+  .pageBreakAvoid {
     page-break-inside: avoid;
   }
+
   p.pageBreakBefore {
     page-break-before: always;
   }
+
   .earningsRecordHeader {
     margin-top: 0px;
   }
+
   body {
     padding-top: 0px;
   }
 }
+
 @page {
   size: 8.5in 11in portrait;
 }
@@ -173,6 +249,7 @@ div#bodychildcontainer {
   max-width: 1080px;
   margin: 0 auto;
 }
+
 div#fixed-center-column {
   max-width: 660px;
   margin: auto;
@@ -186,7 +263,7 @@ div#topheader {
   white-space: nowrap;
 }
 
-div#topheader > h3 {
+div#topheader>h3 {
   margin-top: 0;
   margin-bottom: 0 !important;
   line-height: 40px;
@@ -212,11 +289,13 @@ div#topheader ul.navpills {
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 div#topheader ul.navpills li {
   float: left;
   position: relative;
   display: block;
 }
+
 div#topheader ul.navpills li a {
   border-radius: 4px;
   position: relative;
@@ -224,18 +303,22 @@ div#topheader ul.navpills li a {
   padding: 10px 15px;
   text-decoration: none;
 }
+
 div#topheader ul.navpills li.active a {
   color: #fff;
   background-color: #337ab7;
 }
+
 @media screen and (max-width: 675px) {
+
   /* Below 650px the pills and header start to collide, so
    * we move them to separate lines and center. */
   div#topheader h3#title-header {
-    clear:both;
+    clear: both;
     padding-top: 10px;
     margin: 0;
   }
+
   div#topheader ul.navpills {
     float: left;
   }
@@ -265,66 +348,79 @@ a.bigbtn {
   display: inline-block;
   font-size: 2rem;
 }
+
 a.bigbtn:hover {
   background-color: #449d44;
   border-color: #398439;
 }
 
 h4 {
- margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 br.clear {
   clear: both;
 }
 
-h2,p {
-  padding-left: 20px;
+h2,
+h3,
+h4,
+p {
   padding-right: 20px;
 }
 
 span#pastePrompt {
   margin-top: 10px;
 }
+
 span#pastePrompt div.instructions {
   display: inline-block;
   margin: auto;
   padding: 10px 20px 0px 20px;
 }
-span#pastePrompt div.instructions p{
+
+span#pastePrompt div.instructions p {
   line-height: 1.0;
   margin-left: 14px;
 }
+
 span#pastePrompt div.pastearea {
   display: flex;
   justify-content: center;
   max-width: 480px;
   margin: 0 auto 0 auto;
 }
+
 span#pastePrompt div.pasteareaoffsetleft {
   width: 100%;
 }
+
 span#pastePrompt div.pastearea textarea#pastearea {
   width: 100%;
   height: 100px;
   resize: none;
 }
+
 span#pastePrompt div.pastearea textarea#pastearea::-webkit-input-placeholder {
   text-align: center;
   vertical-align: bottom;
 }
+
 span.lock {
   color: green;
 }
+
 span.nowrap {
   white-space: nowrap;
 }
+
 div.instructions img#earnings-table-img {
   display: block;
   margin: 10px auto;
   height: auto;
   max-width: 100%;
 }
+
 span.confirmation-prompt button {
   border: 0 none;
   border-radius: 36px;
@@ -335,6 +431,7 @@ span.confirmation-prompt button {
   min-width: 110px;
   cursor: pointer;
 }
+
 ul.demos button {
   border: 0 none;
   border-radius: 36px;
@@ -346,23 +443,28 @@ ul.demos button {
   cursor: pointer;
   background: #4ac15a;
 }
+
 ul.demos button.success:hover {
   background: #2aa13a;
 }
-ul.demos button > ico {
+
+ul.demos button>ico {
   font-weight: bold;
   font-size: 22px;
 }
+
 span.confirmation-prompt {
   margin-top: 20px;
   margin-right: 60px;
   font-size: 18px;
 }
-span.confirmation-prompt > div.confirmation-left {
+
+span.confirmation-prompt>div.confirmation-left {
   margin: 0;
   margin-top: 60px;
   text-align: center;
 }
+
 span.confirmation-prompt button {
   border: 0 none;
   border-radius: 36px;
@@ -373,23 +475,28 @@ span.confirmation-prompt button {
   min-width: 110px;
   cursor: pointer;
 }
+
 span.confirmation-prompt button.success {
   background: #4ac15a;
 }
+
 span.confirmation-prompt button.failure {
   background: #d9534f;
 }
+
 span.confirmation-prompt button.success:hover {
   background: #2aa13a;
 }
+
 span.confirmation-prompt button.failure:hover {
   background: #b9332f;
 }
 
-span.confirmation-prompt button > ico {
+span.confirmation-prompt button>ico {
   font-weight: bold;
   font-size: 22px;
 }
+
 p.birthdate {
   font-size: 18px;
 }
@@ -414,10 +521,12 @@ button#disable-earned-credits {
   cursor: pointer;
   background: #4ac15a;
 }
+
 button#disable-earned-credits:hover {
   background: #2aa13a;
 }
-button#disable-earned-credits > ico {
+
+button#disable-earned-credits>ico {
   font-weight: bold;
   font-size: 22px;
 }
@@ -442,19 +551,19 @@ table.earnings-record-table {
   color: #222;
 }
 
-table.earnings-record-table > thead th {
+table.earnings-record-table>thead th {
   padding: 4px 10px;
   border-bottom: 3px solid #CCC;
   font-weight: bold;
-  line-height:20px;
+  line-height: 20px;
   box-sizing: border-box;
 }
 
-table.earnings-record-table > tbody td:not(:last-child) {
+table.earnings-record-table>tbody td:not(:last-child) {
   border-right: solid 1px #DDD;
 }
 
-table.earnings-record-table > tbody td {
+table.earnings-record-table>tbody td {
   padding: 4px 10px;
   vertical-align: top;
   line-height: 20px;
@@ -483,6 +592,7 @@ table.fancy-table {
 table.fancy-table tr:not(:last-child) td {
   border-bottom: 2px solid #ccc;
 }
+
 table.fancy-table tbody tr:nth-child(even) {
   background-color: #E9E9FF;
 }
@@ -493,14 +603,17 @@ table.fancy-table td[headers='workyear'] {
   padding-left: 6px;
   padding-right: 30px;
 }
+
 table.fancy-table th#taxedearnings,
 table.fancy-table td[headers='taxedearnings'] {
   text-align: right;
   min-width: 67px;
 }
+
 table.fancy-table td[headers='taxedearnings'] {
   padding-right: 8px;
 }
+
 table.fancy-table th#multsymbol,
 table.fancy-table td[headers='multsymbol'] {
   text-align: center;
@@ -508,14 +621,17 @@ table.fancy-table td[headers='multsymbol'] {
   padding-right: 0px;
   color: #6B6BBF;
 }
+
 .multsymbol {
   color: #6B6BBF;
 }
+
 table.fancy-table th#multiplier,
 table.fancy-table td[headers='multiplier'] {
   text-align: center;
   min-width: 60px;
 }
+
 table.fancy-table th#eqsymbol,
 table.fancy-table td[headers='eqsymbol'] {
   text-align: center;
@@ -523,35 +639,44 @@ table.fancy-table td[headers='eqsymbol'] {
   padding-right: 0px;
   color: #6B6BBF;
 }
+
 table.fancy-table th#indexedearnings,
 table.fancy-table td[headers='indexedearnings'] {
   text-align: right;
   /*padding-left: 20px;*/
   min-width: 90px;
 }
+
 table.fancy-table td[headers='indexedearnings'] {
   padding-right: 20px;
 }
-table.fancy-table th#epc, table.fancy-table td[headers='epc'] {
+
+table.fancy-table th#epc,
+table.fancy-table td[headers='epc'] {
   text-align: right;
   padding-left: 15px;
   padding-right: 15px;
 }
+
 table.fancy-table td[headers='epc'] {
   padding-right: 23px;
 }
+
 table.fancy-table th#credits,
 table.fancy-table td[headers='credits'] {
   padding-left: 5px;
   text-align: center;
 }
+
 table.fancy-table td[headers='credits'] {
   padding-right: 8px;
 }
+
 table.fancy-table td[headers='top35indicators'] {
   min-width: 48px;
   white-space: nowrap;
 }
+
 table.fancy-table th#age,
 table.fancy-table td[headers='age'] {
   width: 2em;
@@ -559,24 +684,30 @@ table.fancy-table td[headers='age'] {
   padding-right: 30px;
   text-align: left;
 }
+
 table.fancy-table td[headers='age'] {
   text-align: center;
 }
+
 table.fancy-table.wide-age th#age,
 table.fancy-table.wide-age td[headers='age'] {
   width: 7em;
 }
+
 table.fancy-table.wide-age td[headers='age'] {
   text-align: left;
 }
+
 table.fancy-table th#date,
 table.fancy-table td[headers='date'] {
   text-align: left;
 }
+
 table.fancy-table th#adjustment,
 table.fancy-table td[headers='adjustment'] {
   text-align: right;
 }
+
 table.fancy-table th#monthlybenefit,
 table.fancy-table th#annualbenefit,
 table.fancy-table td[headers='annualbenefit'],
@@ -588,41 +719,50 @@ table.fancy-table td[headers='monthlybenefit'] {
 table.benefitBrackets {
   margin: 0 auto;
 }
+
 table.benefitBrackets tr:last-child td:nth-child(2) {
   text-align: left;
   border-top: 1px solid;
 }
+
 @media screen and (min-width: 600px) {
   table.benefitBrackets tr td {
     text-align: right;
     padding-right: 6px;
   }
 }
+
 @media screen and (max-width: 599px) {
   table.benefitBrackets tr td {
     padding: 8px;
   }
+
   table.benefitBrackets td:first-child {
     text-align: left;
     max-width: 200px;
   }
+
   table.benefitBrackets tr:first-child td:first-child,
   table.benefitBrackets tr:nth-child(2) td:first-child,
   table.benefitBrackets tr:first-child td:nth-child(2),
   table.benefitBrackets tr:nth-child(2) td:nth-child(2) {
     border-bottom: 1px solid #d0d0d0;
   }
+
   table.benefitBrackets tr td:nth-child(2) {
     text-align: right;
     padding-right: 0;
   }
+
   table.benefitBrackets tr:last-child td:first-child {
     text-align: right;
     padding-right: 14px;
   }
+
   table.benefitBrackets tr:last-child td:nth-child(2) {
     text-align: right;
   }
+
   table.benefitBrackets tr:last-child td:nth-child(3) {
     text-align: left;
     padding-left: 0;
@@ -637,16 +777,20 @@ table.benefitBrackets tr:last-child td:nth-child(2) {
 table.combinedBenefit {
   margin: auto;
 }
+
 table.combinedBenefit tr:first-child td:first-child {
   text-align: left;
 }
+
 table.combinedBenefit tr:not(:first-child) td:first-child {
   width: 18px;
 }
+
 table.combinedBenefit tr:not(:first-child) td:nth-child(2) {
   text-align: right;
   padding-right: 6px;
 }
+
 table.combinedBenefit tr:last-child td:last-child {
   border-top: 1px solid;
 }
@@ -670,13 +814,13 @@ table.combinedBenefit tr:last-child td:last-child {
   float: left;
 }
 
-.benefit-estimate.chart-ylabel > .vertical-text {
+.benefit-estimate.chart-ylabel>.vertical-text {
   transform: rotate(-90deg) translateY(-52px) translateX(-166px);
   -webkit-transform: rotate(-90deg) translateY(-52px) translateX(-166px);
   float: left;
 }
 
-.pia.chart-ylabel > .vertical-text {
+.pia.chart-ylabel>.vertical-text {
   transform: rotate(-90deg) translateY(-82px) translateX(-166px);
   -webkit-transform: rotate(-90deg) translateY(-82px) translateX(-166px);
   float: left;
@@ -695,14 +839,15 @@ canvas {
 
 /* Right angle chevron next to navigation elements */
 @font-face {
-   font-family: 'Glyphicons Halflings';
-   src:url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.eot);
-   src:url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),
-   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.woff2) format('woff2'),
-   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.woff) format('woff'),
-   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.ttf) format('truetype'),
-   url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')
+  font-family: 'Glyphicons Halflings';
+  src: url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.eot);
+  src: url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.eot?#iefix) format('embedded-opentype'),
+    url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.woff2) format('woff2'),
+    url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.woff) format('woff'),
+    url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.ttf) format('truetype'),
+    url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg')
 }
+
 .glyphicon {
   position: relative;
   top: 1px;
@@ -713,7 +858,10 @@ canvas {
   line-height: 1;
   -webkit-font-smoothing: antialiased;
 }
-.glyphicon-chevron-right:before{content:"\e080"}
+
+.glyphicon-chevron-right:before {
+  content: "\e080"
+}
 
 ul.nav {
   margin: 30px 0 0;
@@ -722,15 +870,18 @@ ul.nav {
   list-style: none;
   padding: 0px;
 }
+
 #navbar.affix {
   top: 10px;
 }
+
 ul.nav li {
   line-height: 20px;
   margin-top: 0px;
   position: relative;
   display: block;
 }
+
 ul.nav li a {
   color: #0088cc;
   text-decoration: none;
@@ -741,28 +892,35 @@ ul.nav li a {
   display: block;
   position: relative;
 }
+
 ul.nav li:first-child a {
   border-radius: 6px 6px 0 0;
 }
+
 ul.nav li:last-child a {
   border-radius: 0 0 6px 6px;
 }
+
 ul.nav li.active a {
   background-color: #08c;
   color: #fff;
 }
+
 ul.nav .glyphicon {
   float: right;
 }
+
 ul.nav li:not(.active) .glyphicon {
   color: black;
   opacity: .25;
 }
+
 ul.nav .navlabel {
   display: inline-block;
   max-width: 175px;
   padding-right: 20px;
 }
+
 @media print {
   ul.nav {
     display: none;
@@ -773,6 +931,7 @@ ul.nav .navlabel {
 input.radio {
   display: none;
 }
+
 label.radio {
   width: 76px;
   border-radius: 4px;
@@ -789,6 +948,7 @@ label.radio {
   color: #999;
   display: block;
 }
+
 label.radio:before {
   position: absolute;
   display: block;
@@ -800,22 +960,27 @@ label.radio:before {
   background: #D1D3D4;
   border-radius: 3px 0 0 3px;
 }
-input.radio:hover:not(:checked) ~ label.radio:before {
-  content:'\2714';
+
+input.radio:hover:not(:checked)~label.radio:before {
+  content: '\2714';
   color: #C2C2C2;
 }
-input.radio:hover:not(:checked) ~ label.radio {
+
+input.radio:hover:not(:checked)~label.radio {
   color: #888;
 }
-input.radio:checked ~ label.radio:before {
-  content:'\2714';
+
+input.radio:checked~label.radio:before {
+  content: '\2714';
   color: #9CE2AE;
   background-color: #4DCB6D;
 }
-input.radio:checked ~ label.radio {
+
+input.radio:checked~label.radio {
   color: #777;
 }
-input.radio:focus ~ label.radio:before {
+
+input.radio:focus~label.radio:before {
   box-shadow: 0 0 0 3px #999;
 }
 
@@ -823,6 +988,7 @@ input.radio:focus ~ label.radio:before {
 .sliderZ {
   z-index: 2;
 }
+
 #stickycontainer {
   position: sticky;
   top: 0;
@@ -830,7 +996,8 @@ input.radio:focus ~ label.radio:before {
   width: 100%;
   background-color: #fff;
 }
-.sliderTable  {
+
+.sliderTable {
   top: 0;
   z-index: 5;
   margin: 0 auto;
@@ -838,29 +1005,36 @@ input.radio:focus ~ label.radio:before {
   max-width: 675px;
   border-collapse: unset;
 }
+
 .sliderTable span {
   display: inline-block;
 }
+
 .sliderTable span.sliderColumn {
   vertical-align: bottom;
   white-space: nowrap;
 }
+
 .sliderTable span.sliderColumn:not(.columnB) {
   vertical-align: bottom;
   padding-bottom: 8px;
   padding-left: 5px;
   padding-right: 5px;
 }
+
 .sliderTable span.sliderColumn.columnA {
   text-align: right;
   min-width: 150px;
 }
+
 .sliderTable span.sliderColumn.columnB {
   min-width: 240px;
 }
+
 .sliderTable span.sliderColumn.columnC {
   text-align: left;
 }
+
 /* Hack to create a bottom shadow on the slider when it stick's.
  * The shadow is always there, but is covered by a white
  *  sticky-shadow-cover. */
@@ -872,6 +1046,7 @@ div.sticky-shadow {
   position: sticky;
   top: 118px;
 }
+
 div.sticky-shadow-cover {
   width: 675px;
   height: 2px;
@@ -880,24 +1055,30 @@ div.sticky-shadow-cover {
   position: relative;
   top: -2px;
 }
+
 /* We must rearrange the sliders below a certain width. */
 @media screen and (max-width: 550px) {
+
   /* Each column now falls on a different row. */
   .sliderTable span.sliderColumn {
     display: block;
     text-align: left !important;
     padding: 0px !important;
   }
+
   /* Add some more space between each slider. */
   .sliderTable tr:nth-child(1) span.sliderColumn.columnC {
     margin-bottom: 20px;
   }
 
   /* This takes up a lot of vertical space now, so don't stick to the top. */
-  #stickycontainer,.sliderTable  {
+  #stickycontainer,
+  .sliderTable {
     position: static;
   }
-  div.sticky-shadow,div.sticky-shadow-cover {
+
+  div.sticky-shadow,
+  div.sticky-shadow-cover {
     display: none;
   }
 }
@@ -908,29 +1089,36 @@ div.sticky-shadow-cover {
 #higherEarnerSlider .rz-bar {
   background: #f6dfad;
 }
+
 #higherEarnerSlider .rz-active,
 #higherEarnerSlider .rz-selection,
 #higherEarnerSlider .rz-selected {
   background: #e69f00;
 }
+
 #higherEarnerSlider .rz-pointer {
   background-color: #e69f00;
 }
+
 #higherEarnerSlider .rz-limit {
   color: #e69f00;
 }
+
 #lowerEarnerSlider .rz-tick,
 #lowerEarnerSlider .rz-bar {
   background: #d9ebd9;
 }
+
 #lowerEarnerSlider .rz-active,
 #lowerEarnerSlider .rz-selection,
 #lowerEarnerSlider .rz-selected {
   background: #060;
 }
+
 #lowerEarnerSlider .rz-pointer {
   background-color: #060;
 }
+
 #lowerEarnerSlider .rz-limit {
   color: #060;
 }
@@ -942,6 +1130,7 @@ div.sticky-shadow-cover {
   top: -30px;
   bottom: unset;
 }
+
 /* Then make the pointer text hide the tick text with 100% transparency */
 span.rz-bubble {
   background-color: rgba(255, 255, 255, 1.0);
@@ -953,11 +1142,19 @@ span.rz-bubble {
  * point in trying to make it work for that. Instead, we just hide the
  * visualization if the screen is too narrow and display a warning instead.*/
 @media screen and (min-width: 621px) {
- #spousal-visualization-screensize-warning { display: none }
+  #spousal-visualization-screensize-warning {
+    display: none
+  }
 }
+
 @media screen and (max-width: 620px) {
- #spousal-visualization { display: none; }
- #spousal-visualization-screensize-warning { display: block }
+  #spousal-visualization {
+    display: none;
+  }
+
+  #spousal-visualization-screensize-warning {
+    display: block
+  }
 }
 
 /* Add some padding for the transparency, excluding the left hand side */
@@ -965,10 +1162,12 @@ span.rz-bubble {
   padding-left: 10px !important;
   padding-right: 10px !important;
 }
+
 #spousal-box span.rz-bar {
   left: 16px;
   width: calc(100% - 32px);
 }
+
 #spousal-box {
   width: 620px;
 }
@@ -977,9 +1176,11 @@ span.rz-bubble {
 div.married-options {
   margin: 22px 0px;
 }
+
 .married-options input {
   display: none;
 }
+
 .married-options label {
   font-size: 18px;
   padding: 10px 16px;
@@ -990,6 +1191,7 @@ div.married-options {
   border-color: #777;
 
 }
+
 .married-options input:checked+label {
   border-color: #6969a4;
   background: #dfdff0;
@@ -1000,12 +1202,16 @@ div.married-options {
   margin: 20px 0;
   position: relative;
 }
-.frequent-questions p, .frequent-questions ul {
+
+.frequent-questions p,
+.frequent-questions ul {
   display: none;
 }
+
 .frequent-questions input {
   display: none;
 }
+
 /* Show only the clipped intro */
 .frequent-questions label+p {
   display: block;
@@ -1017,6 +1223,7 @@ div.married-options {
   white-space: nowrap;
   overflow: hidden;
 }
+
 /* If the checkbox is checked, show all paragraphs */
 .frequent-questions input[type=checkbox]:checked~p,
 .frequent-questions input[type=checkbox]:checked~ul {
@@ -1035,18 +1242,21 @@ div.married-options {
   background: #eee;
   display: block;
   position: relative;
-      height: 20px;
+  height: 20px;
   padding: 7px 10px;
   font-weight: bold;
   border: 1px solid #ddd;
   border-left: 3px solid #888;
-  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
   transition: all .15s ease-out;
   box-sizing: initial;
 }
+
 /* Label texts wraps outside of the label box on small widths*/
 @media screen and (max-width: 450px) {
-  .frequent-questions label { font-size: 0.9em; }
+  .frequent-questions label {
+    font-size: 0.9em;
+  }
 }
 
 /* Remove text selection when toggle-ing */
@@ -1063,7 +1273,7 @@ div.married-options {
   border-color: #ff7f50;
   background: #f5deb4;
   background-image: linear-gradient(to bottom, #fff, #f5deb4);
-  box-shadow: 0 0 1px rgba(0,0,0,.4);
+  box-shadow: 0 0 1px rgba(0, 0, 0, .4);
 }
 
 /* Label's arrow - default state */
@@ -1091,30 +1301,46 @@ div.flashnotify:not(.ng-hide-animate) {
   -webkit-animation: bgfadein linear 0.6s;
   animation: bgfadein linear 0.6s;
 }
+
 @-webkit-keyframes bgfadein {
-  0% { background-color: #00ff00; }
-  100% { background-color: #ffffff; }
+  0% {
+    background-color: #00ff00;
+  }
+
+  100% {
+    background-color: #ffffff;
+  }
 }
+
 @keyframes bgfadein {
-  0% { background-color: #00ff00; }
-  100% { background-color: #ffffff; }
+  0% {
+    background-color: #00ff00;
+  }
+
+  100% {
+    background-color: #ffffff;
+  }
 }
 
 span.names {
   color: #3B3B9F;
   font-weight: 600;
 }
+
 span.higherEarner {
   color: #5E4000;
   font-weight: 600;
 }
+
 span.lowerEarner {
   color: #004000;
   font-weight: 600;
 }
+
 p.nameEntry {
   padding-left: 40px;
 }
+
 p.nameEntry input[name=yourName] {
   margin-right: 12px;
 }
@@ -1144,72 +1370,88 @@ div.totalSpousalAtDate {
 }
 
 div.insetTextBox {
-  box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
-  -webkit-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
-  -moz-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
-  -o-box-shadow: inset 0px 0px 10px 0px #ABABAB,5px 5px 5px 1px #DDDDDD;
+  box-shadow: inset 0px 0px 10px 0px #ABABAB, 5px 5px 5px 1px #DDDDDD;
+  -webkit-box-shadow: inset 0px 0px 10px 0px #ABABAB, 5px 5px 5px 1px #DDDDDD;
+  -moz-box-shadow: inset 0px 0px 10px 0px #ABABAB, 5px 5px 5px 1px #DDDDDD;
+  -o-box-shadow: inset 0px 0px 10px 0px #ABABAB, 5px 5px 5px 1px #DDDDDD;
   margin: 6px 11px 10px 6px;
   padding: 10px;
 }
+
 div.insetTextBox h4 {
   margin-top: 5px;
   margin-bottom: 10px;
 }
+
 div.insetTextBox p {
   margin-left: 20px;
   margin-right: 20px;
 }
+
 .onlyHidden {
   visibility: hidden;
 }
+
 /* Some nav anchors get offset by the height of the future earnings header. */
 a.nav {
   position: relative;
   visibility: hidden;
   display: block;
 }
+
 a.offset-nav {
   top: -128px;
 }
+
 input.birthdate-input {
   font-size: 26px;
 }
+
 .affixed {
   position: fixed;
   top: 0px;
 }
+
 p.postdate {
   font-size: 14px;
   padding-left: 0px;
   font-weight: 700;
 }
+
 ul.guides {
   max-width: 720px;
 }
+
 ul.guides>li {
   list-style-type: none;
 }
+
 ul.guides>li>span.postdate {
   float: right;
   color: #666;
   font-size: 0.9em;
-  margin-left:30px;
+  margin-left: 30px;
   vertical-align: text-top;
 }
+
 ul.guides>li>p {
   font-size: 1.4em;
 }
+
 p.justify {
   text-align: justify;
 }
+
 /* Social Media Buttons in FAQ */
 ul.socialmedia {
   list-style: none;
 }
+
 ul.socialmedia li {
   padding: 3px;
   font-size: 1.8em;
 }
+
 ul.socialmedia img {
   width: 2em;
   height: 2em;
@@ -1217,10 +1459,13 @@ ul.socialmedia img {
 }
 
 /* Guide Pages */
-div#homelink, div#homelink h1 {
+div#homelink,
+div#homelink h1 {
   display: flex;
   justify-content: center;
 }
-.guide p, .guide li {
+
+.guide p,
+.guide li {
   font-size: 18px;
 }
