@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="For those starting benefits after Normal Retirement Age, there is a
+  small delay in some of the delayed credits until the following January.">
+  <title>
+    Bump in delayed Social Security benefits after January - ssa.tools
+  </title>
+  <link rel="stylesheet" href="/src/stylesheet.css" />
+  <link rel="alternate" type="application/rss+xml" title="Social Security Tools"
+    href="https://ssa.tools/guide/feed.rss" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://ssa.tools/guide/delayed-january-bump.html"
+    },
+    "headline": "Article headline",
+    "image": {
+      @type: "ImageObject",
+      "url": "https://ssa.tools/static/delayed-bump.png",
+      "width": 285,
+      "height": 508
+     ],
+    "datePublished": "2023-12-29T00:00:00+00:00",
+    "dateModified": "2023-04-29T00:00:00+00:00",
+    "author": {
+      "@type": "Person",
+      "name": "Greg Grothaus"
+    },
+     "publisher": {
+      "@type": "Organization",
+      "name": "SSA.Tools",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ssa.tools/static/laptop-piggybank.jpg"
+      }
+    }
+  }
+  </script>
+</head>
+
+<body class=guide>
+  <div id="bodychildcontainer">
+    <!-- partials/header.html -->
+    <div id="topheader">
+      <ul class="navpills">
+        <li role="presentation"><a href="/">Calculator</a></li>
+        <li role="presentation"><a href="/about.html">About</a></li>
+        <li role="presentation" class="active"><a href="/guides.html">Guides</a>
+        </li>
+        <li role="presentation"><a href="/contributors.html">Contributors</a>
+        </li>
+        <li role="presentation"><a href="/contact.html">Contact</a></li>
+      </ul>
+      <h3 id="title-header">Social Security Inflation Calculations</h3>
+    </div>
+
+    <!-- Main Contents -->
+    <div>
+      <h1>Bump in delayed Social Security benefits after January</h1>
+      <p class=postdate>Apr 29, 2023</p>
+
+      <p>
+        When using the ssa.tools calculator, you may have noticed a small notch
+        or bump in the income chart when choosing a benefits start date later
+        than the Normal Retirement Age. Here's an example of what this might
+        look like for someone retiring at the age of 68 and 5 months. Initially,
+        the recipient's benefit is $2,258 / mo but in the following January it
+        jumps to $2,392 / mo:
+      </p>
+
+      <img src="/static/delayed-bump.png" width=285 height=503
+        style="margin: 40px 40px 40px 40px; display: block; border: 1px solid">
+
+      <p>If this is not a bug, what's going on?</p>
+
+      <p>
+        When someone chooses to delay collecting social security past the Normal
+        Retirement Age (typically 65), they earn delayed credits that increase
+        their benefit by 6.67% per year (0.56% per month) in exchange for
+        waiting a little longer.
+      </p>
+
+      <p>
+        However, due to a little known quirk in the way the credits work, you
+        only earn credits based on the months delayed in the previous calendar
+        year.
+      </p>
+
+      <p>
+        In the example image above, the recipient began their benefit in
+        November 2018, so intially the benefit was based only on months delayed
+        in 2017.
+        The additional 10 months of delayed credits were in 2018 and are not yet
+        credited to the recipient. In Jan 2019, those credits kick in and the
+        additional bump in benefits does as well.
+      </p>
+
+      <p>
+        There are a few cases where this bump does not appear:
+      </p>
+
+      <ol>
+        <li><u>Early Benefit Reductions</u>: This rule only affects credits from
+          delaying after Normal Retirement age, it does not affect reductions
+          from
+          starting benefits early.</li>
+        <li><u>Age 70</u>: If the recipient starts the benefit at age 70, even
+          if that
+          is in the middle of the year, the full credits are applied.</li>
+        <li><u>Spousal Benefits</u>: Spousal benefits are not affected by
+          delayed
+          credits and so are unaffected by this rule.</li>
+      </ol>
+
+      <p>
+        This is not related to Cost of living adjustments (COLA). COLA is also
+        applied in January, but in addition to this rule.
+      </p>
+
+      <div id=homelink style="display: flex; justify-content: center">
+        <div>
+          <h1>Try SSA.tools to see your personalized benefit</h1>
+          <span style="font-size: 16px;">
+            <p>See your personal benefit data and ask 'What If?' Questions.
+              The tool is 100% free.
+            </p>
+            <p style="text-align: center">
+              <a class="bigbtn" href="/calculator.html" role="button">Get
+                Started</a>
+            </p>
+          </span>
+        </div>
+      </div>
+
+      <script type=module src="/src/analytics.mjs"></script>
+
+</body>
+
+</html>
