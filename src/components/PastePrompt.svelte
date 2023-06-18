@@ -1,4 +1,5 @@
 <script>
+  import "../global.css";
 </script>
 
 <div class="pastePrompt">
@@ -32,8 +33,6 @@
         loop
         muted
         disableRemotePlayback
-        width="576"
-        height="294"
         poster="/static/copy-paste-demo-poster.jpg"
         title="Animation showing a user copying a social security earnings record from ssa.gov."
       >
@@ -95,6 +94,14 @@
 <style>
   .pastePrompt {
     margin: auto;
+    max-width: min(660px, 80%);
+  }
+  ol,
+  ul {
+    padding-inline-start: 5%;
+  }
+  li {
+    margin: 10px;
   }
   h1 {
     font-weight: 500;
@@ -103,15 +110,21 @@
   .pasteArea {
     max-width: 480px;
     margin: 0 auto 0 auto;
+    padding: 0 20px 0 20px;
     width: 100%;
     font-size: 14px;
   }
   textarea {
+    /* Leave room for the padding in the pasteArea div. */
     width: 100%;
     height: 100px;
     resize: none;
     border: 1px solid #ccc;
     margin: 0;
+  }
+  video {
+    width: 100%;
+    aspect-ratio: 576 / 294;
   }
   textarea::-webkit-input-placeholder {
     /**
@@ -128,9 +141,8 @@
     border: 0 none;
     border-radius: 36px;
     color: #fff;
-    font-size: 18px;
     padding: 4px 16px;
-    margin: 0 10px;
+    margin: 2px 2px 0 0;
     cursor: pointer;
     background: #4ac15a;
   }
@@ -138,55 +150,39 @@
   /** Desktop **/
   @media screen and (min-width: 1025px) {
     .pastePrompt {
-      max-width: 660px;
       font-size: 18px;
     }
     h1 {
       font-size: 28px;
     }
-    .pastePrompt li {
-      margin: 20px;
-    }
-    .pasteArea {
-      padding: 0px 40px 0px 40px;
+    button {
+      font-size: 18px;
     }
   }
 
   /** Ipad **/
-  @media screen and (min-width: 421px) and (max-width: 1024px) {
+  @media screen and (min-width: 411px) and (max-width: 1024px) {
     .pastePrompt {
-      max-width: 660px;
       font-size: 16px;
     }
     h1 {
       font-size: 28px;
     }
-
-    .pastePrompt li {
-      margin: 20px;
-    }
-    .pasteArea {
-      padding: 0px 40px 0px 40px;
+    button {
+      font-size: 14px;
     }
   }
 
   /** iPhone */
-  @media screen and (max-width: 420px) {
+  @media screen and (max-width: 410px) {
     .pastePrompt {
-      max-width: 100%;
       font-size: 12px;
     }
     h1 {
       font-size: 20px;
     }
-    .pastePrompt li {
-      margin: 10px;
-    }
-    .pasteArea {
-      padding: 0px 20px 0px 20px;
-    }
-    ol {
-      padding-inline-start: 20px;
+    button {
+      font-size: 12px;
     }
   }
 </style>
