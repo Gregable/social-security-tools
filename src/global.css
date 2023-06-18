@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgb(51, 51, 51);
+  background-color: #fff;
+}
+
+* {
+  scroll-behavior: smooth;
+  /**
+   * border-box tells the browser to account for any border and padding
+   * in the values you specify for an element's width and height, rather than
+   * adding padding and border to the outside of the element's box. This makes
+   * it much easier to size elements.
+   */
+  box-sizing: border-box;
+}
+
+a {
+  color: #337ab7;
+  text-decoration: none;
+}
+
+p {
+  margin: 0 0 10px;
+}
