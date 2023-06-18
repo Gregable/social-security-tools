@@ -12,6 +12,133 @@
     href="https://ssa.tools/guide/feed.rss" />
 </head>
 
+<style>
+  html {
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+  }
+
+  * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+  }
+
+  body {
+    margin: 0px 0px;
+    padding: 20px 0 0 0;
+    font-family: 'Lato';
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+    position: relative;
+  }
+
+  div#topheader {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #c5c5c5;
+    min-height: 50px;
+    white-space: nowrap;
+  }
+
+  a {
+    color: #337ab7;
+  }
+
+  /* Page Header with title and static links */
+  div#topheader {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #c5c5c5;
+    min-height: 50px;
+    white-space: nowrap;
+  }
+
+  div#topheader>h3 {
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    line-height: 40px;
+    color: rgb(150, 150, 150);
+    font-weight: 500;
+    font-size: 24px;
+    font-family: inherit;
+  }
+
+  div#topheader h3#title-header {
+    padding-left: 40px;
+  }
+
+
+  /* Navigation Pills */
+  div#topheader ul.navpills {
+    list-style-image: none;
+    list-style-type: none;
+    list-style: none;
+    font-size: 14px;
+    float: right;
+    display: block;
+    margin: 0;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  div#topheader ul.navpills li {
+    float: left;
+    position: relative;
+    display: block;
+  }
+
+  div#topheader ul.navpills li a {
+    border-radius: 4px;
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+  }
+
+  div#topheader ul.navpills li.active a {
+    color: #fff;
+    background-color: #337ab7;
+  }
+
+  @media screen and (max-width: 675px) {
+
+    /* Below 650px the pills and header start to collide, so
+   * we move them to separate lines and center. */
+    div#topheader h3#title-header {
+      clear: both;
+      padding-top: 10px;
+      margin: 0;
+    }
+
+    div#topheader ul.navpills {
+      float: left;
+    }
+  }
+
+  /* Single div child of body. Prevents content column from getting wider
+ * than 1080px regardless of device width. */
+  div#bodychildcontainer {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: inherit;
+    line-height: 1.1;
+    color: inherit;
+  }
+
+  p {
+    color: #4b4b4b;
+    margin: 0 0 10px;
+    padding: 0px;
+  }
+
+</style>
+
 <body>
   <div id="bodychildcontainer">
     <!-- partials/header.html -->
@@ -80,7 +207,7 @@
         any decisions should be made after researching the subject yourself.
       </p>
       <p>
-        The site was most recently updated on Jan 07, 2023.
+        The site was most recently updated on Jun 16, 2023.
       </p>
       <h3>Why?</h3>
       <p>

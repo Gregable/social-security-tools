@@ -1,9 +1,8 @@
 <script lang="ts">
   import "./global.css";
 
-  import Header from "./lib/Header.svelte";
-  import Navbar from "./lib/Navbar.svelte";
-  import PastePrompt from "./lib/PastePrompt.svelte";
+  import Header from "./components/Header.svelte";
+  import PastePrompt from "./components/PastePrompt.svelte";
 
   // The app has 5 modes which the user can be in, based on the information
   // entered so far.
@@ -40,7 +39,6 @@
   {:else if mode === Mode.RENDER_EARNINGS}
     <div />
   {/if}
-  <Navbar />
 </main>
 
 <style>

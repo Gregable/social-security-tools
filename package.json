@@ -1,31 +1,21 @@
 {
-  "name": "ssa",
-  "version": "1.0.0",
-  "description": "SSA Tool Website",
-  "homepage": "https://ssa.tools/",
-  "bugs": {
-    "url": "https://github.com/Gregable/social-security-tools/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Gregable/social-security-tools/"
-  },
-  "main": "ssa.js",
-  "scripts": {
-    "test": "node tests/jasmine-run.mjs"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "jasmine": "^3.5.0"
-  },
+  "name": "social-security-tools",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
-  "dependencies": {
-    "differencify": "^1.5.5",
-    "express": "^4.17.1",
-    "glob": "^7.1.6",
-    "node": "^12.18.2",
-    "node-version": "^2.0.0",
-    "puppeteer": "^5.0.0"
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.4",
+    "@tsconfig/svelte": "^4.0.1",
+    "svelte": "^3.58.0",
+    "svelte-check": "^3.3.1",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9"
   }
 }
