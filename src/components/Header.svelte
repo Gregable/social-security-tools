@@ -1,3 +1,9 @@
+<!--
+  @component Header
+
+  some markdown here
+-->
+
 <script lang="ts">
   export let active = "Calculator";
 
