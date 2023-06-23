@@ -1,5 +1,12 @@
 body {
   margin: 0;
+  /**
+   * Causes the browser to add horizontal scrollbars if the window
+   * is narrower than this value. Set to 320px to match the width of
+   * the iPhone 5/SE.
+   */
+  min-width: 320px;
+
 
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: rgb(51, 51, 51);

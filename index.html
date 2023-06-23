@@ -16,33 +16,246 @@
   <link rel="og:type" href="website">
   <meta property="og:url" content="https://ssa.tools">
 
-  <link rel="stylesheet" href="/src/stylesheet.css">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="alternate" type="application/rss+xml" title="Social Security Tools"
     href="https://ssa.tools/guide/feed.rss" />
-
-  <!-- not actually needed in this document, but start loading them so
-       that the next page load will be faster -->
-  <link rel="modulepreload" href="/src/constants.mjs">
-  <link rel="modulepreload" href="/src/utils.mjs">
-  <link rel="modulepreload" href="/src/ssa-parse.mjs">
-  <link rel="modulepreload" href="/src/birthday.mjs">
-  <link rel="modulepreload" href="/src/recipient.mjs">
-  <link rel="modulepreload" href="/src/age-chart.mjs">
-  <link rel="modulepreload" href="/src/breakpoint-chart.mjs">
-  <link rel="modulepreload" href="/src/spousal-chart.mjs">
-  <link rel="modulepreload" href="/src/ssa.mjs">
 </head>
 
 <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
 
 <style>
-  /* Override a few styles on root page that we need nowhere else */
+  html {
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+  }
+
+  * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+  }
+
   body {
     margin: 0px 0px;
     padding: 20px 0 0 0;
     font-family: 'Lato';
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+    position: relative;
   }
+
+  div#topheader {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #c5c5c5;
+    min-height: 50px;
+    white-space: nowrap;
+  }
+
+  a {
+    color: #337ab7;
+  }
+
+
+  /* Frontpage message and get started button */
+  .jumbotron {
+    /* @license
+   * CC BY-SA 2.0: Creative Commons Attribution-Share Alike 2.0
+   * https://creativecommons.org/licenses/by-sa/2.0/
+   * "Blue And Pink Piggy Banks"
+   * Ken Teegardin
+   * https://www.flickr.com/photos/teegardin/6093701123/in/photostream/
+   */
+    background-image: url("static/piggybanks.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    text-align: left;
+    height: 507px;
+  }
+
+  .jumbotron>h1 {
+    font-weight: 500;
+  }
+
+  .jumbotron>p {
+    font-weight: 200;
+    margin: 0 0 15px 0;
+  }
+
+  a.bigbtn {
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: #fff;
+    white-space: nowrap;
+    padding: 14px 24px;
+    font-weight: 400;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  a.bigbtn:hover {
+    background-color: #449d44;
+    border-color: #398439;
+  }
+
+  @media screen and (min-width: 921px) {
+    .jumbotron {
+      padding: 80px;
+    }
+
+    .jumbotron>h1 {
+      font-size: 63px;
+      line-height: 1.1;
+    }
+
+    .jumbotron>p {
+      font-size: 21px;
+    }
+
+    a.bigbtn {
+      font-size: 21px;
+      line-height: 1.3;
+    }
+  }
+
+  @media screen and (max-width: 920px) and (min-width: 701px) {
+    .jumbotron {
+      padding: 30px;
+    }
+
+    .jumbotron>h1 {
+      font-size: 50px;
+      line-height: 1.1;
+    }
+
+    .jumbotron>p {
+      font-size: 20px;
+    }
+
+    a.bigbtn {
+      font-size: 20px;
+      line-height: 1.3;
+    }
+  }
+
+  @media screen and (max-width: 700px) and (min-width: 520px) {
+    .jumbotron {
+      padding: 20px;
+    }
+
+    .jumbotron>h1 {
+      font-size: 35px;
+      line-height: 1.1;
+    }
+
+    .jumbotron>p {
+      font-size: 16px;
+    }
+
+    a.bigbtn {
+      font-size: 16px;
+      line-height: 1.2;
+    }
+  }
+
+  @media screen and (max-width: 520px) {
+    .jumbotron {
+      padding: 5px;
+    }
+
+    .jumbotron>h1 {
+      font-size: 28px;
+      line-height: 1.0;
+      margin: 6px;
+    }
+
+    .jumbotron>p {
+      font-size: 16px;
+      line-height: 1.0;
+      font-weight: 400;
+    }
+
+    a.bigbtn {
+      font-size: 16px;
+      line-height: 1.0;
+      padding: 7px 12px;
+    }
+  }
+
+  /* Page Header with title and static links */
+  div#topheader {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #c5c5c5;
+    min-height: 50px;
+    white-space: nowrap;
+  }
+
+  div#topheader>h3 {
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    line-height: 40px;
+    color: rgb(150, 150, 150);
+    font-weight: 500;
+    font-size: 24px;
+    font-family: inherit;
+  }
+
+  div#topheader h3#title-header {
+    padding-left: 40px;
+  }
+
+
+  /* Navigation Pills */
+  div#topheader ul.navpills {
+    list-style-image: none;
+    list-style-type: none;
+    list-style: none;
+    font-size: 14px;
+    float: right;
+    display: block;
+    margin: 0;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  div#topheader ul.navpills li {
+    float: left;
+    position: relative;
+    display: block;
+  }
+
+  div#topheader ul.navpills li a {
+    border-radius: 4px;
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+  }
+
+  div#topheader ul.navpills li.active a {
+    color: #fff;
+    background-color: #337ab7;
+  }
+
+  @media screen and (max-width: 675px) {
+
+    /* Below 650px the pills and header start to collide, so
+   * we move them to separate lines and center. */
+    div#topheader h3#title-header {
+      clear: both;
+      padding-top: 10px;
+      margin: 0;
+    }
+
+    div#topheader ul.navpills {
+      float: left;
+    }
+  }
+
 
   .grid-container {
     display: grid;
@@ -55,6 +268,13 @@
     width: 85%;
     margin: 0 auto;
     align-items: center;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: inherit;
+    line-height: 1.1;
   }
 
   h1 {
@@ -72,7 +292,7 @@
 
   p {
     color: #4b4b4b;
-    margin-bottom: 1rem;
+    margin: 0 0 10px;
     padding: 0px;
   }
 
@@ -213,6 +433,7 @@
       font-size: 2.4vw;
     }
   }
+
 </style>
 
 <script type="application/ld+json">
@@ -372,44 +593,12 @@
         <li>Leave this tab open. Get back to it later.</li>
         <li>Bookmark this in your browser.</li>
         <li><a
-            href=mailto:your-email?body=Here%27s%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator.%0A%0A%20Greg%2C%20the%20creator%2C%20is%20CC%27d%20on%20this%20email.%20Maybe%20reply%20and%20let%20him%20know%20if%20you%20found%20it%20useful%20after%20you%20use%20it.%20He%27ll%20probably%20like%20that.&cc=ggrothau%40gmail.com&amp;subject=Read%20later%3A%20Social%20Security%20Calculator>Send
+            href="mailto:your-email?body=Here%27s%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator.%0A%0A%20Greg%2C%20the%20creator%2C%20is%20CC%27d%20on%20this%20email.%20Maybe%20reply%20and%20let%20him%20know%20if%20you%20found%20it%20useful%20after%20you%20use%20it.%20He%27ll%20probably%20like%20that.&cc=ggrothau%40gmail.com&amp;subject=Read%20later%3A%20Social%20Security%20Calculator">Send
             yourself an email</a>.</li>
-        <li>
-          <a
-            href="https://twitter.com/intent/tweet?text=I%20just%20calculated%20my%20own%20social%20security%20benefit%20with%20this%20super%20simple%20online%20calculator.%20Thanks%20%40Ssatools%20%E2%80%94%20http%3A%2F%2Fssa.tools%2F&amp;url=">Tweet
-            as though you read it read already</a> and I’ll reply and ask you
-          what you thought (at which point, you might try it so you can
-          respond).
-        </li>
-
       </ol>
     </div>
   </div>
 
-  <!-- Preload these for the next page. They aren't modules though, so just
-  reglar script include them. -->
-  <script type="text/javascript"
-    src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-  <script type="text/javascript"
-    src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"
-    async defer></script>
-  <script type="text/javascript"
-    src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"
-    async defer></script>
-  <script type="text/javascript"
-    src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-messages.min.js"
-    async defer></script>
-  <script type="text/javascript"
-    src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-  <script type="text/javascript"
-    src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-  <script type="text/javascript"
-    src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
-  <script type="text/javascript"
-    src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/6.2.2/rzslider.min.js"></script>
-
-  <!-- Google Analytics in privacy-protecting limited mode. -->
-  <script type=module src="/src/analytics.mjs"></script>
 </body>
 
 </html>
