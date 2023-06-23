@@ -4,6 +4,7 @@
   import Header from "./components/Header.svelte";
   import PastePrompt from "./components/PastePrompt.svelte";
 
+
   // The app has 5 modes which the user can be in, based on the information
   // entered so far.
   enum Mode {

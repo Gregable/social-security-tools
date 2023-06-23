@@ -5,6 +5,7 @@
     "types": [
       "vitest/globals"
     ],
+
     "useDefineForClassFields": true,
     "module": "ESNext",
     "resolveJsonModule": true,
