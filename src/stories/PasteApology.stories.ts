@@ -6,7 +6,7 @@ import {EarningRecord} from '../lib/earning-record';
 
 const meta: Meta<PasteApology> = {
   component: PasteApology,
-  title: 'Paste Apology',
+  title: 'Input/PasteFlow/PasteApology',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

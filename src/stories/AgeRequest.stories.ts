@@ -5,7 +5,7 @@ import AgeRequest from '../components/AgeRequest.svelte';
 
 const meta: Meta<AgeRequest> = {
   component: AgeRequest,
-  title: 'Age Request',
+  title: 'Input/PasteFlow/AgeRequest',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

@@ -133,7 +133,7 @@
    */
   table {
     margin: 50px auto;
-    max-width: calc(min(700px, 100% - 20px));
+    max-width: calc(min(600px, 100% - 20px));
     border: 1px solid #ddd;
     border-collapse: collapse;
     font-family: Arimo, sans-serif;
@@ -165,6 +165,5 @@
     line-height: 20px;
     margin: 0;
     box-sizing: border-box;
-    text-align: left;
   }
 </style>

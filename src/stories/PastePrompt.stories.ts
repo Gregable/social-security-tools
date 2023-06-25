@@ -6,7 +6,7 @@ import {EarningRecord} from '../lib/earning-record';
 
 const meta: Meta<PastePrompt> = {
   component: PastePrompt,
-  title: 'Paste Prompt',
+  title: 'Input/PasteFlow/PastePrompt',
 
   tags: ['autodocs'],
   parameters: {

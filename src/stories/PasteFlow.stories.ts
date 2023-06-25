@@ -2,11 +2,10 @@ import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
 import PasteFlow from '../components/PasteFlow.svelte';
-import {EarningRecord} from '../lib/earning-record';
 
 const meta: Meta<PasteFlow> = {
   component: PasteFlow,
-  title: 'Paste Fow',
+  title: 'Input/PasteFlow',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
