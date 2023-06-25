@@ -44,3 +44,19 @@ Default.args = {
         {year: 2013, taxedEarnings: 44777, taxedMedicareEarnings: 44777}),
   ],
 };
+
+export const NoMedicare = Template.bind({});
+NoMedicare.args = {
+  earningsRecords: [
+    new EarningRecord(
+        {year: 2009, taxedEarnings: 39154, taxedMedicareEarnings: -1}),
+    new EarningRecord(
+        {year: 2010, taxedEarnings: 39859, taxedMedicareEarnings: -1}),
+    new EarningRecord(
+        {year: 2011, taxedEarnings: 42911, taxedMedicareEarnings: -1}),
+    new EarningRecord(
+        {year: 2012, taxedEarnings: 44398, taxedMedicareEarnings: -1}),
+    new EarningRecord(
+        {year: 2013, taxedEarnings: 44777, taxedMedicareEarnings: -1}),
+  ],
+};

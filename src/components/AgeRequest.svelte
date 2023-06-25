@@ -82,6 +82,8 @@
   }
   .text {
     margin-bottom: 20px;
+    max-width: calc(min(700px, 100% - 20px));
+    margin: auto;
   }
   input {
     font-size: 26px;
@@ -94,7 +96,7 @@
     color: #fff;
     font-size: 18px;
     padding: 8px 26px;
-    margin: 0 10px;
+    margin: 4px 10px;
     min-width: 110px;
     cursor: pointer;
   }
