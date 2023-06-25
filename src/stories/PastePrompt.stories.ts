@@ -1,19 +1,26 @@
-import type {Meta, StoryObj} from '@storybook/svelte';
+import type {Meta} from '@storybook/svelte';
+import {action} from '@storybook/addon-actions';
 
 import PastePrompt from '../components/PastePrompt.svelte';
+import {EarningRecord} from '../lib/earning-record';
 
-const meta = {
-  title: 'Paste Prompt',
+const meta: Meta<PastePrompt> = {
   component: PastePrompt,
+  title: 'Paste Prompt',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
   },
-} satisfies Meta<PastePrompt>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Default: Story = {
-  args: {},
 };
+export default meta;
+
+const Template = ({...args}) => ({
+  Component: PastePrompt,
+  on: {
+    demo: action('demo'),
+    paste: action('paste'),
+  },
+});
+
+export const Default: Story<PastePrompt> = Template.bind({});
+Default.args = {};

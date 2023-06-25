@@ -104,7 +104,7 @@ function isYearString(maybeYearStr: string): boolean {
   return true;
 };
 
-function parsePaste(paste: string): Array<EarningRecord> {
+export function parsePaste(paste: string): Array<EarningRecord> {
   // We first collapse whitespace on each line as
   // different browsers insert different whitespace for column
   // separation.
@@ -200,4 +200,3 @@ function parsePaste(paste: string): Array<EarningRecord> {
 
   return out;
 };
-export {parsePaste};

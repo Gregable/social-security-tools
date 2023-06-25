@@ -1,5 +1,88 @@
-<script>
+<!--
+  @component
+  @name PastePrompt
+  @description
+    A component that prompts the user to paste their earnings record or select
+    from a list of demo records.
+
+  @example
+    <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
+
+  @events
+    paste: Fired when the user pastes their earnings record. The event detail
+      contains { recipient: Recipient } with the parsed earnings record.
+    demo: Fired when the user selects a demo record. The event detail contains
+      { recipient: Recipient, spouse: ?Recipient } with parsed earning records
+      and birthdates.
+
+-->
+
+<script lang="ts">
   import "../global.css";
+  import { createEventDispatcher } from "svelte";
+  import { parsePaste } from "../lib/ssa-parse";
+  import { Recipient } from "../lib/recipient";
+  import { Birthdate } from "../lib/birthday";
+  import { EarningRecord } from "../lib/earning-record";
+
+  import demo0 from "../assets/averagepaste.txt?raw";
+  import demo1 from "../assets/millionpaste.txt?raw";
+  import demo2 from "../assets/youngpaste.txt?raw";
+
+  const dispatch = createEventDispatcher();
+
+  let pasteContents: string = "";
+
+  function loadDemoData(demoId: number) {
+    return () => {
+      console.log("Loading Demo Data: " + demoId);
+      let recipient: Recipient;
+      let spouse: Recipient;
+      if (demoId == 0) {
+        recipient = new Recipient();
+        recipient.earningsRecords = parsePaste(demo0);
+        recipient.birthdate = new Birthdate(new Date("1950-07-01"));
+
+        spouse = new Recipient();
+        spouse.birthdate = new Birthdate(new Date("1949-03-01"));
+
+        // TODO: spouse.primaryInsuranceAmountValue = 400;
+      } else if (demoId == 1) {
+        recipient = new Recipient();
+        recipient.earningsRecords = parsePaste(demo1);
+        recipient.birthdate = new Birthdate(new Date("1950-08-02"));
+
+        spouse = new Recipient();
+        spouse.birthdate = new Birthdate(new Date("1951-12-02"));
+
+        // TODO: spouse.primaryInsuranceAmountValue = 600;
+      } else if (demoId == 2) {
+        recipient = new Recipient();
+        recipient.earningsRecords = parsePaste(demo2);
+        recipient.birthdate = new Birthdate(new Date("1985-09-03"));
+      } else {
+        throw new Error("Unknown demo ID: " + demoId);
+      }
+      dispatch("demo", {
+        recipient: recipient,
+        spouse: spouse,
+      });
+    };
+  }
+
+  function parsePasteContents(contents: string) {
+    if (contents == "") return;
+    const records = parsePaste(contents);
+    if (records.length > 0) {
+      let recipient: Recipient = new Recipient();
+      recipient.earningsRecords = records;
+
+      dispatch("paste", {
+        recipient: recipient,
+      });
+    }
+  }
+  $: parsePasteContents(pasteContents);
 </script>
 
 <div class="pastePrompt">
@@ -50,7 +133,11 @@
 
   <div class="pasteArea">
     <div>
-      <textarea wrap="off" placeholder={"\n\nPaste Result Here"} />
+      <textarea
+        wrap="off"
+        placeholder={"\n\nPaste Result Here"}
+        bind:value={pasteContents}
+      />
       <p>
         &#x1f512; Your data never leaves your own computer: the report is
         generated entirely by JavaScript in your browser.
@@ -74,19 +161,19 @@
     <li>
       Retiree born in 1950, who earned roughly the average US wage.
       <br />
-      <button>&#x261b; Try the Demo</button>
+      <button on:click={loadDemoData(0)}>&#x261b; Try the Demos</button>
     </li>
     <li>
       Retiree born in 1950 who earned the maximum Social Security wages over
       five years, but nothing otherwise.
       <br />
-      <button>&#x261b; Try the Demo</button>
+      <button on:click={loadDemoData(1)}>&#x261b; Try the Demos</button>
     </li>
     <li>
       Early career, born in 1985, $40k/year starting salary in 2005 with 4%
       annual raises.
       <br />
-      <button>&#x261b; Try the Demo</button>
+      <button on:click={loadDemoData(2)}>&#x261b; Try the Demos</button>
     </li>
   </ul>
 </div>
