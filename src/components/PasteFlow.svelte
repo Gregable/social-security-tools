@@ -67,10 +67,17 @@
     mode = Mode.PASTE_APOLOGY;
   }
 
+  /**
+   * Handle the user clicking the reset button. We go back to the initial
+   * state.
+   */
   function handleReset() {
     mode = Mode.INITIAL;
   }
 
+  /**
+   * Handle the user submitting their age. We're done!
+   */
   function handleAgeSubmit(event: CustomEvent) {
     recipient.birthdate = event.detail.birthdate;
     console.log("Recipient birthdate:", recipient.birthdate);

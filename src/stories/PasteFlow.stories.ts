@@ -1,12 +1,11 @@
 import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
-import PasteApology from '../components/PasteApology.svelte';
-import {EarningRecord} from '../lib/earning-record';
+import PasteFlow from '../components/PasteFlow.svelte';
 
-const meta: Meta<PasteApology> = {
-  component: PasteApology,
-  title: 'Input/PasteFlow/PasteApology',
+const meta: Meta<PasteFlow> = {
+  component: PasteFlow,
+  title: 'Input/PasteFlow',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -15,10 +14,10 @@ const meta: Meta<PasteApology> = {
 export default meta;
 
 const Template = ({...args}) => ({
-  Component: PasteApology,
+  Component: PasteFlow,
   props: args,
   on: {
-    reset: action('reset'),
+    done: action('done'),
   },
 });
 

@@ -28,7 +28,7 @@
 
   function earningsRecordsIncludeMedicare() {
     for (let i = 0; i < earningsRecords.length; ++i) {
-      if (earningsRecords[i].taxedMedicareEarnings >= 0) return true;
+      if (earningsRecords[i].taxedMedicareEarnings > 0) return true;
     }
     return false;
   }
@@ -133,11 +133,10 @@
    */
   table {
     margin: 50px auto;
-
+    max-width: calc(min(600px, 100% - 20px));
     border: 1px solid #ddd;
     border-collapse: collapse;
     font-family: Arimo, sans-serif;
-    max-width: 700px;
     font-size: 16px;
     line-height: 24px;
     color: #222;

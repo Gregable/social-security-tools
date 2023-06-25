@@ -6,7 +6,7 @@ import {EarningRecord} from '../lib/earning-record';
 
 const meta: Meta<PastePrompt> = {
   component: PastePrompt,
-  title: 'Paste Prompt',
+  title: 'Input/PasteFlow/PastePrompt',
 
   tags: ['autodocs'],
   parameters: {
@@ -23,5 +23,5 @@ const Template = ({...args}) => ({
   },
 });
 
-export const Default: Story<PastePrompt> = Template.bind({});
+export const Default = Template.bind({});
 Default.args = {};
