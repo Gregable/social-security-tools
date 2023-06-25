@@ -78,22 +78,23 @@
     // Let the app know we're done.
     dispatch("done");
   }
-
 </script>
 
-{#if mode === Mode.INITIAL}
-  <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
-{:else if mode === Mode.PASTE_CONFIRMATION}
-  <PasteConfirm
-    on:confirm={handleConfirm}
-    on:decline={handleDecline}
-    earningsRecords={recipient.earningsRecords}
-  />
-{:else if mode === Mode.PASTE_APOLOGY}
-  <PasteApology on:reset={handleReset} />
-{:else if mode === Mode.AGE_REQUEST}
-  <AgeRequest on:submit={handleAgeSubmit} />
-{/if}
+<div>
+  {#if mode === Mode.INITIAL}
+    <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
+  {:else if mode === Mode.PASTE_CONFIRMATION}
+    <PasteConfirm
+      on:confirm={handleConfirm}
+      on:decline={handleDecline}
+      earningsRecords={recipient.earningsRecords}
+    />
+  {:else if mode === Mode.PASTE_APOLOGY}
+    <PasteApology on:reset={handleReset} />
+  {:else if mode === Mode.AGE_REQUEST}
+    <AgeRequest on:submit={handleAgeSubmit} />
+  {/if}
+</div>
 
 <style>
 </style>
