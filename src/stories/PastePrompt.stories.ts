@@ -23,5 +23,5 @@ const Template = ({...args}) => ({
   },
 });
 
-export const Default: Story<PastePrompt> = Template.bind({});
+export const Default = Template.bind({});
 Default.args = {};
