@@ -1,9 +1,10 @@
 <script lang="ts">
   import "../global.css";
   import { createEventDispatcher } from "svelte";
+  import { Recipient } from "../lib/recipient";
+  import AgeRequest from "./AgeRequest.svelte";
   import PasteConfirm from "./PasteConfirm.svelte";
   import PastePrompt from "./PastePrompt.svelte";
-  import { Recipient } from "../lib/recipient";
   import PasteApology from "./PasteApology.svelte";
 
   const dispatch = createEventDispatcher();
@@ -69,6 +70,14 @@
   function handleReset() {
     mode = Mode.INITIAL;
   }
+
+  function handleAgeSubmit(event: CustomEvent) {
+    recipient.birthdate = event.detail.birthdate;
+    console.log("Recipient birthdate:", recipient.birthdate);
+
+    // Let the app know we're done.
+    dispatch("done");
+  }
 </script>
 
 {#if mode === Mode.INITIAL}
@@ -82,7 +91,7 @@
 {:else if mode === Mode.PASTE_APOLOGY}
   <PasteApology on:reset={handleReset} />
 {:else if mode === Mode.AGE_REQUEST}
-  <div />
+  <AgeRequest on:submit={handleAgeSubmit} />
 {/if}
 
 <style>
