@@ -78,6 +78,7 @@
     // Let the app know we're done.
     dispatch("done");
   }
+
 </script>
 
 {#if mode === Mode.INITIAL}
