@@ -4,6 +4,7 @@
   import PasteConfirm from "./PasteConfirm.svelte";
   import PastePrompt from "./PastePrompt.svelte";
   import { Recipient } from "../lib/recipient";
+  import PasteApology from "./PasteApology.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -51,7 +52,7 @@
   }
 
   /**
-   * Handle the user confirming their earnings record. We prompt for age.
+   * Handle the user confirming their earnings record. We next prompt for age.
    */
   function handleConfirm() {
     mode = Mode.AGE_REQUEST;
@@ -64,6 +65,10 @@
   function handleDecline() {
     mode = Mode.PASTE_APOLOGY;
   }
+
+  function handleReset() {
+    mode = Mode.INITIAL;
+  }
 </script>
 
 {#if mode === Mode.INITIAL}
@@ -75,7 +80,7 @@
     earningsRecords={recipient.earningsRecords}
   />
 {:else if mode === Mode.PASTE_APOLOGY}
-  <div />
+  <PasteApology on:reset={handleReset} />
 {:else if mode === Mode.AGE_REQUEST}
   <div />
 {/if}
