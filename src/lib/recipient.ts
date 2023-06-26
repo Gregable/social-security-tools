@@ -9,6 +9,40 @@ import {PrimaryInsuranceAmount} from './pia';
  * A Recipient object manages calculating a user's SSA and IRS data.
  */
 export class Recipient {
+  /**
+   * Creates a Recipient object.
+   */
+  constructor() {}
+
+  /**
+   * Subscribers to call back for changes to this Recipient.
+   */
+  private subscribers_: Array<(recipient: Recipient) => void> = [];
+
+  /**
+   * Registers a callback to be called when this Recipient changes.
+   * @param callback The callback to call when this Recipient changes.
+   * @return A function that can be called to unsubscribe the callback.
+   * @see https://svelte.dev/docs#Store_contract
+   */
+  subscribe(callback: (recipient: Recipient) => void): () => void {
+    this.subscribers_.push(callback);
+    callback(this);
+    // Return an unsubscribe function.
+    return () => {
+      const index = this.subscribers_.indexOf(callback);
+      if (index !== -1) {
+        this.subscribers_.splice(index, 1);
+      }
+    };
+  };
+
+  private publish_() {
+    this.subscribers_.forEach((callback) => {
+      callback(this);
+    });
+  }
+
   /** The recipient's name. */
   private name_: string;
   get name(): string {
@@ -16,10 +50,12 @@ export class Recipient {
   }
   set name(name: string) {
     this.name_ = name;
+    this.publish_();
   }
 
   /**
-   * The recipient's earning records over all years in the SSA database, if any.
+   * The recipient's earning records over all years in the SSA database, if
+   * any.
    */
   private earningsRecords_: Array<EarningRecord> = [];
   get earningsRecords(): Array<EarningRecord> {
@@ -52,10 +88,10 @@ export class Recipient {
   simulateFutureEarningsYears(numYears: number, wage: number) {
     this.futureEarningsRecords_ = [];
 
-    // We can't simulate the past, so start the simulation at the current year.
-    // However, if there are records for this year or future years, start the
-    // simulation at the next year not in the records as long as that record is
-    // complete.
+    // We can't simulate the past, so start the simulation at the current
+    // year. However, if there are records for this year or future years,
+    // start the simulation at the next year not in the records as long as
+    // that record is complete.
     let startYear = constants.CURRENT_YEAR;
     if (this.earningsRecords_.length > 0) {
       const lastRecord =
@@ -110,7 +146,8 @@ export class Recipient {
   }
   set birthdate(birthdate: Birthdate) {
     this.birthdate_ = birthdate;
-    // Update the indexing year for the all records based on the new birthdate.
+    // Update the indexing year for the all records based on the new
+    // birthdate.
     this.updateEarningsRecords_();
   }
 
@@ -215,6 +252,8 @@ export class Recipient {
           Math.round(100 * this.top35IndexedEarnings_[i].indexedEarnings());
     }
     this.totalIndexedEarnings_ /= 100;
+
+    this.publish_();
   }
 
   hasEarningsBefore1978(): boolean {

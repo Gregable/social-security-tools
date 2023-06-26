@@ -222,6 +222,65 @@ describe('Recipient', () => {
     }
   });
 
+  it('calls subscribers on name update', () => {
+    let r = new Recipient();
+    let numCallbacks = 0;
+    let unsubscribe = r.subscribe((recipient: Recipient) => {
+      numCallbacks++;
+    });
+    expect(numCallbacks).toEqual(1);
+
+    r.name = 'Greg';
+    expect(numCallbacks).toEqual(2);
+    unsubscribe();
+  });
+
+  it('calls subscribers on earnings record update', () => {
+    let r = new Recipient();
+    let expectedRecordCount = 0;
+    let numCallbacks = 0;
+    let unsubscribe = r.subscribe((recipient: Recipient) => {
+      expect(recipient.earningsRecords.length).toEqual(expectedRecordCount);
+      numCallbacks++;
+    });
+    expect(numCallbacks).toEqual(1);
+
+    expectedRecordCount = 1;
+    r.earningsRecords = [testRecord(2007)];
+    expect(numCallbacks).toEqual(2);
+    unsubscribe();
+  });
+
+  it('calls subscribers on future earnings record update', () => {
+    let r = new Recipient();
+    let expectedRecordCount = 0;
+    let numCallbacks = 0;
+    let unsubscribe = r.subscribe((recipient: Recipient) => {
+      expect(recipient.futureEarningsRecords.length)
+          .toEqual(expectedRecordCount);
+      numCallbacks++;
+    });
+    expect(numCallbacks).toEqual(1);
+
+    expectedRecordCount = 1;
+    r.futureEarningsRecords = [testRecord(2007)];
+    expect(numCallbacks).toEqual(2);
+    unsubscribe();
+  });
+
+  it('calls subscribers on birthday record update', () => {
+    let r = new Recipient();
+    let numCallbacks = 0;
+    let unsubscribe = r.subscribe((recipient: Recipient) => {
+      numCallbacks++;
+    });
+    expect(numCallbacks).toEqual(1);
+
+    r.birthdate = new Birthdate(new Date(1990, 0, 2));
+    expect(numCallbacks).toEqual(2);
+    unsubscribe();
+  });
+
   /**
    * Generates a recipient with a birthdate in 1960, and 40 years of earnings
    * records starting in 1965. Each year has earnings equal to $10,000.
