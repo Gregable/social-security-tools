@@ -9,21 +9,21 @@
 
   const dispatch = createEventDispatcher();
 
-  // The app has 5 modes which the user can be in, based on the information
-  // entered so far.
+  // The mode of the paste flow. This is a state machine that controls
+  // which component is rendered.
   enum Mode {
-    // Starting in initial mode, we render paste-prompt.html and request
+    // Starting in initial mode, we render <PastePrompt> and request
     // either a ssa.gov paste or to load demo data.
     INITIAL,
     // When ssa.gov data is entered, we initially display the earings record
-    // in the same css style as ssa.gov, and have a "yes/no" confirmation box.
-    // This is paste-confirm.html
+    // in the same css style as ssa.gov, and have a "yes / no" confirmation box.
+    // This is <PasteConfirm>.
     PASTE_CONFIRMATION,
     // If the user selects "no" to the paste, we display a "Sorry" view with a
-    // button to call reset(). This is also paste-confirm.html
+    // button to call reset(). This is <PasteApology>.
     PASTE_APOLOGY,
     // If the user selects "yes", we then prompt them to enter their age. This
-    // is age-request.html.
+    // is <AgeRequest>.
     AGE_REQUEST,
   }
   let mode: Mode = Mode.INITIAL;
