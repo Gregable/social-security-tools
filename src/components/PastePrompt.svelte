@@ -23,7 +23,6 @@
   import { parsePaste } from "../lib/ssa-parse";
   import { Recipient } from "../lib/recipient";
   import { Birthdate } from "../lib/birthday";
-  import { EarningRecord } from "../lib/earning-record";
 
   import demo0 from "../assets/averagepaste.txt?raw";
   import demo1 from "../assets/millionpaste.txt?raw";

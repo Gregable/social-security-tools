@@ -1,7 +1,7 @@
 <script lang="ts">
   import "../global.css";
   import { createEventDispatcher } from "svelte";
-  import { Recipient } from "../lib/recipient";
+  import { context } from "../lib/context";
   import AgeRequest from "./AgeRequest.svelte";
   import PasteConfirm from "./PasteConfirm.svelte";
   import PastePrompt from "./PastePrompt.svelte";
@@ -28,16 +28,13 @@
   }
   let mode: Mode = Mode.INITIAL;
 
-  let recipient: Recipient;
-  let spouse: Recipient;
-
   /**
    * Handle the user selecting a demo record. There is no confirmation step
    * for demo records, since the user isn't actually entering data.
    */
   function handleDemo(event: CustomEvent) {
-    recipient = event.detail.recipient;
-    spouse = event.detail.spouse;
+    context.recipient = event.detail.recipient;
+    context.spouse = event.detail.spouse;
 
     // Let the app know we're done.
     dispatch("done");
@@ -48,7 +45,7 @@
    * step, and then prompt for age.
    */
   function handlePaste(event: CustomEvent) {
-    recipient = event.detail.recipient;
+    context.recipient = event.detail.recipient;
     mode = Mode.PASTE_CONFIRMATION;
   }
 
@@ -79,9 +76,7 @@
    * Handle the user submitting their age. We're done!
    */
   function handleAgeSubmit(event: CustomEvent) {
-    recipient.birthdate = event.detail.birthdate;
-    console.log("Recipient birthdate:", recipient.birthdate);
-
+    context.recipient.birthdate = event.detail.birthdate;
     // Let the app know we're done.
     dispatch("done");
   }
@@ -94,7 +89,7 @@
     <PasteConfirm
       on:confirm={handleConfirm}
       on:decline={handleDecline}
-      earningsRecords={recipient.earningsRecords}
+      earningsRecords={context.recipient.earningsRecords}
     />
   {:else if mode === Mode.PASTE_APOLOGY}
     <PasteApology on:reset={handleReset} />
