@@ -20,10 +20,13 @@ function parsePasteExpect(parsed) {
   expect(parsed.length).toBe(3);
   expect(parsed[0].year).toBe(2016);
   expect(parsed[0].taxedEarnings).toBe(80000);
+  expect(parsed[0].incomplete).toBe(false);
   expect(parsed[1].year).toBe(2017);
   expect(parsed[1].taxedEarnings).toBe(90000);
+  expect(parsed[1].incomplete).toBe(false);
   expect(parsed[2].year).toBe(2018);
   expect(parsed[2].taxedEarnings).toBe(100000);
+  expect(parsed[2].incomplete).toBe(false);
 }
 
 describe('parsePaste', () => {
@@ -267,6 +270,28 @@ describe('parsePaste', () => {
          '$80,000 \n' +
          '$80,000');
     parsePasteExpect(parsePaste(pasteData));
+  });
+
+  it('Parses ssa.gov format with not yet recorded year', () => {
+    let pasteData =
+        ('Work Year\n' +
+         'Taxed Social Security Earnings\n' +
+         'Taxed Medicare Earnings\n' +
+         '2018\tNot Yet Recorded\tNot Yet Recorded\n' +
+         '2017\t$90,000\t$90,000\n' +
+         '2016\t$80,000\t$80,000\n');
+    const parsed = parsePaste(pasteData);
+    expect(parsed.length).toBe(3);
+    expect(parsed[0].year).toBe(2016);
+    expect(parsed[0].taxedEarnings).toBe(80000);
+    expect(parsed[0].incomplete).toBe(false);
+    expect(parsed[1].year).toBe(2017);
+    expect(parsed[1].taxedEarnings).toBe(90000);
+    expect(parsed[1].incomplete).toBe(false);
+    expect(parsed[2].year).toBe(2018);
+    expect(parsed[2].taxedEarnings).toBe(0);
+    expect(parsed[2].taxedMedicareEarnings).toBe(0);
+    expect(parsed[2].incomplete).toBe(true);
   });
 
   it('Parses ssa.gov format before medicare', () => {

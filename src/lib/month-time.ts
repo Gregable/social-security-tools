@@ -1,8 +1,5 @@
 import * as constants from './constants'
 
-// TODO(gregable): Remove a bunch of the redundant jsdoc type annotations and
-//                 add descriptive text.
-
 /**
  * In social security calculations, days don't really matter for much.
  * Everything is computed on month scales, not days. Days or smaller
@@ -43,7 +40,7 @@ export class MonthDate {
 
   /**
    * Initializer from a date with string month. Ex: (2000, "Jan").
-   * @param {string} monthStr - 3 character month string from ALL_MONTHS
+   * @param monthStr - 3 character month string from ALL_MONTHS
    */
   static initFromYearsMonthsStr(years: number, monthStr: string): MonthDate {
     console.assert(Number.isInteger(years), years);

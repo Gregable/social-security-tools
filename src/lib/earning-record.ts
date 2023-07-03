@@ -29,7 +29,6 @@ export class EarningRecord {
    * to indicate a difference from a year with no earnings, however the
    * record is marked as incomplete.
    */
-  // TODO:
   incomplete: boolean = false;
 
   constructor(input: EarningRecordInput) {

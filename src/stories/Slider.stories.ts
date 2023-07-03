@@ -1,4 +1,6 @@
 import type {Meta} from '@storybook/svelte';
+import {action} from '@storybook/addon-actions';
+
 import Slider from '../components/Slider.svelte';
 
 const meta: Meta<Slider> = {
@@ -14,6 +16,9 @@ export default meta;
 const Template = ({...args}) => ({
   Component: Slider,
   props: args,
+  on: {
+    change: action('change'),
+  },
 });
 
 export const Default = Template.bind({});
