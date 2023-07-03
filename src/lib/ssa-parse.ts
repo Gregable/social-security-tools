@@ -5,10 +5,6 @@ import {EarningRecord} from './earning-record';
  * dollar sign and internal commas, convert to an actual number.
  */
 export function dollarStringToNumber(dollarString: string): number {
-  // For the current year, the SSA site will display 'Not yet recorded'
-  // if the data is unavailable so far, presumably because taxes haven't
-  // yet been filed. Record this as a -1 sentinel.
-  if (dollarString == 'NotYetRecorded') return -1;
   // Similar idea here, for the year 1965, the SSA site will display
   // 'Medicare Began in 1966' if the data is unavailable. Record this as
   // a 0 sentinel.
@@ -29,13 +25,23 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
-    let record = new EarningRecord({
-      year: Number.parseInt(columns[0]),
-      taxedEarnings: dollarStringToNumber(columns[1]),
-      taxedMedicareEarnings:
-          columns.length > 2 ? dollarStringToNumber(columns[2]) : 0,
-    });
-    earningsRecords.push(record);
+    if (columns[1] == 'NotYetRecorded') {
+      let record = new EarningRecord({
+        year: Number.parseInt(columns[0]),
+        taxedEarnings: 0,
+        taxedMedicareEarnings: 0,
+      });
+      record.incomplete = true;
+      earningsRecords.push(record);
+    } else {
+      let record = new EarningRecord({
+        year: Number.parseInt(columns[0]),
+        taxedEarnings: dollarStringToNumber(columns[1]),
+        taxedMedicareEarnings:
+            columns.length > 2 ? dollarStringToNumber(columns[2]) : 0,
+      });
+      earningsRecords.push(record);
+    }
   }
   return earningsRecords;
 };
@@ -66,12 +72,22 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
-    var record = new EarningRecord({
-      year: Number.parseInt(columns[0]),
-      taxedEarnings: dollarStringToNumber(columns[2]),
-      taxedMedicareEarnings: 0,
-    });
-    earningsRecords.push(record);
+    if (columns[1] == 'NotYetRecorded') {
+      let record = new EarningRecord({
+        year: Number.parseInt(columns[0]),
+        taxedEarnings: 0,
+        taxedMedicareEarnings: 0,
+      });
+      record.incomplete = true;
+      earningsRecords.push(record);
+    } else {
+      var record = new EarningRecord({
+        year: Number.parseInt(columns[0]),
+        taxedEarnings: dollarStringToNumber(columns[2]),
+        taxedMedicareEarnings: 0,
+      });
+      earningsRecords.push(record);
+    }
   }
   return earningsRecords;
 };
@@ -105,7 +121,6 @@ function isYearString(maybeYearStr: string): boolean {
 };
 
 export function parsePaste(paste: string): Array<EarningRecord> {
-
   // We first collapse whitespace on each line as
   // different browsers insert different whitespace for column
   // separation.

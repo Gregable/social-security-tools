@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, onMount } from "svelte";
+  import { afterUpdate, createEventDispatcher } from "svelte";
 
   let sliderEl: HTMLDivElement;
   let handleEl: HTMLSpanElement;
@@ -86,6 +86,9 @@
     _label
   ) => value.toLocaleString();
 
+  const dispatch = createEventDispatcher();
+  $: dispatch("change", { value: value });
+
   // By binding to window.innerWidth, we can update the width when the
   // window is resized and update the slider position visibly.
   function getWidth(_windowWidth: number, el: HTMLDivElement): number {
@@ -113,11 +116,11 @@
     event.stopPropagation();
     dragging = true;
     handleEl.focus();
-    setValue(event.clientX);
+    dragTo(event.clientX);
   }
   function onMove(event: PointerEvent) {
     if (dragging) {
-      setValue(event.clientX);
+      dragTo(event.clientX);
     }
   }
   function onEnd(event: PointerEvent) {
@@ -148,6 +151,15 @@
     // For example, this could be <tab> which we want to allow to remove focus.
     event.preventDefault();
     event.stopPropagation();
+
+    // Ensure that we snap to the nearest "step" increment unless we are at
+    // the bounds:
+    if (val > floor && val < ceiling) {
+      val = Math.round(val / step) * step;
+    }
+    // Ensure that we don't go out of bounds.
+    val = Math.max(floor, Math.min(ceiling, val));
+
     value = val;
   }
 
@@ -156,11 +168,12 @@
    * The value is rounded to the nearest step.
    * @param eventX The x coordinate of the event.
    */
-  function setValue(eventX: number) {
+  function dragTo(eventX: number) {
     const percent = (eventX - sliderEl.getBoundingClientRect().left) / width;
-    value = floor + percent * (ceiling - floor);
-    value = Math.round(value / step) * step;
-    value = Math.max(floor, Math.min(ceiling, value));
+    let val = floor + percent * (ceiling - floor);
+    val = Math.round(val / step) * step;
+    val = Math.max(floor, Math.min(ceiling, val));
+    value = val;
   }
 
   /**
@@ -204,7 +217,6 @@
   afterUpdate(updateHandleLabel);
   $: updateHandleLabel(width);
 
-  // TODO: Ensure this runs on resize.
   /**
    * Update the list of ticks based on the current input values.
    *
@@ -393,10 +405,9 @@
   }
   .handleLabel {
     bottom: 16px;
-    padding: 1px 3px;
+    padding: 3px 3px;
     cursor: default;
     background-color: #fff;
-    color: #000;
     z-index: 2;
   }
   ul.ticks {

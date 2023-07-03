@@ -34,7 +34,6 @@
 
   function loadDemoData(demoId: number) {
     return () => {
-      console.log("Loading Demo Data: " + demoId);
       let recipient: Recipient;
       let spouse: Recipient;
       if (demoId == 0) {

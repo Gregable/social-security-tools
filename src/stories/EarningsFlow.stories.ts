@@ -1,11 +1,13 @@
 import type {Meta} from '@storybook/svelte';
-import EarningsTable from '../components/EarningsTable.svelte';
+import EarningsFlow from '../components/EarningsFlow.svelte';
 
+// TODO: Make this more reusable
 import {context} from '../lib/context';
 import {Recipient} from '../lib/recipient';
 import {parsePaste} from '../lib/ssa-parse';
 import {Birthdate} from '../lib/birthday';
 import {EarningRecord} from '../lib/earning-record';
+
 
 import demo0 from '../assets/averagepaste.txt?raw';
 
@@ -21,9 +23,9 @@ context.recipient.earningsRecords.push((() => {
 context.recipient.earningsRecords = context.recipient.earningsRecords;
 context.recipient.birthdate = new Birthdate(new Date('1950-07-01'));
 
-const meta: Meta<EarningsTable> = {
-  component: EarningsTable,
-  title: 'Report/Earnings/EarningsTable',
+const meta: Meta<EarningsFlow> = {
+  component: EarningsFlow,
+  title: 'Report/Earnings/EarningsFlow',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -32,12 +34,9 @@ const meta: Meta<EarningsTable> = {
 export default meta;
 
 const Template = ({...args}) => ({
-  Component: EarningsTable,
+  Component: EarningsFlow,
   props: args,
 });
 
 export const Default = Template.bind({});
-Default.args = {
-  isSpouse: false,
-  futureTable: false,
-};
+Default.args = {};

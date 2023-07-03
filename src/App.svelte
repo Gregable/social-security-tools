@@ -3,11 +3,22 @@
 
   import Header from "./components/Header.svelte";
   import PasteFlow from "./components/PasteFlow.svelte";
+  import EarningsFlow from "./components/EarningsFlow.svelte";
+
+  let isPasteFlow: Boolean = true;
+
+  function pasteDone() {
+    isPasteFlow = false;
+  }
 </script>
 
 <main>
   <Header />
-  <PasteFlow />
+  {#if isPasteFlow}
+    <PasteFlow on:done={pasteDone} />
+  {:else}
+    <EarningsFlow />
+  {/if}
 </main>
 
 <style>
