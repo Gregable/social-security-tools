@@ -1,5 +1,5 @@
 import type {Meta} from '@storybook/svelte';
-import EarningsFlow from '../components/EarningsFlow.svelte';
+import EarningsReport from '../components/EarningsReport.svelte';
 
 // TODO: Make this more reusable
 import {context} from '../lib/context';
@@ -23,9 +23,9 @@ context.recipient.earningsRecords.push((() => {
 context.recipient.earningsRecords = context.recipient.earningsRecords;
 context.recipient.birthdate = new Birthdate(new Date('1950-07-01'));
 
-const meta: Meta<EarningsFlow> = {
-  component: EarningsFlow,
-  title: 'Report/Earnings/EarningsFlow',
+const meta: Meta<EarningsReport> = {
+  component: EarningsReport,
+  title: 'Report/Earnings/EarningsReport',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -34,7 +34,7 @@ const meta: Meta<EarningsFlow> = {
 export default meta;
 
 const Template = ({...args}) => ({
-  Component: EarningsFlow,
+  Component: EarningsReport,
   props: args,
 });
 
