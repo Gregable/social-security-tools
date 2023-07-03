@@ -13,8 +13,14 @@ import demo0 from '../assets/averagepaste.txt?raw';
 
 context.recipient = new Recipient();
 context.recipient.earningsRecords = parsePaste(demo0);
-context.recipient.earningsRecords.push(new EarningRecord(
-    {year: 2015, taxedEarnings: -1, taxedMedicareEarnings: -1}));
+// Add an incomplete record:
+context.recipient.earningsRecords.push((() => {
+  let record = new EarningRecord(
+      {year: 2015, taxedEarnings: -1, taxedMedicareEarnings: -1});
+  record.incomplete = true;
+  return record;
+})());
+context.recipient.earningsRecords = context.recipient.earningsRecords;
 context.recipient.birthdate = new Birthdate(new Date('1950-07-01'));
 
 const meta: Meta<EarningsFlow> = {

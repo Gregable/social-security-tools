@@ -59,7 +59,7 @@
             <td class="age onlydisplay500">
               {ageAtYear(earningRecord.year)}
             </td>
-            {#if earningRecord.taxedEarnings < 0}
+            {#if earningRecord.incomplete}
               <td colspan="5" class="taxedearnings" style="text-align:center">
                 Not yet recorded
               </td>
@@ -115,7 +115,7 @@
     padding-left: 6px;
     padding-right: 30px;
   }
-  age {
+  .age {
     width: 2em;
     padding-left: 6px;
     padding-right: 30px;
