@@ -3,14 +3,19 @@
   import { context } from "../lib/context";
   import EarningsTable from "./EarningsTable.svelte";
   import FutureEarningsSliders from "./FutureEarningsSliders.svelte";
+  import { Recipient } from "../lib/recipient";
+
+  export let recipient: Recipient = new Recipient();
 </script>
 
 <div>
   <a id="nav-earnings" class="nav" />
-  <h2 class="earningsRecordHeader">Earnings Record</h2>
-  <EarningsTable isSpouse={false} futureTable={false} />
+
+  <h2>Earnings Record</h2>
+
+  <EarningsTable earningsRecords={$recipient.earningsRecords} />
   <FutureEarningsSliders recipient={context.recipient} />
-  <EarningsTable isSpouse={false} futureTable={true} />
+  <EarningsTable earningsRecords={$recipient.futureEarningsRecords} />
 </div>
 
 <style>

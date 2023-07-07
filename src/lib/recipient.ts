@@ -196,6 +196,19 @@ export class Recipient {
   };
 
   /**
+   * The total number of credits the recipient has earned so far.
+   *
+   * This does not include future credits.
+   */
+  earnedCredits(): number {
+    let credits: number = 0;
+    for (let i = 0; i < this.earningsRecords_.length; ++i) {
+      credits += this.earningsRecords_[i].credits();
+    }
+    return Math.min(40, credits);
+  }
+
+  /**
    * The total number of credits the recipient has earned or will earn.
    */
   totalCredits(): number {
@@ -220,12 +233,16 @@ export class Recipient {
     this.earningsRecords_.sort((a, b) => a.year - b.year);
     for (let i = 0; i < this.earningsRecords_.length; ++i) {
       this.earningsRecords_[i].indexingYear = indexingYear;
+      this.earningsRecords_[i].age =
+          this.earningsRecords_[i].year - this.birthdate_.ssaBirthYear();
       this.earningsRecords_[i].isTop35EarningsYear = false;
     }
 
     this.futureEarningsRecords_.sort((a, b) => a.year - b.year);
     for (let i = 0; i < this.futureEarningsRecords_.length; ++i) {
       this.futureEarningsRecords_[i].indexingYear = indexingYear;
+      this.futureEarningsRecords_[i].age =
+          this.futureEarningsRecords_[i].year - this.birthdate_.ssaBirthYear();
       this.futureEarningsRecords_[i].isTop35EarningsYear = false;
     }
 

@@ -184,6 +184,8 @@ describe('Recipient', () => {
     for (let i = 0; i < 3; i++) {
       // Records get sorted by year:
       expect(r.earningsRecords[i].year).toEqual(2007 + i);
+      // Records have age set:
+      expect(r.earningsRecords[i].age).toEqual(2007 - 1990 + i);
       // Records have indexingYear set:
       expect(r.earningsRecords[0].indexingYear).toEqual(2050);
     }
