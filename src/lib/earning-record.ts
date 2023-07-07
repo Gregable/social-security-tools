@@ -19,6 +19,13 @@ export class EarningRecord {
    */
   indexingYear: number = -1;
 
+  /**
+   * The recipient's age in the year of the earnings record. This is the
+   * SSA's definition of age, and will be the age of the recipient at the
+   * end of the year. e.g. in the year they are born, their age will be 0.
+   */
+  age: number = -1;
+
   /** Is this one of the top 35 earnings years */
   isTop35EarningsYear: boolean = false;
 
@@ -51,21 +58,25 @@ export class EarningRecord {
   }
 
   /**
+   * @return amount of earnings in a given year required to earn one credit.
+   */
+  earningsRequiredPerCredit(): number {
+    if (this.year < 1978) {
+      return constants.EARNINGS_PER_CREDIT_BEFORE_1978;
+    } else if (this.year > constants.MAX_YEAR) {
+      return constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR];
+    } else {
+      return constants.EARNINGS_PER_CREDIT[this.year];
+    }
+  }
+
+
+  /**
    * @return number of credits earned in the year of the record.
    */
   credits(): number {
-    let earningsRequiredPerCredit = 0;
-    if (this.year < 1978) {
-      earningsRequiredPerCredit = constants.EARNINGS_PER_CREDIT_BEFORE_1978;
-    } else if (this.year > constants.MAX_YEAR) {
-      earningsRequiredPerCredit =
-          constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR];
-    } else {
-      earningsRequiredPerCredit = constants.EARNINGS_PER_CREDIT[this.year];
-    }
-
     return Math.min(
-        4, Math.floor(this.taxedEarnings / earningsRequiredPerCredit));
+        4, Math.floor(this.taxedEarnings / this.earningsRequiredPerCredit()));
   }
 
 

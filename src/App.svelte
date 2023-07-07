@@ -1,9 +1,12 @@
 <script lang="ts">
   import "./global.css";
 
+  import { context } from "./lib/context";
+
   import Header from "./components/Header.svelte";
   import PasteFlow from "./components/PasteFlow.svelte";
   import EarningsReport from "./components/EarningsReport.svelte";
+  import EligibilityReport from "./components/EligibilityReport.svelte";
 
   let isPasteFlow: Boolean = true;
 
@@ -17,7 +20,8 @@
   {#if isPasteFlow}
     <PasteFlow on:done={pasteDone} />
   {:else}
-    <EarningsReport />
+    <EarningsReport recipient={context.recipient} />
+    <EligibilityReport recipient={context.recipient} />
   {/if}
 </main>
 

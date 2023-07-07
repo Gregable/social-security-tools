@@ -7,12 +7,6 @@
   function wholeDollars(n: number) {
     return "$" + Math.round(n).toLocaleString();
   }
-  function twoSignificantDigits(n: number) {
-    return n.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
 </script>
 
 <div>
@@ -23,10 +17,8 @@
           <th class="workyear">Year</th>
           <th class="age onlydisplay500">Age</th>
           <th class="taxedearnings">Taxed Earnings</th>
-          <th class="multsymbol" />
-          <th class="multiplier">Multiplier</th>
-          <th class="indexedearnings" colspan="2">Indexed Earnings</th>
-          <th class="top35indicators" />
+          <th class="epc">Earnings Per Credit</th>
+          <th class="credits">Credits</th>
         </tr>
       </thead>
       <tbody>
@@ -37,29 +29,23 @@
               {earningRecord.age}
             </td>
             {#if earningRecord.incomplete}
-              <td colspan="5" class="taxedearnings" style="text-align:center">
+              <td colspan="3" class="taxedearnings" style="text-align:center">
                 Not yet recorded
               </td>
             {:else}
               <td class="taxedearnings">
                 {wholeDollars(earningRecord.taxedEarnings)}
               </td>
-
-              <td class="multsymbol"> x </td>
-              <td class="multiplier">
-                {twoSignificantDigits(earningRecord.indexFactor())}
+              <td class="epc">
+                {wholeDollars(earningRecord.earningsRequiredPerCredit())}
               </td>
-              <td class="eqsymbol"> = </td>
-              <td class="indexedearnings">
-                {wholeDollars(earningRecord.indexedEarnings())}
+              <td class="credits">
+                {earningRecord.credits()}
+                {#if earningRecord.credits() == 4}
+                  <span class="maxlabel">(max)</span>
+                {/if}
               </td>
             {/if}
-            <td class="top35indicators">
-              {#if earningRecord.isTop35EarningsYear}
-                Top 35
-                <span class="onlydisplay500"> Value</span>
-              {/if}
-            </td>
           </tr>
         {/each}
       </tbody>
@@ -86,7 +72,6 @@
   tbody tr:nth-child(odd) {
     background-color: #e9e9ff;
   }
-
   .workyear {
     text-align: left;
     padding-left: 6px;
@@ -108,35 +93,14 @@
   td.taxedearnings {
     padding-right: 8px;
   }
-  .multsymbol {
-    text-align: center;
-    padding-left: 14px;
-    padding-right: 0px;
-    color: #6b6bbf;
-  }
-  .multiplier {
-    text-align: center;
-    min-width: 60px;
-  }
-  .eqsymbol {
-    text-align: center;
-    padding-right: 0px;
-    color: #6b6bbf;
-  }
-  .indexedearnings {
+  .epc {
     text-align: right;
-    min-width: 90px;
   }
-  td.indexedearnings {
-    padding-right: 50px;
-    /**
-     * The color for the other columns is 51, 51, 51. By darkening this
-     * slightly, we add a little bit of emphasis to the final calculation.
-     */
-    color: rgb(10, 10, 10);
+  .credits {
+    text-align: center;
   }
-  .top35indicators {
-    white-space: nowrap;
-    color: #3b3b7f;
+  .maxlabel {
+    font-size: 10px;
+    color: #666;
   }
 </style>
