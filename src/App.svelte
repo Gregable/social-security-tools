@@ -7,6 +7,7 @@
   import PasteFlow from "./components/PasteFlow.svelte";
   import EarningsReport from "./components/EarningsReport.svelte";
   import EligibilityReport from "./components/EligibilityReport.svelte";
+  import Sidebar from "./components/Sidebar.svelte";
 
   let isPasteFlow: Boolean = true;
 
@@ -20,8 +21,13 @@
   {#if isPasteFlow}
     <PasteFlow on:done={pasteDone} />
   {:else}
-    <EarningsReport recipient={context.recipient} />
-    <EligibilityReport recipient={context.recipient} />
+    <div class="twoColumns">
+      <Sidebar />
+      <div>
+        <EarningsReport recipient={context.recipient} />
+        <EligibilityReport recipient={context.recipient} />
+      </div>
+    </div>
   {/if}
 </main>
 
@@ -29,5 +35,9 @@
   main {
     max-width: 1080px;
     margin: 0 auto;
+  }
+  .twoColumns {
+    display: grid;
+    grid-template-columns: max-content 1fr;
   }
 </style>

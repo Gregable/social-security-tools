@@ -51,6 +51,7 @@
     <Expando
       collapsedText="Expand for a detailed look at eligibility credits"
       expandedText="Show Less"
+      label_max_width="500px"
       initiallyExpanded={$recipient.totalCredits() < 40}
     >
       <div class="expando">
