@@ -11,8 +11,8 @@ export function dollarStringToNumber(dollarString: string): number {
   if (dollarString == 'MedicareBeganIn1966') return 0;
   if (dollarString == '') return 0;
   const numberString = dollarString.replace(/[$,]/g, '');
-  const value = Number(numberString);
-  if (Number.isNaN(value)) return 0;
+  const value = parseInt(numberString, 10);
+  if (isNaN(value)) return 0;
   if (value < 0) return 0;
   return value;
 };
@@ -27,7 +27,7 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
     const columns: Array<string> = line.split(' ');
     if (columns[1] == 'NotYetRecorded') {
       let record = new EarningRecord({
-        year: Number.parseInt(columns[0]),
+        year: parseInt(columns[0], 10),
         taxedEarnings: 0,
         taxedMedicareEarnings: 0,
       });
@@ -35,7 +35,7 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
       earningsRecords.push(record);
     } else {
       let record = new EarningRecord({
-        year: Number.parseInt(columns[0]),
+        year: parseInt(columns[0], 10),
         taxedEarnings: dollarStringToNumber(columns[1]),
         taxedMedicareEarnings:
             columns.length > 2 ? dollarStringToNumber(columns[2]) : 0,
@@ -55,7 +55,7 @@ function parseFormattedTable(lines: string[]): Array<EarningRecord> {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
     var record = new EarningRecord({
-      year: Number.parseInt(columns[0]),
+      year: parseInt(columns[0], 10),
       taxedEarnings: dollarStringToNumber(columns[1]),
       taxedMedicareEarnings: 0,
     });
@@ -74,7 +74,7 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
     const columns: Array<string> = line.split(' ');
     if (columns[1] == 'NotYetRecorded') {
       let record = new EarningRecord({
-        year: Number.parseInt(columns[0]),
+        year: parseInt(columns[0], 10),
         taxedEarnings: 0,
         taxedMedicareEarnings: 0,
       });
@@ -82,7 +82,7 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
       earningsRecords.push(record);
     } else {
       var record = new EarningRecord({
-        year: Number.parseInt(columns[0]),
+        year: parseInt(columns[0], 10),
         taxedEarnings: dollarStringToNumber(columns[2]),
         taxedMedicareEarnings: 0,
       });
@@ -97,8 +97,8 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
  */
 function isYearString(maybeYearStr: string): boolean {
   // If not an int, it's not a year.
-  let maybeYear: number = Number.parseInt(maybeYearStr);
-  if (Number.isNaN(maybeYear)) return false;
+  let maybeYear: number = parseInt(maybeYearStr, 10);
+  if (isNaN(maybeYear)) return false;
   // parseInt will ignore trailing garbage, so "1A" will be parsed as "1".
   // We don't want this as it could lead us to extract lines that aren't
   // valid.
