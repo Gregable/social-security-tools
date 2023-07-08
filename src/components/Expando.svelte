@@ -43,6 +43,7 @@
   export let expanded_border_color: string = "#c6c6f5";
   export let expanded_background_color: string = "#e9e9ff";
 
+  let id = "expando-" + uniqid;
   // Increment the uniqid to ensure unique ids / labels:
   uniqid += 1;
 
@@ -90,11 +91,8 @@
   style:--expanded-border-color={expanded_border_color}
   style:--expanded-background-color={expanded_background_color}
 >
-  <input type="checkbox" id="expandobox-{uniqid}" bind:checked={expanded} />
-  <label
-    for="expandobox-{uniqid}"
-    class="label"
-    style:--label-max-width={label_max_width}
+  <input type="checkbox" {id} bind:checked={expanded} />
+  <label for={id} class="label" style:--label-max-width={label_max_width}
     >{expanded ? expandedText : collapsedText}</label
   >
   <div class="expandContainer">
