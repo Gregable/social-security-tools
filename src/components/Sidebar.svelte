@@ -99,7 +99,7 @@
   @media print {
     .twoColumns {
       display: grid;
-      grid-template-columns: 1f;
+      grid-template-columns: 0 1fr;
     }
     .sideBar {
       display: none;
