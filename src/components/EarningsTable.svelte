@@ -4,9 +4,6 @@
 
   export let earningsRecords: Array<EarningRecord> = [];
 
-  function wholeDollars(n: number) {
-    return "$" + Math.round(n).toLocaleString();
-  }
   function twoSignificantDigits(n: number) {
     return n.toLocaleString(undefined, {
       minimumFractionDigits: 2,
@@ -42,7 +39,7 @@
               </td>
             {:else}
               <td class="taxedearnings">
-                {wholeDollars(earningRecord.taxedEarnings)}
+                {earningRecord.taxedEarnings.wholeDollars()}
               </td>
 
               <td class="multsymbol"> x </td>
@@ -51,7 +48,7 @@
               </td>
               <td class="eqsymbol"> = </td>
               <td class="indexedearnings">
-                {wholeDollars(earningRecord.indexedEarnings())}
+                {earningRecord.indexedEarnings().wholeDollars()}
               </td>
             {/if}
             <td class="top35indicators">

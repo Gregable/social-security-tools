@@ -2,6 +2,7 @@ import type {Meta} from '@storybook/svelte';
 import EarningsTable from '../components/EarningsTable.svelte';
 
 import {context} from '../lib/context';
+import {Money} from '../lib/money';
 import {Recipient} from '../lib/recipient';
 import {parsePaste} from '../lib/ssa-parse';
 import {Birthdate} from '../lib/birthday';
@@ -13,8 +14,11 @@ context.recipient = new Recipient();
 context.recipient.earningsRecords = parsePaste(demo0);
 // Add an incomplete record:
 context.recipient.earningsRecords.push((() => {
-  let record = new EarningRecord(
-      {year: 2015, taxedEarnings: -1, taxedMedicareEarnings: -1});
+  let record = new EarningRecord({
+    year: 2015,
+    taxedEarnings: Money.from(0),
+    taxedMedicareEarnings: Money.from(0)
+  });
   record.incomplete = true;
   return record;
 })());
@@ -38,6 +42,5 @@ const Template = ({...args}) => ({
 
 export const Default = Template.bind({});
 Default.args = {
-  isSpouse: false,
-  futureTable: false,
+  earningsRecords: context.recipient.earningsRecords
 };

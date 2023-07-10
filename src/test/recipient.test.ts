@@ -1,6 +1,7 @@
 import {Birthdate} from '../lib/birthday';
 import * as constants from '../lib/constants';
 import {EarningRecord} from '../lib/earning-record';
+import {Money} from '../lib/money';
 import {MonthDate, MonthDuration} from '../lib/month-time';
 import {Recipient} from '../lib/recipient'
 
@@ -8,7 +9,7 @@ import {Recipient} from '../lib/recipient'
  * Returns a record with the given year and earnings. Medicare earnings
  * are required, but not used by anything interesting.
  */
-function testRecord(year: number, earnings: number = 10 * 1000) {
+function testRecord(year: number, earnings: Money = Money.from(10 * 1000)) {
   return new EarningRecord({
     year: year,
     taxedEarnings: earnings,
@@ -44,14 +45,15 @@ describe('Recipient', () => {
 
   it('simulates future earning years with no earnings', () => {
     let r = new Recipient();
-    r.simulateFutureEarningsYears(10, 100 * 1000);
+    r.simulateFutureEarningsYears(10, Money.from(100 * 1000));
     expect(r.futureEarningsRecords.length).toEqual(10);
 
     for (let i = 0; i < 10; i++) {
       expect(r.futureEarningsRecords[i].year)
           .toEqual(constants.CURRENT_YEAR + i);
-      expect(r.futureEarningsRecords[i].taxedEarnings).toEqual(100 * 1000);
-      expect(r.futureEarningsRecords[i].taxedMedicareEarnings)
+      expect(r.futureEarningsRecords[i].taxedEarnings.value())
+          .toEqual(100 * 1000);
+      expect(r.futureEarningsRecords[i].taxedMedicareEarnings.value())
           .toEqual(100 * 1000);
     }
   });
@@ -63,7 +65,7 @@ describe('Recipient', () => {
       testRecord(constants.CURRENT_YEAR - 1),
     ];
 
-    r.simulateFutureEarningsYears(10, 100 * 1000);
+    r.simulateFutureEarningsYears(10, Money.from(100 * 1000));
     // If there were no earnings in the current year, the simulation should
     // start in the current year.
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR);
@@ -77,7 +79,7 @@ describe('Recipient', () => {
       testRecord(constants.CURRENT_YEAR),
     ];
 
-    r.simulateFutureEarningsYears(10, 100 * 1000);
+    r.simulateFutureEarningsYears(10, Money.from(100 * 1000));
     // If there were earnings in the current year, the simulation should
     // start in the next year.
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR + 1);
@@ -87,12 +89,12 @@ describe('Recipient', () => {
     let r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
-      testRecord(constants.CURRENT_YEAR - 1, /*earnings*/ -1),
+      testRecord(constants.CURRENT_YEAR - 1, /*earnings*/ Money.from(-1)),
     ];
     // Mark the last record as incomplete.
     r.earningsRecords[1].incomplete = true;
 
-    r.simulateFutureEarningsYears(10, 100 * 1000);
+    r.simulateFutureEarningsYears(10, Money.from(100 * 1000));
     // If there were earnings in the previous year, but it is an incomplete
     // record, the simulation should start in that year.
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR - 1);
@@ -108,7 +110,7 @@ describe('Recipient', () => {
       testRecord(constants.CURRENT_YEAR + 2),
     ];
 
-    r.simulateFutureEarningsYears(10, 100 * 1000);
+    r.simulateFutureEarningsYears(10, Money.from(100 * 1000));
     // If there were earnings in the current year, the simulation should
     // start in the next year.
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR + 3);
@@ -139,15 +141,15 @@ describe('Recipient', () => {
     let r = new Recipient();
     // Earned exactly 1, 2, and 3 credits in 2007, 2008, and 2009, respectively:
     r.earningsRecords = [
-      testRecord(2007, 1 * constants.EARNINGS_PER_CREDIT[2007]),
-      testRecord(2008, 2 * constants.EARNINGS_PER_CREDIT[2008]),
-      testRecord(2009, 3 * constants.EARNINGS_PER_CREDIT[2009]),
+      testRecord(2007, constants.EARNINGS_PER_CREDIT[2007].times(1)),
+      testRecord(2008, constants.EARNINGS_PER_CREDIT[2008].times(2)),
+      testRecord(2009, constants.EARNINGS_PER_CREDIT[2009].times(3)),
     ];
     expect(r.totalCredits()).toEqual(6);
 
     // Earned enough for 20 credits in 2010, but credits are capped at 4 / year.
     r.earningsRecords.push(
-        testRecord(2010, 20 * constants.EARNINGS_PER_CREDIT[2010]))
+        testRecord(2010, constants.EARNINGS_PER_CREDIT[2010].times(20)))
     expect(r.totalCredits()).toEqual(10);
   });
 
@@ -156,17 +158,17 @@ describe('Recipient', () => {
     r.futureEarningsRecords = [
       testRecord(
           constants.MAX_YEAR + 1,
-          1 * constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR]),
+          constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(1)),
       testRecord(
           constants.MAX_YEAR + 2,
-          2 * constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR]),
+          constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(2)),
     ];
     expect(r.totalCredits()).toEqual(3);
 
     // Earned enough for 20 credits in 2010, but credits are capped at 4 / year.
     r.futureEarningsRecords.push(testRecord(
         constants.MAX_YEAR + 3,
-        30 * constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR]))
+        constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(30)))
     expect(r.totalCredits()).toEqual(7);
   });
 
@@ -313,23 +315,20 @@ describe('Recipient', () => {
     // The top 35 years should be the earliest 35 years, since those have the
     // highest indexing multiple, with ties are broken to earlier years.
     expect(r.earningsRecords[34].year).toEqual(1999);
-    expect(r.earningsRecords[34].indexedEarnings()).toEqual(18256.94);
-    expect(r.cutoffIndexedEarnings()).toEqual(18256.94);
-    let top35total = 0.0;
+    expect(r.earningsRecords[34].indexedEarnings().value()).toEqual(18256.94);
+    expect(r.cutoffIndexedEarnings().value()).toEqual(18256.94);
+    let top35total = Money.from(0.0);
     for (let i = 0; i < 40; i++) {
       if (i < 35) {
         expect(r.earningsRecords[i].isTop35EarningsYear).toBe(true);
-        top35total += Math.round(100 * r.earningsRecords[i].indexedEarnings());
+        top35total = top35total.plus(r.earningsRecords[i].indexedEarnings());
       } else {
         expect(r.earningsRecords[i].isTop35EarningsYear).toBe(false);
       }
     }
-    // Deal with precision issues by adding these values as integers:
-    // TODO(issues/221): Use an arbitrary precision library.
-    top35total /= 100;
-    expect(r.totalIndexedEarnings()).toEqual(top35total);
-    expect(r.monthlyIndexedEarnings())
-        .toEqual(Math.floor(top35total / 12 / 35));
+    expect(r.totalIndexedEarnings().value()).toEqual(top35total.value());
+    expect(r.monthlyIndexedEarnings().value())
+        .toEqual(top35total.div(12).div(35).floorToDollar().value());
   });
 
   it('computes top35 earnings years from historical and future data', () => {
@@ -339,32 +338,30 @@ describe('Recipient', () => {
     // ensure that they are top 35 years.
     for (let i = 0; i < 3; i++) {
       r.futureEarningsRecords.push(
-          testRecord(constants.CURRENT_YEAR + i, 30 * 1000));
+          testRecord(constants.CURRENT_YEAR + i, Money.from(30 * 1000)));
     }
     // .push doesn't call set(), so we must force a refresh:
     r.futureEarningsRecords = r.futureEarningsRecords;
 
     // The earliest 32 years should form the cutoff:
     expect(r.earningsRecords[31].year).toEqual(1996);
-    expect(r.earningsRecords[31].indexedEarnings()).toEqual(21466.70);
-    expect(r.cutoffIndexedEarnings()).toEqual(21466.70);
-    let top35total = 0.0;
+    expect(r.earningsRecords[31].indexedEarnings().value()).toEqual(21466.70);
+    expect(r.cutoffIndexedEarnings().value()).toEqual(21466.70);
+    let top35total = Money.from(0.0);
     for (let i = 0; i < 40; i++) {
       if (i < 32) {
         expect(r.earningsRecords[i].isTop35EarningsYear).toBe(true);
-        top35total += Math.round(100 * r.earningsRecords[i].indexedEarnings());
+        top35total = top35total.plus(r.earningsRecords[i].indexedEarnings());
       } else {
         expect(r.earningsRecords[i].isTop35EarningsYear).toBe(false);
       }
     }
-    // Deal with precision issues by adding these values as integers:
-    // TODO(issues/221): Use an arbitrary precision library.
-    top35total /= 100;
+
     // Add back the 3 future years earnings:
-    top35total += 30 * 1000 * 3;
-    expect(r.totalIndexedEarnings()).toEqual(top35total);
-    expect(r.monthlyIndexedEarnings())
-        .toEqual(Math.floor(top35total / 12 / 35));
+    top35total = top35total.plus(Money.from(30 * 1000 * 3));
+    expect(r.totalIndexedEarnings().value()).toEqual(top35total.value());
+    expect(r.monthlyIndexedEarnings().value())
+        .toEqual(top35total.div(12).div(35).floorToDollar().value());
   });
 
   it('determines hasEarningsBefore1978', () => {

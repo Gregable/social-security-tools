@@ -4,6 +4,7 @@ import EligibilityReport from '../components/EligibilityReport.svelte';
 import {Recipient} from '../lib/recipient';
 import {parsePaste} from '../lib/ssa-parse';
 import {Birthdate} from '../lib/birthday';
+import {Money} from '../lib/money';
 import {EarningRecord} from '../lib/earning-record';
 
 import demo0 from '../assets/averagepaste.txt?raw';
@@ -19,10 +20,16 @@ let recipient1 = new Recipient();
 recipient1.earningsRecords = parsePaste(demo1);
 recipient1.birthdate = new Birthdate(new Date('1950-07-01'));
 const futureEarnings1 = [
-  new EarningRecord(
-      {year: 2022, taxedEarnings: 100000, taxedMedicareEarnings: 0}),
-  new EarningRecord(
-      {year: 2023, taxedEarnings: 100000, taxedMedicareEarnings: 0}),
+  new EarningRecord({
+    year: 2022,
+    taxedEarnings: Money.from(100000),
+    taxedMedicareEarnings: Money.from(0)
+  }),
+  new EarningRecord({
+    year: 2023,
+    taxedEarnings: Money.from(100000),
+    taxedMedicareEarnings: Money.from(0)
+  }),
 ]
 recipient1.futureEarningsRecords = futureEarnings1;
 
@@ -31,16 +38,31 @@ let recipient2 = new Recipient();
 recipient2.earningsRecords = parsePaste(demo1);
 recipient2.birthdate = new Birthdate(new Date('1950-07-01'));
 const futureEarnings2 = [
-  new EarningRecord(
-      {year: 2019, taxedEarnings: 100000, taxedMedicareEarnings: 0}),
-  new EarningRecord(
-      {year: 2020, taxedEarnings: 100000, taxedMedicareEarnings: 0}),
-  new EarningRecord(
-      {year: 2021, taxedEarnings: 100000, taxedMedicareEarnings: 0}),
-  new EarningRecord(
-      {year: 2024, taxedEarnings: 100000, taxedMedicareEarnings: 0}),
-  new EarningRecord(
-      {year: 2023, taxedEarnings: 100000, taxedMedicareEarnings: 0}),
+  new EarningRecord({
+    year: 2019,
+    taxedEarnings: Money.from(100000),
+    taxedMedicareEarnings: Money.from(0)
+  }),
+  new EarningRecord({
+    year: 2020,
+    taxedEarnings: Money.from(100000),
+    taxedMedicareEarnings: Money.from(0)
+  }),
+  new EarningRecord({
+    year: 2021,
+    taxedEarnings: Money.from(100000),
+    taxedMedicareEarnings: Money.from(0)
+  }),
+  new EarningRecord({
+    year: 2024,
+    taxedEarnings: Money.from(100000),
+    taxedMedicareEarnings: Money.from(0)
+  }),
+  new EarningRecord({
+    year: 2023,
+    taxedEarnings: Money.from(100000),
+    taxedMedicareEarnings: Money.from(0)
+  }),
 ]
 recipient2.futureEarningsRecords = futureEarnings2;
 

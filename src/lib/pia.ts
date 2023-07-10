@@ -1,21 +1,6 @@
 import * as constants from './constants';
+import {Money} from './money';
 import {Recipient} from './recipient';
-
-/**
- * Floors a number to the nearest dime (1 significant figure).
- * e.g. 1.266 -> 1.20
- */
-function nearestDime(input: number) {
-  return Math.floor(input * 10) / 10;
-}
-
-/**
- * Floors a number to the nearest penny (2 significant figures).
- * e.g. 1.266 -> 1.26
- */
-function nearestPenny(input: number): number {
-  return Math.floor(input * 100) / 100;
-}
 
 /**
  * A PrimaryInsuranceAmount object manages calculating the user's PIA.
@@ -40,23 +25,23 @@ export class PrimaryInsuranceAmount {
     // maximum year in the data range.
     const effectiveIndexingYear =
         Math.min(this.recipient_.indexingYear(), constants.MAX_WAGE_INDEX_YEAR);
-    const wage_in_1977 = constants.WAGE_INDICES[1977];
-    const wage = constants.WAGE_INDICES[effectiveIndexingYear];
-    return wage / wage_in_1977;
+    const wage_in_1977: Money = constants.WAGE_INDICES[1977];
+    const wage: Money = constants.WAGE_INDICES[effectiveIndexingYear];
+    return wage.div$(wage_in_1977);
   }
 
   /**
    * Returns the first monthly bend point in the PIA formula.
    */
-  firstBendPoint(): number {
-    return Math.round(constants.BENDPOINT1_IN_1977 * this.wageRatio());
+  firstBendPoint(): Money {
+    return constants.BENDPOINT1_IN_1977.times(this.wageRatio()).roundToDollar();
   }
 
   /**
    * Returns the second monthly bend point in the PIA formula.
    */
-  secondBendPoint(): number {
-    return Math.round(constants.BENDPOINT2_IN_1977 * this.wageRatio());
+  secondBendPoint(): Money {
+    return constants.BENDPOINT2_IN_1977.times(this.wageRatio()).roundToDollar();
   }
 
   /**
@@ -67,26 +52,25 @@ export class PrimaryInsuranceAmount {
    * @return benefit in that bracket for this earnings.
    */
   primaryInsuranceAmountForEarningsByBracket(
-      totalIndexedEarnings: number, bracket: number): number {
+      totalIndexedEarnings: Money, bracket: number): Money {
     assert(bracket == 0 || bracket == 1 || bracket == 2);
 
-    totalIndexedEarnings = Math.round(totalIndexedEarnings);
+    totalIndexedEarnings = totalIndexedEarnings.roundToDollar();
     let firstBend = this.firstBendPoint();
     let secondBend = this.secondBendPoint();
 
     if (bracket == 0) {
-      return nearestPenny(
-          Math.min(totalIndexedEarnings, firstBend) *
-          constants.BEFORE_BENDPOINT1_MULTIPLIER);
+      return Money.min(totalIndexedEarnings, firstBend)
+          .times(constants.BEFORE_BENDPOINT1_MULTIPLIER);
     } else if (bracket == 1) {
-      return nearestPenny(
-          Math.max(
-              0, (Math.min(totalIndexedEarnings, secondBend) - firstBend)) *
-          constants.BEFORE_BENDPOINT2_MULTIPLIER);
+      return Money
+          .max(
+              Money.from(0),
+              Money.min(totalIndexedEarnings, secondBend).sub(firstBend))
+          .times(constants.BEFORE_BENDPOINT2_MULTIPLIER);
     } else if (bracket == 2) {
-      return nearestPenny(
-          Math.max(0, totalIndexedEarnings - secondBend) *
-          constants.AFTER_BENDPOINT2_MULTIPLIER);
+      return Money.max(Money.from(0), totalIndexedEarnings.sub(secondBend))
+          .times(constants.AFTER_BENDPOINT2_MULTIPLIER);
     }
   };
 };

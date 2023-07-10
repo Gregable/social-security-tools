@@ -1,4 +1,5 @@
 import * as constants from './constants'
+import {Money} from './money';
 
 /**
  * EarningRecord class
@@ -7,9 +8,9 @@ export class EarningRecord {
   /** Year of the record */
   year: number;
   /** Taxed earnings entry */
-  taxedEarnings: number;
+  taxedEarnings: Money;
   /** Taxed Medicare earnings entry */
-  taxedMedicareEarnings: number;
+  taxedMedicareEarnings: Money;
 
   /**
    * The year from which benefits are indexed for the PIA calculation.
@@ -47,7 +48,7 @@ export class EarningRecord {
   /**
    * @return maximum earnings cap for the year of the record.
    */
-  earningsCap(): number {
+  earningsCap(): Money {
     if (this.year < constants.MIN_MAXIMUM_EARNINGS_YEAR) {
       return constants.MAXIMUM_EARNINGS[constants.MIN_MAXIMUM_EARNINGS_YEAR];
     } else if (this.year <= constants.MAX_YEAR) {
@@ -60,7 +61,7 @@ export class EarningRecord {
   /**
    * @return amount of earnings in a given year required to earn one credit.
    */
-  earningsRequiredPerCredit(): number {
+  earningsRequiredPerCredit(): Money {
     if (this.year < 1978) {
       return constants.EARNINGS_PER_CREDIT_BEFORE_1978;
     } else if (this.year > constants.MAX_YEAR) {
@@ -76,7 +77,8 @@ export class EarningRecord {
    */
   credits(): number {
     return Math.min(
-        4, Math.floor(this.taxedEarnings / this.earningsRequiredPerCredit()));
+        4,
+        Math.floor(this.taxedEarnings.div$(this.earningsRequiredPerCredit())));
   }
 
 
@@ -114,8 +116,8 @@ export class EarningRecord {
 
       // The year is in the WAGE_INDICES data range and is before the indexing
       // year. Compute the index factor.
-      return constants.WAGE_INDICES[effectiveIndexingYear] /
-          constants.WAGE_INDICES[this.year];
+      return constants.WAGE_INDICES[effectiveIndexingYear].div$(
+          constants.WAGE_INDICES[this.year]);
     }
   }
 
@@ -123,15 +125,16 @@ export class EarningRecord {
   /**
    * @return indexed earnings for this record.
    */
-  indexedEarnings(): number {
+  indexedEarnings(): Money {
     if (this.indexingYear < 0) {
       throw new Error('EarningRecord not initialized with indexingYear');
     }
 
-    let cappedEarning = Math.min(this.earningsCap(), this.taxedEarnings);
-    // Round to the nearest cent.
-    return Math.round(100 * cappedEarning * this.indexFactor()) / 100;
-  };
+    const cappedEarning: Money =
+        Money.min(this.earningsCap(), this.taxedEarnings);
+    const factor: number = this.indexFactor();
+    return cappedEarning.times(factor);
+  }
 }
 
 /**
@@ -139,6 +142,6 @@ export class EarningRecord {
  */
 interface EarningRecordInput {
   year: number;
-  taxedEarnings: number;
-  taxedMedicareEarnings: number;
+  taxedEarnings: Money;
+  taxedMedicareEarnings: Money;
 }
