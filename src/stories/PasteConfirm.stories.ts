@@ -3,6 +3,7 @@ import {action} from '@storybook/addon-actions';
 
 import PasteConfirm from '../components/PasteConfirm.svelte';
 import {EarningRecord} from '../lib/earning-record';
+import {Money} from '../lib/money';
 
 const meta: Meta<PasteConfirm> = {
   component: PasteConfirm,
@@ -32,31 +33,61 @@ const Template = ({...args}) => ({
 export const Default = Template.bind({});
 Default.args = {
   earningsRecords: [
-    new EarningRecord(
-        {year: 2009, taxedEarnings: 39154, taxedMedicareEarnings: 39154}),
-    new EarningRecord(
-        {year: 2010, taxedEarnings: 39859, taxedMedicareEarnings: 39859}),
-    new EarningRecord(
-        {year: 2011, taxedEarnings: 42911, taxedMedicareEarnings: 42911}),
-    new EarningRecord(
-        {year: 2012, taxedEarnings: 44398, taxedMedicareEarnings: 44398}),
-    new EarningRecord(
-        {year: 2013, taxedEarnings: 44777, taxedMedicareEarnings: 44777}),
+    new EarningRecord({
+      year: 2009,
+      taxedEarnings: Money.from(39154),
+      taxedMedicareEarnings: Money.from(39154)
+    }),
+    new EarningRecord({
+      year: 2010,
+      taxedEarnings: Money.from(39859),
+      taxedMedicareEarnings: Money.from(39859)
+    }),
+    new EarningRecord({
+      year: 2011,
+      taxedEarnings: Money.from(42911),
+      taxedMedicareEarnings: Money.from(42911)
+    }),
+    new EarningRecord({
+      year: 2012,
+      taxedEarnings: Money.from(44398),
+      taxedMedicareEarnings: Money.from(44398)
+    }),
+    new EarningRecord({
+      year: 2013,
+      taxedEarnings: Money.from(44777),
+      taxedMedicareEarnings: Money.from(44777)
+    }),
   ],
 };
 
 export const NoMedicare = Template.bind({});
 NoMedicare.args = {
   earningsRecords: [
-    new EarningRecord(
-        {year: 2009, taxedEarnings: 39154, taxedMedicareEarnings: 0}),
-    new EarningRecord(
-        {year: 2010, taxedEarnings: 39859, taxedMedicareEarnings: 0}),
-    new EarningRecord(
-        {year: 2011, taxedEarnings: 42911, taxedMedicareEarnings: 0}),
-    new EarningRecord(
-        {year: 2012, taxedEarnings: 44398, taxedMedicareEarnings: 0}),
-    new EarningRecord(
-        {year: 2013, taxedEarnings: 44777, taxedMedicareEarnings: 0}),
+    new EarningRecord({
+      year: 2009,
+      taxedEarnings: Money.from(39154),
+      taxedMedicareEarnings: Money.from(0)
+    }),
+    new EarningRecord({
+      year: 2010,
+      taxedEarnings: Money.from(39859),
+      taxedMedicareEarnings: Money.from(0)
+    }),
+    new EarningRecord({
+      year: 2011,
+      taxedEarnings: Money.from(42911),
+      taxedMedicareEarnings: Money.from(0)
+    }),
+    new EarningRecord({
+      year: 2012,
+      taxedEarnings: Money.from(44398),
+      taxedMedicareEarnings: Money.from(0)
+    }),
+    new EarningRecord({
+      year: 2013,
+      taxedEarnings: Money.from(44777),
+      taxedMedicareEarnings: Money.from(0)
+    }),
   ],
 };

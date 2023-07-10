@@ -1,6 +1,7 @@
 import {Birthdate} from './birthday';
 import * as constants from './constants';
 import {EarningRecord} from './earning-record';
+import {Money} from './money';
 import {MonthDate, MonthDuration} from './month-time';
 import {PrimaryInsuranceAmount} from './pia';
 
@@ -85,7 +86,7 @@ export class Recipient {
    * @param numYears The number of years to simulate.
    * @param wage The wage to use for the simulation.
    */
-  simulateFutureEarningsYears(numYears: number, wage: number) {
+  simulateFutureEarningsYears(numYears: number, wage: Money) {
     this.futureEarningsRecords_ = [];
 
     // We can't simulate the past, so start the simulation at the current
@@ -132,8 +133,8 @@ export class Recipient {
    *
    * Updated in updateEarningsRecords_().
    */
-  private totalIndexedEarnings_: number = 0;
-  totalIndexedEarnings(): number {
+  private totalIndexedEarnings_: Money = Money.from(0);
+  totalIndexedEarnings(): Money {
     return this.totalIndexedEarnings_;
   }
 
@@ -250,8 +251,8 @@ export class Recipient {
         this.earningsRecords_.concat(this.futureEarningsRecords_);
     this.top35IndexedEarnings_.sort((a, b) => {
       // Prefer higher indexed earnings, break ties by by older years.
-      if (a.indexedEarnings() != b.indexedEarnings()) {
-        return b.indexedEarnings() - a.indexedEarnings();
+      if (a.indexedEarnings().value() != b.indexedEarnings().value()) {
+        return b.indexedEarnings().value() - a.indexedEarnings().value();
       } else {
         return a.year - b.year;
       }
@@ -259,16 +260,12 @@ export class Recipient {
     // Remove all but the top 35 years.
     this.top35IndexedEarnings_.splice(constants.SSA_EARNINGS_YEARS);
     // Calculate the total indexed earnings and mark the top 35 years.
-    this.totalIndexedEarnings_ = 0;
+    this.totalIndexedEarnings_ = Money.from(0);
     for (let i = 0; i < this.top35IndexedEarnings_.length; ++i) {
       this.top35IndexedEarnings_[i].isTop35EarningsYear = true;
-      // Attempt to deal with floating point precision issues by operating
-      // in integer cents, dividing by 100 at the end. This is not perfect.
-      // TODO(issues/221): Use an arbitrary precision library.
-      this.totalIndexedEarnings_ +=
-          Math.round(100 * this.top35IndexedEarnings_[i].indexedEarnings());
+      this.totalIndexedEarnings_ = this.totalIndexedEarnings_.plus(
+          this.top35IndexedEarnings_[i].indexedEarnings());
     }
-    this.totalIndexedEarnings_ /= 100;
 
     this.publish_();
   }
@@ -284,9 +281,9 @@ export class Recipient {
    * Minimum indexed earnings needed to affect the top 35 years of earnings.
    * If fewer than 35 years of earnings, this is always 0.
    */
-  cutoffIndexedEarnings(): number {
+  cutoffIndexedEarnings(): Money {
     return this.top35IndexedEarnings_.length < constants.SSA_EARNINGS_YEARS ?
-        0 :
+        Money.from(0) :
         this.top35IndexedEarnings_[this.top35IndexedEarnings_.length - 1]
             .indexedEarnings();
   }
@@ -294,9 +291,10 @@ export class Recipient {
   /**
    * Monthly indexed earnings for the top 35 years of earnings.
    */
-  monthlyIndexedEarnings(): number {
-    return Math.floor(
-        this.totalIndexedEarnings_ / 12 / constants.SSA_EARNINGS_YEARS);
+  monthlyIndexedEarnings(): Money {
+    return this.totalIndexedEarnings_.div(12)
+        .div(constants.SSA_EARNINGS_YEARS)
+        .floorToDollar();
   }
 
   /**

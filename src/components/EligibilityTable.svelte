@@ -3,10 +3,6 @@
   import { EarningRecord } from "../lib/earning-record";
 
   export let earningsRecords: Array<EarningRecord> = [];
-
-  function wholeDollars(n: number) {
-    return "$" + Math.round(n).toLocaleString();
-  }
 </script>
 
 <div>
@@ -34,10 +30,10 @@
               </td>
             {:else}
               <td class="taxedearnings">
-                {wholeDollars(earningRecord.taxedEarnings)}
+                {earningRecord.taxedEarnings.wholeDollars()}
               </td>
               <td class="epc">
-                {wholeDollars(earningRecord.earningsRequiredPerCredit())}
+                {earningRecord.earningsRequiredPerCredit().wholeDollars()}
               </td>
               <td class="credits">
                 {earningRecord.credits()}

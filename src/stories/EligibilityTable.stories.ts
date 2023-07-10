@@ -4,8 +4,10 @@ import EligibilityTable from '../components/EligibilityTable.svelte';
 import {context} from '../lib/context';
 import {Recipient} from '../lib/recipient';
 import {parsePaste} from '../lib/ssa-parse';
+import {Money} from '../lib/money';
 import {Birthdate} from '../lib/birthday';
 import {EarningRecord} from '../lib/earning-record';
+
 
 import demo0 from '../assets/averagepaste.txt?raw';
 
@@ -13,8 +15,11 @@ context.recipient = new Recipient();
 context.recipient.earningsRecords = parsePaste(demo0);
 // Add an incomplete record:
 context.recipient.earningsRecords.push((() => {
-  let record = new EarningRecord(
-      {year: 2015, taxedEarnings: -1, taxedMedicareEarnings: -1});
+  let record = new EarningRecord({
+    year: 2015,
+    taxedEarnings: Money.from(0),
+    taxedMedicareEarnings: Money.from(0)
+  });
   record.incomplete = true;
   return record;
 })());

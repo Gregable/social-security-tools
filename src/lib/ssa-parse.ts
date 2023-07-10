@@ -1,20 +1,21 @@
 import {EarningRecord} from './earning-record';
+import {Money} from './money';
 
 /**
  * Given a string which we know to be a number containing possibly a leading
- * dollar sign and internal commas, convert to an actual number.
+ * dollar sign and internal commas, convert to an actual Money.
  */
-export function dollarStringToNumber(dollarString: string): number {
+export function dollarStringToMoney(dollarString: string): Money {
   // Similar idea here, for the year 1965, the SSA site will display
   // 'Medicare Began in 1966' if the data is unavailable. Record this as
   // a 0 sentinel.
-  if (dollarString == 'MedicareBeganIn1966') return 0;
-  if (dollarString == '') return 0;
+  if (dollarString == 'MedicareBeganIn1966') return Money.from(0);
+  if (dollarString == '') return Money.from(0);
   const numberString = dollarString.replace(/[$,]/g, '');
   const value = parseInt(numberString, 10);
-  if (isNaN(value)) return 0;
-  if (value < 0) return 0;
-  return value;
+  if (isNaN(value)) return Money.from(0);
+  if (value < 0) return Money.from(0);
+  return Money.from(value);
 };
 
 /**
@@ -28,17 +29,18 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
     if (columns[1] == 'NotYetRecorded') {
       let record = new EarningRecord({
         year: parseInt(columns[0], 10),
-        taxedEarnings: 0,
-        taxedMedicareEarnings: 0,
+        taxedEarnings: Money.from(0),
+        taxedMedicareEarnings: Money.from(0),
       });
       record.incomplete = true;
       earningsRecords.push(record);
     } else {
       let record = new EarningRecord({
         year: parseInt(columns[0], 10),
-        taxedEarnings: dollarStringToNumber(columns[1]),
-        taxedMedicareEarnings:
-            columns.length > 2 ? dollarStringToNumber(columns[2]) : 0,
+        taxedEarnings: dollarStringToMoney(columns[1]),
+        taxedMedicareEarnings: columns.length > 2 ?
+            dollarStringToMoney(columns[2]) :
+            Money.from(0),
       });
       earningsRecords.push(record);
     }
@@ -56,8 +58,8 @@ function parseFormattedTable(lines: string[]): Array<EarningRecord> {
     const columns: Array<string> = line.split(' ');
     var record = new EarningRecord({
       year: parseInt(columns[0], 10),
-      taxedEarnings: dollarStringToNumber(columns[1]),
-      taxedMedicareEarnings: 0,
+      taxedEarnings: dollarStringToMoney(columns[1]),
+      taxedMedicareEarnings: Money.from(0),
     });
     earningsRecords.push(record);
   }
@@ -75,16 +77,16 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
     if (columns[1] == 'NotYetRecorded') {
       let record = new EarningRecord({
         year: parseInt(columns[0], 10),
-        taxedEarnings: 0,
-        taxedMedicareEarnings: 0,
+        taxedEarnings: Money.from(0),
+        taxedMedicareEarnings: Money.from(0),
       });
       record.incomplete = true;
       earningsRecords.push(record);
     } else {
       var record = new EarningRecord({
         year: parseInt(columns[0], 10),
-        taxedEarnings: dollarStringToNumber(columns[2]),
-        taxedMedicareEarnings: 0,
+        taxedEarnings: dollarStringToMoney(columns[2]),
+        taxedMedicareEarnings: Money.from(0),
       });
       earningsRecords.push(record);
     }

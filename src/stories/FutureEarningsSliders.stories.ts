@@ -1,5 +1,6 @@
 import type {Meta} from '@storybook/svelte';
 import FutureEarningsSliders from '../components/FutureEarningsSliders.svelte';
+import {Recipient} from '../lib/recipient';
 
 const meta: Meta<FutureEarningsSliders> = {
   component: FutureEarningsSliders,
@@ -11,10 +12,14 @@ const meta: Meta<FutureEarningsSliders> = {
 };
 export default meta;
 
+let recipient = new Recipient();
+
 const Template = ({...args}) => ({
   Component: FutureEarningsSliders,
   props: args,
 });
 
 export const Default = Template.bind({});
-Default.args = {};
+Default.args = {
+  recipient: recipient
+};

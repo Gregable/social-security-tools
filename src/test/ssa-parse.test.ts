@@ -1,16 +1,16 @@
-import * as constants from '../lib/constants';
-import {dollarStringToNumber, parsePaste} from '../lib/ssa-parse';
+import {Money} from '../lib/money';
+import {dollarStringToMoney, parsePaste} from '../lib/ssa-parse';
 
 
-describe('dollarStringToNumber', () => {
+describe('dollarStringToMoney', () => {
   it('Parses Number', () => {
-    expect(dollarStringToNumber('123')).toBe(123);
+    expect(dollarStringToMoney('123').value()).toBe(123);
   });
   it('Parses Dollars', () => {
-    expect(dollarStringToNumber('$123')).toBe(123);
+    expect(dollarStringToMoney('$123').value()).toBe(123);
   });
   it('Parses Dollars with thousands', () => {
-    expect(dollarStringToNumber('$1,234')).toBe(1234);
+    expect(dollarStringToMoney('$1,234').value()).toBe(1234);
   });
 });
 
@@ -19,13 +19,13 @@ describe('dollarStringToNumber', () => {
 function parsePasteExpect(parsed) {
   expect(parsed.length).toBe(3);
   expect(parsed[0].year).toBe(2016);
-  expect(parsed[0].taxedEarnings).toBe(80000);
+  expect(parsed[0].taxedEarnings.value()).toBe(80000);
   expect(parsed[0].incomplete).toBe(false);
   expect(parsed[1].year).toBe(2017);
-  expect(parsed[1].taxedEarnings).toBe(90000);
+  expect(parsed[1].taxedEarnings.value()).toBe(90000);
   expect(parsed[1].incomplete).toBe(false);
   expect(parsed[2].year).toBe(2018);
-  expect(parsed[2].taxedEarnings).toBe(100000);
+  expect(parsed[2].taxedEarnings.value()).toBe(100000);
   expect(parsed[2].incomplete).toBe(false);
 }
 
@@ -283,14 +283,14 @@ describe('parsePaste', () => {
     const parsed = parsePaste(pasteData);
     expect(parsed.length).toBe(3);
     expect(parsed[0].year).toBe(2016);
-    expect(parsed[0].taxedEarnings).toBe(80000);
+    expect(parsed[0].taxedEarnings.value()).toBe(80000);
     expect(parsed[0].incomplete).toBe(false);
     expect(parsed[1].year).toBe(2017);
-    expect(parsed[1].taxedEarnings).toBe(90000);
+    expect(parsed[1].taxedEarnings.value()).toBe(90000);
     expect(parsed[1].incomplete).toBe(false);
     expect(parsed[2].year).toBe(2018);
-    expect(parsed[2].taxedEarnings).toBe(0);
-    expect(parsed[2].taxedMedicareEarnings).toBe(0);
+    expect(parsed[2].taxedEarnings.value()).toBe(0);
+    expect(parsed[2].taxedMedicareEarnings.value()).toBe(0);
     expect(parsed[2].incomplete).toBe(true);
   });
 
@@ -303,12 +303,12 @@ describe('parsePaste', () => {
     const parsed = parsePaste(pasteData);
     expect(parsed.length).toBe(4);
     expect(parsed[0].year).toBe(1963);
-    expect(parsed[0].taxedEarnings).toBe(2963);
+    expect(parsed[0].taxedEarnings.value()).toBe(2963);
     expect(parsed[1].year).toBe(1964);
-    expect(parsed[1].taxedEarnings).toBe(2964);
+    expect(parsed[1].taxedEarnings.value()).toBe(2964);
     expect(parsed[2].year).toBe(1965);
-    expect(parsed[2].taxedEarnings).toBe(2965);
+    expect(parsed[2].taxedEarnings.value()).toBe(2965);
     expect(parsed[3].year).toBe(1966);
-    expect(parsed[3].taxedEarnings).toBe(2966);
+    expect(parsed[3].taxedEarnings.value()).toBe(2966);
   });
 });

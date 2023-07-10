@@ -3,6 +3,7 @@
   import * as constants from "../lib/constants";
   import Slider from "./Slider.svelte";
   import { Recipient } from "../lib/recipient";
+  import { Money } from "../lib/money";
 
   /**
    * The recipient whose earnings records to display.
@@ -21,7 +22,7 @@
   }
   function translateFutureEarnings(value: number, label: string): string {
     if (label == "value") {
-      if (value == constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR])
+      if (value == constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR].value())
         return "$" + value.toLocaleString() + "+";
       else return "$" + value.toLocaleString();
     }
@@ -31,7 +32,7 @@
   let futureEarningWage: number = 1000;
   $: recipient.simulateFutureEarningsYears(
     futureEarningYears,
-    futureEarningWage
+    Money.from(futureEarningWage)
   );
 </script>
 
@@ -54,7 +55,7 @@
       <Slider
         bind:value={futureEarningWage}
         floor={1000}
-        ceiling={constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR]}
+        ceiling={constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR].value()}
         step={1000}
         translate={translateFutureEarnings}
       />

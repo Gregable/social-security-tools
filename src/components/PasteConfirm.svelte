@@ -17,7 +17,6 @@
   import "../global.css";
   import { createEventDispatcher } from "svelte";
   import { EarningRecord } from "../lib/earning-record";
-  import { TAX_RATES } from "../lib/constants";
 
   const dispatch = createEventDispatcher();
 
@@ -28,12 +27,9 @@
 
   function earningsRecordsIncludeMedicare() {
     for (let i = 0; i < earningsRecords.length; ++i) {
-      if (earningsRecords[i].taxedMedicareEarnings > 0) return true;
+      if (earningsRecords[i].taxedMedicareEarnings.value() > 0) return true;
     }
     return false;
-  }
-  function wholeDollars(n: number) {
-    return "$" + Math.round(n).toLocaleString();
   }
 
   function confirm() {
@@ -72,16 +68,17 @@
         <tr>
           <td>{earningRecord.year}</td>
           <td>
-            {#if earningRecord.taxedEarnings >= 0}
-              <span>{wholeDollars(earningRecord.taxedEarnings)}</span>
+            {#if earningRecord.taxedEarnings.value() >= 0}
+              <span>{earningRecord.taxedEarnings.wholeDollars()}</span>
             {:else}
               <span> Not yet recorded </span>
             {/if}
           </td>
           {#if earningsRecordsIncludeMedicare()}
             <td>
-              {#if earningRecord.taxedMedicareEarnings >= 0}
-                <span>{wholeDollars(earningRecord.taxedMedicareEarnings)}</span>
+              {#if earningRecord.taxedMedicareEarnings.value() >= 0}
+                <span>{earningRecord.taxedMedicareEarnings.wholeDollars()}</span
+                >
               {:else}
                 <span> Not yet recorded </span>
               {/if}
