@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { ChevronRight } from "svelte-bootstrap-icons";
 
   function scrollTo(id: string) {
     return () => {
@@ -81,7 +82,7 @@
           class:active={section.active}
         >
           <div class="navlabel">{section.label}</div>
-          <i class="glyphicon glyphicon-chevron-right" />
+          <span class="chevron"><ChevronRight /></span>
         </li>
       {/each}
     </ul>
@@ -144,5 +145,10 @@
     display: inline-block;
     max-width: 175px;
     padding-right: 20px;
+  }
+  .chevron {
+    float: right;
+    position: relative;
+    top: 2px;
   }
 </style>
