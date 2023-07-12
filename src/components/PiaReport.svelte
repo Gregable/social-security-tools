@@ -3,6 +3,7 @@
   import * as constants from "../lib/constants";
   import { MonthDate } from "../lib/month-time";
   import { Recipient } from "../lib/recipient";
+  import BendpointChart from "./BendpointChart.svelte";
   import Expando from "./Expando.svelte";
 
   export let recipient: Recipient = new Recipient();
@@ -141,21 +142,21 @@
         {/if}
 
         <p class="indent">
-          Monthly average indexed earnings:
+          Average Indexed Monthly Earnings:
           <b>{$recipient.totalIndexedEarnings().wholeDollars()}</b> / 35 / 12 =
           <b>{$recipient.monthlyIndexedEarnings().wholeDollars()}</b>
         </p>
 
         <p>
-          Your primary insurance amount is based on your monthly indexed
-          earnings using
+          Your primary insurance amount is based on your Average Indexed Monthly
+          Earnings using
           <a
             href="https://www.ssa.gov/oact/cola/piaformula.html"
             target="_blank">a formula</a
           >
           that increases your Primary Insurance Amount as your earnings increase,
           but increases more slowly for higher total earnings. Your Primary Insurance
-          Amount is calculated from your monthly indexed earnings as follows:
+          Amount is calculated from your Average Indexed Monthly Earnings as follows:
         </p>
 
         <table class="benefitBrackets pageBreakAvoid">
@@ -274,26 +275,12 @@
     </Expando>
 
     <p style="margin-top: 1em">
-      In the chart below, you can see what your current primary insurance amount
-      would be if your indexed earnings were to increase. Move your mouse over
-      the chart to see how the primary insurance amount changes.
+      In the chart below, you can see what your current Primary Insurance Amount
+      would be if your Average Indexed Monthly Earnings were to increase. Move
+      your mouse over the chart to see how the Primary Insurance Amount changes.
     </p>
 
-    <!--
-    <div class="chart-container pageBreakAvoid">
-      <div class="chart-ylabel pia">
-        <span class="vertical-text">Primary Insurance Amount</span>
-      </div>
-
-      <canvas id="breakpoint-chart-canvas" width=600 height=400>
-        Your browser does not support HTML canvas.
-      </canvas>
-
-      <div class="chart-xlabel">
-        Monthly Indexed Earnings
-      </div>
-    </div>
-    -->
+    <BendpointChart recipient={$recipient} />
   </div>
 </div>
 

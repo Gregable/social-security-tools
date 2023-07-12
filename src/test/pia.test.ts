@@ -67,4 +67,18 @@ describe('Recipient', () => {
     expect(adjustments[adjustments.length - 1].end.value())
         .toEqual(r.pia().primaryInsuranceAmount().value());
   });
+
+  it('calculates pia from AIME', () => {
+    let r = new Recipient();
+    // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
+    // day before the birthday.
+    r.birthdate = new Birthdate(new Date(1950, 7, 1));
+    r.earningsRecords = parsePaste(demo0);
+
+    // Verify that piaFromAIME agrees with primaryInsuranceAmount using the
+    // same AIME.
+    expect(
+        r.pia().piaFromAIME(r.monthlyIndexedEarnings().roundToDollar()).value())
+        .toEqual(r.pia().primaryInsuranceAmount().value());
+  });
 });
