@@ -1,6 +1,5 @@
 import * as constants from './constants';
 import {Money} from './money';
-import {MonthDuration} from './month-time';
 import {Recipient} from './recipient';
 
 /**
@@ -56,22 +55,19 @@ export class PrimaryInsuranceAmount {
       throw new Error('Invalid bracket: ' + bracket);
     }
 
-    let monthlyIndexedEarnings =
-        this.recipient_.monthlyIndexedEarnings().roundToDollar();
+    let aime = this.recipient_.monthlyIndexedEarnings().roundToDollar();
     let firstBend = this.firstBendPoint();
     let secondBend = this.secondBendPoint();
 
     if (bracket == 0) {
-      return Money.min(monthlyIndexedEarnings, firstBend)
+      return Money.min(aime, firstBend)
           .times(constants.BEFORE_BENDPOINT1_MULTIPLIER);
     } else if (bracket == 1) {
       return Money
-          .max(
-              Money.from(0),
-              Money.min(monthlyIndexedEarnings, secondBend).sub(firstBend))
+          .max(Money.from(0), Money.min(aime, secondBend).sub(firstBend))
           .times(constants.BEFORE_BENDPOINT2_MULTIPLIER);
     } else if (bracket == 2) {
-      return Money.max(Money.from(0), monthlyIndexedEarnings.sub(secondBend))
+      return Money.max(Money.from(0), aime.sub(secondBend))
           .times(constants.AFTER_BENDPOINT2_MULTIPLIER);
     }
   };
@@ -104,6 +100,42 @@ export class PrimaryInsuranceAmount {
     }
     return pia;
   };
+
+  /**
+   * Returns the Primary Insurance Amount for this recipient as though they
+   * had an AIME of the given amount.
+   * @param aime The AIME to use for the simulated calculation.
+   */
+  piaFromAIME(aime: Money): Money {
+    aime = aime.roundToDollar();
+
+    let pia = Money.from(0);
+
+    let firstBend = this.firstBendPoint();
+    let secondBend = this.secondBendPoint();
+
+    // First compute the unadjusted PIA from all 3 brackets.
+    pia = pia.plus(Money.min(aime, firstBend)
+                       .times(constants.BEFORE_BENDPOINT1_MULTIPLIER));
+    pia = pia.plus(
+        Money.max(Money.from(0), Money.min(aime, secondBend).sub(firstBend))
+            .times(constants.BEFORE_BENDPOINT2_MULTIPLIER));
+    pia = pia.plus(Money.max(Money.from(0), aime.sub(secondBend))
+                       .times(constants.AFTER_BENDPOINT2_MULTIPLIER));
+
+    // Round to nearest dime.
+    pia = pia.floorToDime();
+
+    // Now adjust for COLA.
+    for (let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+         year < constants.CURRENT_YEAR; ++year) {
+      pia = pia.times(1 + (constants.COLA[year] / 100.0));
+      // Primary Insurance amounts are rounded down to the nearest dime.
+      pia = pia.floorToDime();
+    }
+    return pia;
+  }
+
 
   /**
    * Returns true if the recipient is old enough (62) to receive a COLA
