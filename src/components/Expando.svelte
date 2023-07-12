@@ -47,20 +47,16 @@
   // Increment the uniqid to ensure unique ids / labels:
   uniqid += 1;
 
-  // This is the div that contains the contents of the expando.
-  // We need to know the height of this div so that we can set
-  // it's negative margin in the collapsed state.
-  let contentsDiv: HTMLDivElement;
-  // By binding to window.innerWidth, we can update the width when the
-  // window is resized.
-  let innerWidth: number = window.innerWidth;
+  // The height of the contents div. This is used to set the negative margin
+  // on the contents div to hide it when the expando is collapsed.
+  let clientHeight: number;
 
   // The goal is to set the contents div to have a negative margin equal to
   // it's height. With the parent div having overflow: hidden, this will cause
   // the contents div to be hidden when the expando is collapsed.
-  function updateMargin(_windowWidth: number, el: HTMLDivElement): string {
-    if (el != undefined) {
-      return `-${el.getBoundingClientRect().height}px`;
+  function updateMargin(clientHeight: number): string {
+    if (clientHeight) {
+      return `-${clientHeight}px`;
     } else {
       // Initially set to -100vh so that when the page loads, the contents
       // are hidden. Otherwise, there is a brief transition animation to hide
@@ -68,8 +64,8 @@
       return "-10000vh";
     }
   }
-  let negative_margin: string = "-100vh";
-  $: negative_margin = updateMargin(innerWidth, contentsDiv);
+  let negative_margin: string;
+  $: negative_margin = updateMargin(clientHeight);
 
   // Determine if the expando is expanded or collapsed initially from outside
   // state, but once rendered, the expando should manage it's own state.
@@ -78,8 +74,6 @@
     expanded = initiallyExpanded;
   });
 </script>
-
-<svelte:window bind:innerWidth />
 
 <section
   class="expando"
@@ -98,7 +92,7 @@
   <div class="expandContainer">
     <div
       class="expandContents"
-      bind:this={contentsDiv}
+      bind:clientHeight
       style:--negative-margin={negative_margin}
     >
       <div>

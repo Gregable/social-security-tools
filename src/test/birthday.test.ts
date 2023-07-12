@@ -55,6 +55,18 @@ describe('dateAtSssAge', function() {
     expect(date.monthIndex()).toBe(1);
   });
 });
+describe('yearTurningSsaAge', function() {
+  it('is correct if born on first of month', function() {
+    let bd = Birthdate.FromYMD(2000, 0, 1);
+    let year = bd.yearTurningSsaAge(13);
+    expect(year).toBe(2012);
+  });
+  it('is correct if born on tenth of month', function() {
+    let bd = Birthdate.FromYMD(2000, 0, 10);
+    let year = bd.yearTurningSsaAge(13);
+    expect(year).toBe(2013);
+  });
+});
 describe('ageAtSsaDate', function() {
   it('is correct if born on first of month', function() {
     let bd = Birthdate.FromYMD(2000, 0, 1);

@@ -9,8 +9,6 @@
 </script>
 
 <div>
-  <a id="nav-earnings" class="nav" />
-
   <h2>Earnings Record</h2>
 
   <EarningsTable earningsRecords={$recipient.earningsRecords} />
@@ -19,9 +17,4 @@
 </div>
 
 <style>
-  a.nav {
-    position: relative;
-    visibility: hidden;
-    display: block;
-  }
 </style>

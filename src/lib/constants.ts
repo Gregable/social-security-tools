@@ -422,6 +422,11 @@ export const COLA: {[key: number]: number} = {
 };
 
 /**
+ * The maximum year for which we have COLA data.
+ */
+export const MAX_COLA_YEAR: number = Math.max(...Object.keys(COLA).map(Number));
+
+/**
  * Number of top years of earnings which contribute to SSA calculations.
  */
 export const SSA_EARNINGS_YEARS: number = 35;

@@ -37,8 +37,6 @@
         lastActiveSection.active = true;
       }
       sidebarSections = sidebarSections;
-      console.log(visibleSections);
-      console.log(sidebarSections);
     },
     {
       rootMargin: "0px",
@@ -145,10 +143,11 @@
     display: inline-block;
     max-width: 175px;
     padding-right: 20px;
+    white-space: nowrap;
   }
   .chevron {
-    float: right;
-    position: relative;
-    top: 2px;
+    position: absolute;
+    top: 10px;
+    right: 4px;
   }
 </style>
