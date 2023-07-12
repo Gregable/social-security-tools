@@ -1,5 +1,6 @@
 import * as constants from './constants';
 import {Money} from './money';
+import {MonthDuration} from './month-time';
 import {Recipient} from './recipient';
 
 /**
@@ -47,30 +48,121 @@ export class PrimaryInsuranceAmount {
   /**
    * Returns the PIA component for a specific breakpoint bracket for any
    * monthly indexed earnings.
-   * @param totalIndexedEarnings monthly indexed earnings to compute
    * @param bracket Which component of the bend point: Must be 0, 1 or 2
    * @return benefit in that bracket for this earnings.
    */
-  primaryInsuranceAmountForEarningsByBracket(
-      totalIndexedEarnings: Money, bracket: number): Money {
-    assert(bracket == 0 || bracket == 1 || bracket == 2);
+  primaryInsuranceAmountByBracket(bracket: number): Money {
+    if (bracket != 0 && bracket != 1 && bracket != 2) {
+      throw new Error('Invalid bracket: ' + bracket);
+    }
 
-    totalIndexedEarnings = totalIndexedEarnings.roundToDollar();
+    let monthlyIndexedEarnings =
+        this.recipient_.monthlyIndexedEarnings().roundToDollar();
     let firstBend = this.firstBendPoint();
     let secondBend = this.secondBendPoint();
 
     if (bracket == 0) {
-      return Money.min(totalIndexedEarnings, firstBend)
+      return Money.min(monthlyIndexedEarnings, firstBend)
           .times(constants.BEFORE_BENDPOINT1_MULTIPLIER);
     } else if (bracket == 1) {
       return Money
           .max(
               Money.from(0),
-              Money.min(totalIndexedEarnings, secondBend).sub(firstBend))
+              Money.min(monthlyIndexedEarnings, secondBend).sub(firstBend))
           .times(constants.BEFORE_BENDPOINT2_MULTIPLIER);
     } else if (bracket == 2) {
-      return Money.max(Money.from(0), totalIndexedEarnings.sub(secondBend))
+      return Money.max(Money.from(0), monthlyIndexedEarnings.sub(secondBend))
           .times(constants.AFTER_BENDPOINT2_MULTIPLIER);
     }
   };
+
+  /**
+   * Returns the total monthly full benefit summed across all benefit brackets,
+   * not adjusted for cost of living.
+   */
+  primaryInsuranceAmountUnadjusted(): Money {
+    let sum = Money.from(0);
+    for (let i = 0; i < 3; ++i)
+      sum = sum.plus(this.primaryInsuranceAmountByBracket(i));
+    // Primary Insurance amounts are always rounded down the the nearest dime.
+    // Who decided this was an important step?
+    return sum.floorToDime();
+  };
+
+  /**
+   * Returns the total monthly full benefit summed across all benefit brackets,
+   * then adjusted for cost of living.
+   */
+  primaryInsuranceAmount(): Money {
+    let pia = this.primaryInsuranceAmountUnadjusted();
+
+    for (let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+         year < constants.CURRENT_YEAR; ++year) {
+      pia = pia.times(1 + (constants.COLA[year] / 100.0));
+      // Primary Insurance amounts are rounded down to the nearest dime.
+      pia = pia.floorToDime();
+    }
+    return pia;
+  };
+
+  /**
+   * Returns true if the recipient is old enough (62) to receive a COLA
+   * adjustment.
+   */
+  shouldAdjustForCOLA(): boolean {
+    return this.recipient_.birthdate.yearTurningSsaAge(62) <
+        constants.CURRENT_YEAR;
+  }
+
+  /**
+   * Returns an array of adjustments to be displayed to the user. Each record
+   * has the year, the adjustment rate, and the starting/ending values.
+   */
+  colaAdjustments(): Array<ColaAdjustment> {
+    let adjusted = this.primaryInsuranceAmountUnadjusted();
+
+    let adjustments: Array<ColaAdjustment> = [];
+    for (let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+         year <= constants.CURRENT_YEAR; ++year) {
+      if (constants.COLA[year] !== undefined) {
+        let newadjusted = adjusted.times(1 + (constants.COLA[year] / 100.0));
+        // Primary Insurance amounts are rounded down to the nearest dime.
+        newadjusted = newadjusted.floorToDime();
+
+        let adjustment = new ColaAdjustment();
+        adjustment.year = year;
+        adjustment.cola = constants.COLA[year];
+        adjustment.start = adjusted;
+        adjustment.end = newadjusted;
+        adjustments.push(adjustment);
+
+        adjusted = newadjusted;
+      }
+    }
+    return adjustments;
+  };
+};
+
+/**
+ * Return value for colaAdjustments() function. Stores fields describing
+ * a single COLA adjustment.
+ */
+class ColaAdjustment {
+  /**
+   * The year of the adjustment.
+   */
+  year: number;
+  /**
+   * The COLA rate for the year, as a fraction.
+   */
+  cola: number;
+  /**
+   * The starting value for the user's PIA before the adjustment.
+   */
+  start: Money;
+  /**
+   * The ending value for the user's PIA after the adjustment.
+   * This is also the `.start` value for the next year.
+   */
+  end: Money;
 };

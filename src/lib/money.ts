@@ -105,6 +105,13 @@ export class Money {
     return new Money(Math.floor(this.cents_ / 100) * 100);
   }
 
+  /**
+   * Floors to the nearest dime.
+   */
+  floorToDime(): Money {
+    return new Money(Math.floor(this.cents_ / 10) * 10);
+  }
+
 
   private constructor(cents: number) {
     if (isNaN(cents)) {

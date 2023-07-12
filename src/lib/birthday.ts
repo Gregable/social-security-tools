@@ -117,6 +117,19 @@ export class Birthdate {
   }
 
   /**
+   * Convenient version of dateAtSsaAge that operates on years only.
+   *
+   * @returns year in which the recipient turns the given age, as determined by
+   *     SSA ages.
+   */
+  yearTurningSsaAge(yearsOld: number): number {
+    return this
+        .dateAtSsaAge(
+            MonthDuration.initFromYearsMonths({years: yearsOld, months: 0}))
+        .year();
+  }
+
+  /**
    * @returns the date in the given year that social security considers it
    * the person's birthdate, as well as their age.
    */

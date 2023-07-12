@@ -8,8 +8,6 @@
 </script>
 
 <div>
-  <a id="nav-eligibility" class="nav" />
-
   <h2>Retirement Benefits Eligibility</h2>
 
   <div class="text">
@@ -55,7 +53,7 @@
       initiallyExpanded={$recipient.totalCredits() < 40}
     >
       <div class="expando">
-        <p class="expando">
+        <p>
           To be eligible for a normal retirement benefit from your own work
           history you must earn 40 <a
             href="https://www.ssa.gov/planners/credits.html"
@@ -73,7 +71,7 @@
         -->
           <div class="insetTextBox">
             <h4>Special Rule</h4>
-            <p class="expando">
+            <p>
               Earnings before 1978 were reported <i>quarterly</i>, and one could
               earn only one credit per quarter. Because the SSA earnings record
               only reports <i>yearly</i> earnings, credits may not be calculated
@@ -147,11 +145,6 @@
 </div>
 
 <style>
-  a.nav {
-    position: relative;
-    visibility: hidden;
-    display: block;
-  }
   .text {
     margin: 0 0.5em;
   }
@@ -161,9 +154,10 @@
     grid-gap: 1em;
   }
   .eligibility {
-    margin: 1em 0 1em 0;
-    font-size: 18px;
+    margin: 1em 0;
+    font-size: 20px;
     font-weight: 700;
+    letter-spacing: 0.04rem;
   }
   .eligible {
     color: green;

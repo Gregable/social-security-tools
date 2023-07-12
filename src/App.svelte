@@ -7,6 +7,7 @@
   import PasteFlow from "./components/PasteFlow.svelte";
   import EarningsReport from "./components/EarningsReport.svelte";
   import EligibilityReport from "./components/EligibilityReport.svelte";
+  import PiaReport from "./components/PiaReport.svelte";
   import Sidebar from "./components/Sidebar.svelte";
   import SidebarSection from "./components/SidebarSection.svelte";
 
@@ -28,6 +29,9 @@
       </SidebarSection>
       <SidebarSection label="Benefits Eligibility">
         <EligibilityReport recipient={context.recipient} />
+      </SidebarSection>
+      <SidebarSection label="Primary Insurance Amount">
+        <PiaReport recipient={context.recipient} />
       </SidebarSection>
     </Sidebar>
   {/if}
