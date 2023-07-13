@@ -465,7 +465,7 @@
     max-width: 650px;
     height: 430px;
     margin-top: 20px;
-    font-size: 15px;
+    font-size: 16px;
     white-space: nowrap;
   }
 
@@ -479,6 +479,8 @@
     transform: rotate(-90deg) translateY(-82px) translateX(-166px);
     -webkit-transform: rotate(-90deg) translateY(-82px) translateX(-166px);
     float: left;
+    width: 235px;
+    white-space: nowrap;
   }
 
   .chart-xlabel {
