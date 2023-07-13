@@ -10,6 +10,7 @@
   import PiaReport from "./components/PiaReport.svelte";
   import Sidebar from "./components/Sidebar.svelte";
   import SidebarSection from "./components/SidebarSection.svelte";
+  import NormalRetirementAgeReport from "./components/NormalRetirementAgeReport.svelte";
 
   let isPasteFlow: boolean = true;
 
@@ -32,6 +33,9 @@
       </SidebarSection>
       <SidebarSection label="Primary Insurance Amount">
         <PiaReport recipient={context.recipient} />
+      </SidebarSection>
+      <SidebarSection label="Normal Retirement Age">
+        <NormalRetirementAgeReport recipient={context.recipient} />
       </SidebarSection>
     </Sidebar>
   {/if}
