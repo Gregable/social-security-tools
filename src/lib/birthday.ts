@@ -89,6 +89,16 @@ export class Birthdate {
   }
 
   /**
+   * @returns date at a given age, as determined by lay ages.
+   */
+  dateAtLayAge(age: MonthDuration): MonthDate {
+    return MonthDate
+        .initFromYearsMonths(
+            {years: this.layBirthYear(), months: this.layBirthMonth()})
+        .addDuration(age);
+  }
+
+  /**
    * @returns 4 digit number representing the year
    */
   ssaBirthYear(): number {

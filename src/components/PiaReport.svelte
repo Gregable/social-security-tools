@@ -231,7 +231,7 @@
         </div>
 
         {#if $recipient.pia().shouldAdjustForCOLA()}
-          <div ng-if="recipient.shouldAdjustForCOLA()" class="pageBreakAvoid">
+          <div class="pageBreakAvoid">
             <p>
               After attaining age 62, your primary insurance amount will
               increase annually in proportion to the consumer price index

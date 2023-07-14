@@ -11,6 +11,7 @@
   import Sidebar from "./components/Sidebar.svelte";
   import SidebarSection from "./components/SidebarSection.svelte";
   import NormalRetirementAgeReport from "./components/NormalRetirementAgeReport.svelte";
+  import FilingDateReport from "./components/FilingDateReport.svelte";
 
   let isPasteFlow: boolean = true;
 
@@ -36,6 +37,9 @@
       </SidebarSection>
       <SidebarSection label="Normal Retirement Age">
         <NormalRetirementAgeReport recipient={context.recipient} />
+      </SidebarSection>
+      <SidebarSection label="Filing Date">
+        <FilingDateReport recipient={context.recipient} />
       </SidebarSection>
     </Sidebar>
   {/if}
