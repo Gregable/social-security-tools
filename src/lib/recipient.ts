@@ -152,10 +152,13 @@ export class Recipient {
     this.updateEarningsRecords_();
   }
 
-  /*
-   * Recipient's normal retirement age.
-   */
-  normalRetirementAge(): MonthDuration {
+  private retirementAgeBracket(): {
+    minYear: number,
+    maxYear: number,
+    ageYears: number,
+    ageMonths: number,
+    delayedIncreaseAnnual: number
+  } {
     // Find the retirement age bracket data for this recipient.
     let retirementAgeBracket = undefined;
     for (let i = 0; i < constants.FULL_RETIREMENT_AGE.length; ++i) {
@@ -166,11 +169,21 @@ export class Recipient {
       }
     }
     console.assert(retirementAgeBracket !== undefined);
+    return retirementAgeBracket;
+  }
 
+  /*
+   * Recipient's normal retirement age.
+   */
+  normalRetirementAge(): MonthDuration {
     return MonthDuration.initFromYearsMonths({
-      years: retirementAgeBracket.ageYears,
-      months: retirementAgeBracket.ageMonths
+      years: this.retirementAgeBracket().ageYears,
+      months: this.retirementAgeBracket().ageMonths
     });
+  }
+
+  delayedRetirementIncrease(): number {
+    return this.retirementAgeBracket().delayedIncreaseAnnual;
   }
 
   /*
@@ -179,7 +192,27 @@ export class Recipient {
   normalRetirementDate(): MonthDate {
     return this.birthdate_.ssaBirthMonthDate().addDuration(
         this.normalRetirementAge());
-  };
+  }
+
+  /**
+   * The early retirement reduction factor changes from 6.67%/yr for years
+   * earlier than 3 years before normal retirement age to 5%/yr for the 3 years
+   * immediately before normal retirement age. This function returns the age at
+   * which the reduction factor changes.
+   */
+  earlyRetirementInflectionAge(): MonthDuration {
+    return this.normalRetirementAge().subtract(new MonthDuration(36));
+  }
+
+  /**
+   * The early retirement reduction factor changes from 6.67%/yr for years
+   * earlier than 3 years before normal retirement age to 5%/yr for the 3 years
+   * immediately before normal retirement age. This function returns the date at
+   * which the reduction factor changes.
+   */
+  earlyRetirementInflectionDate(): MonthDate {
+    return this.normalRetirementDate().subtractDuration(new MonthDuration(36));
+  }
 
 
   /**
