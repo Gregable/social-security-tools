@@ -337,4 +337,95 @@ export class Recipient {
     return new PrimaryInsuranceAmount(this);
   }
 
+  /**
+   * Returns benefit multiplier at a given age.
+   */
+  benefitMultiplierAtAge(age: MonthDuration): number {
+    const nra = this.normalRetirementAge();
+    // Compute the number of total months between birth and full retirement age.
+    if (nra.greaterThan(age)) {
+      // Reduced benefits due to taking benefits early.
+      let before = nra.subtract(age);
+      return -1.0 *
+          ((Math.min(36, before.asMonths()) * 5 / 900) +
+           (Math.max(0, before.asMonths() - 36) * 5 / 1200));
+    } else {
+      // Increased benefits due to taking benefits late.
+      const after = age.subtract(nra);
+      return this.delayedRetirementIncrease() / 12 * after.asMonths();
+    }
+  };
+
+  private testPrimaryInsuranceAmount_: Money|null = null;
+  forceTestPia(pia: Money) {
+    this.testPrimaryInsuranceAmount_ = pia;
+  }
+
+  /**
+   * Returns personal benefit amount if starting benefits at a given age.
+   */
+  benefitAtAge(age: MonthDuration): Money {
+    // Support overriding the PIA dollar amount for testing purposes, using
+    // forceTestPia().
+    let piaAmount: Money;
+    if (this.testPrimaryInsuranceAmount_ != null) {
+      piaAmount = this.testPrimaryInsuranceAmount_;
+    } else {
+      piaAmount = this.pia().primaryInsuranceAmount();
+    }
+
+    return piaAmount.floorToDollar()
+        .times(1 + this.benefitMultiplierAtAge(age))
+        .floorToDollar();
+  };
+
+  /**
+   * Given a certain filing date and current date, returns the benefit amount
+   * for the recipient on that date. Does not include spousal benefits.
+   */
+  benefitOnDate(filingDate: MonthDate, atDate: MonthDate): Money {
+    // The filing date must be between 62 and 70:
+    console.assert(this.birthdate.ageAtSsaDate(filingDate)
+                       .greaterThanOrEqual(MonthDuration.initFromYearsMonths(
+                           {years: 62, months: 0})));
+    console.assert(this.birthdate.ageAtSsaDate(filingDate)
+                       .lessThanOrEqual(MonthDuration.initFromYearsMonths(
+                           {years: 70, months: 0})));
+
+    // If the recipient hasn't filed yet, return $0:
+    if (filingDate.greaterThan(atDate)) return Money.from(0);
+
+    // This is the eventual benefit amount given a filing date. The actual
+    // benefit may be lower, for example if the user has yet to realize full
+    // delated credits.
+    const filingAgeBenefit: Money =
+        this.benefitAtAge(this.birthdate.ageAtSsaDate(filingDate));
+
+    // 70 is an explicit exception because the SSA likes to make my life harder.
+    // Normally, you'd need to wait until the next year to get delayed credits,
+    // but not if you file at exactly 70.
+    if (this.birthdate.ageAtSsaDate(filingDate).years() >= 70)
+      return filingAgeBenefit;
+
+    // If you are filing before normal retirement, no delayed credits apply.
+    if (filingDate.lessThanOrEqual(this.normalRetirementDate()))
+      return filingAgeBenefit;
+
+    // If you file in January, delayed credits are fully applied.
+    if (filingDate.monthIndex() === 0) return filingAgeBenefit;
+
+    // If this is the year after filing, delayed credits are fully applied.
+    if (filingDate.year() < atDate.year()) return filingAgeBenefit;
+
+    // Otherwise, you only get credits up to January of this year,
+    // or NRA, whichever is later.
+    let thisJan =
+        MonthDate.initFromYearsMonths({years: filingDate.year(), months: 0});
+    let benefitComputationDate =
+        this.normalRetirementDate().greaterThan(thisJan) ?
+        this.normalRetirementDate() :
+        thisJan;
+    return this.benefitAtAge(
+        this.birthdate.ageAtSsaDate(benefitComputationDate));
+  }
 }  // class Recipient

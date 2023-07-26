@@ -9,7 +9,7 @@ import demo0 from '../assets/averagepaste.txt?raw';
 
 const meta: Meta<FilingDate> = {
   component: FilingDate,
-  title: 'Report/FilingDate',
+  title: 'Report/FilingDate/FilingDateReport',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
