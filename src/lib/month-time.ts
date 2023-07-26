@@ -163,6 +163,13 @@ export class MonthDuration {
   }
 
   /**
+   * Copy initializer.
+   */
+  static copyFrom(other: MonthDuration): MonthDuration {
+    return new MonthDuration(other.months_);
+  }
+
+  /**
    * Initializer from a number of years and months.
    * Internally just adds the two together after multiplying years by 12.
    */
@@ -205,28 +212,42 @@ export class MonthDuration {
   /**
    * Returns true if this duration is greater than the other.
    */
-  greaterThan(other): boolean {
+  greaterThan(other: MonthDuration): boolean {
     return this.asMonths() > other.asMonths();
+  }
+
+  /**
+   * Returns true if this duration is greater than or equal to the other.
+   */
+  greaterThanOrEqual(other: MonthDuration): boolean {
+    return this.asMonths() >= other.asMonths();
   }
 
   /**
    * Returns true if this duration is less than the other.
    */
-  lessThan(other): boolean {
+  lessThan(other: MonthDuration): boolean {
     return this.asMonths() < other.asMonths();
+  }
+
+  /**
+   * Returns true if this duration is less than or equal to the other.
+   */
+  lessThanOrEqual(other: MonthDuration): boolean {
+    return this.asMonths() <= other.asMonths();
   }
 
   /**
    * Subtracts the other duration from this one and returns a new MonthDuration.
    */
-  subtract(other): MonthDuration {
+  subtract(other: MonthDuration): MonthDuration {
     return new MonthDuration(this.asMonths() - other.asMonths());
   }
 
   /**
    * Adds the other duration to this one and returns a new MonthDuration.
    */
-  add(other): MonthDuration {
+  add(other: MonthDuration): MonthDuration {
     return new MonthDuration(this.asMonths() + other.asMonths());
   }
 }

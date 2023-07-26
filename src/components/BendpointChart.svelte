@@ -459,7 +459,6 @@
 </div>
 
 <style>
-  /* Canvas Chart CSS */
   .chart-container {
     position: relative;
     max-width: 650px;

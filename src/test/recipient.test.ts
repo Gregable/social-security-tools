@@ -381,4 +381,94 @@ describe('Recipient', () => {
     ];
     expect(r.hasEarningsBefore1978()).toBe(true);
   });
+
+  it('correctly calculates benefits based on filing ages', () => {
+    let r = new Recipient();
+    r.birthdate = new Birthdate(new Date(1960, 0, 5));
+    // Over time, the PIA will increase due to COLAs, but we want the tests
+    // to be stable, so we set the PIA to a fixed value for testing.
+    r.forceTestPia(Money.from(1000.00));
+
+    // Early retirement at 62 should be 30% reduction:
+    expect(r.benefitAtAge(
+                MonthDuration.initFromYearsMonths({years: 62, months: 0}))
+               .value())
+        .toEqual(700.00);
+    // Early retirement at 66 should be 6.67% reduction:
+    expect(r.benefitAtAge(
+                MonthDuration.initFromYearsMonths({years: 66, months: 0}))
+               .value())
+        .toEqual(933.00);
+    // Test the normal retirement age:
+    expect(r.benefitAtAge(
+                MonthDuration.initFromYearsMonths({years: 67, months: 0}))
+               .value())
+        .toEqual(1000.00);
+    // Delayed retirement at 68 should be 8% increase:
+    expect(r.benefitAtAge(
+                MonthDuration.initFromYearsMonths({years: 68, months: 0}))
+               .value())
+        .toEqual(1080.00);
+    // Delayed retirement at 70 should be 24% increase:
+    expect(r.benefitAtAge(
+                MonthDuration.initFromYearsMonths({years: 70, months: 0}))
+               .value())
+        .toEqual(1240.00);
+  });
+
+  it('correctly calculates benefits based on filing and current dates', () => {
+    let r = new Recipient();
+    // Over time, the PIA will increase due to COLAs, but we want the tests
+    // to be stable, so we set the PIA to a fixed value for testing.
+    r.forceTestPia(Money.from(1000.00));
+
+    // If they haven't filed yet, they should have zero benefit:
+    r.birthdate = new Birthdate(new Date(1960, 0, 5));
+    expect(r.benefitOnDate(
+                // File at NRA, 67:
+                MonthDate.initFromYearsMonths({years: 2027, months: 1}),
+                // Currently at age 63:
+                MonthDate.initFromYearsMonths({years: 2023, months: 1}))
+               .value())
+        .toEqual(0);
+
+    // Early retirement at 66 should be 6.67% reduction:
+    expect(r.benefitOnDate(
+                MonthDate.initFromYearsMonths({years: 2026, months: 0}),
+                MonthDate.initFromYearsMonths({years: 2026, months: 0}))
+               .value())
+        .toEqual(933.00);
+    // Reductions are applied monthly, unlike delayed retirement credits, so
+    // adding 2 months should increase the benefit by 1/6 of 6.67%:
+    expect(r.benefitOnDate(
+                MonthDate.initFromYearsMonths({years: 2026, months: 2}),
+                MonthDate.initFromYearsMonths({years: 2026, months: 2}))
+               .value())
+        .toEqual(944.00);
+
+    // Filing in the middle of the year, but on the month they turn 70,
+    // should immediately be maximum delayed multiplier of 24%
+    r.birthdate = new Birthdate(new Date(1960, 6, 5));
+    expect(r.benefitOnDate(
+                MonthDate.initFromYearsMonths({years: 2030, months: 6}),
+                MonthDate.initFromYearsMonths({years: 2030, months: 6}))
+               .value())
+        .toEqual(1240.00);
+
+    // Filing in the middle of the year, but on the month before they turn 70,
+    // should result in only a 20% increase until the following year. where
+    // it will be 24%. The 20% number is the delayed retirement credits as of
+    // Jan 2030.
+    r.birthdate = new Birthdate(new Date(1960, 6, 5));
+    expect(r.benefitOnDate(
+                MonthDate.initFromYearsMonths({years: 2030, months: 5}),
+                MonthDate.initFromYearsMonths({years: 2030, months: 5}))
+               .value())
+        .toEqual(1200.00);  // 0.67 per month for 30 months = 20%
+    expect(r.benefitOnDate(
+                MonthDate.initFromYearsMonths({years: 2030, months: 5}),
+                MonthDate.initFromYearsMonths({years: 2031, months: 0}))
+               .value())
+        .toEqual(1233.00);  // 0.67 per month for 35 months = 23.33%
+  });
 });

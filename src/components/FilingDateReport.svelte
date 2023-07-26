@@ -3,6 +3,7 @@
   import { Recipient } from "../lib/recipient";
   import * as constants from "../lib/constants";
   import { MonthDate, MonthDuration } from "../lib/month-time";
+  import FilingDateChart from "./FilingDateChart.svelte";
 
   export let recipient: Recipient = new Recipient();
 
@@ -84,9 +85,11 @@
       <div class="insetTextBox">
         <h4>Special Rule</h4>
         <p>
-          You may find it oddly specific that the dates are offset by 1 month
-          from your birthdate. Benefit eligibility is calculated based on the
-          first month that you are a particular age throughout the <u>entire</u>
+          You may find it oddly specific that the start date is offset by 1
+          month from your birthdate. Benefit eligibility is calculated based on
+          the first month that you are a particular age throughout the <u
+            >entire</u
+          >
           month. For most, this is the month <i>after</i> their birthdate.
         </p>
         <p>
@@ -164,10 +167,19 @@
         {/if}
       </ul>
       <p>
-        Increases due to delaying your benefit do not take affect until the
-        following January, except for those who delay until the full age of 70.
+        Increases due to delaying your benefit do not take affect until January,
+        except at the full age of 70. <a
+          href="https://ssa.tools/guide/delayed-january-bump.html"
+          target="_blank">Learn more</a
+        >.
       </p>
     </div>
+    <h3>Explore Filing Dates</h3>
+    <p>
+      The following <i>interactive</i> tool visualizes how different filing dates
+      affect your benefit amount.
+    </p>
+    <FilingDateChart recipient={$recipient} />
   </div>
 </div>
 
