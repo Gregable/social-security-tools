@@ -1,12 +1,11 @@
 import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
-import PastePrompt from '../components/PastePrompt.svelte';
+import SpouseQuestion from '../components/SpouseQuestion.svelte';
 
-const meta: Meta<PastePrompt> = {
-  component: PastePrompt,
-  title: 'Input/PasteFlow/PastePrompt',
-
+const meta: Meta<SpouseQuestion> = {
+  component: SpouseQuestion,
+  title: 'Input/PasteFlow/SpouseQuestion',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -15,9 +14,10 @@ const meta: Meta<PastePrompt> = {
 export default meta;
 
 const Template = ({...args}) => ({
-  Component: PastePrompt,
+  Component: SpouseQuestion,
+  props: args,
   on: {
-    paste: action('paste'),
+    response: action('response'),
   },
 });
 

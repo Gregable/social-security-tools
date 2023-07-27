@@ -58,7 +58,7 @@
   <div class="text">
     <h3>Step 3 of 3: Select Birthdate</h3>
     <p>
-      Your birthdate is used to calculate when you can collect Social Security
+      Birthdate is used to calculate when you can collect Social Security
       benefits, as well as to determine the amount of your benefit.
     </p>
   </div>

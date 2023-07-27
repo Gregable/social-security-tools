@@ -1,6 +1,5 @@
 <script lang="ts">
   import "../global.css";
-  import { context } from "../lib/context";
   import EarningsTable from "./EarningsTable.svelte";
   import FutureEarningsSliders from "./FutureEarningsSliders.svelte";
   import { Recipient } from "../lib/recipient";
@@ -12,7 +11,7 @@
   <h2>Earnings Record</h2>
 
   <EarningsTable earningsRecords={$recipient.earningsRecords} />
-  <FutureEarningsSliders recipient={context.recipient} />
+  <FutureEarningsSliders recipient={$recipient} />
   <EarningsTable earningsRecords={$recipient.futureEarningsRecords} />
 </div>
 

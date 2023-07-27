@@ -6,7 +6,7 @@
   import { Money } from "../lib/money";
 
   /**
-   * The recipient whose earnings records to display.
+   * The recipient we are adding future earning years to.
    */
   export let recipient: Recipient;
 
@@ -30,10 +30,14 @@
   }
   let futureEarningYears: number = 0;
   let futureEarningWage: number = 1000;
-  $: recipient.simulateFutureEarningsYears(
-    futureEarningYears,
-    Money.from(futureEarningWage)
-  );
+  function update(futureEarningYears: number, futureEarningWage: Money) {
+    $recipient.simulateFutureEarningsYears(
+      futureEarningYears,
+      futureEarningWage
+    );
+  }
+
+  $: update(futureEarningYears, Money.from(futureEarningWage));
 </script>
 
 <div class="sliders">

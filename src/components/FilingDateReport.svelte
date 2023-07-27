@@ -149,7 +149,7 @@
         <i>increased</i>:
       </p>
       <ul>
-        {#if $recipient.delayedRetirementIncrease() == 0.8}
+        {#if $recipient.delayedRetirementIncrease() == 0.08}
           <li>
             <b>2 / 3</b> of one percent per month (<b>8%</b> per year) for each month
             after normal retirement age, up age 70.
@@ -177,7 +177,8 @@
     <h3>Explore Filing Dates</h3>
     <p>
       The following <i>interactive</i> tool visualizes how different filing dates
-      affect your benefit amount.
+      affect your benefit amount. Move the slider to select a filing date and hover
+      over the chart to see the benefit amount for that date.
     </p>
     <FilingDateChart recipient={$recipient} />
   </div>
