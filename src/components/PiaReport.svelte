@@ -55,13 +55,6 @@
       > / month
     </div>
 
-    <p>
-      Don't let the government mandated acronyms confuse you. Think of the
-      primary insurance amount like a salary: it's the amount of money you can
-      expect to earn in retirement every month starting at your normal
-      retirement age.
-    </p>
-
     <p>To understand how your PIA is calculated, expand the box below:</p>
 
     <Expando

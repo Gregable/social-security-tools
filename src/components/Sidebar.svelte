@@ -16,7 +16,7 @@
   let visibleSections: Array<number> = [];
 
   let observer = new IntersectionObserver(
-    (entries, observer) => {
+    (entries, _) => {
       entries.forEach((entry) => {
         let id: number = parseInt(
           entry.target.getAttribute("id").split("-")[1]
@@ -27,7 +27,8 @@
           visibleSections = visibleSections.filter((x) => x != id);
         }
       });
-      visibleSections.sort();
+      // Ensure we are sorting by number, not string:
+      visibleSections.sort((n1, n2) => n1 - n2);
 
       if (lastActiveSection) {
         lastActiveSection.active = false;
@@ -47,10 +48,12 @@
   class SidebarSection {
     label: string;
     id: string;
+    heading: boolean = false;
     active: boolean = false;
   }
   let lastActiveSection: SidebarSection;
 
+  let hasHeading: boolean = false;
   let sidebarSections: Array<SidebarSection> = [];
 
   onMount(() => {
@@ -59,9 +62,16 @@
     let children = mainColumn.children;
     for (let i = 0; i < children.length; i++) {
       let child = children[i];
+      let isHeading = child.getAttribute("data-heading") == "true";
+      // If we have no headings, then nothing should be indented. If we have
+      // at least one heading, non-heading items should be indented.
+      if (isHeading) hasHeading = true;
       sidebarSections.push({
         label: child.getAttribute("data-label"),
         id: child.id,
+        heading: isHeading,
+        // active highlights a section if it's visible at the top of
+        // the viewport. Initially all false.
         active: false,
       });
       observer.observe(child);
@@ -79,7 +89,11 @@
           on:keydown={scrollTo(section.id)}
           class:active={section.active}
         >
-          <div class="navlabel">{section.label}</div>
+          {#if hasHeading && !section.heading}
+            <div class="navlabel indent">{section.label}</div>
+          {:else}
+            <div class="navlabel">{section.label}</div>
+          {/if}
           <span class="chevron"><ChevronRight /></span>
         </li>
       {/each}
@@ -93,7 +107,7 @@
 <style>
   .twoColumns {
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: 230px 1fr;
   }
   @media print {
     .twoColumns {
@@ -144,6 +158,9 @@
     max-width: 175px;
     padding-right: 20px;
     white-space: nowrap;
+  }
+  .navlabel.indent {
+    padding-left: 10px;
   }
   .chevron {
     position: absolute;

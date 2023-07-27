@@ -9,6 +9,11 @@
    */
   export let label: string = "";
 
+  /**
+   * Whether this section is a heading. Headings are styled differently.
+   */
+  export let heading: boolean = false;
+
   // TODO: This should ideally generate a unique id for each sidebar as well,
   // by having the sidebar pass it's own unique id down to the section.
 
@@ -17,7 +22,7 @@
   uniqid += 1;
 </script>
 
-<div {id} data-label={label}>
+<div {id} data-label={label} data-heading={heading ? "true" : "false"}>
   <slot />
 </div>
 
