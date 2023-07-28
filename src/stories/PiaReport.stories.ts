@@ -8,6 +8,8 @@ import {Birthdate} from '../lib/birthday';
 import demo0 from '../assets/averagepaste.txt?raw';
 
 let recipient = new Recipient();
+recipient.name = 'Alex';
+recipient.markFirst();
 recipient.earningsRecords = parsePaste(demo0);
 recipient.birthdate = new Birthdate(new Date('1950-07-01'));
 

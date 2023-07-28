@@ -5,6 +5,8 @@
   import { Recipient } from "../lib/recipient";
   import { Money } from "../lib/money";
   import Slider from "./Slider.svelte";
+  import RecipientName from "./RecipientName.svelte";
+
   import { MonthDate, MonthDuration } from "../lib/month-time";
 
   export let recipient: Recipient = new Recipient();
@@ -629,7 +631,13 @@
 </script>
 
 <div class="chart-container">
-  <p>File for benefits at age:</p>
+  <p>
+    Select the age that <RecipientName
+      r={$recipient}
+      suffix="
+  files">you file</RecipientName
+    > for benefits:
+  </p>
   <div
     class="slider-box"
     style:--reserved-left="{reservedLeft}px"
@@ -679,7 +687,9 @@
       <span class="selectedDate"
         >{dateX(lastMouseX).monthName()}
         {dateX(lastMouseX).year()}</span
-      >, your benefit will be:
+      >, <RecipientName r={$recipient} apos noColor={true} shortenTo={30}
+        >your</RecipientName
+      > benefit will be:
 
       <b>
         {$recipient
@@ -691,7 +701,7 @@
            it is here to ensure the div doesn't collapse
            and thus takes up space.-->
       Select a date<br />
-      to see your benefit
+      to see the benefit
     {/if}
   </div>
 </div>

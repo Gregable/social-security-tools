@@ -2,9 +2,11 @@
   import "../global.css";
   import * as constants from "../lib/constants";
   import { Recipient } from "../lib/recipient";
+  import RName from "./RecipientName.svelte";
   import { Money } from "../lib/money";
 
   export let recipient: Recipient = new Recipient();
+  let r: Recipient = $recipient;
 
   let exampleAge: { age: number; day: number; month: string; year: number };
   $: exampleAge = $recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
@@ -22,8 +24,9 @@
   <h2>Normal Retirement Age</h2>
   <div class="text">
     <p>
-      Your primary insurance amount rounded down to the next lower whole dollar
-      (<b>{benefit.wholeDollars()}</b>
+      The primary insurance amount rounded down to the next lower whole dollar (<b
+        >{benefit.wholeDollars()}</b
+      >
       / month) is the benefit you will earn if you begin collecting your benefit
       at your <u>normal retirement age</u> (NRA). Normal Retirement Age is
       between 65 and 67, depending on when you were born. You may also see this
@@ -31,8 +34,9 @@
     </p>
 
     <p>
-      For those born in <b>{$recipient.birthdate.ssaBirthYear()}</b>, normal
-      retirement age is
+      For <RName {r} suffix=" who was">those</RName>
+      born in <b>{$recipient.birthdate.ssaBirthYear()}</b>, normal retirement
+      age is
       {#if $recipient.normalRetirementAge().modMonths() == 0}
         <b>{$recipient.normalRetirementAge().years()}</b> years.
       {:else}
@@ -55,8 +59,12 @@
         <p>
           The month you reach specific ages may seem "off by one" from what you
           entered. Social Security follows English common law that finds that a
-          person "attains" an age on the day before their birthdate. Because you
-          were born on the first of the month, this means that you attain age
+          person "attains" an age on the day before their birthdate. Because
+          <RName {r} suffix=" was">you were</RName>
+          born on the first of the month, this means that <RName
+            {r}
+            suffix=" attains">you attain</RName
+          > age
           <b>{exampleAge.age}</b> on
           <b>{exampleAge.month} {exampleAge.day}, {exampleAge.year}</b>.
         </p>
@@ -64,7 +72,8 @@
     {/if}
 
     <p>
-      If you start collecting benefits at your normal retirement age, your
+      If <RName {r} suffix=" starts">you start</RName> collecting benefits at your
+      normal retirement age, <RName {r} apos>your</RName>
       benefit will be the primary insurance amount, rounded down:
     </p>
     <ul>

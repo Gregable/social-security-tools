@@ -32,6 +32,8 @@ function AdjustedBirthdate(dateStr: string): Birthdate {
 let r1 = new Recipient();
 r1.earningsRecords = parsePaste(demo0);
 r1.birthdate = AdjustedBirthdate('1950-07-15');
+r1.name = 'Alex';
+r1.markFirst();
 
 export const Default = Template.bind({});
 Default.args = {
@@ -41,6 +43,8 @@ Default.args = {
 let r2 = new Recipient();
 r2.earningsRecords = parsePaste(demo0);
 r2.birthdate = AdjustedBirthdate('1950-07-01');
+r2.name = 'Alex';
+r2.markFirst();
 
 export const BirthdayOnFirst = Template.bind({});
 BirthdayOnFirst.args = {
@@ -51,6 +55,8 @@ BirthdayOnFirst.args = {
 let r3 = new Recipient();
 r3.earningsRecords = parsePaste(demo0);
 r3.birthdate = AdjustedBirthdate('1950-07-02');
+r3.name = 'Alex';
+r3.markFirst();
 
 export const BirthdayOnSecond = Template.bind({});
 BirthdayOnSecond.args = {

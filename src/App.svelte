@@ -12,6 +12,7 @@
   import SidebarSection from "./components/SidebarSection.svelte";
   import NormalRetirementAgeReport from "./components/NormalRetirementAgeReport.svelte";
   import FilingDateReport from "./components/FilingDateReport.svelte";
+  import RecipientName from "./components/RecipientName.svelte";
 
   let isPasteFlow: boolean = true;
 
@@ -27,8 +28,8 @@
   {:else}
     <Sidebar>
       {#if context.spouse}
-        <SidebarSection label={context.recipient.name} heading={true}>
-          <h1>User: {context.recipient.name}</h1>
+        <SidebarSection label={context.recipient.shortName(15)} heading={true}>
+          <h1><RecipientName r={context.recipient} /></h1>
         </SidebarSection>
       {/if}
       <SidebarSection label="Earnings Record">
@@ -47,11 +48,11 @@
         <FilingDateReport recipient={context.recipient} />
       </SidebarSection>
       {#if context.spouse}
-        <SidebarSection label={context.spouse.name} heading={true}>
-          <h1>User: {context.spouse.name}</h1>
+        <SidebarSection label={context.spouse.shortName(15)} heading={true}>
+          <h1><RecipientName r={context.spouse} /></h1>
         </SidebarSection>
 
-        <SidebarSection label="Earnings Record2">
+        <SidebarSection label="Earnings Record">
           <EarningsReport recipient={context.spouse} />
         </SidebarSection>
         <SidebarSection label="Benefits Eligibility">

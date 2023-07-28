@@ -4,6 +4,7 @@
   import Slider from "./Slider.svelte";
   import { Recipient } from "../lib/recipient";
   import { Money } from "../lib/money";
+  import RecipientName from "./RecipientName.svelte";
 
   /**
    * The recipient we are adding future earning years to.
@@ -42,7 +43,11 @@
 
 <div class="sliders">
   <div class="grid">
-    <div class="item left">I plan to work for</div>
+    <div class="item left">
+      <RecipientName r={$recipient} shortenTo={15} suffix=" plans"
+        >I plan</RecipientName
+      > to work for
+    </div>
     <div class="item center">
       <Slider
         bind:value={futureEarningYears}

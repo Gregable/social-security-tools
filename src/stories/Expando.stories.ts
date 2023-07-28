@@ -4,7 +4,7 @@ import Expando from './Expando.demo.svelte';
 
 const meta: Meta<Expando> = {
   component: Expando,
-  title: 'Expando',
+  title: 'Widgets/Expando',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

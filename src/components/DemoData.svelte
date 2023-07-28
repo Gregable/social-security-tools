@@ -71,13 +71,9 @@
 
 <div class="demoPrompt">
   <h3>Try out some <u>demo</u> data instead:</h3>
-  <p>
-    If you aren't ready to take a look at your own Social Security data, you can
-    first play with some fictional account data.
-  </p>
   <ul class="demos">
     <li>
-      Born in 1950; earned the average US wage until 2014
+      Born in 1950; earned the average US wage until 2014.
       <br />
       <button on:click={loadDemoData(0)}>&#x261b; Try the Demo</button>
     </li>

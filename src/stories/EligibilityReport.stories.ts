@@ -14,6 +14,8 @@ import demo1 from '../assets/millionpaste.txt?raw';
 let recipient0 = new Recipient();
 recipient0.earningsRecords = parsePaste(demo0);
 recipient0.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient0.name = 'Alex';
+recipient0.markFirst();
 
 // Insuficient earnings for eligibility
 let recipient1 = new Recipient();
@@ -32,6 +34,8 @@ const futureEarnings1 = [
   }),
 ]
 recipient1.futureEarningsRecords = futureEarnings1;
+recipient1.name = 'Alex';
+recipient1.markFirst();
 
 // Sufficient earnings for eligibility with future earnings
 let recipient2 = new Recipient();
@@ -65,6 +69,8 @@ const futureEarnings2 = [
   }),
 ]
 recipient2.futureEarningsRecords = futureEarnings2;
+recipient2.name = 'Alex';
+recipient2.markFirst();
 
 const meta: Meta<EligibilityReport> = {
   component: EligibilityReport,

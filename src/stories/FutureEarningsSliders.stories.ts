@@ -13,6 +13,8 @@ const meta: Meta<FutureEarningsSliders> = {
 export default meta;
 
 let recipient = new Recipient();
+recipient.name = 'Alex';
+recipient.markFirst();
 
 const Template = ({...args}) => ({
   Component: FutureEarningsSliders,

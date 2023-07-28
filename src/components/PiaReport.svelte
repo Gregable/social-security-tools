@@ -5,15 +5,17 @@
   import { Recipient } from "../lib/recipient";
   import BendpointChart from "./BendpointChart.svelte";
   import Expando from "./Expando.svelte";
+  import RName from "./RecipientName.svelte";
 
   export let recipient: Recipient = new Recipient();
+  let r: Recipient = $recipient;
 
   /**
    * Returns true if the recipient is over 60 years old this year.
    */
   function isOver60(): boolean {
     return (
-      recipient.birthdate
+      $recipient.birthdate
         .ageAtSsaDate(
           MonthDate.initFromYearsMonths({
             years: constants.CURRENT_YEAR,
@@ -43,60 +45,71 @@
   <h2>Primary Insurance Amount</h2>
   <div class="text">
     <p>
-      Your Social Security benefits are best thought of in terms of your
+      Social Security benefits are best thought of in terms of
       <u>primary insurance amount</u> (PIA). This is the dollar amount that
-      Social Security will pay you every month starting at your
+      Social Security will pay <RName {r}>you</RName> every month starting at <RName
+        {r}
+        apos>your</RName
+      >
       <u>normal retirement age</u> (NRA).
     </p>
 
     <div class="pia-banner">
       Primary Insurance Amount (PIA): <b
-        >{recipient.pia().primaryInsuranceAmount().string()}</b
+        >{$recipient.pia().primaryInsuranceAmount().string()}</b
       > / month
     </div>
 
-    <p>To understand how your PIA is calculated, expand the box below:</p>
+    <p>
+      To understand how <RName {r} apos>your</RName> PIA is calculated, expand the
+      box below:
+    </p>
 
     <Expando
-      collapsedText="Expand for a detailed look at your Primary Insurance Amount"
+      collapsedText="Expand for a detailed look at the Primary Insurance Amount"
       expandedText="Show Less"
       label_max_width="600px"
       initiallyExpanded={false}
     >
       <div class="expando">
         <p>
-          You have Social Security earnings recorded for
+          <RName {r} suffix=" has">You have</RName> Social Security earnings recorded
+          for
           <b>{$recipient.earningsRecords.length}</b> total years. Your PIA is
-          based on your <u>Averaged Indexed Monthly Earnings</u> (AIME), a straightforward
+          based on the <u>Averaged Indexed Monthly Earnings</u> (AIME), a straightforward
           calculation from your lifetime earnings record. So, that's our first step.
         </p>
 
         {#if has35Years()}
           <p>
             Only the top 35 years of <u>indexed earnings</u> values are used in
-            the calculation of your Averaged Indexed Monthly Earnings (and thus,
-            your Primary Insurance Amount). Indexed earnings are simply the
-            payroll wages you earned in a year multiplied by a number that
-            adjusts for wage growth (similar to an inflation adjustment). In
-            your case, this means that years where the indexed earnings value
-            falls below
+            the calculation of <RName {r} apos>your</RName> Averaged Indexed Monthly
+            Earnings (and thus,
+            <RName {r} apos>your</RName> Primary Insurance Amount). Indexed earnings
+            are simply the payroll wages you earned in a year multiplied by a number
+            that adjusts for wage growth (similar to an inflation adjustment). In
+            <RName {r} apos>your</RName> case, this means that years where the indexed
+            earnings value falls below
             <b>{$recipient.cutoffIndexedEarnings().wholeDollars()}</b>
-            do not affect your benefit calculation because they are not among the
-            top 35. If you were to earn additional years of wages in the future,
-            they would only affect your Social Security if you earned more than
+            do not affect the benefit calculation because they are not among the
+            top 35. If <RName {r} suffix=" was">you were</RName>
+            to earn additional years of wages in the future, those years would only
+            affect Social Security benefits if <RName {r}>you</RName> earned more
+            than
             <b>{$recipient.cutoffIndexedEarnings().wholeDollars()}</b> in those years.
           </p>
         {:else}
           <p>
-            The top 35 <u>indexed earnings</u> values are used in the calculation
-            of your Averaged Indexed Monthly Earnings (and thus, your Primary Insurance
-            Amount). Indexed earnings are simply the capped payroll wages you earned
-            in a year multiplied by a number that adjusts for wage growth (similar
-            to an inflation adjustment). As you don't have 35 years of earnings yet,
-            every additional year you work will increase your benefit a little more.
-            Once you reach 35 years of earnings values, increasing your Averaged
-            Indexed Monthly Earnings amount requires earning more than previous years'
-            indexed values.
+            The top 35 <u>indexed earnings</u> values are used in the
+            calculation of <RName {r} apos>your</RName> Averaged Indexed Monthly
+            Earnings (and thus, <RName {r} apos>your</RName> Primary Insurance Amount).
+            Indexed earnings are simply the capped payroll wages you earned in a
+            year multiplied by a number that adjusts for wage growth (similar to
+            an inflation adjustment). As you don't have 35 years of earnings yet,
+            every additional year you work will increase the benefit a little more.
+            Once you reach 35 years of earnings values, increasing the Averaged Indexed
+            Monthly Earnings amount requires earning more than previous years' indexed
+            values.
           </p>
         {/if}
 
@@ -111,7 +124,8 @@
         {/if}
 
         <p class="indent">
-          Your total indexed earnings:
+          <RName {r} apos>Your</RName>
+          total indexed earnings:
           <b>{$recipient.totalIndexedEarnings().wholeDollars()}</b>
         </p>
 
@@ -122,8 +136,9 @@
 
         {#if has35Years()}
           <p>
-            Your Averaged Indexed Monthly Earnings is simply your total indexed
-            earnings divided by 35 years divided by 12 months, as follows:
+            <RName {r} apos>Your</RName> Averaged Indexed Monthly Earnings is simply
+            the total indexed earnings divided by 35 years divided by 12 months,
+            as follows:
           </p>
         {:else}
           <p>
@@ -148,8 +163,10 @@
             target="_blank">a formula</a
           >
           that increases your Primary Insurance Amount as your earnings increase,
-          but increases more slowly for higher total earnings. Your Primary Insurance
-          Amount is calculated from your Average Indexed Monthly Earnings as follows:
+          but increases more slowly for higher total earnings. <RName {r} apos
+            >Your</RName
+          > Primary Insurance Amount is calculated from Average Indexed Monthly Earnings
+          as follows:
         </p>
 
         <table class="benefitBrackets pageBreakAvoid">
@@ -232,10 +249,11 @@
               even after beginning to collect your benefit. These adjustments
               are called
               <u>Cost of Living Adjustments</u> (COLA). Here are the adjustments
-              in past years which affect your current Primary Insurance Amount.
+              in past years which affect <RName {r} apos>your</RName> current Primary
+              Insurance Amount.
             </p>
             <ul>
-              {#each recipient.pia().colaAdjustments() as adjustment}
+              {#each $recipient.pia().colaAdjustments() as adjustment}
                 <li>
                   {#if adjustment.year === constants.CURRENT_YEAR}
                     <!-- Not yet applied, so special case the text: -->
@@ -253,24 +271,27 @@
               {/each}
             </ul>
             <p>
-              The adjustments are applied at the <b>end</b> of the year. For
-              example, the {constants.CURRENT_YEAR} adjustment will only affect your
+              The adjustments are applied at the <b>end</b> of the adjustment
+              year. For example, the {constants.CURRENT_YEAR} adjustment will only
+              affect <RName {r} apos>your</RName>
               benefit starting in January {constants.CURRENT_YEAR + 1}.
             </p>
           </div>
         {/if}
 
         <p>
-          The final value is your current <u>primary insurance amount (PIA)</u>.
-          It will continue to increase every year.
+          The final value is <RName {r} apos>your</RName>
+          current <u>primary insurance amount (PIA)</u>. It will continue to
+          increase every year.
         </p>
       </div>
     </Expando>
 
     <p style="margin-top: 1em">
-      In the chart below, you can see what your current Primary Insurance Amount
-      would be if your Average Indexed Monthly Earnings were to increase. Move
-      your mouse over the chart to see how the Primary Insurance Amount changes.
+      In the following chart, you can see what <RName {r} apos>your</RName> current
+      Primary Insurance Amount would be if <RName {r} apos>your</RName> Average Indexed
+      Monthly Earnings were to increase. Move your mouse over the chart to see how
+      the Primary Insurance Amount changes.
     </p>
 
     <BendpointChart recipient={$recipient} />
