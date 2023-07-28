@@ -28,9 +28,10 @@
   {:else}
     <Sidebar>
       {#if context.spouse}
-        <SidebarSection label={context.recipient.shortName(15)} heading={true}>
-          <h1><RecipientName r={context.recipient} /></h1>
-        </SidebarSection>
+        <SidebarSection
+          label={context.recipient.shortName(15)}
+          heading={true}
+        />
       {/if}
       <SidebarSection label="Earnings Record">
         <EarningsReport recipient={context.recipient} />
@@ -48,10 +49,7 @@
         <FilingDateReport recipient={context.recipient} />
       </SidebarSection>
       {#if context.spouse}
-        <SidebarSection label={context.spouse.shortName(15)} heading={true}>
-          <h1><RecipientName r={context.spouse} /></h1>
-        </SidebarSection>
-
+        <SidebarSection label={context.spouse.shortName(15)} heading={true} />
         <SidebarSection label="Earnings Record">
           <EarningsReport recipient={context.spouse} />
         </SidebarSection>
