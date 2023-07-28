@@ -62,19 +62,28 @@
     {:else}
       <div>
         <p>
-          To help keep organized, you can change the default name for yourself
-          and your spouse: "<b>{selfname}</b>" and "<b>{spousename}</b>".
+          To help keep organized, you can change the default names in the
+          report:
+        </p>
+        <p>
+          <span class="self">{selfname}</span> is the name of the person whose data
+          you've already entered.
+        </p>
+        <p>
+          <span class="spouse">{spousename}</span> is the name of the person whose
+          data you'll enter next.
         </p>
         <div class="container">
-          <div class="label">1st Person's Name:</div>
+          <div class="label">Name 1:</div>
           <div class="name">
             <input type="text" bind:value={selfname} />
           </div>
-          <div class="label">2nd Person's Name:</div>
+          <div class="label">Name 2:</div>
           <div class="name">
             <input type="text" bind:value={spousename} />
           </div>
         </div>
+
         <button on:click={confirmSpouse}>
           <ico>&#10003;</ico> Use these names
         </button>
@@ -110,9 +119,10 @@
   }
   .container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: max-content max-content;
     font-size: 22px;
-    margin: 1em 0;
+    width: max-content;
+    margin: 1em auto;
   }
   input[type="text"] {
     font-size: 20px;
@@ -124,5 +134,13 @@
   }
   .name {
     text-align: left;
+  }
+  .self {
+    font-weight: 900;
+    color: #dd6600;
+  }
+  .spouse {
+    font-weight: 900;
+    color: #558855;
   }
 </style>

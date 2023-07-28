@@ -55,6 +55,38 @@ export class Recipient {
   }
 
   /**
+   * Returns a shortened version of the recipient's name, if necessary.
+   * @param length The maximum character length of the output.
+   * @returns
+   */
+  shortName(length: number): string {
+    if (this.name_.length <= length) return this.name_;
+    return this.name_.substring(0, length - 1) + '…';
+  }
+
+  /** True if this is the only recipient, false if there are two. */
+  private only_: boolean = true;
+  /** True if this is the only recipient or the first recipient. */
+  private first_: boolean = true;
+  get only(): boolean {
+    return this.only_;
+  }
+  get first(): boolean {
+    return this.first_;
+  }
+  markFirst() {
+    this.only_ = false;
+    this.first_ = true;
+    this.publish_();
+  }
+  markSecond() {
+    this.only_ = false;
+    this.first_ = false;
+    this.publish_();
+  }
+
+
+  /**
    * The recipient's earning records over all years in the SSA database, if
    * any.
    */

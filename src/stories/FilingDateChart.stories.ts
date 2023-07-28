@@ -10,6 +10,8 @@ import demo0 from '../assets/averagepaste.txt?raw';
 let recipient = new Recipient();
 recipient.earningsRecords = parsePaste(demo0);
 recipient.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient.name = 'Alex';
+recipient.markFirst();
 
 const meta: Meta<FilingDateChart> = {
   component: FilingDateChart,

@@ -48,7 +48,9 @@
    */
   function handleDemo(event: CustomEvent) {
     context.recipient = event.detail.recipient;
+    context.recipient.markFirst();
     context.spouse = event.detail.spouse;
+    context.spouse.markSecond();
 
     // Let the app know we're done.
     dispatch("done");
@@ -62,7 +64,9 @@
     if (isRecipient) {
       context.recipient = event.detail.recipient;
     } else {
+      context.recipient.markFirst();
       context.spouse = event.detail.recipient;
+      context.spouse.markSecond();
       context.spouse.name = spouseName;
     }
 
@@ -113,6 +117,7 @@
   function handleSpouseQuestion(event: CustomEvent) {
     context.recipient.name = event.detail.name;
     if (event.detail.spouse) {
+      // Mark the recipient as first. Spouse will be marked second later.
       isRecipient = false;
       spouseName = event.detail.spousename;
       mode = Mode.INITIAL;
@@ -135,12 +140,9 @@
     {#if isRecipient}
       <div class="text">
         <p>
-          To use the calculator, you must provide some data from your Social
-          Security record.
-        </p>
-        <p>
-          If you aren't ready for that yet, select a demo data set at the bottom
-          of the page.
+          To use the calculator, you must provide data from your Social Security
+          record. If you aren't ready for that yet, select a demo data set at
+          the bottom of the page.
         </p>
       </div>
       <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />

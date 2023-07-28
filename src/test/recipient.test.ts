@@ -285,6 +285,28 @@ describe('Recipient', () => {
     unsubscribe();
   });
 
+  it('shortens name', () => {
+    let r = new Recipient();
+    r.name = 'Gregory';
+    expect(r.shortName(5)).toEqual('Greg…');
+    expect(r.shortName(7)).toEqual('Gregory');
+  });
+
+  it('captures first, second, only', () => {
+    let r = new Recipient();
+    expect(r.first).toEqual(true);
+    expect(r.only).toEqual(true);
+
+    r.markFirst();
+    expect(r.first).toEqual(true);
+    expect(r.only).toEqual(false);
+
+    let r2 = new Recipient();
+    r2.markSecond();
+    expect(r2.first).toEqual(false);
+    expect(r2.only).toEqual(false);
+  });
+
   /**
    * Generates a recipient with a birthdate in 1960, and 40 years of earnings
    * records starting in 1965. Each year has earnings equal to $10,000.
@@ -292,9 +314,9 @@ describe('Recipient', () => {
   function top35RecipientSetup() {
     let r = new Recipient();
 
-    // Pick a start year such that the indexing year is in the past (2020). This
-    // way the test won't break when the wage indices are updated for future
-    // years.
+    // Pick a start year such that the indexing year is in the past (2020).
+    // This way the test won't break when the wage indices are updated for
+    // future years.
     const startYear = 1965;
     r.birthdate = new Birthdate(new Date(startYear - 5, 0, 2));
     expect(r.indexingYear()).toBe(2020);

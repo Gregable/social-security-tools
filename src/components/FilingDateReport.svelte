@@ -4,8 +4,10 @@
   import * as constants from "../lib/constants";
   import { MonthDate, MonthDuration } from "../lib/month-time";
   import FilingDateChart from "./FilingDateChart.svelte";
+  import RName from "./RecipientName.svelte";
 
   export let recipient: Recipient = new Recipient();
+  let r: Recipient = $recipient;
 
   let exampleAge: { age: number; day: number; month: string; year: number };
   $: exampleAge = $recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
@@ -29,7 +31,8 @@
   <div class="text">
     <p>
       {#if $recipient.birthdate.layBirthDayOfMonth() <= 2}
-        You can begin taking benefits as early as 62 years old (<b
+        <RName {r}>You</RName> can begin taking benefits as early as 62 years old
+        (<b
           >{$recipient.birthdate
             .dateAtLayAge(
               MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
@@ -51,10 +54,13 @@
               MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
             )
             .year()}</b
-        >), or start any month in between. The longer you wait, the higher your
-        benefit will be.
+        >), or start any month in between. The longer <RName
+          r={$recipient}
+          suffix=" waits">you wait</RName
+        >, the higher the benefit will be.
       {:else}
-        You can begin taking benefits as early as 62 years and 1 month old (<b
+        <RName {r}>You</RName> can begin taking benefits as early as 62 years and
+        1 month old (<b
           >{$recipient.birthdate
             .dateAtLayAge(
               MonthDuration.initFromYearsMonths({ years: 62, months: 1 })
@@ -76,8 +82,9 @@
               MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
             )
             .year()}</b
-        >), or start any month in between. The longer you wait, the higher your
-        benefit will be.
+        >), or start any month in between. The longer <RName {r} suffix=" waits"
+          >you wait</RName
+        >, the higher the benefit will be.
       {/if}
     </p>
 
@@ -86,14 +93,14 @@
         <h4>Special Rule</h4>
         <p>
           You may find it oddly specific that the start date is offset by 1
-          month from your birthdate. Benefit eligibility is calculated based on
-          the first month that you are a particular age throughout the <u
+          month from one's birthdate. Benefit eligibility is calculated based on
+          the first month that one is a particular age throughout the <u
             >entire</u
           >
           month. For most, this is the month <i>after</i> their birthdate.
         </p>
         <p>
-          For example, the first month that you are
+          For example, the first month that <RName {r}>you</RName> are
           <b>{exampleAge.age}</b>
           throughout the <u>entire</u> month is
           <b
@@ -107,11 +114,13 @@
     <h3>Early Filing</h3>
     <div class="text">
       <p>
-        If you choose to take benefits <i>earlier</i> than normal retirement age
-        (<b
+        If <RName {r} suffix=" chooses">you choose</RName> to take benefits
+        <i>earlier</i>
+        than normal retirement age (<b
           >{$recipient.normalRetirementDate().monthFullName()}
           {$recipient.normalRetirementDate().year()}</b
-        >), your benefit amount will be <u>permanently</u> <i>reduced</i>:
+        >), <RName {r} apos>your</RName> benefit amount will be
+        <u>permanently</u> <i>reduced</i>:
       </p>
       <ul>
         <li>
@@ -142,10 +151,13 @@
     <h3>Delayed Filing</h3>
     <div class="text">
       <p>
-        If you choose to delay until <i>later</i> than normal retirement age (<b
+        If <RName {r} suffix=" chooses">you choose</RName> to delay until
+        <i>later</i>
+        than normal retirement age (<b
           >{$recipient.normalRetirementDate().monthFullName()}
           {$recipient.normalRetirementDate().year()}</b
-        >) to start your benefits, your amount will be <u>permanently</u>
+        >) to start <RName {r} apos>your</RName> benefit, the amount will be
+        <u>permanently</u>
         <i>increased</i>:
       </p>
       <ul>
@@ -176,9 +188,10 @@
     </div>
     <h3>Explore Filing Dates</h3>
     <p>
-      The following <i>interactive</i> tool visualizes how different filing dates
-      affect your benefit amount. Move the slider to select a filing date and hover
-      over the chart to see the benefit amount for that date.
+      The following <i>interactive</i> tool visualizes how different filing
+      dates affect <RName {r} apos>your</RName> benefit amount. Move the slider to
+      select a filing date and hover over the chart to see the benefit amount for
+      that date.
     </p>
     <FilingDateChart recipient={$recipient} />
   </div>

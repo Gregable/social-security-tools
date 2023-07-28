@@ -3,7 +3,7 @@ import type {Meta, StoryObj} from '@storybook/svelte';
 import Header from '../components/Header.svelte';
 
 const meta = {
-  title: 'Sitewide Header',
+  title: 'Widgets/Header',
   component: Header,
   tags: ['autodocs'],
   parameters: {

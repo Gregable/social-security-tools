@@ -5,7 +5,7 @@ import Slider from '../components/Slider.svelte';
 
 const meta: Meta<Slider> = {
   component: Slider,
-  title: 'Slider',
+  title: 'Widgets/Slider',
   tags: ['autodocs'],
   parameters: {
     layout: 'padded',

@@ -1,8 +1,6 @@
 import type {Meta} from '@storybook/svelte';
 import EarningsReport from '../components/EarningsReport.svelte';
 
-// TODO: Make this more reusable
-import {context} from '../lib/context';
 import {Money} from '../lib/money';
 import {Recipient} from '../lib/recipient';
 import {parsePaste} from '../lib/ssa-parse';
@@ -12,10 +10,10 @@ import {EarningRecord} from '../lib/earning-record';
 
 import demo0 from '../assets/averagepaste.txt?raw';
 
-context.recipient = new Recipient();
-context.recipient.earningsRecords = parsePaste(demo0);
+let recipient = new Recipient();
+recipient.earningsRecords = parsePaste(demo0);
 // Add an incomplete record:
-context.recipient.earningsRecords.push((() => {
+recipient.earningsRecords.push((() => {
   let record = new EarningRecord({
     year: 2015,
     taxedEarnings: Money.from(0),
@@ -24,8 +22,10 @@ context.recipient.earningsRecords.push((() => {
   record.incomplete = true;
   return record;
 })());
-context.recipient.earningsRecords = context.recipient.earningsRecords;
-context.recipient.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient.earningsRecords = recipient.earningsRecords;
+recipient.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient.name = 'Alex';
+recipient.markFirst();
 
 const meta: Meta<EarningsReport> = {
   component: EarningsReport,
@@ -44,5 +44,5 @@ const Template = ({...args}) => ({
 
 export const Default = Template.bind({});
 Default.args = {
-  recipient: context.recipient
+  recipient: recipient
 };
