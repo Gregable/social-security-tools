@@ -1,5 +1,6 @@
 <script lang="ts">
   import "../global.css";
+  import HandShakeIcon from "../../static/handshake.svg?url";
   import EligibilityTable from "./EligibilityTable.svelte";
   import Expando from "./Expando.svelte";
   import { Recipient } from "../lib/recipient";
@@ -141,7 +142,7 @@
             <h4>Special Rule</h4>
             <div class="grid">
               <img
-                src="/static/handshake.svg"
+                src={HandShakeIcon}
                 alt="Handshake icon"
                 width="100px"
                 height="100px"

@@ -1,7 +1,9 @@
 <script lang="ts">
   import "../global.css";
+  import horizCurlyImg from "../../static/horiz-curly.png?url";
+
   import { Money } from "../lib/money";
-  import { PrimaryInsuranceAmount } from "../lib/pia";
+
   import { Recipient } from "../lib/recipient";
   import Expando from "./Expando.svelte";
   import RName from "./RecipientName.svelte";
@@ -142,7 +144,7 @@
               </div>
               <img
                 class="horiz-curly"
-                src="/static/horiz-curly.png"
+                src={horizCurlyImg}
                 alt="Horizontal curly brace indicating to sum the personal and
               spousal benefit amounts."
               />
