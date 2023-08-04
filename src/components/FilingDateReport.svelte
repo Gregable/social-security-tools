@@ -100,7 +100,9 @@
           month. For most, this is the month <i>after</i> their birthdate.
         </p>
         <p>
-          For example, the first month that <RName {r}>you</RName> are
+          For example, the first month that <RName {r} suffix=" is"
+            >you are</RName
+          >
           <b>{exampleAge.age}</b>
           throughout the <u>entire</u> month is
           <b
@@ -189,9 +191,9 @@
     <h3>Explore Filing Dates</h3>
     <p>
       The following <i>interactive</i> tool visualizes how different filing
-      dates affect <RName {r} apos>your</RName> benefit amount. Move the slider to
-      select a filing date and hover over the chart to see the benefit amount for
-      that date.
+      dates affect <RName {r} suffix="'s personal">your</RName> benefit. Move the
+      slider to select a filing date and hover over the chart to see the benefit
+      amount for that date.
     </p>
     <FilingDateChart recipient={$recipient} />
   </div>

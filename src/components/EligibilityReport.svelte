@@ -180,7 +180,7 @@
     letter-spacing: 0.04rem;
   }
   .eligible {
-    color: black;
+    color: #443378;
   }
   .ineligible {
     color: red;

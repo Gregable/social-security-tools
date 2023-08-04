@@ -5,6 +5,16 @@ import {Money} from './money';
 import {MonthDate, MonthDuration} from './month-time';
 import {PrimaryInsuranceAmount} from './pia';
 
+export class RecipientColors {
+  constructor(dark: string, medium: string, light: string) {
+    this.dark = dark;
+    this.medium = medium;
+    this.light = light;
+  }
+  dark: string;
+  medium: string;
+  light: string;
+};
 
 /**
  * A Recipient object manages calculating a user's SSA and IRS data.
@@ -416,13 +426,10 @@ export class Recipient {
    * for the recipient on that date. Does not include spousal benefits.
    */
   benefitOnDate(filingDate: MonthDate, atDate: MonthDate): Money {
-    // The filing date must be between 62 and 70:
+    // The filing date must be greater than 62:
     console.assert(this.birthdate.ageAtSsaDate(filingDate)
                        .greaterThanOrEqual(MonthDuration.initFromYearsMonths(
                            {years: 62, months: 0})));
-    console.assert(this.birthdate.ageAtSsaDate(filingDate)
-                       .lessThanOrEqual(MonthDuration.initFromYearsMonths(
-                           {years: 70, months: 0})));
 
     // If the recipient hasn't filed yet, return $0:
     if (filingDate.greaterThan(atDate)) return Money.from(0);
@@ -459,5 +466,107 @@ export class Recipient {
         thisJan;
     return this.benefitAtAge(
         this.birthdate.ageAtSsaDate(benefitComputationDate));
+  }
+
+  /**
+   * Returns the spousal benefit on a given date for this recipient. May be $0.
+   */
+  spousalBenefitOnDate(
+      spouse: Recipient, spouseFilingDate: MonthDate, filingDate: MonthDate,
+      atDate: MonthDate): Money {
+    // Support overriding the PIA dollar amount for testing purposes, using
+    // forceTestPia().
+    let piaAmount: Money;
+    if (this.testPrimaryInsuranceAmount_ != null) {
+      piaAmount = this.testPrimaryInsuranceAmount_;
+    } else {
+      piaAmount = this.pia().primaryInsuranceAmount();
+    }
+    let spousePiaAmount: Money;
+    if (this.testPrimaryInsuranceAmount_ != null) {
+      spousePiaAmount = spouse.testPrimaryInsuranceAmount_;
+    } else {
+      spousePiaAmount = spouse.pia().primaryInsuranceAmount();
+    }
+
+
+    // The filing date must be greater than 62:
+    console.assert(this.birthdate.ageAtSsaDate(filingDate)
+                       .greaterThanOrEqual(MonthDuration.initFromYearsMonths(
+                           {years: 62, months: 0})));
+    console.assert(spouse.birthdate.ageAtSsaDate(spouseFilingDate)
+                       .greaterThanOrEqual(MonthDuration.initFromYearsMonths(
+                           {years: 62, months: 0})));
+
+    // If the recipient hasn't filed yet, return $0:
+    if (filingDate.greaterThan(atDate)) return Money.from(0);
+
+    // If the spouse hasn't filed yet, return $0:
+    if (spouseFilingDate.greaterThan(atDate)) return Money.from(0);
+
+    // If the spouse has lower earnings, return $0:
+    if (this.higherEarningsThan(spouse)) return Money.from(0);
+
+    // Calculate the base spousal benefit amount:
+    let maxSpousal = spousePiaAmount.div(2);
+    let spousal: Money = maxSpousal.sub(piaAmount);
+    if (spousal.value() <= 0) {
+      return Money.from(0);
+    }
+
+    // Calculate the starting date as the latest of the two filing dates:
+    let startDate = spouseFilingDate.greaterThan(filingDate) ?
+        spouseFilingDate :
+        filingDate;
+
+    if (startDate.greaterThanOrEqual(this.normalRetirementDate())) {
+      return spousal;
+    }
+
+    let monthsBeforeNra: number =
+        this.normalRetirementDate().subtractDate(startDate).asMonths();
+    if (monthsBeforeNra <= 36) {
+      // 5 / 12 of one percent for each additional month:
+      return spousal.times(1 - (monthsBeforeNra * 5 / 1200));
+    } else {
+      // 15% for the first 36 months:
+      const firstReduction: Money = spousal.times(0.15);
+      monthsBeforeNra = monthsBeforeNra - 36;
+      // 25 / 36 of one percent for each additional month:
+      const secondReduction: Money = spousal.times(monthsBeforeNra * 25 / 3600);
+
+      return spousal.sub(firstReduction).sub(secondReduction);
+    }
+  }
+
+  /**
+   * Returns the spousal and primary benefit on a given date for this recipient.
+   */
+  allBenefitsOnDate(
+      spouse: Recipient, spouseFilingDate: MonthDate, filingDate: MonthDate,
+      atDate: MonthDate): Money {
+    return this.benefitOnDate(filingDate, atDate)
+        .plus(this.spousalBenefitOnDate(
+            spouse, spouseFilingDate, filingDate, atDate));
+  }
+
+  /**
+   * Returns true if this recipient is the higher earner in the couple.
+   */
+  higherEarningsThan(other: Recipient): boolean {
+    return this.pia().primaryInsuranceAmount().value() >
+        other.pia().primaryInsuranceAmount().value();
+  }
+
+  /**
+   * Returns a dark, medium, and light color for the recipient.
+   * First and only recipients are orange, while second recipients are green.
+   */
+  colors(): RecipientColors {
+    if (this.first) {
+      return new RecipientColors('#8d6100', '#e69f00', '#f6dfad');
+    } else {
+      return new RecipientColors('#004400', '#558855', '#d9ebd9');
+    }
   }
 }  // class Recipient
