@@ -17,6 +17,7 @@
   import { createEventDispatcher } from "svelte";
   import { parsePaste } from "../lib/ssa-parse";
   import { Recipient } from "../lib/recipient";
+  import copyPasteDemoVideo from "../../static/copy-paste-demo.mp4?url";
 
   const dispatch = createEventDispatcher();
 
@@ -66,7 +67,7 @@
         poster="/static/copy-paste-demo-poster.jpg"
         title="Animation showing a user copying a social security earnings record from ssa.gov."
       >
-        <source src="/static/copy-paste-demo.mp4" type="video/mp4" />
+        <source src={copyPasteDemoVideo} type="video/mp4" />
       </video>
       You can select the table by dragging your mouse over the entire table to select,
       or you can just use 'Control+A' to select the entire page. Either way will
