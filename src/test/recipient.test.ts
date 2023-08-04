@@ -493,4 +493,77 @@ describe('Recipient', () => {
                .value())
         .toEqual(1233.00);  // 0.67 per month for 35 months = 23.33%
   });
+
+  it('correctly calculates spousal benefits based on filing and current dates',
+     () => {
+       let r = new Recipient();
+       // Over time, the PIA will increase due to COLAs, but we want the tests
+       // to be stable, so we set the PIA to a fixed value for testing.
+       r.forceTestPia(Money.from(1000.00));
+
+       let s = new Recipient();
+       // Force a spousal PIA large enough to generate a $500 spousal benefit.
+       s.forceTestPia(Money.from(3000.00));
+
+       // If they haven't filed yet, they should have zero benefit:
+       r.birthdate = new Birthdate(new Date(1960, 0, 5));
+       s.birthdate = new Birthdate(new Date(1960, 0, 5));
+       expect(r.spousalBenefitOnDate(
+                   s, MonthDate.initFromYearsMonths({years: 2027, months: 1}),
+                   // File at NRA, 67:
+                   MonthDate.initFromYearsMonths({years: 2027, months: 1}),
+                   // Currently at age 63:
+                   MonthDate.initFromYearsMonths({years: 2023, months: 1}))
+                  .value())
+           .toEqual(0);
+
+       // atDate before spouse files results in no benefit
+       expect(r.spousalBenefitOnDate(
+                   s, MonthDate.initFromYearsMonths({years: 2027, months: 1}),
+                   MonthDate.initFromYearsMonths({years: 2026, months: 0}),
+                   MonthDate.initFromYearsMonths({years: 2026, months: 0}))
+                  .value())
+           .toEqual(0);
+
+       // Early retirement at 66 should be 5% reduction:
+       expect(r.spousalBenefitOnDate(
+                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
+                   MonthDate.initFromYearsMonths({years: 2026, months: 0}),
+                   MonthDate.initFromYearsMonths({years: 2026, months: 0}))
+                  .value())
+           .toEqual(475.00);
+
+       // Reductions are applied monthly, unlike delayed retirement credits, so
+       // adding 6 months should be only a 2.5% reduction:
+       expect(r.spousalBenefitOnDate(
+                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
+                   MonthDate.initFromYearsMonths({years: 2026, months: 6}),
+                   MonthDate.initFromYearsMonths({years: 2026, months: 6}))
+                  .value())
+           .toEqual(487.5);
+
+       // 3 years of reductions should be 15%
+       expect(r.spousalBenefitOnDate(
+                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
+                   MonthDate.initFromYearsMonths({years: 2024, months: 0}),
+                   MonthDate.initFromYearsMonths({years: 2024, months: 0}))
+                  .value())
+           .toEqual(425);
+
+       // Each month past 3 years should be another 25 / 36 % reduction.
+       expect(r.spousalBenefitOnDate(
+                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
+                   MonthDate.initFromYearsMonths({years: 2023, months: 11}),
+                   MonthDate.initFromYearsMonths({years: 2023, months: 11}))
+                  .value())
+           .toEqual(421.53);
+
+       // Delayed retirement should not add any additional benefit:
+       expect(r.spousalBenefitOnDate(
+                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
+                   MonthDate.initFromYearsMonths({years: 2029, months: 0}),
+                   MonthDate.initFromYearsMonths({years: 2029, months: 0}))
+                  .value())
+           .toEqual(500.00);
+     });
 });
