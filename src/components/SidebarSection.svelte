@@ -22,9 +22,22 @@
   uniqid += 1;
 </script>
 
-<div {id} data-label={label} data-heading={heading ? "true" : "false"}>
+<div
+  {id}
+  data-label={label}
+  data-heading={heading ? "true" : "false"}
+  data-sidebarsection
+>
   <slot />
 </div>
 
 <style>
+  /**
+   * This ensures that the <div> does not become a scrollable container which
+   * prevents the earnings sliders from being sticky at a higher level element.
+   * I'm a bit confused about why this is necessary, but it works.
+   */
+  div {
+    display: unset;
+  }
 </style>

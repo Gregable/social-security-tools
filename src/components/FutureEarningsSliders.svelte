@@ -85,11 +85,32 @@
   @media screen {
     .sliders {
       position: sticky;
+      overflow-anchor: none;
       top: 0;
       z-index: 5;
       background-color: #fff;
     }
+    /**
+     * Hack to create a bottom shadow on the slider when it stick's.
+     * The shadow is always there, but is covered by a white
+     *  sticky-shadow-cover.
+     */
+    div.sticky-shadow {
+      height: 2px;
+      background-color: #bbb;
+      z-index: 3;
+      position: sticky;
+      top: 118px;
+    }
+    div.sticky-shadow-cover {
+      height: 2px;
+      background-color: #fff;
+      z-index: 4;
+      position: relative;
+      top: -2px;
+    }
   }
+
   .grid {
     display: grid;
     grid-template-columns: 1fr 250px 1fr;

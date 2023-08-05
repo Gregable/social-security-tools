@@ -29,44 +29,57 @@
     <PasteFlow on:done={pasteDone} />
   {:else}
     <Sidebar>
-      {#if context.spouse}
-        <SidebarSection
-          label={context.recipient.shortName(15)}
-          heading={true}
-        />
-      {/if}
-      <SidebarSection label="Earnings Record">
-        <EarningsReport recipient={context.recipient} />
-      </SidebarSection>
-      <SidebarSection label="Benefits Eligibility">
-        <EligibilityReport recipient={context.recipient} />
-      </SidebarSection>
-      <SidebarSection label="Primary Insurance Amount">
-        <PiaReport recipient={context.recipient} />
-      </SidebarSection>
-      <SidebarSection label="Normal Retirement Age">
-        <NormalRetirementAgeReport recipient={context.recipient} />
-      </SidebarSection>
-      <SidebarSection label="Filing Date">
-        <FilingDateReport recipient={context.recipient} />
-      </SidebarSection>
-      {#if context.spouse}
-        <SidebarSection label={context.spouse.shortName(15)} heading={true} />
+      <!--
+        This div ends up as the parent element for the position:sticky sliders
+        inside the EarningsReport component. It closes at the end of this user's
+        part of the report and another one is opened for the spouse's part.
+      -->
+      <div>
+        {#if context.spouse}
+          <SidebarSection
+            label={context.recipient.shortName(15)}
+            heading={true}
+          />
+        {/if}
         <SidebarSection label="Earnings Record">
-          <EarningsReport recipient={context.spouse} />
+          <EarningsReport recipient={context.recipient} />
         </SidebarSection>
         <SidebarSection label="Benefits Eligibility">
-          <EligibilityReport recipient={context.spouse} />
+          <EligibilityReport recipient={context.recipient} />
         </SidebarSection>
+
         <SidebarSection label="Primary Insurance Amount">
-          <PiaReport recipient={context.spouse} />
+          <PiaReport recipient={context.recipient} />
         </SidebarSection>
         <SidebarSection label="Normal Retirement Age">
-          <NormalRetirementAgeReport recipient={context.spouse} />
+          <NormalRetirementAgeReport recipient={context.recipient} />
         </SidebarSection>
         <SidebarSection label="Filing Date">
-          <FilingDateReport recipient={context.spouse} />
+          <FilingDateReport recipient={context.recipient} />
         </SidebarSection>
+      </div>
+      {#if context.spouse}
+        <!--
+          See the description of the purpose of this div above.
+        -->
+        <div>
+          <SidebarSection label={context.spouse.shortName(15)} heading={true} />
+          <SidebarSection label="Earnings Record">
+            <EarningsReport recipient={context.spouse} />
+          </SidebarSection>
+          <SidebarSection label="Benefits Eligibility">
+            <EligibilityReport recipient={context.spouse} />
+          </SidebarSection>
+          <SidebarSection label="Primary Insurance Amount">
+            <PiaReport recipient={context.spouse} />
+          </SidebarSection>
+          <SidebarSection label="Normal Retirement Age">
+            <NormalRetirementAgeReport recipient={context.spouse} />
+          </SidebarSection>
+          <SidebarSection label="Filing Date">
+            <FilingDateReport recipient={context.spouse} />
+          </SidebarSection>
+        </div>
         <SidebarSection label="Combined" heading={true}>
           <CombinedHeading />
         </SidebarSection>
