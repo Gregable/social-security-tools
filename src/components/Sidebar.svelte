@@ -59,7 +59,7 @@
   onMount(() => {
     // Read the SidebarSection components from the slot and use them to
     // populate the sidebar.
-    let children = mainColumn.children;
+    let children = mainColumn.querySelectorAll("[data-sidebarsection]");
     for (let i = 0; i < children.length; i++) {
       let child = children[i];
       let isHeading = child.getAttribute("data-heading") == "true";
@@ -108,6 +108,15 @@
   .twoColumns {
     display: grid;
     grid-template-columns: 230px 1fr;
+  }
+  .sideBar {
+    /**
+     * This prevents the sidebar from being selected as the "scroll anchoring"
+     * element. This is a feature that prevents the page from jumping around
+     * when new content is loaded. However, the sidebar doesn't scroll, so it
+     * shouldn't be used as the anchor.
+     */
+    overflow-anchor: none;
   }
   @media print {
     .twoColumns {
