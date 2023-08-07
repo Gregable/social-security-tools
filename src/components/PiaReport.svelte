@@ -1,7 +1,6 @@
 <script lang="ts">
   import "../global.css";
   import * as constants from "../lib/constants";
-  import { MonthDate } from "../lib/month-time";
   import { Recipient } from "../lib/recipient";
   import BendpointChart from "./BendpointChart.svelte";
   import Expando from "./Expando.svelte";
@@ -9,22 +8,6 @@
 
   export let recipient: Recipient = new Recipient();
   let r: Recipient = $recipient;
-
-  /**
-   * Returns true if the recipient is over 60 years old this year.
-   */
-  function isOver60(): boolean {
-    return (
-      $recipient.birthdate
-        .ageAtSsaDate(
-          MonthDate.initFromYearsMonths({
-            years: constants.CURRENT_YEAR,
-            months: 0,
-          })
-        )
-        .years() > 60
-    );
-  }
 
   /**
    * Returns true if the recipient has 35 or more years of earnings.
@@ -68,91 +51,13 @@
     <Expando
       collapsedText="Expand for a detailed look at the Primary Insurance Amount"
       expandedText="Show Less"
-      label_max_width="600px"
       initiallyExpanded={false}
     >
       <div class="expando">
         <p>
-          <RName {r} suffix=" has">You have</RName> Social Security earnings recorded
-          for
-          <b>{$recipient.earningsRecords.length}</b> total years. Your PIA is
-          based on the <u>Averaged Indexed Monthly Earnings</u> (AIME), a straightforward
-          calculation from your lifetime earnings record. So, that's our first step.
-        </p>
-
-        {#if has35Years()}
-          <p>
-            Only the top 35 years of <u>indexed earnings</u> values are used in
-            the calculation of <RName {r} apos>your</RName> Averaged Indexed Monthly
-            Earnings (and thus,
-            <RName {r} apos>your</RName> Primary Insurance Amount). Indexed earnings
-            are simply the payroll wages you earned in a year multiplied by a number
-            that adjusts for wage growth (similar to an inflation adjustment). In
-            <RName {r} apos>your</RName> case, this means that years where the indexed
-            earnings value falls below
-            <b>{$recipient.cutoffIndexedEarnings().wholeDollars()}</b>
-            do not affect the benefit calculation because they are not among the
-            top 35. If <RName {r} suffix=" was">you were</RName>
-            to earn additional years of wages in the future, those years would only
-            affect Social Security benefits if <RName {r}>you</RName> earned more
-            than
-            <b>{$recipient.cutoffIndexedEarnings().wholeDollars()}</b> in those years.
-          </p>
-        {:else}
-          <p>
-            The top 35 <u>indexed earnings</u> values are used in the
-            calculation of <RName {r} apos>your</RName> Averaged Indexed Monthly
-            Earnings (and thus, <RName {r} apos>your</RName> Primary Insurance Amount).
-            Indexed earnings are simply the capped payroll wages you earned in a
-            year multiplied by a number that adjusts for wage growth (similar to
-            an inflation adjustment). As you don't have 35 years of earnings yet,
-            every additional year you work will increase the benefit a little more.
-            Once you reach 35 years of earnings values, increasing the Averaged Indexed
-            Monthly Earnings amount requires earning more than previous years' indexed
-            values.
-          </p>
-        {/if}
-
-        {#if isOver60()}
-          <p>
-            The multipliers in the earnings record table above will increase
-            every year through age 60, at which point they are fixed at 1.0 for
-            everyone. The increase in the multipliers through age 60 is
-            determined by US wage growth. Thus, your indexed earnings in a given
-            year are scaled to be equivalent to modern wages.
-          </p>
-        {/if}
-
-        <p class="indent">
-          <RName {r} apos>Your</RName>
-          total indexed earnings:
-          <b>{$recipient.totalIndexedEarnings().wholeDollars()}</b>
-        </p>
-
-        <p>
-          This is simply the sum of the highest 35 values in the indexed
-          earnings column in the earnings record table above.
-        </p>
-
-        {#if has35Years()}
-          <p>
-            <RName {r} apos>Your</RName> Averaged Indexed Monthly Earnings is simply
-            the total indexed earnings divided by 35 years divided by 12 months,
-            as follows:
-          </p>
-        {:else}
-          <p>
-            Your Averaged Indexed Monthly Earnings (AIME) is simply your total
-            indexed earnings divided by 35 years divided by 12 months. As you
-            have fewer than 35 years of earnings, this average is calculated
-            using zeroes for the additional years, as follows:
-          </p>
-        {/if}
-
-        <p class="indent">
-          Average Indexed Monthly Earnings:
-          <b>{$recipient.totalIndexedEarnings().wholeDollars()}</b> / 35 / 12 =
+          <RName {r} apos>Your</RName> Average Indexed Monthly Earnings:
           <b>{$recipient.monthlyIndexedEarnings().wholeDollars()}</b>
+          (see above).
         </p>
 
         <p>
@@ -227,7 +132,7 @@
                   .string()}</b
               >
             </td>
-            <td>&nbsp;/ month</td>
+            <td class="nowrap">&nbsp;/ month</td>
           </tr>
         </table>
 
@@ -252,7 +157,7 @@
               in past years which affect <RName {r} apos>your</RName> current Primary
               Insurance Amount.
             </p>
-            <ul>
+            <ul class="cola">
               {#each $recipient.pia().colaAdjustments() as adjustment}
                 <li>
                   {#if adjustment.year === constants.CURRENT_YEAR}
@@ -377,5 +282,12 @@
     font-weight: 700;
     letter-spacing: 0.04rem;
     color: #443378;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  ul.cola {
+    padding-inline-start: 0px;
+    list-style-type: none;
   }
 </style>

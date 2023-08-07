@@ -90,7 +90,6 @@
         <Expando
           collapsedText="Expand for a detailed look at the Spousal Benefit"
           expandedText="Show Less"
-          label_max_width="600px"
           initiallyExpanded={false}
         >
           <div class="expando">
@@ -101,26 +100,33 @@
                 apos
               /> own Primary Insurance Amount.
             </p>
-            <ul>
+            <ul class="pialist">
               <li>
                 <RName r={$s} apos /> Primary Insurance Amount:
-                <b>{$s.pia().primaryInsuranceAmount().string()}</b>
-                / month.
+                <span class="nowrap">
+                  <b>{$s.pia().primaryInsuranceAmount().string()}</b>
+                  / month.</span
+                >
               </li>
               <li>
                 <RName r={$r} apos /> Primary Insurance Amount:
-                <b>{$r.pia().primaryInsuranceAmount().string()}</b>
-                / month.
+                <span class="nowrap">
+                  <b>{$r.pia().primaryInsuranceAmount().string()}</b>
+                  / month.</span
+                >
               </li>
             </ul>
             <p>
-              <RName r={$r} apos /> Spousal Benefit: (
-              <b>{$s.pia().primaryInsuranceAmount().string()}</b> x 50% ) -
-              <b>{$r.pia().primaryInsuranceAmount().string()}</b> =
-              <b>{spousalBenefit().string()}</b>
+              <RName r={$r} apos /> Spousal Benefit:
+              <span class="nowrap"
+                >(
+                <b>{$s.pia().primaryInsuranceAmount().string()}</b> x 50% ) -
+                <b>{$r.pia().primaryInsuranceAmount().string()}</b> =
+                <b>{spousalBenefit().string()}</b></span
+              >
             </p>
 
-            <div>
+            <div class="curlyvisualization">
               <div style="width: 100%">
                 <div
                   class="curlyText"
@@ -284,6 +290,9 @@
   .expando {
     margin: 1em 0 1em 1em;
   }
+  div.curlyvisualization {
+    margin: 2em 0;
+  }
   .curlyText {
     text-align: center;
     float: left;
@@ -303,5 +312,12 @@
     width: 100%;
     max-height: 30px;
     padding-top: 2px;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  ul.pialist {
+    padding-inline-start: 0px;
+    list-style-type: none;
   }
 </style>

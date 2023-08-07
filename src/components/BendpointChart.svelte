@@ -4,6 +4,7 @@
   import { Recipient } from "../lib/recipient";
   import { Money } from "../lib/money";
   import * as constants from "../lib/constants";
+  import { update_keyed_each } from "svelte/internal";
 
   export let recipient: Recipient = new Recipient();
 
@@ -20,6 +21,13 @@
   let chartHeight: number = 0;
 
   onMount(() => {
+    updateCanvas();
+    mounted = true;
+  });
+
+  function updateCanvas() {
+    canvasEl.setAttribute("width", getComputedStyle(canvasEl).width);
+    canvasEl.setAttribute("height", getComputedStyle(canvasEl).height);
     ctx = canvasEl.getContext("2d");
     ctx.font = "bold 14px Helvetica";
     chartWidth = calcChartWidth();
@@ -31,8 +39,11 @@
     ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
     ctx.fillRect(30, 30, 50, 50);
 
-    mounted = true;
-  });
+    render();
+  }
+
+  let innerWidth: number = 0;
+  $: innerWidth && updateCanvas();
 
   let mouseToggle: boolean = true;
   function onClick(event: MouseEvent) {
@@ -440,6 +451,7 @@
   }
 </script>
 
+<svelte:window bind:innerWidth />
 <div class="chart-container">
   <div class="chart-ylabel">
     <span class="vertical-text">Primary Insurance Amount (PIA)</span>
@@ -462,10 +474,11 @@
   .chart-container {
     position: relative;
     max-width: 650px;
-    height: 430px;
     margin-top: 20px;
     font-size: 16px;
     white-space: nowrap;
+    /* Prevent wrap */
+    width: max-content;
   }
 
   .chart-ylabel {
@@ -491,5 +504,26 @@
 
   canvas {
     float: left;
+    width: 600px;
+    height: 400px;
+  }
+
+  @media screen and (max-width: 680px) {
+    .chart-container {
+      font-size: 12px;
+    }
+    .chart-ylabel {
+      width: 30px;
+      height: 220px;
+    }
+    .vertical-text {
+      transform: rotate(-90deg) translateY(-82px) translateX(-110px);
+      -webkit-transform: rotate(-90deg) translateY(-82px) translateX(-110px);
+      width: 180px;
+    }
+    canvas {
+      width: 350px;
+      height: 250px;
+    }
   }
 </style>
