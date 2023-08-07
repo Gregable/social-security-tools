@@ -18,11 +18,14 @@
       <thead>
         <tr>
           <th class="workyear">Year</th>
-          <th class="age onlydisplay500">Age</th>
+          <th class="age onlyDisplayLarge">Age</th>
           <th class="taxedearnings">Taxed Earnings</th>
           <th class="multsymbol" />
-          <th class="multiplier">Multiplier</th>
-          <th class="indexedearnings" colspan="2">Indexed Earnings</th>
+          <th class="multiplier"
+            ><span class="onlyDisplayLarge">Multiplier</span></th
+          >
+          <th class="eqymbol" />
+          <th class="indexedearnings">Indexed Earnings</th>
           <th class="top35indicators" />
         </tr>
       </thead>
@@ -30,7 +33,7 @@
         {#each earningsRecords as earningRecord}
           <tr>
             <td class="workyear">{earningRecord.year}</td>
-            <td class="age onlydisplay500">
+            <td class="age onlyDisplayLarge">
               {earningRecord.age}
             </td>
             {#if earningRecord.incomplete}
@@ -54,7 +57,7 @@
             <td class="top35indicators">
               {#if earningRecord.isTop35EarningsYear}
                 Top 35
-                <span class="onlydisplay500"> Value</span>
+                <span class="onlyDisplayLarge"> Value</span>
               {/if}
             </td>
           </tr>
@@ -73,7 +76,7 @@
     /* page-break-inside makes printed pages less likely to break the table */
     page-break-inside: avoid;
     border-collapse: collapse;
-    width: calc(min(100%, 600px));
+    width: calc(min(100% - 1em, 600px));
     margin: 10px auto 10px 5%;
     font-size: 14px;
   }
@@ -125,7 +128,7 @@
     min-width: 90px;
   }
   td.indexedearnings {
-    padding-right: 50px;
+    padding-right: 35px;
     /**
      * The color for the other columns is 51, 51, 51. By darkening this
      * slightly, we add a little bit of emphasis to the final calculation.
@@ -135,5 +138,39 @@
   .top35indicators {
     white-space: nowrap;
     color: #3b3b7f;
+  }
+  @media screen and (max-width: 500px) {
+    /* Hide age column and some text */
+    .onlyDisplayLarge {
+      display: none;
+    }
+    /* 5% left margin gets pretty big as the screen narrows */
+    .earnings-table {
+      margin-left: 0.4em;
+    }
+    /* Gain some space by shrinking paddings */
+    .workyear,
+    .taxedearnings {
+      padding-left: 2px;
+      padding-right: 8px;
+    }
+    .multsymbol {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+    .eqsymbol {
+      padding-right: 8px;
+    }
+    td.indexedearnings {
+      padding-right: 8px;
+    }
+    /**
+     * Headings start to wrap if they have multiple words. This looks bad
+     *  if they are left/right aligned, so center them instead.
+     */
+    .taxedearnings,
+    .indexedearnings {
+      text-align: center;
+    }
   }
 </style>

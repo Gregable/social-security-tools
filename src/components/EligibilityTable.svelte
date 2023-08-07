@@ -13,7 +13,9 @@
           <th class="workyear">Year</th>
           <th class="age onlydisplay500">Age</th>
           <th class="taxedearnings">Taxed Earnings</th>
-          <th class="epc">Earnings Per Credit</th>
+          <th class="epc"
+            ><span class="hideNarrow">Earnings </span>Per Credit</th
+          >
           <th class="credits">Credits</th>
         </tr>
       </thead>
@@ -98,5 +100,30 @@
   .maxlabel {
     font-size: 10px;
     color: #666;
+  }
+  /* TODO: This may be easier with a grid than a table */
+  @media screen and (max-width: 600px) {
+    /* 5% left margin gets pretty big as the screen narrows */
+    .earnings-table {
+      margin-left: 0.4em;
+    }
+    /* Gain some space by shrinking paddings */
+    .workyear,
+    .age,
+    .taxedearnings {
+      padding-left: 2px;
+      padding-right: 8px;
+    }
+    /**
+     * Headings start to wrap if they have multiple words. This looks bad
+     *  if they are left/right aligned, so center them instead.
+     */
+    .taxedearnings,
+    .epc {
+      text-align: center;
+    }
+    .hideNarrow {
+      display: none;
+    }
   }
 </style>

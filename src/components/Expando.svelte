@@ -27,14 +27,6 @@
    */
   export let expandedText = "Collapse";
 
-  /**
-   * The maximum width of the expando's label.
-   *
-   * To control the width of the expando's contents, use the
-   * CSS on the expando itself.
-   */
-  export let label_max_width: string = "100%";
-
   export let collapsed_background_color: string = "#eee";
   export let collapsed_hover_color: string = "#f5f5f5";
   export let collapsed_tab_color: string = "#ddd";
@@ -86,8 +78,7 @@
   style:--expanded-background-color={expanded_background_color}
 >
   <input type="checkbox" {id} bind:checked={expanded} />
-  <label for={id} class="label" style:--label-max-width={label_max_width}
-    >{expanded ? expandedText : collapsedText}</label
+  <label for={id} class="label">{expanded ? expandedText : collapsedText}</label
   >
   <div class="expandContainer">
     <div
@@ -115,7 +106,7 @@
     display: block;
     position: relative;
     /* 20px + 7x2 padding + 1x2 border = 36px */
-    height: 36px;
+    height: auto;
     padding: 7px 10px;
     font-weight: bold;
     background-color: var(--collapsed-background-color);
@@ -123,7 +114,9 @@
     border-left: 3px solid var(--collapsed-border-color);
     cursor: pointer;
     transition: all 0.15s ease-out;
-    max-width: var(--label-max-width);
+    /* Leave some space for the right arrow */
+    padding-right: 35px;
+    max-width: max-content;
   }
   label:hover {
     background: var(--collapsed-hover-color);

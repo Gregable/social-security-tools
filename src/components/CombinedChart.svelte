@@ -895,140 +895,161 @@
   }
 </script>
 
-<div class="chart-container">
+<div>
   <h3>Explore Filing Dates</h3>
   <p>
-    <span>
-      Select the age that <RecipientName
-        r={$recipient}
-        suffix="
-  files">you file</RecipientName
-      > for benefits:
-    </span>
+    The following <i>interactive</i> tool visualizes how different filing dates
+    for both <RecipientName r={recipient} /> and <RecipientName r={spouse} /> affect
+    total benefits, including the spousal benefit. Move the slider to select a filing
+    date for each person and hover over the chart to see the benefit amounts for
+    that date.
   </p>
-  <div
-    class="slider-box"
-    style:--reserved-left="{reservedLeftRecipient_}px"
-    style:--reserved-right="{reservedRightRecipient_}px"
-  >
-    <Slider
-      bind:value={ctxA_.sliderMonths}
-      bind:this={sliderEl_}
-      floor={62 * 12}
-      userFloor={ctxA_.userFloor}
-      ceiling={70 * 12}
-      step={1}
-      translate={translateSliderLabel}
-      showTicks={true}
-      ticksArray={ctxA_.ticks}
-      barLeftColor={ctxA_.r.colors().light}
-      barRightColor={ctxA_.r.colors().medium}
-      tickLeftColor={ctxA_.r.colors().light}
-      tickRightColor={ctxA_.r.colors().medium}
-      handleColor={ctxA_.r.colors().medium}
-      handleSelectedColor={ctxA_.r.colors().dark}
-      tickLegendColor={ctxA_.r.colors().dark}
-    />
+
+  <div class="narrowWarningBox">
+    <h4>Small Screen Warning</h4>
+    <div class="grid">
+      <p>
+        This chart doesn't fit on a screen this narrow, such as a phone oriented
+        vertically.
+      </p>
+      <p>Rotate your phone to landscape mode or use a larger screen.</p>
+    </div>
   </div>
-  <p>
-    <span>
-      Select the age that <RecipientName
-        r={$spouse}
-        suffix="
+
+  <div class="chart-container">
+    <p class="sliderLabel">
+      <span>
+        Select the age that <RecipientName
+          r={$recipient}
+          suffix="
   files">you file</RecipientName
-      > for benefits:</span
+        > for benefits:
+      </span>
+    </p>
+    <div
+      class="slider-box"
+      style:--reserved-left="{reservedLeftRecipient_}px"
+      style:--reserved-right="{reservedRightRecipient_}px"
     >
-  </p>
-  <div
-    class="slider-box"
-    style:--reserved-left="{reservedLeftSpouse_}px"
-    style:--reserved-right="{reservedRightSpouse_}px"
-  >
-    <Slider
-      bind:value={ctxB_.sliderMonths}
-      bind:this={sliderEl_}
-      floor={62 * 12}
-      userFloor={ctxB_.userFloor}
-      ceiling={70 * 12}
-      step={1}
-      translate={translateSliderLabel}
-      showTicks={true}
-      ticksArray={ctxB_.ticks}
-      barLeftColor={ctxB_.r.colors().light}
-      barRightColor={ctxB_.r.colors().medium}
-      tickLeftColor={ctxB_.r.colors().light}
-      tickRightColor={ctxB_.r.colors().medium}
-      handleColor={ctxB_.r.colors().medium}
-      handleSelectedColor={ctxB_.r.colors().dark}
-      tickLegendColor={ctxB_.r.colors().dark}
+      <Slider
+        bind:value={ctxA_.sliderMonths}
+        bind:this={sliderEl_}
+        floor={62 * 12}
+        userFloor={ctxA_.userFloor}
+        ceiling={70 * 12}
+        step={1}
+        translate={translateSliderLabel}
+        showTicks={true}
+        ticksArray={ctxA_.ticks}
+        barLeftColor={ctxA_.r.colors().light}
+        barRightColor={ctxA_.r.colors().medium}
+        tickLeftColor={ctxA_.r.colors().light}
+        tickRightColor={ctxA_.r.colors().medium}
+        handleColor={ctxA_.r.colors().medium}
+        handleSelectedColor={ctxA_.r.colors().dark}
+        tickLegendColor={ctxA_.r.colors().dark}
+      />
+    </div>
+    <p class="sliderLabel">
+      <span>
+        Select the age that <RecipientName
+          r={$spouse}
+          suffix="
+  files">you file</RecipientName
+        > for benefits:</span
+      >
+    </p>
+    <div
+      class="slider-box"
+      style:--reserved-left="{reservedLeftSpouse_}px"
+      style:--reserved-right="{reservedRightSpouse_}px"
+    >
+      <Slider
+        bind:value={ctxB_.sliderMonths}
+        bind:this={sliderEl_}
+        floor={62 * 12}
+        userFloor={ctxB_.userFloor}
+        ceiling={70 * 12}
+        step={1}
+        translate={translateSliderLabel}
+        showTicks={true}
+        ticksArray={ctxB_.ticks}
+        barLeftColor={ctxB_.r.colors().light}
+        barRightColor={ctxB_.r.colors().medium}
+        tickLeftColor={ctxB_.r.colors().light}
+        tickRightColor={ctxB_.r.colors().medium}
+        handleColor={ctxB_.r.colors().medium}
+        handleSelectedColor={ctxB_.r.colors().dark}
+        tickLegendColor={ctxB_.r.colors().dark}
+      />
+    </div>
+    <canvas
+      width="620"
+      height="500"
+      bind:this={canvasEl_}
+      on:pointerdown={onClick}
+      on:pointermove={onMove}
+      on:pointerout={onOut}
     />
-  </div>
-  <canvas
-    width="620"
-    height="500"
-    bind:this={canvasEl_}
-    on:pointerdown={onClick}
-    on:pointermove={onMove}
-    on:pointerout={onOut}
-  />
-  <div style="height: 362px" />
-  <div
-    class="selectedDateBox"
-    style:--selected-date-border-color={blueish_}
-    style:--selected-date-text-color={blueish_}
-    style:--filing-date-text-color={blueish_}
-    class:hidden={lastMouseX_ <= 0}
-  >
-    {#if lastMouseX_ > 0}
-      <table class="combinedBenefit">
-        <tr>
-          <td colspan="3" class="date">
-            In <span class="selectedDate"
-              >{dateX(lastMouseX_).monthName()}
-              {dateX(lastMouseX_).year()}</span
-            >,
-          </td>
-        </tr>
-        <tr>
-          <td class="indent" />
-          <td class="label">
-            <RecipientName r={ctxA_.r} apos shortenTo={50} /> Benefit:
-          </td>
-          <td class="value">
-            {allBenefitsOnDate(ctxA_, dateX(lastMouseX_)).wholeDollars()}
-          </td>
-        </tr>
-        <tr>
-          <td class="indent" />
-          <td class="label">
-            <RecipientName r={ctxB_.r} apos shortenTo={50} /> Benefit:
-          </td>
-          <td class="value">
-            {allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).wholeDollars()}
-          </td>
-        </tr>
-        <tr>
-          <td class="indent" />
-          <td class="label">
-            <b>Total</b> Benefit:
-          </td>
-          <td class="value sum"
-            >{allBenefitsOnDate(ctxA_, dateX(lastMouseX_))
-              .roundToDollar()
-              .plus(
-                allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).roundToDollar()
-              )
-              .wholeDollars()}</td
-          >
-        </tr>
-      </table>
-    {:else}
-      <!-- This text shouldn't ever be visible,
+    <div style="height: 362px" />
+    <div
+      class="selectedDateBox"
+      style:--selected-date-border-color={blueish_}
+      style:--selected-date-text-color={blueish_}
+      style:--filing-date-text-color={blueish_}
+      class:hidden={lastMouseX_ <= 0}
+    >
+      {#if lastMouseX_ > 0}
+        <table class="combinedBenefit">
+          <tr>
+            <td colspan="3" class="date">
+              In <span class="selectedDate"
+                >{dateX(lastMouseX_).monthName()}
+                {dateX(lastMouseX_).year()}</span
+              >,
+            </td>
+          </tr>
+          <tr>
+            <td class="indent" />
+            <td class="label">
+              <RecipientName r={ctxA_.r} apos shortenTo={50} /> Benefit:
+            </td>
+            <td class="value">
+              {allBenefitsOnDate(ctxA_, dateX(lastMouseX_)).wholeDollars()}
+            </td>
+          </tr>
+          <tr>
+            <td class="indent" />
+            <td class="label">
+              <RecipientName r={ctxB_.r} apos shortenTo={50} /> Benefit:
+            </td>
+            <td class="value">
+              {allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).wholeDollars()}
+            </td>
+          </tr>
+          <tr>
+            <td class="indent" />
+            <td class="label">
+              <b>Total</b> Benefit:
+            </td>
+            <td class="value sum"
+              >{allBenefitsOnDate(ctxA_, dateX(lastMouseX_))
+                .roundToDollar()
+                .plus(
+                  allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).roundToDollar()
+                )
+                .wholeDollars()}</td
+            >
+          </tr>
+        </table>
+      {:else}
+        <!-- This text shouldn't ever be visible,
            it is here to ensure the div doesn't collapse
            and thus takes up space.-->
-      Select a date<br />
-      to see the benefit
-    {/if}
+        Select a date<br />
+        to see the benefit
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -1038,13 +1059,37 @@
     width: 620px;
     margin: 2em 1em 1em 1em;
   }
-  p {
+  @media screen and (min-width: 700px) {
+    .narrowWarningBox {
+      display: none;
+    }
+  }
+  @media screen and (max-width: 699px) {
+    .chart-container {
+      display: none;
+    }
+  }
+  .narrowWarningBox {
+    box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
+    -webkit-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
+    -moz-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
+    -o-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
+    margin: 6px 1em;
+    padding: 10px;
+  }
+  .narrowWarningBox h4 {
+    margin: 5px 0 10px 0;
+  }
+  .narrowWarningBox p {
+    margin: 0px 20px 15px 20px;
+  }
+  p.sliderLabel {
     position: relative;
     font-weight: bold;
     font-size: 0.9em;
     z-index: 2;
   }
-  p span {
+  p.sliderLabel span {
     background-color: rgba(255, 255, 255, 0.7);
   }
   .slider-box {

@@ -15,8 +15,9 @@
   import CombinedHeading from "./components/CombinedHeading.svelte";
   import CombinedChart from "./components/CombinedChart.svelte";
   import SpousalReport from "./components/SpousalReport.svelte";
+  import RecipientName from "./components/RecipientName.svelte";
 
-  let isPasteFlow: boolean = true;
+  export let isPasteFlow: boolean = true;
 
   function pasteDone() {
     isPasteFlow = false;
@@ -40,14 +41,16 @@
             label={context.recipient.shortName(15)}
             heading={true}
           />
+          <h1 class="recipientName">
+            <RecipientName r={context.recipient} noColor />
+          </h1>
         {/if}
-        <SidebarSection label="Earnings Record">
-          <EarningsReport recipient={context.recipient} />
-        </SidebarSection>
         <SidebarSection label="Benefits Eligibility">
           <EligibilityReport recipient={context.recipient} />
         </SidebarSection>
-
+        <SidebarSection label="Indexed Earnings">
+          <EarningsReport recipient={context.recipient} />
+        </SidebarSection>
         <SidebarSection label="Primary Insurance Amount">
           <PiaReport recipient={context.recipient} />
         </SidebarSection>
@@ -64,11 +67,14 @@
         -->
         <div>
           <SidebarSection label={context.spouse.shortName(15)} heading={true} />
-          <SidebarSection label="Earnings Record">
-            <EarningsReport recipient={context.spouse} />
-          </SidebarSection>
+          <h1 class="recipientName">
+            <RecipientName r={context.spouse} noColor />
+          </h1>
           <SidebarSection label="Benefits Eligibility">
             <EligibilityReport recipient={context.spouse} />
+          </SidebarSection>
+          <SidebarSection label="Indexed Earnings">
+            <EarningsReport recipient={context.spouse} />
           </SidebarSection>
           <SidebarSection label="Primary Insurance Amount">
             <PiaReport recipient={context.spouse} />
@@ -104,5 +110,8 @@
   main {
     max-width: 1080px;
     margin: 0 auto;
+  }
+  .recipientName {
+    text-decoration: underline;
   }
 </style>

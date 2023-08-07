@@ -24,6 +24,7 @@
   // we don't override the user's selection should they have changed it
   // manually.
   let sliderMonths_: number = 62 * 12;
+  $: sliderMonths_ && render();
   // userFloor_ is the minimum age that the user can select. This may be
   // 62 years or 62 years and one month, depending on their birthdate.
   let userFloor_: number = 62 * 12;
@@ -40,13 +41,17 @@
   // date.
   let reservedRight_: number = 0;
 
-  let darkOrange_ = "#8d6100";
-  let mediumOrange_ = "#e69f00";
-  let lightOrange = "#f6dfad";
   let blueish_ = "#337ab7";
 
-  $: onMount(() => {
+  onMount(() => {
+    sliderMonths_ = $recipient.normalRetirementAge().asMonths();
+    updateCanvas();
     mounted_ = true;
+  });
+
+  function updateCanvas() {
+    canvasEl_.setAttribute("width", getComputedStyle(canvasEl_).width);
+    canvasEl_.setAttribute("height", getComputedStyle(canvasEl_).height);
 
     // The slider represents 8 years of duration, but we want to render 9
     // years of data. So we reserve the rightmost 1/9th of the canvas after the
@@ -56,10 +61,11 @@
     ctx_ = canvasEl_.getContext("2d");
     ctx_.font = "bold 14px Helvetica";
 
-    sliderMonths_ = $recipient.normalRetirementAge().asMonths();
-
     render();
-  });
+  }
+
+  let innerWidth: number = 0;
+  $: innerWidth && updateCanvas();
 
   let mouseToggle_: boolean = true;
   let lastMouseX_: number = -1;
@@ -310,7 +316,7 @@
           value: age.asMonths(),
           label: translateSliderLabel(age.asMonths(), "tick-value"),
           legend: "NRA",
-          color: darkOrange_,
+          color: $recipient.colors().dark,
         });
       } else {
         // Not an NRA tick, so just add it normally.
@@ -326,7 +332,7 @@
           value: $recipient.normalRetirementAge().asMonths(),
           label: "",
           legend: "NRA",
-          color: darkOrange_,
+          color: $recipient.colors().dark,
         });
       }
     }
@@ -380,7 +386,7 @@
   function renderFilingDateBenefitBoxes(boxes: Array<[number, number, Money]>) {
     ctx_.save();
 
-    ctx_.strokeStyle = mediumOrange_;
+    ctx_.strokeStyle = $recipient.colors().medium;
     ctx_.lineWidth = 2;
     ctx_.beginPath();
 
@@ -401,7 +407,7 @@
     // Draw all of the way to the right edge of the chart.
     ctx_.lineTo(canvasEl_.width, boxes[boxes.length - 1][1]);
 
-    ctx_.fillStyle = lightOrange;
+    ctx_.fillStyle = $recipient.colors().light;
     ctx_.fill();
     ctx_.stroke();
     ctx_.restore();
@@ -422,7 +428,7 @@
    */
   function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
     ctx_.save();
-    ctx_.fillStyle = darkOrange_;
+    ctx_.fillStyle = $recipient.colors().dark;
     ctx_.font = "14px Helvetica";
     let font_height = 12;
 
@@ -489,7 +495,7 @@
    */
   function renderTrendline() {
     ctx_.save();
-    ctx_.strokeStyle = mediumOrange_;
+    ctx_.strokeStyle = $recipient.colors().medium;
     ctx_.lineWidth = 2;
     ctx_.globalAlpha = 0.4;
     ctx_.beginPath();
@@ -554,7 +560,7 @@
     // Draw vertical line.
     ctx_.beginPath();
     ctx_.moveTo(canvasX, 0);
-    ctx_.lineTo(canvasX, 420);
+    ctx_.lineTo(canvasX, canvasEl_.height);
     ctx_.stroke();
 
     // Print the year vertically atop the line, with a white rectangle behind
@@ -624,6 +630,7 @@
   );
 </script>
 
+<svelte:window bind:innerWidth />
 <div class="chart-container">
   <p>
     Select the age that <RecipientName
@@ -647,13 +654,13 @@
       translate={translateSliderLabel}
       showTicks={true}
       ticksArray={customTicks_}
-      barLeftColor={lightOrange}
-      barRightColor={mediumOrange_}
-      tickLeftColor={lightOrange}
-      tickRightColor={mediumOrange_}
-      handleColor={mediumOrange_}
-      handleSelectedColor={darkOrange_}
-      tickLegendColor={darkOrange_}
+      barLeftColor={$recipient.colors().light}
+      barRightColor={$recipient.colors().medium}
+      tickLeftColor={$recipient.colors().light}
+      tickRightColor={$recipient.colors().medium}
+      handleColor={$recipient.colors().medium}
+      handleSelectedColor={$recipient.colors().dark}
+      tickLegendColor={$recipient.colors().dark}
     />
   </div>
   <canvas
@@ -664,12 +671,11 @@
     on:pointermove={onMove}
     on:pointerout={onOut}
   />
-  <div style="height: 404px" />
   <div
     class="selectedDateBox"
     style:--selected-date-border-color={blueish_}
     style:--selected-date-text-color={blueish_}
-    style:--filing-date-text-color={darkOrange_}
+    style:--filing-date-text-color={$recipient.colors().dark}
     class:hidden={lastMouseX_ <= 0}
   >
     {#if lastMouseX_ > 0}
@@ -703,7 +709,8 @@
 <style>
   .chart-container {
     position: relative;
-    width: 620px;
+    width: 80vw;
+    height: calc(80vw * 0.67 + 105px);
     margin: 2em 1em 1em 1em;
   }
   p {
@@ -721,6 +728,8 @@
     position: absolute;
     z-index: 1;
     margin-top: -18px;
+    width: 80vw;
+    height: calc(80vw * 0.67);
   }
   .selectedDateBox {
     border: 1px solid;
@@ -730,6 +739,7 @@
     margin-bottom: 6px;
     padding: 8px;
     text-align: center;
+    margin-top: calc(80vw * 0.67 - 18px);
   }
   .selectedDateBox.hidden {
     visibility: hidden;
@@ -741,5 +751,37 @@
   .selectedDate {
     color: var(--selected-date-text-color);
     font-weight: bold;
+  }
+
+  /**
+   * If the screen is wide, the sidebar is displayed. The sidebar takes
+   * up some of the horizontal space, so the chart should be smaller,
+   * in vw terms.
+  */
+  @media screen and (min-width: 1025px) {
+    .chart-container {
+      width: 60vw;
+      height: calc(60vw * 0.67 + 105px);
+    }
+    canvas {
+      width: 60vw;
+      height: calc(60vw * 0.67);
+    }
+    .selectedDateBox {
+      margin-top: calc(60vw * 0.67 - 18px);
+    }
+  }
+  @media screen and (max-width: 1024px) {
+    .chart-container {
+      width: 80vw;
+      height: calc(80vw * 0.67 + 105px);
+    }
+    canvas {
+      width: 80vw;
+      height: calc(80vw * 0.67);
+    }
+    .selectedDateBox {
+      margin-top: calc(80vw * 0.67 - 18px);
+    }
   }
 </style>

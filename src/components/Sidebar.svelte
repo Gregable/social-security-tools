@@ -105,19 +105,6 @@
 </div>
 
 <style>
-  .twoColumns {
-    display: grid;
-    grid-template-columns: 230px 1fr;
-  }
-  .sideBar {
-    /**
-     * This prevents the sidebar from being selected as the "scroll anchoring"
-     * element. This is a feature that prevents the page from jumping around
-     * when new content is loaded. However, the sidebar doesn't scroll, so it
-     * shouldn't be used as the anchor.
-     */
-    overflow-anchor: none;
-  }
   @media print {
     .twoColumns {
       display: grid;
@@ -127,6 +114,41 @@
       display: none;
     }
   }
+  /** Wide Tablet or Desktop **/
+  @media screen and (min-width: 1025px) {
+    .twoColumns {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      grid-column-gap: 10px;
+    }
+    .mainColumn {
+      max-width: 750px;
+    }
+  }
+  /** Tall Tablet **/
+  @media screen and (max-width: 1024px) {
+    /** Hide the sidebar, display only main column*/
+    .sideBar {
+      display: none;
+    }
+    .twoColumns {
+      display: block;
+    }
+    .mainColumn {
+      margin: 0 auto;
+      padding: 0 5px;
+    }
+  }
+  /**
+   * This prevents the sidebar from being selected as the "scroll anchoring"
+   * element. This is a feature that prevents the page from jumping around
+   * when new content is loaded. However, the sidebar doesn't scroll, so it
+   * shouldn't be used as the anchor.
+   */
+  .sideBar {
+    overflow-anchor: none;
+  }
+
   ul {
     top: 10px;
     position: sticky;
