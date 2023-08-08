@@ -24,19 +24,19 @@
     <ul class="socialmedia">
       <li>
         <a href="https://twitter.com/SsaTools">
-          <img src="/static/twitter.svg" />
+          <img src="/static/twitter.svg" alt="Twitter Icon" />
           @SSATools
         </a>
       </li>
       <li>
         <a href="https://www.facebook.com/SsaToolsCalculator">
-          <img src="/static/facebook.svg" />
+          <img src="/static/facebook.svg" alt="Facebook Icon" />
           SSAToolsCalculator
         </a>
       </li>
       <li>
         <a href="https://github.com/Gregable/social-security-tools">
-          <img src="/static/github.svg" />
+          <img src="/static/github.svg" alt="GitHub Icon" />
           social-security-tools
         </a>
       </li>
