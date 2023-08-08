@@ -1,21 +1,22 @@
 <script lang="ts">
-  import "./global.css";
+  import "../global.css";
 
-  import { context } from "./lib/context";
+  import { context } from "../lib/context";
 
-  import Header from "./components/Header.svelte";
-  import PasteFlow from "./components/PasteFlow.svelte";
-  import EarningsReport from "./components/EarningsReport.svelte";
-  import EligibilityReport from "./components/EligibilityReport.svelte";
-  import PiaReport from "./components/PiaReport.svelte";
-  import Sidebar from "./components/Sidebar.svelte";
-  import SidebarSection from "./components/SidebarSection.svelte";
-  import NormalRetirementAgeReport from "./components/NormalRetirementAgeReport.svelte";
-  import FilingDateReport from "./components/FilingDateReport.svelte";
-  import CombinedHeading from "./components/CombinedHeading.svelte";
-  import CombinedChart from "./components/CombinedChart.svelte";
-  import SpousalReport from "./components/SpousalReport.svelte";
-  import RecipientName from "./components/RecipientName.svelte";
+  import Header from "./Header.svelte";
+  import PasteFlow from "./PasteFlow.svelte";
+  import EarningsReport from "./EarningsReport.svelte";
+  import EligibilityReport from "./EligibilityReport.svelte";
+  import PiaReport from "./PiaReport.svelte";
+  import Sidebar from "./Sidebar.svelte";
+  import SidebarSection from "./SidebarSection.svelte";
+  import MoreResources from "./MoreResources.svelte";
+  import NormalRetirementAgeReport from "./NormalRetirementAgeReport.svelte";
+  import FilingDateReport from "./FilingDateReport.svelte";
+  import CombinedHeading from "./CombinedHeading.svelte";
+  import CombinedChart from "./CombinedChart.svelte";
+  import SpousalReport from "./SpousalReport.svelte";
+  import RecipientName from "./RecipientName.svelte";
 
   export let isPasteFlow: boolean = true;
 
@@ -24,8 +25,8 @@
   }
 </script>
 
+<Header active="Calculator" />
 <main>
-  <Header />
   {#if isPasteFlow}
     <PasteFlow on:done={pasteDone} />
   {:else}
@@ -102,6 +103,9 @@
           />
         </SidebarSection>
       {/if}
+      <SidebarSection label="More Reading" heading={true}>
+        <MoreResources />
+      </SidebarSection>
     </Sidebar>
   {/if}
 </main>

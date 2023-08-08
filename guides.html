@@ -7,28 +7,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>About: Social Security Calculator</title>
 
-  <link rel="stylesheet" href="/src/stylesheet.css" />
   <link rel="alternate" type="application/rss+xml" title="Social Security Tools"
     href="https://ssa.tools/guide/feed.rss" />
+  <link href="global.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body>
-  <div id="bodychildcontainer">
-    <!-- partials/header.html -->
-    <div id="topheader">
-      <ul class="navpills">
-        <li role="presentation"><a href=".">Calculator</a></li>
-        <li role="presentation"><a href="about.html">About</a></li>
-        <li role="presentation" class="active"><a href="/guides.html">Guides</a>
-        </li>
-        <li role="presentation"><a href="contributors.html">Contributors</a>
-        </li>
-        <li role="presentation"><a href="contact.html">Contact</a></li>
-      </ul>
-      <h3 id="title-header">Social Security Guides</h3>
-    </div>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1.2;
+  }
 
-    <!-- Main Contents -->
+  a {
+    color: #337ab7;
+  }
+
+  /* Single div child of body. Prevents content column from getting wider
+   * than 1080px regardless of device width. */
+  div#bodychildcontainer {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+</style>
+
+
+<body>
+  <div id="header" active="Guides"></div>
+  <div id="bodychildcontainer">
     <div>
       <h1>Social Security Guides</h1>
       <p style="font-size:1.4em">
@@ -162,7 +170,7 @@
         </li>
       </ul>
     </div>
-
+    <script type="module" src="/src/header.ts"></script>
 </body>
 
 </html>

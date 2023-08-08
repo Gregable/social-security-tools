@@ -3,20 +3,20 @@
 
   some markdown here
 -->
-
 <script lang="ts">
-  export let active = "Calculator";
+  export let active = "none";
 
   let navOptions = [
     { name: "Calculator", link: "calculator.html", active: false },
+    { name: "Guides", link: "guides.html", active: false },
     { name: "About", link: "about.html", active: false },
-    { name: "Contributors", link: "contributors.html", active: false },
     { name: "Contact", link: "contact.html", active: false },
   ];
   $: active && navOptions.forEach((o) => (o.active = o.name === active));
 
   let navbar: HTMLDivElement;
-  $: navbar && navbar.style.setProperty("--pill-count", navOptions.length);
+  $: navbar &&
+    navbar.style.setProperty("--pill-count", navOptions.length.toString());
 </script>
 
 <div class="header">
@@ -25,7 +25,11 @@
   <div class="navpills" bind:this={navbar}>
     {#each navOptions as option}
       <div class="pill" class:active={option.active}>
-        <a href={option.link}>{option.name}</a>
+        {#if option.active}
+          <span>{option.name}</span>
+        {:else}
+          <a href={option.link}>{option.name}</a>
+        {/if}
       </div>
     {/each}
   </div>
@@ -63,14 +67,15 @@
     /** Vertically aligns he pill */
     display: flex;
   }
-  .pill a {
+  .pill a,
+  .pill span {
     text-align: center;
     border-radius: 4px;
     padding: 10px 15px;
     text-decoration: none;
     vertical-align: middle;
   }
-  .pill.active a {
+  .pill.active span {
     color: #fff;
     background-color: #337ab7;
   }
@@ -83,6 +88,16 @@
     .header {
       grid-template-columns: 1fr;
       justify-items: center;
+      margin-bottom: 10px;
+    }
+    h3 {
+      padding-left: 0px;
+      font-size: 20px;
+      line-height: 30px;
+    }
+    .pill a,
+    .pill span {
+      padding: 5px 5px;
     }
   }
 </style>
