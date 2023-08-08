@@ -1,9 +1,8 @@
-import demo0 from '../assets/averagepaste.txt?raw';
+import demo0 from '../../static/pastes/averagepaste.txt?raw';
 import {Birthdate} from '../lib/birthday';
 import * as constants from '../lib/constants';
 import {EarningRecord} from '../lib/earning-record';
 import {Money} from '../lib/money';
-import {MonthDate, MonthDuration} from '../lib/month-time';
 import {Recipient} from '../lib/recipient'
 import {parsePaste} from '../lib/ssa-parse';
 

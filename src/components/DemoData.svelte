@@ -22,11 +22,11 @@
   import { Recipient } from "../lib/recipient";
   import { Birthdate } from "../lib/birthday";
 
-  import demo0 from "../assets/averagepaste.txt?raw";
-  import demo0_spouse from "../assets/averagepaste-spouse.txt?raw";
-  import demo1 from "../assets/millionpaste.txt?raw";
-  import demo2 from "../assets/youngpaste.txt?raw";
-  import demo2_spouse from "../assets/youngpaste-spouse.txt?raw";
+  import demo0 from "../../static/pastes/averagepaste.txt?raw";
+  import demo0_spouse from "../../static/pastes/averagepaste-spouse.txt?raw";
+  import demo1 from "../../static/pastes/millionpaste.txt?raw";
+  import demo2 from "../../static/pastes/youngpaste.txt?raw";
+  import demo2_spouse from "../../static/pastes/youngpaste-spouse.txt?raw";
 
   const dispatch = createEventDispatcher();
 

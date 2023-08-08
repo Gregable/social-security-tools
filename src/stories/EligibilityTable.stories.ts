@@ -9,7 +9,7 @@ import {Birthdate} from '../lib/birthday';
 import {EarningRecord} from '../lib/earning-record';
 
 
-import demo0 from '../assets/averagepaste.txt?raw';
+import demo0 from '../../static/pastes/averagepaste.txt?raw';
 
 context.recipient = new Recipient();
 context.recipient.earningsRecords = parsePaste(demo0);

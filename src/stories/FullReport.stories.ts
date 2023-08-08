@@ -6,8 +6,8 @@ import {Recipient} from '../lib/recipient';
 import {parsePaste} from '../lib/ssa-parse';
 import {Birthdate} from '../lib/birthday';
 
-import demo from '../assets/averagepaste.txt?raw';
-import demo_spouse_low from '../assets/averagepaste-spouse.txt?raw';
+import demo from '../../static/pastes/averagepaste.txt?raw';
+import demo_spouse_low from '../../static/pastes/averagepaste-spouse.txt?raw';
 
 let recipient = new Recipient();
 recipient.name = 'Alex';

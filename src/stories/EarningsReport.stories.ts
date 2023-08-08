@@ -8,7 +8,7 @@ import {Birthdate} from '../lib/birthday';
 import {EarningRecord} from '../lib/earning-record';
 
 
-import demo0 from '../assets/averagepaste.txt?raw';
+import demo0 from '../../static/pastes/averagepaste.txt?raw';
 
 let recipient = new Recipient();
 recipient.earningsRecords = parsePaste(demo0);
