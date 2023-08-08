@@ -208,10 +208,6 @@
     margin: 0 0.5em;
   }
 
-  p.indent {
-    margin-left: 2em;
-  }
-
   .expando {
     margin: 1em 0 1em 1em;
   }
