@@ -82,21 +82,20 @@
       in the future.
     </p>
     <p>
-      The <a href="/contact.html">author of this site</a> could never have done all
-      of this without help from the internet. This page lists some of the contributors
+      The <a href="/contact">author of this site</a> could never have done all of
+      this without help from the internet. This page lists some of the contributors
       that have made this all possible.
     </p>
     <h1>Major Contributors</h1>
     <p>
-      <a href="contact.html">Greg Grothaus</a>: Greg is the primary developer of
+      <a href="/contact">Greg Grothaus</a>: Greg is the primary developer of
       this site. He is a software engineer who has worked on this project on the
       side for several years. You can find Greg's personal blog at
       <a href="http://www.gregable.com/"> gregable.com</a>.
     </p>
     <p>
-      <a href=" http://www.sotirioskeros.com/sotirios-keros/">
-        Sotirios Keros</a
-      >: a physician, financial planner, and co-founder of the not-for-profit
+      <a href="http://www.sotirioskeros.com/"> Sotirios Keros</a>: a physician,
+      financial planner, and co-founder of the not-for-profit
       <a href="http://www.doctoredmoney.org/">Doctored Money</a>. Sotirios
       contributed heavily to the design and correctness of the calculations this
       tool makes.
