@@ -94,7 +94,7 @@
       <a href="http://www.gregable.com/"> gregable.com</a>.
     </p>
     <p>
-      <a href=" http://www.sotirioskeros.com/sotirios-keros/">
+      <a href="http://www.sotirioskeros.com/sotirios-keros/">
         Sotirios Keros</a
       >: a physician, financial planner, and co-founder of the not-for-profit
       <a href="http://www.doctoredmoney.org/">Doctored Money</a>. Sotirios
