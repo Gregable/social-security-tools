@@ -42,10 +42,10 @@
       Social Security Benefits are based on the <u
         >Averaged Indexed Monthly Earnings</u
       >
-      (AIME). This is the average monthly income <RecipientName
-        r={$recipient}
-      /> earned over the top 35 years of wage income, indexed for wage growth (similar
-      to an inflation adjustment).
+      (AIME). This is the monthly average of <RecipientName r={$recipient} apos
+        >your</RecipientName
+      > highest 35 years of earnings, indexed for wage growth (similar to an inflation
+      adjustment).
     </p>
 
     <div class="aime-banner">
@@ -72,38 +72,23 @@
         </p>
 
         <p>
-          <RecipientName r={$recipient} apos>Your</RecipientName> social security
-          benefit is based on the <u>Averaged Indexed Monthly Earnings</u>
-          (AIME), a straightforward calculation from <RecipientName
-            r={$recipient}
-            apos>your</RecipientName
-          >
-          {$recipient.earningsRecords.length} years of earnings.
-        </p>
-
-        <p>
-          Only the top 35 years of <u>indexed earnings</u> values are used in
-          the calculation of <RecipientName r={$recipient} apos
-            >your</RecipientName
-          > AIME. Indexed earnings are simply the capped payroll wages you earned
-          in a year multiplied by a number that adjusts for wage growth.
+          The multipliers and indexed earnings in the table below will increase
+          every year until <RecipientName r={$recipient} suffix=" reaches"
+            >you reach</RecipientName
+          > age 60, after which point they are fixed. Years after age 60 will be
+          a 1.0 multiplier. The increase in the multipliers is determined by US wage
+          growth. Thus, your indexed earnings in a given year are scaled to be equivalent
+          to a wage in the year you turn 60.
         </p>
 
         {#if has35Years()}
           <p>
-            In
-            <RecipientName r={$recipient} apos>your</RecipientName> case, this means
-            that years where the indexed earnings value falls below
+            For
+            <RecipientName r={$recipient}>you</RecipientName>, this means that
+            years where the indexed earnings value falls below
             <b>{$recipient.cutoffIndexedEarnings().wholeDollars()}</b>
             do not affect the benefit calculation because they are not among the
-            top 35. If <RecipientName r={$recipient} suffix=" was"
-              >you were</RecipientName
-            >
-            to earn additional years of wages in the future, those years would only
-            affect Social Security benefits if <RecipientName r={$recipient}
-              >you</RecipientName
-            > earned more than
-            <b>{$recipient.cutoffIndexedEarnings().wholeDollars()}</b> in those years.
+            top 35.
           </p>
         {:else}
           <p>
@@ -111,18 +96,6 @@
             you work will increase the benefit a little more. Once you reach 35
             years of earnings values, increasing the AIME requires earning more
             than previous years' indexed values.
-          </p>
-        {/if}
-
-        {#if isOver60()}
-          <p>
-            The multipliers in the earnings record table below will increase
-            every year until <RecipientName r={$recipient} suffix=" reaches"
-              >you reach</RecipientName
-            > reach age 60, at which point they are fixed at 1.0. The increase in
-            the multipliers through age 60 is determined by US wage growth. Thus,
-            your indexed earnings in a given year are scaled to be equivalent a wage
-            in the year you turn 60.
           </p>
         {/if}
 
@@ -165,6 +138,12 @@
     </Expando>
   </div>
 
+  <p />
+
+  <p>
+    Here is a table of <RecipientName r={$recipient} apos>your</RecipientName>
+    earnings, with wage indexing multipliers applied:
+  </p>
   <EarningsTable earningsRecords={$recipient.earningsRecords} />
 
   <p>

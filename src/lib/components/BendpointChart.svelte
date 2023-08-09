@@ -482,14 +482,13 @@
   }
 
   .chart-ylabel {
-    width: 50px;
-    height: 376px;
-    float: left;
+    width: 1px;
+    float: right;
   }
 
   .vertical-text {
     transform: rotate(-90deg) translateY(-82px) translateX(-166px);
-    -webkit-transform: rotate(-90deg) translateY(-82px) translateX(-166px);
+    -webkit-transform: rotate(-90deg) translateY(-116px) translateX(-166px);
     float: left;
     width: 235px;
     white-space: nowrap;

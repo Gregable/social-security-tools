@@ -17,12 +17,12 @@
       <div class="eligibility eligible">Eligible</div>
       <p>
         <RName {r} suffix=" has">You have</RName>
-        already earned the <b>40</b> credits required
+        already earned the <b>40</b>
         <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
           >Social Security credits</a
         >
-        to be eligible for a normal retirement benefit. Additional credits will not
-        affect <RName {r} apos>your</RName> eligibility or benefit amount.
+        required to be eligible for a retirement benefit. Additional credits will
+        not affect <RName {r} apos>your</RName> eligibility or benefit amount.
       </p>
     {:else if $recipient.totalCredits() >= 40}
       <div class="eligibility eligible">Eligible</div>
@@ -30,22 +30,22 @@
         <RName {r} suffix=" has">You have</RName> already earned
         <b>{$recipient.earnedCredits()}</b>
         credits and with your projected earnings <RName {r}>you</RName> will earn
-        the <b>40</b> credits required
+        the <b>40</b>
         <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
           >Social Security credits</a
-        > to be eligible for a normal retirement benefit.
+        > required to be eligible for a normal retirement benefit.
       </p>
     {:else}
       <div class="eligibility ineligible">Ineligible</div>
       <p>
         <RName {r} suffix=" has">You have</RName> not yet earned the <b>40</b>
-        credits required
         <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
           >Social Security credits</a
         >
-        to be eligible for a normal retirement benefit. <RName {r}>You</RName> may
-        still be eligible to receive spousal benefits (see spousal benefits section
-        below). The rest of this report will continue to show you what <RName
+        required to be eligible for a normal retirement benefit. <RName {r}
+          >You</RName
+        > may still be eligible to receive spousal benefits (see spousal benefits
+        section below). The rest of this report will continue to show you what <RName
           {r}
           apos>your</RName
         > benefit would be if <RName {r}>you</RName> were eligible.
@@ -63,16 +63,14 @@
     >
       <div class="expando">
         <p>
-          To be eligible for a normal retirement benefit from your own work
-          history you must earn 40 <a
-            href="https://www.ssa.gov/planners/credits.html"
-            target="_blank">Social Security credits</a
-          >. You can earn a <u>maximum of 4 credits each year</u>. Each year,
-          you must earn a certain amount of money to get one Social Security
-          credit. The amount of money needed for a credit changes from year to
-          year. The table below shows the amounts needed to earn one credit and
-          the number of credits <RName {r} suffix=" has">you have</RName> earned
-          each year:
+          To be eligible for Social Security retirement benefits, you must earn
+          40 <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
+            >Social Security credits</a
+          >. You can earn <u>up to</u> 4 credits per year. Each year, you must
+          earn a certain amount of money to get one Social Security credit. he
+          amount of money you need to earn per credit changes each year. The
+          table below shows the amount needed per credit and the number of
+          credits <RName {r} suffix=" has">you have</RName> earned:
         </p>
 
         {#if $recipient.hasEarningsBefore1978()}
@@ -82,12 +80,11 @@
           <div class="insetTextBox">
             <h4>Special Rule</h4>
             <p>
-              Earnings before 1978 were reported <i>quarterly</i>, and one could
-              earn only one credit per quarter. Because the SSA earnings record
-              only reports <i>yearly</i> earnings, credits may not be calculated
-              correctly for years before 1978 if in those years <RName {r} apos
-                >your</RName
-              > earnings were not evenly spread throughout the year.
+              Before 1978, Social Security credits were earned <i>quarterly</i>.
+              The SSA earnings record only reports <i>yearly</i> earnings,so
+              credits may not be calculated correctly for years before 1978, if
+              <RName {r} apos>your</RName> earnings were not evenly spread throughout
+              the year.
             </p>
           </div>
         {/if}
