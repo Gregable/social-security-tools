@@ -1,4 +1,5 @@
-import {MonthDate, MonthDuration} from '../lib/month-time';
+import {MonthDate, MonthDuration} from '$lib/month-time';
+import {describe, expect, it} from 'vitest'
 
 describe('MonthDate Initialization', () => {
   it('constructor from months', () => {

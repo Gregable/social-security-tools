@@ -1,4 +1,5 @@
-import {COLA, EARNINGS_PER_CREDIT, MAX_WAGE_INDEX_YEAR, MAX_YEAR, MAXIMUM_EARNINGS, TAX_RATES, WAGE_INDICES} from '../lib/constants'
+import {COLA, EARNINGS_PER_CREDIT, MAX_WAGE_INDEX_YEAR, MAX_YEAR, MAXIMUM_EARNINGS, TAX_RATES, WAGE_INDICES} from '$lib/constants'
+import {describe, expect, it} from 'vitest'
 
 describe('constants.ts', () => {
   // The first year for earnings_per_credit is 1978.

@@ -1,12 +1,12 @@
 import type {Meta} from '@storybook/svelte';
-import NormalRetirementAgeReport from '../components/NormalRetirementAgeReport.svelte';
+import NormalRetirementAgeReport from '../lib/components/NormalRetirementAgeReport.svelte';
 
 
-import {Recipient} from '../lib/recipient';
-import {parsePaste} from '../lib/ssa-parse';
-import {Birthdate} from '../lib/birthday';
+import {Recipient} from '$lib/recipient';
+import {parsePaste} from '$lib/ssa-parse';
+import {Birthdate} from '$lib/birthday';
 
-import demo0 from '../assets/averagepaste.txt?raw';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
 const meta: Meta<NormalRetirementAgeReport> = {
   component: NormalRetirementAgeReport,

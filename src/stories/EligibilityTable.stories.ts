@@ -1,15 +1,15 @@
 import type {Meta} from '@storybook/svelte';
-import EligibilityTable from '../components/EligibilityTable.svelte';
+import EligibilityTable from '$lib/components/EligibilityTable.svelte';
 
-import {context} from '../lib/context';
-import {Recipient} from '../lib/recipient';
-import {parsePaste} from '../lib/ssa-parse';
-import {Money} from '../lib/money';
-import {Birthdate} from '../lib/birthday';
-import {EarningRecord} from '../lib/earning-record';
+import {context} from '$lib/context';
+import {Recipient} from '$lib/recipient';
+import {parsePaste} from '$lib/ssa-parse';
+import {Money} from '$lib/money';
+import {Birthdate} from '$lib/birthday';
+import {EarningRecord} from '$lib/earning-record';
 
 
-import demo0 from '../assets/averagepaste.txt?raw';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
 context.recipient = new Recipient();
 context.recipient.earningsRecords = parsePaste(demo0);

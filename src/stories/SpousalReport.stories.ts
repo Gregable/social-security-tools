@@ -1,13 +1,13 @@
 import type {Meta} from '@storybook/svelte';
-import SpousalReport from '../components/SpousalReport.svelte';
+import SpousalReport from '../lib/components/SpousalReport.svelte';
 
-import {Recipient} from '../lib/recipient';
-import {parsePaste} from '../lib/ssa-parse';
-import {Birthdate} from '../lib/birthday';
+import {Recipient} from '$lib/recipient';
+import {parsePaste} from '$lib/ssa-parse';
+import {Birthdate} from '$lib/birthday';
 
-import demo from '../assets/averagepaste.txt?raw';
-import demo_spouse_low from '../assets/averagepaste-spouse.txt?raw';
-import demo_spouse_high from '../assets/averagepaste-spouse-2.txt?raw';
+import demo from '$lib/pastes/averagepaste.txt?raw';
+import demo_spouse_low from '$lib/pastes/averagepaste-spouse.txt?raw';
+import demo_spouse_high from '$lib/pastes/averagepaste-spouse-2.txt?raw';
 
 let recipient = new Recipient();
 recipient.name = 'Alex';

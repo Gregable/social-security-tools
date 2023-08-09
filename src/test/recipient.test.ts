@@ -1,9 +1,11 @@
-import {Birthdate} from '../lib/birthday';
+import {Birthdate} from '$lib/birthday';
+import {EarningRecord} from '$lib/earning-record';
+import {Money} from '$lib/money';
+import {MonthDate, MonthDuration} from '$lib/month-time';
+import {Recipient} from '$lib/recipient'
+import {describe, expect, it} from 'vitest'
+
 import * as constants from '../lib/constants';
-import {EarningRecord} from '../lib/earning-record';
-import {Money} from '../lib/money';
-import {MonthDate, MonthDuration} from '../lib/month-time';
-import {Recipient} from '../lib/recipient'
 
 /**
  * Returns a record with the given year and earnings. Medicare earnings

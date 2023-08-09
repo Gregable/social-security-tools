@@ -1,11 +1,11 @@
 import type {Meta} from '@storybook/svelte';
-import FilingDate from '../components/FilingDateReport.svelte';
+import FilingDate from '../lib/components/FilingDateReport.svelte';
 
-import {Recipient} from '../lib/recipient';
-import {parsePaste} from '../lib/ssa-parse';
-import {Birthdate} from '../lib/birthday';
+import {Recipient} from '$lib/recipient';
+import {parsePaste} from '$lib/ssa-parse';
+import {Birthdate} from '$lib/birthday';
 
-import demo0 from '../assets/averagepaste.txt?raw';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
 const meta: Meta<FilingDate> = {
   component: FilingDate,

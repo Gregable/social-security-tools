@@ -1,4 +1,4 @@
-import {Money} from '../lib/money';
+import {Money} from '$lib/money';
 /**
  * This file holds constants that various bits of code need. Most of these
  * constants are values from the SSA and other IRS laws and require updating

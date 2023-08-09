@@ -1,5 +1,6 @@
-import {Birthdate} from '../lib/birthday'
-import {MonthDate, MonthDuration} from '../lib/month-time'
+import {Birthdate} from '$lib/birthday'
+import {MonthDate, MonthDuration} from '$lib/month-time'
+import {describe, expect, it} from 'vitest'
 
 
 describe('Birthdate Initialization', function() {

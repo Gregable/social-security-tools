@@ -1,7 +1,7 @@
 import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
-import Slider from '../components/Slider.svelte';
+import Slider from '../lib/components/Slider.svelte';
 
 const meta: Meta<Slider> = {
   component: Slider,

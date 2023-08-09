@@ -1,7 +1,7 @@
 import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
-import AgeRequest from '../components/AgeRequest.svelte';
+import AgeRequest from '../lib/components/AgeRequest.svelte';
 
 const meta: Meta<AgeRequest> = {
   component: AgeRequest,
