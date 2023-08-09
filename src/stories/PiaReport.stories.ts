@@ -1,11 +1,11 @@
 import type {Meta} from '@storybook/svelte';
-import PiaReport from '../components/PiaReport.svelte';
+import PiaReport from '../lib/components/PiaReport.svelte';
 
-import {Recipient} from '../lib/recipient';
-import {parsePaste} from '../lib/ssa-parse';
-import {Birthdate} from '../lib/birthday';
+import {Recipient} from '$lib/recipient';
+import {parsePaste} from '$lib/ssa-parse';
+import {Birthdate} from '$lib/birthday';
 
-import demo0 from '../../static/pastes/averagepaste.txt?raw';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
 let recipient = new Recipient();
 recipient.name = 'Alex';

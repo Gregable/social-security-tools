@@ -1,14 +1,14 @@
 import type {Meta} from '@storybook/svelte';
-import EarningsReport from '../components/EarningsReport.svelte';
+import EarningsReport from '../lib/components/EarningsReport.svelte';
 
-import {Money} from '../lib/money';
-import {Recipient} from '../lib/recipient';
-import {parsePaste} from '../lib/ssa-parse';
-import {Birthdate} from '../lib/birthday';
-import {EarningRecord} from '../lib/earning-record';
+import {Money} from '$lib/money';
+import {Recipient} from '$lib/recipient';
+import {parsePaste} from '$lib/ssa-parse';
+import {Birthdate} from '$lib/birthday';
+import {EarningRecord} from '$lib/earning-record';
 
 
-import demo0 from '../../static/pastes/averagepaste.txt?raw';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
 let recipient = new Recipient();
 recipient.earningsRecords = parsePaste(demo0);

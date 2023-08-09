@@ -1,10 +1,12 @@
-import demo0 from '../../static/pastes/averagepaste.txt?raw';
-import {Birthdate} from '../lib/birthday';
+import {Birthdate} from '$lib/birthday';
+import {EarningRecord} from '$lib/earning-record';
+import {Money} from '$lib/money';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
+import {Recipient} from '$lib/recipient'
+import {parsePaste} from '$lib/ssa-parse';
+import {describe, expect, it} from 'vitest'
+
 import * as constants from '../lib/constants';
-import {EarningRecord} from '../lib/earning-record';
-import {Money} from '../lib/money';
-import {Recipient} from '../lib/recipient'
-import {parsePaste} from '../lib/ssa-parse';
 
 
 

@@ -1,7 +1,7 @@
 import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
-import PastePrompt from '../components/PastePrompt.svelte';
+import PastePrompt from '../lib/components/PastePrompt.svelte';
 
 const meta: Meta<PastePrompt> = {
   component: PastePrompt,

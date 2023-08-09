@@ -2,7 +2,7 @@ import type {Meta} from '@storybook/svelte';
 
 import RecipientName from './RecipientName.demo.svelte';
 
-import {Recipient} from '../lib/recipient';
+import {Recipient} from '$lib/recipient';
 
 
 const meta: Meta<RecipientName> = {

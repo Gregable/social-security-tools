@@ -1,5 +1,5 @@
-import {Money} from '../lib/money';
-import {dollarStringToMoney, parsePaste} from '../lib/ssa-parse';
+import {dollarStringToMoney, parsePaste} from '$lib/ssa-parse';
+import {describe, expect, it} from 'vitest'
 
 
 describe('dollarStringToMoney', () => {

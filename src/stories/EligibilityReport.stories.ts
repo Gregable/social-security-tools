@@ -1,14 +1,14 @@
 import type {Meta} from '@storybook/svelte';
-import EligibilityReport from '../components/EligibilityReport.svelte';
+import EligibilityReport from '../lib/components/EligibilityReport.svelte';
 
-import {Recipient} from '../lib/recipient';
-import {parsePaste} from '../lib/ssa-parse';
-import {Birthdate} from '../lib/birthday';
-import {Money} from '../lib/money';
-import {EarningRecord} from '../lib/earning-record';
+import {Recipient} from '$lib/recipient';
+import {parsePaste} from '$lib/ssa-parse';
+import {Birthdate} from '$lib/birthday';
+import {Money} from '$lib/money';
+import {EarningRecord} from '$lib/earning-record';
 
-import demo0 from '../../static/pastes/averagepaste.txt?raw';
-import demo1 from '../../static/pastes/millionpaste.txt?raw';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
+import demo1 from '$lib/pastes/millionpaste.txt?raw';
 
 // Sufficient earnigns for eligibility
 let recipient0 = new Recipient();

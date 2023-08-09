@@ -1,6 +1,6 @@
 import type {Meta} from '@storybook/svelte';
-import FutureEarningsSliders from '../components/FutureEarningsSliders.svelte';
-import {Recipient} from '../lib/recipient';
+import FutureEarningsSliders from '../lib/components/FutureEarningsSliders.svelte';
+import {Recipient} from '$lib/recipient';
 
 const meta: Meta<FutureEarningsSliders> = {
   component: FutureEarningsSliders,

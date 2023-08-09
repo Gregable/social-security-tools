@@ -1,7 +1,7 @@
 import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
-import SpouseQuestion from '../components/SpouseQuestion.svelte';
+import SpouseQuestion from '../lib/components/SpouseQuestion.svelte';
 
 const meta: Meta<SpouseQuestion> = {
   component: SpouseQuestion,

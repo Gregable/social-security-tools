@@ -1,8 +1,8 @@
 import type {Meta} from '@storybook/svelte';
 import {action} from '@storybook/addon-actions';
 
-import PasteApology from '../components/PasteApology.svelte';
-import {EarningRecord} from '../lib/earning-record';
+import PasteApology from '../lib/components/PasteApology.svelte';
+import {EarningRecord} from '$lib/earning-record';
 
 const meta: Meta<PasteApology> = {
   component: PasteApology,
