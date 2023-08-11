@@ -107,7 +107,7 @@
       <h2>Visual Charts</h2>
       <h1>PIA Calculation</h1>
       <p>
-        Visually calculate how your Average Indexed Monthly Income (AIME)
+        Visually calculate how your Average Indexed Monthly Earnings (AIME)
         affects your Primary Insurance Amount (PIA). Use the estimator to see
         how you compare to the two Social Security breakpoints.
       </p>
