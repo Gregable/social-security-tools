@@ -2,7 +2,7 @@
   import "$lib/global.css";
   import * as constants from "$lib/constants";
   import Slider from "./Slider.svelte";
-  import { Recipient } from "$lib/recipient";
+  import type { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
   import RecipientName from "./RecipientName.svelte";
 

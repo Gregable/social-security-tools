@@ -10,28 +10,13 @@
 
   export let recipient: Recipient = new Recipient();
 
-  /**
-   * Returns true if the recipient has 35 or more years of earnings.
-   */
-  function has35Years(): boolean {
-    return $recipient.earningsRecords.length >= 35;
-  }
-
-  /**
-   * Returns true if the recipient is over 60 years old this year.
-   */
-  function isOver60(): boolean {
+  function records(recipient: Recipient): number {
     return (
-      $recipient.birthdate
-        .ageAtSsaDate(
-          MonthDate.initFromYearsMonths({
-            years: constants.CURRENT_YEAR,
-            months: 0,
-          })
-        )
-        .years() > 60
+      recipient.earningsRecords.length + recipient.futureEarningsRecords.length
     );
   }
+  let totalRecords: number = 0;
+  $: totalRecords = records($recipient);
 </script>
 
 <div class="main">
@@ -67,8 +52,8 @@
       <div class="expando">
         <p>
           <RecipientName r={$recipient} suffix=" has">You have</RecipientName>
-          <b>{$recipient.earningsRecords.length}</b> total years of lifetime Social
-          Security earnings, shown in the table below.
+          <b>{totalRecords}</b> total years of lifetime Social Security earnings,
+          shown in the table below.
         </p>
 
         <p>
@@ -81,7 +66,7 @@
           to a wage in the year you turn 60.
         </p>
 
-        {#if has35Years()}
+        {#if totalRecords >= 35}
           <p>
             For
             <RecipientName r={$recipient}>you</RecipientName>, this means that
@@ -111,7 +96,7 @@
           <b>{$recipient.totalIndexedEarnings().wholeDollars()}</b>
         </p>
 
-        {#if has35Years()}
+        {#if totalRecords >= 35}
           <p>
             <RecipientName r={$recipient} apos>Your</RecipientName>
             <u>Averaged Indexed Monthly Earnings</u> (AIME) is simply the total indexed
