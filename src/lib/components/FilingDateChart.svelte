@@ -711,7 +711,7 @@
     position: relative;
     width: 80vw;
     height: calc(80vw * 0.67 + 105px);
-    margin: 2em 1em 1em 1em;
+    margin: 2em 1em 1em 0;
   }
   p {
     font-weight: bold;
@@ -760,15 +760,15 @@
   */
   @media screen and (min-width: 1025px) {
     .chart-container {
-      width: 60vw;
-      height: calc(60vw * 0.67 + 105px);
+      width: min(55vw, 740px);
+      height: calc(min(55vw, 740px) * 0.67 + 105px);
     }
     canvas {
-      width: 60vw;
-      height: calc(60vw * 0.67);
+      width: min(55vw, 740px);
+      height: calc(min(55vw, 740px) * 0.67);
     }
     .selectedDateBox {
-      margin-top: calc(60vw * 0.67 - 18px);
+      margin-top: calc(min(55vw, 740px) * 0.67 - 18px);
     }
   }
   @media screen and (max-width: 1024px) {
