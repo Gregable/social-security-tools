@@ -1,9 +1,7 @@
 <script lang="ts">
   import "$lib/global.css";
-  import * as constants from "$lib/constants";
   import EarningsTable from "./EarningsTable.svelte";
   import FutureEarningsSliders from "./FutureEarningsSliders.svelte";
-  import { MonthDate } from "$lib/month-time";
   import RecipientName from "./RecipientName.svelte";
   import { Recipient } from "$lib/recipient";
   import Expando from "./Expando.svelte";

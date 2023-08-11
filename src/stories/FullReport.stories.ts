@@ -1,5 +1,5 @@
 import type {Meta} from '@storybook/svelte';
-import App from '../lib/components/App.svelte';
+import App from '../routes/calculator/+page.svelte';
 
 import {context} from '$lib/context';
 import {Recipient} from '$lib/recipient';
