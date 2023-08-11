@@ -14,10 +14,8 @@
   /**
    * The benefit amount at normal retirement age.
    */
-  let benefit: Money = $recipient
-    .pia()
-    .primaryInsuranceAmount()
-    .floorToDollar();
+  let benefit: Money = Money.from(0);
+  $: benefit = $recipient.pia().primaryInsuranceAmount().floorToDollar();
 </script>
 
 <div>

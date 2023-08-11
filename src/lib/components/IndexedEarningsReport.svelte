@@ -45,6 +45,7 @@
     <Expando
       collapsedText="Expand to read an explanation of Averaged Indexed Monthly Earnings"
       expandedText="Show Less"
+      enableTransition={false}
       initiallyExpanded={false}
     >
       <div class="expando">

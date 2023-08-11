@@ -17,6 +17,8 @@
   import { createEventDispatcher } from "svelte";
   import { parsePaste } from "$lib/ssa-parse";
   import { Recipient } from "$lib/recipient";
+  import CopyPasteDemoMp4 from "$lib/videos/copy-paste-demo.mp4";
+  import CopyPasteDemoPoster from "$lib/videos/copy-paste-demo-poster.jpg";
 
   const dispatch = createEventDispatcher();
 
@@ -63,19 +65,15 @@
         loop
         muted
         disableRemotePlayback
-        poster="/copy-paste-demo-poster.jpg"
+        poster={CopyPasteDemoPoster}
         title="Animation showing a user copying a social security earnings record from ssa.gov."
       >
-        <source src="/copy-paste-demo.mp4" type="video/mp4" />
+        <source src={CopyPasteDemoMp4} type="video/mp4" />
       </video>
-      You can select the table by dragging your mouse over the entire table to select,
-      or you can just use 'Control+A' to select the entire page. Either way will
-      work. Copy the text with 'Control+C'.
+      You can select the table by dragging over the entire table to select or you
+      can just select the entire page. Either way will work.
     </li>
-    <li>
-      Return to this page, paste the result into the text area below with
-      'Control+V'.
-    </li>
+    <li>Return to this page, paste the result into the text area below</li>
   </ol>
 
   <div class="pasteArea">
