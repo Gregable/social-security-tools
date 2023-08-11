@@ -17,7 +17,7 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/federal-taxes"
+      "@id": "https://ssa.tools/guides/federal-taxes"
     },
     "headline": "Article headline",
     "image": {

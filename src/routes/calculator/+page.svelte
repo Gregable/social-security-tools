@@ -5,6 +5,7 @@
 
   import Header from "$lib/components/Header.svelte";
   import PasteFlow from "$lib/components/PasteFlow.svelte";
+  import IndexedEarningsReport from "$lib/components/IndexedEarningsReport.svelte";
   import EarningsReport from "$lib/components/EarningsReport.svelte";
   import EligibilityReport from "$lib/components/EligibilityReport.svelte";
   import PiaReport from "$lib/components/PiaReport.svelte";
@@ -46,11 +47,14 @@
             <RecipientName r={context.recipient} noColor />
           </h1>
         {/if}
+        <SidebarSection label="Earnings Report">
+          <EarningsReport recipient={context.recipient} />
+        </SidebarSection>
         <SidebarSection label="Benefits Eligibility">
           <EligibilityReport recipient={context.recipient} />
         </SidebarSection>
         <SidebarSection label="Indexed Earnings">
-          <EarningsReport recipient={context.recipient} />
+          <IndexedEarningsReport recipient={context.recipient} />
         </SidebarSection>
         <SidebarSection label="Primary Insurance Amount">
           <PiaReport recipient={context.recipient} />
@@ -71,11 +75,14 @@
           <h1 class="recipientName">
             <RecipientName r={context.spouse} noColor />
           </h1>
+          <SidebarSection label="Earnings Report">
+            <EarningsReport recipient={context.recipient} />
+          </SidebarSection>
           <SidebarSection label="Benefits Eligibility">
             <EligibilityReport recipient={context.spouse} />
           </SidebarSection>
           <SidebarSection label="Indexed Earnings">
-            <EarningsReport recipient={context.spouse} />
+            <IndexedEarningsReport recipient={context.spouse} />
           </SidebarSection>
           <SidebarSection label="Primary Insurance Amount">
             <PiaReport recipient={context.spouse} />

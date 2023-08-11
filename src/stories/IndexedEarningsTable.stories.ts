@@ -1,13 +1,12 @@
 import type {Meta} from '@storybook/svelte';
-import EligibilityTable from '$lib/components/EligibilityTable.svelte';
+import IndexedEarningsTable from '../lib/components/IndexedEarningsTable.svelte';
 
 import {context} from '$lib/context';
+import {Money} from '$lib/money';
 import {Recipient} from '$lib/recipient';
 import {parsePaste} from '$lib/ssa-parse';
-import {Money} from '$lib/money';
 import {Birthdate} from '$lib/birthday';
 import {EarningRecord} from '$lib/earning-record';
-
 
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
@@ -24,11 +23,12 @@ context.recipient.earningsRecords.push((() => {
   return record;
 })());
 context.recipient.earningsRecords = context.recipient.earningsRecords;
+context.recipient.simulateFutureEarningsYears(5, Money.from(30 * 1000))
 context.recipient.birthdate = new Birthdate(new Date('1950-07-01'));
 
-const meta: Meta<EligibilityTable> = {
-  component: EligibilityTable,
-  title: 'Report/Eligibility/EligibilityTable',
+const meta: Meta<IndexedEarningsTable> = {
+  component: IndexedEarningsTable,
+  title: 'Report/IndexedEarnings/IndexedEarningsTable',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -37,11 +37,11 @@ const meta: Meta<EligibilityTable> = {
 export default meta;
 
 const Template = ({...args}) => ({
-  Component: EligibilityTable,
+  Component: IndexedEarningsTable,
   props: args,
 });
 
 export const Default = Template.bind({});
 Default.args = {
-  earningsRecords: context.recipient.earningsRecords,
+  recipient: context.recipient
 };

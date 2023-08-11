@@ -16,7 +16,7 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/earnings-cap"
+      "@id": "https://ssa.tools/guides/earnings-cap"
     },
     "headline": "Article headline",
     "datePublished": "2020-11-28T00:00:00+00:00",

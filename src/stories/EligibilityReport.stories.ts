@@ -74,7 +74,7 @@ recipient2.markFirst();
 
 const meta: Meta<EligibilityReport> = {
   component: EligibilityReport,
-  title: 'Report/Earnings/EligibilityReport',
+  title: 'Report/Eligibility/EligibilityReport',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

@@ -18,11 +18,11 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/inflation.html"
+      "@id": "https://ssa.tools/guides/inflation"
     },
     "headline": "Article headline",
     "image": [
-      "https://ssa.tools/static/example-earnings-record-simplified.jpg",
+      "https://ssa.tools/example-earnings-record-simplified.jpg",
      ],
     "datePublished": "2018-11-23T00:00:00+00:00",
     "dateModified": "2020-07-19T00:00:00+00:00",
@@ -35,7 +35,7 @@
       "name": "SSA.Tools",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://ssa.tools/static/laptop-piggybank.jpg"
+        "url": "https://ssa.tools/laptop-piggybank.jpg"
       }
     }
   }

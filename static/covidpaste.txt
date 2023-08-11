@@ -1,4 +1,4 @@
-# Companion data for https://ssa.tools/guide/covid-awi-drop.html
+# Companion data for https://ssa.tools/guides/covid-awi-drop
 # Copy and paste this data into https://ssa.tools/
 # Then choose a birthdate in 1960, but not Jan 1, 1960 since with social
 # security rules you attain an age the day _before_ your birthday.

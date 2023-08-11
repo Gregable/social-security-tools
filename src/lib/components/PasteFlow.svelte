@@ -48,9 +48,11 @@
    */
   function handleDemo(event: CustomEvent) {
     context.recipient = event.detail.recipient;
-    context.recipient.markFirst();
-    context.spouse = event.detail.spouse;
-    context.spouse.markSecond();
+    if (event.detail.spouse !== null) {
+      context.recipient.markFirst();
+      context.spouse = event.detail.spouse;
+      context.spouse.markSecond();
+    }
 
     // Let the app know we're done.
     dispatch("done");

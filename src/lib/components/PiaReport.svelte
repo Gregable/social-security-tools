@@ -9,13 +9,6 @@
   export let recipient: Recipient = new Recipient();
   let r: Recipient = $recipient;
 
-  /**
-   * Returns true if the recipient has 35 or more years of earnings.
-   */
-  function has35Years(): boolean {
-    return $recipient.earningsRecords.length >= 35;
-  }
-
   function oneSignificantDigit(n: number) {
     return n.toLocaleString(undefined, {
       minimumFractionDigits: 1,

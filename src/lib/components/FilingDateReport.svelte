@@ -181,9 +181,9 @@
         {/if}
       </ul>
       <p>
-        Increases due to delaying your benefit do not take affect until January,
+        Increases due to delaying your benefit do not take effect until January,
         except at the full age of 70. <a
-          href="https://ssa.tools/guide/delayed-january-bump.html"
+          href="/guides/delayed-january-bump"
           target="_blank">Learn more</a
         >.
       </p>

@@ -367,7 +367,7 @@
     ctx.setLineDash([3, 5]);
 
     // Both lines starting at the point and radiating out makes a nifty
-    // animation affect with the dashed lines at the edges of the chart.
+    // animation effect with the dashed lines at the edges of the chart.
     ctx.beginPath();
     moveTo(x, y);
     lineTo(x, Money.from(0));

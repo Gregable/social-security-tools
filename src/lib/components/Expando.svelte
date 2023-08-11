@@ -64,6 +64,10 @@
   onMount(() => {
     expanded = initiallyExpanded;
   });
+
+  // The transition animation for expanding the expando looks nice, one
+  // particular expando gives us trouble, so we allow it to be disabled:
+  export let enableTransition = true;
 </script>
 
 <section
@@ -81,7 +85,8 @@
   >
   <div class="expandContainer">
     <div
-      class="expandContents"
+      class:expandContents={true}
+      class:enableTransition
       bind:clientHeight
       style:--negative-margin={negative_margin}
     >
@@ -95,6 +100,7 @@
 <style>
   section {
     position: relative;
+    margin-bottom: 20px;
   }
   /* Hide the checkbox, this is only used as a toggle state. */
   input {
@@ -178,10 +184,12 @@
      * javascript (~typescript).
      */
     margin-top: var(--negative-margin);
-    transition: all 0.25s ease-in;
     margin-left: 6px;
     border-left: 2px solid #a6a6f5;
     border-image: linear-gradient(to bottom, #a6a6f5, 90%, #fff) 1 100%;
+  }
+  .expandContents.enableTransition {
+    transition: all 0.25s ease-in;
   }
   input[type="checkbox"]:checked ~ label ~ .expandContainer .expandContents {
     margin-top: 0;
