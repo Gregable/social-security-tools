@@ -19,7 +19,7 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/delayed-january-bump"
+      "@id": "https://ssa.tools/guides/delayed-january-bump"
     },
     "headline": "Article headline",
     "image": {

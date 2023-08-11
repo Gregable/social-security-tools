@@ -18,11 +18,11 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/international-agreements.html"
+      "@id": "https://ssa.tools/guides/international-agreements"
     },
     "headline": "Article headline",
     "image": [
-      "https://ssa.tools/static/handshake.svg",
+      "https://ssa.tools/handshake.svg",
      ],
     "datePublished": "2022-06-26T00:00:00+00:00",
     "dateModified": "2022-06-26T00:00:00+00:00",
@@ -35,7 +35,7 @@
       "name": "SSA.Tools",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://ssa.tools/static/laptop-piggybank.jpg"
+        "url": "https://ssa.tools/laptop-piggybank.jpg"
       }
     }
   }

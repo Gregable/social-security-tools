@@ -18,7 +18,7 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/1st-and-2nd-of-month"
+      "@id": "https://ssa.tools/guides/1st-and-2nd-of-month"
     },
     "headline": "Extra rules for those born on the 1st or 2nd of the month",
     "image": [

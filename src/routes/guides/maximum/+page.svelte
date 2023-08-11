@@ -18,7 +18,7 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/maximum.html"
+      "@id": "https://ssa.tools/guides/maximum"
     },
     "headline": "Article headline",
     "datePublished": "2019-08-03T00:00:00+00:00",
@@ -32,7 +32,7 @@
       "name": "SSA.Tools",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://ssa.tools/static/laptop-piggybank.jpg"
+        "url": "https://ssa.tools/laptop-piggybank.jpg"
       }
     }
   }

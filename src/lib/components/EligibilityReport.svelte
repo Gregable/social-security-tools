@@ -59,6 +59,7 @@
     <Expando
       collapsedText="Expand for a detailed look at eligibility credits"
       expandedText="Show Less"
+      enableTransition={false}
       initiallyExpanded={$recipient.totalCredits() < 40}
     >
       <div class="expando">
@@ -94,14 +95,14 @@
         {#if $recipient.earnedCredits() < 40 && $recipient.futureEarningsRecords.length > 0}
           <p>
             <RName {r} suffix=" has">You have</RName>
-            worked for <b>{recipient.earningsRecords.length}</b> years, earning
-            <b>{recipient.earnedCredits()}</b> credits so far.
+            worked for <b>{$recipient.earningsRecords.length}</b> years, earning
+            <b>{$recipient.earnedCredits()}</b> credits so far.
           </p>
           <p>
             If <RName {r} suffix=" works">you work</RName>
-            <b>{recipient.futureEarningsRecords.length}</b>
+            <b>{$recipient.futureEarningsRecords.length}</b>
             additional estimated years, <RName {r}>you</RName> will earn
-            <b>{recipient.totalCredits() - recipient.earnedCredits()}</b> additional
+            <b>{$recipient.totalCredits() - $recipient.earnedCredits()}</b> additional
             credits:
           </p>
           <!--
@@ -137,7 +138,7 @@
             <h4>Special Rule</h4>
             <div class="grid">
               <img
-                src="handshake.svg"
+                src="/handshake.svg"
                 alt="Handshake icon"
                 width="100px"
                 height="100px"
@@ -148,7 +149,7 @@
                 another country that has a legal agreement with the US,
                 <RName {r}>you</RName> may have earned credits from a foreign work
                 history. This tool does not cover these cases.
-                <a href="/guide/international-agreements.html" target="_blank"
+                <a href="/guides/international-agreements" target="_blank"
                   >Learn More</a
                 >.
               </p>

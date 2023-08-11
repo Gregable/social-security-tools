@@ -17,7 +17,7 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/indexing-factors"
+      "@id": "https://ssa.tools/guides/indexing-factors"
     },
     "headline": "Article headline",
     "datePublished": "2020-12-28T00:00:00+00:00",

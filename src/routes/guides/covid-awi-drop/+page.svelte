@@ -18,11 +18,11 @@
     "@type": "NewsArticle",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": "https://ssa.tools/guide/covid-awi-drop.html"
+      "@id": "https://ssa.tools/guides/covid-awi-drop"
     },
     "headline": "Effect of Covid-19 on Social Security Benefits",
     "image": [
-      "https://ssa.tools/static/covid-19.jpg"
+      "https://ssa.tools/covid-19.jpg"
      ],
     "datePublished": "2020-12-01T00:00:00+00:00",
     "dateModified": "2020-12-01T00:00:00+00:00",
@@ -35,7 +35,7 @@
       "name": "SSA.Tools",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://ssa.tools/static/laptop-piggybank.jpg"
+        "url": "https://ssa.tools/laptop-piggybank.jpg"
       }
     }
   }
@@ -81,11 +81,10 @@
     <p>
       I've created a data file with exactly this setup. You can try it for
       yourself by copying the entire file at
-      <a href="/static/covidpaste.txt">covidpaste.txt</a> and then pasting it in
-      to the text box on the <a href="/calculator">SSA.tools Calculator</a>.
-      After doing so, select a birthday in 1960, but not Jan 1, because with
-      Social Security law, you attain an age the day before your standard
-      birthday.
+      <a href="/covidpaste.txt">covidpaste.txt</a> and then pasting it in to the
+      text box on the <a href="/calculator">SSA.tools Calculator</a>. After
+      doing so, select a birthday in 1960, but not Jan 1, because with Social
+      Security law, you attain an age the day before your standard birthday.
     </p>
     <p>The resulting earnings table will look like this:</p>
     <img

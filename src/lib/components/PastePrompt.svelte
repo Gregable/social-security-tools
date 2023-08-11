@@ -8,7 +8,7 @@
     <PastePrompt on:paste={handlePaste} />
 
   @events
-    paste: Fired when the user ../static/pastes their earnings record. The event detail
+    paste: Fired when the user pastes their earnings record. The event detail
       contains { recipient: Recipient } with the parsed earnings record.
 -->
 
