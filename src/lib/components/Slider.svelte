@@ -301,7 +301,7 @@
   style:--tick-legend-color={tickLegendColor}
 >
   <span
-    class="barWrapper"
+    class="barWrapper noTouchAction"
     on:pointerdown={onStart}
     on:pointermove={onMove}
     on:pointerup={onEnd}
@@ -309,7 +309,7 @@
     <span class="bar" />
   </span>
   <span
-    class="barWrapper selection"
+    class="barWrapper selection noTouchAction"
     on:pointerdown={onStart}
     on:pointermove={onMove}
     on:pointerup={onEnd}
@@ -317,7 +317,7 @@
     <span class="bar selection" />
   </span>
   <span
-    class="handle"
+    class="handle noTouchAction"
     class:selected
     tabindex="0"
     role="slider"
@@ -369,6 +369,10 @@
   span {
     position: absolute;
     display: inline-block;
+  }
+  .noTouchAction {
+    /* Prevent the browser from hijacking dragging on the sliders. */
+    touch-action: none;
   }
   .barWrapper {
     left: 0;

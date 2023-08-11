@@ -123,6 +123,12 @@
     render();
   }
 
+  function onBlur(event: FocusEvent) {
+    if (!mouseToggle_) return;
+    lastMouseX_ = -1;
+    render();
+  }
+
   // Returns all benefits on a given date, including spousal benefits.
   // Pulls the filing dates automatically from the sliders. If selfFilingDate
   // is specified, uses that instead of the slider value.
@@ -987,9 +993,10 @@
       width="620"
       height="500"
       bind:this={canvasEl_}
-      on:pointerdown={onClick}
+      on:mousedown={onClick}
       on:pointermove={onMove}
-      on:pointerout={onOut}
+      on:mouseout={onOut}
+      on:blur={onBlur}
     />
     <div style="height: 362px" />
     <div
@@ -1104,6 +1111,8 @@
     position: absolute;
     z-index: 0;
     margin-top: -138px;
+    /* Prevent the browser from hijacking dragging on the canvas. */
+    touch-action: none;
   }
   .selectedDateBox {
     border: 1px solid;
