@@ -46,27 +46,33 @@
   $: innerWidth && updateCanvas();
 
   let mouseToggle: boolean = true;
+  let lastMouseX_: number = -1;
   function onClick(event: MouseEvent) {
     if (mouseToggle) {
       mouseToggle = false;
     } else {
       mouseToggle = true;
-      // Immediately trigger a rendering based on mouse location.
-      onMove(event);
+      lastMouseX_ = event.clientX - canvasEl.getBoundingClientRect().left;
     }
+    render();
   }
 
   function onMove(event: MouseEvent) {
     if (!mouseToggle) return;
-
-    // The mouse just moved, we need to re-render.
+    lastMouseX_ = event.clientX - canvasEl.getBoundingClientRect().left;
     render();
+  }
 
-    ctx.save();
-    ctx.strokeStyle = "#337ab7";
-    let canvasX = event.clientX - canvasEl.getBoundingClientRect().left;
-    renderEarningsPoint(earningsX(canvasX));
-    ctx.restore();
+  function onOut(event: MouseEvent) {
+    if (!mouseToggle) return;
+    lastMouseX_ = -1;
+    render();
+  }
+
+  function onBlur(event: FocusEvent) {
+    if (!mouseToggle) return;
+    lastMouseX_ = -1;
+    render();
   }
 
   function calcChartWidth() {
@@ -447,6 +453,13 @@
 
     renderEarningsPoint(recipient.monthlyIndexedEarnings());
 
+    if (lastMouseX_ > 0) {
+      ctx.save();
+      ctx.strokeStyle = "#337ab7";
+      renderEarningsPoint(earningsX(lastMouseX_));
+      ctx.restore();
+    }
+
     ctx.restore();
   }
 </script>
@@ -461,8 +474,10 @@
     width="600"
     height="400"
     bind:this={canvasEl}
-    on:pointerdown={onClick}
+    on:mousedown={onClick}
     on:pointermove={onMove}
+    on:mouseout={onOut}
+    on:blur={onBlur}
   >
     Your browser does not support HTML canvas.
   </canvas>
@@ -505,6 +520,8 @@
     float: left;
     width: 600px;
     height: 400px;
+    /* Prevent the browser from hijacking dragging on the canvas. */
+    touch-action: none;
   }
 
   @media screen and (max-width: 680px) {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import "$lib/global.css";
-  import { Birthdate } from "$lib/birthday";
+  import type { Birthdate } from "$lib/birthday";
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
   import Slider from "./Slider.svelte";
@@ -93,6 +93,12 @@
   }
 
   function onOut(event: MouseEvent) {
+    if (!mouseToggle_) return;
+    lastMouseX_ = -1;
+    render();
+  }
+
+  function onBlur(event: FocusEvent) {
     if (!mouseToggle_) return;
     lastMouseX_ = -1;
     render();
@@ -667,9 +673,10 @@
     width="620"
     height="420"
     bind:this={canvasEl_}
-    on:pointerdown={onClick}
+    on:mousedown={onClick}
     on:pointermove={onMove}
-    on:pointerout={onOut}
+    on:mouseout={onOut}
+    on:blur={onBlur}
   />
   <div
     class="selectedDateBox"
@@ -730,6 +737,8 @@
     margin-top: -18px;
     width: 80vw;
     height: calc(80vw * 0.67);
+    /* Prevent the browser from hijacking dragging on the canvas. */
+    touch-action: none;
   }
   .selectedDateBox {
     border: 1px solid;
