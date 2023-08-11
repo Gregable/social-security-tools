@@ -67,7 +67,7 @@
           40 <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
             >Social Security credits</a
           >. You can earn <u>up to</u> 4 credits per year. Each year, you must
-          earn a certain amount of money to get one Social Security credit. he
+          earn a certain amount of money to get one Social Security credit. The
           amount of money you need to earn per credit changes each year. The
           table below shows the amount needed per credit and the number of
           credits <RName {r} suffix=" has">you have</RName> earned:
