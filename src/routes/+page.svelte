@@ -1,9 +1,11 @@
 <script lang="ts">
   import "$lib/global.css";
 
-  import { context } from "$lib/context";
-
   import Header from "$lib/components/Header.svelte";
+  import CopyPasteDemoMp4 from "$lib/videos/copy-paste-demo.mp4";
+  import CopyPasteDemoPoster from "$lib/videos/copy-paste-demo-poster.jpg";
+  import CombinedDemoMp4 from "$lib/videos/combined-demo.mp4";
+  import CombinedDemoPoster from "$lib/videos/combined-demo-poster.jpg";
 </script>
 
 <svelte:head>
@@ -65,10 +67,10 @@
           disableRemotePlayback
           width="576"
           height="294"
-          poster="/copy-paste-demo-poster.jpg"
+          poster={CopyPasteDemoPoster}
           title="Animation showing a user copying a social security earnings record from ssa.gov."
         >
-          <source src="/copy-paste-demo.mp4" type="video/mp4" />
+          <source src={CopyPasteDemoMp4} type="video/mp4" />
         </video>
       </div>
     </div>
@@ -154,10 +156,10 @@
           disableRemotePlayback
           width="640"
           height="784"
-          poster="/combined-demo-poster.jpg"
+          poster={CombinedDemoPoster}
           title="Animation showing user interacting with a widget that visualizes the effect of different benefit filing start dates."
         >
-          <source src="/combined-demo.mp4" type="video/mp4" />
+          <source src={CombinedDemoMp4} type="video/mp4" />
         </video>
       </div>
     </div>
