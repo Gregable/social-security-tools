@@ -899,7 +899,7 @@
   <h3>Explore Filing Dates</h3>
   <p>
     The following <i>interactive</i> tool visualizes how different filing dates
-    for both <RecipientName r={recipient} /> and <RecipientName r={spouse} /> affect
+    for both <RecipientName r={$recipient} /> and <RecipientName r={$spouse} /> affect
     total benefits, including the spousal benefit. Move the slider to select a filing
     date for each person and hover over the chart to see the benefit amounts for
     that date.
