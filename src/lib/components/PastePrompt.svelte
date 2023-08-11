@@ -37,14 +37,6 @@
     }
   }
   $: parsePasteContents(pasteContents);
-
-  function isMobile(): boolean {
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
-    if ("maxTouchPoints" in navigator) {
-      return navigator.maxTouchPoints > 0;
-    }
-    return false;
-  }
 </script>
 
 <div class="pastePrompt">
@@ -78,18 +70,10 @@
       >
         <source src={CopyPasteDemoMp4} type="video/mp4" />
       </video>
-      {#if isMobile()}
-        You can also copy the entire page. Either way will work.
-      {:else}
-        You can select the table by dragging your mouse over the entire table to
-        select, or you can just use 'Control+A' to select the entire page.
-        Either way will work. Copy the text with 'Control+C'.
-      {/if}
+      You can select the table by dragging over the entire table to select or you
+      can just select the entire page. Either way will work.
     </li>
-    <li>
-      Return to this page, paste the result into the text area below with
-      'Control+V'.
-    </li>
+    <li>Return to this page, paste the result into the text area below</li>
   </ol>
 
   <div class="pasteArea">
