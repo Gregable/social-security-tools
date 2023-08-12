@@ -1,6 +1,6 @@
 <script lang="ts">
   import "$lib/global.css";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { context } from "$lib/context";
   import AgeRequest from "./AgeRequest.svelte";
   import DemoData from "./DemoData.svelte";
@@ -8,15 +8,9 @@
   import PastePrompt from "./PastePrompt.svelte";
   import PasteApology from "./PasteApology.svelte";
   import SpouseQuestion from "./SpouseQuestion.svelte";
+  import RecipientName from "./RecipientName.svelte";
 
   const dispatch = createEventDispatcher();
-
-  // The flow supports data entry for two people. The first person is always
-  // "recipient", set to context.recipient. The second person is "spouse", set
-  // to context.spouse. If the user chooses to enter data for their spouse,
-  // at that time isRecipient is set to false and the flow is repeated for
-  // the spouse.
-  let isRecipient: boolean = true;
 
   // The mode of the paste flow. This is a state machine that controls
   // which component is rendered.
@@ -40,7 +34,23 @@
   }
   let mode: Mode = Mode.INITIAL;
 
+  // The flow supports data entry for two people. The first person is always
+  // "recipient", set to context.recipient. The second person is "spouse", set
+  // to context.spouse. If the user chooses to enter data for their spouse,
+  // at that time isRecipient is set to false and the flow is repeated for
+  // the spouse.
+  let isRecipient: boolean = true;
+
   let spouseName: string = "Spouse";
+
+  onMount(() => {
+    // Reset everything, especially the context.
+    mode = Mode.INITIAL;
+    isRecipient = true;
+    spouseName = "Spouse";
+    context.recipient = null;
+    context.spouse = null;
+  });
 
   /**
    * Handle the user selecting a demo record. There is no confirmation step

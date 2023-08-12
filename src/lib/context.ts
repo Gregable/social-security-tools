@@ -1,11 +1,10 @@
 /**
  * Global context for the application.
  */
-
-import {Recipient} from './recipient';
+import type {Recipient} from './recipient';
 
 class Context {
-  recipient: Recipient;
+  recipient: Recipient|null = null;
   spouse: Recipient|null = null;
 };
 
