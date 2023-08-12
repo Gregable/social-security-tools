@@ -2,6 +2,39 @@
   import "$lib/global.css";
 
   const title = "Extra rules for those born on the 1st or 2nd of the month";
+
+  function schema() {
+    let schema = {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": "https://ssa.tools/guides/1st-and-2nd-of-month",
+      },
+      headline: title,
+      image: ["https://ssa.tools/calendar.svg"],
+      datePublished: "2022-06-05T00:00:00+00:00",
+      dateModified: "2023-01-07T00:00:00+00:00",
+      author: {
+        "@type": "Person",
+        name: "Greg Grothaus",
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "SSA.Tools",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://ssa.tools/laptop-piggybank.jpg",
+        },
+      },
+    };
+    return (
+      `<script type="application/ld+json">` +
+      JSON.stringify(schema) +
+      `</` +
+      `script>`
+    );
+  }
 </script>
 
 <svelte:head>
@@ -12,34 +45,7 @@
   <title>
     {title} | SSA.tools
   </title>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/1st-and-2nd-of-month"
-    },
-    "headline": {title},
-    "image": [
-      "https://ssa.tools/calendar.svg"
-    ],
-    "datePublished": "2022-06-05T00:00:00+00:00",
-    "dateModified": "2023-01-07T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  {schema()}
 </svelte:head>
 
 <div>
