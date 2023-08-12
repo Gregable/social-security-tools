@@ -1,65 +1,42 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+  import HeroImage from "./calendar.svg";
 
   const title = "Extra rules for those born on the 1st or 2nd of the month";
+  const description =
+    "Learn more about how Social Security law is affected by the day of the month one was born in.";
+  const publishDate = new Date("2022-06-05T00:00:00+00:00");
+  const updateDate = new Date("2023-01-07T00:00:00+00:00");
 
-  function schema() {
-    let schema = {
-      "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      mainEntityOfPage: {
-        "@type": "WebPage",
-        "@id": "https://ssa.tools/guides/1st-and-2nd-of-month",
-      },
-      headline: title,
-      image: ["https://ssa.tools/calendar.svg"],
-      datePublished: "2022-06-05T00:00:00+00:00",
-      dateModified: "2023-01-07T00:00:00+00:00",
-      author: {
-        "@type": "Person",
-        name: "Greg Grothaus",
-      },
-      publisher: {
-        "@type": "Organization",
-        name: "SSA.Tools",
-        logo: {
-          "@type": "ImageObject",
-          url: "https://ssa.tools/laptop-piggybank.jpg",
-        },
-      },
-    };
-    return (
-      `<script type="application/ld+json">` +
-      JSON.stringify(schema) +
-      `</` +
-      `script>`
-    );
-  }
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/1st-and-2nd-of-month";
+  schema.title = title;
+  schema.image = HeroImage;
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="Learn more about how Social Security law is affected by the day of the month one was born in."
-  />
+  <meta name="description" content={description} />
   <title>
     {title} | SSA.tools
   </title>
-  {@html schema()}
+  {@html schema.render()}
 </svelte:head>
 
 <div>
   <h1>{title}</h1>
   <img
     class="hero"
-    src="/calendar.svg"
+    src={HeroImage}
     width="233"
     height="200"
     alt="Clipart of a calendar"
   />
 
-  <p class="postdate">Published: Jun 05, 2022</p>
-  <p class="postdate">Updated: Jan 07, 2023</p>
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
   <p>
     Social Security calculates and pays benefits <i>monthly</i>. However there
     are still several rules that are affected by the day of the month that you
@@ -191,31 +168,10 @@
       loading="lazy"
     />
   </a>
-  <br /><br /><br />
-  <p>
-    When you enter your birthdate into the <a href="/calculator"
-      >SSA.Tools Calculator</a
-    >, these rules are taken into account for you.
-  </p>
 </div>
 
 <style>
   a {
     color: #337ab7;
-  }
-  @media screen and (max-width: 420px) {
-    img.hero {
-      max-width: 20em;
-      margin: 0 2em 2em 0;
-    }
-  }
-
-  @media screen and (min-width: 421px) {
-    img.hero {
-      max-width: 20em;
-      position: relative;
-      float: left;
-      margin: 0 2em 2em 0;
-    }
   }
 </style>

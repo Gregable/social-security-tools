@@ -1,56 +1,36 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+  import HeroImage from "./covid-19.jpg";
+  import CovidAimeImage from "./covid-aime.jpg";
+  import CovidEarningsImage from "./covid-earnings.jpg";
+  import CovidPiaImage from "./covid-pia.jpg";
+  import CovidPia2Image from "./covid-pia-2.jpg";
+
+  const title = "Effect of Covid-19 on Social Security Benefits";
+  const description =
+    "Will a weak economy in 2020 result in a benefits decrease for those born in 1960?";
+  const publishDate = new Date("2020-12-01T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/1st-and-2nd-of-month";
+  schema.title = title;
+  schema.image = HeroImage;
+  schema.datePublished = publishDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="Will a weak economy in 2020 result in a
-   benefits decrease for those born in 1960?"
-  />
-  <title>Effect of Covid-19 on Social Security Benefits</title>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/covid-awi-drop"
-    },
-    "headline": "Effect of Covid-19 on Social Security Benefits",
-    "image": [
-      "https://ssa.tools/covid-19.jpg"
-     ],
-    "datePublished": "2020-12-01T00:00:00+00:00",
-    "dateModified": "2020-12-01T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
 <div>
-  <h1>
-    Will a weak economy in 2020 result in a benefits decrease for those born in
-    1960?
-  </h1>
-  <p class="postdate">Dec 1, 2020</p>
-  <img
-    class="hero"
-    src="/covid-19.jpg"
-    alt="Artist depiction of Covid-19 virus"
-  />
+  <h1>{title}</h1>
+  <img class="hero" src={HeroImage} alt="Artist depiction of Covid-19 virus" />
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
   <p>
     Reddit user <a href="https://www.reddit.com/user/jgatcomb/">jgatcomb</a>
     started an interesting thread about the
@@ -84,7 +64,7 @@
   </p>
   <p>The resulting earnings table will look like this:</p>
   <img
-    src="/covid-earnings.jpg"
+    src={CovidEarningsImage}
     style="margin: 2em auto 2em auto; display: block; border: 1px solid black"
     alt="Earnings table screenshot"
   />
@@ -95,7 +75,7 @@
     annual to monthly. The calculation is a little further down the page:
   </p>
   <img
-    src="/covid-aime.jpg"
+    src={CovidAimeImage}
     style="margin: 2em auto 2em auto; display: block; border: 1px solid black"
     alt="AIME calculation resulting in $4,375"
   />
@@ -178,7 +158,7 @@
     covid related drop:
   </p>
   <img
-    src="/covid-pia.jpg"
+    src={CovidPiaImage}
     style="margin: 2em auto 2em auto; display: block; border: 1px solid
       black"
     alt="PIA without covid, predicted at $1,977.60"
@@ -186,7 +166,7 @@
 
   <p>Next, adjust both the AIME and the bendpoints downward by 9.1%:</p>
   <img
-    src="/covid-pia-2.jpg"
+    src={CovidPia2Image}
     style="margin: 2em auto 2em auto; display: block; border: 1px solid
       black"
     alt="PIA with covid, predicted at $1,798.40"
