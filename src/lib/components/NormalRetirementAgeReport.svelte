@@ -70,8 +70,8 @@
     {/if}
 
     <p>
-      If <RName {r} suffix=" starts">you start</RName> collecting benefits at your
-      normal retirement age, <RName {r} apos>your</RName>
+      If <RName {r} suffix=" starts">you start</RName> collecting benefits at normal
+      retirement age, <RName {r} apos>your</RName>
       benefit will be the primary insurance amount, rounded down:
     </p>
     <ul>
