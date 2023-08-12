@@ -45,7 +45,7 @@
   <title>
     {title} | SSA.tools
   </title>
-  {schema()}
+  {@html schema()}
 </svelte:head>
 
 <div>
