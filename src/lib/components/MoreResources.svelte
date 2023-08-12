@@ -8,10 +8,10 @@
   <div class="text">
     <h3>Additional Guides</h3>
     <p>
-      <a href="guides">Guides</a>: Additional articles explaining some of the
-      details of Social Security, this calculator, and related topics. These
-      guides don't include interactive and personalized information, but still
-      can be very useful for understanding your benefits.
+      <a href="/guides" target="_blank">Guides</a>: Additional articles
+      explaining some of the details of Social Security, this calculator, and
+      related topics. These guides don't include interactive and personalized
+      information, but still can be very useful for understanding your benefits.
     </p>
 
     <h3>Follow for updates</h3>
