@@ -30,85 +30,90 @@
   <h2>Filing Date Selection</h2>
   <div class="text">
     <p>
-      {#if $recipient.birthdate.layBirthDayOfMonth() <= 2}
-        <RName {r}>You</RName> can begin taking benefits as early as 62 years old
-        (<b
+      <RName {r}>You</RName> can begin taking benefits as early as
+      {#if $recipient.birthdate.layBirthDayOfMonth() == 2}
+        62 years old (<b
           >{$recipient.birthdate
-            .dateAtLayAge(
+            .dateAtSsaAge(
               MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
             )
             .monthFullName()}
           {$recipient.birthdate
-            .dateAtLayAge(
+            .dateAtSsaAge(
               MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
             )
             .year()}</b
-        >), or wait until as late as 70 years old (<b
-          >{$recipient.birthdate
-            .dateAtSsaAge(
-              MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-            )
-            .monthFullName()}
-          {$recipient.birthdate
-            .dateAtSsaAge(
-              MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-            )
-            .year()}</b
-        >), or start any month in between. The longer <RName
-          r={$recipient}
-          suffix=" waits">you wait</RName
-        >, the higher the benefit will be.
+        >),
       {:else}
-        <RName {r}>You</RName> can begin taking benefits as early as 62 years and
-        1 month old (<b
+        62 years and 1 month old (<b
           >{$recipient.birthdate
-            .dateAtLayAge(
+            .dateAtSsaAge(
               MonthDuration.initFromYearsMonths({ years: 62, months: 1 })
             )
             .monthFullName()}
           {$recipient.birthdate
-            .dateAtLayAge(
+            .dateAtSsaAge(
               MonthDuration.initFromYearsMonths({ years: 62, months: 1 })
             )
             .year()}</b
-        >), or wait until as late as 70 years old (<b
-          >{$recipient.birthdate
-            .dateAtSsaAge(
-              MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-            )
-            .monthFullName()}
-          {$recipient.birthdate
-            .dateAtSsaAge(
-              MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-            )
-            .year()}</b
-        >), or start any month in between. The longer <RName {r} suffix=" waits"
-          >you wait</RName
-        >, the higher the benefit will be.
+        >),
       {/if}
+      wait until as late as 70 years old (<b
+        >{$recipient.birthdate
+          .dateAtSsaAge(
+            MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+          )
+          .monthFullName()}
+        {$recipient.birthdate
+          .dateAtSsaAge(
+            MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+          )
+          .year()}</b
+      >), or start any month in between. The longer <RName
+        r={$recipient}
+        suffix=" waits">you wait</RName
+      >, the higher the benefit will be.
     </p>
 
-    {#if $recipient.birthdate.layBirthDayOfMonth() > 2}
+    {#if $recipient.birthdate.layBirthDayOfMonth() != 2}
       <div class="insetTextBox">
         <h4>Special Rule</h4>
         <p>
-          You may find it oddly specific that the start date is offset by 1
-          month from one's birthdate. Benefit eligibility is calculated based on
-          the first month that one is a particular age throughout the <u
-            >entire</u
-          >
-          month. For most, this is the month <i>after</i> their birthdate.
+          You may find it oddly specific that the earliest start date is offset
+          by 1 month from one's birthdate (62 years and 1 month). You first
+          become eligible for benefits in the month that you are 62 years old
+          throughout the <u>entire</u>
+          month. For most, this is the month
+          <i>after</i>
+          attaining age 62.
         </p>
         <p>
-          For example, the first month that <RName {r} suffix=" is"
-            >you are</RName
-          >
-          <b>{exampleAge.age}</b>
-          throughout the <u>entire</u> month is
-          <b
-            >{followingMonth.monthFullName()}
-            {followingMonth.year()}</b
-          >.
+          {#if $recipient.birthdate.layBirthDayOfMonth() == 1}
+            For example, <RName {r} suffix=" was">you were</RName> born on
+            <b>{$recipient.birthdate.layBirthdateString()}</b>. <RName
+              {r}
+              suffix=" attains">You attain</RName
+            > age <b>{exampleAge.age}</b>
+            on <b>{exampleAge.month} {exampleAge.day}, {exampleAge.year}</b>
+            so the first month that <RName {r} suffix=" is">you are</RName>
+            <b>{exampleAge.age}</b>
+            throughout the <u>entire</u> month is
+            <b
+              >{followingMonth.monthFullName()}
+              {followingMonth.year()}</b
+            >.
+          {:else}
+            For example, <RName {r} suffix=" was">you were</RName> born on
+            <b>{$recipient.birthdate.layBirthdateString()}</b>, so the first
+            month that <RName {r} suffix=" is">you are</RName>
+            <b>{exampleAge.age}</b>
+            throughout the <u>entire</u> month is
+            <b
+              >{followingMonth.monthFullName()}
+              {followingMonth.year()}</b
+            >.
+          {/if}
+          <a href="/guides/1st-and-2nd-of-month/" target="_blank">Learn More</a>
         </p>
       </div>
     {/if}

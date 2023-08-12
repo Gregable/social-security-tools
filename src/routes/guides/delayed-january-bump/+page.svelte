@@ -112,6 +112,28 @@
     applied in January, but in addition to this rule.
   </p>
 
+  <h2>ssa.gov reference</h2>
+  <p>
+    <a
+      href="https://www.ssa.gov/benefits/retirement/planner/delayret.html"
+      target="_blank">ssa.gov</a
+    > has this to say about delayed credits:
+  </p>
+  <blockquote>
+    <p>
+      If you retire before age 70, some of your delayed retirement credits will
+      not be applied until the January after you start receiving benefits.
+    </p>
+    <p>
+      For example, if you reach your full retirement age (67) in June, you may
+      plan to wait until your 69th birthday to start your retirement benefits.
+      Your initial benefit amount will reflect delayed retirement credits earned
+      from your full retirement age through the year before your 69th birthday.
+      In January of the following calendar year, your benefit will increase for
+      the credits earned in the year of your 69th birthday.
+    </p>
+  </blockquote>
+
   <div id="homelink" style="display: flex; justify-content: center">
     <div>
       <h1>Try SSA.tools to see your personalized benefit</h1>

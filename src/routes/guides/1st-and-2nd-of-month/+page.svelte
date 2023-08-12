@@ -64,9 +64,9 @@
     <div style="clear: both;" />
     <h2>Eligibility</h2>
     <p>
-      Eligibility rules have to do with what month you are first eligible to
-      recieve social security benefits. There are a couple rules that interact
-      with the day of the month:
+      Eligibility rules have to do with what is the earliest month you are first
+      eligible to recieve social security benefits. There are a couple rules
+      that interact with the day of the month:
     </p>
     <ol>
       <li>
@@ -101,6 +101,41 @@
     Some resources will tell you that the first month you can begin benefits is 62
     + 1 month. The third example above shows where this comes from, but it doesn't
     apply if you were born on the 1st or 2nd of a month.
+
+    <h2>Normal Retirement Age</h2>
+    <p>
+      Also known as <u>Full Retirement Age</u>. This is the age at which if you
+      file to start benefits, you benefit will equal your Primary Insurance
+      Amount with no reductions from starting early or delayed credit increases
+      for delaying benefits. Normal Retirement Age varies by year of birth.
+      Currently anyone born in 1960 or later has a Normal Retirement Age of 67.
+    </p>
+    <p>
+      The month of your normal retirement age is the month that you attain that
+      age. Just like eligbility, Social Security is based on English Common Law
+      which states that you "attain" a particular age on the day before your
+      birthday. So, if you are born on May 1, you will attain age 67 on April
+      30.
+    </p>
+    <p>
+      Unlike eligbility though, you don't need to be 67 for the entire month for
+      that month to be your Normal Retirement Age.
+    </p>
+    <p>Let's illustrate with the same three example birthdays:</p>
+    <ul>
+      <li>
+        <b>May 1, 1960</b>: Attained 67 on April 30, 2027. Normal Retirement Age
+        is <b>April</b>, 2027.
+      </li>
+      <li>
+        <b>May 2, 1960</b>: Attained 67 on May 1, 2027. Normal Retirement Age is
+        <b>May</b>, 2027.
+      </li>
+      <li>
+        <b>May 3, 1960</b>: Attained 67 on May 2, 2027. Normal Retirement Age is
+        <b>May</b>, 2027.
+      </li>
+    </ul>
 
     <h2>Benefit Payment Date</h2>
     In most cases, the date of payment is also based on the day of the month you
