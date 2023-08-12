@@ -57,7 +57,8 @@
         <p>
           The month you reach specific ages may seem "off by one" from what you
           entered. Social Security follows English common law that finds that a
-          person "attains" an age on the day before their birthdate. Because
+          person "attains" an age on the day before their birthdate. For
+          example, because
           <RName {r} suffix=" was">you were</RName>
           born on the first of the month, this means that <RName
             {r}
@@ -65,6 +66,7 @@
           > age
           <b>{exampleAge.age}</b> on
           <b>{exampleAge.month} {exampleAge.day}, {exampleAge.year}</b>.
+          <a href="/guides/1st-and-2nd-of-month/" target="_blank">Learn More</a>
         </p>
       </div>
     {/if}
