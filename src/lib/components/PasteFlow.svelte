@@ -153,11 +153,19 @@
       <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
     {/if}
   {:else if mode === Mode.PASTE_CONFIRMATION}
-    <PasteConfirm
-      on:confirm={handleConfirm}
-      on:decline={handleDecline}
-      earningsRecords={context.recipient.earningsRecords}
-    />
+    {#if isRecipient}
+      <PasteConfirm
+        on:confirm={handleConfirm}
+        on:decline={handleDecline}
+        earningsRecords={context.recipient.earningsRecords}
+      />
+    {:else}
+      <PasteConfirm
+        on:confirm={handleConfirm}
+        on:decline={handleDecline}
+        earningsRecords={context.spouse.earningsRecords}
+      />
+    {/if}
   {:else if mode === Mode.PASTE_APOLOGY}
     <PasteApology on:reset={handleReset} />
   {:else if mode === Mode.AGE_REQUEST}
