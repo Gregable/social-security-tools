@@ -76,7 +76,7 @@
             <RecipientName r={context.spouse} noColor />
           </h1>
           <SidebarSection label="Earnings Report">
-            <EarningsReport recipient={context.recipient} />
+            <EarningsReport recipient={context.spouse} />
           </SidebarSection>
           <SidebarSection label="Benefits Eligibility">
             <EligibilityReport recipient={context.spouse} />
