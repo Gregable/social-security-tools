@@ -1,9 +1,9 @@
-import {Birthdate} from './birthday';
-import * as constants from './constants';
-import {EarningRecord} from './earning-record';
-import {Money} from './money';
-import {MonthDate, MonthDuration} from './month-time';
-import {PrimaryInsuranceAmount} from './pia';
+import {Birthdate} from '$lib/birthday';
+import * as constants from '$lib/constants';
+import {EarningRecord} from '$lib/earning-record';
+import {Money} from '$lib/money';
+import {MonthDate, MonthDuration} from '$lib/month-time';
+import {PrimaryInsuranceAmount} from '$lib/pia';
 
 export class RecipientColors {
   constructor(dark: string, medium: string, light: string) {
