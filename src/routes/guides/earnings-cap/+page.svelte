@@ -1,46 +1,31 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
 
-  import Header from "$lib/components/Header.svelte";
+  const title = "Extra rules for those born on the 1st or 2nd of the month";
+  const description = "How do Social Security annual earnings caps work?";
+  const publishDate = new Date("2020-11-28T00:00:00+00:00");
+  const updateDate = new Date("2023-08-08T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/1st-and-2nd-of-month";
+  schema.title = "Social Security Earnings Caps";
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="How do Social Security annual earnings caps work?"
-  />
-  <title>Social Security Earnings Caps</title>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/earnings-cap"
-    },
-    "headline": "Article headline",
-    "datePublished": "2020-11-28T00:00:00+00:00",
-    "dateModified": "2020-11-28T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-      "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
-<Header active="Guides" />
-<main>
-  <h1>Earnings Caps by year</h1>
-  <p class="postdate">August 8, 2023</p>
+<div>
+  <h1>{title}</h1>
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
   <p>
     There is an annual limit on the amount of personal earnings that subject to
     payroll, or Social Security tax. Above that amount, payroll taxes are no
@@ -362,60 +347,18 @@
       [ssa.gov]
     </li>
   </ul>
-
-  <div id="homelink" style="display: flex; justify-content: center">
-    <div>
-      <h1>Try SSA.tools to see your personalized maximum</h1>
-      <span style="font-size: 16px;">
-        <p>
-          Look at your personal benefit data find out how it will compare to
-          these maximums.
-        </p>
-        <p>Ask other 'What If?' questions. The tool is absolutely free.</p>
-        <p style="text-align: center">
-          <a class="bigbtn" href="/calculator" role="button">Get Started</a>
-        </p>
-      </span>
-    </div>
-  </div>
-</main>
+</div>
 
 <style>
   a {
     color: #337ab7;
   }
-  main {
-    max-width: 1080px;
-    margin: 0 auto;
-  }
-
-  a.bigbtn {
-    background-color: #5cb85c;
-    border-color: #4cae4c;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    color: #fff;
-    white-space: nowrap;
-    padding: 14px 24px;
-    font-weight: 400;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 2rem;
-  }
-
-  a.bigbtn:hover {
-    background-color: #449d44;
-    border-color: #398439;
-  }
-
   .css-column {
     column-count: 4;
     width: 90%;
     column-rule: 1px solid lightblue;
     margin: 2em;
   }
-
   .css-column span {
     margin-right: 1.5em;
     margin-left: 1.5em;

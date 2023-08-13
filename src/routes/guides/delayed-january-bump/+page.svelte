@@ -1,55 +1,34 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+  import HeroImage from "./delayed-bump.png";
 
-  import Header from "$lib/components/Header.svelte";
+  const title = "Bump in delayed Social Security benefits after January";
+  const description =
+    "For those starting benefits after Normal Retirement Age, there is a small delay in some of the delayed credits until the following January.";
+  const publishDate = new Date("2023-12-29T00:00:00+00:00");
+  const updateDate = new Date("2023-04-29T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/delayed-january-bump";
+  schema.title = title;
+  schema.image = HeroImage;
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="For those starting benefits after Normal Retirement Age, there is a
-  small delay in some of the delayed credits until the following January."
-  />
+  <meta name="description" content={description} />
   <title>
-    Bump in delayed Social Security benefits after January - ssa.tools
+    {title} | SSA.tools
   </title>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/delayed-january-bump"
-    },
-    "headline": "Article headline",
-    "image": {
-      @type: "ImageObject",
-      "url": "https://ssa.tools/delayed-bump.png",
-      "width": 285,
-      "height": 508
-     ],
-    "datePublished": "2023-12-29T00:00:00+00:00",
-    "dateModified": "2023-04-29T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  {@html schema.render()}
 </svelte:head>
 
-<Header active="Guides" />
-<main>
-  <h1>Bump in delayed Social Security benefits after January</h1>
-  <p class="postdate">Apr 29, 2023</p>
+<div>
+  <h1>{title}</h1>
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
 
   <p>
     When using the ssa.tools calculator, you may have noticed a small notch or
@@ -60,7 +39,7 @@
   </p>
 
   <img
-    src="/delayed-bump.png"
+    src={HeroImage}
     width="285"
     height="503"
     style="margin: 40px 40px 40px 40px; display: block; border: 1px solid"
@@ -133,49 +112,10 @@
       the credits earned in the year of your 69th birthday.
     </p>
   </blockquote>
-
-  <div id="homelink" style="display: flex; justify-content: center">
-    <div>
-      <h1>Try SSA.tools to see your personalized benefit</h1>
-      <span style="font-size: 16px;">
-        <p>
-          See your personal benefit data and ask 'What If?' Questions. The tool
-          is 100% free.
-        </p>
-        <p style="text-align: center">
-          <a class="bigbtn" href="/calculator" role="button">Get Started</a>
-        </p>
-      </span>
-    </div>
-  </div>
-</main>
+</div>
 
 <style>
   a {
     color: #337ab7;
-  }
-  main {
-    max-width: 1080px;
-    margin: 0 auto;
-  }
-
-  a.bigbtn {
-    background-color: #5cb85c;
-    border-color: #4cae4c;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    color: #fff;
-    white-space: nowrap;
-    padding: 14px 24px;
-    font-weight: 400;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 2rem;
-  }
-
-  a.bigbtn:hover {
-    background-color: #449d44;
-    border-color: #398439;
   }
 </style>

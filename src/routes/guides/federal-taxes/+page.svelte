@@ -1,56 +1,36 @@
 <script lang="ts">
-  import "$lib/global.css";
-
   import Header from "$lib/components/Header.svelte";
+  import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+  import HeroImage from "./taxes.jpg";
+
+  const title = "Federal Taxation of Social Security Benefits";
+  const description =
+    "A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI.";
+  const publishDate = new Date("2022-12-04T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/federal-taxes";
+  schema.title = title;
+  schema.image = HeroImage;
+  schema.datePublished = publishDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI."
-  />
-  <title>Federal Taxation of Social Security Benefits</title>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/federal-taxes"
-    },
-    "headline": "Article headline",
-    "image": {
-      @type: "ImageObject",
-      "url": "https://ssa.tools/taxes.jpg",
-      "width": 1024,
-      "height": 605
-     ],
-    "datePublished": "2022-12-04T00:00:00+00:00",
-    "dateModified": "2022-12-04T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
-<Header active="Guides" />
-<main>
-  <h1>Federal Taxation of Social Security Benefits</h1>
-  <p class="postdate">Dec 4, 2022</p>
+<div>
+  <h1>{title}</h1>
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
   <img
-    src="/taxes.jpg"
+    src={HeroImage}
+    class="hero"
     width="512"
     height="302"
     style="margin: 40px auto 40px auto; display: block;"
@@ -155,7 +135,8 @@
     income tax. This can include interest earned on certain types of
     investments, such as municipal bonds, as well as interest income from
     certain life insurance policies. Non-taxable interest is reported on on line
-    2a of <a href="https://www.irs.gov/pub/irs-pdf/f1040.pdf">Form 1040</a>.
+    2a of
+    <a href="https://www.irs.gov/pub/irs-pdf/f1040.pdf">Form 1040</a>.
     Tax-exempt interest is not added to Adjusted Gross Income (AGI), but it will
     be added back in for the purposes of computing the taxable percentage of
     Social Security Benefits.
@@ -269,49 +250,10 @@
     consult with a tax professional or the Social Security Administration for
     more information and assistance.
   </p>
-
-  <div id="homelink" style="display: flex; justify-content: center">
-    <div>
-      <h1>Try SSA.tools to see your personalized benefit</h1>
-      <span style="font-size: 16px;">
-        <p>
-          See your personal benefit data and ask 'What If?' Questions. The tool
-          is absolutely free.
-        </p>
-        <p style="text-align: center">
-          <a class="bigbtn" href="/calculator" role="button">Get Started</a>
-        </p>
-      </span>
-    </div>
-  </div>
-</main>
+</div>
 
 <style>
   a {
     color: #337ab7;
-  }
-  main {
-    max-width: 1080px;
-    margin: 0 auto;
-  }
-
-  a.bigbtn {
-    background-color: #5cb85c;
-    border-color: #4cae4c;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    color: #fff;
-    white-space: nowrap;
-    padding: 14px 24px;
-    font-weight: 400;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 2rem;
-  }
-
-  a.bigbtn:hover {
-    background-color: #449d44;
-    border-color: #398439;
   }
 </style>
