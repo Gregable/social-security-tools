@@ -1,3 +1,4 @@
+import * as constants from './constants';
 import {EarningRecord} from './earning-record';
 import {Money} from './money';
 
@@ -16,6 +17,105 @@ export function dollarStringToMoney(dollarString: string): Money {
   if (isNaN(value)) return Money.from(0);
   if (value < 0) return Money.from(0);
   return Money.from(value);
+};
+
+/**
+ * Identifies the table format used in PDF Social Security statements.
+ * See: https://github.com/Gregable/social-security-tools/issues/214
+ */
+function isPdfPaste(lines: string[]): boolean {
+  const lineMatch = new RegExp('[12][0-9]{3}-[12][0-9]{3}', 'g')
+  for (let i = 0; i < lines.length; ++i) {
+    const line: string = lines[i];
+    const columns: Array<string> = line.split(' ');
+    // Looking for a line like "1991 - 2000":
+    if (columns.length == 3 && lineMatch.test(columns[0])) {
+      const years: Array<string> = columns[0].split('-');
+      let startYear = parseInt(years[0], 10);
+      let endYear = parseInt(years[1], 10);
+      if (!isNaN(startYear) && !isNaN(endYear) && startYear >= 1966 &&
+          endYear >= 1966 && startYear <= constants.CURRENT_YEAR &&
+          endYear <= constants.CURRENT_YEAR) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Parses the table format used in PDF Social Security statements.
+ * See: https://github.com/Gregable/social-security-tools/issues/214
+ */
+function parseSsaPdfTable(lines: string[]): Array<EarningRecord> {
+  const lineMatch = new RegExp('[12][0-9]{3}-[12][0-9]{3}')
+  let earningsRecords: Array<EarningRecord> = [];
+  let i = 0;
+  for (; i < lines.length; ++i) {
+    let line: string = lines[i];
+    let columns: Array<string> = line.split(' ');
+
+    if (columns.length == 3 && lineMatch.test(columns[0])) {
+      break;
+    }
+  }
+
+  for (; i < lines.length; ++i) {
+    let line: string = lines[i];
+    let columns: Array<string> = line.split(' ');
+    if (columns.length != 3 || !lineMatch.test(columns[0])) break;
+
+    // Col 1: '1991-2000'
+    const years: Array<string> = columns[0].split('-');
+    let startYear = parseInt(years[0], 10);
+    let endYear = parseInt(years[1], 10);
+    if (isNaN(startYear) || isNaN(endYear) || startYear < 1966 ||
+        endYear < 1966 || startYear > constants.CURRENT_YEAR ||
+        endYear > constants.CURRENT_YEAR)
+      return earningsRecords;
+    let numYears = endYear - startYear + 1;
+
+
+    // Col 2: $5,000
+    let taxedEarnings = dollarStringToMoney(columns[1]).div(numYears);
+
+    // Line 3: $5,000
+    let taxedMedicareEarnings = dollarStringToMoney(columns[2]).div(numYears);
+
+    for (let j = startYear; j <= endYear; ++j) {
+      let record = new EarningRecord({
+        year: j,
+        taxedEarnings: taxedEarnings,
+        taxedMedicareEarnings: taxedMedicareEarnings,
+      });
+      earningsRecords.push(record);
+    }
+  }
+
+  for (; i < lines.length; ++i) {
+    let line: string = lines[i];
+    let columns: Array<string> = line.split(' ');
+    if (columns.length != 3) break;
+
+    // Col 1: "2006"
+    let year = parseInt(columns[0], 10);
+    if (isNaN(year) || year < 1966 || year > constants.CURRENT_YEAR) break;
+
+    // Co. 2: $5,000
+    let taxedEarnings = dollarStringToMoney(columns[1]);
+
+    // Col 3: $5,000
+    let taxedMedicareEarnings = dollarStringToMoney(columns[2]);
+
+    let record = new EarningRecord({
+      year: year,
+      taxedEarnings: taxedEarnings,
+      taxedMedicareEarnings: taxedMedicareEarnings,
+    });
+    earningsRecords.push(record);
+  }
+
+  return earningsRecords;
 };
 
 /**
@@ -143,6 +243,14 @@ export function parsePaste(paste: string): Array<EarningRecord> {
   // Split based on newlines.
   let lines: string[] = replacedStr.split('\n');
 
+  if (isPdfPaste(lines)) {
+    let out = parseSsaPdfTable(lines);
+    out.sort(function(a, b) {
+      return a.year - b.year
+    });
+    return out;
+  }
+
   // All valid lines will start with a year indicator.
   let earningsLines: string[] = [];
   for (let i = 0; i < lines.length; ++i) {
@@ -197,15 +305,22 @@ export function parsePaste(paste: string): Array<EarningRecord> {
   }
   // User formatted input looks like:
   //   1974 $500
-  if (firstLineColumns.length === 2) {
+  else if (firstLineColumns.length === 2) {
     out = parseFormattedTable(earningsLines);
   }
   // The table that this tool produces has lines that look like:
   //   1974 24 $500 x 5.19 = $2,595 Top 35 Value
-  if (firstLineColumns.length >= 7 && firstLineColumns[3] === 'x' &&
+  else if (
+      firstLineColumns.length >= 7 && firstLineColumns[3] === 'x' &&
       firstLineColumns[5] === '=') {
     out = parseThisSiteTable(earningsLines);
   }
+  // Nothing to lose at this point, let's try guessing that the first two
+  // columns are year and earnings, and the rest are garbage.
+  else if (firstLineColumns.length > 3) {
+    out = parseFormattedTable(earningsLines);
+  }
+
 
   // SSA's tables display years in reverse chronological order which makes
   // sense for display, but is not what code usually expects, so we sort

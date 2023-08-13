@@ -17,8 +17,10 @@
   import { createEventDispatcher } from "svelte";
   import { parsePaste } from "$lib/ssa-parse";
   import { Recipient } from "$lib/recipient";
+  import Expando from "$lib/components/Expando.svelte";
   import CopyPasteDemoMp4 from "$lib/videos/copy-paste-demo.mp4";
   import CopyPasteDemoPoster from "$lib/videos/copy-paste-demo-poster.jpg";
+  import EarningsRecordLinkImage from "$lib/images/earnings-record-link.png";
 
   const dispatch = createEventDispatcher();
 
@@ -46,19 +48,31 @@
       Sign in to
       <a target="_blank" href="https://secure.ssa.gov/RIL/SiView.action"
         >ssa.gov</a
-      >. You may need to create an account if you haven't already.
+      >. You may need to create an account.
     </li>
     <li>
-      In the section "Eligibility and Earnings", click the link labelled "Review
-      your full earnings record now". If you cannot find the link, click <a
+      In the section <span class="referenceText"
+        >"Eligibility and Earnings"</span
+      >, click the link
+      <span class="referenceText">"Review your full earnings record now"</span>.
+      If you cannot find it, click
+      <a
         href="https://secure.ssa.gov/ec2/eligibility-earnings-ui/earnings-record"
-        >this link</a
+        target="_blank">this link</a
       >
       after signing in.
+      <Expando collapsedText="Show me what it looks like" expandedText="Hide">
+        <img
+          src={EarningsRecordLinkImage}
+          alt="Screenshot of the link to the earnings record on ssa.gov."
+          width="991"
+          height="568"
+          class="fit-image"
+        />
+      </Expando>
     </li>
     <li>
-      Copy the "Earnings Record" table. It should look similar to the example
-      below, with different numbers and years.
+      Copy the Earnings Record table.
       <video
         autoplay
         playsinline
@@ -70,10 +84,10 @@
       >
         <source src={CopyPasteDemoMp4} type="video/mp4" />
       </video>
-      You can select the table by dragging over the entire table to select or you
-      can just select the entire page. Either way will work.
+      Select the table by clicking and dragging or just select the entire page. Either
+      way will work.
     </li>
-    <li>Return to this page, paste the result into the text area below</li>
+    <li>Return here, paste the result into the text area below:</li>
   </ol>
 
   <div class="pasteArea">
@@ -102,6 +116,13 @@
   .pastePrompt {
     margin: auto;
     max-width: min(660px, 80%);
+  }
+  .referenceText {
+    font-family: "Times New Roman", serif;
+  }
+  .fit-image {
+    width: 100%;
+    height: auto;
   }
   ol {
     padding-inline-start: 5%;

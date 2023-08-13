@@ -100,7 +100,7 @@
 <style>
   section {
     position: relative;
-    margin-bottom: 20px;
+    margin: 10px 0 20px 0;
   }
   /* Hide the checkbox, this is only used as a toggle state. */
   input {
