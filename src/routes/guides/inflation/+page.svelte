@@ -1,46 +1,31 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+  import EarningsRecordExampleImage from "./example-earnings-record-simplified.jpg";
+
+  const title = "Social Security and Inflation";
+  const description =
+    "Learn how two different types of inflation, wage increase and consumer price index, each interact to affect your social security benefit.";
+  const publishDate = new Date("2018-11-23T00:00:00+00:00");
+  const updateDate = new Date("2020-07-19T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/inflation";
+  schema.title = title;
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="How do various measures of inflation affect
-  the calculation of social security benefits in retirement?"
-  />
-  <title>Social Security Inflation Calculator</title>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/inflation"
-    },
-    "headline": "Article headline",
-    "image": [
-      "https://ssa.tools/example-earnings-record-simplified.jpg",
-     ],
-    "datePublished": "2018-11-23T00:00:00+00:00",
-    "dateModified": "2020-07-19T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
 <div>
+  <h1>{title}</h1>
   <h1>How inflation rate affects Social Security benefit calculations.</h1>
   <p class="postdate">November 23, 2018</p>
   <p>
@@ -72,7 +57,7 @@
   <h2>Wage Growth Adjustments during your working years</h2>
   <p>Consider the following example earnings record from 2005 to 2017:</p>
   <img
-    src="/example-earnings-record-simplified.jpg"
+    src={EarningsRecordExampleImage}
     style="margin: auto; display: block"
     alt="Example earnings record"
   />

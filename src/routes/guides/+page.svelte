@@ -101,7 +101,7 @@
     <li>
       <span class="postdate">Nov 28, 2020</span>
       <h3 class="posttitle">
-        <a href="./earnings-cap"> Earnings Cap </a>
+        <a href="./earnings-cap">Earnings Caps</a>
       </h3>
       <p class="justify">How do Social Security annual earnings caps work?</p>
     </li>
@@ -109,7 +109,7 @@
     <li>
       <span class="postdate">Aug 3, 2019</span>
       <h3 class="posttitle">
-        <a href="./maximum"> Maximum Benefits </a>
+        <a href="./maximum">Maximum Benefits </a>
       </h3>
       <p class="justify">
         What is the maximum possible Social Security benefit that someone can
@@ -119,7 +119,7 @@
     <li>
       <span class="postdate">Nov 23, 2018</span>
       <h3 class="posttitle">
-        <a href="./inflation"> Social Security and Inflation </a>
+        <a href="./inflation">Social Security and Inflation </a>
       </h3>
       <p class="justify">
         Learn how two different types of inflation, wage increase and consumer

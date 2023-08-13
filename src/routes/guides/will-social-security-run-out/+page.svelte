@@ -1,43 +1,29 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+
+  const title = "Will Social Security run out?";
+  const description =
+    "And what happens if it does? Learn more about the Social Security Trust Fund, how it's slowly running out, and how what happens next could affect your benefits.";
+  const publishDate = new Date("2023-08-11T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/will-social-security-run-out";
+  schema.title = title;
+  schema.datePublished = publishDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="What happens if Social Security runs out of money?"
-  />
-  <title>Will Social Security run out and what happens next | SSA.tools</title>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/will-social-security-run-out"
-    },
-    "headline": "Will Social Security run out and what happens next?",
-    "datePublished": "2023-08-11T00:00:00+00:00",
-    "dateModified": "2023-08-11T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
 <div>
-  <h1>Will Social Security run out and what happens next?</h1>
-  <p class="postdate">Published: Aug 11, 2023</p>
+  <h1>{title}</h1>
+
   <h2>Running out of money</h2>
   <p>
     You may have heard that the Social Security program is running out of money.
@@ -53,7 +39,7 @@
   <p>
     Once the surplus runs out, the program will still be collecting money, and
     those collections will cover all but 26% of the current payments. So, if
-    nothing changes by 2035, the calculated benefit may be be reduced by 26%,
+    nothing changes by 2034, the calculated benefit may be be reduced by 26%,
     but the payments will still continue. This is probably the 'worst case'
     scenario.
   </p>

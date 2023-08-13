@@ -1,48 +1,28 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+
+  const title = "Social Security International Agreements";
+  const description = "How does working abroad affect social security?";
+  const publishDate = new Date("2022-06-26T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/international-agreements";
+  schema.title = title;
+  schema.datePublished = publishDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="How does working abroad affect social
-  security?"
-  />
-  <title>Social Security International Agreements</title>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/international-agreements"
-    },
-    "headline": "Article headline",
-    "image": [
-      "https://ssa.tools/handshake.svg",
-     ],
-    "datePublished": "2022-06-26T00:00:00+00:00",
-    "dateModified": "2022-06-26T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
 <div>
-  <h1>Social Security International Agreements</h1>
-  <p class="postdate">June 26, 2022</p>
+  <h1>{title}</h1>
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
   <p>
     SSA.tools calculates social security benefits based on a person's earnings
     record, copy/pasted from ssa.gov. In cases of work abroad, this record may

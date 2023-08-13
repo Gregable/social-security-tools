@@ -1,46 +1,29 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+
+  const title = "Social Security Indexing Factors";
+  const description =
+    "Why use the current year's indexing factors for someone younger than 62?";
+  const publishDate = new Date("2020-12-28T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/indexing-factors";
+  schema.title = title;
+  schema.datePublished = publishDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="Why use the current year's indexing factors for someone younger than 62?"
-  />
-  <title>Social Security Indexing Factors | SSA.tools</title>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/indexing-factors"
-    },
-    "headline": "Article headline",
-    "datePublished": "2020-12-28T00:00:00+00:00",
-    "dateModified": "2020-12-28T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-     "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
 <div>
-  <h1>
-    Why use the current year's indexing factors for someone younger than 62?
-  </h1>
-  <p class="postdate">December 28, 2020</p>
+  <h1>{title}</h1>
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
   <p>
     Yesterday, Josh Scandlen posted a <a
       href="https://www.youtube.com/watch?v=JZXymvFm8uw&t=78s">YouTube video</a

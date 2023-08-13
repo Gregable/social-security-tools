@@ -1,45 +1,31 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { GuidesSchema } from "$lib/schema-org";
+
+  const title = "Social Security Maximum";
+  const description =
+    "What is the maximum monthly social security benefit that someone can reach, and what does it take to reach this maximum?";
+  const publishDate = new Date("2019-08-03T00:00:00+00:00");
+  const updateDate = new Date("2023-06-05T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/maximum";
+  schema.title = title;
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
 </script>
 
 <svelte:head>
-  <meta
-    name="description"
-    content="What is the maximum monthly social security
-  benefit that someone can reach, and what does it take to reach this maximum?"
-  />
-  <title>Social Security Maximum</title>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://ssa.tools/guides/maximum"
-    },
-    "headline": "Article headline",
-    "datePublished": "2019-08-03T00:00:00+00:00",
-    "dateModified": "2022-06-05T00:00:00+00:00",
-    "author": {
-      "@type": "Person",
-      "name": "Greg Grothaus"
-    },
-      "publisher": {
-      "@type": "Organization",
-      "name": "SSA.Tools",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://ssa.tools/laptop-piggybank.jpg"
-      }
-    }
-  }
-  </script>
+  <meta name="description" content={description} />
+  <title>
+    {title} | SSA.tools
+  </title>
+  {@html schema.render()}
 </svelte:head>
 
 <div>
-  <h1>Maximum possible Social Security benefit in 2023</h1>
-  <p class="postdate">August 8, 2023</p>
+  <h1>{title}</h1>
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
   <p>
     Few people will receive the maximum possible benefit, but how high is the
     maximum? The short answer is that the maximum monthly Social Security
