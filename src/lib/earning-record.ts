@@ -1,5 +1,5 @@
-import * as constants from './constants'
-import {Money} from './money';
+import * as constants from '$lib/constants'
+import {Money} from '$lib/money';
 
 /**
  * EarningRecord class
