@@ -35,6 +35,61 @@ describe('parsePaste', () => {
     parsePasteExpect(parsePaste(pasteData));
   });
 
+  it('Parses unknown 3-column format', () => {
+    // If the fist two columns are year and earnings, we might be able to
+    // parse it ignoring the other columns.
+    let pasteData =
+        '2018 $100,000 garbage\n2017 $90,000 garbage\n2016 $80,000 garbage';
+    parsePasteExpect(parsePaste(pasteData));
+  });
+
+  it('Parses unknown 4-column format', () => {
+    // If the fist two columns are year and earnings, we might be able to
+    // parse it ignoring the other columns.
+    let pasteData =
+        ('2018 $100,000 garbage garbage\n' +
+         '2017 $90,000 garbage garbage\n' +
+         '2016 $80,000 garbage garbage');
+    parsePasteExpect(parsePaste(pasteData));
+  });
+
+  it('Parses data from ssa.gov pdf statement', () => {
+    let pasteData =
+        ('Work Year\n' +
+         'Earnings Taxed for Social Security\n' +
+         'Earnings Taxed for Medicare (began 1966)\n' +
+         '1966-1980 $15,000 $15,000\n' +
+         '1981-1990 $100,000 $100,000\n' +
+         '1991-2000 $200,000 $200,000\n' +
+         '2001-2005 $300,000 $300,000\n' +
+         '2006 $40,000 $40,000');
+    let parsed = parsePaste(pasteData);
+    expect(parsed.length).toBe(41);
+    let j = 0;
+    for (let i = 1966; i <= 1980; i++) {
+      expect(parsed[j].year).toBe(i);
+      expect(parsed[j].taxedEarnings.value()).toBe(1000);
+      j++;
+    }
+    for (let i = 1981; i <= 1990; i++) {
+      expect(parsed[j].year).toBe(i);
+      expect(parsed[j].taxedEarnings.value()).toBe(10000);
+      j++;
+    }
+    for (let i = 1991; i <= 2000; i++) {
+      expect(parsed[j].year).toBe(i);
+      expect(parsed[j].taxedEarnings.value()).toBe(20000);
+      j++;
+    }
+    for (let i = 2001; i <= 2005; i++) {
+      expect(parsed[j].year).toBe(i);
+      expect(parsed[j].taxedEarnings.value()).toBe(60000);
+      j++;
+    }
+    expect(parsed[j].year).toBe(2006);
+    expect(parsed[j].taxedEarnings.value()).toBe(40000);
+  });
+
   it('Parses ssa.tools own formatted table', () => {
     let pasteData =
         ('Year\tAge\tTaxed Earnings\t\tMultiplier\tIndexed Earnings\t\t\n' +
