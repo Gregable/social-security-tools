@@ -56,7 +56,11 @@ p {
   }
 
   * {
-    transition: none !important
+    transition: none !important;
+    /* Disabling background graphics in print (default) breaks some
+       of the UI elements. This forces them back on. */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 

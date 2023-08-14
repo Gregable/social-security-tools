@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, createEventDispatcher } from "svelte";
+  import { afterUpdate, createEventDispatcher, onMount } from "svelte";
 
   let sliderEl: HTMLDivElement;
   let handleEl: HTMLSpanElement;
@@ -113,6 +113,25 @@
   let innerWidth: number = window.innerWidth;
   let width: number = 0;
   $: width = getWidth(innerWidth, sliderEl);
+
+  // Similarly, we want to bind to print events so we resize correctly for those
+  // too:
+  let media_query_list: MediaQueryList;
+  function onPrintMediaChange() {
+    width = getWidth(innerWidth, sliderEl);
+  }
+  function removeMediaQueryListener() {
+    if (media_query_list) {
+      media_query_list.removeEventListener("change", onPrintMediaChange);
+    }
+  }
+  onMount(() => {
+    media_query_list = window.matchMedia("print");
+    media_query_list.addEventListener("change", onPrintMediaChange);
+    return () => {
+      removeMediaQueryListener();
+    };
+  });
 
   // If we're dragging the slider, it's selected. However, it can also be
   // selected by tabbing to it. It also remains selected after dragging until
