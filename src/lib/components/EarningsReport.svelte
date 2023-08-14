@@ -78,7 +78,7 @@
   .text {
     margin: 0 0.5em;
   }
-  @media screen and (max-width: 400px) {
+  @media (max-width: 400px) {
     .text {
       margin: 0 0.2em;
     }

@@ -54,6 +54,10 @@ p {
   .pageBreakAvoid {
     page-break-inside: avoid;
   }
+
+  * {
+    transition: none !important
+  }
 }
 
 @media screen {

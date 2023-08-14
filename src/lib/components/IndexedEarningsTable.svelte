@@ -141,8 +141,6 @@
    * table format for the age-based benefit table.
    */
   .earnings-table {
-    /* page-break-inside makes printed pages less likely to break the table */
-    page-break-inside: avoid;
     border-collapse: collapse;
     width: calc(min(100% - 1em, 600px));
     margin: 10px auto 10px 5%;
@@ -213,7 +211,7 @@
     white-space: nowrap;
     color: #3b3b7f;
   }
-  @media screen and (max-width: 500px) {
+  @media (max-width: 500px) {
     /* Hide age column and some text */
     .onlyDisplayLarge {
       display: none;

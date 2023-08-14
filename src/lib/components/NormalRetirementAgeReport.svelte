@@ -96,9 +96,6 @@
   .text {
     margin: 0 0.5em;
   }
-  .pageBreakAvoid {
-    page-break-inside: avoid;
-  }
   .insetTextBox {
     box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
     -webkit-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;

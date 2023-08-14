@@ -1,6 +1,6 @@
 <script lang="ts">
   import "$lib/global.css";
-  import { EarningRecord } from "$lib/earning-record";
+  import type { EarningRecord } from "$lib/earning-record";
 
   export let earningsRecords: Array<EarningRecord> = [];
 </script>
@@ -57,8 +57,6 @@
    * table format for the age-based benefit table.
    */
   .earnings-table {
-    /* page-break-inside makes printed pages less likely to break the table */
-    page-break-inside: avoid;
     border-collapse: collapse;
     width: calc(min(100%, 600px));
     margin: 10px auto 10px 5%;
@@ -102,7 +100,7 @@
     color: #666;
   }
   /* TODO: This may be easier with a grid than a table */
-  @media screen and (max-width: 600px) {
+  @media (max-width: 600px) {
     /* 5% left margin gets pretty big as the screen narrows */
     .earnings-table {
       margin-left: 0.4em;

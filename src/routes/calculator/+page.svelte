@@ -137,6 +137,7 @@
       position: fixed;
       padding: 0.5em;
       bottom: 0;
+      right: 0px;
     }
   }
 </style>

@@ -60,7 +60,6 @@
     <Expando
       collapsedText="Expand for a detailed look at eligibility credits"
       expandedText="Show Less"
-      enableTransition={false}
       initiallyExpanded={$recipient.totalCredits() < 40}
     >
       <div class="expando">
