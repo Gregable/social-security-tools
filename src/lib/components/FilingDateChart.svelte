@@ -47,6 +47,11 @@
     sliderMonths_ = $recipient.normalRetirementAge().asMonths();
     updateCanvas();
     mounted_ = true;
+    media_query_list = window.matchMedia("print");
+    media_query_list.addEventListener("change", updateCanvas);
+    return () => {
+      removeMediaQueryListener();
+    };
   });
 
   function updateCanvas() {
@@ -64,8 +69,18 @@
     render();
   }
 
+  // By binding to window.innerWidth, we update positions when the window
+  // size changes:
   let innerWidth: number = 0;
   $: innerWidth && updateCanvas();
+  // Similarly, we want to bind to print events so we resize correctly for those
+  // too:
+  let media_query_list: MediaQueryList;
+  function removeMediaQueryListener() {
+    if (media_query_list) {
+      media_query_list.removeEventListener("change", updateCanvas);
+    }
+  }
 
   let mouseToggle_: boolean = true;
   let lastMouseX_: number = -1;
