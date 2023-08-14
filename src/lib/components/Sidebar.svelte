@@ -1,4 +1,6 @@
 <script lang="ts">
+  import "$lib/global.css";
+
   import { onMount } from "svelte";
   import { ChevronRight } from "svelte-bootstrap-icons";
 
@@ -112,6 +114,10 @@
     }
     .sideBar {
       display: none;
+    }
+    .mainColumn {
+      margin: 0 auto;
+      padding: 0 5px;
     }
   }
   /** Wide Tablet or Desktop **/

@@ -904,14 +904,17 @@
 <div>
   <h3>Explore Filing Dates</h3>
   <p>
-    The following <i>interactive</i> tool visualizes how different filing dates
-    for both <RecipientName r={$recipient} /> and <RecipientName r={$spouse} /> affect
-    total benefits, including the spousal benefit. Move the slider to select a filing
-    date for each person and hover over the chart to see the benefit amounts for
-    that date.
+    The following <i class="noprint">interactive</i> tool visualizes how
+    different filing dates for both <RecipientName r={$recipient} /> and <RecipientName
+      r={$spouse}
+    /> affect total benefits, including the spousal benefit.
+    <span class="noprint"
+      >Move the slider to select a filing date for each person and hover over
+      the chart to see the benefit amounts for that date.</span
+    >
   </p>
 
-  <div class="narrowWarningBox">
+  <div class="narrowWarningBox noprint">
     <h4>Small Screen Warning</h4>
     <div class="grid">
       <p>
@@ -924,8 +927,15 @@
 
   <div class="chart-container">
     <p class="sliderLabel">
-      <span>
+      <span class="noprint">
         Select the age that <RecipientName
+          r={$recipient}
+          suffix="
+  files">you file</RecipientName
+        > for benefits:
+      </span>
+      <span class="onlyprint">
+        Age that <RecipientName
           r={$recipient}
           suffix="
   files">you file</RecipientName
@@ -957,13 +967,20 @@
       />
     </div>
     <p class="sliderLabel">
-      <span>
+      <span class="noprint">
         Select the age that <RecipientName
           r={$spouse}
           suffix="
   files">you file</RecipientName
-        > for benefits:</span
-      >
+        > for benefits:
+      </span>
+      <span class="onlyprint">
+        Age that <RecipientName
+          r={$spouse}
+          suffix="
+  files">you file</RecipientName
+        > for benefits:
+      </span>
     </p>
     <div
       class="slider-box"

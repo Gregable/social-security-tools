@@ -56,7 +56,7 @@
 
         spouse = new Recipient();
         spouse.earningsRecords = parsePaste(demo2_spouse);
-        spouse.birthdate = new Birthdate(new Date("1949-03-01"));
+        spouse.birthdate = new Birthdate(new Date("1986-03-01"));
         spouse.name = "Riley";
       } else {
         throw new Error("Unknown demo ID: " + demoId);

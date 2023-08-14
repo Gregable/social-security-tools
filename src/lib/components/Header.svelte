@@ -1,9 +1,5 @@
-<!--
-  @component Header
-
-  some markdown here
--->
 <script lang="ts">
+  import "$lib/global.css";
   export let active = "none";
 
   let navOptions = [
@@ -20,7 +16,7 @@
 
   <div class="navpills" style:--pill-count={navOptions.length.toString()}>
     {#each navOptions as option}
-      <div class="pill" class:active={option.active}>
+      <div class="pill noprint" class:active={option.active}>
         {#if option.active}
           <span>{option.name}</span>
         {:else}
@@ -29,13 +25,14 @@
       </div>
     {/each}
   </div>
+  <div class="onlyprint printurl">https://ssa.tools/</div>
 </div>
 
 <style>
   /* Page Header with title and static links */
   .header {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     width: 100%;
     border-bottom: 1px solid #c5c5c5;
     margin-bottom: 20px;
@@ -49,6 +46,13 @@
     font-size: 24px;
     padding-left: 20px;
     white-space: nowrap;
+  }
+  .printurl {
+    margin: 0 1em;
+    line-height: 40px;
+    color: rgb(50, 50, 50);
+    font-weight: 900;
+    font-size: 20px;
   }
 
   /* Navigation Pills */

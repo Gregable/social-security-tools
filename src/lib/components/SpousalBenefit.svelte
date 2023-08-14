@@ -7,6 +7,8 @@
   import Expando from "./Expando.svelte";
   import RName from "./RecipientName.svelte";
 
+  import HorizCurlyImg from "$lib/images/horiz-curly.png";
+
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
   let r: Recipient = $recipient;
@@ -149,7 +151,7 @@
               </div>
               <img
                 class="horiz-curly"
-                src="/horiz-curly.png"
+                src={HorizCurlyImg}
                 alt="Horizontal curly brace indicating to sum the personal and
               spousal benefit amounts."
               />

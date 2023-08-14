@@ -17,7 +17,7 @@
   $: totalRecords = records($recipient);
 </script>
 
-<div class="main">
+<div class="main pageBreakAvoid">
   <h2>Earnings Report</h2>
 
   <div class="text">
@@ -49,7 +49,7 @@
       </div>
     </Expando>
 
-    <p>
+    <p class="noprint">
       This tool also allows you to simulate future years of earnings. This can
       help you understand the impact of your additional years of earnings on <RecipientName
         r={$recipient}

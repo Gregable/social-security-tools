@@ -9,48 +9,49 @@
   let r = $recipient;
 </script>
 
-<div>
+<div class="pageBreakAvoid">
   <h2>Retirement Benefits Eligibility</h2>
 
   <div class="text">
-    {#if $recipient.earnedCredits() >= 40}
-      <div class="eligibility eligible">Eligible</div>
-      <p>
-        <RName {r} suffix=" has">You have</RName>
-        already earned the <b>40</b>
-        <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
-          >Social Security credits</a
-        >
-        required to be eligible for a retirement benefit. Additional credits will
-        not affect <RName {r} apos>your</RName> eligibility or benefit amount.
-      </p>
-    {:else if $recipient.totalCredits() >= 40}
-      <div class="eligibility eligible">Eligible</div>
-      <p>
-        <RName {r} suffix=" has">You have</RName> already earned
-        <b>{$recipient.earnedCredits()}</b>
-        credits and with your projected earnings <RName {r}>you</RName> will earn
-        the <b>40</b>
-        <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
-          >Social Security credits</a
-        > required to be eligible for a normal retirement benefit.
-      </p>
-    {:else}
-      <div class="eligibility ineligible">Ineligible</div>
-      <p>
-        <RName {r} suffix=" has">You have</RName> not yet earned the <b>40</b>
-        <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
-          >Social Security credits</a
-        >
-        required to be eligible for a normal retirement benefit. <RName {r}
-          >You</RName
-        > may still be eligible to receive spousal benefits (see spousal benefits
-        section below). The rest of this report will continue to show you what <RName
-          {r}
-          apos>your</RName
-        > benefit would be if <RName {r}>you</RName> were eligible.
-      </p>
-    {/if}
+    <div>
+      {#if $recipient.earnedCredits() >= 40}
+        <div class="eligibility eligible">Eligible</div>
+        <p>
+          <RName {r} suffix=" has">You have</RName>
+          already earned the <b>40</b>
+          <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
+            >Social Security credits</a
+          >
+          required to be eligible for a retirement benefit. Additional credits will
+          not affect <RName {r} apos>your</RName> eligibility or benefit amount.
+        </p>
+      {:else if $recipient.totalCredits() >= 40}
+        <div class="eligibility eligible">Eligible</div>
+        <p>
+          <RName {r} suffix=" has">You have</RName> already earned
+          <b>{$recipient.earnedCredits()}</b>
+          credits and with your projected earnings <RName {r}>you</RName> will earn
+          the <b>40</b>
+          <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
+            >Social Security credits</a
+          > required to be eligible for a normal retirement benefit.
+        </p>
+      {:else}
+        <div class="eligibility ineligible">Ineligible</div>
+        <p>
+          <RName {r} suffix=" has">You have</RName> not yet earned the <b>40</b>
+          <a href="https://www.ssa.gov/planners/credits.html" target="_blank"
+            >Social Security credits</a
+          >
+          required to be eligible for a normal retirement benefit. <RName {r}
+            >You</RName
+          > may still be eligible to receive spousal benefits (see spousal benefits
+          section below). The rest of this report will continue to show you what
+          <RName {r} apos>your</RName> benefit would be if <RName {r}>you</RName
+          > were eligible.
+        </p>
+      {/if}
+    </div>
 
     <!--
       If the user's total credits are less than 40, we expand the expando by
@@ -149,8 +150,10 @@
                 another country that has a legal agreement with the US,
                 <RName {r}>you</RName> may have earned credits from a foreign work
                 history. This tool does not cover these cases.
-                <a href="/guides/international-agreements" target="_blank"
-                  >Learn More</a
+                <a
+                  href="/guides/international-agreements"
+                  target="_blank"
+                  class="noprint">Learn More</a
                 >.
               </p>
             </div>

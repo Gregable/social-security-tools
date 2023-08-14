@@ -32,3 +32,32 @@ a {
 p {
   margin: 0 0 10px;
 }
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  .noprint {
+    display: none !important;
+  }
+
+  .pageBreakBefore {
+    page-break-before: always;
+  }
+
+  .pageBreakAfter {
+    page-break-after: always;
+  }
+
+  .pageBreakAvoid {
+    page-break-inside: avoid;
+  }
+}
+
+@media screen {
+  .onlyprint {
+    display: none !important;
+  }
+}
