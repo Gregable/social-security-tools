@@ -18,172 +18,177 @@
 </script>
 
 <div>
-  <h2>Primary Insurance Amount</h2>
-  <div class="text pageBreakAvoid">
-    <p>
-      Social Security benefits are best thought of in terms of
-      <u>primary insurance amount</u> (PIA). This is the dollar amount that
-      Social Security will pay <RName {r}>you</RName> every month starting at <RName
-        {r}
-        apos>your</RName
+  <div class="pageBreakAvoid">
+    <h2>Primary Insurance Amount</h2>
+    <div class="text">
+      <p>
+        Social Security benefits are best thought of in terms of
+        <u>primary insurance amount</u> (PIA). This is the dollar amount that
+        Social Security will pay <RName {r}>you</RName> every month starting at <RName
+          {r}
+          apos>your</RName
+        >
+        <u>normal retirement age</u> (NRA).
+      </p>
+
+      <div class="pia-banner">
+        Primary Insurance Amount (PIA): <b
+          >{$recipient.pia().primaryInsuranceAmount().string()}</b
+        > / month
+      </div>
+
+      <p class="noprint">
+        To understand how <RName {r} apos>your</RName> PIA is calculated, expand
+        the box below:
+      </p>
+
+      <Expando
+        collapsedText="Expand for a detailed look at the Primary Insurance Amount"
+        expandedText="Show Less"
+        initiallyExpanded={false}
       >
-      <u>normal retirement age</u> (NRA).
-    </p>
-
-    <div class="pia-banner">
-      Primary Insurance Amount (PIA): <b
-        >{$recipient.pia().primaryInsuranceAmount().string()}</b
-      > / month
-    </div>
-
-    <p class="noprint">
-      To understand how <RName {r} apos>your</RName> PIA is calculated, expand the
-      box below:
-    </p>
-
-    <Expando
-      collapsedText="Expand for a detailed look at the Primary Insurance Amount"
-      expandedText="Show Less"
-      initiallyExpanded={false}
-    >
-      <div class="expando">
-        <p>
-          <RName {r} apos>Your</RName> Average Indexed Monthly Earnings:
-          <b>{$recipient.monthlyIndexedEarnings().wholeDollars()}</b>
-          (see above).
-        </p>
-
-        <p>
-          Your primary insurance amount is based on your Average Indexed Monthly
-          Earnings using
-          <a
-            href="https://www.ssa.gov/oact/cola/piaformula.html"
-            target="_blank">a formula</a
-          >
-          that increases your Primary Insurance Amount as your earnings increase,
-          but increases more slowly for higher total earnings. <RName {r} apos
-            >Your</RName
-          > Primary Insurance Amount is calculated from Average Indexed Monthly Earnings
-          as follows:
-        </p>
-
-        <table class="benefitBrackets pageBreakAvoid">
-          <tr>
-            <td>
-              Any amount less than
-              {$recipient.pia().firstBendPoint().wholeDollars()}
-              is multiplied by 90%:
-            </td>
-            <td>
-              <b
-                >{$recipient
-                  .pia()
-                  .primaryInsuranceAmountByBracket(0)
-                  .string()}</b
-              >
-            </td>
-            <td />
-          </tr>
-          <tr>
-            <td>
-              The amount more than
-              {$recipient.pia().firstBendPoint().wholeDollars()}
-              and less than
-              {$recipient.pia().secondBendPoint().wholeDollars()}
-              is multiplied by 32%:
-            </td>
-            <td>
-              <b
-                >{$recipient
-                  .pia()
-                  .primaryInsuranceAmountByBracket(1)
-                  .string()}</b
-              >
-            </td>
-            <td />
-          </tr>
-          <tr>
-            <td>
-              Any <span class="onlydisplay600">remaining</span> amount more than
-              {$recipient.pia().secondBendPoint().wholeDollars()}
-              is multiplied by 15%:
-            </td>
-            <td>
-              <b>
-                {$recipient.pia().primaryInsuranceAmountByBracket(2).string()}
-              </b>
-            </td>
-            <td />
-          </tr>
-          <tr>
-            <td>Total:</td>
-            <td>
-              <b
-                >{$recipient
-                  .pia()
-                  .primaryInsuranceAmountUnadjusted()
-                  .string()}</b
-              >
-            </td>
-            <td class="nowrap">&nbsp;/ month</td>
-          </tr>
-        </table>
-
-        <div class="insetTextBox">
-          <h4>Special Rule</h4>
+        <div class="expando">
           <p>
-            You may notice that some of these numbers are short a few pennies.
-            Social Security rounds the Primary Insurance Amount down to the
-            dime, while benefits are rounded down to the dollar.
+            <RName {r} apos>Your</RName> Average Indexed Monthly Earnings:
+            <b>{$recipient.monthlyIndexedEarnings().wholeDollars()}</b>
+            (see above).
           </p>
-        </div>
 
-        {#if $recipient.pia().shouldAdjustForCOLA()}
-          <div class="pageBreakAvoid">
+          <p>
+            Your primary insurance amount is based on your Average Indexed
+            Monthly Earnings using
+            <a
+              href="https://www.ssa.gov/oact/cola/piaformula.html"
+              target="_blank">a formula</a
+            >
+            that increases your Primary Insurance Amount as your earnings increase,
+            but increases more slowly for higher total earnings. <RName {r} apos
+              >Your</RName
+            > Primary Insurance Amount is calculated from Average Indexed Monthly
+            Earnings as follows:
+          </p>
+
+          <table class="benefitBrackets pageBreakAvoid">
+            <tr>
+              <td>
+                Any amount less than
+                {$recipient.pia().firstBendPoint().wholeDollars()}
+                is multiplied by 90%:
+              </td>
+              <td>
+                <b
+                  >{$recipient
+                    .pia()
+                    .primaryInsuranceAmountByBracket(0)
+                    .string()}</b
+                >
+              </td>
+              <td />
+            </tr>
+            <tr>
+              <td>
+                The amount more than
+                {$recipient.pia().firstBendPoint().wholeDollars()}
+                and less than
+                {$recipient.pia().secondBendPoint().wholeDollars()}
+                is multiplied by 32%:
+              </td>
+              <td>
+                <b
+                  >{$recipient
+                    .pia()
+                    .primaryInsuranceAmountByBracket(1)
+                    .string()}</b
+                >
+              </td>
+              <td />
+            </tr>
+            <tr>
+              <td>
+                Any <span class="onlydisplay600">remaining</span> amount more
+                than
+                {$recipient.pia().secondBendPoint().wholeDollars()}
+                is multiplied by 15%:
+              </td>
+              <td>
+                <b>
+                  {$recipient.pia().primaryInsuranceAmountByBracket(2).string()}
+                </b>
+              </td>
+              <td />
+            </tr>
+            <tr>
+              <td>Total:</td>
+              <td>
+                <b
+                  >{$recipient
+                    .pia()
+                    .primaryInsuranceAmountUnadjusted()
+                    .string()}</b
+                >
+              </td>
+              <td class="nowrap">&nbsp;/ month</td>
+            </tr>
+          </table>
+
+          <div class="insetTextBox">
+            <h4>Special Rule</h4>
             <p>
-              After attaining age 62, your primary insurance amount will
-              increase annually in proportion to the consumer price index
-              (CPI-W), a measure of inflation. This will continue every year,
-              even after beginning to collect your benefit. These adjustments
-              are called
-              <u>Cost of Living Adjustments</u> (COLA). Here are the adjustments
-              in past years which affect <RName {r} apos>your</RName> current Primary
-              Insurance Amount.
-            </p>
-            <ul class="cola">
-              {#each $recipient.pia().colaAdjustments() as adjustment}
-                <li>
-                  {#if adjustment.year === constants.CURRENT_YEAR}
-                    <!-- Not yet applied, so special case the text: -->
-                    {adjustment.year}: At the <b>end</b> of the year,
-                    <b>{adjustment.start.string()}</b>
-                    will be increased by {oneSignificantDigit(adjustment.cola)}%
-                    =
-                    <b>{adjustment.end.string()}</b>
-                  {:else}
-                    {adjustment.year}: <b>{adjustment.start.string()}</b>
-                    increased by {oneSignificantDigit(adjustment.cola)}% =
-                    <b>{adjustment.end.string()}</b>
-                  {/if}
-                </li>
-              {/each}
-            </ul>
-            <p>
-              The adjustments are applied at the <b>end</b> of the adjustment
-              year. For example, the {constants.CURRENT_YEAR} adjustment will only
-              affect <RName {r} apos>your</RName>
-              benefit starting in January {constants.CURRENT_YEAR + 1}.
+              You may notice that some of these numbers are short a few pennies.
+              Social Security rounds the Primary Insurance Amount down to the
+              dime, while benefits are rounded down to the dollar.
             </p>
           </div>
-        {/if}
 
-        <p>
-          The final value is <RName {r} apos>your</RName>
-          current <u>primary insurance amount (PIA)</u>. It will continue to
-          increase every year.
-        </p>
-      </div>
-    </Expando>
+          {#if $recipient.pia().shouldAdjustForCOLA()}
+            <div class="pageBreakAvoid">
+              <p>
+                After attaining age 62, your primary insurance amount will
+                increase annually in proportion to the consumer price index
+                (CPI-W), a measure of inflation. This will continue every year,
+                even after beginning to collect your benefit. These adjustments
+                are called
+                <u>Cost of Living Adjustments</u> (COLA). Here are the
+                adjustments in past years which affect <RName {r} apos
+                  >your</RName
+                > current Primary Insurance Amount.
+              </p>
+              <ul class="cola">
+                {#each $recipient.pia().colaAdjustments() as adjustment}
+                  <li>
+                    {#if adjustment.year === constants.CURRENT_YEAR}
+                      <!-- Not yet applied, so special case the text: -->
+                      {adjustment.year}: At the <b>end</b> of the year,
+                      <b>{adjustment.start.string()}</b>
+                      will be increased by {oneSignificantDigit(
+                        adjustment.cola
+                      )}% =
+                      <b>{adjustment.end.string()}</b>
+                    {:else}
+                      {adjustment.year}: <b>{adjustment.start.string()}</b>
+                      increased by {oneSignificantDigit(adjustment.cola)}% =
+                      <b>{adjustment.end.string()}</b>
+                    {/if}
+                  </li>
+                {/each}
+              </ul>
+              <p>
+                The adjustments are applied at the <b>end</b> of the adjustment
+                year. For example, the {constants.CURRENT_YEAR} adjustment will only
+                affect <RName {r} apos>your</RName>
+                benefit starting in January {constants.CURRENT_YEAR + 1}.
+              </p>
+            </div>
+          {/if}
+
+          <p>
+            The final value is <RName {r} apos>your</RName>
+            current <u>primary insurance amount (PIA)</u>. It will continue to
+            increase every year.
+          </p>
+        </div>
+      </Expando>
+    </div>
   </div>
 
   <div class="text pageBreakAvoid">
@@ -217,13 +222,13 @@
     text-align: left;
     border-top: 1px solid;
   }
-  @media screen and (min-width: 600px) {
+  @media (min-width: 600px) {
     table.benefitBrackets tr td {
       text-align: right;
       padding-right: 6px;
     }
   }
-  @media screen and (max-width: 599px) {
+  @media (max-width: 599px) {
     table.benefitBrackets tr td {
       padding: 8px;
     }

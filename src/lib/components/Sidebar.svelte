@@ -109,8 +109,7 @@
 <style>
   @media print {
     .twoColumns {
-      display: grid;
-      grid-template-columns: 0 1fr;
+      display: block;
     }
     .sideBar {
       display: none;

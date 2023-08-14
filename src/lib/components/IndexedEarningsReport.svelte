@@ -47,7 +47,6 @@
     <Expando
       collapsedText="Expand to read an explanation of Averaged Indexed Monthly Earnings"
       expandedText="Show Less"
-      enableTransition={false}
       initiallyExpanded={false}
     >
       <div class="expando">
@@ -153,7 +152,7 @@
   p.indent {
     margin-left: 2em;
   }
-  @media screen and (max-width: 400px) {
+  @media (max-width: 400px) {
     p.indent {
       margin-left: 0.6em;
     }

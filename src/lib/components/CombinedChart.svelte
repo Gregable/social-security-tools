@@ -1083,12 +1083,12 @@
     width: 620px;
     margin: 2em 1em 1em 1em;
   }
-  @media screen and (min-width: 700px) {
+  @media (min-width: 700px) {
     .narrowWarningBox {
       display: none;
     }
   }
-  @media screen and (max-width: 699px) {
+  @media (max-width: 699px) {
     .chart-container {
       display: none;
     }

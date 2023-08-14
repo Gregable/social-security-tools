@@ -7,10 +7,6 @@
 
 <div>
   {#if earningsRecords.length > 0}
-    <p class="onlyprint">
-      <b>Future Earnings Projections:</b>
-    </p>
-
     <table class="earnings-table">
       <thead>
         <tr>
@@ -46,8 +42,6 @@
    * table format for the age-based benefit table.
    */
   .earnings-table {
-    /* page-break-inside makes printed pages less likely to break the table */
-    page-break-inside: avoid;
     border-collapse: collapse;
     width: calc(min(100% - 1em, 220px));
     margin: 10px auto 10px auto;
