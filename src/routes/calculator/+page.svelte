@@ -37,7 +37,7 @@
         inside the EarningsReport component. It closes at the end of this user's
         part of the report and another one is opened for the spouse's part.
       -->
-      <div>
+      <div class="pageBreakAfter">
         {#if context.spouse}
           <SidebarSection
             label={context.recipient.shortName(15)}
@@ -70,7 +70,7 @@
         <!--
           See the description of the purpose of this div above.
         -->
-        <div>
+        <div class="pageBreakAfter">
           <SidebarSection label={context.spouse.shortName(15)} heading={true} />
           <h1 class="recipientName">
             <RecipientName r={context.spouse} noColor />
@@ -117,6 +117,8 @@
   {/if}
 </main>
 
+<div class="printFooter">https://ssa.tools/</div>
+
 <style>
   main {
     max-width: 1080px;
@@ -124,5 +126,17 @@
   }
   .recipientName {
     text-decoration: underline;
+  }
+  @media screen {
+    .printFooter {
+      display: none;
+    }
+  }
+  @media print {
+    .printFooter {
+      position: fixed;
+      padding: 0.5em;
+      bottom: 0;
+    }
   }
 </style>

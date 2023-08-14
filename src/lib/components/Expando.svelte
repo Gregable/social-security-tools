@@ -1,4 +1,5 @@
 <script context="module" lang="ts">
+  import "$lib/global.css";
   // Generate a number unique to each Expando instance to use
   // with label for / input id pairs.
   let uniqid: number = 0;
@@ -81,7 +82,8 @@
   style:--expanded-background-color={expanded_background_color}
 >
   <input type="checkbox" {id} bind:checked={expanded} />
-  <label for={id} class="label">{expanded ? expandedText : collapsedText}</label
+  <label for={id} class="label noprint"
+    >{expanded ? expandedText : collapsedText}</label
   >
   <div class="expandContainer">
     <div
@@ -106,7 +108,7 @@
   input {
     display: none;
   }
-  label {
+  .label {
     font-size: 16px;
     display: block;
     position: relative;
@@ -123,18 +125,18 @@
     padding-right: 35px;
     max-width: max-content;
   }
-  label:hover {
+  .label:hover {
     background: var(--collapsed-hover-color);
   }
   /* Prevent the label from being selected */
-  label::selection {
+  .label::selection {
     background: none;
   }
   /* Create a right pointing triangle by making only the left border
    * visible. Since the border is 6px wide, the triangle is 6px wide
    * and 12px tall.
    */
-  label::before {
+  .label::before {
     content: "";
     position: absolute;
     right: 4px;

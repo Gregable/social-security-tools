@@ -19,7 +19,7 @@
 
 <div>
   <h2>Primary Insurance Amount</h2>
-  <div class="text">
+  <div class="text pageBreakAvoid">
     <p>
       Social Security benefits are best thought of in terms of
       <u>primary insurance amount</u> (PIA). This is the dollar amount that
@@ -36,7 +36,7 @@
       > / month
     </div>
 
-    <p>
+    <p class="noprint">
       To understand how <RName {r} apos>your</RName> PIA is calculated, expand the
       box below:
     </p>
@@ -184,14 +184,18 @@
         </p>
       </div>
     </Expando>
+  </div>
 
+  <div class="text pageBreakAvoid">
     <p style="margin-top: 1em">
       In the following chart, you can see what <RName {r} apos>your</RName> current
       Primary Insurance Amount would be if <RName {r} apos>your</RName> Average Indexed
-      Monthly Earnings were to increase. Move your mouse over the chart to see how
-      the Primary Insurance Amount changes.
+      Monthly Earnings were to increase.
+      <span class="noprint"
+        >Move your mouse over the chart to see how the Primary Insurance Amount
+        changes.</span
+      >
     </p>
-
     <BendpointChart recipient={$recipient} />
   </div>
 </div>

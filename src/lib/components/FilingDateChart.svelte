@@ -638,8 +638,15 @@
 
 <svelte:window bind:innerWidth />
 <div class="chart-container">
-  <p>
+  <p class="noprint">
     Select the age that <RecipientName
+      r={$recipient}
+      suffix="
+  files">you file</RecipientName
+    > for benefits:
+  </p>
+  <p class="onlyprint">
+    Age that <RecipientName
       r={$recipient}
       suffix="
   files">you file</RecipientName
@@ -723,6 +730,7 @@
   p {
     font-weight: bold;
     font-size: 0.9em;
+    margin-left: 1.5em;
   }
   .slider-box {
     /* Reserve space on canvas left for the dollar labels */
@@ -781,6 +789,19 @@
     }
   }
   @media screen and (max-width: 1024px) {
+    .chart-container {
+      width: 80vw;
+      height: calc(80vw * 0.67 + 105px);
+    }
+    canvas {
+      width: 80vw;
+      height: calc(80vw * 0.67);
+    }
+    .selectedDateBox {
+      margin-top: calc(80vw * 0.67 - 18px);
+    }
+  }
+  @media print {
     .chart-container {
       width: 80vw;
       height: calc(80vw * 0.67 + 105px);

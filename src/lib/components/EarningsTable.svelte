@@ -7,6 +7,10 @@
 
 <div>
   {#if earningsRecords.length > 0}
+    <p class="onlyprint">
+      <b>Future Earnings Projections:</b>
+    </p>
+
     <table class="earnings-table">
       <thead>
         <tr>

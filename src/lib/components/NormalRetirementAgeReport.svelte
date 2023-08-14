@@ -20,7 +20,7 @@
 
 <div>
   <h2>Normal Retirement Age</h2>
-  <div class="text">
+  <div class="text pageBreakAvoid">
     <p>
       The primary insurance amount rounded down to the next lower whole dollar (<b
         >{benefit.wholeDollars()}</b
@@ -66,7 +66,11 @@
           > age
           <b>{exampleAge.age}</b> on
           <b>{exampleAge.month} {exampleAge.day}, {exampleAge.year}</b>.
-          <a href="/guides/1st-and-2nd-of-month/" target="_blank">Learn More</a>
+          <a
+            href="/guides/1st-and-2nd-of-month/"
+            target="_blank"
+            class="noprint">Learn More</a
+          >
         </p>
       </div>
     {/if}

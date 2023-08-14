@@ -1,8 +1,12 @@
 <script lang="ts">
   import "$lib/global.css";
+
+  import FacebookImg from "$lib/images/facebook.svg";
+  import TwitterImg from "$lib/images/twitter.svg";
+  import GithubImg from "$lib/images/github.svg";
 </script>
 
-<div class="container">
+<div class="container pageBreakAvoid pageBreakBefore">
   <h2>More Reading</h2>
 
   <div class="text">
@@ -24,19 +28,19 @@
     <ul class="socialmedia">
       <li>
         <a href="https://twitter.com/SsaTools">
-          <img src="/twitter.svg" alt="Twitter Icon" />
+          <img src={TwitterImg} alt="Twitter Icon" />
           @SSATools
         </a>
       </li>
       <li>
         <a href="https://www.facebook.com/SsaToolsCalculator">
-          <img src="/facebook.svg" alt="Facebook Icon" />
+          <img src={FacebookImg} alt="Facebook Icon" />
           SSAToolsCalculator
         </a>
       </li>
       <li>
         <a href="https://github.com/Gregable/social-security-tools">
-          <img src="/github.svg" alt="GitHub Icon" />
+          <img src={GithubImg} alt="GitHub Icon" />
           social-security-tools
         </a>
       </li>
@@ -44,12 +48,19 @@
 
     <h3>Thank you</h3>
     <p>Many have asked me if they can support this site.</p>
-    <p>
+    <p class="noprint">
       While absolutely not necessary, if you would like to say thanks you can
       contribute by clicking the button below:
     </p>
+    <p class="onlyprint">
+      While absolutely not necessary, if you would like to say thanks you can
+      contribute at:
+    </p>
+    <p class="onlyprint" style="text-align:center; font-size: 1.8em">
+      https://ko-fi.com/ssatools
+    </p>
     <p style="text-align:center">
-      <a href="https://ko-fi.com/V7V4BQE1D" target="_blank"
+      <a href="https://ko-fi.com/ssatools" target="_blank"
         ><img
           height="55"
           width="214"
@@ -63,9 +74,11 @@
 </div>
 
 <style>
-  .container {
-    /* Add some buffer space to support scrolling all the way to the bottom. */
-    margin-bottom: 600px;
+  @media screen {
+    .container {
+      /* Add some buffer space to support scrolling all the way to the bottom. */
+      margin-bottom: 600px;
+    }
   }
   .text,
   p {
