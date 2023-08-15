@@ -184,7 +184,7 @@
     only one of them, and it varies from price inflation. Typically wages grow a
     little faster than prices. Price inflation also has an effect on the formula
     for your social security benefit. To understand more, take a look at our
-    guide on <a href="inflation.html"
+    guide on <a href="./inflation"
       >How inflation rate affects Social Security benefit calculations.</a
     >
   </p>
@@ -194,7 +194,7 @@
     an unusually large impact on the nation's Average Wages in a manner that
     will likely negatively impact those who turn 60 that year. If you were born
     in 1960, take a look at our guide answering the question: <a
-      href="covid-awi-drop.html"
+      href="./covid-awi-drop"
       >Will a weak economy in 2020 result in a benefits decrease for those born
       in 1960?</a
     >
