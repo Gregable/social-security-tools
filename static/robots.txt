@@ -1,4 +1,2 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://ssa.tools/sitemap.xml
