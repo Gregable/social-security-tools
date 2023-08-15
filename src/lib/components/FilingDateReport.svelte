@@ -115,7 +115,7 @@
               >.
             {/if}
             <a
-              href="/guides/1st-and-2nd-of-month/"
+              href="/guides/1st-and-2nd-of-month"
               target="_blank"
               class="noprint">Learn More</a
             >

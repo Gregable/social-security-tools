@@ -66,10 +66,8 @@
           > age
           <b>{exampleAge.age}</b> on
           <b>{exampleAge.month} {exampleAge.day}, {exampleAge.year}</b>.
-          <a
-            href="/guides/1st-and-2nd-of-month/"
-            target="_blank"
-            class="noprint">Learn More</a
+          <a href="/guides/1st-and-2nd-of-month" target="_blank" class="noprint"
+            >Learn More</a
           >
         </p>
       </div>
