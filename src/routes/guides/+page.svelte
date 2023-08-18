@@ -10,6 +10,18 @@
   <h1>Social Security Guides</h1>
   <ul class="guides">
     <li>
+      <span class="postdate">Aug 18, 2023</span>
+      <h3 class="posttitle">
+        <a href="/guides/filing-date-chart"> Navigate the Filing Date Chart </a>
+      </h3>
+      <p class="justify">
+        This site's calculator shows a information dense chart of how filing
+        dates affect your benefits. The chart can be a little confusing at
+        first, so here's a guide to help you understand it.
+      </p>
+    </li>
+
+    <li>
       <span class="postdate">Aug 11, 2023</span>
       <h3 class="posttitle">
         <a href="/guides/will-social-security-run-out">

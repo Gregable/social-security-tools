@@ -206,9 +206,14 @@
     <div class="h3text">
       <p>
         The following <i>interactive</i> tool visualizes how different filing
-        dates affect <RName {r} suffix="'s personal">your</RName> benefit. Move the
-        slider to select a filing date and hover over the chart to see the benefit
-        amount for that date.
+        dates affect <RName {r} suffix="'s personal">your</RName> benefit.
+        <span class="noprint"
+          >Move the slider to select a filing date and hover over the chart to
+          see the benefit amount for that date.
+          <a href="/guides/filing-date-chart" target="_blank"
+            >Click for more help.</a
+          ></span
+        >
       </p>
     </div>
     <FilingDateChart recipient={$recipient} />
