@@ -910,8 +910,11 @@
     /> affect total benefits, including the spousal benefit.
     <span class="noprint"
       >Move the slider to select a filing date for each person and hover over
-      the chart to see the benefit amounts for that date.</span
-    >
+      the chart to see the benefit amounts for that date.
+      <a href="/guides/filing-date-chart" target="_blank"
+        >Click for more help.</a
+      >
+    </span>
   </p>
 
   <div class="narrowWarningBox noprint">
