@@ -18,6 +18,7 @@
   import CombinedChart from "$lib/components/CombinedChart.svelte";
   import SpousalReport from "$lib/components/SpousalReport.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
+  import Sponsor from "$lib/components/Sponsor.svelte";
 
   export let isPasteFlow: boolean = true;
 
@@ -58,6 +59,9 @@
         </SidebarSection>
         <SidebarSection label="Primary Insurance Amount">
           <PiaReport recipient={context.recipient} />
+        </SidebarSection>
+        <SidebarSection label="Sponsor - ProjectionLab" sponsor>
+          <Sponsor />
         </SidebarSection>
         <SidebarSection label="Normal Retirement Age">
           <NormalRetirementAgeReport recipient={context.recipient} />

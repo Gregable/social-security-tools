@@ -52,6 +52,7 @@
     id: string = "";
     heading: boolean = false;
     active: boolean = false;
+    sponsor: boolean = false;
   }
   let lastActiveSection: SidebarSection;
 
@@ -75,6 +76,7 @@
         // active highlights a section if it's visible at the top of
         // the viewport. Initially all false.
         active: false,
+        sponsor: child.getAttribute("data-sponsor") == "true",
       });
       observer.observe(child);
     }
@@ -90,12 +92,12 @@
           on:click={scrollTo(section.id)}
           on:keydown={scrollTo(section.id)}
           class:active={section.active}
+          class:sponsor={section.sponsor}
         >
-          {#if hasHeading && !section.heading}
-            <div class="navlabel indent">{section.label}</div>
-          {:else}
-            <div class="navlabel">{section.label}</div>
-          {/if}
+          <div class="navlabel" class:indent={hasHeading && !section.heading}>
+            {section.label}
+          </div>
+
           <span class="chevron"><ChevronRight /></span>
         </li>
       {/each}
@@ -178,10 +180,14 @@
     font-size: 14px;
     cursor: pointer;
   }
-  li.active {
+  li.active,
+  li.active.sponsor {
     background-color: #0088cc;
     color: #fff;
     border-color: #0088cc;
+  }
+  li.sponsor {
+    background-color: aliceblue;
   }
   li:first-child {
     border-radius: 6px 6px 0 0;

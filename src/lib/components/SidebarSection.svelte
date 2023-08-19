@@ -14,6 +14,11 @@
    */
   export let heading: boolean = false;
 
+  /**
+   * If true, color this as a sponsor section.
+   */
+  export let sponsor: boolean = false;
+
   // TODO: This should ideally generate a unique id for each sidebar as well,
   // by having the sidebar pass it's own unique id down to the section.
 
@@ -27,6 +32,7 @@
   data-label={label}
   data-heading={heading ? "true" : "false"}
   data-sidebarsection
+  data-sponsor={sponsor ? "true" : "false"}
 >
   <slot />
 </div>
