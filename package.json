@@ -27,6 +27,7 @@
     "@sveltejs/adapter-vercel": "^3.0.3",
     "@sveltejs/kit": "^1.0.0-next.587",
     "@vercel/analytics": "^1.0.2",
+    "posthog-js": "^1.77.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "storybook": "^7.2.1",

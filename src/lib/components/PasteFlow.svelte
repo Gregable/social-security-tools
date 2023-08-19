@@ -1,7 +1,6 @@
 <script lang="ts">
   import "$lib/global.css";
   import { createEventDispatcher, onMount } from "svelte";
-  import va from "@vercel/analytics";
   import { context } from "$lib/context";
   import AgeRequest from "./AgeRequest.svelte";
   import DemoData from "./DemoData.svelte";
@@ -9,6 +8,9 @@
   import PastePrompt from "./PastePrompt.svelte";
   import PasteApology from "./PasteApology.svelte";
   import SpouseQuestion from "./SpouseQuestion.svelte";
+  import { page } from "$app/stores";
+  import { browser } from "$app/environment";
+  import posthog from "posthog-js";
 
   const dispatch = createEventDispatcher();
 
@@ -65,7 +67,7 @@
     }
 
     // Let the app know we're done.
-    va.track("Demo Loaded");
+    browser && posthog.capture("Demo Loaded");
     dispatch("done");
   }
 
@@ -117,7 +119,7 @@
       context.recipient.birthdate = event.detail.birthdate;
     } else {
       context.spouse.birthdate = event.detail.birthdate;
-      va.track("Pasted with spousal");
+      browser && posthog.capture("Pasted with spousal");
       // Let the app know we're done.
       dispatch("done");
     }
@@ -136,7 +138,7 @@
       spouseName = event.detail.spousename;
       mode = Mode.INITIAL;
     } else {
-      va.track("Pasted");
+      browser && posthog.capture("Pasted");
       // Let the app know we're done.
       dispatch("done");
     }
