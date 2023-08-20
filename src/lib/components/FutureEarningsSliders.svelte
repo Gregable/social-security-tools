@@ -1,9 +1,11 @@
 <script lang="ts">
   import "$lib/global.css";
+  import { onMount } from "svelte";
   import * as constants from "$lib/constants";
   import Slider from "./Slider.svelte";
   import type { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
+  import { context } from "$lib/context";
   import RecipientName from "./RecipientName.svelte";
 
   /**
@@ -68,9 +70,74 @@
     );
   }
   $: update(futureEarningYears, Money.from(futureEarningWage));
+
+  // We want to track if one of the sliders is stuck to the top of the screen.
+  // This is used by the Sidebar to calculate which is the top active section,
+  // where we need to know if that section is hidden by the sticky sliders.
+  //
+  // The strategy is to have two intersection observers, one for the sliders
+  // and one for the slider container. The slider observer is offset by 1px so
+  // that we detect when the slider is stuck vs simply visible.
+  //
+  // We consider a slider to be stuck if it's partly intersecting the page top
+  // and it's container is visible. We track both slider stuckness seperately
+  // in the global context.
+  function updateStuckness() {
+    if (isStuck && isVisible) {
+      if (recipient.first) {
+        context.isFirstStuck = true;
+      } else {
+        context.isSecondStuck = true;
+      }
+    } else {
+      if (recipient.first) {
+        context.isFirstStuck = false;
+      } else {
+        context.isSecondStuck = false;
+      }
+    }
+  }
+  let slidersEl: HTMLDivElement;
+  let isStuck: boolean = false;
+  let isVisible: boolean = false;
+  const stickyObserver = new IntersectionObserver(
+    (entries, _) => {
+      entries.forEach((entry) => {
+        isStuck =
+          entry.intersectionRatio < 1 &&
+          entry.intersectionRatio > 0 &&
+          entry.boundingClientRect.top <= 1;
+        updateStuckness();
+      });
+    },
+    {
+      rootMargin: "-1px 0px 0px 0px",
+      threshold: [1],
+    }
+  );
+  const stickyContainerObserver = new IntersectionObserver(
+    (entries, _) => {
+      entries.forEach((entry) => {
+        isVisible = entry.intersectionRatio > 0;
+        updateStuckness();
+      });
+    },
+    { threshold: [0] }
+  );
+  onMount(() => {
+    stickyObserver.observe(slidersEl);
+    let parent = slidersEl.parentElement;
+    while (parent) {
+      if (parent.classList.contains("stickyContainer")) {
+        stickyContainerObserver.observe(parent);
+        break;
+      }
+      parent = parent.parentElement;
+    }
+  });
 </script>
 
-<div class="sliders">
+<div class="sliders" bind:this={slidersEl}>
   <div class="grid">
     <div class="item left">
       <RecipientName r={$recipient} shortenTo={15} suffix=" plans"

@@ -38,35 +38,36 @@
         inside the EarningsReport component. It closes at the end of this user's
         part of the report and another one is opened for the spouse's part.
       -->
-      <div class="pageBreakAfter">
+      <div class="pageBreakAfter stickyContainer">
         {#if context.spouse}
           <SidebarSection
             label={context.recipient.shortName(15)}
             heading={true}
-          />
-          <h1 class="recipientName">
-            <RecipientName r={context.recipient} noColor />
-          </h1>
+          >
+            <h1 class="recipientName">
+              <RecipientName r={context.recipient} noColor />
+            </h1>
+          </SidebarSection>
         {/if}
         <SidebarSection label="Earnings Report">
           <EarningsReport recipient={context.recipient} />
         </SidebarSection>
-        <SidebarSection label="Benefits Eligibility">
+        <SidebarSection label="Benefits Eligibility" underSticky>
           <EligibilityReport recipient={context.recipient} />
         </SidebarSection>
-        <SidebarSection label="Indexed Earnings">
+        <SidebarSection label="Indexed Earnings" underSticky>
           <IndexedEarningsReport recipient={context.recipient} />
         </SidebarSection>
-        <SidebarSection label="Primary Insurance Amount">
+        <SidebarSection label="Primary Insurance Amount" underSticky>
           <PiaReport recipient={context.recipient} />
         </SidebarSection>
-        <SidebarSection label="Sponsor - ProjectionLab" sponsor>
+        <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
           <Sponsor />
         </SidebarSection>
-        <SidebarSection label="Normal Retirement Age">
+        <SidebarSection label="Normal Retirement Age" underSticky>
           <NormalRetirementAgeReport recipient={context.recipient} />
         </SidebarSection>
-        <SidebarSection label="Filing Date">
+        <SidebarSection label="Filing Date" underSticky>
           <FilingDateReport recipient={context.recipient} />
         </SidebarSection>
       </div>
@@ -74,27 +75,28 @@
         <!--
           See the description of the purpose of this div above.
         -->
-        <div class="pageBreakAfter">
-          <SidebarSection label={context.spouse.shortName(15)} heading={true} />
-          <h1 class="recipientName">
-            <RecipientName r={context.spouse} noColor />
-          </h1>
+        <div class="pageBreakAfter stickyContainer">
+          <SidebarSection label={context.spouse.shortName(15)} heading={true}>
+            <h1 class="recipientName">
+              <RecipientName r={context.spouse} noColor />
+            </h1>
+          </SidebarSection>
           <SidebarSection label="Earnings Report">
             <EarningsReport recipient={context.spouse} />
           </SidebarSection>
-          <SidebarSection label="Benefits Eligibility">
+          <SidebarSection label="Benefits Eligibility" underSticky>
             <EligibilityReport recipient={context.spouse} />
           </SidebarSection>
-          <SidebarSection label="Indexed Earnings">
+          <SidebarSection label="Indexed Earnings" underSticky>
             <IndexedEarningsReport recipient={context.spouse} />
           </SidebarSection>
-          <SidebarSection label="Primary Insurance Amount">
+          <SidebarSection label="Primary Insurance Amount" underSticky>
             <PiaReport recipient={context.spouse} />
           </SidebarSection>
-          <SidebarSection label="Normal Retirement Age">
+          <SidebarSection label="Normal Retirement Age" underSticky>
             <NormalRetirementAgeReport recipient={context.spouse} />
           </SidebarSection>
-          <SidebarSection label="Filing Date">
+          <SidebarSection label="Filing Date" underSticky>
             <FilingDateReport recipient={context.spouse} />
           </SidebarSection>
         </div>
