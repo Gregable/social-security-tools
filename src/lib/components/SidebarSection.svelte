@@ -19,6 +19,14 @@
    */
   export let sponsor: boolean = false;
 
+  /**
+   * If true, this section considered to be below a sticky element, namely the
+   * slider elements. This is used to add a scroll-margin-top to the section
+   * so that it's not hidden behind the sticky elements when it's selected in
+   * the sidebar.
+   */
+  export let underSticky: boolean = false;
+
   // TODO: This should ideally generate a unique id for each sidebar as well,
   // by having the sidebar pass it's own unique id down to the section.
 
@@ -29,10 +37,11 @@
 
 <div
   {id}
+  data-sidebarsection
   data-label={label}
   data-heading={heading ? "true" : "false"}
-  data-sidebarsection
   data-sponsor={sponsor ? "true" : "false"}
+  class:underSticky
 >
   <slot />
 </div>
@@ -45,5 +54,8 @@
    */
   div {
     display: unset;
+  }
+  .underSticky {
+    scroll-margin-top: 110px;
   }
 </style>

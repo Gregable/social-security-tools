@@ -3,6 +3,7 @@
 
   import { onMount } from "svelte";
   import { ChevronRight } from "svelte-bootstrap-icons";
+  import { context } from "$lib/context";
 
   function scrollTo(id: string) {
     return () => {
@@ -17,35 +18,59 @@
 
   let visibleSections: Array<number> = [];
 
-  let observer = new IntersectionObserver(
-    (entries, _) => {
-      entries.forEach((entry) => {
-        let id: number = parseInt(
-          entry.target.getAttribute("id").split("-")[1]
-        );
-        if (entry.isIntersecting) {
-          visibleSections.push(id);
-        } else {
-          visibleSections = visibleSections.filter((x) => x != id);
-        }
-      });
-      // Ensure we are sorting by number, not string:
-      visibleSections.sort((n1, n2) => n1 - n2);
+  function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
+    entries.forEach((entry) => {
+      let id: number = parseInt(entry.target.getAttribute("id").split("-")[1]);
+      // If we use entry.isIntersecting, the element may still be partly
+      // intersecting the scroll box, but hidden below a sticky element where
+      // it's not visible. So we use the boundingClientRect to check if it's
+      // bottom point is below the sticky element's height (110px), iff there
+      // is a sticky element.
 
-      if (lastActiveSection) {
-        lastActiveSection.active = false;
+      let isIntersecting = context.isStuck()
+        ? entry.boundingClientRect.bottom > 110
+        : entry.isIntersecting;
+
+      if (isIntersecting) {
+        // Push to front or back, as appropriate, if not already present.
+        if (visibleSections.length == 0) {
+          visibleSections.push(id);
+        } else if (visibleSections[0] > id) {
+          visibleSections.unshift(id);
+        } else if (visibleSections[visibleSections.length - 1] < id) {
+          visibleSections.push(id);
+        }
+      } else {
+        visibleSections = visibleSections.filter((x) => x != id);
       }
-      if (visibleSections.length > 0) {
-        lastActiveSection = sidebarSections[visibleSections[0]];
-        lastActiveSection.active = true;
-      }
-      sidebarSections = sidebarSections;
-    },
-    {
-      rootMargin: "0px",
-      threshold: 0.1,
+    });
+
+    if (lastActiveSection) {
+      lastActiveSection.active = false;
     }
-  );
+    if (visibleSections.length > 0) {
+      lastActiveSection = sidebarSections[visibleSections[0]];
+      lastActiveSection.active = true;
+    }
+    sidebarSections = sidebarSections;
+  }
+
+  let observer: IntersectionObserver | null = null;
+
+  function createObserver(isStuck: boolean = false) {
+    if (!mainColumn) return;
+    if (observer) observer.disconnect();
+    observer = new IntersectionObserver(observeCallback, {
+      root: document,
+      rootMargin: "0px",
+      // Every 5%:
+      threshold: [...Array(20).keys()].map((i) => i / 20),
+    });
+    let children = mainColumn.querySelectorAll("[data-sidebarsection]");
+    for (let i = 0; i < children.length; i++) {
+      observer.observe(children[i]);
+    }
+  }
 
   class SidebarSection {
     label: string | null = "";
@@ -78,9 +103,9 @@
         active: false,
         sponsor: child.getAttribute("data-sponsor") == "true",
       });
-      observer.observe(child);
     }
     sidebarSections = sidebarSections;
+    createObserver();
   });
 </script>
 
