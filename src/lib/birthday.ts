@@ -12,10 +12,14 @@ import {MonthDate, MonthDuration} from './month-time'
  *
  * This class stores the lay birthdate, and provides functions to convert to
  * the SSA birthdate.
+ *
+ * All dates should be considered UTC, and care should be taken, since
+ * Javascript likes to use local time converssions in many cases.
  */
 export class Birthdate {
   /**
-   * Birthdate is stored internally as a Date object.
+   * Birthdate is stored internally as a Date object. We don't expose Date
+   * objects as part of the API though, because of the UTC issues.
    */
   private birthdate_: Date;
 
@@ -24,30 +28,36 @@ export class Birthdate {
    *
    * The parameter is the "lay birthdate", which is the birthdate that is
    * commonly celebrated. It is the date at the moment the person was born.
+   * It is very important that this is provided as a UTC date.
    */
-  constructor(layBirthdate: Date = new Date(1980, 0, 1)) {
+  private constructor(layBirthdate: Date = new Date(Date.UTC(1980, 0, 1))) {
     this.birthdate_ = layBirthdate;
   }
 
   /**
-   * Creates a new Birthdate object from a year, month, and day.
+   * Creates a new Birthdate object from a year, month, and day. Note that month
+   * is zero indexed. Day is one indexed.
    */
   static FromYMD(year: number, month: number, day: number) {
-    return new Birthdate(new Date(year, month, day));
+    return new Birthdate(new Date(Date.UTC(year, month, day)));
   }
   /**
    * Returns true iff the lay birthdate lies on the first of the month,
    * for example Jan 1.
    */
   isFirstOfMonth(): boolean {
-    return this.birthdate_.getDate() == 1;
+    return this.birthdate_.getUTCDate() == 1;
   }
 
   /**
    * Returns a string version of the user's lay birthdate. e.g. "Jan 1, 2000"
    */
   layBirthdateString(): string {
-    return this.birthdate_.toLocaleDateString(
+    // Adjust by the timezone offset because toLocaleDateString() uses local
+    // time, not UTC.
+    const timeDiff = this.birthdate_.getTimezoneOffset() * 60000;
+    const adjustedDate = new Date(this.birthdate_.valueOf() + timeDiff);
+    return adjustedDate.toLocaleDateString(
         'en-us', {month: 'short', year: 'numeric', day: 'numeric'});
   }
 
@@ -57,9 +67,8 @@ export class Birthdate {
    * lay birthdate, and returns the result as a Date object.
    */
   ssaBirthdate(): Date {
-    // We subtract 12 hours. 24 or 1 could get into trouble with daylight
-    // savings time changes. Why doesn't javascript have better date libraries?
-    return new Date(this.birthdate_.getTime() - (12 * 60 * 60 * 1000));
+    // We subtract 24 hours:
+    return new Date(this.birthdate_.getTime() - (24 * 60 * 60 * 1000));
   }
 
   /**
@@ -70,22 +79,22 @@ export class Birthdate {
   ssaBirthMonthDate(): MonthDate {
     const ebd = this.ssaBirthdate();
     return MonthDate.initFromYearsMonths(
-        {years: ebd.getFullYear(), months: ebd.getMonth()});
+        {years: ebd.getUTCFullYear(), months: ebd.getUTCMonth()});
   }
 
   /** @returns 4 digit number representing the year */
   layBirthYear(): number {
-    return this.birthdate_.getFullYear();
+    return this.birthdate_.getUTCFullYear();
   }
   /**
    * @returns Index of the month. January is 0, Feb is 1, and so on.
    */
   layBirthMonth(): number {
-    return this.birthdate_.getMonth();
+    return this.birthdate_.getUTCMonth();
   }
   /** @returns number representing the day of the month (from 1 to 31). */
   layBirthDayOfMonth(): number {
-    return this.birthdate_.getDate();
+    return this.birthdate_.getUTCDate();
   }
 
   /**
@@ -147,7 +156,7 @@ export class Birthdate {
       {age: number, day: number, month: string, year: number} {
     var example = {
       'age': year - this.ssaBirthYear(),
-      'day': this.ssaBirthdate().getDate(),
+      'day': this.ssaBirthdate().getUTCDate(),
       'month': this.ssaBirthMonthDate().monthFullName(),
       'year': year,
     };

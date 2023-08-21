@@ -34,29 +34,33 @@
     return () => {
       let recipient: Recipient | null = null;
       let spouse: Recipient | null = null;
+      // All of the demo birthdays are on the 2nd of the month. This is to
+      // make their filing date math as simple as possible. If you are born on
+      // the 2nd, then you attain an age on the 1st and are that age through
+      // the entire same month that you are born.
       if (demoId == 0) {
         recipient = new Recipient();
         recipient.earningsRecords = parsePaste(demo0);
-        recipient.birthdate = new Birthdate(new Date("1950-07-01"));
+        recipient.birthdate = Birthdate.FromYMD(1950, 6, 2);
         recipient.name = "Alex";
 
         spouse = new Recipient();
         spouse.earningsRecords = parsePaste(demo0_spouse);
-        spouse.birthdate = new Birthdate(new Date("1949-03-01"));
+        spouse.birthdate = Birthdate.FromYMD(1949, 3, 2);
         spouse.name = "Chris";
       } else if (demoId == 1) {
         recipient = new Recipient();
         recipient.earningsRecords = parsePaste(demo1);
-        recipient.birthdate = new Birthdate(new Date("1950-08-02"));
+        recipient.birthdate = Birthdate.FromYMD(1950, 8, 2);
       } else if (demoId == 2) {
         recipient = new Recipient();
         recipient.earningsRecords = parsePaste(demo2);
-        recipient.birthdate = new Birthdate(new Date("1985-09-03"));
+        recipient.birthdate = Birthdate.FromYMD(1985, 9, 2);
         recipient.name = "Avery";
 
         spouse = new Recipient();
         spouse.earningsRecords = parsePaste(demo2_spouse);
-        spouse.birthdate = new Birthdate(new Date("1986-03-01"));
+        spouse.birthdate = Birthdate.FromYMD(1986, 3, 2);
         spouse.name = "Riley";
       } else {
         throw new Error("Unknown demo ID: " + demoId);

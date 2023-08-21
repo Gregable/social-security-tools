@@ -14,7 +14,7 @@ let recipient = new Recipient();
 recipient.name = 'Alex';
 recipient.markFirst();
 recipient.earningsRecords = parsePaste(demo);
-recipient.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 
 // This data is such that the spouse has a low enough PIA that they can claim
 // spousal benefits, but not a zero PIA.
@@ -22,14 +22,13 @@ let spouseLowEarner = new Recipient();
 spouseLowEarner.name = 'Chris';
 spouseLowEarner.markSecond();
 spouseLowEarner.earningsRecords = parsePaste(demo_spouse_low);
-spouseLowEarner.birthdate = new Birthdate(new Date('1954-07-01'));
-
+spouseLowEarner.birthdate = Birthdate.FromYMD(1954, 6, 1);
 // This data is such that the spouse has a low enough PIA that they can claim
 // spousal benefits, but not a zero PIA.
 let spouseZeroEarner = new Recipient();
 spouseZeroEarner.name = 'Chris';
 spouseZeroEarner.markSecond();
-spouseZeroEarner.birthdate = new Birthdate(new Date('1954-07-01'));
+spouseZeroEarner.birthdate = Birthdate.FromYMD(1954, 6, 1);
 
 // This data is such that the spouse has a high enough PIA that they cannot
 // claim spousal benefits.
@@ -37,7 +36,7 @@ let spouseHighEarner = new Recipient();
 spouseHighEarner.name = 'Chris';
 spouseHighEarner.markSecond();
 spouseHighEarner.earningsRecords = parsePaste(demo_spouse_high);
-spouseHighEarner.birthdate = new Birthdate(new Date('1954-07-01'));
+spouseHighEarner.birthdate = Birthdate.FromYMD(1954, 6, 1);
 
 const meta: Meta<CombinedChart> = {
   component: CombinedChart,

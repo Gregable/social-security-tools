@@ -22,16 +22,9 @@ const Template = ({...args}) => ({
   props: args,
 });
 
-function AdjustedBirthdate(dateStr: string): Birthdate {
-  // Add timezone offset to get the correct date.
-  let d = new Date(dateStr);
-  return new Birthdate(
-      new Date(d.getTime() + Math.abs(d.getTimezoneOffset() * 60 * 1000)));
-}
-
 let r1 = new Recipient();
 r1.earningsRecords = parsePaste(demo0);
-r1.birthdate = AdjustedBirthdate('1950-07-15');
+r1.birthdate = Birthdate.FromYMD(1950, 6, 15);
 r1.name = 'Alex';
 r1.markFirst();
 
@@ -42,7 +35,7 @@ Default.args = {
 
 let r2 = new Recipient();
 r2.earningsRecords = parsePaste(demo0);
-r2.birthdate = AdjustedBirthdate('1950-07-01');
+r2.birthdate = Birthdate.FromYMD(1950, 6, 1);
 r2.name = 'Alex';
 r2.markFirst();
 
@@ -54,7 +47,7 @@ BirthdayOnFirst.args = {
 
 let r3 = new Recipient();
 r3.earningsRecords = parsePaste(demo0);
-r3.birthdate = AdjustedBirthdate('1950-07-02');
+r3.birthdate = Birthdate.FromYMD(1950, 6, 2);
 r3.name = 'Alex';
 r3.markFirst();
 

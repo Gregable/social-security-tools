@@ -183,7 +183,7 @@ export class Recipient {
   /**
    * The recipient's birthdate.
    */
-  private birthdate_: Birthdate = new Birthdate();
+  private birthdate_: Birthdate = Birthdate.FromYMD(1980, 0, 1);
   get birthdate(): Birthdate {
     return this.birthdate_;
   }

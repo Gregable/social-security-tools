@@ -23,7 +23,7 @@ recipient.earningsRecords.push((() => {
   return record;
 })());
 recipient.earningsRecords = recipient.earningsRecords;
-recipient.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 recipient.name = 'Alex';
 recipient.markFirst();
 

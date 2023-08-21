@@ -23,7 +23,7 @@ context.recipient.earningsRecords.push((() => {
   return record;
 })());
 context.recipient.earningsRecords = context.recipient.earningsRecords;
-context.recipient.birthdate = new Birthdate(new Date('1950-07-01'));
+context.recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 
 const meta: Meta<EarningsTable> = {
   component: EarningsTable,
