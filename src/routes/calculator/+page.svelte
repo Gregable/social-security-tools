@@ -24,6 +24,7 @@
 
   function pasteDone() {
     isPasteFlow = false;
+    history.pushState({ id: "top" }, "", "#results");
   }
 </script>
 
