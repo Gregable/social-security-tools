@@ -27,7 +27,7 @@ describe('Recipient', () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
-    r.birthdate = new Birthdate(new Date(1957, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1957, 0, 2);
 
     expect(r.pia().firstBendPoint().value()).toEqual(926);
     expect(r.pia().secondBendPoint().value()).toEqual(5583);
@@ -35,9 +35,7 @@ describe('Recipient', () => {
 
   it('calculates pia by bracket', () => {
     let r = new Recipient();
-    // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
-    // day before the birthday.
-    r.birthdate = new Birthdate(new Date(1950, 7, 1));
+    r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
 
     expect(r.pia().primaryInsuranceAmountByBracket(0).value()).toEqual(690.30);
@@ -49,9 +47,7 @@ describe('Recipient', () => {
 
   it('calculates cola adjustments', () => {
     let r = new Recipient();
-    // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
-    // day before the birthday.
-    r.birthdate = new Birthdate(new Date(1950, 7, 1));
+    r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
 
     // There should be one adjustment per year from 2012 to MAX_COLA_YEAR.
@@ -71,9 +67,7 @@ describe('Recipient', () => {
 
   it('calculates pia from AIME', () => {
     let r = new Recipient();
-    // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
-    // day before the birthday.
-    r.birthdate = new Birthdate(new Date(1950, 7, 1));
+    r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
 
     // Verify that piaFromAIME agrees with primaryInsuranceAmount using the

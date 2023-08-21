@@ -19,20 +19,24 @@
 
   const dispatch = createEventDispatcher();
   function confirm() {
-    dispatch("submit", { birthdate: new Birthdate(parsedDate) });
+    dispatch("submit", {
+      birthdate: Birthdate.FromYMD(
+        parsedDate.getUTCFullYear(),
+        parsedDate.getUTCMonth(),
+        parsedDate.getUTCDate()
+      ),
+    });
   }
 
   function parseDateInputValue(dateInputValue: string): Date {
     // Svelte binds the value of the input to a string, so we need to parse it
-    let out = new Date(dateInputValue);
+    let localInput = new Date(dateInputValue);
     // Javascript parses dates in UTC, but converts to local time.
     // This can cause dates to add/subract a day from what's entered because
-    // of daylight savings. This line normalizes that. Fun times.
-    out = new Date(
-      out.getTime() + Math.abs(out.getTimezoneOffset() * 60 * 1000)
-    );
-
-    return out;
+    // of daylight savings. This normalizes that. Fun times.
+    const timeDiff = localInput.getTimezoneOffset() * 60000;
+    const adjusted = new Date(localInput.valueOf() + timeDiff);
+    return adjusted;
   }
 
   // Svelte binds the value of the input to a string, so we need to parse it

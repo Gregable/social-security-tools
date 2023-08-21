@@ -40,7 +40,7 @@ describe('Recipient', () => {
 
   it('sets and gets birth date', () => {
     let r = new Recipient();
-    const b = new Birthdate(new Date(1970, 1, 1));
+    const b = Birthdate.FromYMD(1970, 1, 1);
     r.birthdate = b;
     expect(r.birthdate).toEqual(b);
   });
@@ -122,7 +122,7 @@ describe('Recipient', () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
-    r.birthdate = new Birthdate(new Date(1957, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1957, 0, 2);
 
     expect(r.normalRetirementAge())
         .toEqual(MonthDuration.initFromYearsMonths({years: 66, months: 6}));
@@ -134,7 +134,7 @@ describe('Recipient', () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
-    r.birthdate = new Birthdate(new Date(1957, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1957, 0, 2);
 
     expect(r.indexingYear()).toEqual(2017);
   });
@@ -176,7 +176,7 @@ describe('Recipient', () => {
 
   it('updates earnings records on record write', () => {
     let r = new Recipient();
-    r.birthdate = new Birthdate(new Date(1990, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1990, 0, 2);
 
     // Records are written initially out of order:
     r.earningsRecords = [
@@ -195,7 +195,7 @@ describe('Recipient', () => {
     }
 
     // Update the birthdate to be 1995, which changes the indexing year:
-    r.birthdate = new Birthdate(new Date(1995, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1995, 0, 2);
     for (let i = 0; i < 3; i++) {
       // Records have indexingYear set:
       expect(r.earningsRecords[0].indexingYear).toEqual(2055);
@@ -204,7 +204,7 @@ describe('Recipient', () => {
 
   it('updates future earnings records on record write', () => {
     let r = new Recipient();
-    r.birthdate = new Birthdate(new Date(1990, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1990, 0, 2);
 
     // Records are written initially out of order:
     r.futureEarningsRecords = [
@@ -221,7 +221,7 @@ describe('Recipient', () => {
     }
 
     // Update the birthdate to be 1995, which changes the indexing year:
-    r.birthdate = new Birthdate(new Date(1995, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1995, 0, 2);
     for (let i = 0; i < 3; i++) {
       // Records have indexingYear set:
       expect(r.futureEarningsRecords[0].indexingYear).toEqual(2055);
@@ -282,7 +282,7 @@ describe('Recipient', () => {
     });
     expect(numCallbacks).toEqual(1);
 
-    r.birthdate = new Birthdate(new Date(1990, 0, 2));
+    r.birthdate = Birthdate.FromYMD(1990, 0, 2);
     expect(numCallbacks).toEqual(2);
     unsubscribe();
   });
@@ -320,7 +320,7 @@ describe('Recipient', () => {
     // This way the test won't break when the wage indices are updated for
     // future years.
     const startYear = 1965;
-    r.birthdate = new Birthdate(new Date(startYear - 5, 0, 2));
+    r.birthdate = Birthdate.FromYMD(startYear - 5, 0, 2);
     expect(r.indexingYear()).toBe(2020);
 
     // Add 40 years of earnings records, starting the year they were born:
@@ -408,7 +408,7 @@ describe('Recipient', () => {
 
   it('correctly calculates benefits based on filing ages', () => {
     let r = new Recipient();
-    r.birthdate = new Birthdate(new Date(1960, 0, 5));
+    r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
     r.forceTestPia(Money.from(1000.00));
@@ -447,7 +447,7 @@ describe('Recipient', () => {
     r.forceTestPia(Money.from(1000.00));
 
     // If they haven't filed yet, they should have zero benefit:
-    r.birthdate = new Birthdate(new Date(1960, 0, 5));
+    r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     expect(r.benefitOnDate(
                 // File at NRA, 67:
                 MonthDate.initFromYearsMonths({years: 2027, months: 1}),
@@ -472,7 +472,7 @@ describe('Recipient', () => {
 
     // Filing in the middle of the year, but on the month they turn 70,
     // should immediately be maximum delayed multiplier of 24%
-    r.birthdate = new Birthdate(new Date(1960, 6, 5));
+    r.birthdate = Birthdate.FromYMD(1960, 6, 5);
     expect(r.benefitOnDate(
                 MonthDate.initFromYearsMonths({years: 2030, months: 6}),
                 MonthDate.initFromYearsMonths({years: 2030, months: 6}))
@@ -483,7 +483,7 @@ describe('Recipient', () => {
     // should result in only a 20% increase until the following year. where
     // it will be 24%. The 20% number is the delayed retirement credits as of
     // Jan 2030.
-    r.birthdate = new Birthdate(new Date(1960, 6, 5));
+    r.birthdate = Birthdate.FromYMD(1960, 6, 5);
     expect(r.benefitOnDate(
                 MonthDate.initFromYearsMonths({years: 2030, months: 5}),
                 MonthDate.initFromYearsMonths({years: 2030, months: 5}))
@@ -508,8 +508,8 @@ describe('Recipient', () => {
        s.forceTestPia(Money.from(3000.00));
 
        // If they haven't filed yet, they should have zero benefit:
-       r.birthdate = new Birthdate(new Date(1960, 0, 5));
-       s.birthdate = new Birthdate(new Date(1960, 0, 5));
+       r.birthdate = Birthdate.FromYMD(1960, 0, 5);
+       s.birthdate = Birthdate.FromYMD(1960, 0, 5);
        expect(r.spousalBenefitOnDate(
                    s, MonthDate.initFromYearsMonths({years: 2027, months: 1}),
                    // File at NRA, 67:

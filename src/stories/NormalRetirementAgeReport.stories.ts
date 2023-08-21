@@ -25,9 +25,7 @@ const Template = ({...args}) => ({
 
 let r1 = new Recipient();
 r1.earningsRecords = parsePaste(demo0);
-let d = new Date('1950-07-01');
-r1.birthdate = new Birthdate(
-    new Date(d.getTime() + Math.abs(d.getTimezoneOffset() * 60 * 1000)));
+r1.birthdate = Birthdate.FromYMD(1950, 6, 1);
 r1.name = 'Alex';
 r1.markFirst();
 export const Default = Template.bind({});

@@ -24,7 +24,7 @@ context.recipient.earningsRecords.push((() => {
 })());
 context.recipient.earningsRecords = context.recipient.earningsRecords;
 context.recipient.simulateFutureEarningsYears(5, Money.from(30 * 1000))
-context.recipient.birthdate = new Birthdate(new Date('1950-07-01'));
+context.recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 
 const meta: Meta<IndexedEarningsTable> = {
   component: IndexedEarningsTable,

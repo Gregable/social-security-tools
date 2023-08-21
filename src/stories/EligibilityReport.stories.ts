@@ -13,14 +13,14 @@ import demo1 from '$lib/pastes/millionpaste.txt?raw';
 // Sufficient earnigns for eligibility
 let recipient0 = new Recipient();
 recipient0.earningsRecords = parsePaste(demo0);
-recipient0.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient0.birthdate = Birthdate.FromYMD(1950, 6, 1);
 recipient0.name = 'Alex';
 recipient0.markFirst();
 
 // Insuficient earnings for eligibility
 let recipient1 = new Recipient();
 recipient1.earningsRecords = parsePaste(demo1);
-recipient1.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient1.birthdate = Birthdate.FromYMD(1950, 6, 1);
 const futureEarnings1 = [
   new EarningRecord({
     year: 2022,
@@ -40,7 +40,7 @@ recipient1.markFirst();
 // Sufficient earnings for eligibility with future earnings
 let recipient2 = new Recipient();
 recipient2.earningsRecords = parsePaste(demo1);
-recipient2.birthdate = new Birthdate(new Date('1950-07-01'));
+recipient2.birthdate = Birthdate.FromYMD(1950, 6, 1);
 const futureEarnings2 = [
   new EarningRecord({
     year: 2019,
