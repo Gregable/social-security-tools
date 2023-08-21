@@ -5,13 +5,32 @@
   import { ChevronRight } from "svelte-bootstrap-icons";
   import { context } from "$lib/context";
 
-  function scrollTo(id: string) {
+  function scrollTo(section: SidebarSection) {
     return () => {
-      const element = document.getElementById(id);
+      const element = document.getElementById(section.id);
       if (element) {
+        history.pushState(
+          { id: section.id },
+          "",
+          "#" + section.label.replaceAll(" ", "")
+        );
         element.scrollIntoView({ behavior: "smooth" });
       }
     };
+  }
+
+  function popState(event: PopStateEvent) {
+    console.log("popState", event);
+    if (event.state && event.state.id) {
+      if (event.state.id == "top") {
+        mainColumn.scrollIntoView({ behavior: "smooth" });
+      } else {
+        const element = document.getElementById(event.state.id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
   }
 
   let mainColumn: HTMLDivElement;
@@ -109,13 +128,15 @@
   });
 </script>
 
+<svelte:window on:popstate={popState} />
+
 <div class="twoColumns">
   <div class="sideBar">
     <ul>
       {#each sidebarSections as section}
         <li
-          on:click={scrollTo(section.id)}
-          on:keydown={scrollTo(section.id)}
+          on:click={scrollTo(section)}
+          on:keydown={scrollTo(section)}
           class:active={section.active}
           class:sponsor={section.sponsor}
         >
