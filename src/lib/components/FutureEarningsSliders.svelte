@@ -180,7 +180,6 @@
   }
   @media screen {
     .sliders {
-      position: sticky;
       overflow-anchor: none;
       top: 0;
       z-index: 5;
@@ -206,29 +205,55 @@
       top: -2px;
     }
   }
+  @media screen and (max-width: 500px) {
+    .grid {
+      display: grid;
+      grid-template-columns: auto;
+      grid-template-rows: auto auto auto auto auto auto;
+      grid-column-gap: 0px;
+      grid-row-gap: 0px;
+      align-items: center;
+    }
+    .item.left,
+    .item.right {
+      justify-self: center;
+      white-space: nowrap;
+    }
+    .item.right {
+      padding-bottom: 18px;
+    }
+    .item.left {
+      padding-top: 18px;
+    }
+  }
+  @media screen and (min-width: 501px) {
+    .sliders {
+      position: sticky;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 250px 1fr;
+      grid-template-rows: auto auto;
+      grid-column-gap: 0px;
+      grid-row-gap: 0px;
+      align-items: center;
+    }
+    .item.left {
+      justify-self: end;
+    }
+    .item.right {
+      justify-self: start;
+    }
+    .item.right,
+    .item.left {
+      padding-top: 18px;
+      white-space: nowrap;
+    }
+  }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 250px 1fr;
-    grid-template-rows: auto auto;
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
-    align-items: center;
-  }
-  .item.left {
-    justify-self: end;
-  }
   .item.center {
     /* Need at least 16px of margin to avoid clipping the slider handles */
     margin: 0 20px;
     font-size: 14px;
-  }
-  .item.right {
-    justify-self: start;
-  }
-  .item.right,
-  .item.left {
-    padding-top: 18px;
-    white-space: nowrap;
   }
 </style>
