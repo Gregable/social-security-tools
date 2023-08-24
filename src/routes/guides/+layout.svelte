@@ -7,17 +7,13 @@
 <main>
   <slot />
   <div class="footer">
-    <div>
-      <h1>Try SSA.tools to see your personalized benefit</h1>
-      <span style="font-size: 16px;">
-        <p>
-          See your personal benefit data and ask 'What If?' Questions. The tool
-          is absolutely free.
-        </p>
-        <p style="text-align: center">
-          <a class="bigbtn" href="/calculator" role="button">Get Started</a>
-        </p>
-      </span>
+    <h1>Try SSA.tools to see your personalized benefit</h1>
+    <p>See your personal benefit data and ask 'What If?' Questions.</p>
+    <div class="bigbtn">
+      <a class="bigbtn" href="/calculator" role="button"
+        ><span>Get Started</span>
+        <div class="freebadge">Free</div></a
+      >
     </div>
   </div>
 </main>
@@ -33,23 +29,48 @@
   .footer {
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    margin: auto auto;
+    width: max-content;
   }
-  a.bigbtn {
+  .bigbtn {
+    position: relative;
+  }
+
+  .bigbtn a {
     background-color: #5cb85c;
     border-color: #4cae4c;
-    border-radius: 6px;
-    border: 1px solid transparent;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     cursor: pointer;
     color: #fff;
     white-space: nowrap;
     padding: 14px 24px;
+    font-size: 24px;
     font-weight: 400;
     text-decoration: none;
-    display: inline-block;
-    font-size: 2rem;
+    display: flex;
+    box-shadow: 0 0 0 1px #5cb85c, 0 1px 2px 0 rgba(31, 42, 55, 0.4);
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-out;
+    width: min-content;
+    margin: auto;
   }
-  a.bigbtn:hover {
+  .footer h1,
+  .footer p {
+    text-align: center;
+  }
+
+  .bigbtn a:hover {
     background-color: #449d44;
     border-color: #398439;
+  }
+
+  .bigbtn .freebadge {
+    background: #fd6054;
+    border-radius: 4px;
+    margin-left: 10px;
+    padding: 3px 5px;
   }
 </style>

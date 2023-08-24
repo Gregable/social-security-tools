@@ -26,9 +26,12 @@
   <div class="jumbotron-grid">
     <div>
       <h1><span id="understand">Understand</span> Social Security</h1>
-      <p>
-        <a class="bigbtn" href="calculator" role="button">Get Started</a>
-      </p>
+      <div class="bigbtn">
+        <a class="bigbtn" href="calculator" role="button"
+          ><span>Get Started</span>
+          <div class="freebadge">Free</div></a
+        >
+      </div>
     </div>
     <div>
       <div>
@@ -201,48 +204,65 @@
     color: #337ab7;
   }
 
-  a.bigbtn {
+  .bigbtn {
+    position: relative;
+  }
+
+  .bigbtn a {
     background-color: #5cb85c;
     border-color: #4cae4c;
-    border-radius: 6px;
-    border: 1px solid transparent;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     cursor: pointer;
     color: #fff;
     white-space: nowrap;
     padding: 14px 24px;
     font-weight: 400;
     text-decoration: none;
-    display: inline-block;
+    display: flex;
+    box-shadow: 0 0 0 1px #5cb85c, 0 1px 2px 0 rgba(31, 42, 55, 0.4);
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-out;
+    width: min-content;
+    margin: auto;
   }
 
-  a.bigbtn:hover {
+  .bigbtn a:hover {
     background-color: #449d44;
     border-color: #398439;
   }
 
+  .bigbtn .freebadge {
+    background: #fd6054;
+    border-radius: 4px;
+    margin-left: 10px;
+    padding: 3px 5px;
+  }
+
   @media (min-width: 921px) {
-    a.bigbtn {
+    .bigbtn a {
       font-size: 21px;
       line-height: 1.3;
     }
   }
 
   @media (max-width: 920px) and (min-width: 701px) {
-    a.bigbtn {
+    .bigbtn a {
       font-size: 20px;
       line-height: 1.3;
     }
   }
 
   @media (max-width: 700px) and (min-width: 520px) {
-    a.bigbtn {
+    .bigbtn a {
       font-size: 16px;
       line-height: 1.2;
     }
   }
 
   @media (max-width: 520px) {
-    a.bigbtn {
+    .bigbtn a {
       font-size: 16px;
       line-height: 1;
       padding: 7px 12px;
@@ -399,6 +419,11 @@
     .jumbotron-grid h1 {
       font-size: 11vw;
       line-height: 16vw;
+      margin: 0.2rem 0 1rem;
+    }
+
+    hr {
+      display: none;
     }
 
     span#understand {

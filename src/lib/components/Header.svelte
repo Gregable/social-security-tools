@@ -12,7 +12,7 @@
 </script>
 
 <div class="header">
-  <h3>Social Security Calculator</h3>
+  <h3><a href="/">SSA.tools Social Security Calculator</a></h3>
 
   <div class="navpills" style:--pill-count={navOptions.length.toString()}>
     {#each navOptions as option}
@@ -46,6 +46,9 @@
     font-size: 24px;
     padding-left: 20px;
     white-space: nowrap;
+  }
+  h3 a {
+    color: rgb(150, 150, 150);
   }
   .printurl {
     margin: 0 1em;
