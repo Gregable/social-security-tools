@@ -155,18 +155,9 @@
   {/if}
   {#if mode === Mode.INITIAL}
     {#if isRecipient}
-      <div class="text">
-        <p>
-          To use the calculator, you must provide data from your Social Security
-          record. If you aren't ready for that yet, select a demo data set at
-          the bottom of the page.
-        </p>
-      </div>
-      <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
       <DemoData on:demo={handleDemo} />
-    {:else}
-      <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
     {/if}
+    <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
   {:else if mode === Mode.PASTE_CONFIRMATION}
     {#if isRecipient}
       <PasteConfirm
