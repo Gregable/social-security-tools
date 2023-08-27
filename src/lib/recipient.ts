@@ -95,6 +95,28 @@ export class Recipient {
     this.publish_();
   }
 
+  /**
+   * If true, the user only entered the PIA, not individual earnings records,
+   * for this user. In this case, many of the reports can not be shown since
+   * they depend on the earnings records.
+   */
+  private isPiaOnly_: boolean = false;
+  get isPiaOnly(): boolean {
+    return this.isPiaOnly_;
+  }
+
+  private overridePia_: Money|null = null;
+  get overridePia(): Money|null {
+    return this.overridePia_;
+  }
+  setPia(pia: Money) {
+    if (this.earningsRecords_.length > 0 ||
+        this.futureEarningsRecords_.length > 0) {
+      throw new Error('Cannot set PIA when earnings records are present.');
+    }
+    this.isPiaOnly_ = true;
+    this.overridePia_ = pia;
+  }
 
   /**
    * The recipient's earning records over all years in the SSA database, if
@@ -105,6 +127,9 @@ export class Recipient {
     return this.earningsRecords_;
   }
   set earningsRecords(earningsRecords: Array<EarningRecord>) {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot set earnings records when PIA is set.');
+    }
     this.earningsRecords_ = earningsRecords;
     // Update the indexing year for the new records.
     this.updateEarningsRecords_();
@@ -118,6 +143,9 @@ export class Recipient {
     return this.futureEarningsRecords_;
   }
   set futureEarningsRecords(futureEarningsRecords: Array<EarningRecord>) {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot set earnings records when PIA is set.');
+    }
     this.futureEarningsRecords_ = futureEarningsRecords;
     // Update the indexing year for the new records.
     this.updateEarningsRecords_();
@@ -129,6 +157,9 @@ export class Recipient {
    * @param wage The wage to use for the simulation.
    */
   simulateFutureEarningsYears(numYears: number, wage: Money) {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot set earnings records when PIA is set.');
+    }
     this.futureEarningsRecords_ = [];
 
     // We can't simulate the past, so start the simulation at the current
@@ -177,6 +208,9 @@ export class Recipient {
    */
   private totalIndexedEarnings_: Money = Money.from(0);
   totalIndexedEarnings(): Money {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot get total indexed earnings when PIA is set.');
+    }
     return this.totalIndexedEarnings_;
   }
 
@@ -191,7 +225,7 @@ export class Recipient {
     this.birthdate_ = birthdate;
     // Update the indexing year for the all records based on the new
     // birthdate.
-    this.updateEarningsRecords_();
+    if (!this.isPiaOnly_) this.updateEarningsRecords_();
   }
 
   private retirementAgeBracket(): {
@@ -277,6 +311,10 @@ export class Recipient {
    * This does not include future credits.
    */
   earnedCredits(): number {
+    // Assume that PIA only recipients have enough credits.
+    if (this.isPiaOnly_) {
+      return 40;
+    }
     let credits: number = 0;
     for (let i = 0; i < this.earningsRecords_.length; ++i) {
       credits += this.earningsRecords_[i].credits();
@@ -288,10 +326,7 @@ export class Recipient {
    * The total number of credits the recipient has earned or will earn.
    */
   totalCredits(): number {
-    let credits: number = 0;
-    for (let i = 0; i < this.earningsRecords_.length; ++i) {
-      credits += this.earningsRecords_[i].credits();
-    }
+    let credits: number = this.earnedCredits();
     for (let i = 0; i < this.futureEarningsRecords_.length; ++i) {
       credits += this.futureEarningsRecords_[i].credits();
     }
@@ -304,6 +339,9 @@ export class Recipient {
    * Sorts the earnings records by year ascending.
    */
   private updateEarningsRecords_() {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot update earnings records when PIA is set.');
+    }
     const indexingYear = this.indexingYear();
 
     this.earningsRecords_.sort((a, b) => a.year - b.year);
@@ -346,6 +384,9 @@ export class Recipient {
   }
 
   hasEarningsBefore1978(): boolean {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot check earnings records when PIA is set.');
+    }
     // Only check the first earnings record. Future records are after 1978.
     return this.earningsRecords_.length == 0 ?
         false :
@@ -357,6 +398,9 @@ export class Recipient {
    * If fewer than 35 years of earnings, this is always 0.
    */
   cutoffIndexedEarnings(): Money {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot get cutoff indexed earnings when PIA is set.');
+    }
     return this.top35IndexedEarnings_.length < constants.SSA_EARNINGS_YEARS ?
         Money.from(0) :
         this.top35IndexedEarnings_[this.top35IndexedEarnings_.length - 1]
@@ -367,6 +411,9 @@ export class Recipient {
    * Monthly indexed earnings for the top 35 years of earnings.
    */
   monthlyIndexedEarnings(): Money {
+    if (this.isPiaOnly_) {
+      throw new Error('Cannot get monthly indexed earnings when PIA is set.');
+    }
     return this.totalIndexedEarnings_.div(12)
         .div(constants.SSA_EARNINGS_YEARS)
         .floorToDollar();
@@ -398,25 +445,13 @@ export class Recipient {
     }
   };
 
-  private testPrimaryInsuranceAmount_: Money|null = null;
-  forceTestPia(pia: Money) {
-    this.testPrimaryInsuranceAmount_ = pia;
-  }
-
   /**
    * Returns personal benefit amount if starting benefits at a given age.
    */
   benefitAtAge(age: MonthDuration): Money {
-    // Support overriding the PIA dollar amount for testing purposes, using
-    // forceTestPia().
-    let piaAmount: Money;
-    if (this.testPrimaryInsuranceAmount_ != null) {
-      piaAmount = this.testPrimaryInsuranceAmount_;
-    } else {
-      piaAmount = this.pia().primaryInsuranceAmount();
-    }
-
-    return piaAmount.floorToDollar()
+    return this.pia()
+        .primaryInsuranceAmount()
+        .floorToDollar()
         .times(1 + this.benefitMultiplierAtAge(age))
         .floorToDollar();
   };
@@ -474,21 +509,8 @@ export class Recipient {
   spousalBenefitOnDate(
       spouse: Recipient, spouseFilingDate: MonthDate, filingDate: MonthDate,
       atDate: MonthDate): Money {
-    // Support overriding the PIA dollar amount for testing purposes, using
-    // forceTestPia().
-    let piaAmount: Money;
-    if (this.testPrimaryInsuranceAmount_ != null) {
-      piaAmount = this.testPrimaryInsuranceAmount_;
-    } else {
-      piaAmount = this.pia().primaryInsuranceAmount();
-    }
-    let spousePiaAmount: Money;
-    if (this.testPrimaryInsuranceAmount_ != null) {
-      spousePiaAmount = spouse.testPrimaryInsuranceAmount_;
-    } else {
-      spousePiaAmount = spouse.pia().primaryInsuranceAmount();
-    }
-
+    let piaAmount: Money = this.pia().primaryInsuranceAmount();
+    let spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
 
     // The filing date must be greater than 62:
     console.assert(this.birthdate.ageAtSsaDate(filingDate)
