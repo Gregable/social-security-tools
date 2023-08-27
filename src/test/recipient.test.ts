@@ -411,7 +411,7 @@ describe('Recipient', () => {
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
-    r.forceTestPia(Money.from(1000.00));
+    r.setPia(Money.from(1000.00));
 
     // Early retirement at 62 should be 30% reduction:
     expect(r.benefitAtAge(
@@ -444,7 +444,7 @@ describe('Recipient', () => {
     let r = new Recipient();
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
-    r.forceTestPia(Money.from(1000.00));
+    r.setPia(Money.from(1000.00));
 
     // If they haven't filed yet, they should have zero benefit:
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
@@ -501,11 +501,11 @@ describe('Recipient', () => {
        let r = new Recipient();
        // Over time, the PIA will increase due to COLAs, but we want the tests
        // to be stable, so we set the PIA to a fixed value for testing.
-       r.forceTestPia(Money.from(1000.00));
+       r.setPia(Money.from(1000.00));
 
        let s = new Recipient();
        // Force a spousal PIA large enough to generate a $500 spousal benefit.
-       s.forceTestPia(Money.from(3000.00));
+       s.setPia(Money.from(3000.00));
 
        // If they haven't filed yet, they should have zero benefit:
        r.birthdate = Birthdate.FromYMD(1960, 0, 5);

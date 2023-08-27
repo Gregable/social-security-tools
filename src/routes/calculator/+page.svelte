@@ -50,27 +50,36 @@
             </h1>
           </SidebarSection>
         {/if}
-        <SidebarSection label="Earnings Report">
-          <EarningsReport recipient={context.recipient} />
-        </SidebarSection>
-        <SidebarSection label="Benefits Eligibility" underSticky>
-          <EligibilityReport recipient={context.recipient} />
-        </SidebarSection>
-        <SidebarSection label="Indexed Earnings" underSticky>
-          <IndexedEarningsReport recipient={context.recipient} />
-        </SidebarSection>
-        <SidebarSection label="Primary Insurance Amount" underSticky>
-          <PiaReport recipient={context.recipient} />
-        </SidebarSection>
-        <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
-          <Sponsor />
-        </SidebarSection>
-        <SidebarSection label="Normal Retirement Age" underSticky>
-          <NormalRetirementAgeReport recipient={context.recipient} />
-        </SidebarSection>
-        <SidebarSection label="Filing Date" underSticky>
-          <FilingDateReport recipient={context.recipient} />
-        </SidebarSection>
+        {#if !context.recipient.isPiaOnly}
+          <SidebarSection label="Earnings Report">
+            <EarningsReport recipient={context.recipient} />
+          </SidebarSection>
+          <SidebarSection label="Benefits Eligibility" underSticky>
+            <EligibilityReport recipient={context.recipient} />
+          </SidebarSection>
+          <SidebarSection label="Indexed Earnings" underSticky>
+            <IndexedEarningsReport recipient={context.recipient} />
+          </SidebarSection>
+          <SidebarSection label="Primary Insurance Amount" underSticky>
+            <PiaReport recipient={context.recipient} />
+          </SidebarSection>
+          <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
+            <Sponsor />
+          </SidebarSection>
+          <SidebarSection label="Normal Retirement Age" underSticky>
+            <NormalRetirementAgeReport recipient={context.recipient} />
+          </SidebarSection>
+          <SidebarSection label="Filing Date" underSticky>
+            <FilingDateReport recipient={context.recipient} />
+          </SidebarSection>
+        {:else}
+          <SidebarSection label="Normal Retirement Age">
+            <NormalRetirementAgeReport recipient={context.recipient} />
+          </SidebarSection>
+          <SidebarSection label="Filing Date">
+            <FilingDateReport recipient={context.recipient} />
+          </SidebarSection>
+        {/if}
       </div>
       {#if context.spouse}
         <!--
@@ -82,24 +91,33 @@
               <RecipientName r={context.spouse} noColor />
             </h1>
           </SidebarSection>
-          <SidebarSection label="Earnings Report">
-            <EarningsReport recipient={context.spouse} />
-          </SidebarSection>
-          <SidebarSection label="Benefits Eligibility" underSticky>
-            <EligibilityReport recipient={context.spouse} />
-          </SidebarSection>
-          <SidebarSection label="Indexed Earnings" underSticky>
-            <IndexedEarningsReport recipient={context.spouse} />
-          </SidebarSection>
-          <SidebarSection label="Primary Insurance Amount" underSticky>
-            <PiaReport recipient={context.spouse} />
-          </SidebarSection>
-          <SidebarSection label="Normal Retirement Age" underSticky>
-            <NormalRetirementAgeReport recipient={context.spouse} />
-          </SidebarSection>
-          <SidebarSection label="Filing Date" underSticky>
-            <FilingDateReport recipient={context.spouse} />
-          </SidebarSection>
+          {#if !context.spouse.isPiaOnly}
+            <SidebarSection label="Earnings Report">
+              <EarningsReport recipient={context.spouse} />
+            </SidebarSection>
+            <SidebarSection label="Benefits Eligibility" underSticky>
+              <EligibilityReport recipient={context.spouse} />
+            </SidebarSection>
+            <SidebarSection label="Indexed Earnings" underSticky>
+              <IndexedEarningsReport recipient={context.spouse} />
+            </SidebarSection>
+            <SidebarSection label="Primary Insurance Amount" underSticky>
+              <PiaReport recipient={context.spouse} />
+            </SidebarSection>
+            <SidebarSection label="Normal Retirement Age" underSticky>
+              <NormalRetirementAgeReport recipient={context.spouse} />
+            </SidebarSection>
+            <SidebarSection label="Filing Date" underSticky>
+              <FilingDateReport recipient={context.spouse} />
+            </SidebarSection>
+          {:else}
+            <SidebarSection label="Normal Retirement Age">
+              <NormalRetirementAgeReport recipient={context.spouse} />
+            </SidebarSection>
+            <SidebarSection label="Filing Date">
+              <FilingDateReport recipient={context.spouse} />
+            </SidebarSection>
+          {/if}
         </div>
         <SidebarSection label="Combined" heading={true}>
           <CombinedHeading />

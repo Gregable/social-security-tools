@@ -1,6 +1,6 @@
 import * as constants from './constants';
 import {Money} from './money';
-import {Recipient} from './recipient';
+import type {Recipient} from './recipient';
 
 /**
  * A PrimaryInsuranceAmount object manages calculating the user's PIA.
@@ -54,6 +54,9 @@ export class PrimaryInsuranceAmount {
     if (bracket != 0 && bracket != 1 && bracket != 2) {
       throw new Error('Invalid bracket: ' + bracket);
     }
+    if (this.recipient_.isPiaOnly) {
+      throw new Error('Cannot calculate PIA brackets for PIA-only recipient');
+    }
 
     let aime = this.recipient_.monthlyIndexedEarnings().roundToDollar();
     let firstBend = this.firstBendPoint();
@@ -77,6 +80,9 @@ export class PrimaryInsuranceAmount {
    * not adjusted for cost of living.
    */
   primaryInsuranceAmountUnadjusted(): Money {
+    if (this.recipient_.isPiaOnly) {
+      throw new Error('Cannot calculate unadjusted PIA for PIA-only recipient');
+    }
     let sum = Money.from(0);
     for (let i = 0; i < 3; ++i)
       sum = sum.plus(this.primaryInsuranceAmountByBracket(i));
@@ -90,6 +96,10 @@ export class PrimaryInsuranceAmount {
    * then adjusted for cost of living.
    */
   primaryInsuranceAmount(): Money {
+    if (this.recipient_.isPiaOnly) {
+      return this.recipient_.overridePia;
+    }
+
     let pia = this.primaryInsuranceAmountUnadjusted();
 
     for (let year = this.recipient_.birthdate.yearTurningSsaAge(62);

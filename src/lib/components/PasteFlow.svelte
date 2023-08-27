@@ -85,7 +85,12 @@
       context.spouse.name = spouseName;
     }
 
-    mode = Mode.PASTE_CONFIRMATION;
+    if (event.detail.recipient.isPiaOnly) {
+      // If the user only pasted their PIA, we skip the confirmation step.
+      mode = Mode.AGE_REQUEST;
+    } else {
+      mode = Mode.PASTE_CONFIRMATION;
+    }
   }
 
   /**

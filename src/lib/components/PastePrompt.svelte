@@ -21,6 +21,7 @@
   import CopyPasteDemoMp4 from "$lib/videos/copy-paste-demo.mp4";
   import CopyPasteDemoPoster from "$lib/videos/copy-paste-demo-poster.jpg";
   import EarningsRecordLinkImage from "$lib/images/earnings-record-link.png";
+  import { Money } from "$lib/money";
 
   const dispatch = createEventDispatcher();
 
@@ -39,15 +40,33 @@
     }
   }
   $: parsePasteContents(pasteContents);
+
+  let piaInput: number | null = null;
+  let piaDisabled: boolean = true;
+  function piaEntry() {
+    if (piaInput === null) return;
+
+    let recipient: Recipient = new Recipient();
+    recipient.setPia(Money.from(piaInput));
+
+    dispatch("paste", {
+      recipient: recipient,
+    });
+  }
+  $: piaDisabled = (() => {
+    if (piaInput === null) return true;
+    return piaInput < 0;
+  })();
 </script>
 
 <div class="pastePrompt">
   <h3>Step 1 of 2: Retrieve Social Security data</h3>
+  <div class="subheading">Preferred Option</div>
   <ol>
     <li>
       Sign in to
       <a target="_blank" href="https://secure.ssa.gov/RIL/SiView.action"
-        >ssa.gov</a
+        >ssa.gov here</a
       >. You may need to create an account.
     </li>
     <li>
@@ -61,7 +80,10 @@
         target="_blank">this link</a
       >
       after signing in.
-      <Expando collapsedText="Show me what it looks like" expandedText="Hide">
+      <Expando
+        collapsedText="Show me what the link looks like"
+        expandedText="Hide"
+      >
         <img
           src={EarningsRecordLinkImage}
           alt="Screenshot of the link to the earnings record on ssa.gov."
@@ -89,7 +111,6 @@
     </li>
     <li>Return here, paste the result into the text area below:</li>
   </ol>
-
   <div class="pasteArea">
     <div>
       <textarea
@@ -103,6 +124,73 @@
       </p>
     </div>
   </div>
+
+  <div class="subheading">Alternative Options</div>
+  <Expando
+    collapsedText="Enter Primary Insurance Amount (PIA)"
+    expandedText="Enter Primary Insurance Amount (PIA)"
+  >
+    <div class="expandoContents">
+      <p>
+        If you already know the Primary Insurance Amount (PIA) at Normal
+        Retirement Age (aka "Full Retirement Age"), you can enter it here.
+      </p>
+      <p>
+        <u>Not Preferred</u>: Without your earnings record, the calculator
+        cannot help you understand the effect of earnings in the future.
+      </p>
+      <div>
+        <label for="piaInput">Primary Insurance Amount: </label>
+        <div>
+          $<input
+            id="piaInput"
+            class="piaInput"
+            type="number"
+            min="0"
+            bind:value={piaInput}
+          />
+        </div>
+        <button on:click={piaEntry} disabled={piaDisabled}>
+          <ico>&#10003;</ico> Submit
+        </button>
+      </div>
+    </div>
+  </Expando>
+  <Expando
+    collapsedText="Enter earnings data in alternative formats"
+    expandedText="Enter earnings data in alternative formats"
+  >
+    <div class="expandoContents">
+      <p>The box above also accepts earnings in alternative formats.</p>
+      <ul>
+        <li>
+          <p>Copy / paste from a spreadsheet or text file.</p>
+          <p>
+            The records must be one row per year, with the year in the first
+            column and the earnings in the second column. For example:
+          </p>
+          <pre class="spreadsheetPasteExample">
+            2015 $5,000
+            2014 $4,000
+            2013 $3,000
+            2012 $2,000
+            2011 $1,000
+          </pre>
+        </li>
+        <li>
+          <p>
+            Copy / paste from your Social Security Statement (not preferred).
+          </p>
+          <p>
+            Your Social Security Statement groups older work years together in
+            ranges rather than listing each year individually, e.g. "2001-2005".
+            This calculator will assume you earned the average of the range for
+            each year. This is only approximate and may result in small errors.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </Expando>
 </div>
 
 <style>
@@ -117,6 +205,15 @@
     width: 100%;
     height: auto;
   }
+  h3 {
+    margin-bottom: 0px;
+  }
+  .subheading {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
+    color: rgb(80, 80, 80);
+  }
   ol {
     padding-inline-start: 5%;
   }
@@ -125,7 +222,7 @@
   }
   .pasteArea {
     max-width: 480px;
-    margin: 0 auto 0 auto;
+    margin: 0 auto 40px auto;
     padding: 0 20px 0 20px;
     width: 100%;
     font-size: 14px;
@@ -149,9 +246,51 @@
     text-align: center;
     vertical-align: bottom;
   }
-  .pasteableData {
-    margin: auto;
-    width: 140px;
+  .expandoContents {
+    margin: 1em;
+  }
+  .spreadsheetPasteExample {
+    margin-left: 1.5em;
+    white-space: pre-line;
+  }
+
+  .piaInput {
+    margin-left: 4px;
+    font-size: 18px;
+    max-width: 5em;
+  }
+
+  /* Hide the arrows from number inputs. */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  button {
+    background: #4ac15a;
+    border: 0 none;
+    border-radius: 36px;
+    color: #fff;
+    font-size: 14px;
+    padding: 2px 0px;
+    margin: 5px 0px;
+    min-width: 90px;
+    cursor: pointer;
+  }
+  button:disabled,
+  button:disabled:hover {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  button:hover {
+    background: #2aa13a;
+  }
+
+  button ico {
+    font-weight: bold;
+    font-size: 22px;
+    vertical-align: middle;
   }
 
   /** Desktop **/
