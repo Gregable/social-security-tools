@@ -107,7 +107,7 @@
 
 <style>
   .demoPrompt {
-    margin: auto;
+    margin: 0 auto 2em auto;
     max-width: min(660px, 80%);
   }
   button {
@@ -118,9 +118,6 @@
     margin: 2px 2px 0 0;
     cursor: pointer;
     background: #4ac15a;
-  }
-  li {
-    margin-bottom: 1em;
   }
 
   /** Desktop **/

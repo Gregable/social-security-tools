@@ -103,13 +103,6 @@
       </p>
     </div>
   </div>
-
-  <p>
-    Alternatively, just paste any text formatted string with year and earnings
-    in the same line, for example:
-  </p>
-  <pre class="pasteableData">2000 $10,000
-2001 $15,000</pre>
 </div>
 
 <style>
