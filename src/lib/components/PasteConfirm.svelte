@@ -16,7 +16,7 @@
 <script lang="ts">
   import "$lib/global.css";
   import { createEventDispatcher } from "svelte";
-  import { EarningRecord } from "$lib/earning-record";
+  import type { EarningRecord } from "$lib/earning-record";
 
   const dispatch = createEventDispatcher();
 
@@ -42,7 +42,7 @@
 
 <div>
   <div class="confirmation">
-    <h3>Step 2 of 3: Confirm Earnings Record</h3>
+    <h3>Step 1 of 2: Confirm Earnings Record</h3>
     <p>Is this the same table you copied from ssa.gov?</p>
 
     <button on:click={confirm} class="success">

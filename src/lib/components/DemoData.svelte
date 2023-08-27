@@ -74,6 +74,16 @@
 </script>
 
 <div class="demoPrompt">
+  <p>
+    To use the calculator, you must provide data from your Social Security
+    record. If you aren't ready for that yet, try the demo using sample data:
+
+    <button on:click={loadDemoData(0)}>&#x261b; Try the Demo</button>
+  </p>
+
+  <!--
+    Undecided if we want to keep the multiple demo option, so commenting out
+    for now.
   <h3>Try out some <u>demo</u> data instead:</h3>
   <ul class="demos">
     <li>
@@ -92,6 +102,7 @@
       <button on:click={loadDemoData(2)}>&#x261b; Try the Demo</button>
     </li>
   </ul>
+  -->
 </div>
 
 <style>

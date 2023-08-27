@@ -42,7 +42,7 @@
 </script>
 
 <div class="pastePrompt">
-  <h3>Step 1 of 3: Retrieve Social Security data</h3>
+  <h3>Step 1 of 2: Retrieve Social Security data</h3>
   <ol>
     <li>
       Sign in to
