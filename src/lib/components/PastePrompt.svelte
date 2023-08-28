@@ -65,9 +65,8 @@
   <ol>
     <li>
       Sign in to
-      <a target="_blank" href="https://secure.ssa.gov/RIL/SiView.action"
-        >ssa.gov here</a
-      >. You may need to create an account.
+      <a target="_blank" href="https://www.ssa.gov/myaccount/">ssa.gov here</a>.
+      You may need to create an account.
     </li>
     <li>
       In the section <span class="referenceText"
