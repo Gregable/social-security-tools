@@ -2,13 +2,15 @@
   import "$lib/global.css";
   import { createEventDispatcher, onMount } from "svelte";
   import { context } from "$lib/context";
+  import { Birthdate } from "$lib/birthday";
+  import { Recipient } from "$lib/recipient";
+  import { Money } from "$lib/money";
   import AgeRequest from "./AgeRequest.svelte";
   import DemoData from "./DemoData.svelte";
   import PasteConfirm from "./PasteConfirm.svelte";
   import PastePrompt from "./PastePrompt.svelte";
   import PasteApology from "./PasteApology.svelte";
   import SpouseQuestion from "./SpouseQuestion.svelte";
-  import { page } from "$app/stores";
   import { browser } from "$app/environment";
   import posthog from "posthog-js";
 
@@ -52,7 +54,68 @@
     spouseName = "Spouse";
     context.recipient = null;
     context.spouse = null;
+    if (window.location.hash.startsWith("#pia1")) {
+      handleHashPaste();
+    }
   });
+
+  function parseRecipient(piaStr, dobStr, nameStr): Recipient | null {
+    const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
+    let recipient1: Recipient | null = null;
+    if (piaStr && dobStr) {
+      const pia1 = parseInt(piaStr, 10);
+      console.log(pia1);
+      if (isNaN(pia1)) return;
+
+      let m = dobStr.match(dobRegex);
+      console.log(m);
+      if (!m) return;
+      const year = parseInt(m[1], 10);
+      const month = parseInt(m[2], 10) - 1;
+      const day = parseInt(m[3], 10);
+      if (isNaN(year) || isNaN(month) || isNaN(day)) return;
+
+      recipient1 = new Recipient();
+      recipient1.setPia(Money.from(pia1));
+      recipient1.birthdate = Birthdate.FromYMD(year, month, day);
+      recipient1.name = nameStr || "Self";
+    }
+    return recipient1;
+  }
+
+  function handleHashPaste() {
+    const fullHash = window.location.hash;
+    console.log(fullHash);
+    // Parse the hash string into parameters:
+    // #pia1=3000&dob1=1965-09-21&name1=Alex&
+    //  pia2=500&dob2=1962-09-28&name2=Chris
+    const hash = fullHash.substring(1);
+    const params = new URLSearchParams(hash);
+
+    const pia1str: string | null = params.get("pia1");
+    const pia2str: string | null = params.get("pia2");
+    const dob1str: string | null = params.get("dob1");
+    const dob2str: string | null = params.get("dob2");
+    const name1str: string | null = params.get("name1");
+    const name2str: string | null = params.get("name2");
+    console.log(pia1str, pia2str, dob1str, dob2str, name1str, name2str);
+
+    const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
+    let recipient1 = parseRecipient(pia1str, dob1str, name1str);
+    let recipient2 = parseRecipient(pia2str, dob2str, name2str);
+
+    if (recipient1) {
+      context.recipient = recipient1;
+      if (recipient2) {
+        context.recipient.markFirst();
+        context.spouse = recipient2;
+        context.spouse.markSecond();
+      }
+      // Let the app know we're done.
+      browser && posthog.capture("Hash Pasted");
+      dispatch("done");
+    }
+  }
 
   /**
    * Handle the user selecting a demo record. There is no confirmation step
