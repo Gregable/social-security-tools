@@ -149,9 +149,9 @@
                 </div>
               </div>
               <br style="clear: both" />
-              <div class="fullCurlyBar">
+              <div class="fullCurlyBar" class:firstRecipient={!$r.first} class:secondRecipient={$r.first}>
                 <div
-                  class="leftCurlyBar"
+                  class="leftCurlyBar" class:firstRecipient={$r.first} class:secondRecipient={!$r.first}
                   style="width: {spousalBenefitFraction}%"
                 />
               </div>
@@ -306,14 +306,18 @@
     white-space: nowrap;
   }
   .fullCurlyBar {
-    background-color: #0db9f0;
     height: 20px;
     border: 1px solid #666;
   }
   .leftCurlyBar {
-    background-color: #5cb85c;
     height: 100%;
     border-right: 1px solid #666;
+  }
+  .curlyvisualization .firstRecipient {
+    background-color: #669966;
+  }
+  .curlyvisualization .secondRecipient {
+    background-color: #ee8800;
   }
   img.horiz-curly {
     width: 100%;

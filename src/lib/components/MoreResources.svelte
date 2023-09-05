@@ -17,21 +17,6 @@
       related topics. These guides don't include interactive and personalized
       information, but still can be very useful for understanding your benefits.
     </p>
-    <a href="https://projectionlab.com?ref=ssa-tools">
-      <div class="sponsored">
-        <span class="sponsored">Sponsored</span><br />
-        <p>
-          <a href="https://projectionlab.com?ref=ssa-tools">ProjectionLab</a>:
-          If you are interested in simulating more of your retirement, beyond
-          just Social Security, check out ProjectionLab.
-        </p>
-        <p>
-          ProjectionLab is a powerful tool that models your entire retirement
-          plan, runs Monte Carlo simulations using historical market data,
-          estimates taxes, and visualizes cash flow.<br />
-        </p>
-      </div>
-    </a>
 
     <h3>Follow for updates</h3>
     <p>
@@ -114,17 +99,5 @@
     width: 2em;
     height: 2em;
     vertical-align: middle;
-  }
-  div.sponsored {
-    background-color: aliceblue;
-  }
-  div.sponsored p {
-    margin: 0 0.5em 10px 1em;
-  }
-  span.sponsored {
-    color: rgb(100, 100, 110);
-  }
-  a p {
-    color: rgb(51, 51, 51);
   }
 </style>

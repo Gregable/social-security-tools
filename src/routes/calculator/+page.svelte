@@ -63,9 +63,6 @@
           <SidebarSection label="Primary Insurance Amount" underSticky>
             <PiaReport recipient={context.recipient} />
           </SidebarSection>
-          <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
-            <Sponsor />
-          </SidebarSection>
           <SidebarSection label="Normal Retirement Age" underSticky>
             <NormalRetirementAgeReport recipient={context.recipient} />
           </SidebarSection>
