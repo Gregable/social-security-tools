@@ -8,6 +8,7 @@
   import RName from "./RecipientName.svelte";
 
   import HorizCurlyImg from "$lib/images/horiz-curly.png";
+    import RecipientName from "./RecipientName.svelte";
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -19,23 +20,26 @@
   $: higherEarner = $r.higherEarningsThan($s) ? $r : $s;
   $: lowerEarner = $r.higherEarningsThan($s) ? $s : $r;
 
-  function spousalBenefit(): Money {
-    let maxSpousal = higherEarner.pia().primaryInsuranceAmount().div(2);
-    let spousal = maxSpousal.sub(lowerEarner.pia().primaryInsuranceAmount());
+  function spousalBenefitCalc(higher: Recipient, lower: Recipient): Money {
+    let maxSpousal = higher.pia().primaryInsuranceAmount().div(2);
+    let spousal = maxSpousal.sub(lower.pia().primaryInsuranceAmount());
     if (spousal.value() > 0) {
       return spousal;
     } else {
       return Money.from(0);
     }
   }
+  let spousalBenefit: Money = Money.from(0);
+  $: spousalBenefit = spousalBenefitCalc(higherEarner, lowerEarner);
+
 
   /**
    * Returns the personal benefit as a percentage of personal + spousal
    * benefits. Used for the spousal benefit percentage diagram.
    */
-  function spousalBenefitFraction(): number {
-    let maxSpousal: Money = higherEarner.pia().primaryInsuranceAmount().div(2);
-    let myPia: Money = lowerEarner.pia().primaryInsuranceAmount();
+  function spousalBenefitFractionCalc(higher: Recipient, lower: Recipient): number {
+    let maxSpousal: Money = higher.pia().primaryInsuranceAmount().div(2);
+    let myPia: Money = lower.pia().primaryInsuranceAmount();
     var actualFraction = myPia.div$(maxSpousal) * 100.0;
     // If the actual number is > 0, return at least 1%.
     if (actualFraction > 0 || myPia.value() == 0) {
@@ -43,6 +47,8 @@
     }
     return 1;
   }
+  let spousalBenefitFraction: number = 0;
+  $: spousalBenefitFraction = spousalBenefitFractionCalc(higherEarner, lowerEarner);
 
   // TODO: We may want to consider zero'ing out PIA in this section if
   // the user isn't eligible for benefits, even if they have a record.
@@ -58,7 +64,7 @@
           r={$r}
         /> is not eligible to receive a spousal benefit.
       </p>
-    {:else if spousalBenefit().value() == 0}
+    {:else if spousalBenefit.value() == 0}
       <p>
         <RName r={$r} /> has lower earnings than <RName r={$s} />. However <RName
           r={$r}
@@ -84,7 +90,7 @@
         / month.
       {/if}
       <div class="banner">
-        Spousal Benefit: <b>{spousalBenefit().string()}</b> / month
+        Spousal Benefit: <b>{spousalBenefit.string()}</b> / month
       </div>
 
       {#if $r.pia().primaryInsuranceAmount().value() > 0}
@@ -123,7 +129,7 @@
                 >(
                 <b>{$s.pia().primaryInsuranceAmount().string()}</b> x 50% ) -
                 <b>{$r.pia().primaryInsuranceAmount().string()}</b> =
-                <b>{spousalBenefit().string()}</b></span
+                <b>{spousalBenefit.string()}</b></span
               >
             </p>
 
@@ -131,22 +137,22 @@
               <div style="width: 100%">
                 <div
                   class="curlyText"
-                  style="width: {spousalBenefitFraction()}%"
+                  style="width: {spousalBenefitFraction}%"
                 >
                   Personal (<b>{$r.pia().primaryInsuranceAmount().string()}</b>)
                 </div>
                 <div
                   class="curlyText"
-                  style="width: {100 - spousalBenefitFraction()}%"
+                  style="width: {100 - spousalBenefitFraction}%"
                 >
-                  Spousal (<b>{spousalBenefit().string()}</b>)
+                  Spousal (<b>{spousalBenefit.string()}</b>)
                 </div>
               </div>
               <br style="clear: both" />
               <div class="fullCurlyBar">
                 <div
                   class="leftCurlyBar"
-                  style="width: {spousalBenefitFraction()}%"
+                  style="width: {spousalBenefitFraction}%"
                 />
               </div>
               <img
@@ -160,7 +166,7 @@
                   >{$r
                     .pia()
                     .primaryInsuranceAmount()
-                    .plus(spousalBenefit())
+                    .plus(spousalBenefit)
                     .string()}</b
                 >
               </div>
