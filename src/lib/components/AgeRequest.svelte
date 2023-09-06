@@ -67,8 +67,6 @@
       birthdateMonthStr,
       birthdateYearStr
     );
-    if (parsedDate == null) console.log(null);
-    else console.log(parsedDate.toUTCString());
     if (parsedDate == null) return true;
     // Date is in the future, can't be valid:
     if (parsedDate > new Date()) return true;

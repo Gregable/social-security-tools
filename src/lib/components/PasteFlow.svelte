@@ -64,11 +64,9 @@
     let recipient1: Recipient | null = null;
     if (piaStr && dobStr) {
       const pia1 = parseInt(piaStr, 10);
-      console.log(pia1);
       if (isNaN(pia1)) return;
 
       let m = dobStr.match(dobRegex);
-      console.log(m);
       if (!m) return;
       const year = parseInt(m[1], 10);
       const month = parseInt(m[2], 10) - 1;
@@ -85,7 +83,6 @@
 
   function handleHashPaste() {
     const fullHash = window.location.hash;
-    console.log(fullHash);
     // Parse the hash string into parameters:
     // #pia1=3000&dob1=1965-09-21&name1=Alex&
     //  pia2=500&dob2=1962-09-28&name2=Chris
@@ -98,7 +95,6 @@
     const dob2str: string | null = params.get("dob2");
     const name1str: string | null = params.get("name1");
     const name2str: string | null = params.get("name2");
-    console.log(pia1str, pia2str, dob1str, dob2str, name1str, name2str);
 
     const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
     let recipient1 = parseRecipient(pia1str, dob1str, name1str);
