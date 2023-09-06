@@ -70,6 +70,9 @@
             <FilingDateReport recipient={context.recipient} />
           </SidebarSection>
         {:else}
+          <SidebarSection label="Primary Insurance Amount" underSticky>
+            <PiaReport recipient={context.recipient} />
+          </SidebarSection>
           <SidebarSection label="Normal Retirement Age">
             <NormalRetirementAgeReport recipient={context.recipient} />
           </SidebarSection>
@@ -108,6 +111,9 @@
               <FilingDateReport recipient={context.spouse} />
             </SidebarSection>
           {:else}
+            <SidebarSection label="Primary Insurance Amount" underSticky>
+              <PiaReport recipient={context.spouse} />
+            </SidebarSection>
             <SidebarSection label="Normal Retirement Age">
               <NormalRetirementAgeReport recipient={context.spouse} />
             </SidebarSection>

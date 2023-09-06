@@ -20,7 +20,6 @@
   }
 
   function popState(event: PopStateEvent) {
-    console.log("popState", event);
     if (event.state && event.state.id) {
       if (event.state.id == "top") {
         mainColumn.scrollIntoView({ behavior: "smooth" });
