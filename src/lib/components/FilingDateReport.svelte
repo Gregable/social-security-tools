@@ -5,6 +5,7 @@
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import FilingDateChart from "./FilingDateChart.svelte";
   import RName from "./RecipientName.svelte";
+  import Expando from "./Expando.svelte";
 
   export let recipient: Recipient = new Recipient();
   let r: Recipient = $recipient;
@@ -75,132 +76,136 @@
           suffix=" waits">you wait</RName
         >, the higher the benefit will be.
       </p>
-
-      {#if $recipient.birthdate.layBirthDayOfMonth() != 2}
-        <div class="insetTextBox">
-          <h4>Special Rule</h4>
-          <p>
-            You may find it oddly specific that the earliest start date is
-            offset by 1 month from one's birthdate (62 years and 1 month). You
-            first become eligible for benefits in the month that you are 62
-            years old throughout the <u>entire</u>
-            month. For most, this is the month
-            <i>after</i>
-            attaining age 62.
-          </p>
-          <p>
-            {#if $recipient.birthdate.layBirthDayOfMonth() == 1}
-              For example, <RName {r} suffix=" was">you were</RName> born on
-              <b>{$recipient.birthdate.layBirthdateString()}</b>. <RName
-                {r}
-                suffix=" attains">You attain</RName
-              > age <b>{exampleAge.age}</b>
-              on <b>{exampleAge.month} {exampleAge.day}, {exampleAge.year}</b>
-              so the first month that <RName {r} suffix=" is">you are</RName>
-              <b>{exampleAge.age}</b>
-              throughout the <u>entire</u> month is
-              <b
-                >{followingMonth.monthFullName()}
-                {followingMonth.year()}</b
-              >.
-            {:else}
-              For example, <RName {r} suffix=" was">you were</RName> born on
-              <b>{$recipient.birthdate.layBirthdateString()}</b>, so the first
-              month that <RName {r} suffix=" is">you are</RName>
-              <b>{exampleAge.age}</b>
-              throughout the <u>entire</u> month is
-              <b
-                >{followingMonth.monthFullName()}
-                {followingMonth.year()}</b
-              >.
-            {/if}
-            <a
-              href="/guides/1st-and-2nd-of-month"
-              target="_blank"
-              class="noprint">Learn More</a
-            >
-          </p>
-        </div>
-      {/if}
     </div>
   </div>
 
-  <h3>Early Filing</h3>
-  <div class="h3text pageBreakAvoid">
-    <p>
-      If <RName {r} suffix=" chooses">you choose</RName> to take benefits
-      <i>earlier</i>
-      than normal retirement age (<b
-        >{$recipient.normalRetirementDate().monthFullName()}
-        {$recipient.normalRetirementDate().year()}</b
-      >), <RName {r} apos>your</RName> benefit amount will be
-      <u>permanently</u> <i>reduced</i>:
-    </p>
-    <ul>
-      <li>
-        <b>5 / 9</b> of one percent per month (<b>6.67%</b> per year) for each month
-        before normal retirement age, up to 36 months.
-      </li>
-      <li>
-        <b>5 / 12</b> of one percent per month (<b>5.0%</b> per year) for each month
-        before normal retirement age, exceeding 36 months.
-      </li>
-    </ul>
-    <p>
-      The 36 month mark before normal retirement age is age
-      <b
-        >{$recipient.earlyRetirementInflectionAge().years()} years
-        {#if $recipient.earlyRetirementInflectionAge().modMonths() != 0}
-          and
-          {$recipient.earlyRetirementInflectionAge().modMonths()} months >
-        {/if}</b
-      >
-      (<b
-        >{$recipient.earlyRetirementInflectionDate().monthName()}
-        {$recipient.earlyRetirementInflectionDate().year()}</b
-      >).
-    </p>
-  </div>
-
-  <h3>Delayed Filing</h3>
-  <div class="h3text pageBreakAvoid">
-    <p>
-      If <RName {r} suffix=" chooses">you choose</RName> to delay until
-      <i>later</i>
-      than normal retirement age (<b
-        >{$recipient.normalRetirementDate().monthFullName()}
-        {$recipient.normalRetirementDate().year()}</b
-      >) to start <RName {r} apos>your</RName> benefit, the amount will be
-      <u>permanently</u>
-      <i>increased</i>:
-    </p>
-    <ul>
-      {#if $recipient.delayedRetirementIncrease() == 0.08}
-        <li>
-          <b>2 / 3</b> of one percent per month (<b>8%</b> per year) for each month
-          after normal retirement age, up age 70.
-        </li>
-      {:else}
-        <li>
-          <b
-            >{twoSignificantDigits(
-              ($recipient.delayedRetirementIncrease() * 100) / 12
-            )}%</b
+  <Expando
+    collapsedText="Expand to learn about the effect of Filing before or after Normal Retirement Age"
+    expandedText="Show Less"
+  >
+    {#if $recipient.birthdate.layBirthDayOfMonth() != 2}
+      <div class="insetTextBox">
+        <h4>Special Rule</h4>
+        <p>
+          You may find it oddly specific that the earliest start date is offset
+          by 1 month from one's birthdate (62 years and 1 month). You first
+          become eligible for benefits in the month that you are 62 years old
+          throughout the <u>entire</u>
+          month. For most, this is the month
+          <i>after</i>
+          attaining age 62.
+        </p>
+        <p>
+          {#if $recipient.birthdate.layBirthDayOfMonth() == 1}
+            For example, <RName {r} suffix=" was">you were</RName> born on
+            <b>{$recipient.birthdate.layBirthdateString()}</b>. <RName
+              {r}
+              suffix=" attains">You attain</RName
+            > age <b>{exampleAge.age}</b>
+            on <b>{exampleAge.month} {exampleAge.day}, {exampleAge.year}</b>
+            so the first month that <RName {r} suffix=" is">you are</RName>
+            <b>{exampleAge.age}</b>
+            throughout the <u>entire</u> month is
+            <b
+              >{followingMonth.monthFullName()}
+              {followingMonth.year()}</b
+            >.
+          {:else}
+            For example, <RName {r} suffix=" was">you were</RName> born on
+            <b>{$recipient.birthdate.layBirthdateString()}</b>, so the first
+            month that <RName {r} suffix=" is">you are</RName>
+            <b>{exampleAge.age}</b>
+            throughout the <u>entire</u> month is
+            <b
+              >{followingMonth.monthFullName()}
+              {followingMonth.year()}</b
+            >.
+          {/if}
+          <a href="/guides/1st-and-2nd-of-month" target="_blank" class="noprint"
+            >Learn More</a
           >
-          per month (<b>{$recipient.delayedRetirementIncrease() * 100}%</b>
-          per year) for each month after normal retirement age, up age 70.
+        </p>
+      </div>
+    {/if}
+
+    <h3>Early Filing</h3>
+    <div class="h3text pageBreakAvoid">
+      <p>
+        If <RName {r} suffix=" chooses">you choose</RName> to take benefits
+        <i>earlier</i>
+        than normal retirement age (<b
+          >{$recipient.normalRetirementDate().monthFullName()}
+          {$recipient.normalRetirementDate().year()}</b
+        >), <RName {r} apos>your</RName> benefit amount will be
+        <u>permanently</u> <i>reduced</i>:
+      </p>
+      <ul>
+        <li>
+          <b>5 / 9</b> of one percent per month (<b>6.67%</b> per year) for each
+          month before normal retirement age, up to 36 months.
         </li>
-      {/if}
-    </ul>
-    <p>
-      Increases due to delaying your benefit do not take effect until January,
-      except at the full age of 70. <a
-        href="/guides/delayed-january-bump"
-        target="_blank"
-        class="noprint">Learn more</a
-      >.
-    </p>
-  </div>
+        <li>
+          <b>5 / 12</b> of one percent per month (<b>5.0%</b> per year) for each
+          month before normal retirement age, exceeding 36 months.
+        </li>
+      </ul>
+      <p>
+        The 36 month mark before normal retirement age is age
+        <b
+          >{$recipient.earlyRetirementInflectionAge().years()} years
+          {#if $recipient.earlyRetirementInflectionAge().modMonths() != 0}
+            and
+            {$recipient.earlyRetirementInflectionAge().modMonths()} months >
+          {/if}</b
+        >
+        (<b
+          >{$recipient.earlyRetirementInflectionDate().monthName()}
+          {$recipient.earlyRetirementInflectionDate().year()}</b
+        >).
+      </p>
+    </div>
+
+    <h3>Delayed Filing</h3>
+    <div class="h3text pageBreakAvoid">
+      <p>
+        If <RName {r} suffix=" chooses">you choose</RName> to delay until
+        <i>later</i>
+        than normal retirement age (<b
+          >{$recipient.normalRetirementDate().monthFullName()}
+          {$recipient.normalRetirementDate().year()}</b
+        >) to start <RName {r} apos>your</RName> benefit, the amount will be
+        <u>permanently</u>
+        <i>increased</i>:
+      </p>
+      <ul>
+        {#if $recipient.delayedRetirementIncrease() == 0.08}
+          <li>
+            <b>2 / 3</b> of one percent per month (<b>8%</b> per year) for each month
+            after normal retirement age, up age 70.
+          </li>
+        {:else}
+          <li>
+            <b
+              >{twoSignificantDigits(
+                ($recipient.delayedRetirementIncrease() * 100) / 12
+              )}%</b
+            >
+            per month (<b>{$recipient.delayedRetirementIncrease() * 100}%</b>
+            per year) for each month after normal retirement age, up age 70.
+          </li>
+        {/if}
+      </ul>
+      <p>
+        Increases due to delaying your benefit do not take effect until January,
+        except at the full age of 70. <a
+          href="/guides/delayed-january-bump"
+          target="_blank"
+          class="noprint">Learn more</a
+        >.
+      </p>
+    </div>
+  </Expando>
+
   <div class="pageBreakAvoid">
     <h3>Explore Filing Dates</h3>
     <div class="h3text">

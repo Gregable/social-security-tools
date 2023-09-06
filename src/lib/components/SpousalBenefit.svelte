@@ -8,7 +8,7 @@
   import RName from "./RecipientName.svelte";
 
   import HorizCurlyImg from "$lib/images/horiz-curly.png";
-    import RecipientName from "./RecipientName.svelte";
+  import RecipientName from "./RecipientName.svelte";
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -32,12 +32,14 @@
   let spousalBenefit: Money = Money.from(0);
   $: spousalBenefit = spousalBenefitCalc(higherEarner, lowerEarner);
 
-
   /**
    * Returns the personal benefit as a percentage of personal + spousal
    * benefits. Used for the spousal benefit percentage diagram.
    */
-  function spousalBenefitFractionCalc(higher: Recipient, lower: Recipient): number {
+  function spousalBenefitFractionCalc(
+    higher: Recipient,
+    lower: Recipient
+  ): number {
     let maxSpousal: Money = higher.pia().primaryInsuranceAmount().div(2);
     let myPia: Money = lower.pia().primaryInsuranceAmount();
     var actualFraction = myPia.div$(maxSpousal) * 100.0;
@@ -48,7 +50,10 @@
     return 1;
   }
   let spousalBenefitFraction: number = 0;
-  $: spousalBenefitFraction = spousalBenefitFractionCalc(higherEarner, lowerEarner);
+  $: spousalBenefitFraction = spousalBenefitFractionCalc(
+    higherEarner,
+    lowerEarner
+  );
 
   // TODO: We may want to consider zero'ing out PIA in this section if
   // the user isn't eligible for benefits, even if they have a record.
@@ -135,10 +140,7 @@
 
             <div class="curlyvisualization">
               <div style="width: 100%">
-                <div
-                  class="curlyText"
-                  style="width: {spousalBenefitFraction}%"
-                >
+                <div class="curlyText" style="width: {spousalBenefitFraction}%">
                   Personal (<b>{$r.pia().primaryInsuranceAmount().string()}</b>)
                 </div>
                 <div
@@ -149,9 +151,15 @@
                 </div>
               </div>
               <br style="clear: both" />
-              <div class="fullCurlyBar" class:firstRecipient={$r.first} class:secondRecipient={!$r.first}>
+              <div
+                class="fullCurlyBar"
+                class:firstRecipient={$r.first}
+                class:secondRecipient={!$r.first}
+              >
                 <div
-                  class="leftCurlyBar" class:firstRecipient={!$r.first} class:secondRecipient={$r.first}
+                  class="leftCurlyBar"
+                  class:firstRecipient={!$r.first}
+                  class:secondRecipient={$r.first}
                   style="width: {spousalBenefitFraction}%"
                 />
               </div>
@@ -181,104 +189,109 @@
         </Expando>
       {/if}
       <h4>Filing Date</h4>
-      {#if $r.pia().primaryInsuranceAmount().value() == 0}
-        <p>
-          <RName r={$r} /> can choose the filing date to begin receiving spousal
-          benefits. However,
-          <RName r={$r} /> is not eligible to begin spousal benefits until
-          <RName r={$s} /> begins primary benefits. (If applicable, see
-          <a
-            href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
-            target="_blank">divorced spouses</a
-          >.)
-        </p>
-      {:else}
-        <p>
-          <RName r={$r} /> can choose the filing date to begin receiving spousal
-          benefits. However, there are some considerations:
-        </p>
+      <p>
+        <RName r={$r} /> will begin receiving spousal benefits at the latter of either
+        the date that <RName r={$r} /> or <RName r={$s} /> files for benefits.
+      </p>
+      <Expando
+        collapsedText="Expand for detail about the effect of Filing Date on Spousal Benefits"
+        expandedText="Show Less"
+      >
+        <div class="expando">
+          {#if $r.pia().primaryInsuranceAmount().value() == 0}
+            <p>
+              <RName r={$r} /> can choose the filing date to begin receiving spousal
+              benefits. However,
+              <RName r={$r} /> is not eligible to begin spousal benefits until
+              <RName r={$s} /> begins primary benefits. (If applicable, see
+              <a
+                href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
+                target="_blank">divorced spouses</a
+              >.)
+            </p>
+          {:else}
+            <p>
+              There are a couple rules regarding the filing date selection for
+              spousal benefits:
+            </p>
 
-        <ul>
-          <li>
-            <RName r={$r} /> is not eligible to begin spousal benefits until
-            <RName r={$s} /> begins primary benefits. (If applicable, see
-            <a
-              href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
-              target="_blank">divorced spouses</a
-            >.)
-          </li>
-          <li>
-            <RName r={$r} /> must elect to collect all or none of the benefits
-            <RName r={$r} /> is eligible for. This is known as the
-            <u>deeming</u> rule; you are deemed to be filing for all benefits
-            you are eligible for. Examples:
             <ul>
               <li>
-                <RName r={$r} /> cannot choose to delay personal benefits while collecting
-                spousal benefits.
+                <RName r={$r} /> is not eligible to begin spousal benefits until
+                <RName r={$s} /> begins primary benefits. (If applicable, see
+                <a
+                  href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
+                  target="_blank">divorced spouses</a
+                >.)
               </li>
               <li>
-                Once <RName r={$r} />
-                begins personal benefits, <RName r={$r} /> cannot delay spousal benefits
-                beyond when <RName r={$s} /> begins primary benefits.
+                <RName r={$r} /> must elect to collect all or none of the benefits
+                <RName r={$r} /> is eligible for. This is known as the
+                <u>deeming</u> rule; you are deemed to be filing for all
+                benefits you are eligible for. Examples:
+                <ul>
+                  <li>
+                    <RName r={$r} /> cannot choose to delay personal benefits while
+                    collecting spousal benefits.
+                  </li>
+                  <li>
+                    Once <RName r={$r} />
+                    begins personal benefits, <RName r={$r} /> cannot delay spousal
+                    benefits beyond when <RName r={$s} /> begins primary benefits.
+                  </li>
+                </ul>
               </li>
             </ul>
-          </li>
-        </ul>
-        <p>
-          Stated another way, the date that <RName r={$r} apos /> spousal benefits
-          begin is the latter of either the date that <RName r={$r} /> or <RName
-            r={$s}
-          /> begins personal benefits.
-        </p>
-        <p>
-          This can lead to different reduction multipliers for <RName
-            r={$r}
-            apos
-          /> personal and spousal benefits.
-        </p>
-      {/if}
-      <h4>Early Filing for Spousal Benefits</h4>
-      <p>
-        If <RName {r} /> chooses to file for spousal benefits
-        <i>earlier</i>
-        than <RName {r} apos /> normal retirement age (<b
-          >{$r.normalRetirementDate().monthFullName()}
-          {$r.normalRetirementDate().year()}</b
-        >), the spousal benefit amount will be
-        <u>permanently</u> <i>reduced</i>:
-      </p>
-      <ul>
-        <li>
-          <b>25 / 36</b> of one percent per month (<b>8.33%</b> per year) for each
-          month before normal retirement age, up to 36 months.
-        </li>
-        <li>
-          &nbsp;&nbsp;<b>5 / 12</b> of one percent per month (<b>5.00%</b> per year)
-          for each month before normal retirement age, exceeding 36 months.
-        </li>
-      </ul>
-      <p>
-        The 36 month mark before normal retirement age is age
-        <b
-          >{$recipient.earlyRetirementInflectionAge().years()} years
-          {#if $recipient.earlyRetirementInflectionAge().modMonths() != 0}
-            and
-            {$recipient.earlyRetirementInflectionAge().modMonths()} months >
-          {/if}</b
-        >
-        (<b
-          >{$recipient.earlyRetirementInflectionDate().monthName()}
-          {$recipient.earlyRetirementInflectionDate().year()}</b
-        >).
-      </p>
-      <h4>Delayed Filing for Spousal Benefits</h4>
-      <p>
-        If <RName {r} /> chooses to file for spousal benefits
-        <i>later</i>
-        than <RName {r} apos /> normal retirement age, unlike personal benefits,
-        there are no additional delayed retirement credits to increase spousal benefits.
-      </p>
+            <p>
+              Since <RName r={$r} apos /> personal and spousal benefits may begin
+              on different dates, the reduction factors for early filing may applied
+              from different starting dates for each of the two benefits.
+            </p>
+          {/if}
+          <h4>Early Filing for Spousal Benefits</h4>
+          <p>
+            If <RName {r} /> chooses to file for spousal benefits
+            <i>earlier</i>
+            than <RName {r} apos /> normal retirement age (<b
+              >{$r.normalRetirementDate().monthFullName()}
+              {$r.normalRetirementDate().year()}</b
+            >), the spousal benefit amount will be
+            <u>permanently</u> <i>reduced</i>:
+          </p>
+          <ul>
+            <li>
+              <b>25 / 36</b> of one percent per month (<b>8.33%</b> per year) for
+              each month before normal retirement age, up to 36 months.
+            </li>
+            <li>
+              &nbsp;&nbsp;<b>5 / 12</b> of one percent per month (<b>5.00%</b> per
+              year) for each month before normal retirement age, exceeding 36 months.
+            </li>
+          </ul>
+          <p>
+            The 36 month mark before normal retirement age is age
+            <b
+              >{$recipient.earlyRetirementInflectionAge().years()} years
+              {#if $recipient.earlyRetirementInflectionAge().modMonths() != 0}
+                and
+                {$recipient.earlyRetirementInflectionAge().modMonths()} months >
+              {/if}</b
+            >
+            (<b
+              >{$recipient.earlyRetirementInflectionDate().monthName()}
+              {$recipient.earlyRetirementInflectionDate().year()}</b
+            >).
+          </p>
+          <h4>Delayed Filing for Spousal Benefits</h4>
+          <p>
+            If <RName {r} /> chooses to file for spousal benefits
+            <i>later</i>
+            than <RName {r} apos /> normal retirement age, unlike personal benefits,
+            there are no additional delayed retirement credits to increase spousal
+            benefits.
+          </p>
+        </div>
+      </Expando>
     {/if}
   </div>
 </div>

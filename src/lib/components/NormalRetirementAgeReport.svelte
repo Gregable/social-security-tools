@@ -72,21 +72,6 @@
         </p>
       </div>
     {/if}
-
-    <p>
-      If <RName {r} suffix=" starts">you start</RName> collecting benefits at normal
-      retirement age, <RName {r} apos>your</RName>
-      benefit will be the primary insurance amount, rounded down:
-    </p>
-    <ul>
-      <li>
-        <b>{benefit.wholeDollars()}</b> / month
-      </li>
-      <li>
-        <b>{benefit.times(12).wholeDollars()}</b>
-        / year
-      </li>
-    </ul>
   </div>
 </div>
 
