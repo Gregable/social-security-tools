@@ -149,9 +149,9 @@
                 </div>
               </div>
               <br style="clear: both" />
-              <div class="fullCurlyBar" class:firstRecipient={!$r.first} class:secondRecipient={$r.first}>
+              <div class="fullCurlyBar" class:firstRecipient={$r.first} class:secondRecipient={!$r.first}>
                 <div
-                  class="leftCurlyBar" class:firstRecipient={$r.first} class:secondRecipient={!$r.first}
+                  class="leftCurlyBar" class:firstRecipient={!$r.first} class:secondRecipient={$r.first}
                   style="width: {spousalBenefitFraction}%"
                 />
               </div>
