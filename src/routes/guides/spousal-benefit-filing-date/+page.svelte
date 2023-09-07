@@ -64,7 +64,7 @@
 
   <p>
     You can explore this example with <a
-      href="/calculator#pia1=1000&dob1=1965-09-21&name1=Alex&pia2=0&dob2=1965-09-28&name2=Chris"
+      href="https://ssa.tools/calculator#pia1=1000&dob1=1965-09-21&name1=Alex&pia2=0&dob2=1965-09-28&name2=Chris"
       >this link</a
     >.
   </p>
@@ -159,7 +159,7 @@
 
 <p>
   You can use <a
-    href="/calculator#pia1=1000&dob1=1965-09-21&name1=Alex&pia2=100&dob2=1965-09-28&name2=Chris"
+    href="https://ssa.tools/calculator#pia1=1000&dob1=1965-09-21&name1=Alex&pia2=100&dob2=1965-09-28&name2=Chris"
     >this link</a
   > to explore the scenario.
 </p>
