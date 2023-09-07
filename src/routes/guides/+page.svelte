@@ -10,9 +10,24 @@
   <h1>Social Security Guides</h1>
   <ul class="guides">
     <li>
+      <span class="postdate">Sep 6, 2023</span>
+      <h3 class="posttitle">
+        <a href="/guides/spousal-benefit-filing-date"
+          >Deep look at Spousal Benefits and Filing Dates
+        </a>
+      </h3>
+      <p class="justify">
+        Spousal Benefits are sometimes commonly misunderstood to be equal to
+        half of the other spouse's benefit. This guide takes a deep dive into
+        how spousal benefits are calculated and how different filing dates can
+        affect the final benefit calculation in confusing ways.
+      </p>
+    </li>
+
+    <li>
       <span class="postdate">Aug 18, 2023</span>
       <h3 class="posttitle">
-        <a href="/guides/filing-date-chart"> Navigate the Filing Date Chart </a>
+        <a href="/guides/filing-date-chart">Navigate the Filing Date Chart</a>
       </h3>
       <p class="justify">
         This site's calculator shows a information dense chart of how filing
