@@ -179,12 +179,6 @@
                 >
               </div>
             </div>
-
-            <p>
-              Note that <RName r={$r} apos /> <i>total</i> benefit is capped at
-              50% of <RName r={$s} apos /> Primary Insurance Amount, regardless of
-              <RName r={$r} apos /> own personal Primary Insurance Amount.
-            </p>
           </div>
         </Expando>
       {/if}
@@ -289,6 +283,14 @@
             than <RName {r} apos /> normal retirement age, unlike personal benefits,
             there are no additional delayed retirement credits to increase spousal
             benefits.
+          </p>
+          <h4>Spousal Benefit Filing Date Examples</h4>
+          <p>
+            Both the personal and spousal benefits are independently reduced or
+            increased by choice of filing dates. See <a
+              href="/guides/spousal-benefit-filing-date"
+              target="_blank">this guide</a
+            > for some examples.
           </p>
         </div>
       </Expando>

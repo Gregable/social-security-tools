@@ -3,7 +3,7 @@
 </script>
 
 <div>
-  <h2>Combined Benefits</h2>
+  <h1>Combined Benefits</h1>
 
   <div class="text">
     <!--
@@ -24,6 +24,9 @@
 </div>
 
 <style>
+  h1 {
+    text-decoration: underline;
+  }
   .text {
     margin: 0 0.5em;
   }
