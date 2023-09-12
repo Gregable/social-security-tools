@@ -1,9 +1,9 @@
-import {Birthdate} from '$lib/birthday';
-import * as constants from '$lib/constants';
-import {EarningRecord} from '$lib/earning-record';
-import {Money} from '$lib/money';
-import {MonthDate, MonthDuration} from '$lib/month-time';
-import {PrimaryInsuranceAmount} from '$lib/pia';
+import { Birthdate } from "$lib/birthday";
+import * as constants from "$lib/constants";
+import { EarningRecord } from "$lib/earning-record";
+import { Money } from "$lib/money";
+import { MonthDate, MonthDuration } from "$lib/month-time";
+import { PrimaryInsuranceAmount } from "$lib/pia";
 
 export class RecipientColors {
   constructor(dark: string, medium: string, light: string) {
@@ -14,7 +14,7 @@ export class RecipientColors {
   dark: string;
   medium: string;
   light: string;
-};
+}
 
 /**
  * A Recipient object manages calculating a user's SSA and IRS data.
@@ -46,7 +46,7 @@ export class Recipient {
         this.subscribers_.splice(index, 1);
       }
     };
-  };
+  }
 
   private publish_() {
     this.subscribers_.forEach((callback) => {
@@ -71,7 +71,7 @@ export class Recipient {
    */
   shortName(length: number): string {
     if (this.name_.length <= length) return this.name_;
-    return this.name_.substring(0, length - 1) + '…';
+    return this.name_.substring(0, length - 1) + "…";
   }
 
   /** True if this is the only recipient, false if there are two. */
@@ -105,14 +105,16 @@ export class Recipient {
     return this.isPiaOnly_;
   }
 
-  private overridePia_: Money|null = null;
-  get overridePia(): Money|null {
+  private overridePia_: Money | null = null;
+  get overridePia(): Money | null {
     return this.overridePia_;
   }
   setPia(pia: Money) {
-    if (this.earningsRecords_.length > 0 ||
-        this.futureEarningsRecords_.length > 0) {
-      throw new Error('Cannot set PIA when earnings records are present.');
+    if (
+      this.earningsRecords_.length > 0 ||
+      this.futureEarningsRecords_.length > 0
+    ) {
+      throw new Error("Cannot set PIA when earnings records are present.");
     }
     this.isPiaOnly_ = true;
     this.overridePia_ = pia;
@@ -128,7 +130,7 @@ export class Recipient {
   }
   set earningsRecords(earningsRecords: Array<EarningRecord>) {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot set earnings records when PIA is set.');
+      throw new Error("Cannot set earnings records when PIA is set.");
     }
     this.earningsRecords_ = earningsRecords;
     // Update the indexing year for the new records.
@@ -144,7 +146,7 @@ export class Recipient {
   }
   set futureEarningsRecords(futureEarningsRecords: Array<EarningRecord>) {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot set earnings records when PIA is set.');
+      throw new Error("Cannot set earnings records when PIA is set.");
     }
     this.futureEarningsRecords_ = futureEarningsRecords;
     // Update the indexing year for the new records.
@@ -158,7 +160,7 @@ export class Recipient {
    */
   simulateFutureEarningsYears(numYears: number, wage: Money) {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot set earnings records when PIA is set.');
+      throw new Error("Cannot set earnings records when PIA is set.");
     }
     this.futureEarningsRecords_ = [];
 
@@ -169,9 +171,11 @@ export class Recipient {
     let startYear = constants.CURRENT_YEAR;
     if (this.earningsRecords_.length > 0) {
       const lastRecord =
-          this.earningsRecords_[this.earningsRecords_.length - 1];
-      if (lastRecord.year == constants.CURRENT_YEAR - 1 &&
-          lastRecord.incomplete) {
+        this.earningsRecords_[this.earningsRecords_.length - 1];
+      if (
+        lastRecord.year == constants.CURRENT_YEAR - 1 &&
+        lastRecord.incomplete
+      ) {
         // If the previous year's record is listed as incomplete, we allow the
         // user to simulate that year as well.
         startYear = constants.CURRENT_YEAR - 1;
@@ -184,11 +188,13 @@ export class Recipient {
 
     // Add the simulated records for the number of years requested.
     for (let i = 0; i < numYears; ++i) {
-      this.futureEarningsRecords_.push(new EarningRecord({
-        year: startYear + i,
-        taxedEarnings: wage,
-        taxedMedicareEarnings: wage
-      }));
+      this.futureEarningsRecords_.push(
+        new EarningRecord({
+          year: startYear + i,
+          taxedEarnings: wage,
+          taxedMedicareEarnings: wage,
+        })
+      );
     }
     // Update the indexing year for the new records.
     this.updateEarningsRecords_();
@@ -209,7 +215,7 @@ export class Recipient {
   private totalIndexedEarnings_: Money = Money.from(0);
   totalIndexedEarnings(): Money {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot get total indexed earnings when PIA is set.');
+      throw new Error("Cannot get total indexed earnings when PIA is set.");
     }
     return this.totalIndexedEarnings_;
   }
@@ -229,18 +235,20 @@ export class Recipient {
   }
 
   private retirementAgeBracket(): {
-    minYear: number,
-    maxYear: number,
-    ageYears: number,
-    ageMonths: number,
-    delayedIncreaseAnnual: number
+    minYear: number;
+    maxYear: number;
+    ageYears: number;
+    ageMonths: number;
+    delayedIncreaseAnnual: number;
   } {
     // Find the retirement age bracket data for this recipient.
     let retirementAgeBracket = undefined;
     for (let i = 0; i < constants.FULL_RETIREMENT_AGE.length; ++i) {
       let ageBracket = constants.FULL_RETIREMENT_AGE[i];
-      if (this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
-          this.birthdate_.ssaBirthYear() <= ageBracket.maxYear) {
+      if (
+        this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
+        this.birthdate_.ssaBirthYear() <= ageBracket.maxYear
+      ) {
         retirementAgeBracket = ageBracket;
       }
     }
@@ -254,7 +262,7 @@ export class Recipient {
   normalRetirementAge(): MonthDuration {
     return MonthDuration.initFromYearsMonths({
       years: this.retirementAgeBracket().ageYears,
-      months: this.retirementAgeBracket().ageMonths
+      months: this.retirementAgeBracket().ageMonths,
     });
   }
 
@@ -266,8 +274,9 @@ export class Recipient {
    * Recipient's normal retirement date.
    */
   normalRetirementDate(): MonthDate {
-    return this.birthdate_.ssaBirthMonthDate().addDuration(
-        this.normalRetirementAge());
+    return this.birthdate_
+      .ssaBirthMonthDate()
+      .addDuration(this.normalRetirementAge());
   }
 
   /**
@@ -290,7 +299,6 @@ export class Recipient {
     return this.normalRetirementDate().subtractDuration(new MonthDuration(36));
   }
 
-
   /**
    * The year from which benefits are indexed for the PIA calculation.
    *
@@ -301,9 +309,9 @@ export class Recipient {
    */
   indexingYear(): number {
     return this.birthdate_
-        .dateAtSsaAge(MonthDuration.initFromYearsMonths({years: 60, months: 0}))
-        .year();
-  };
+      .dateAtSsaAge(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
+      .year();
+  }
 
   /**
    * The total number of credits the recipient has earned so far.
@@ -335,12 +343,25 @@ export class Recipient {
   }
 
   /**
+   * Detects if the recipient is eligible for benefits. Uses future earnings
+   * records if present.
+   * @returns True if the recipient is eligible for benefits, false otherwise.
+   */
+  isEligible(): boolean {
+    // Assume that PIA only recipients are eligible.
+    if (this.isPiaOnly_) {
+      return true;
+    }
+    return this.totalCredits() >= 40;
+  }
+
+  /**
    * Populates the indexingYear field of each earnings record.
    * Sorts the earnings records by year ascending.
    */
   private updateEarningsRecords_() {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot update earnings records when PIA is set.');
+      throw new Error("Cannot update earnings records when PIA is set.");
     }
     const indexingYear = this.indexingYear();
 
@@ -348,7 +369,7 @@ export class Recipient {
     for (let i = 0; i < this.earningsRecords_.length; ++i) {
       this.earningsRecords_[i].indexingYear = indexingYear;
       this.earningsRecords_[i].age =
-          this.earningsRecords_[i].year - this.birthdate_.ssaBirthYear();
+        this.earningsRecords_[i].year - this.birthdate_.ssaBirthYear();
       this.earningsRecords_[i].isTop35EarningsYear = false;
     }
 
@@ -356,12 +377,13 @@ export class Recipient {
     for (let i = 0; i < this.futureEarningsRecords_.length; ++i) {
       this.futureEarningsRecords_[i].indexingYear = indexingYear;
       this.futureEarningsRecords_[i].age =
-          this.futureEarningsRecords_[i].year - this.birthdate_.ssaBirthYear();
+        this.futureEarningsRecords_[i].year - this.birthdate_.ssaBirthYear();
       this.futureEarningsRecords_[i].isTop35EarningsYear = false;
     }
 
-    this.top35IndexedEarnings_ =
-        this.earningsRecords_.concat(this.futureEarningsRecords_);
+    this.top35IndexedEarnings_ = this.earningsRecords_.concat(
+      this.futureEarningsRecords_
+    );
     this.top35IndexedEarnings_.sort((a, b) => {
       // Prefer higher indexed earnings, break ties by by older years.
       if (a.indexedEarnings().value() != b.indexedEarnings().value()) {
@@ -377,7 +399,8 @@ export class Recipient {
     for (let i = 0; i < this.top35IndexedEarnings_.length; ++i) {
       this.top35IndexedEarnings_[i].isTop35EarningsYear = true;
       this.totalIndexedEarnings_ = this.totalIndexedEarnings_.plus(
-          this.top35IndexedEarnings_[i].indexedEarnings());
+        this.top35IndexedEarnings_[i].indexedEarnings()
+      );
     }
 
     this.publish_();
@@ -385,12 +408,12 @@ export class Recipient {
 
   hasEarningsBefore1978(): boolean {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot check earnings records when PIA is set.');
+      throw new Error("Cannot check earnings records when PIA is set.");
     }
     // Only check the first earnings record. Future records are after 1978.
-    return this.earningsRecords_.length == 0 ?
-        false :
-        this.earningsRecords_[0].year < 1978;
+    return this.earningsRecords_.length == 0
+      ? false
+      : this.earningsRecords_[0].year < 1978;
   }
 
   /**
@@ -399,12 +422,13 @@ export class Recipient {
    */
   cutoffIndexedEarnings(): Money {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot get cutoff indexed earnings when PIA is set.');
+      throw new Error("Cannot get cutoff indexed earnings when PIA is set.");
     }
-    return this.top35IndexedEarnings_.length < constants.SSA_EARNINGS_YEARS ?
-        Money.from(0) :
-        this.top35IndexedEarnings_[this.top35IndexedEarnings_.length - 1]
-            .indexedEarnings();
+    return this.top35IndexedEarnings_.length < constants.SSA_EARNINGS_YEARS
+      ? Money.from(0)
+      : this.top35IndexedEarnings_[
+          this.top35IndexedEarnings_.length - 1
+        ].indexedEarnings();
   }
 
   /**
@@ -412,11 +436,12 @@ export class Recipient {
    */
   monthlyIndexedEarnings(): Money {
     if (this.isPiaOnly_) {
-      throw new Error('Cannot get monthly indexed earnings when PIA is set.');
+      throw new Error("Cannot get monthly indexed earnings when PIA is set.");
     }
-    return this.totalIndexedEarnings_.div(12)
-        .div(constants.SSA_EARNINGS_YEARS)
-        .floorToDollar();
+    return this.totalIndexedEarnings_
+      .div(12)
+      .div(constants.SSA_EARNINGS_YEARS)
+      .floorToDollar();
   }
 
   /**
@@ -435,26 +460,28 @@ export class Recipient {
     if (nra.greaterThan(age)) {
       // Reduced benefits due to taking benefits early.
       let before = nra.subtract(age);
-      return -1.0 *
-          ((Math.min(36, before.asMonths()) * 5 / 900) +
-           (Math.max(0, before.asMonths() - 36) * 5 / 1200));
+      return (
+        -1.0 *
+        ((Math.min(36, before.asMonths()) * 5) / 900 +
+          (Math.max(0, before.asMonths() - 36) * 5) / 1200)
+      );
     } else {
       // Increased benefits due to taking benefits late.
       const after = age.subtract(nra);
-      return this.delayedRetirementIncrease() / 12 * after.asMonths();
+      return (this.delayedRetirementIncrease() / 12) * after.asMonths();
     }
-  };
+  }
 
   /**
    * Returns personal benefit amount if starting benefits at a given age.
    */
   benefitAtAge(age: MonthDuration): Money {
     return this.pia()
-        .primaryInsuranceAmount()
-        .floorToDollar()
-        .times(1 + this.benefitMultiplierAtAge(age))
-        .floorToDollar();
-  };
+      .primaryInsuranceAmount()
+      .floorToDollar()
+      .times(1 + this.benefitMultiplierAtAge(age))
+      .floorToDollar();
+  }
 
   /**
    * Given a certain filing date and current date, returns the benefit amount
@@ -462,9 +489,13 @@ export class Recipient {
    */
   benefitOnDate(filingDate: MonthDate, atDate: MonthDate): Money {
     // The filing date must be greater than 62:
-    console.assert(this.birthdate.ageAtSsaDate(filingDate)
-                       .greaterThanOrEqual(MonthDuration.initFromYearsMonths(
-                           {years: 62, months: 0})));
+    console.assert(
+      this.birthdate
+        .ageAtSsaDate(filingDate)
+        .greaterThanOrEqual(
+          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
+        )
+    );
 
     // If the recipient hasn't filed yet, return $0:
     if (filingDate.greaterThan(atDate)) return Money.from(0);
@@ -472,8 +503,9 @@ export class Recipient {
     // This is the eventual benefit amount given a filing date. The actual
     // benefit may be lower, for example if the user has yet to realize full
     // delated credits.
-    const filingAgeBenefit: Money =
-        this.benefitAtAge(this.birthdate.ageAtSsaDate(filingDate));
+    const filingAgeBenefit: Money = this.benefitAtAge(
+      this.birthdate.ageAtSsaDate(filingDate)
+    );
 
     // 70 is an explicit exception because the SSA likes to make my life harder.
     // Normally, you'd need to wait until the next year to get delayed credits,
@@ -493,32 +525,47 @@ export class Recipient {
 
     // Otherwise, you only get credits up to January of this year,
     // or NRA, whichever is later.
-    let thisJan =
-        MonthDate.initFromYearsMonths({years: filingDate.year(), months: 0});
-    let benefitComputationDate =
-        this.normalRetirementDate().greaterThan(thisJan) ?
-        this.normalRetirementDate() :
-        thisJan;
+    let thisJan = MonthDate.initFromYearsMonths({
+      years: filingDate.year(),
+      months: 0,
+    });
+    let benefitComputationDate = this.normalRetirementDate().greaterThan(
+      thisJan
+    )
+      ? this.normalRetirementDate()
+      : thisJan;
     return this.benefitAtAge(
-        this.birthdate.ageAtSsaDate(benefitComputationDate));
+      this.birthdate.ageAtSsaDate(benefitComputationDate)
+    );
   }
 
   /**
    * Returns the spousal benefit on a given date for this recipient. May be $0.
    */
   spousalBenefitOnDate(
-      spouse: Recipient, spouseFilingDate: MonthDate, filingDate: MonthDate,
-      atDate: MonthDate): Money {
+    spouse: Recipient,
+    spouseFilingDate: MonthDate,
+    filingDate: MonthDate,
+    atDate: MonthDate
+  ): Money {
     let piaAmount: Money = this.pia().primaryInsuranceAmount();
     let spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
 
     // The filing date must be greater than 62:
-    console.assert(this.birthdate.ageAtSsaDate(filingDate)
-                       .greaterThanOrEqual(MonthDuration.initFromYearsMonths(
-                           {years: 62, months: 0})));
-    console.assert(spouse.birthdate.ageAtSsaDate(spouseFilingDate)
-                       .greaterThanOrEqual(MonthDuration.initFromYearsMonths(
-                           {years: 62, months: 0})));
+    console.assert(
+      this.birthdate
+        .ageAtSsaDate(filingDate)
+        .greaterThanOrEqual(
+          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
+        )
+    );
+    console.assert(
+      spouse.birthdate
+        .ageAtSsaDate(spouseFilingDate)
+        .greaterThanOrEqual(
+          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
+        )
+    );
 
     // If the recipient hasn't filed yet, return $0:
     if (filingDate.greaterThan(atDate)) return Money.from(0);
@@ -537,25 +584,28 @@ export class Recipient {
     }
 
     // Calculate the starting date as the latest of the two filing dates:
-    let startDate = spouseFilingDate.greaterThan(filingDate) ?
-        spouseFilingDate :
-        filingDate;
+    let startDate = spouseFilingDate.greaterThan(filingDate)
+      ? spouseFilingDate
+      : filingDate;
 
     if (startDate.greaterThanOrEqual(this.normalRetirementDate())) {
       return spousal;
     }
 
-    let monthsBeforeNra: number =
-        this.normalRetirementDate().subtractDate(startDate).asMonths();
+    let monthsBeforeNra: number = this.normalRetirementDate()
+      .subtractDate(startDate)
+      .asMonths();
     if (monthsBeforeNra <= 36) {
       // 5 / 12 of one percent for each additional month:
-      return spousal.times(1 - (monthsBeforeNra * 5 / 1200));
+      return spousal.times(1 - (monthsBeforeNra * 5) / 1200);
     } else {
       // 15% for the first 36 months:
       const firstReduction: Money = spousal.times(0.15);
       monthsBeforeNra = monthsBeforeNra - 36;
       // 25 / 36 of one percent for each additional month:
-      const secondReduction: Money = spousal.times(monthsBeforeNra * 25 / 3600);
+      const secondReduction: Money = spousal.times(
+        (monthsBeforeNra * 25) / 3600
+      );
 
       return spousal.sub(firstReduction).sub(secondReduction);
     }
@@ -565,19 +615,24 @@ export class Recipient {
    * Returns the spousal and primary benefit on a given date for this recipient.
    */
   allBenefitsOnDate(
-      spouse: Recipient, spouseFilingDate: MonthDate, filingDate: MonthDate,
-      atDate: MonthDate): Money {
-    return this.benefitOnDate(filingDate, atDate)
-        .plus(this.spousalBenefitOnDate(
-            spouse, spouseFilingDate, filingDate, atDate));
+    spouse: Recipient,
+    spouseFilingDate: MonthDate,
+    filingDate: MonthDate,
+    atDate: MonthDate
+  ): Money {
+    return this.benefitOnDate(filingDate, atDate).plus(
+      this.spousalBenefitOnDate(spouse, spouseFilingDate, filingDate, atDate)
+    );
   }
 
   /**
    * Returns true if this recipient is the higher earner in the couple.
    */
   higherEarningsThan(other: Recipient): boolean {
-    return this.pia().primaryInsuranceAmount().value() >
-        other.pia().primaryInsuranceAmount().value();
+    return (
+      this.pia().primaryInsuranceAmount().value() >
+      other.pia().primaryInsuranceAmount().value()
+    );
   }
 
   /**
@@ -586,9 +641,9 @@ export class Recipient {
    */
   colors(): RecipientColors {
     if (this.first) {
-      return new RecipientColors('#8d6100', '#e69f00', '#f6dfad');
+      return new RecipientColors("#8d6100", "#e69f00", "#f6dfad");
     } else {
-      return new RecipientColors('#004400', '#558855', '#d9ebd9');
+      return new RecipientColors("#004400", "#558855", "#d9ebd9");
     }
   }
-}  // class Recipient
+} // class Recipient

@@ -1,6 +1,6 @@
-import * as constants from './constants';
-import {Money} from './money';
-import type {Recipient} from './recipient';
+import * as constants from "./constants";
+import { Money } from "./money";
+import type { Recipient } from "./recipient";
 
 /**
  * A PrimaryInsuranceAmount object manages calculating the user's PIA.
@@ -15,7 +15,6 @@ export class PrimaryInsuranceAmount {
     this.recipient_ = recipient;
   }
 
-
   /**
    * Returns the ratio of the average wage in indexingYear to the
    * average wage in 1977.
@@ -23,8 +22,10 @@ export class PrimaryInsuranceAmount {
   private wageRatio(): number {
     // If the indexing year is beyond the WAGE_INDICES data range, use the
     // maximum year in the data range.
-    const effectiveIndexingYear =
-        Math.min(this.recipient_.indexingYear(), constants.MAX_WAGE_INDEX_YEAR);
+    const effectiveIndexingYear = Math.min(
+      this.recipient_.indexingYear(),
+      constants.MAX_WAGE_INDEX_YEAR
+    );
     const wage_in_1977: Money = constants.WAGE_INDICES[1977];
     const wage: Money = constants.WAGE_INDICES[effectiveIndexingYear];
     return wage.div$(wage_in_1977);
@@ -52,10 +53,14 @@ export class PrimaryInsuranceAmount {
    */
   primaryInsuranceAmountByBracket(bracket: number): Money {
     if (bracket != 0 && bracket != 1 && bracket != 2) {
-      throw new Error('Invalid bracket: ' + bracket);
+      throw new Error("Invalid bracket: " + bracket);
     }
     if (this.recipient_.isPiaOnly) {
-      throw new Error('Cannot calculate PIA brackets for PIA-only recipient');
+      throw new Error("Cannot calculate PIA brackets for PIA-only recipient");
+    }
+    // If the recipient is not eligible for benefits, return $0.
+    if (!this.recipient_.isEligible()) {
+      return Money.from(0);
     }
 
     let aime = this.recipient_.monthlyIndexedEarnings().roundToDollar();
@@ -63,17 +68,20 @@ export class PrimaryInsuranceAmount {
     let secondBend = this.secondBendPoint();
 
     if (bracket == 0) {
-      return Money.min(aime, firstBend)
-          .times(constants.BEFORE_BENDPOINT1_MULTIPLIER);
+      return Money.min(aime, firstBend).times(
+        constants.BEFORE_BENDPOINT1_MULTIPLIER
+      );
     } else if (bracket == 1) {
-      return Money
-          .max(Money.from(0), Money.min(aime, secondBend).sub(firstBend))
-          .times(constants.BEFORE_BENDPOINT2_MULTIPLIER);
+      return Money.max(
+        Money.from(0),
+        Money.min(aime, secondBend).sub(firstBend)
+      ).times(constants.BEFORE_BENDPOINT2_MULTIPLIER);
     } else if (bracket == 2) {
-      return Money.max(Money.from(0), aime.sub(secondBend))
-          .times(constants.AFTER_BENDPOINT2_MULTIPLIER);
+      return Money.max(Money.from(0), aime.sub(secondBend)).times(
+        constants.AFTER_BENDPOINT2_MULTIPLIER
+      );
     }
-  };
+  }
 
   /**
    * Returns the total monthly full benefit summed across all benefit brackets,
@@ -81,7 +89,7 @@ export class PrimaryInsuranceAmount {
    */
   primaryInsuranceAmountUnadjusted(): Money {
     if (this.recipient_.isPiaOnly) {
-      throw new Error('Cannot calculate unadjusted PIA for PIA-only recipient');
+      throw new Error("Cannot calculate unadjusted PIA for PIA-only recipient");
     }
     let sum = Money.from(0);
     for (let i = 0; i < 3; ++i)
@@ -89,7 +97,7 @@ export class PrimaryInsuranceAmount {
     // Primary Insurance amounts are always rounded down the the nearest dime.
     // Who decided this was an important step?
     return sum.floorToDime();
-  };
+  }
 
   /**
    * Returns the total monthly full benefit summed across all benefit brackets,
@@ -102,14 +110,17 @@ export class PrimaryInsuranceAmount {
 
     let pia = this.primaryInsuranceAmountUnadjusted();
 
-    for (let year = this.recipient_.birthdate.yearTurningSsaAge(62);
-         year < constants.CURRENT_YEAR; ++year) {
-      pia = pia.times(1 + (constants.COLA[year] / 100.0));
+    for (
+      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+      year < constants.CURRENT_YEAR;
+      ++year
+    ) {
+      pia = pia.times(1 + constants.COLA[year] / 100.0);
       // Primary Insurance amounts are rounded down to the nearest dime.
       pia = pia.floorToDime();
     }
     return pia;
-  };
+  }
 
   /**
    * Returns the Primary Insurance Amount for this recipient as though they
@@ -125,35 +136,45 @@ export class PrimaryInsuranceAmount {
     let secondBend = this.secondBendPoint();
 
     // First compute the unadjusted PIA from all 3 brackets.
-    pia = pia.plus(Money.min(aime, firstBend)
-                       .times(constants.BEFORE_BENDPOINT1_MULTIPLIER));
     pia = pia.plus(
-        Money.max(Money.from(0), Money.min(aime, secondBend).sub(firstBend))
-            .times(constants.BEFORE_BENDPOINT2_MULTIPLIER));
-    pia = pia.plus(Money.max(Money.from(0), aime.sub(secondBend))
-                       .times(constants.AFTER_BENDPOINT2_MULTIPLIER));
+      Money.min(aime, firstBend).times(constants.BEFORE_BENDPOINT1_MULTIPLIER)
+    );
+    pia = pia.plus(
+      Money.max(
+        Money.from(0),
+        Money.min(aime, secondBend).sub(firstBend)
+      ).times(constants.BEFORE_BENDPOINT2_MULTIPLIER)
+    );
+    pia = pia.plus(
+      Money.max(Money.from(0), aime.sub(secondBend)).times(
+        constants.AFTER_BENDPOINT2_MULTIPLIER
+      )
+    );
 
     // Round to nearest dime.
     pia = pia.floorToDime();
 
     // Now adjust for COLA.
-    for (let year = this.recipient_.birthdate.yearTurningSsaAge(62);
-         year < constants.CURRENT_YEAR; ++year) {
-      pia = pia.times(1 + (constants.COLA[year] / 100.0));
+    for (
+      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+      year < constants.CURRENT_YEAR;
+      ++year
+    ) {
+      pia = pia.times(1 + constants.COLA[year] / 100.0);
       // Primary Insurance amounts are rounded down to the nearest dime.
       pia = pia.floorToDime();
     }
     return pia;
   }
 
-
   /**
    * Returns true if the recipient is old enough (62) to receive a COLA
    * adjustment.
    */
   shouldAdjustForCOLA(): boolean {
-    return this.recipient_.birthdate.yearTurningSsaAge(62) <
-        constants.CURRENT_YEAR;
+    return (
+      this.recipient_.birthdate.yearTurningSsaAge(62) < constants.CURRENT_YEAR
+    );
   }
 
   /**
@@ -164,10 +185,13 @@ export class PrimaryInsuranceAmount {
     let adjusted = this.primaryInsuranceAmountUnadjusted();
 
     let adjustments: Array<ColaAdjustment> = [];
-    for (let year = this.recipient_.birthdate.yearTurningSsaAge(62);
-         year <= constants.CURRENT_YEAR; ++year) {
+    for (
+      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+      year <= constants.CURRENT_YEAR;
+      ++year
+    ) {
       if (constants.COLA[year] !== undefined) {
-        let newadjusted = adjusted.times(1 + (constants.COLA[year] / 100.0));
+        let newadjusted = adjusted.times(1 + constants.COLA[year] / 100.0);
         // Primary Insurance amounts are rounded down to the nearest dime.
         newadjusted = newadjusted.floorToDime();
 
@@ -182,8 +206,8 @@ export class PrimaryInsuranceAmount {
       }
     }
     return adjustments;
-  };
-};
+  }
+}
 
 /**
  * Return value for colaAdjustments() function. Stores fields describing
@@ -207,4 +231,4 @@ class ColaAdjustment {
    * This is also the `.start` value for the next year.
    */
   end: Money;
-};
+}

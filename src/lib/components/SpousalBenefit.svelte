@@ -41,6 +41,9 @@
     lower: Recipient
   ): number {
     let maxSpousal: Money = higher.pia().primaryInsuranceAmount().div(2);
+    if (maxSpousal.value() == 0) {
+      return 0;
+    }
     let myPia: Money = lower.pia().primaryInsuranceAmount();
     var actualFraction = myPia.div$(maxSpousal) * 100.0;
     // If the actual number is > 0, return at least 1%.
@@ -68,6 +71,14 @@
         Because <RName r={$r} /> has higher earnings than <RName r={$s} />, <RName
           r={$r}
         /> is not eligible to receive a spousal benefit.
+      </p>
+    {:else if $r.pia().primaryInsuranceAmount().value() === $s
+        .pia()
+        .primaryInsuranceAmount()
+        .value()}
+      <p>
+        <RName r={$r} /> and <RName r={$s} /> have the same Primary Insurance Amount.
+        Therefore, <RName r={$r} /> is not eligible to receive a spousal benefit.
       </p>
     {:else if spousalBenefit.value() == 0}
       <p>

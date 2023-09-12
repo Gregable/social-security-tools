@@ -37,7 +37,7 @@
           Amount,
           <RName {r} suffix=" will">you will</RName> not receive any benefits on
           <RName {r} apos>your</RName> own record. Filing Date Selection for your
-          personal benefit is not relevant. <RName {r} suffix=" may"
+          personal benefit has no effect. <RName {r} suffix=" may"
             >You may</RName
           > still be eligible for benefits on <RName {r} apos>your</RName> spouse's
           record.

@@ -39,6 +39,12 @@
 
       {#if $recipient.isPiaOnly}
         <p>The amount above is the value you provided.</p>
+      {:else if !$recipient.isEligible()}
+        <p>
+          Since <RName {r} suffix=" has">you have</RName> not yet earned 40 Social
+          Security credits, <RName {r} suffix=" is">you are</RName> not eligible
+          for benefits.
+        </p>
       {:else}
         <p class="noprint">
           To understand how <RName {r} apos>your</RName> PIA is calculated, expand
@@ -199,7 +205,7 @@
     </div>
   </div>
 
-  {#if !$recipient.isPiaOnly}
+  {#if !$recipient.isPiaOnly && $recipient.isEligible()}
     <div class="text pageBreakAvoid">
       <p style="margin-top: 1em">
         In the following chart, you can see what <RName {r} apos>your</RName> current
