@@ -8,6 +8,7 @@
   import RecipientName from "./RecipientName.svelte";
 
   import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { PrimaryInsuranceAmount } from "$lib/pia";
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -1089,6 +1090,35 @@
       {/if}
     </div>
   </div>
+
+  <p>
+    Choosing a filing date is a complex and personal decision. It often depends
+    on your health, your financial situation, and your plans for retirement.
+    There can be no one-size-fits-all answer.
+  </p>
+  <p>
+    That said, some prefer to calculate a strategy based on maximizing your
+    total actuarial lifetime benefits. A recommended free tool for doing this is
+    Open Social Security. The following link will open pre-populated with the
+    information you've already entered here:
+  </p>
+  <p>
+    <a
+      href="https://opensocialsecurity.com/?marital=married&aDOBm={ctxA_.r.birthdate.layBirthMonth() +
+        1}&aDOBd={ctxA_.r.birthdate.layBirthDayOfMonth()}&aDOBy={ctxA_.r.birthdate.layBirthYear()}&aPIA={ctxA_.r
+        .pia()
+        .primaryInsuranceAmount()
+        .roundToDollar()
+        .value()}&bPIA={ctxB_.r
+        .pia()
+        .primaryInsuranceAmount()
+        .roundToDollar()
+        .value()}&bDOBm={ctxB_.r.birthdate.layBirthMonth() +
+        1}&bDOBd={ctxB_.r.birthdate.layBirthDayOfMonth()}&bDOBy={ctxB_.r.birthdate.layBirthYear()}
+"
+      target="_blank">Open Social Security (populated with my information)</a
+    >
+  </p>
 </div>
 
 <style>
