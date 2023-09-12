@@ -7,7 +7,6 @@ body {
    */
   min-width: 320px;
 
-
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: rgb(51, 51, 51);
   background-color: #fff;
@@ -22,6 +21,14 @@ body {
    * it much easier to size elements.
    */
   box-sizing: border-box;
+}
+/**
+ * The exception to border-box is for images/video where we want to use
+ * explicit sizing of the underlying asset so as not to get any distortion.
+ */
+img,
+video {
+  box-sizing: content-box;
 }
 
 a {

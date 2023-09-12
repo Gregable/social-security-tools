@@ -26,9 +26,13 @@
   const dispatch = createEventDispatcher();
 
   let pasteContents: string = "";
+  let pasteError: boolean = false;
 
   function parsePasteContents(contents: string) {
-    if (contents == "") return;
+    if (contents == "") {
+      pasteError = false;
+      return;
+    }
     const records = parsePaste(contents);
     if (records.length > 0) {
       let recipient: Recipient = new Recipient();
@@ -37,6 +41,8 @@
       dispatch("paste", {
         recipient: recipient,
       });
+    } else {
+      pasteError = true;
     }
   }
   $: parsePasteContents(pasteContents);
@@ -110,6 +116,17 @@
     </li>
     <li>Return here, paste the result into the text area below:</li>
   </ol>
+  {#if pasteError}
+    <div class="pasteError">
+      <span class="warningIcon">&#x26A0;</span>
+      <p>
+        The data you have pasted could not be parsed. Please clear the box and
+        try again. <a href="/guides/earnings-record-paste" target="_blank"
+          >Additional Help</a
+        >
+      </p>
+    </div>
+  {/if}
   <div class="pasteArea">
     <div>
       <textarea
@@ -117,10 +134,13 @@
         placeholder={"\n\nPaste Result Here"}
         bind:value={pasteContents}
       />
-      <p>
-        &#x1f512; Your data never leaves your own computer: the report is
-        generated entirely by JavaScript in your browser.
-      </p>
+      <div class="privateDataNotice">
+        <span class="lockIcon">&#x1f512;</span>
+        <p>
+          Your data never leaves your computer: the report is generated entirely
+          by JavaScript in your browser.
+        </p>
+      </div>
     </div>
   </div>
 
@@ -226,6 +246,20 @@
     width: 100%;
     font-size: 14px;
   }
+  .pasteError {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 20px 0 20px;
+    width: 100%;
+    font-size: 16px;
+    display: grid;
+    grid-template-columns: min-content auto;
+  }
+  .warningIcon {
+    font-size: 32px;
+    color: #ff0000;
+    padding: 0 10px 0 0;
+  }
   textarea {
     /* Leave room for the padding in the pasteArea div. */
     width: 100%;
@@ -233,6 +267,15 @@
     resize: none;
     border: 1px solid #ccc;
     margin: 0;
+  }
+  .lockIcon {
+    font-size: 26px;
+    color: #0000ff;
+    padding: 0 10px 0 0;
+  }
+  .privateDataNotice {
+    display: grid;
+    grid-template-columns: min-content auto;
   }
   video {
     width: 100%;
