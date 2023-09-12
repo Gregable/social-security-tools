@@ -903,6 +903,17 @@
 
 <div>
   <h3>Explore Filing Dates</h3>
+  {#if $recipient.pia().primaryInsuranceAmount().value() === 0 && $spouse
+      .pia()
+      .primaryInsuranceAmount()
+      .value() === 0}
+    <p>
+      Neither you nor your spouse have a PIA, so filing dates have no effect.
+      Try using the simulated future years of earnings sliders in the "Earnings
+      Report" sections to see what would be required to become eligible for
+      benefits.
+    </p>
+  {/if}
   <p>
     The following <i class="noprint">interactive</i> tool visualizes how
     different filing dates for both <RecipientName r={$recipient} /> and <RecipientName
