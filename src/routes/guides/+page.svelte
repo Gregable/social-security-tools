@@ -10,6 +10,21 @@
   <h1>Social Security Guides</h1>
   <ul class="guides">
     <li>
+      <span class="postdate">Sep 12, 2023</span>
+      <h3 class="posttitle">
+        <a href="/guides/earnings-record-paste"
+          >Possible causes of Parsing Errors
+        </a>
+      </h3>
+      <p class="justify">
+        SSA.tools accepts a copy and pasted earnings record from the Social
+        Security Administration's website. This guide explains If your earnings
+        record is not being parsed correctly, this guide may help you understand
+        why and how to fix it.
+      </p>
+    </li>
+
+    <li>
       <span class="postdate">Sep 6, 2023</span>
       <h3 class="posttitle">
         <a href="/guides/spousal-benefit-filing-date"

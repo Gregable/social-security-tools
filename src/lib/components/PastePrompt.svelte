@@ -121,7 +121,9 @@
       <span class="warningIcon">&#x26A0;</span>
       <p>
         The data you have pasted could not be parsed. Please clear the box and
-        try again.
+        try again. <a href="/guides/earnings-record-paste" target="_blank"
+          >Additional Help</a
+        >
       </p>
     </div>
   {/if}
