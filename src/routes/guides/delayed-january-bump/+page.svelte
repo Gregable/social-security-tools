@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
+
   import HeroImage from "./delayed-bump.png";
 
   const title = "Bump in delayed Social Security benefits after January";
@@ -112,10 +115,8 @@
       the credits earned in the year of your 69th birthday.
     </p>
   </blockquote>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
 </style>

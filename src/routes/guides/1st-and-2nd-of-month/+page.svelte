@@ -1,6 +1,8 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
   import HeroImage from "./calendar.svg";
 
   const title = "Extra rules for those born on the 1st or 2nd of the month";
@@ -168,10 +170,8 @@
       loading="lazy"
     />
   </a>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
 </style>

@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
+
   import HeroImage from "./covid-19.jpg";
   import CovidAimeImage from "./covid-aime.jpg";
   import CovidEarningsImage from "./covid-earnings.jpg";
@@ -180,40 +183,15 @@
     next like Covid appears to have produced, so this has never been much of an
     issue until now.
   </p>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
-  p,
-  ul,
-  table {
-    font-size: 16px;
-  }
-
   .division td {
     padding: 6px;
     text-align: center;
   }
-
   .division {
     margin: auto;
-  }
-
-  @media screen and (max-width: 420px) {
-    img.hero {
-      max-width: 20em;
-      margin: 0 2em 2em 0;
-    }
-  }
-
-  @media screen and (min-width: 421px) {
-    img.hero {
-      max-width: 20em;
-      position: relative;
-      float: left;
-      margin: 0 2em 2em 0;
-    }
   }
 </style>

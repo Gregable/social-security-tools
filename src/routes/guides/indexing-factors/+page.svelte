@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
+
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
 
   const title = "Social Security Indexing Factors";
   const description =
@@ -199,12 +202,10 @@
       in 1960?</a
     >
   </p>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
   .division td {
     padding: 6px;
     text-align: center;

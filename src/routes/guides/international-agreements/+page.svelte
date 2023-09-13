@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
+
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
 
   const title = "Social Security International Agreements";
   const description = "How does working abroad affect social security?";
@@ -53,10 +56,8 @@
     to compute the related benefits. It should be used as a starting point, but
     not the final answer, in a case of a multinational career.
   </p>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
 </style>

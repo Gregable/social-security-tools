@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
+
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
 
   const title = "Will Social Security run out?";
   const description =
@@ -78,10 +81,8 @@
     be used. It is also unlikely that the program will go away entirely, due to
     it's popularity.
   </p>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
 </style>
