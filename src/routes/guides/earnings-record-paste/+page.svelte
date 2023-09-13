@@ -1,10 +1,12 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
   import { GuidesSchema } from "$lib/schema-org";
   import HeroImage from "./hero.svg";
   import ErrorMessageImage from "./error.png";
   import EarnignsRecordLinkImage from "./earnings-record-link.png";
   import StatementImage from "./statement.png";
+  import GuideFooter from "../guide-footer.svelte";
 
   const title = "Possible causes of Parsing Errors";
   const description =
@@ -162,50 +164,9 @@
       2011 $1,000
     </pre>
   </div>
+
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
-  h1 {
-    font-size: 2.5em;
-    margin-bottom: 0;
-  }
-  p,
-  ul,
-  pre {
-    font-size: 1.4em;
-    color: #333;
-  }
-  p.postdate {
-    margin: 0.4em 0 1.5em 0;
-    font-size: 0.8em;
-    color: #666;
-  }
-  figure {
-    margin: 0;
-    width: min-content;
-  }
-  img {
-    border: 1px solid #ccc;
-  }
-  figure.hero-image {
-    float: right;
-    margin: 0 0 3vw 4vw;
-  }
-  .hero-image img {
-    height: 24vw;
-    width: auto;
-  }
-  figcaption {
-    font-size: 0.8em;
-    text-align: center;
-  }
-  figure:not(hero-image) {
-    margin: 1.8em 0 1.8em 0;
-  }
-  div.indent {
-    margin-left: 2em;
-  }
 </style>

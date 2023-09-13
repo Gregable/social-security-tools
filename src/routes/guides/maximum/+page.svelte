@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
+
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
 
   const title = "Social Security Maximum";
   const description =
@@ -75,10 +78,8 @@
     total benefit for the two maximum personal benefits is simply double a
     single personal benefit, which is $9,110 / month.
   </p>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
 </style>

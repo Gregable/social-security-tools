@@ -1,6 +1,10 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
+
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
+
   import EarningsRecordExampleImage from "./example-earnings-record-simplified.jpg";
 
   const title = "Social Security and Inflation";
@@ -116,10 +120,8 @@
     won't be known until the future. Therefore any benefits shown by this calculator
     are displayed in "today's dollars".
   </p>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
 </style>

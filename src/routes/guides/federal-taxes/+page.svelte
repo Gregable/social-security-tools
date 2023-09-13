@@ -1,7 +1,10 @@
 <script lang="ts">
-  import Header from "$lib/components/Header.svelte";
   import "$lib/global.css";
+  import "../guide.css";
+
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
+
   import HeroImage from "./taxes.jpg";
 
   const title = "Federal Taxation of Social Security Benefits";
@@ -250,10 +253,8 @@
     consult with a tax professional or the Social Security Administration for
     more information and assistance.
   </p>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
 </style>

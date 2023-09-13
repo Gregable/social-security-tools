@@ -16,7 +16,7 @@
           >Possible causes of Parsing Errors
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         SSA.tools accepts a copy and pasted earnings record from the Social
         Security Administration's website. This guide explains If your earnings
         record is not being parsed correctly, this guide may help you understand
@@ -31,7 +31,7 @@
           >Deep look at Spousal Benefits and Filing Dates
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         Spousal Benefits are sometimes commonly misunderstood to be equal to
         half of the other spouse's benefit. This guide takes a deep dive into
         how spousal benefits are calculated and how different filing dates can
@@ -44,7 +44,7 @@
       <h3 class="posttitle">
         <a href="/guides/filing-date-chart">Navigate the Filing Date Chart</a>
       </h3>
-      <p class="justify">
+      <p class="description">
         This site's calculator shows a information dense chart of how filing
         dates affect your benefits. The chart can be a little confusing at
         first, so here's a guide to help you understand it.
@@ -58,7 +58,7 @@
           Will Social Security Run Out?
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         And what happens if it does? Learn more about the Social Security Trust
         Fund, how it's slowly running out, and how what happens next could
         affect your benefits.
@@ -72,7 +72,7 @@
           Bump in delayed benefits after January
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         For those starting benefits after Normal Retirement Age, there is a
         small delay in some of the delayed credits until the following January.
       </p>
@@ -85,7 +85,7 @@
           Federal Taxation of Social Security Benefits
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         A Comprehensive Guide to Calculating the Taxability of Social Security
         Benefits Based on AGI.
       </p>
@@ -98,7 +98,7 @@
           International Agreements
         </a>
       </h3>
-      <p class="justify">How does working abroad affect social security?</p>
+      <p class="description">How does working abroad affect social security?</p>
     </li>
 
     <li>
@@ -108,7 +108,7 @@
           Rules for those born on the 1st or 2nd of the month
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         Learn more about how Social Security law is affected by the day of the
         month one was born in.
       </p>
@@ -122,7 +122,7 @@
           younger than 62?
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         SSA.gov publishes estimated future indexing factors based on economic
         projections. Should ssa.tools use these factors and why?
       </p>
@@ -135,7 +135,7 @@
           The effect of AWI declining in 2020 due to Covid
         </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         For earners who were born in 1960, the effect of a potentially much
         lower average wage in 2020 may have an outsized impact on their lifetime
         benefit.
@@ -147,7 +147,9 @@
       <h3 class="posttitle">
         <a href="/guides/earnings-cap">Earnings Caps</a>
       </h3>
-      <p class="justify">How do Social Security annual earnings caps work?</p>
+      <p class="description">
+        How do Social Security annual earnings caps work?
+      </p>
     </li>
 
     <li>
@@ -155,7 +157,7 @@
       <h3 class="posttitle">
         <a href="/guides/maximum">Maximum Benefits </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         What is the maximum possible Social Security benefit that someone can
         recieve?
       </p>
@@ -165,7 +167,7 @@
       <h3 class="posttitle">
         <a href="/guides/inflation">Social Security and Inflation </a>
       </h3>
-      <p class="justify">
+      <p class="description">
         Learn how two different types of inflation, wage increase and consumer
         price index, each interact to affect your social security benefit.
       </p>
@@ -177,12 +179,13 @@
   a {
     color: #337ab7;
   }
-  p.justify {
+  p.description {
     text-align: justify;
     margin: 0 0 0 1em;
   }
   ul.guides {
-    max-width: 720px;
+    padding: 0 2em;
+    margin: 0 auto;
   }
   ul.guides > li {
     list-style-type: none;

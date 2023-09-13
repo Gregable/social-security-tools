@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/global.css";
+  import "../guide.css";
+
   import { GuidesSchema } from "$lib/schema-org";
+  import GuideFooter from "../guide-footer.svelte";
 
   const title = "Extra rules for those born on the 1st or 2nd of the month";
   const description = "How do Social Security annual earnings caps work?";
@@ -347,12 +350,10 @@
       [ssa.gov]
     </li>
   </ul>
+  <GuideFooter />
 </div>
 
 <style>
-  a {
-    color: #337ab7;
-  }
   .css-column {
     column-count: 4;
     width: 90%;
