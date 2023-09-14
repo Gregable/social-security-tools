@@ -22,17 +22,17 @@
   <h2>Normal Retirement Age</h2>
   <div class="text pageBreakAvoid">
     <p>
-      The primary insurance amount rounded down to the next lower whole dollar (<b
-        >{benefit.wholeDollars()}</b
-      >
+      The primary insurance amount rounded down (<b>{benefit.wholeDollars()}</b>
       / month) is the benefit you will earn if you begin collecting your benefit
-      at your <u>normal retirement age</u> (NRA). Normal Retirement Age is
-      between 65 and 67, depending on when you were born. You may also see this
-      referred to as the <u>full retirement age</u> (FRA).
+      at your <u>normal retirement age</u> (NRA).
+    </p>
+    <p>
+      You may also see this referred to as the <u>full retirement age</u> (FRA).
     </p>
 
     <p>
-      For <RName {r} suffix=" who was">those</RName>
+      Normal Retirement Age is between 65 and 67, depending on when you were
+      born. For <RName {r} suffix=" who was">those</RName>
       born in <b>{$recipient.birthdate.ssaBirthYear()}</b>, normal retirement
       age is
       {#if $recipient.normalRetirementAge().modMonths() == 0}

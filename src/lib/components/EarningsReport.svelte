@@ -22,10 +22,9 @@
 
   <div class="text">
     <p>
-      Your earnings report is a summary of your lifetime earnings. Each year,
-      the wages you earned which are taxed for Social Security are recorded by
-      the Social Security Administration. These earnings are used to calculate
-      your Social Security benefits.
+      Every year, the wages you earn are recorded by the Social Security
+      Administration. These earnings are used to calculate your Social Security
+      benefits.
     </p>
 
     <div class="earnings-banner">
@@ -50,12 +49,8 @@
     </Expando>
 
     <p class="noprint">
-      This tool also allows you to simulate future years of earnings. This can
-      help you understand the impact of your additional years of earnings on <RecipientName
-        r={$recipient}
-        apos>your</RecipientName
-      > Social Security benefits. Every number and chart in this report will recalculate
-      as you adjust these sliders:
+      This calculator also allows you to estimate future earnings. Every number
+      and chart in this report will recalculate as you adjust these sliders:
     </p>
   </div>
 

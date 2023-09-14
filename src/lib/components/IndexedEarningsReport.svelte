@@ -28,8 +28,7 @@
         (AIME). This is the monthly average of <RecipientName
           r={$recipient}
           apos>your</RecipientName
-        > highest 35 years of earnings, indexed for wage growth (similar to an inflation
-        adjustment).
+        > highest 35 years of earnings, adjusted over time by wage growth.
       </p>
 
       <div class="aime-banner">
