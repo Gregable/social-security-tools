@@ -208,9 +208,8 @@
   {#if !$recipient.isPiaOnly && $recipient.isEligible()}
     <div class="text pageBreakAvoid">
       <p style="margin-top: 1em">
-        In the following chart, you can see what <RName {r} apos>your</RName> current
-        Primary Insurance Amount would be if <RName {r} apos>your</RName> Average
-        Indexed Monthly Earnings were to increase.
+        In the following chart, you can see what <RName {r} apos>your</RName>
+        PIA would be if <RName {r} apos>your</RName> AIME changed.
         <span class="noprint"
           >Move your mouse over the chart to see how the Primary Insurance
           Amount changes.</span

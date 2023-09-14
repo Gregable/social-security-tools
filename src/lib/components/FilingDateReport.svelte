@@ -86,7 +86,7 @@
           >), or start any month in between. The longer <RName
             r={$recipient}
             suffix=" waits">you wait</RName
-          >, the higher the benefit will be.
+          >, the higher the benefit.
         </p>
       {/if}
     </div>
