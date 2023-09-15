@@ -1,14 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import "$lib/global.css";
-  import { Birthdate } from "$lib/birthday";
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
   import Slider from "./Slider.svelte";
   import RecipientName from "./RecipientName.svelte";
 
   import { MonthDate, MonthDuration } from "$lib/month-time";
-  import { PrimaryInsuranceAmount } from "$lib/pia";
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -776,23 +774,21 @@
   function YoungerOlder(): [Recipient, Recipient] {
     // If the recipients are the same age, arbitrarily pick the recipient
     // as the younger one.
-    if (
-      $recipient.birthdate.ssaBirthdate() == $spouse.birthdate.ssaBirthdate()
-    ) {
-      return [$recipient, $spouse];
+    if (recipient.birthdate.ssaBirthdate() == spouse.birthdate.ssaBirthdate()) {
+      return [recipient, spouse];
     }
 
     // Determine which recipient is older / younger.
     // Slight point of confusion: The younger recipient is the
     // one who has the *higher* birthdate.
     const youngerRecipient: Recipient =
-      $recipient.birthdate.ssaBirthdate() < $spouse.birthdate.ssaBirthdate()
-        ? $spouse
-        : $recipient;
+      recipient.birthdate.ssaBirthdate() < spouse.birthdate.ssaBirthdate()
+        ? spouse
+        : recipient;
     const olderRecipient: Recipient =
-      $recipient.birthdate.ssaBirthdate() < $spouse.birthdate.ssaBirthdate()
-        ? $recipient
-        : $spouse;
+      recipient.birthdate.ssaBirthdate() < spouse.birthdate.ssaBirthdate()
+        ? recipient
+        : spouse;
 
     return [youngerRecipient, olderRecipient];
   }
@@ -917,8 +913,8 @@
   {/if}
   <p>
     The following <i class="noprint">interactive</i> tool visualizes how
-    different filing dates for both <RecipientName r={$recipient} /> and <RecipientName
-      r={$spouse}
+    different filing dates for both <RecipientName r={recipient} /> and <RecipientName
+      r={spouse}
     /> affect total benefits, including the spousal benefit.
     <span class="noprint"
       >Move the slider to select a filing date for each person and hover over
@@ -944,14 +940,14 @@
     <p class="sliderLabel">
       <span class="noprint">
         Select the age that <RecipientName
-          r={$recipient}
+          r={recipient}
           suffix="
   files">you file</RecipientName
         > for benefits:
       </span>
       <span class="onlyprint">
         Age that <RecipientName
-          r={$recipient}
+          r={recipient}
           suffix="
   files">you file</RecipientName
         > for benefits:
@@ -984,14 +980,14 @@
     <p class="sliderLabel">
       <span class="noprint">
         Select the age that <RecipientName
-          r={$spouse}
+          r={spouse}
           suffix="
   files">you file</RecipientName
         > for benefits:
       </span>
       <span class="onlyprint">
         Age that <RecipientName
-          r={$spouse}
+          r={spouse}
           suffix="
   files">you file</RecipientName
         > for benefits:

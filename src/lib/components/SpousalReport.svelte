@@ -14,8 +14,8 @@
       In addition to your own <u>primary</u> benefit, married couples may earn
       <u>spousal</u> Social Security benefits based on each other's records.
     </p>
-    <SpousalBenefit recipient={$recipient} spouse={$spouse} />
-    <SpousalBenefit recipient={$spouse} spouse={$recipient} />
+    <SpousalBenefit {recipient} {spouse} />
+    <SpousalBenefit recipient={spouse} spouse={recipient} />
   </div>
 </div>
 

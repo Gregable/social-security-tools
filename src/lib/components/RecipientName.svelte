@@ -11,7 +11,7 @@
     with styling to help visually identify the user.
 
   @example
-    <RecipientName r={$recipient}/ suffix="'s">your</RecipientName>
+    <RecipientName r={recipient}/ suffix="'s">your</RecipientName>
     This will display as "your" if the recipient is the only user, or as
     "Alex's" for example if the recipient is not the only user.
 -->
@@ -58,11 +58,11 @@
 </script>
 
 <span
-  >{#if $r.only}<slot />{:else}<span
+  >{#if r.only}<slot />{:else}<span
       class="name"
       class:noColor
-      class:first={$r.first}
-      >{#if shortenTo}{$r.shortName(shortenTo)}{:else}{$r.name}{/if}</span
+      class:first={r.first}
+      >{#if shortenTo}{r.shortName(shortenTo)}{:else}{r.name}{/if}</span
     >{finalSuffix()}{/if}
 </span>
 

@@ -6,7 +6,7 @@
   import RName from "./RecipientName.svelte";
 
   export let recipient: Recipient = new Recipient();
-  let r = $recipient;
+  let r = recipient;
 </script>
 
 <div class="pageBreakAvoid">

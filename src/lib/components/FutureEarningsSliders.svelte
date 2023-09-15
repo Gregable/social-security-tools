@@ -36,14 +36,14 @@
   function remainingEarningYears(recipient: Recipient): number {
     if (!recipient) return 0;
     let years =
-      $recipient.normalRetirementDate().year() - constants.CURRENT_YEAR + 1;
+      recipient.normalRetirementDate().year() - constants.CURRENT_YEAR + 1;
     // The slider can go from 0 to 35 years.
     return Math.min(35, Math.max(0, years));
   }
   function mostRecentEarningWage(recipient: Recipient): Money {
-    const numEarningsYears = $recipient.earningsRecords.length;
+    const numEarningsYears = recipient.earningsRecords.length;
     if (numEarningsYears == 0) return Money.from(1000);
-    let earningRecord = $recipient.earningsRecords[numEarningsYears - 1];
+    let earningRecord = recipient.earningsRecords[numEarningsYears - 1];
     if (
       earningRecord.year == constants.CURRENT_YEAR ||
       earningRecord.year == constants.CURRENT_YEAR - 1 ||
@@ -58,13 +58,13 @@
   // the year of the normal retirement age. We want the sliders to start
   // in the same place as ssa.gov, but the user can of course move them from
   // there.
-  let futureEarningYears: number = remainingEarningYears($recipient);
-  let futureEarningWage: number = mostRecentEarningWage($recipient)
+  let futureEarningYears: number = remainingEarningYears(recipient);
+  let futureEarningWage: number = mostRecentEarningWage(recipient)
     .roundToDollar()
     .value();
 
   function update(futureEarningYears: number, futureEarningWage: Money) {
-    $recipient.simulateFutureEarningsYears(
+    recipient.simulateFutureEarningsYears(
       futureEarningYears,
       futureEarningWage
     );
@@ -140,7 +140,7 @@
 <div class="sliders" bind:this={slidersEl}>
   <div class="grid">
     <div class="item left">
-      <RecipientName r={$recipient} shortenTo={15} suffix=" plans"
+      <RecipientName r={recipient} shortenTo={15} suffix=" plans"
         >I plan</RecipientName
       > to work for
     </div>
