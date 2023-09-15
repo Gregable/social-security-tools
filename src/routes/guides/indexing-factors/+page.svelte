@@ -1,6 +1,5 @@
 <script lang="ts">
   import "$lib/global.css";
-  import "../guide.css";
 
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
@@ -117,13 +116,18 @@
     (AWI) in the year she turned 60 divided by the AWI of the multiplier year:
   </p>
 
-  <table class="division">
+  <table style="margin: auto;">
     <tr>
-      <td rowspan="2">Multiplier (year X) =</td>
-      <td style="border-bottom: 1px solid black;">AWI (year 2030)</td>
+      <td rowspan="2" style="padding: 6px; text-align: center;"
+        >Multiplier (year X) =</td
+      >
+      <td
+        style="border-bottom: 1px solid black; padding: 6px; text-align: center;"
+        >AWI (year 2030)</td
+      >
     </tr>
     <tr>
-      <td>AWI (year X)</td>
+      <td style="padding: 6px; text-align: center;">AWI (year X)</td>
     </tr>
   </table>
 
@@ -205,12 +209,4 @@
   <GuideFooter />
 </div>
 
-<style>
-  .division td {
-    padding: 6px;
-    text-align: center;
-  }
-  .division {
-    margin: auto;
-  }
-</style>
+<style src="../guide.css"></style>

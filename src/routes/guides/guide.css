@@ -24,6 +24,10 @@ figure {
   margin: 0;
   width: min-content;
 }
+figure.float-right {
+  float: right;
+  margin: 0 0 3vw 4vw;
+}
 img {
   border: 1px solid #ccc;
   max-width: 80vw;
@@ -46,4 +50,16 @@ figure:not(hero-image) {
 }
 div.indent {
   margin-left: 2em;
+}
+
+.earnings-cap-guide .css-column {
+  column-count: 4;
+  width: 90%;
+  column-rule: 1px solid lightblue;
+  margin: 2em;
+}
+.earnings-cap-guide .css-column span {
+  margin-right: 1.5em;
+  margin-left: 1.5em;
+  font-size: 14px;
 }

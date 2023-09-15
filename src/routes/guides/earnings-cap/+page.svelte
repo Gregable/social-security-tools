@@ -1,6 +1,5 @@
 <script lang="ts">
   import "$lib/global.css";
-  import "../guide.css";
 
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
@@ -25,7 +24,7 @@
   {@html schema.render()}
 </svelte:head>
 
-<div>
+<div class="earnings-cap-guide">
   <h1>{title}</h1>
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
   <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
@@ -353,16 +352,4 @@
   <GuideFooter />
 </div>
 
-<style>
-  .css-column {
-    column-count: 4;
-    width: 90%;
-    column-rule: 1px solid lightblue;
-    margin: 2em;
-  }
-  .css-column span {
-    margin-right: 1.5em;
-    margin-left: 1.5em;
-    font-size: 14px;
-  }
-</style>
+<style src="../guide.css"></style>

@@ -1,6 +1,5 @@
 <script lang="ts">
   import "$lib/global.css";
-  import "../guide.css";
 
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
@@ -200,5 +199,4 @@
   <GuideFooter />
 </div>
 
-<style>
-</style>
+<style src="../guide.css"></style>
