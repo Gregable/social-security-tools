@@ -8,15 +8,13 @@
   import Expando from "./Expando.svelte";
 
   export let recipient: Recipient = new Recipient();
-  let r: Recipient = $recipient;
+  let r: Recipient = recipient;
 
-  let exampleAge: { age: number; day: number; month: string; year: number };
-  $: exampleAge = $recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
+  let exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
 
-  let followingMonth: MonthDate;
-  $: followingMonth = MonthDate.initFromYearsMonths({
+  let followingMonth = MonthDate.initFromYearsMonths({
     years: constants.CURRENT_YEAR,
-    months: $recipient.birthdate.ssaBirthMonthDate().monthIndex(),
+    months: recipient.birthdate.ssaBirthMonthDate().monthIndex(),
   }).addDuration(new MonthDuration(1));
 
   function twoSignificantDigits(n: number) {
@@ -45,14 +43,14 @@
       {:else}
         <p>
           <RName {r}>You</RName> can begin taking benefits as early as
-          {#if $recipient.birthdate.layBirthDayOfMonth() == 2}
+          {#if recipient.birthdate.layBirthDayOfMonth() == 2}
             62 years old (<b
-              >{$recipient.birthdate
+              >{recipient.birthdate
                 .dateAtSsaAge(
                   MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
                 )
                 .monthFullName()}
-              {$recipient.birthdate
+              {recipient.birthdate
                 .dateAtSsaAge(
                   MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
                 )
@@ -60,12 +58,12 @@
             >),
           {:else}
             62 years and 1 month old (<b
-              >{$recipient.birthdate
+              >{recipient.birthdate
                 .dateAtSsaAge(
                   MonthDuration.initFromYearsMonths({ years: 62, months: 1 })
                 )
                 .monthFullName()}
-              {$recipient.birthdate
+              {recipient.birthdate
                 .dateAtSsaAge(
                   MonthDuration.initFromYearsMonths({ years: 62, months: 1 })
                 )
@@ -73,18 +71,18 @@
             >),
           {/if}
           wait until as late as 70 years old (<b
-            >{$recipient.birthdate
+            >{recipient.birthdate
               .dateAtSsaAge(
                 MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
               )
               .monthFullName()}
-            {$recipient.birthdate
+            {recipient.birthdate
               .dateAtSsaAge(
                 MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
               )
               .year()}</b
           >), or start any month in between. The longer <RName
-            r={$recipient}
+            r={recipient}
             suffix=" waits">you wait</RName
           >, the higher the benefit.
         </p>
@@ -97,7 +95,7 @@
       collapsedText="Expand to learn about the effect of Filing before or after Normal Retirement Age"
       expandedText="Show Less"
     >
-      {#if $recipient.birthdate.layBirthDayOfMonth() != 2}
+      {#if recipient.birthdate.layBirthDayOfMonth() != 2}
         <div class="insetTextBox">
           <h4>Special Rule</h4>
           <p>
@@ -110,9 +108,9 @@
             attaining age 62.
           </p>
           <p>
-            {#if $recipient.birthdate.layBirthDayOfMonth() == 1}
+            {#if recipient.birthdate.layBirthDayOfMonth() == 1}
               For example, <RName {r} suffix=" was">you were</RName> born on
-              <b>{$recipient.birthdate.layBirthdateString()}</b>. <RName
+              <b>{recipient.birthdate.layBirthdateString()}</b>. <RName
                 {r}
                 suffix=" attains">You attain</RName
               > age <b>{exampleAge.age}</b>
@@ -126,7 +124,7 @@
               >.
             {:else}
               For example, <RName {r} suffix=" was">you were</RName> born on
-              <b>{$recipient.birthdate.layBirthdateString()}</b>, so the first
+              <b>{recipient.birthdate.layBirthdateString()}</b>, so the first
               month that <RName {r} suffix=" is">you are</RName>
               <b>{exampleAge.age}</b>
               throughout the <u>entire</u> month is
@@ -150,8 +148,8 @@
           If <RName {r} suffix=" chooses">you choose</RName> to take benefits
           <i>earlier</i>
           than normal retirement age (<b
-            >{$recipient.normalRetirementDate().monthFullName()}
-            {$recipient.normalRetirementDate().year()}</b
+            >{recipient.normalRetirementDate().monthFullName()}
+            {recipient.normalRetirementDate().year()}</b
           >), <RName {r} apos>your</RName> benefit amount will be
           <u>permanently</u> <i>reduced</i>:
         </p>
@@ -168,15 +166,15 @@
         <p>
           The 36 month mark before normal retirement age is age
           <b
-            >{$recipient.earlyRetirementInflectionAge().years()} years
-            {#if $recipient.earlyRetirementInflectionAge().modMonths() != 0}
+            >{recipient.earlyRetirementInflectionAge().years()} years
+            {#if recipient.earlyRetirementInflectionAge().modMonths() != 0}
               and
-              {$recipient.earlyRetirementInflectionAge().modMonths()} months >
+              {recipient.earlyRetirementInflectionAge().modMonths()} months >
             {/if}</b
           >
           (<b
-            >{$recipient.earlyRetirementInflectionDate().monthName()}
-            {$recipient.earlyRetirementInflectionDate().year()}</b
+            >{recipient.earlyRetirementInflectionDate().monthName()}
+            {recipient.earlyRetirementInflectionDate().year()}</b
           >).
         </p>
       </div>
@@ -187,14 +185,14 @@
           If <RName {r} suffix=" chooses">you choose</RName> to delay until
           <i>later</i>
           than normal retirement age (<b
-            >{$recipient.normalRetirementDate().monthFullName()}
-            {$recipient.normalRetirementDate().year()}</b
+            >{recipient.normalRetirementDate().monthFullName()}
+            {recipient.normalRetirementDate().year()}</b
           >) to start <RName {r} apos>your</RName> benefit, the amount will be
           <u>permanently</u>
           <i>increased</i>:
         </p>
         <ul>
-          {#if $recipient.delayedRetirementIncrease() == 0.08}
+          {#if recipient.delayedRetirementIncrease() == 0.08}
             <li>
               <b>2 / 3</b> of one percent per month (<b>8%</b> per year) for each
               month after normal retirement age, up age 70.
@@ -203,10 +201,10 @@
             <li>
               <b
                 >{twoSignificantDigits(
-                  ($recipient.delayedRetirementIncrease() * 100) / 12
+                  (recipient.delayedRetirementIncrease() * 100) / 12
                 )}%</b
               >
-              per month (<b>{$recipient.delayedRetirementIncrease() * 100}%</b>
+              per month (<b>{recipient.delayedRetirementIncrease() * 100}%</b>
               per year) for each month after normal retirement age, up age 70.
             </li>
           {/if}
@@ -237,7 +235,7 @@
           >
         </p>
       </div>
-      <FilingDateChart recipient={$recipient} />
+      <FilingDateChart {recipient} />
     </div>
   {/if}
 </div>

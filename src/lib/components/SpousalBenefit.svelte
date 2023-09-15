@@ -12,13 +12,17 @@
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
-  let r: Recipient = $recipient;
-  let s: Recipient = $spouse;
+  const r: Recipient = recipient;
+  const s: Recipient = spouse;
 
   let higherEarner: Recipient;
   let lowerEarner: Recipient;
-  $: higherEarner = $r.higherEarningsThan($s) ? $r : $s;
-  $: lowerEarner = $r.higherEarningsThan($s) ? $s : $r;
+  $: higherEarner = $recipient.higherEarningsThan($spouse)
+    ? $recipient
+    : $spouse;
+  $: lowerEarner = $recipient.higherEarningsThan($spouse)
+    ? $spouse
+    : $recipient;
 
   function spousalBenefitCalc(higher: Recipient, lower: Recipient): Money {
     let maxSpousal = higher.pia().primaryInsuranceAmount().div(2);
@@ -64,52 +68,52 @@
 </script>
 
 <div>
-  <h3><RName r={$r} noColor /></h3>
+  <h3><RName {r} noColor /></h3>
   <div class="text">
-    {#if $r.higherEarningsThan($s)}
+    {#if $recipient.higherEarningsThan($spouse)}
       <p>
-        Because <RName r={$r} /> has higher earnings than <RName r={$s} />, <RName
-          r={$r}
+        Because <RName {r} /> has higher earnings than <RName r={s} />, <RName
+          {r}
         /> is not eligible to receive a spousal benefit.
       </p>
-    {:else if $r.pia().primaryInsuranceAmount().value() === $s
+    {:else if $recipient.pia().primaryInsuranceAmount().value() === $spouse
         .pia()
         .primaryInsuranceAmount()
         .value()}
       <p>
-        <RName r={$r} /> and <RName r={$s} /> have the same Primary Insurance Amount.
-        Therefore, <RName r={$r} /> is not eligible to receive a spousal benefit.
+        <RName {r} /> and <RName r={s} /> have the same Primary Insurance Amount.
+        Therefore, <RName {r} /> is not eligible to receive a spousal benefit.
       </p>
     {:else if spousalBenefit.value() == 0}
       <p>
-        <RName r={$r} /> has lower earnings than <RName r={$s} />. However <RName
-          r={$r}
+        <RName {r} /> has lower earnings than <RName r={s} />. However <RName
+          {r}
           apos
         /> Primary Insurance Amount is greater than half of
         <RName r={s} apos /> Primary Insurance Amount, so there is no spousal benefit
         payable.
       </p>
     {:else}
-      {#if $r.pia().primaryInsuranceAmount().value() == 0}
-        <RName r={$r} /> is eligible to receive a <u>spousal benefit</u> on <RName
-          r={$s}
+      {#if $recipient.pia().primaryInsuranceAmount().value() == 0}
+        <RName {r} /> is eligible to receive a <u>spousal benefit</u> on <RName
+          r={s}
           apos
-        /> record equal to half of <RName r={$s} apos /> Primary Insurance Amount.
+        /> record equal to half of <RName r={s} apos /> Primary Insurance Amount.
       {:else}
-        <RName r={$r} /> is eligible to receive a <u>spousal benefit</u> on <RName
-          r={$s}
+        <RName {r} /> is eligible to receive a <u>spousal benefit</u> on <RName
+          r={s}
           apos
         /> record. A spousal benefit is the amount at normal retirement age that
-        <RName r={$r} /> recieves in addition to <RName r={$r} apos />
+        <RName {r} /> recieves in addition to <RName {r} apos />
         own benefit of
-        <b>{$r.pia().primaryInsuranceAmount().string()}</b>
+        <b>{$recipient.pia().primaryInsuranceAmount().string()}</b>
         / month.
       {/if}
       <div class="banner">
         Spousal Benefit: <b>{spousalBenefit.string()}</b> / month
       </div>
 
-      {#if $r.pia().primaryInsuranceAmount().value() > 0}
+      {#if $recipient.pia().primaryInsuranceAmount().value() > 0}
         <Expando
           collapsedText="Expand for a detailed look at the Spousal Benefit"
           expandedText="Show Less"
@@ -117,34 +121,35 @@
         >
           <div class="expando">
             <p>
-              <RName r={$r} apos /> spousal benefit at normal retirement age is calculated
-              as 50% of <RName r={$s} apos /> Primary Insurance Amount minus <RName
-                r={$r}
+              <RName {r} apos /> spousal benefit at normal retirement age is calculated
+              as 50% of <RName r={s} apos /> Primary Insurance Amount minus <RName
+                {r}
                 apos
               /> own Primary Insurance Amount.
             </p>
             <ul class="pialist">
               <li>
-                <RName r={$s} apos /> Primary Insurance Amount:
+                <RName r={s} apos /> Primary Insurance Amount:
                 <span class="nowrap">
-                  <b>{$s.pia().primaryInsuranceAmount().string()}</b>
+                  <b>{$spouse.pia().primaryInsuranceAmount().string()}</b>
                   / month.</span
                 >
               </li>
               <li>
-                <RName r={$r} apos /> Primary Insurance Amount:
+                <RName {r} apos /> Primary Insurance Amount:
                 <span class="nowrap">
-                  <b>{$r.pia().primaryInsuranceAmount().string()}</b>
+                  <b>{$recipient.pia().primaryInsuranceAmount().string()}</b>
                   / month.</span
                 >
               </li>
             </ul>
             <p>
-              <RName r={$r} apos /> Spousal Benefit:
+              <RName {r} apos /> Spousal Benefit:
               <span class="nowrap"
                 >(
-                <b>{$s.pia().primaryInsuranceAmount().string()}</b> x 50% ) -
-                <b>{$r.pia().primaryInsuranceAmount().string()}</b> =
+                <b>{$spouse.pia().primaryInsuranceAmount().string()}</b> x 50% )
+                -
+                <b>{$recipient.pia().primaryInsuranceAmount().string()}</b> =
                 <b>{spousalBenefit.string()}</b></span
               >
             </p>
@@ -152,7 +157,9 @@
             <div class="curlyvisualization">
               <div style="width: 100%">
                 <div class="curlyText" style="width: {spousalBenefitFraction}%">
-                  Personal (<b>{$r.pia().primaryInsuranceAmount().string()}</b>)
+                  Personal (<b
+                    >{$recipient.pia().primaryInsuranceAmount().string()}</b
+                  >)
                 </div>
                 <div
                   class="curlyText"
@@ -164,13 +171,13 @@
               <br style="clear: both" />
               <div
                 class="fullCurlyBar"
-                class:firstRecipient={$r.first}
-                class:secondRecipient={!$r.first}
+                class:firstRecipient={r.first}
+                class:secondRecipient={!r.first}
               >
                 <div
                   class="leftCurlyBar"
-                  class:firstRecipient={!$r.first}
-                  class:secondRecipient={$r.first}
+                  class:firstRecipient={!r.first}
+                  class:secondRecipient={r.first}
                   style="width: {spousalBenefitFraction}%"
                 />
               </div>
@@ -182,7 +189,7 @@
               />
               <div style="width: 100%; text-align: center;">
                 Total: <b
-                  >{$r
+                  >{$recipient
                     .pia()
                     .primaryInsuranceAmount()
                     .plus(spousalBenefit)
@@ -195,20 +202,20 @@
       {/if}
       <h4>Filing Date</h4>
       <p>
-        <RName r={$r} /> will begin receiving spousal benefits at the latter of either
-        the date that <RName r={$r} /> or <RName r={$s} /> files for benefits.
+        <RName {r} /> will begin receiving spousal benefits at the latter of either
+        the date that <RName {r} /> or <RName r={s} /> files for benefits.
       </p>
       <Expando
         collapsedText="Expand for detail about the effect of Filing Date on Spousal Benefits"
         expandedText="Show Less"
       >
         <div class="expando">
-          {#if $r.pia().primaryInsuranceAmount().value() == 0}
+          {#if $recipient.pia().primaryInsuranceAmount().value() == 0}
             <p>
-              <RName r={$r} /> can choose the filing date to begin receiving spousal
+              <RName {r} /> can choose the filing date to begin receiving spousal
               benefits. However,
-              <RName r={$r} /> is not eligible to begin spousal benefits until
-              <RName r={$s} /> begins primary benefits. (If applicable, see
+              <RName {r} /> is not eligible to begin spousal benefits until
+              <RName r={s} /> begins primary benefits. (If applicable, see
               <a
                 href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
                 target="_blank">divorced spouses</a
@@ -222,34 +229,34 @@
 
             <ul>
               <li>
-                <RName r={$r} /> is not eligible to begin spousal benefits until
-                <RName r={$s} /> begins primary benefits. (If applicable, see
+                <RName {r} /> is not eligible to begin spousal benefits until
+                <RName r={s} /> begins primary benefits. (If applicable, see
                 <a
                   href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
                   target="_blank">divorced spouses</a
                 >.)
               </li>
               <li>
-                <RName r={$r} /> must elect to collect all or none of the benefits
-                <RName r={$r} /> is eligible for. This is known as the
+                <RName {r} /> must elect to collect all or none of the benefits
+                <RName {r} /> is eligible for. This is known as the
                 <u>deeming</u> rule; you are deemed to be filing for all
                 benefits you are eligible for. Examples:
                 <ul>
                   <li>
-                    <RName r={$r} /> cannot choose to delay personal benefits while
+                    <RName {r} /> cannot choose to delay personal benefits while
                     collecting spousal benefits.
                   </li>
                   <li>
-                    Once <RName r={$r} />
-                    begins personal benefits, <RName r={$r} /> cannot delay spousal
-                    benefits beyond when <RName r={$s} /> begins primary benefits.
+                    Once <RName {r} />
+                    begins personal benefits, <RName {r} /> cannot delay spousal
+                    benefits beyond when <RName r={s} /> begins primary benefits.
                   </li>
                 </ul>
               </li>
             </ul>
             <p>
-              Since <RName r={$r} apos /> personal and spousal benefits may begin
-              on different dates, the reduction factors for early filing may applied
+              Since <RName {r} apos /> personal and spousal benefits may begin on
+              different dates, the reduction factors for early filing may applied
               from different starting dates for each of the two benefits.
             </p>
           {/if}
@@ -258,8 +265,8 @@
             If <RName {r} /> chooses to file for spousal benefits
             <i>earlier</i>
             than <RName {r} apos /> normal retirement age (<b
-              >{$r.normalRetirementDate().monthFullName()}
-              {$r.normalRetirementDate().year()}</b
+              >{recipient.normalRetirementDate().monthFullName()}
+              {recipient.normalRetirementDate().year()}</b
             >), the spousal benefit amount will be
             <u>permanently</u> <i>reduced</i>:
           </p>
@@ -276,15 +283,15 @@
           <p>
             The 36 month mark before normal retirement age is age
             <b
-              >{$recipient.earlyRetirementInflectionAge().years()} years
-              {#if $recipient.earlyRetirementInflectionAge().modMonths() != 0}
+              >{recipient.earlyRetirementInflectionAge().years()} years
+              {#if recipient.earlyRetirementInflectionAge().modMonths() != 0}
                 and
-                {$recipient.earlyRetirementInflectionAge().modMonths()} months >
+                {recipient.earlyRetirementInflectionAge().modMonths()} months >
               {/if}</b
             >
             (<b
-              >{$recipient.earlyRetirementInflectionDate().monthName()}
-              {$recipient.earlyRetirementInflectionDate().year()}</b
+              >{recipient.earlyRetirementInflectionDate().monthName()}
+              {recipient.earlyRetirementInflectionDate().year()}</b
             >).
           </p>
           <h4>Delayed Filing for Spousal Benefits</h4>

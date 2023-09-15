@@ -6,10 +6,9 @@
   import { Money } from "$lib/money";
 
   export let recipient: Recipient = new Recipient();
-  let r: Recipient = $recipient;
+  const r: Recipient = recipient;
 
-  let exampleAge: { age: number; day: number; month: string; year: number };
-  $: exampleAge = $recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
+  const exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
 
   /**
    * The benefit amount at normal retirement age.
@@ -33,25 +32,25 @@
     <p>
       Normal Retirement Age is between 65 and 67, depending on when you were
       born. For <RName {r} suffix=" who was">those</RName>
-      born in <b>{$recipient.birthdate.ssaBirthYear()}</b>, normal retirement
-      age is
-      {#if $recipient.normalRetirementAge().modMonths() == 0}
-        <b>{$recipient.normalRetirementAge().years()}</b> years.
+      born in <b>{recipient.birthdate.ssaBirthYear()}</b>, normal retirement age
+      is
+      {#if recipient.normalRetirementAge().modMonths() == 0}
+        <b>{recipient.normalRetirementAge().years()}</b> years.
       {:else}
         <b
-          >{$recipient.normalRetirementAge().years()} years and {$recipient
+          >{recipient.normalRetirementAge().years()} years and {recipient
             .normalRetirementAge()
             .modMonths()} months</b
         >.
       {/if}
       This is in
       <b
-        >{$recipient.normalRetirementDate().monthFullName()},
-        {$recipient.normalRetirementDate().year()}</b
+        >{recipient.normalRetirementDate().monthFullName()},
+        {recipient.normalRetirementDate().year()}</b
       >.
     </p>
 
-    {#if $recipient.birthdate.isFirstOfMonth()}
+    {#if recipient.birthdate.isFirstOfMonth()}
       <div class="insetTextBox pageBreakAvoid">
         <h4>Special Rule</h4>
         <p>

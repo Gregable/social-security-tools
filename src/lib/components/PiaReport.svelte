@@ -7,7 +7,7 @@
   import RName from "./RecipientName.svelte";
 
   export let recipient: Recipient = new Recipient();
-  let r: Recipient = $recipient;
+  const r: Recipient = recipient;
 
   function oneSignificantDigit(n: number) {
     return n.toLocaleString(undefined, {
@@ -37,7 +37,7 @@
         > / month
       </div>
 
-      {#if $recipient.isPiaOnly}
+      {#if recipient.isPiaOnly}
         <p>The amount above is the value you provided.</p>
       {:else if !$recipient.isEligible()}
         <p>
@@ -82,12 +82,12 @@
               <tr>
                 <td>
                   Any amount less than
-                  {$recipient.pia().firstBendPoint().wholeDollars()}
+                  {recipient.pia().firstBendPoint().wholeDollars()}
                   is multiplied by 90%:
                 </td>
                 <td>
                   <b
-                    >{$recipient
+                    >{recipient
                       .pia()
                       .primaryInsuranceAmountByBracket(0)
                       .string()}</b
@@ -98,9 +98,9 @@
               <tr>
                 <td>
                   The amount more than
-                  {$recipient.pia().firstBendPoint().wholeDollars()}
+                  {recipient.pia().firstBendPoint().wholeDollars()}
                   and less than
-                  {$recipient.pia().secondBendPoint().wholeDollars()}
+                  {recipient.pia().secondBendPoint().wholeDollars()}
                   is multiplied by 32%:
                 </td>
                 <td>
@@ -117,7 +117,7 @@
                 <td>
                   Any <span class="onlydisplay600">remaining</span> amount more
                   than
-                  {$recipient.pia().secondBendPoint().wholeDollars()}
+                  {recipient.pia().secondBendPoint().wholeDollars()}
                   is multiplied by 15%:
                 </td>
                 <td>
@@ -205,7 +205,7 @@
     </div>
   </div>
 
-  {#if !$recipient.isPiaOnly && $recipient.isEligible()}
+  {#if !recipient.isPiaOnly && $recipient.isEligible()}
     <div class="text pageBreakAvoid">
       <p style="margin-top: 1em">
         In the following chart, you can see what <RName {r} apos>your</RName>
@@ -215,7 +215,7 @@
           Amount changes.</span
         >
       </p>
-      <BendpointChart recipient={$recipient} />
+      <BendpointChart {recipient} />
     </div>
   {/if}
 </div>

@@ -44,7 +44,7 @@
   let blueish_ = "#337ab7";
 
   onMount(() => {
-    sliderMonths_ = $recipient.normalRetirementAge().asMonths();
+    sliderMonths_ = recipient.normalRetirementAge().asMonths();
     updateCanvas();
     mounted_ = true;
     media_query_list = window.matchMedia("print");
@@ -125,19 +125,19 @@
    */
   function maxRenderedYDollars(): Money {
     const maxAge = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
-    return $recipient.benefitAtAge(maxAge);
+    return recipient.benefitAtAge(maxAge);
   }
 
   /**
    * Compute the canvas x-coordinate for a date.
    */
   function canvasX(date: MonthDate): number {
-    const startDate: MonthDate = $recipient.birthdate.dateAtSsaAge(
+    const startDate: MonthDate = recipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
     );
     // Allow the canvas to show all of the way to age 71, so that there is
     // some rendered space if the user slides the slider all of the way to 70.
-    const endDate = $recipient.birthdate.dateAtSsaAge(
+    const endDate = recipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
     );
     const xValue =
@@ -152,10 +152,10 @@
    * @param x The x-coordinate in canvas pixels.
    */
   function dateX(x: number): MonthDate {
-    const startDate: MonthDate = $recipient.birthdate.dateAtSsaAge(
+    const startDate: MonthDate = recipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
     );
-    const endDate = $recipient.birthdate.dateAtSsaAge(
+    const endDate = recipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
     );
 
@@ -256,10 +256,10 @@
     ctx_.strokeStyle = "#666";
     ctx_.setLineDash([2, 2]);
 
-    let startDate: MonthDate = $recipient.birthdate.dateAtSsaAge(
+    let startDate: MonthDate = recipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
     );
-    let endDate = $recipient.birthdate.dateAtSsaAge(
+    let endDate = recipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
     );
 
@@ -312,7 +312,7 @@
     // We don't want users to select a start date earlier than is allowed.
     // For those born on the 1st/2nd, that's 62y0m. For everyone else, it's
     // 62y1m.
-    if ($recipient.birthdate.layBirthDayOfMonth() <= 2) {
+    if (recipient.birthdate.layBirthDayOfMonth() <= 2) {
       userFloor_ = 62 * 12;
     } else {
       userFloor_ = 62 * 12 + 1;
@@ -327,7 +327,7 @@
       age.lessThanOrEqual(endAge);
       age = age.add(MonthDuration.initFromYearsMonths({ years: 1, months: 0 }))
     ) {
-      const monthsUntilNRA: number = $recipient
+      const monthsUntilNRA: number = recipient
         .normalRetirementAge()
         .subtract(age)
         .asMonths();
@@ -337,7 +337,7 @@
           value: age.asMonths(),
           label: translateSliderLabel(age.asMonths(), "tick-value"),
           legend: "NRA",
-          color: $recipient.colors().dark,
+          color: recipient.colors().dark,
         });
       } else {
         // Not an NRA tick, so just add it normally.
@@ -350,10 +350,10 @@
       if (monthsUntilNRA > 0 && monthsUntilNRA < 12) {
         // The NRA is between this and the next tick: add a special tick for it.
         customTicks_.push({
-          value: $recipient.normalRetirementAge().asMonths(),
+          value: recipient.normalRetirementAge().asMonths(),
           label: "",
           legend: "NRA",
-          color: $recipient.colors().dark,
+          color: recipient.colors().dark,
         });
       }
     }
@@ -362,7 +362,7 @@
 
   function userSelectedDate() {
     let selectedAge = new MonthDuration(sliderMonths_);
-    let selectedDate = $recipient.birthdate.dateAtSsaAge(selectedAge);
+    let selectedDate = recipient.birthdate.dateAtSsaAge(selectedAge);
     return selectedDate;
   }
 
@@ -382,7 +382,7 @@
     let selectedDate = userSelectedDate();
 
     let boxes = [];
-    let benefit = $recipient.benefitOnDate(selectedDate, selectedDate);
+    let benefit = recipient.benefitOnDate(selectedDate, selectedDate);
     boxes.push([canvasX(selectedDate), canvasY(benefit), benefit]);
 
     for (
@@ -390,10 +390,8 @@
       i.lessThanOrEqual(dateX(canvasEl_.width));
       i = i.addDuration(new MonthDuration(1))
     ) {
-      if (
-        $recipient.benefitOnDate(selectedDate, i).value() != benefit.value()
-      ) {
-        benefit = $recipient.benefitOnDate(selectedDate, i);
+      if (recipient.benefitOnDate(selectedDate, i).value() != benefit.value()) {
+        benefit = recipient.benefitOnDate(selectedDate, i);
         boxes.push([canvasX(i), canvasY(benefit), benefit]);
       }
     }
@@ -407,7 +405,7 @@
   function renderFilingDateBenefitBoxes(boxes: Array<[number, number, Money]>) {
     ctx_.save();
 
-    ctx_.strokeStyle = $recipient.colors().medium;
+    ctx_.strokeStyle = recipient.colors().medium;
     ctx_.lineWidth = 2;
     ctx_.beginPath();
 
@@ -428,7 +426,7 @@
     // Draw all of the way to the right edge of the chart.
     ctx_.lineTo(canvasEl_.width, boxes[boxes.length - 1][1]);
 
-    ctx_.fillStyle = $recipient.colors().light;
+    ctx_.fillStyle = recipient.colors().light;
     ctx_.fill();
     ctx_.stroke();
     ctx_.restore();
@@ -449,7 +447,7 @@
    */
   function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
     ctx_.save();
-    ctx_.fillStyle = $recipient.colors().dark;
+    ctx_.fillStyle = recipient.colors().dark;
     ctx_.font = "14px Helvetica";
     let font_height = 12;
 
@@ -516,15 +514,15 @@
    */
   function renderTrendline() {
     ctx_.save();
-    ctx_.strokeStyle = $recipient.colors().medium;
+    ctx_.strokeStyle = recipient.colors().medium;
     ctx_.lineWidth = 2;
     ctx_.globalAlpha = 0.4;
     ctx_.beginPath();
 
-    const startDate: MonthDate = $recipient.birthdate.dateAtSsaAge(
+    const startDate: MonthDate = recipient.birthdate.dateAtSsaAge(
       new MonthDuration(userFloor_)
     );
-    const endDate = $recipient.birthdate.dateAtSsaAge(
+    const endDate = recipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
     );
 
@@ -535,7 +533,7 @@
     ) {
       let thisX = canvasX(i);
       // Determine the maximum eventual benefit for a filing date of i.
-      let yDollars = $recipient.benefitOnDate(i, i);
+      let yDollars = recipient.benefitOnDate(i, i);
       let thisY = canvasY(yDollars);
       if (i.monthsSinceEpoch() == startDate.monthsSinceEpoch()) {
         ctx_.moveTo(thisX, thisY);
@@ -646,7 +644,7 @@
   }
   let filingDateString_: string = "";
   $: filingDateString_ = updateFilingDateString(
-    $recipient.birthdate,
+    recipient.birthdate,
     sliderMonths_
   );
 </script>
@@ -655,14 +653,14 @@
 <div class="chart-container">
   <p class="noprint">
     Select the age that <RecipientName
-      r={$recipient}
+      r={recipient}
       suffix="
   files">you file</RecipientName
     > for benefits:
   </p>
   <p class="onlyprint">
     Age that <RecipientName
-      r={$recipient}
+      r={recipient}
       suffix="
   files">you file</RecipientName
     > for benefits:
@@ -682,13 +680,13 @@
       translate={translateSliderLabel}
       showTicks={true}
       ticksArray={customTicks_}
-      barLeftColor={$recipient.colors().light}
-      barRightColor={$recipient.colors().medium}
-      tickLeftColor={$recipient.colors().light}
-      tickRightColor={$recipient.colors().medium}
-      handleColor={$recipient.colors().medium}
-      handleSelectedColor={$recipient.colors().dark}
-      tickLegendColor={$recipient.colors().dark}
+      barLeftColor={recipient.colors().light}
+      barRightColor={recipient.colors().medium}
+      tickLeftColor={recipient.colors().light}
+      tickRightColor={recipient.colors().medium}
+      handleColor={recipient.colors().medium}
+      handleSelectedColor={recipient.colors().dark}
+      tickLegendColor={recipient.colors().dark}
     />
   </div>
   <canvas
@@ -704,7 +702,7 @@
     class="selectedDateBox"
     style:--selected-date-border-color={blueish_}
     style:--selected-date-text-color={blueish_}
-    style:--filing-date-text-color={$recipient.colors().dark}
+    style:--filing-date-text-color={recipient.colors().dark}
     class:hidden={lastMouseX_ <= 0}
   >
     {#if lastMouseX_ > 0}
@@ -716,7 +714,7 @@
       <span class="selectedDate"
         >{dateX(lastMouseX_).monthName()}
         {dateX(lastMouseX_).year()}</span
-      >, <RecipientName r={$recipient} apos noColor={true} shortenTo={30}
+      >, <RecipientName r={recipient} apos noColor={true} shortenTo={30}
         >your</RecipientName
       > benefit will be:
 
