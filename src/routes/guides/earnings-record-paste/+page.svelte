@@ -1,6 +1,5 @@
 <script lang="ts">
   import "$lib/global.css";
-  import "../guide.css";
   import { GuidesSchema } from "$lib/schema-org";
   import HeroImage from "./hero.svg";
   import ErrorMessageImage from "./error.png";
@@ -168,5 +167,4 @@
   <GuideFooter />
 </div>
 
-<style>
-</style>
+<style src="../guide.css"></style>

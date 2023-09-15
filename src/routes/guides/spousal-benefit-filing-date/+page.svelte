@@ -1,6 +1,5 @@
 <script lang="ts">
   import "$lib/global.css";
-  import "../guide.css";
 
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
@@ -75,7 +74,7 @@
 
     <br class="clear" />
 
-    <figure>
+    <figure class="float-right">
       <img
         src={EarlyFileImage}
         width="617"
@@ -110,7 +109,7 @@
 
   <br class="clear" />
 
-  <figure>
+  <figure class="float-right">
     <img
       src={LateFileImage}
       width="625"
@@ -140,7 +139,7 @@
 
   <h2>Personal and Spousal Benefits</h2>
 
-  <figure>
+  <figure class="float-right">
     <img
       src={HeroImage}
       width="628"
@@ -186,7 +185,7 @@
 
   <h3>Early Filing</h3>
 
-  <figure>
+  <figure class="float-right">
     <img
       src={EarlyFile100Image}
       width="621"
@@ -218,7 +217,7 @@
 
   <h3>Late Filing</h3>
 
-  <figure>
+  <figure class="float-right">
     <img
       src={LateFile100Image}
       width="620"
@@ -272,16 +271,4 @@
   <GuideFooter />
 </div>
 
-<style>
-  figure {
-    margin: 0;
-    width: min-content;
-    float: right;
-    margin: 0 0 3vw 4vw;
-  }
-  img {
-    border: 1px solid #ccc;
-    height: 40vw;
-    width: auto;
-  }
-</style>
+<style src="../guide.css"></style>

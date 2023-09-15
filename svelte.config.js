@@ -1,24 +1,20 @@
-import adapter from '@sveltejs/adapter-vercel';
-import {vitePreprocess} from '@sveltejs/kit/vite';
+import adapter from "@sveltejs/adapter-vercel";
+import preprocess from "svelte-preprocess";
 
 /** @type {import('@sveltejs/kit').Config} */
 export default {
-  // Consult https://kit.svelte.dev/docs/integrations#preprocessors
-  // for more information about preprocessors
-  preprocess: vitePreprocess(),
+  preprocess: preprocess(),
 
   kit: {
     adapter: adapter({
-      pages: 'build',
-      assets: 'build',
+      pages: "build",
+      assets: "build",
       fallback: undefined,
       precompress: false,
       strict: true,
     }),
     prerender: {
-      handleHttpError: 'warn',
-    }
+      handleHttpError: "warn",
+    },
   },
-
-
 };
