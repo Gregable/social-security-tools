@@ -93,7 +93,7 @@
     <li>Oklahoma</li>
     <li>Oregon</li>
     <li>Pennsylvania</li>
-    <li>Sourch Carolina</li>
+    <li>South Carolina</li>
     <li>South Dakota</li>
     <li>Tennessee</li>
     <li>Texas</li>
