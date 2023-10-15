@@ -173,7 +173,7 @@ export class PrimaryInsuranceAmount {
    */
   shouldAdjustForCOLA(): boolean {
     return (
-      this.recipient_.birthdate.yearTurningSsaAge(62) < constants.CURRENT_YEAR
+      this.recipient_.birthdate.yearTurningSsaAge(62) <= constants.MAX_COLA_YEAR
     );
   }
 
