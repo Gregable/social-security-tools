@@ -47,7 +47,7 @@
   <h2>Eligibility</h2>
   <p>
     Eligibility rules have to do with what is the earliest month you are first
-    eligible to recieve social security benefits. There are a couple rules that
+    eligible to receive social security benefits. There are a couple rules that
     interact with the day of the month:
   </p>
   <ol>
@@ -136,12 +136,12 @@
     </li>
   </ul>
   <p>
-    There are some exceptions though. If you recieve a benefit based on someone
+    There are some exceptions though. If you receive a benefit based on someone
     else's work record, such as a spousal benefit, this will be paid the same
     day as the primary beneficiary.
   </p>
   <p>
-    There are also certain recipients who may recieve payment on the 3rd of the
+    There are also certain recipients who may receive payment on the 3rd of the
     month:
   </p>
   <ul>

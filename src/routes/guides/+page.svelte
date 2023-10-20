@@ -159,7 +159,7 @@
       </h3>
       <p class="description">
         What is the maximum possible Social Security benefit that someone can
-        recieve?
+        receive?
       </p>
     </li>
     <li>
