@@ -1,11 +1,43 @@
 {
-  "name": "ssa",
-  "version": "1.0.0",
-  "description": "SSA Tool Website",
-  "main": "ssa.js",
+  "name": "social-security-tools",
+  "version": "0.0.1",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite dev",
+    "build": "vite build",
+    "prepare": "svelte-kit sync",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.3.2",
+    "@storybook/addon-interactions": "^7.3.2",
+    "@storybook/addon-links": "^7.3.2",
+    "@storybook/blocks": "^7.3.2",
+    "@storybook/svelte": "^7.3.2",
+    "@storybook/sveltekit": "^7.3.2",
+    "@storybook/testing-library": "^0.2.0",
+    "@sveltejs/adapter-auto": "^1.0.0-next.90",
+    "@sveltejs/adapter-static": "^2.0.3",
+    "@sveltejs/adapter-vercel": "^3.0.3",
+    "@sveltejs/kit": "^1.0.0-next.587",
+    "@vercel/analytics": "^1.0.2",
+    "posthog-js": "^1.77.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.3.2",
+    "svelte": "^3.54.0",
+    "svelte-bootstrap-icons": "^3.0.0",
+    "svelte-check": "^2.9.2",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.3",
+    "vite": "^4.0.0",
+    "vitest": "^0.25.3"
+  },
+  "type": "module"
 }

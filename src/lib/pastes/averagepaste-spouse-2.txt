@@ -1,0 +1,17 @@
+# This demo data is used along with averagepaste.txt as a spouse's record.
+# This is a worker with 10 years of income, so enough to reach eligibility.
+#
+# This variant is only used in testing and generates a PIA below
+# averagepaste.txt but high enough that there shoule be no spousal benefit.
+
+1978 $15,311
+1979 $15,881
+1980 $16,222
+1981 $16,690
+1982 $17,331
+1983 $17,439
+1984 $18,035
+1985 $18,742
+1986 $19,123
+1987 $19,882
+1989 $20,105
