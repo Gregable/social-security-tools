@@ -96,9 +96,9 @@
     </p>
     <p>
       No longer is Chris's benefit half of Alex's benefit. Alex's personal
-      benefit is reduced by 5% for the first 3 years and 6.67% for each
+      benefit is reduced by 6.67% for the first 3 years and 5% for each
       additional year filed early. Chris's Spousal benefit uses a different
-      reduction formula: 5% for the first 3 years and 8.33% for each additional
+      reduction formula: 8.33% for the first 3 years and 5% for each additional
       year filed early.
     </p>
     <p>
