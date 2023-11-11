@@ -71,7 +71,7 @@
               For
               <RecipientName r={recipient}>you</RecipientName>, this means that
               years where the indexed earnings value falls below
-              <b>{recipient.cutoffIndexedEarnings().wholeDollars()}</b>
+              <b>{$recipient.cutoffIndexedEarnings().wholeDollars()}</b>
               do not affect the benefit calculation because they are not among the
               top 35.
             </p>
