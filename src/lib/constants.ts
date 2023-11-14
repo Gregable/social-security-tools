@@ -186,7 +186,13 @@ export const MAXIMUM_EARNINGS: { [key: number]: Money } = {
 /**
  * Earliest Year for which we have data for the maximum earnings.
  */
-export const MIN_MAXIMUM_EARNINGS_YEAR = 1937;
+export const MIN_MAXIMUM_EARNINGS_YEAR: number = 1937;
+/**
+ * Latest Year for which we have data for the maximum earnings.
+ */
+export const MAX_MAXIMUM_EARNINGS_YEAR: number = Math.max(
+  ...Object.keys(MAXIMUM_EARNINGS).map(Number)
+);
 
 /**
  * Tax rates for social security contributions by year.
