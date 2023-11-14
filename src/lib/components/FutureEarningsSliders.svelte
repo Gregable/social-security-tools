@@ -160,7 +160,9 @@
       <Slider
         bind:value={futureEarningWage}
         floor={1000}
-        ceiling={constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR].value()}
+        ceiling={constants.MAXIMUM_EARNINGS[
+          constants.MAX_MAXIMUM_EARNINGS_YEAR
+        ].value()}
         step={1000}
         translate={translateFutureEarnings}
       />

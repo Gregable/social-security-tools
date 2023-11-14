@@ -188,11 +188,15 @@ export class Recipient {
 
     // Add the simulated records for the number of years requested.
     for (let i = 0; i < numYears; ++i) {
+      let cappedWage = wage;
+      if (startYear + i <= constants.MAX_MAXIMUM_EARNINGS_YEAR) {
+        cappedWage = Money.min(wage, constants.MAXIMUM_EARNINGS[startYear + i]);
+      }
       this.futureEarningsRecords_.push(
         new EarningRecord({
           year: startYear + i,
-          taxedEarnings: wage,
-          taxedMedicareEarnings: wage,
+          taxedEarnings: cappedWage,
+          taxedMedicareEarnings: cappedWage,
         })
       );
     }
