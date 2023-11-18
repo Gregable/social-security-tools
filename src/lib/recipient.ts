@@ -191,6 +191,11 @@ export class Recipient {
       let cappedWage = wage;
       if (startYear + i <= constants.MAX_MAXIMUM_EARNINGS_YEAR) {
         cappedWage = Money.min(wage, constants.MAXIMUM_EARNINGS[startYear + i]);
+      } else {
+        cappedWage = Money.min(
+          wage,
+          constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR]
+        );
       }
       this.futureEarningsRecords_.push(
         new EarningRecord({

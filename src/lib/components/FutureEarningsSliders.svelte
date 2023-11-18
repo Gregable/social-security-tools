@@ -25,7 +25,10 @@
   }
   function translateFutureEarnings(value: number, label: string): string {
     if (label == "value") {
-      if (value == constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR].value())
+      if (
+        value ==
+        constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR].value()
+      )
         return "$" + value.toLocaleString() + "+";
       else return "$" + value.toLocaleString();
     }

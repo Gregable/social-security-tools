@@ -1,8 +1,8 @@
-import {EarningRecord} from '$lib/earning-record';
-import {Money} from '$lib/money';
-import {describe, expect, it} from 'vitest'
+import { EarningRecord } from "$lib/earning-record";
+import { Money } from "$lib/money";
+import { describe, expect, it } from "vitest";
 
-import * as constants from '../lib/constants';
+import * as constants from "../lib/constants";
 
 // Returns a record with the given year and earnings. Medicare earnings
 // are required, but not used by anything interesting.
@@ -14,22 +14,24 @@ function testRecord(year: number, earnings: Money = Money.from(100 * 1000)) {
   });
 }
 
-describe('EarningRecord', () => {
+describe("EarningRecord", () => {
   it(`looks up earnings cap for pre-range past year`, () => {
     const preCapRecord = testRecord(1900);
-    expect(preCapRecord.earningsCap())
-        .toEqual(
-            constants.MAXIMUM_EARNINGS[constants.MIN_MAXIMUM_EARNINGS_YEAR]);
+    expect(preCapRecord.earningsCap()).toEqual(
+      constants.MAXIMUM_EARNINGS[constants.MIN_MAXIMUM_EARNINGS_YEAR]
+    );
   });
 
   it(`looks up earnings cap for past year`, () => {
-    expect(testRecord(2010).earningsCap())
-        .toEqual(constants.MAXIMUM_EARNINGS[2010]);
+    expect(testRecord(2010).earningsCap()).toEqual(
+      constants.MAXIMUM_EARNINGS[2010]
+    );
   });
 
   it(`looks up earnings cap for future year`, () => {
-    expect(testRecord(constants.MAX_YEAR + 5).earningsCap())
-        .toEqual(constants.MAXIMUM_EARNINGS[constants.MAX_YEAR]);
+    expect(testRecord(constants.MAX_YEAR + 5).earningsCap()).toEqual(
+      constants.MAXIMUM_EARNINGS[constants.MAX_YEAR]
+    );
   });
 
   it(`calculates credits before 1978`, () => {
@@ -75,21 +77,25 @@ describe('EarningRecord', () => {
     let indexedRecord = testRecord(2010);
     indexedRecord.indexingYear = 2020;
 
-    const expectedIndexFactor =
-        constants.WAGE_INDICES[2020].div$(constants.WAGE_INDICES[2010]);
+    const expectedIndexFactor = constants.WAGE_INDICES[2020].div$(
+      constants.WAGE_INDICES[2010]
+    );
     expect(indexedRecord.indexFactor()).toEqual(expectedIndexFactor);
 
     let expectedIndexedEarnings: Money =
-        indexedRecord.taxedEarnings.times(expectedIndexFactor);
+      indexedRecord.taxedEarnings.times(expectedIndexFactor);
     expect(indexedRecord.indexedEarnings()).toEqual(expectedIndexedEarnings);
   });
 
   it(`calculates capped earnings`, () => {
     let indexedRecord = testRecord(
-        constants.MAX_YEAR + 5, constants.MAXIMUM_EARNINGS[2010].times(2));
+      constants.MAX_YEAR + 5,
+      constants.MAXIMUM_EARNINGS[2010].times(2)
+    );
     indexedRecord.indexingYear = constants.MAX_YEAR;
 
-    expect(indexedRecord.indexedEarnings())
-        .toEqual(constants.MAXIMUM_EARNINGS[constants.MAX_YEAR]);
+    expect(indexedRecord.indexedEarnings()).toEqual(
+      constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR]
+    );
   });
 });
