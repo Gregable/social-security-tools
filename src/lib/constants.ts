@@ -18,7 +18,7 @@ export const MAX_CREDITS: number = 40;
  * manually manipulates the input string.
  * @type {number}
  */
-export const MAX_YEAR: number = 2023;
+export const MAX_YEAR: number = 2024;
 
 /**
  * For years before 1978, an individual was credited with a quarter of coverage
@@ -269,6 +269,7 @@ export const TAX_RATES: { [key: number]: number } = {
   2021: 0.053,
   2022: 0.053,
   2023: 0.053,
+  2024: 0.053,
 };
 
 // Values from https://www.ssa.gov/oact/cola/piaformula.html
@@ -443,18 +444,9 @@ export const MAX_COLA_YEAR: number = Math.max(...Object.keys(COLA).map(Number));
 export const SSA_EARNINGS_YEARS: number = 35;
 
 /**
- * The current calendar year, or the next calendar year if the URL parameter
- * "next_year" is set.
+ * The current calendar year.
  */
 export let CURRENT_YEAR: number = new Date().getFullYear();
-if (MAX_YEAR > CURRENT_YEAR && typeof window !== "undefined") {
-  // Tests can't access DOM:
-  const urlParams = new URLSearchParams(window.location.search);
-  const parameterNextYear = urlParams.get("next_year");
-  if (parameterNextYear !== null) {
-    CURRENT_YEAR += 1;
-  }
-}
 
 /**
  * All months, in order, as 3-letter abbreviations.

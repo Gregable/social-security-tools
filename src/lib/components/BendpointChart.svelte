@@ -136,7 +136,7 @@
     // 3) Don't show values beyond the maximum achievable AIME.
     // https://github.com/Gregable/social-security-tools/issues/167
     let absolute_max =
-      constants.MAXIMUM_EARNINGS[constants.CURRENT_YEAR].div(12);
+      constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR].div(12);
 
     let computed = Money.min(Money.max(breakpoint_min, user_min), absolute_max);
 

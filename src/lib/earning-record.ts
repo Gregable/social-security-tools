@@ -1,5 +1,5 @@
-import * as constants from '$lib/constants'
-import {Money} from '$lib/money';
+import * as constants from "$lib/constants";
+import { Money } from "$lib/money";
 
 /**
  * EarningRecord class
@@ -51,10 +51,10 @@ export class EarningRecord {
   earningsCap(): Money {
     if (this.year < constants.MIN_MAXIMUM_EARNINGS_YEAR) {
       return constants.MAXIMUM_EARNINGS[constants.MIN_MAXIMUM_EARNINGS_YEAR];
-    } else if (this.year <= constants.MAX_YEAR) {
+    } else if (this.year <= constants.MAX_MAXIMUM_EARNINGS_YEAR) {
       return constants.MAXIMUM_EARNINGS[this.year];
     } else {
-      return constants.MAXIMUM_EARNINGS[constants.MAX_YEAR];
+      return constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR];
     }
   }
 
@@ -71,16 +71,15 @@ export class EarningRecord {
     }
   }
 
-
   /**
    * @return number of credits earned in the year of the record.
    */
   credits(): number {
     return Math.min(
-        4,
-        Math.floor(this.taxedEarnings.div$(this.earningsRequiredPerCredit())));
+      4,
+      Math.floor(this.taxedEarnings.div$(this.earningsRequiredPerCredit()))
+    );
   }
-
 
   /**
    * Returns the index factor for the year of the record. If the user is
@@ -90,7 +89,7 @@ export class EarningRecord {
    */
   indexFactor(): number {
     if (this.indexingYear < 0) {
-      throw new Error('EarningRecord not initialized with indexingYear');
+      throw new Error("EarningRecord not initialized with indexingYear");
     }
 
     if (this.year >= this.indexingYear) {
@@ -111,27 +110,31 @@ export class EarningRecord {
     } else {
       // If the indexing year is beyond the WAGE_INDICES data range, use the
       // maximum year in the data range.
-      const effectiveIndexingYear =
-          Math.min(this.indexingYear, constants.MAX_WAGE_INDEX_YEAR);
+      const effectiveIndexingYear = Math.min(
+        this.indexingYear,
+        constants.MAX_WAGE_INDEX_YEAR
+      );
 
       // The year is in the WAGE_INDICES data range and is before the indexing
       // year. Compute the index factor.
       return constants.WAGE_INDICES[effectiveIndexingYear].div$(
-          constants.WAGE_INDICES[this.year]);
+        constants.WAGE_INDICES[this.year]
+      );
     }
   }
-
 
   /**
    * @return indexed earnings for this record.
    */
   indexedEarnings(): Money {
     if (this.indexingYear < 0) {
-      throw new Error('EarningRecord not initialized with indexingYear');
+      throw new Error("EarningRecord not initialized with indexingYear");
     }
 
-    const cappedEarning: Money =
-        Money.min(this.earningsCap(), this.taxedEarnings);
+    const cappedEarning: Money = Money.min(
+      this.earningsCap(),
+      this.taxedEarnings
+    );
     const factor: number = this.indexFactor();
     return cappedEarning.times(factor);
   }

@@ -1,14 +1,12 @@
-import {Birthdate} from '$lib/birthday';
-import {EarningRecord} from '$lib/earning-record';
-import {Money} from '$lib/money';
-import demo0 from '$lib/pastes/averagepaste.txt?raw';
-import {Recipient} from '$lib/recipient'
-import {parsePaste} from '$lib/ssa-parse';
-import {describe, expect, it} from 'vitest'
+import { Birthdate } from "$lib/birthday";
+import { EarningRecord } from "$lib/earning-record";
+import { Money } from "$lib/money";
+import demo0 from "$lib/pastes/averagepaste.txt?raw";
+import { Recipient } from "$lib/recipient";
+import { parsePaste } from "$lib/ssa-parse";
+import { describe, expect, it } from "vitest";
 
-import * as constants from '../lib/constants';
-
-
+import * as constants from "../lib/constants";
 
 /**
  * Returns a record with the given year and earnings. Medicare earnings
@@ -22,8 +20,8 @@ function testRecord(year: number, earnings: Money = Money.from(10 * 1000)) {
   });
 }
 
-describe('Recipient', () => {
-  it('calculates bendpoints', () => {
+describe("Recipient", () => {
+  it("calculates bendpoints", () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
@@ -33,19 +31,19 @@ describe('Recipient', () => {
     expect(r.pia().secondBendPoint().value()).toEqual(5583);
   });
 
-  it('calculates pia by bracket', () => {
+  it("calculates pia by bracket", () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
 
-    expect(r.pia().primaryInsuranceAmountByBracket(0).value()).toEqual(690.30);
-    expect(r.pia().primaryInsuranceAmountByBracket(1).value()).toEqual(843.20);
+    expect(r.pia().primaryInsuranceAmountByBracket(0).value()).toEqual(690.3);
+    expect(r.pia().primaryInsuranceAmountByBracket(1).value()).toEqual(843.2);
     expect(r.pia().primaryInsuranceAmountByBracket(2).value()).toEqual(0);
-    let sum: number = 690.30 + 843.20 + 0;
+    let sum: number = 690.3 + 843.2 + 0;
     expect(r.pia().primaryInsuranceAmountUnadjusted().value()).toEqual(sum);
   });
 
-  it('calculates cola adjustments', () => {
+  it("calculates cola adjustments", () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
@@ -57,15 +55,20 @@ describe('Recipient', () => {
     // Verify the first adjustment.
     expect(adjustments[0].year).toEqual(2012);
     expect(adjustments[0].cola).toEqual(1.7);
-    expect(adjustments[0].start.value()).toEqual(1533.50);
-    expect(adjustments[0].end.value()).toEqual(1559.50);
+    expect(adjustments[0].start.value()).toEqual(1533.5);
+    expect(adjustments[0].end.value()).toEqual(1559.5);
 
-    // The final adjustment should end with the PIA.
-    expect(adjustments[adjustments.length - 1].end.value())
-        .toEqual(r.pia().primaryInsuranceAmount().value());
+    // The final adjustment or one before it, should end with the PIA.
+    let one_before = 0;
+    if (constants.MAX_COLA_YEAR === constants.CURRENT_YEAR) {
+      one_before = 1;
+    }
+    expect(
+      adjustments[adjustments.length - 1 - one_before].end.value()
+    ).toEqual(r.pia().primaryInsuranceAmount().value());
   });
 
-  it('calculates pia from AIME', () => {
+  it("calculates pia from AIME", () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
@@ -73,7 +76,7 @@ describe('Recipient', () => {
     // Verify that piaFromAIME agrees with primaryInsuranceAmount using the
     // same AIME.
     expect(
-        r.pia().piaFromAIME(r.monthlyIndexedEarnings().roundToDollar()).value())
-        .toEqual(r.pia().primaryInsuranceAmount().value());
+      r.pia().piaFromAIME(r.monthlyIndexedEarnings().roundToDollar()).value()
+    ).toEqual(r.pia().primaryInsuranceAmount().value());
   });
 });
