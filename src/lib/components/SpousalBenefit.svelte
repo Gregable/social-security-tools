@@ -104,7 +104,7 @@
           r={s}
           apos
         /> record. A spousal benefit is the amount at normal retirement age that
-        <RName {r} /> recieves in addition to <RName {r} apos />
+        <RName {r} /> receives in addition to <RName {r} apos />
         own benefit of
         <b>{$recipient.pia().primaryInsuranceAmount().string()}</b>
         / month.
