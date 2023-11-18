@@ -25,7 +25,7 @@
     "@sveltejs/adapter-auto": "^1.0.0-next.90",
     "@sveltejs/adapter-static": "^2.0.3",
     "@sveltejs/adapter-vercel": "^3.0.3",
-    "@sveltejs/kit": "^1.0.0-next.587",
+    "@sveltejs/kit": "^1.27.6",
     "@vercel/analytics": "^1.0.2",
     "posthog-js": "^1.77.0",
     "react": "^18.2.0",
