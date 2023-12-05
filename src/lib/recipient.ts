@@ -605,15 +605,15 @@ export class Recipient {
       .subtractDate(startDate)
       .asMonths();
     if (monthsBeforeNra <= 36) {
-      // 5 / 12 of one percent for each additional month:
-      return spousal.times(1 - (monthsBeforeNra * 5) / 1200);
+      // 25 / 36 of one percent for each month:
+      return spousal.times(1 - (monthsBeforeNra * 25) / 3600);
     } else {
-      // 15% for the first 36 months:
-      const firstReduction: Money = spousal.times(0.15);
+      // 25% for the first 36 months:
+      const firstReduction: Money = spousal.times(0.25);
       monthsBeforeNra = monthsBeforeNra - 36;
-      // 25 / 36 of one percent for each additional month:
+      // 5 / 12 of one percent for each additional month:
       const secondReduction: Money = spousal.times(
-        (monthsBeforeNra * 25) / 3600
+        (monthsBeforeNra * 5) / 1200
       );
 
       return spousal.sub(firstReduction).sub(secondReduction);

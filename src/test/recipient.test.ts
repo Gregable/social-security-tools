@@ -1,11 +1,11 @@
-import {Birthdate} from '$lib/birthday';
-import {EarningRecord} from '$lib/earning-record';
-import {Money} from '$lib/money';
-import {MonthDate, MonthDuration} from '$lib/month-time';
-import {Recipient} from '$lib/recipient'
-import {describe, expect, it} from 'vitest'
+import { Birthdate } from "$lib/birthday";
+import { EarningRecord } from "$lib/earning-record";
+import { Money } from "$lib/money";
+import { MonthDate, MonthDuration } from "$lib/month-time";
+import { Recipient } from "$lib/recipient";
+import { describe, expect, it } from "vitest";
 
-import * as constants from '../lib/constants';
+import * as constants from "../lib/constants";
 
 /**
  * Returns a record with the given year and earnings. Medicare earnings
@@ -19,48 +19,51 @@ function testRecord(year: number, earnings: Money = Money.from(10 * 1000)) {
   });
 }
 
-describe('Recipient', () => {
-  it('initializes without input', () => {
+describe("Recipient", () => {
+  it("initializes without input", () => {
     let r = new Recipient();
   });
 
-  it('sets and gets earning records', () => {
+  it("sets and gets earning records", () => {
     let r = new Recipient();
     let er = testRecord(2010);
     r.earningsRecords = [er];
     expect(r.earningsRecords).toEqual([er]);
   });
 
-  it('sets and gets future earning records', () => {
+  it("sets and gets future earning records", () => {
     let r = new Recipient();
     let er = testRecord(2010);
     r.futureEarningsRecords = [er];
     expect(r.futureEarningsRecords).toEqual([er]);
   });
 
-  it('sets and gets birth date', () => {
+  it("sets and gets birth date", () => {
     let r = new Recipient();
     const b = Birthdate.FromYMD(1970, 1, 1);
     r.birthdate = b;
     expect(r.birthdate).toEqual(b);
   });
 
-  it('simulates future earning years with no earnings', () => {
+  it("simulates future earning years with no earnings", () => {
     let r = new Recipient();
     r.simulateFutureEarningsYears(10, Money.from(100 * 1000));
     expect(r.futureEarningsRecords.length).toEqual(10);
 
     for (let i = 0; i < 10; i++) {
-      expect(r.futureEarningsRecords[i].year)
-          .toEqual(constants.CURRENT_YEAR + i);
-      expect(r.futureEarningsRecords[i].taxedEarnings.value())
-          .toEqual(100 * 1000);
-      expect(r.futureEarningsRecords[i].taxedMedicareEarnings.value())
-          .toEqual(100 * 1000);
+      expect(r.futureEarningsRecords[i].year).toEqual(
+        constants.CURRENT_YEAR + i
+      );
+      expect(r.futureEarningsRecords[i].taxedEarnings.value()).toEqual(
+        100 * 1000
+      );
+      expect(r.futureEarningsRecords[i].taxedMedicareEarnings.value()).toEqual(
+        100 * 1000
+      );
     }
   });
 
-  it('simulates future earning years with past earnings', () => {
+  it("simulates future earning years with past earnings", () => {
     let r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
@@ -73,7 +76,7 @@ describe('Recipient', () => {
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR);
   });
 
-  it('simulates future earning years with past and current earnings', () => {
+  it("simulates future earning years with past and current earnings", () => {
     let r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
@@ -87,7 +90,7 @@ describe('Recipient', () => {
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR + 1);
   });
 
-  it('simulates future earning years with incomplete earnings', () => {
+  it("simulates future earning years with incomplete earnings", () => {
     let r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
@@ -102,7 +105,7 @@ describe('Recipient', () => {
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR - 1);
   });
 
-  it('simulates future earning years with earnings in the future', () => {
+  it("simulates future earning years with earnings in the future", () => {
     let r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
@@ -118,19 +121,21 @@ describe('Recipient', () => {
     expect(r.futureEarningsRecords[0].year).toEqual(constants.CURRENT_YEAR + 3);
   });
 
-  it('calculates normal retirement', () => {
+  it("calculates normal retirement", () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
     r.birthdate = Birthdate.FromYMD(1957, 0, 2);
 
-    expect(r.normalRetirementAge())
-        .toEqual(MonthDuration.initFromYearsMonths({years: 66, months: 6}));
-    expect(r.normalRetirementDate())
-        .toEqual(MonthDate.initFromYearsMonths({years: 2023, months: 6}));
+    expect(r.normalRetirementAge()).toEqual(
+      MonthDuration.initFromYearsMonths({ years: 66, months: 6 })
+    );
+    expect(r.normalRetirementDate()).toEqual(
+      MonthDate.initFromYearsMonths({ years: 2023, months: 6 })
+    );
   });
 
-  it('calculates indexing year', () => {
+  it("calculates indexing year", () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
@@ -139,7 +144,7 @@ describe('Recipient', () => {
     expect(r.indexingYear()).toEqual(2017);
   });
 
-  it('calculates total credits from only earned credits', () => {
+  it("calculates total credits from only earned credits", () => {
     let r = new Recipient();
     // Earned exactly 1, 2, and 3 credits in 2007, 2008, and 2009, respectively:
     r.earningsRecords = [
@@ -151,39 +156,41 @@ describe('Recipient', () => {
 
     // Earned enough for 20 credits in 2010, but credits are capped at 4 / year.
     r.earningsRecords.push(
-        testRecord(2010, constants.EARNINGS_PER_CREDIT[2010].times(20)))
+      testRecord(2010, constants.EARNINGS_PER_CREDIT[2010].times(20))
+    );
     expect(r.totalCredits()).toEqual(10);
   });
 
-  it('calculates total credits from only future credits', () => {
+  it("calculates total credits from only future credits", () => {
     let r = new Recipient();
     r.futureEarningsRecords = [
       testRecord(
-          constants.MAX_YEAR + 1,
-          constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(1)),
+        constants.MAX_YEAR + 1,
+        constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(1)
+      ),
       testRecord(
-          constants.MAX_YEAR + 2,
-          constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(2)),
+        constants.MAX_YEAR + 2,
+        constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(2)
+      ),
     ];
     expect(r.totalCredits()).toEqual(3);
 
     // Earned enough for 20 credits in 2010, but credits are capped at 4 / year.
-    r.futureEarningsRecords.push(testRecord(
+    r.futureEarningsRecords.push(
+      testRecord(
         constants.MAX_YEAR + 3,
-        constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(30)))
+        constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(30)
+      )
+    );
     expect(r.totalCredits()).toEqual(7);
   });
 
-  it('updates earnings records on record write', () => {
+  it("updates earnings records on record write", () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1990, 0, 2);
 
     // Records are written initially out of order:
-    r.earningsRecords = [
-      testRecord(2009),
-      testRecord(2007),
-      testRecord(2008),
-    ];
+    r.earningsRecords = [testRecord(2009), testRecord(2007), testRecord(2008)];
 
     for (let i = 0; i < 3; i++) {
       // Records get sorted by year:
@@ -202,7 +209,7 @@ describe('Recipient', () => {
     }
   });
 
-  it('updates future earnings records on record write', () => {
+  it("updates future earnings records on record write", () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1990, 0, 2);
 
@@ -228,7 +235,7 @@ describe('Recipient', () => {
     }
   });
 
-  it('calls subscribers on name update', () => {
+  it("calls subscribers on name update", () => {
     let r = new Recipient();
     let numCallbacks = 0;
     let unsubscribe = r.subscribe((recipient: Recipient) => {
@@ -236,12 +243,12 @@ describe('Recipient', () => {
     });
     expect(numCallbacks).toEqual(1);
 
-    r.name = 'Greg';
+    r.name = "Greg";
     expect(numCallbacks).toEqual(2);
     unsubscribe();
   });
 
-  it('calls subscribers on earnings record update', () => {
+  it("calls subscribers on earnings record update", () => {
     let r = new Recipient();
     let expectedRecordCount = 0;
     let numCallbacks = 0;
@@ -257,13 +264,14 @@ describe('Recipient', () => {
     unsubscribe();
   });
 
-  it('calls subscribers on future earnings record update', () => {
+  it("calls subscribers on future earnings record update", () => {
     let r = new Recipient();
     let expectedRecordCount = 0;
     let numCallbacks = 0;
     let unsubscribe = r.subscribe((recipient: Recipient) => {
-      expect(recipient.futureEarningsRecords.length)
-          .toEqual(expectedRecordCount);
+      expect(recipient.futureEarningsRecords.length).toEqual(
+        expectedRecordCount
+      );
       numCallbacks++;
     });
     expect(numCallbacks).toEqual(1);
@@ -274,7 +282,7 @@ describe('Recipient', () => {
     unsubscribe();
   });
 
-  it('calls subscribers on birthday record update', () => {
+  it("calls subscribers on birthday record update", () => {
     let r = new Recipient();
     let numCallbacks = 0;
     let unsubscribe = r.subscribe((recipient: Recipient) => {
@@ -287,14 +295,14 @@ describe('Recipient', () => {
     unsubscribe();
   });
 
-  it('shortens name', () => {
+  it("shortens name", () => {
     let r = new Recipient();
-    r.name = 'Gregory';
-    expect(r.shortName(5)).toEqual('Greg…');
-    expect(r.shortName(7)).toEqual('Gregory');
+    r.name = "Gregory";
+    expect(r.shortName(5)).toEqual("Greg…");
+    expect(r.shortName(7)).toEqual("Gregory");
   });
 
-  it('captures first, second, only', () => {
+  it("captures first, second, only", () => {
     let r = new Recipient();
     expect(r.first).toEqual(true);
     expect(r.only).toEqual(true);
@@ -333,7 +341,7 @@ describe('Recipient', () => {
     return r;
   }
 
-  it('computes top35 earnings years from historical data', () => {
+  it("computes top35 earnings years from historical data", () => {
     let r = top35RecipientSetup();
 
     // The top 35 years should be the earliest 35 years, since those have the
@@ -351,26 +359,28 @@ describe('Recipient', () => {
       }
     }
     expect(r.totalIndexedEarnings().value()).toEqual(top35total.value());
-    expect(r.monthlyIndexedEarnings().value())
-        .toEqual(top35total.div(12).div(35).floorToDollar().value());
+    expect(r.monthlyIndexedEarnings().value()).toEqual(
+      top35total.div(12).div(35).floorToDollar().value()
+    );
   });
 
-  it('computes top35 earnings years from historical and future data', () => {
+  it("computes top35 earnings years from historical and future data", () => {
     let r = top35RecipientSetup();
 
     // Add 3 years of future earnings records with enough earnings to
     // ensure that they are top 35 years.
     for (let i = 0; i < 3; i++) {
       r.futureEarningsRecords.push(
-          testRecord(constants.CURRENT_YEAR + i, Money.from(30 * 1000)));
+        testRecord(constants.CURRENT_YEAR + i, Money.from(30 * 1000))
+      );
     }
     // .push doesn't call set(), so we must force a refresh:
     r.futureEarningsRecords = r.futureEarningsRecords;
 
     // The earliest 32 years should form the cutoff:
     expect(r.earningsRecords[31].year).toEqual(1996);
-    expect(r.earningsRecords[31].indexedEarnings().value()).toEqual(21466.70);
-    expect(r.cutoffIndexedEarnings().value()).toEqual(21466.70);
+    expect(r.earningsRecords[31].indexedEarnings().value()).toEqual(21466.7);
+    expect(r.cutoffIndexedEarnings().value()).toEqual(21466.7);
     let top35total = Money.from(0.0);
     for (let i = 0; i < 40; i++) {
       if (i < 32) {
@@ -384,188 +394,266 @@ describe('Recipient', () => {
     // Add back the 3 future years earnings:
     top35total = top35total.plus(Money.from(30 * 1000 * 3));
     expect(r.totalIndexedEarnings().value()).toEqual(top35total.value());
-    expect(r.monthlyIndexedEarnings().value())
-        .toEqual(top35total.div(12).div(35).floorToDollar().value());
+    expect(r.monthlyIndexedEarnings().value()).toEqual(
+      top35total.div(12).div(35).floorToDollar().value()
+    );
   });
 
-  it('determines hasEarningsBefore1978', () => {
+  it("determines hasEarningsBefore1978", () => {
     let r = new Recipient();
     // Empty records:
     expect(r.hasEarningsBefore1978()).toBe(false);
 
     // Record in 1978:
-    r.earningsRecords = [
-      testRecord(1978),
-    ];
+    r.earningsRecords = [testRecord(1978)];
     expect(r.hasEarningsBefore1978()).toBe(false);
 
     // Record in 1977:
-    r.earningsRecords = [
-      testRecord(1977),
-    ];
+    r.earningsRecords = [testRecord(1977)];
     expect(r.hasEarningsBefore1978()).toBe(true);
   });
 
-  it('correctly calculates benefits based on filing ages', () => {
+  it("correctly calculates benefits based on filing ages", () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
-    r.setPia(Money.from(1000.00));
+    r.setPia(Money.from(1000.0));
 
     // Early retirement at 62 should be 30% reduction:
-    expect(r.benefitAtAge(
-                MonthDuration.initFromYearsMonths({years: 62, months: 0}))
-               .value())
-        .toEqual(700.00);
+    expect(
+      r
+        .benefitAtAge(
+          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
+        )
+        .value()
+    ).toEqual(700.0);
     // Early retirement at 66 should be 6.67% reduction:
-    expect(r.benefitAtAge(
-                MonthDuration.initFromYearsMonths({years: 66, months: 0}))
-               .value())
-        .toEqual(933.00);
+    expect(
+      r
+        .benefitAtAge(
+          MonthDuration.initFromYearsMonths({ years: 66, months: 0 })
+        )
+        .value()
+    ).toEqual(933.0);
     // Test the normal retirement age:
-    expect(r.benefitAtAge(
-                MonthDuration.initFromYearsMonths({years: 67, months: 0}))
-               .value())
-        .toEqual(1000.00);
+    expect(
+      r
+        .benefitAtAge(
+          MonthDuration.initFromYearsMonths({ years: 67, months: 0 })
+        )
+        .value()
+    ).toEqual(1000.0);
     // Delayed retirement at 68 should be 8% increase:
-    expect(r.benefitAtAge(
-                MonthDuration.initFromYearsMonths({years: 68, months: 0}))
-               .value())
-        .toEqual(1080.00);
+    expect(
+      r
+        .benefitAtAge(
+          MonthDuration.initFromYearsMonths({ years: 68, months: 0 })
+        )
+        .value()
+    ).toEqual(1080.0);
     // Delayed retirement at 70 should be 24% increase:
-    expect(r.benefitAtAge(
-                MonthDuration.initFromYearsMonths({years: 70, months: 0}))
-               .value())
-        .toEqual(1240.00);
+    expect(
+      r
+        .benefitAtAge(
+          MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+        )
+        .value()
+    ).toEqual(1240.0);
   });
 
-  it('correctly calculates benefits based on filing and current dates', () => {
+  it("correctly calculates benefits based on filing and current dates", () => {
     let r = new Recipient();
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
-    r.setPia(Money.from(1000.00));
+    r.setPia(Money.from(1000.0));
 
     // If they haven't filed yet, they should have zero benefit:
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
-    expect(r.benefitOnDate(
-                // File at NRA, 67:
-                MonthDate.initFromYearsMonths({years: 2027, months: 1}),
-                // Currently at age 63:
-                MonthDate.initFromYearsMonths({years: 2023, months: 1}))
-               .value())
-        .toEqual(0);
+    expect(
+      r
+        .benefitOnDate(
+          // File at NRA, 67:
+          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+          // Currently at age 63:
+          MonthDate.initFromYearsMonths({ years: 2023, months: 1 })
+        )
+        .value()
+    ).toEqual(0);
 
     // Early retirement at 66 should be 6.67% reduction:
-    expect(r.benefitOnDate(
-                MonthDate.initFromYearsMonths({years: 2026, months: 0}),
-                MonthDate.initFromYearsMonths({years: 2026, months: 0}))
-               .value())
-        .toEqual(933.00);
+    expect(
+      r
+        .benefitOnDate(
+          MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
+        )
+        .value()
+    ).toEqual(933.0);
     // Reductions are applied monthly, unlike delayed retirement credits, so
     // adding 2 months should increase the benefit by 1/6 of 6.67%:
-    expect(r.benefitOnDate(
-                MonthDate.initFromYearsMonths({years: 2026, months: 2}),
-                MonthDate.initFromYearsMonths({years: 2026, months: 2}))
-               .value())
-        .toEqual(944.00);
+    expect(
+      r
+        .benefitOnDate(
+          MonthDate.initFromYearsMonths({ years: 2026, months: 2 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 2 })
+        )
+        .value()
+    ).toEqual(944.0);
 
     // Filing in the middle of the year, but on the month they turn 70,
     // should immediately be maximum delayed multiplier of 24%
     r.birthdate = Birthdate.FromYMD(1960, 6, 5);
-    expect(r.benefitOnDate(
-                MonthDate.initFromYearsMonths({years: 2030, months: 6}),
-                MonthDate.initFromYearsMonths({years: 2030, months: 6}))
-               .value())
-        .toEqual(1240.00);
+    expect(
+      r
+        .benefitOnDate(
+          MonthDate.initFromYearsMonths({ years: 2030, months: 6 }),
+          MonthDate.initFromYearsMonths({ years: 2030, months: 6 })
+        )
+        .value()
+    ).toEqual(1240.0);
 
     // Filing in the middle of the year, but on the month before they turn 70,
     // should result in only a 20% increase until the following year. where
     // it will be 24%. The 20% number is the delayed retirement credits as of
     // Jan 2030.
     r.birthdate = Birthdate.FromYMD(1960, 6, 5);
-    expect(r.benefitOnDate(
-                MonthDate.initFromYearsMonths({years: 2030, months: 5}),
-                MonthDate.initFromYearsMonths({years: 2030, months: 5}))
-               .value())
-        .toEqual(1200.00);  // 0.67 per month for 30 months = 20%
-    expect(r.benefitOnDate(
-                MonthDate.initFromYearsMonths({years: 2030, months: 5}),
-                MonthDate.initFromYearsMonths({years: 2031, months: 0}))
-               .value())
-        .toEqual(1233.00);  // 0.67 per month for 35 months = 23.33%
+    expect(
+      r
+        .benefitOnDate(
+          MonthDate.initFromYearsMonths({ years: 2030, months: 5 }),
+          MonthDate.initFromYearsMonths({ years: 2030, months: 5 })
+        )
+        .value()
+    ).toEqual(1200.0); // 0.67 per month for 30 months = 20%
+    expect(
+      r
+        .benefitOnDate(
+          MonthDate.initFromYearsMonths({ years: 2030, months: 5 }),
+          MonthDate.initFromYearsMonths({ years: 2031, months: 0 })
+        )
+        .value()
+    ).toEqual(1233.0); // 0.67 per month for 35 months = 23.33%
   });
 
-  it('correctly calculates spousal benefits based on filing and current dates',
-     () => {
-       let r = new Recipient();
-       // Over time, the PIA will increase due to COLAs, but we want the tests
-       // to be stable, so we set the PIA to a fixed value for testing.
-       r.setPia(Money.from(1000.00));
+  it("correctly calculates spousal benefits based on filing and current dates", () => {
+    let r = new Recipient();
+    // Over time, the PIA will increase due to COLAs, but we want the tests
+    // to be stable, so we set the PIA to a fixed value for testing.
+    r.setPia(Money.from(1000.0));
 
-       let s = new Recipient();
-       // Force a spousal PIA large enough to generate a $500 spousal benefit.
-       s.setPia(Money.from(3000.00));
+    let s = new Recipient();
+    // Force a spousal PIA large enough to generate a $500 spousal benefit.
+    s.setPia(Money.from(3000.0));
 
-       // If they haven't filed yet, they should have zero benefit:
-       r.birthdate = Birthdate.FromYMD(1960, 0, 5);
-       s.birthdate = Birthdate.FromYMD(1960, 0, 5);
-       expect(r.spousalBenefitOnDate(
-                   s, MonthDate.initFromYearsMonths({years: 2027, months: 1}),
-                   // File at NRA, 67:
-                   MonthDate.initFromYearsMonths({years: 2027, months: 1}),
-                   // Currently at age 63:
-                   MonthDate.initFromYearsMonths({years: 2023, months: 1}))
-                  .value())
-           .toEqual(0);
+    // If they haven't filed yet, they should have zero benefit:
+    r.birthdate = Birthdate.FromYMD(1960, 0, 5);
+    s.birthdate = Birthdate.FromYMD(1960, 0, 5);
+    expect(
+      r
+        .spousalBenefitOnDate(
+          s,
+          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+          // File at NRA, 67:
+          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+          // Currently at age 63:
+          MonthDate.initFromYearsMonths({ years: 2023, months: 1 })
+        )
+        .value()
+    ).toEqual(0);
 
-       // atDate before spouse files results in no benefit
-       expect(r.spousalBenefitOnDate(
-                   s, MonthDate.initFromYearsMonths({years: 2027, months: 1}),
-                   MonthDate.initFromYearsMonths({years: 2026, months: 0}),
-                   MonthDate.initFromYearsMonths({years: 2026, months: 0}))
-                  .value())
-           .toEqual(0);
+    // atDate before spouse files results in no benefit
+    expect(
+      r
+        .spousalBenefitOnDate(
+          s,
+          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
+        )
+        .value()
+    ).toEqual(0);
 
-       // Early retirement at 66 should be 5% reduction:
-       expect(r.spousalBenefitOnDate(
-                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
-                   MonthDate.initFromYearsMonths({years: 2026, months: 0}),
-                   MonthDate.initFromYearsMonths({years: 2026, months: 0}))
-                  .value())
-           .toEqual(475.00);
+    // Early retirement at 66 should be 8.33% reduction:
+    expect(
+      r
+        .spousalBenefitOnDate(
+          s,
+          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
+        )
+        .value()
+    ).toEqual(458.33);
 
-       // Reductions are applied monthly, unlike delayed retirement credits, so
-       // adding 6 months should be only a 2.5% reduction:
-       expect(r.spousalBenefitOnDate(
-                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
-                   MonthDate.initFromYearsMonths({years: 2026, months: 6}),
-                   MonthDate.initFromYearsMonths({years: 2026, months: 6}))
-                  .value())
-           .toEqual(487.5);
+    // Reductions are applied monthly, unlike delayed retirement credits, so
+    // adding 6 months should be only a 4.165% reduction:
+    expect(
+      r
+        .spousalBenefitOnDate(
+          s,
+          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 6 }),
+          MonthDate.initFromYearsMonths({ years: 2026, months: 6 })
+        )
+        .value()
+    ).toEqual(479.17);
 
-       // 3 years of reductions should be 15%
-       expect(r.spousalBenefitOnDate(
-                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
-                   MonthDate.initFromYearsMonths({years: 2024, months: 0}),
-                   MonthDate.initFromYearsMonths({years: 2024, months: 0}))
-                  .value())
-           .toEqual(425);
+    // 3 years of reductions should be 25%
+    expect(
+      r
+        .spousalBenefitOnDate(
+          s,
+          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+          MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
+          MonthDate.initFromYearsMonths({ years: 2024, months: 0 })
+        )
+        .value()
+    ).toEqual(375);
 
-       // Each month past 3 years should be another 25 / 36 % reduction.
-       expect(r.spousalBenefitOnDate(
-                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
-                   MonthDate.initFromYearsMonths({years: 2023, months: 11}),
-                   MonthDate.initFromYearsMonths({years: 2023, months: 11}))
-                  .value())
-           .toEqual(421.53);
+    // Each month past 3 years should be another 5 / 12 % reduction.
+    expect(
+      r
+        .spousalBenefitOnDate(
+          s,
+          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+          MonthDate.initFromYearsMonths({ years: 2023, months: 11 }),
+          MonthDate.initFromYearsMonths({ years: 2023, months: 11 })
+        )
+        .value()
+    ).toEqual(372.92);
 
-       // Delayed retirement should not add any additional benefit:
-       expect(r.spousalBenefitOnDate(
-                   s, MonthDate.initFromYearsMonths({years: 2022, months: 1}),
-                   MonthDate.initFromYearsMonths({years: 2029, months: 0}),
-                   MonthDate.initFromYearsMonths({years: 2029, months: 0}))
-                  .value())
-           .toEqual(500.00);
-     });
+    // Delayed retirement should not add any additional benefit:
+    expect(
+      r
+        .spousalBenefitOnDate(
+          s,
+          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+          MonthDate.initFromYearsMonths({ years: 2029, months: 0 }),
+          MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
+        )
+        .value()
+    ).toEqual(500.0);
+  });
+
+  it("correctly calculates spousal benefits for a specific example", () => {
+    let r = new Recipient();
+    r.setPia(Money.from(1000.0));
+
+    let s = new Recipient();
+    s.setPia(Money.from(200.0));
+
+    r.birthdate = Birthdate.FromYMD(1962, 0, 2);
+    s.birthdate = Birthdate.FromYMD(1962, 0, 2);
+    expect(
+      s
+        .spousalBenefitOnDate(
+          r,
+          MonthDate.initFromYearsMonths({ years: 2028, months: 0 }),
+          MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
+          MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
+        )
+        .value()
+    ).toEqual(275);
+  });
 });
