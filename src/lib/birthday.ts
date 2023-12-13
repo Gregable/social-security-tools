@@ -1,4 +1,4 @@
-import {MonthDate, MonthDuration} from './month-time'
+import { MonthDate, MonthDuration } from "./month-time";
 
 /**
  * This class represents a person's birthdate.
@@ -24,6 +24,12 @@ export class Birthdate {
   private birthdate_: Date;
 
   /**
+   * SSA follows English common law that finds that a person "attains" an age
+   * on the day before their birthdate.
+   */
+  private ssaBirthdate_: Date;
+
+  /**
    * Creates a new Birthdate object.
    *
    * The parameter is the "lay birthdate", which is the birthdate that is
@@ -32,6 +38,11 @@ export class Birthdate {
    */
   private constructor(layBirthdate: Date = new Date(Date.UTC(1980, 0, 1))) {
     this.birthdate_ = layBirthdate;
+
+    // Subtract 24 hours to get the common law date:
+    this.ssaBirthdate_ = new Date(
+      this.birthdate_.getTime() - 24 * 60 * 60 * 1000
+    );
   }
 
   /**
@@ -57,18 +68,20 @@ export class Birthdate {
     // time, not UTC.
     const timeDiff = this.birthdate_.getTimezoneOffset() * 60000;
     const adjustedDate = new Date(this.birthdate_.valueOf() + timeDiff);
-    return adjustedDate.toLocaleDateString(
-        'en-us', {month: 'short', year: 'numeric', day: 'numeric'});
+    return adjustedDate.toLocaleDateString("en-us", {
+      month: "short",
+      year: "numeric",
+      day: "numeric",
+    });
   }
 
   /**
    * SSA follows English common law that finds that a person "attains" an age
-   * on the day before their birthdate. This function subtracts 1 day from the
-   * lay birthdate, and returns the result as a Date object.
+   * on the day before their birthdate.
    */
   ssaBirthdate(): Date {
     // We subtract 24 hours:
-    return new Date(this.birthdate_.getTime() - (24 * 60 * 60 * 1000));
+    return this.ssaBirthdate_;
   }
 
   /**
@@ -78,8 +91,10 @@ export class Birthdate {
    */
   ssaBirthMonthDate(): MonthDate {
     const ebd = this.ssaBirthdate();
-    return MonthDate.initFromYearsMonths(
-        {years: ebd.getUTCFullYear(), months: ebd.getUTCMonth()});
+    return MonthDate.initFromYearsMonths({
+      years: ebd.getUTCFullYear(),
+      months: ebd.getUTCMonth(),
+    });
   }
 
   /** @returns 4 digit number representing the year */
@@ -101,10 +116,10 @@ export class Birthdate {
    * @returns date at a given age, as determined by lay ages.
    */
   dateAtLayAge(age: MonthDuration): MonthDate {
-    return MonthDate
-        .initFromYearsMonths(
-            {years: this.layBirthYear(), months: this.layBirthMonth()})
-        .addDuration(age);
+    return MonthDate.initFromYearsMonths({
+      years: this.layBirthYear(),
+      months: this.layBirthMonth(),
+    }).addDuration(age);
   }
 
   /**
@@ -142,24 +157,27 @@ export class Birthdate {
    *     SSA ages.
    */
   yearTurningSsaAge(yearsOld: number): number {
-    return this
-        .dateAtSsaAge(
-            MonthDuration.initFromYearsMonths({years: yearsOld, months: 0}))
-        .year();
+    return this.dateAtSsaAge(
+      MonthDuration.initFromYearsMonths({ years: yearsOld, months: 0 })
+    ).year();
   }
 
   /**
    * @returns the date in the given year that social security considers it
    * the person's birthdate, as well as their age.
    */
-  exampleSsaAge(year: number):
-      {age: number, day: number, month: string, year: number} {
+  exampleSsaAge(year: number): {
+    age: number;
+    day: number;
+    month: string;
+    year: number;
+  } {
     var example = {
-      'age': year - this.ssaBirthYear(),
-      'day': this.ssaBirthdate().getUTCDate(),
-      'month': this.ssaBirthMonthDate().monthFullName(),
-      'year': year,
+      age: year - this.ssaBirthYear(),
+      day: this.ssaBirthdate().getUTCDate(),
+      month: this.ssaBirthMonthDate().monthFullName(),
+      year: year,
     };
     return example;
   }
-};
+}

@@ -20,7 +20,7 @@ export class Money {
    */
   public static from(dollars: number): Money {
     if (isNaN(dollars)) {
-      throw new Error('Money.from() called with NaN');
+      throw new Error("Money.from() called with NaN");
     }
     return new Money(Math.round(dollars * 100));
   }
@@ -45,8 +45,10 @@ export class Money {
    * e.g. $1,234.56
    */
   string(): string {
-    return new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'})
-        .format(this.value());
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(this.value());
   }
 
   /**
@@ -54,14 +56,12 @@ export class Money {
    * e.g. $1,234
    */
   wholeDollars(): string {
-    return new Intl
-        .NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0
-        })
-        .format(Math.round(this.value()));
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Math.round(this.value()));
   }
 
   plus(other: Money): Money {
@@ -78,14 +78,14 @@ export class Money {
 
   div(factor: number): Money {
     if (factor == 0) {
-      throw new Error('Money.div() called with 0');
+      throw new Error("Money.div() called with 0");
     }
     return new Money(this.cents_ / factor);
   }
 
   div$(other: Money): number {
     if (other.cents_ == 0) {
-      throw new Error('Money.div$() called with 0');
+      throw new Error("Money.div$() called with 0");
     }
     return this.cents_ / other.cents_;
   }
@@ -112,10 +112,9 @@ export class Money {
     return new Money(Math.floor(this.cents_ / 10) * 10);
   }
 
-
   private constructor(cents: number) {
     if (isNaN(cents)) {
-      throw new Error('Money constructor called with NaN');
+      throw new Error("Money constructor called with NaN");
     }
     this.cents_ = cents;
   }
