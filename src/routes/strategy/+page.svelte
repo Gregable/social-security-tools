@@ -1,9 +1,4 @@
 <script lang="ts">
-  import { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import { Birthdate } from "$lib/birthday";
-  import { MonthDate, MonthDuration } from "$lib/month-time";
-
   import StrategyWorker from "$lib/workers/strategy?worker";
   import { onDestroy, onMount } from "svelte";
 

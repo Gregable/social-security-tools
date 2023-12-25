@@ -2,7 +2,6 @@ import { Recipient } from "$lib/recipient";
 import { Money } from "$lib/money";
 import { Birthdate } from "$lib/birthday";
 import { MonthDate, MonthDuration } from "$lib/month-time";
-import { Person } from "svelte-bootstrap-icons";
 
 // Precomputed value for if recipient is eligible for spousal benefits,
 // determined by comparing the PIA of the recipient to the PIA of the spouse.
