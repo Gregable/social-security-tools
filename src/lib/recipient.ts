@@ -230,6 +230,20 @@ export class Recipient {
   }
 
   /**
+   * The recipient's normal retirement age.
+   *
+   * Recalculated when birthdate is updated.
+   */
+  private normalRetirementAge_: MonthDuration;
+
+  /**
+   * The recipient's annual delayed retirement increase.
+   *
+   * Recalculated when birthdate is updated.
+   */
+  private delayedRetirementIncrease_: number;
+
+  /**
    * The recipient's birthdate.
    */
   private birthdate_: Birthdate = Birthdate.FromYMD(1980, 0, 1);
@@ -241,6 +255,18 @@ export class Recipient {
     // Update the indexing year for the all records based on the new
     // birthdate.
     if (!this.isPiaOnly_) this.updateEarningsRecords_();
+
+    const retirementAgeBracket = this.retirementAgeBracket();
+
+    // Recompute the NRA based on the new birthdate.
+    this.normalRetirementAge_ = MonthDuration.initFromYearsMonths({
+      years: retirementAgeBracket.ageYears,
+      months: retirementAgeBracket.ageMonths,
+    });
+
+    // Recompute the delayed retirement increase based on the new birthdate.
+    this.delayedRetirementIncrease_ =
+      retirementAgeBracket.delayedIncreaseAnnual;
   }
 
   private retirementAgeBracket(): {
@@ -269,14 +295,11 @@ export class Recipient {
    * Recipient's normal retirement age.
    */
   normalRetirementAge(): MonthDuration {
-    return MonthDuration.initFromYearsMonths({
-      years: this.retirementAgeBracket().ageYears,
-      months: this.retirementAgeBracket().ageMonths,
-    });
+    return this.normalRetirementAge_;
   }
 
   delayedRetirementIncrease(): number {
-    return this.retirementAgeBracket().delayedIncreaseAnnual;
+    return this.delayedRetirementIncrease_;
   }
 
   /*
@@ -497,55 +520,58 @@ export class Recipient {
    * for the recipient on that date. Does not include spousal benefits.
    */
   benefitOnDate(filingDate: MonthDate, atDate: MonthDate): Money {
+    const filingAge = this.birthdate.ageAtSsaDate(filingDate);
     // The filing date must be greater than 62:
     console.assert(
-      this.birthdate
-        .ageAtSsaDate(filingDate)
-        .greaterThanOrEqual(
-          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
-        )
+      filingAge.greaterThanOrEqual(
+        MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
+      )
     );
 
     // If the recipient hasn't filed yet, return $0:
     if (filingDate.greaterThan(atDate)) return Money.from(0);
 
-    // This is the eventual benefit amount given a filing date. The actual
-    // benefit may be lower, for example if the user has yet to realize full
-    // delated credits.
-    const filingAgeBenefit: Money = this.benefitAtAge(
-      this.birthdate.ageAtSsaDate(filingDate)
-    );
+    // If this is the year after filing, delayed credits are fully applied.
+    if (filingDate.year() < atDate.year()) return this.benefitAtAge(filingAge);
+
+    const normalRetirementDate: MonthDate = this.normalRetirementDate();
+
+    // If you are filing before normal retirement, no delayed credits apply.
+    if (filingDate.lessThanOrEqual(normalRetirementDate))
+      return this.benefitAtAge(filingAge);
 
     // 70 is an explicit exception because the SSA likes to make my life harder.
     // Normally, you'd need to wait until the next year to get delayed credits,
     // but not if you file at exactly 70.
-    if (this.birthdate.ageAtSsaDate(filingDate).years() >= 70)
-      return filingAgeBenefit;
-
-    // If you are filing before normal retirement, no delayed credits apply.
-    if (filingDate.lessThanOrEqual(this.normalRetirementDate()))
-      return filingAgeBenefit;
+    if (filingAge.years() >= 70) return this.benefitAtAge(filingAge);
 
     // If you file in January, delayed credits are fully applied.
-    if (filingDate.monthIndex() === 0) return filingAgeBenefit;
-
-    // If this is the year after filing, delayed credits are fully applied.
-    if (filingDate.year() < atDate.year()) return filingAgeBenefit;
+    if (filingDate.monthIndex() === 0) return this.benefitAtAge(filingAge);
 
     // Otherwise, you only get credits up to January of this year,
     // or NRA, whichever is later.
-    let thisJan = MonthDate.initFromYearsMonths({
+    const thisJan = MonthDate.initFromYearsMonths({
       years: filingDate.year(),
       months: 0,
     });
-    let benefitComputationDate = this.normalRetirementDate().greaterThan(
-      thisJan
-    )
-      ? this.normalRetirementDate()
+
+    const benefitComputationDate = normalRetirementDate.greaterThan(thisJan)
+      ? normalRetirementDate
       : thisJan;
+
     return this.benefitAtAge(
       this.birthdate.ageAtSsaDate(benefitComputationDate)
     );
+  }
+
+  /**
+   * @returns True if this recipient is eligible for spousal benefits.
+   */
+  eligibleForSpousalBenefit(spouse: Recipient): boolean {
+    let piaAmount: Money = this.pia().primaryInsuranceAmount();
+    let spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
+
+    return spousePiaAmount.div(2).value() > piaAmount.value();
   }
 
   /**
@@ -560,30 +586,16 @@ export class Recipient {
     let piaAmount: Money = this.pia().primaryInsuranceAmount();
     let spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
 
-    // The filing date must be greater than 62:
-    console.assert(
-      this.birthdate
-        .ageAtSsaDate(filingDate)
-        .greaterThanOrEqual(
-          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
-        )
-    );
-    console.assert(
-      spouse.birthdate
-        .ageAtSsaDate(spouseFilingDate)
-        .greaterThanOrEqual(
-          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
-        )
-    );
-
-    // If the recipient hasn't filed yet, return $0:
-    if (filingDate.greaterThan(atDate)) return Money.from(0);
-
-    // If the spouse hasn't filed yet, return $0:
-    if (spouseFilingDate.greaterThan(atDate)) return Money.from(0);
-
     // If the spouse has lower earnings, return $0:
     if (this.higherEarningsThan(spouse)) return Money.from(0);
+
+    // Calculate the starting date as the latest of the two filing dates:
+    let startDate = spouseFilingDate.greaterThan(filingDate)
+      ? spouseFilingDate
+      : filingDate;
+
+    // If the start date is in the future, return $0:
+    if (startDate.greaterThan(atDate)) return Money.from(0);
 
     // Calculate the base spousal benefit amount:
     let maxSpousal = spousePiaAmount.div(2);
@@ -591,11 +603,6 @@ export class Recipient {
     if (spousal.value() <= 0) {
       return Money.from(0);
     }
-
-    // Calculate the starting date as the latest of the two filing dates:
-    let startDate = spouseFilingDate.greaterThan(filingDate)
-      ? spouseFilingDate
-      : filingDate;
 
     if (startDate.greaterThanOrEqual(this.normalRetirementDate())) {
       return spousal;
@@ -606,15 +613,13 @@ export class Recipient {
       .asMonths();
     if (monthsBeforeNra <= 36) {
       // 25 / 36 of one percent for each month:
-      return spousal.times(1 - (monthsBeforeNra * 25) / 3600);
+      return spousal.times(1 - monthsBeforeNra / 144);
     } else {
       // 25% for the first 36 months:
       const firstReduction: Money = spousal.times(0.25);
       monthsBeforeNra = monthsBeforeNra - 36;
       // 5 / 12 of one percent for each additional month:
-      const secondReduction: Money = spousal.times(
-        (monthsBeforeNra * 5) / 1200
-      );
+      const secondReduction: Money = spousal.times(monthsBeforeNra / 240);
 
       return spousal.sub(firstReduction).sub(secondReduction);
     }
