@@ -3,19 +3,6 @@ import { Money } from "$lib/money";
 import { Birthdate } from "$lib/birthday";
 import { MonthDate, MonthDuration } from "$lib/month-time";
 
-// Precomputed value for if recipient is eligible for spousal benefits,
-// determined by comparing the PIA of the recipient to the PIA of the spouse.
-let eligibleForSpousal: boolean;
-
-// Precomputed values for the minimum filing date for each recipient. This is
-// the date that the recipient turns 62. Stored in months since epoch.
-let minimumFilingDateA: number;
-let minimumFilingDateB: number;
-// Precomputed values for the maximum benefit date for each recipient. This is
-// the maximum age of this recipient, which is 70. Stored in months since epoch.
-let finalBenefitDateA: number;
-let finalBenefitDateB: number;
-
 function PersonalBenefitStrategySum(
   recipient: Recipient,
   filingDate: MonthDate,
@@ -70,19 +57,27 @@ function SpousalBenefitStrategySum(
   return spousalBenefit.times(numMonths);
 }
 
-function run() {
+function run(config: any) {
   let recipientA = new Recipient();
   let recipientB = new Recipient();
 
   // TODO: Ensure that recipientA is always the higher earner.
-  recipientA.setPia(Money.from(1000));
-  recipientB.setPia(Money.from(200));
+  recipientA.setPia(Money.from(config.piaA));
+  recipientB.setPia(Money.from(config.piaB));
 
-  recipientA.birthdate = Birthdate.FromYMD(1962, 0, 2);
-  recipientB.birthdate = Birthdate.FromYMD(1962, 0, 2);
+  recipientA.birthdate = Birthdate.FromYMD(
+    config.birthdateA.year,
+    config.birthdateA.month,
+    config.birthdateA.day
+  );
+  recipientB.birthdate = Birthdate.FromYMD(
+    config.birthdateB.year,
+    config.birthdateB.month,
+    config.birthdateB.day
+  );
 
   // Precalculate spousal eligibility:
-  eligibleForSpousal = recipientB.eligibleForSpousalBenefit(recipientA);
+  const eligibleForSpousal = recipientB.eligibleForSpousalBenefit(recipientA);
 
   let bestStrategy = {
     strategySum: Money.from(0),
@@ -98,29 +93,19 @@ function run() {
     years: 70,
     months: 0,
   });
-  const finalAge = MonthDuration.initFromYearsMonths({
-    years: 75,
+  const finalAgeA = MonthDuration.initFromYearsMonths({
+    years: config.finalAgeA,
     months: 11,
   });
-  const finalDateA = recipientA.birthdate.dateAtLayAge(finalAge);
-  const finalDateB = recipientB.birthdate.dateAtLayAge(finalAge);
-
-  minimumFilingDateA = recipientA.birthdate
-    .dateAtLayAge(minStrategyAge)
-    .monthsSinceEpoch();
-  minimumFilingDateB = recipientB.birthdate
-    .dateAtLayAge(minStrategyAge)
-    .monthsSinceEpoch();
-  finalBenefitDateA = recipientA.birthdate
-    .dateAtLayAge(finalAge)
-    .monthsSinceEpoch();
-  finalBenefitDateB = recipientB.birthdate
-    .dateAtLayAge(finalAge)
-    .monthsSinceEpoch();
-
-  const start = Date.now();
+  const finalAgeB = MonthDuration.initFromYearsMonths({
+    years: config.finalAgeB,
+    months: 11,
+  });
+  const finalDateA = recipientA.birthdate.dateAtLayAge(finalAgeA);
+  const finalDateB = recipientB.birthdate.dateAtLayAge(finalAgeB);
 
   // TODO: Add survivor benefit.
+  // TODO: Account for time value.
   const personalBSums: Array<Money> = [];
   for (
     let stratB = minStrategyAge;
@@ -172,25 +157,15 @@ function run() {
     }
   }
 
-  const timeElapsed: number = (Date.now() - start) / 1000;
-  self.postMessage([
-    "done",
-    {
-      strategySum: bestStrategy.strategySum.string(),
-      ageA:
-        bestStrategy.ageA.years() + "y " + bestStrategy.ageA.modMonths() + "m",
-      ageB:
-        bestStrategy.ageB.years() + "y " + bestStrategy.ageB.modMonths() + "m",
-      timeElapsed,
-    },
-  ]);
-  self.postMessage(["timeElapsed", timeElapsed]);
+  self.postMessage({
+    strategySum: bestStrategy.strategySum.string(),
+    /*ageA: bestStrategy.ageA.years() + "." + bestStrategy.ageA.modMonths(),
+    ageB: bestStrategy.ageB.years() + "." + bestStrategy.ageB.modMonths(),*/
+    ageA: bestStrategy.ageA.asMonths(),
+    ageB: bestStrategy.ageB.asMonths(),
+  });
 }
 
 self.addEventListener("message", function (event) {
-  if (event.data == "run") {
-    run();
-  } else {
-    console.log("unrecognized message from worker", event.data);
-  }
+  run(event.data);
 });
