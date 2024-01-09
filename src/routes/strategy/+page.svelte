@@ -11,6 +11,7 @@
   let progress = 0;
   let startTime: number;
   let timeElapsed: number = 0;
+  let done = false;
 
   class DisplayedStrategy {
     private strategyA_: MonthDuration;
@@ -169,6 +170,7 @@
 
     if (!SendNextInput(event.data.workerIdx)) {
       // Done, swap the arrays:
+      done = true;
       displayedStrategies = strategies.map((row) => row.slice());
     }
 
@@ -246,9 +248,12 @@
   <p>
     Calculating... {progress}% ({window.navigator.hardwareConcurrency} threads)
   </p>
-  <p>Time Elapsed: {timeElapsed}s</p>
-  <p>Skipped: {skipped}</p>
-  <p>Called: {called}</p>
+
+  {#if done}
+    <p>Time Elapsed: {timeElapsed}s</p>
+    <p>Skipped: {skipped}</p>
+    <p>Called: {called}</p>
+  {/if}
 
   <br />
 
