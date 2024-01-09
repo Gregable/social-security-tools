@@ -3,6 +3,15 @@ import { Money } from "$lib/money";
 import { Birthdate } from "$lib/birthday";
 import { MonthDate, MonthDuration } from "$lib/month-time";
 
+const minStrategyAge = MonthDuration.initFromYearsMonths({
+  years: 62,
+  months: 0,
+});
+const maxStrategyAge = MonthDuration.initFromYearsMonths({
+  years: 70,
+  months: 0,
+});
+
 function PersonalBenefitStrategySum(
   recipient: Recipient,
   filingDate: MonthDate,
@@ -57,42 +66,58 @@ function SpousalBenefitStrategySum(
   return spousalBenefit.times(numMonths);
 }
 
-function run(config: any) {
-  let recipientA = new Recipient();
-  let recipientB = new Recipient();
+let settings = {
+  workerIdx: -1,
+  recipientA: new Recipient(),
+  recipientB: new Recipient(),
+  eligibleForSpousal: false,
+};
+
+function setup(config: any) {
+  settings.workerIdx = config.workerIdx;
+  settings.recipientA = new Recipient();
+  settings.recipientB = new Recipient();
 
   // TODO: Ensure that recipientA is always the higher earner.
-  recipientA.setPia(Money.from(config.piaA));
-  recipientB.setPia(Money.from(config.piaB));
+  settings.recipientA.setPia(Money.from(config.piaA));
+  settings.recipientB.setPia(Money.from(config.piaB));
 
-  recipientA.birthdate = Birthdate.FromYMD(
+  settings.recipientA.birthdate = Birthdate.FromYMD(
     config.birthdateA.year,
     config.birthdateA.month,
     config.birthdateA.day
   );
-  recipientB.birthdate = Birthdate.FromYMD(
+  settings.recipientB.birthdate = Birthdate.FromYMD(
     config.birthdateB.year,
     config.birthdateB.month,
     config.birthdateB.day
   );
 
   // Precalculate spousal eligibility:
-  const eligibleForSpousal = recipientB.eligibleForSpousalBenefit(recipientA);
+  settings.eligibleForSpousal = settings.recipientB.eligibleForSpousalBenefit(
+    settings.recipientA
+  );
+}
 
+function run(config: any) {
   let bestStrategy = {
     strategySum: Money.from(0),
     ageA: new MonthDuration(0),
     ageB: new MonthDuration(0),
   };
 
-  const minStrategyAge = MonthDuration.initFromYearsMonths({
-    years: 62,
-    months: 0,
+  /*
+  self.postMessage({
+    //strategySum: bestStrategy.strategySum.string(),
+    workerIdx: settings.workerIdx,
+    finalAgeA: config.finalAgeA,
+    finalAgeB: config.finalAgeB,
+    strategyA: bestStrategy.ageA.asMonths(),
+    strategyB: bestStrategy.ageB.asMonths(),
   });
-  const maxStrategyAge = MonthDuration.initFromYearsMonths({
-    years: 70,
-    months: 0,
-  });
+  return;
+  */
+
   const finalAgeA = MonthDuration.initFromYearsMonths({
     years: config.finalAgeA,
     months: 11,
@@ -101,8 +126,8 @@ function run(config: any) {
     years: config.finalAgeB,
     months: 11,
   });
-  const finalDateA = recipientA.birthdate.dateAtLayAge(finalAgeA);
-  const finalDateB = recipientB.birthdate.dateAtLayAge(finalAgeB);
+  const finalDateA = settings.recipientA.birthdate.dateAtLayAge(finalAgeA);
+  const finalDateB = settings.recipientB.birthdate.dateAtLayAge(finalAgeB);
 
   // TODO: Add survivor benefit.
   // TODO: Account for time value.
@@ -112,9 +137,9 @@ function run(config: any) {
     stratB.lessThanOrEqual(maxStrategyAge);
     stratB = stratB.add(new MonthDuration(1))
   ) {
-    const stratBDate = recipientB.birthdate.dateAtLayAge(stratB);
+    const stratBDate = settings.recipientB.birthdate.dateAtLayAge(stratB);
     personalBSums.push(
-      PersonalBenefitStrategySum(recipientB, stratBDate, finalDateB)
+      PersonalBenefitStrategySum(settings.recipientB, stratBDate, finalDateB)
     );
   }
 
@@ -123,10 +148,10 @@ function run(config: any) {
     stratA.lessThanOrEqual(maxStrategyAge);
     stratA = stratA.add(new MonthDuration(1))
   ) {
-    const stratADate = recipientA.birthdate.dateAtLayAge(stratA);
+    const stratADate = settings.recipientA.birthdate.dateAtLayAge(stratA);
 
     const personalASum = PersonalBenefitStrategySum(
-      recipientA,
+      settings.recipientA,
       stratADate,
       finalDateA
     );
@@ -138,12 +163,12 @@ function run(config: any) {
     ) {
       let strategySum = personalASum.plus(personalBSums[i++]);
 
-      const stratBDate = recipientB.birthdate.dateAtLayAge(stratB);
-      if (eligibleForSpousal) {
+      const stratBDate = settings.recipientB.birthdate.dateAtLayAge(stratB);
+      if (settings.eligibleForSpousal) {
         strategySum = strategySum.plus(
           SpousalBenefitStrategySum(
-            recipientB,
-            recipientA,
+            settings.recipientB,
+            settings.recipientA,
             stratBDate,
             stratADate,
             finalDateB
@@ -159,13 +184,15 @@ function run(config: any) {
 
   self.postMessage({
     strategySum: bestStrategy.strategySum.string(),
-    /*ageA: bestStrategy.ageA.years() + "." + bestStrategy.ageA.modMonths(),
-    ageB: bestStrategy.ageB.years() + "." + bestStrategy.ageB.modMonths(),*/
-    ageA: bestStrategy.ageA.asMonths(),
-    ageB: bestStrategy.ageB.asMonths(),
+    workerIdx: settings.workerIdx,
+    finalAgeA: config.finalAgeA,
+    finalAgeB: config.finalAgeB,
+    strategyA: bestStrategy.ageA.asMonths(),
+    strategyB: bestStrategy.ageB.asMonths(),
   });
 }
 
 self.addEventListener("message", function (event) {
-  run(event.data);
+  if (event.data.command == "setup") setup(event.data);
+  else if (event.data.command == "run") run(event.data);
 });

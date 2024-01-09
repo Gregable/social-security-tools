@@ -3,8 +3,8 @@
   import StrategyWorker from "$lib/workers/strategy?worker";
   import { onDestroy, onMount } from "svelte";
 
-  const worker = new StrategyWorker();
-  const maxAge = 95;
+  const workers = [];
+  const maxAge = 110;
   const minAge = 62;
   const tableWidth = maxAge - minAge + 1;
 
@@ -20,19 +20,17 @@
         years: minAge,
         months: 0,
       }).asMonths() * 2;
-    private static maxMonthSum_ =
-      MonthDuration.initFromYearsMonths({
-        years: 70,
-        months: 0,
-      }).asMonths() *
-        2 -
-      DisplayedStrategy.minMonthSum_;
+
     private static minYearSum_ = minAge * 2;
     private static maxYearSum_ = 70 * 2 - DisplayedStrategy.minYearSum_;
 
     constructor(strategyA: MonthDuration, strategyB: MonthDuration) {
       this.strategyA_ = strategyA;
       this.strategyB_ = strategyB;
+    }
+
+    done(): boolean {
+      return this.strategyA_.years() != 0 || this.strategyB_.years() != 0;
     }
 
     text(): string {
@@ -60,15 +58,6 @@
       if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
         return "rgb(255, 255, 255)";
       }
-      /*
-      const monthsSum =
-        this.strategyA_.asMonths() +
-        this.strategyB_.asMonths() -
-        DisplayedStrategy.minMonthSum_;
-      const colorValue = Math.round(
-        (monthsSum / DisplayedStrategy.maxMonthSum_) * 200
-      );
-      */
       const yearsSum =
         this.strategyA_.years() +
         this.strategyB_.years() -
@@ -97,6 +86,7 @@
   let ageA = minAge;
   let ageB = minAge;
   let scenario = {
+    workerIdx: -1,
     piaA: 1000,
     piaB: 300,
     birthdateA: {
@@ -109,50 +99,81 @@
       month: 4,
       day: 15,
     },
-    finalAgeA: ageA,
-    finalAgeB: ageB,
+    command: "setup",
   };
 
-  function SendNextInput() {
-    scenario.finalAgeA = ageA;
-    scenario.finalAgeB = ageB;
-    worker.postMessage(scenario);
+  function SendSetup(workerIdx: number = 0) {
+    scenario.workerIdx = workerIdx;
+    workers[workerIdx].postMessage(scenario);
+  }
+
+  let skipped = 0;
+  let called = 0;
+  function SendNextInput(workerIdx: number = 0): boolean {
+    if (ageB > maxAge) {
+      return false;
+    }
+    while (strategies[ageA - minAge][ageB - minAge].done()) {
+      skipped += 1;
+      [ageA, ageB] = IncrementAgeLoop(ageA, ageB);
+      if (ageA == 0) {
+        return false;
+      }
+    }
+    called += 1;
+    workers[workerIdx].postMessage({
+      finalAgeA: ageA,
+      finalAgeB: ageB,
+      command: "run",
+    });
+    [ageA, ageB] = IncrementAgeLoop(ageA, ageB);
+    return true;
   }
 
   // Returns the next ageA and ageB values to run the simulation on.
   // Returns [0, 0] when done.
   function IncrementAgeLoop(inAgeA: number, inAgeB: number): [number, number] {
+    // This increments over the ages diagonally, rather than by row or column.
+    // This reduces the amount of calculations when we have high parallelism
+    // by skipping over the ends of each row and column when we reach an age 70
+    // strategy, avoiding calls that we know will be skipped.
     if (ageB == maxAge) {
-      if (ageA == maxAge) {
-        progress = 100;
-        return [0, 0];
-      }
-      progress = Math.round(((ageA - minAge) / tableWidth) * 100);
-      return [ageA + 1, minAge];
+      return [maxAge, ageA + 1];
+    } else if (ageA == minAge) {
+      return [ageB + 1, minAge];
     } else {
-      return [ageA, ageB + 1];
+      return [ageA - 1, ageB + 1];
     }
   }
 
-  worker.addEventListener("message", (event) => {
-    const strategyA = new MonthDuration(event.data.ageA);
-    const strategyB = new MonthDuration(event.data.ageB);
-    strategies[ageA - minAge][ageB - minAge] = new DisplayedStrategy(
-      strategyA,
-      strategyB
-    );
+  function WorkerEventListener(event: MessageEvent) {
+    const strategyA = new MonthDuration(event.data.strategyA);
+    const strategyB = new MonthDuration(event.data.strategyB);
+    const displayStrategy = new DisplayedStrategy(strategyA, strategyB);
+    strategies[event.data.finalAgeA - minAge][event.data.finalAgeB - minAge] =
+      displayStrategy;
 
-    [ageA, ageB] = IncrementAgeLoop(ageA, ageB);
+    if (event.data.strategyA == 70 * 12) {
+      for (let i = event.data.finalAgeA - minAge; i < tableWidth; i++) {
+        strategies[i][event.data.finalAgeB - minAge] = displayStrategy;
+      }
+    }
+    if (
+      event.data.strategyB == 70 * 12 ||
+      (scenario.piaB == 0 && event.data.strategyB == 67 * 12)
+    ) {
+      for (let i = event.data.finalAgeB - minAge; i < tableWidth; i++) {
+        strategies[event.data.finalAgeA - minAge][i] = displayStrategy;
+      }
+    }
 
-    if (ageA == 0) {
+    if (!SendNextInput(event.data.workerIdx)) {
       // Done, swap the arrays:
       displayedStrategies = strategies.map((row) => row.slice());
-    } else {
-      SendNextInput();
     }
 
     timeElapsed = Math.floor((Date.now() - startTime) / 100) / 10;
-  });
+  }
 
   function leftborder(
     displayedStrategies: DisplayedStrategy[][],
@@ -177,11 +198,26 @@
   }
 
   onMount(() => {
+    const maxWorkers = 16;
+    // Parrallelize the calculation by using a worker for each available core.
+    for (
+      let i = 0;
+      i < Math.max(maxWorkers, window.navigator.hardwareConcurrency);
+      i++
+    ) {
+      workers.push(new StrategyWorker());
+    }
     startTime = Date.now();
-    worker.postMessage(scenario);
+    for (let i = 0; i < workers.length; i++) {
+      workers[i].addEventListener("message", WorkerEventListener);
+      SendSetup(i);
+      SendNextInput(i);
+    }
   });
   onDestroy(() => {
-    worker.terminate();
+    for (let i = 0; i < workers.length; i++) {
+      workers[i].terminate();
+    }
   });
 </script>
 
@@ -207,8 +243,12 @@
     now, I'm just playing around with the UI and some data to see if this even
     seems worth pursuing.
   </p>
-  <p>Calculating... {progress}%</p>
+  <p>
+    Calculating... {progress}% ({window.navigator.hardwareConcurrency} threads)
+  </p>
   <p>Time Elapsed: {timeElapsed}s</p>
+  <p>Skipped: {skipped}</p>
+  <p>Called: {called}</p>
 
   <br />
 
@@ -268,11 +308,6 @@
 </main>
 
 <style>
-  th,
-  td {
-    /*white-space: nowrap;*/
-    /*padding: 0.5rem;*/
-  }
   table {
     border-collapse: collapse;
     border: 1px solid black;
