@@ -70,6 +70,8 @@ let settings = {
   eligibleForSpousal: false,
 };
 
+const personalBSums: Array<number> = [];
+
 function setup(config: any) {
   settings.workerIdx = config.workerIdx;
   settings.recipientA = new Recipient();
@@ -94,6 +96,15 @@ function setup(config: any) {
   settings.eligibleForSpousal = settings.recipientB.eligibleForSpousalBenefit(
     settings.recipientA
   );
+
+  // Reuse the array rather than reallocating on each pass.
+  for (
+    let i = MonthDuration.copyFrom(minStrategyAge);
+    i.lessThanOrEqual(maxStrategyAge);
+    i.increment()
+  ) {
+    personalBSums.push(0);
+  }
 }
 
 function run(config: any) {
@@ -116,23 +127,20 @@ function run(config: any) {
 
   // TODO: Add survivor benefit.
   // TODO: Account for time value.
-  const personalBSums: Array<number> = [];
   for (
-    let stratB = minStrategyAge;
+    let stratB = MonthDuration.copyFrom(minStrategyAge);
     stratB.lessThanOrEqual(maxStrategyAge);
-    stratB = stratB.add(new MonthDuration(1))
+    stratB.increment()
   ) {
     const stratBDate = settings.recipientB.birthdate.dateAtLayAge(stratB);
-    personalBSums.push(
-      PersonalBenefitStrategySum(settings.recipientB, stratBDate, finalDateB)
-    );
+    personalBSums[stratB.asMonths() - minStrategyAge.asMonths()] =
+      PersonalBenefitStrategySum(settings.recipientB, stratBDate, finalDateB);
   }
 
   for (
-    let stratA = minStrategyAge;
+    let stratA = MonthDuration.copyFrom(minStrategyAge);
     stratA.lessThanOrEqual(maxStrategyAge);
-    // Why doesn't stratA.increment() work?
-    stratA = stratA.add(new MonthDuration(1))
+    stratA.increment()
   ) {
     const stratADate = settings.recipientA.birthdate.dateAtLayAge(stratA);
     const personalASum = PersonalBenefitStrategySum(
@@ -142,9 +150,9 @@ function run(config: any) {
     );
     let i = 0;
     for (
-      let stratB = minStrategyAge;
+      let stratB = MonthDuration.copyFrom(minStrategyAge);
       stratB.lessThanOrEqual(maxStrategyAge);
-      stratB = stratB.add(new MonthDuration(1))
+      stratB.increment()
     ) {
       let strategySumCents = personalASum + personalBSums[i++];
 
@@ -162,8 +170,8 @@ function run(config: any) {
       if (strategySumCents > bestStrategy.strategySumCents) {
         bestStrategy = {
           strategySumCents: strategySumCents,
-          ageA: stratA,
-          ageB: stratB,
+          ageA: MonthDuration.copyFrom(stratA),
+          ageB: MonthDuration.copyFrom(stratB),
         };
       }
     }
