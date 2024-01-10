@@ -6,10 +6,8 @@
   const workers = [];
   const maxAge = 110;
   const minAge = 62;
-  const tableWidth = maxAge - minAge + 1;
   const maxWorkers = 4;
 
-  let progress = 0;
   let startTime: number;
   let timeElapsed: number = 0;
   let done = false;
@@ -17,11 +15,6 @@
   class DisplayedStrategy {
     private strategyA_: MonthDuration;
     private strategyB_: MonthDuration;
-    private static minMonthSum_ =
-      MonthDuration.initFromYearsMonths({
-        years: minAge,
-        months: 0,
-      }).asMonths() * 2;
 
     private static minYearSum_ = minAge * 2;
     private static maxYearSum_ = 70 * 2 - DisplayedStrategy.minYearSum_;
@@ -71,11 +64,117 @@
     }
   }
 
-  let strategies: DisplayedStrategy[][] = [];
-  let displayedStrategies: DisplayedStrategy[][] = [];
+  class ScenarioTable {
+    public static maxAge = 110;
+    public static minAge = 62;
 
-  let ageA = minAge;
-  let ageB = minAge;
+    private strategies_: DisplayedStrategy[][];
+    public displayedStrategies_: DisplayedStrategy[][] = [];
+
+    constructor() {
+      const tableWidth_ = maxAge - minAge + 1;
+      this.strategies_ = [];
+      for (let i = 0; i < tableWidth_; i++) {
+        let row: DisplayedStrategy[] = [];
+        for (let j = 0; j < tableWidth_; j++) {
+          row.push(
+            new DisplayedStrategy(new MonthDuration(0), new MonthDuration(0))
+          );
+        }
+        this.strategies_.push(row);
+      }
+      this.displayedStrategies_ = this.strategies_.map((row) => row.slice());
+    }
+
+    private nextX_: number = 0;
+    private nextY_: number = 0;
+    private scenariosDone_: boolean = false;
+
+    IncrementNextScenario(): boolean {
+      // The idea here is to always increment once, because even if the current
+      // cell isn't done, it has already been sent for processing. We may
+      // increment more than once if the cell we are incrementing to is done
+      // already.
+      //
+      // Increments move over the table diagonally rather than by row or column.
+      // This reduces the amount of calculations when we have high parallelism
+      // by skipping over the ends of each row and column when we reach an age
+      // 70 strategy, avoiding calls that we know will be skipped.
+      const maxIdx = this.strategies_.length - 1;
+      if (this.nextX_ == maxIdx && this.nextY_ == maxIdx) {
+        // Done, we've reached the end of the table:
+        // 0 0 0
+        // 0 0 0
+        // 0 0 *
+        this.scenariosDone_ = true;
+        return false;
+      } else {
+        if (this.nextX_ == maxIdx) {
+          // Increment to the next row, then reflect across the diagonal:
+          // 0 0 *      0 0 0
+          // 0 0 0  ->  0 0 0
+          // 0 0 0      0 * 0
+          //       -or-
+          // 0 0 0      0 0 0
+          // 0 0 *  ->  0 0 0
+          // 0 0 0      0 0 *
+          this.nextX_ = this.nextY_ + 1;
+          this.nextY_ = maxIdx;
+        } else if (this.nextY_ == 0) {
+          // Increment to the next column, then reflect across the diagonal:
+          // * 0 0      0 0 0
+          // 0 0 0  ->  * 0 0
+          // 0 0 0      0 0 0
+          //       -or-
+          // 0 * 0      0 0 0
+          // 0 0 0  ->  0 0 0
+          // 0 0 0      * 0 0
+          this.nextY_ = this.nextX_ + 1;
+          this.nextX_ = 0;
+        } else {
+          // Move along the diagonal:
+          // 0 0 0      0 0 *
+          // 0 * 0  ->  0 0 0
+          // 0 0 0      0 0 0
+          this.nextX_ += 1;
+          this.nextY_ -= 1;
+        }
+        if (!this.strategies_[this.nextX_][this.nextY_].done()) {
+          return true;
+        } else {
+          return this.IncrementNextScenario();
+        }
+      }
+    }
+
+    done(): boolean {
+      return this.scenariosDone_;
+    }
+
+    NextScenario(): [number, number] {
+      console.assert(!this.done());
+      return [this.nextX_ + minAge, this.nextY_ + minAge];
+    }
+
+    RecordStrategy(
+      ageA: number,
+      ageB: number,
+      strategyA: MonthDuration,
+      strategyB: MonthDuration
+    ) {
+      this.strategies_[ageA - minAge][ageB - minAge] = new DisplayedStrategy(
+        strategyA,
+        strategyB
+      );
+    }
+
+    SwapStrategies() {
+      this.displayedStrategies_ = this.strategies_.map((row) => row.slice());
+    }
+  }
+
+  let scenarioTable = new ScenarioTable();
+
   let scenario = {
     workerIdx: -1,
     piaA: 1000,
@@ -93,82 +192,72 @@
     command: "setup",
   };
 
-  function SendSetup(workerIdx: number = 0) {
+  function SetupWorker(workerIdx: number = 0) {
+    workers[workerIdx].addEventListener("message", WorkerEventListener);
     scenario.workerIdx = workerIdx;
     workers[workerIdx].postMessage(scenario);
   }
 
-  let skipped = 0;
-  let called = 0;
-  function SendNextInput(workerIdx: number = 0): boolean {
-    if (ageB > maxAge) {
-      return false;
-    }
-    while (strategies[ageA - minAge][ageB - minAge].done()) {
-      skipped += 1;
-      [ageA, ageB] = IncrementAgeLoop(ageA, ageB);
-      if (ageA == 0) {
-        return false;
+  function SendNextInput(workerIdx: number = 0) {
+    if (scenarioTable.done()) {
+      workers[workerIdx].terminate();
+      numWorkers--;
+      if (numWorkers == 0) {
+        timeElapsed = Math.floor((Date.now() - startTime) / 100) / 10;
+        scenarioTable.SwapStrategies();
+        done = true;
       }
-    }
-    called += 1;
-
-    workers[workerIdx].postMessage({
-      finalAgeA: ageA,
-      finalAgeB: ageB,
-      command: "run",
-    });
-    [ageA, ageB] = IncrementAgeLoop(ageA, ageB);
-    return true;
-  }
-
-  // Returns the next ageA and ageB values to run the simulation on.
-  // Returns [0, 0] when done.
-  function IncrementAgeLoop(inAgeA: number, inAgeB: number): [number, number] {
-    // This increments over the ages diagonally, rather than by row or column.
-    // This reduces the amount of calculations when we have high parallelism
-    // by skipping over the ends of each row and column when we reach an age 70
-    // strategy, avoiding calls that we know will be skipped.
-    if (ageB == maxAge) {
-      return [maxAge, ageA + 1];
-    } else if (ageA == minAge) {
-      return [ageB + 1, minAge];
     } else {
-      return [ageA - 1, ageB + 1];
+      let [ageA, ageB] = scenarioTable.NextScenario();
+      workers[workerIdx].postMessage({
+        finalAgeA: ageA,
+        finalAgeB: ageB,
+        command: "run",
+      });
+      scenarioTable.IncrementNextScenario();
     }
   }
 
   function WorkerEventListener(event: MessageEvent) {
     const strategyA = new MonthDuration(event.data.strategyA);
     const strategyB = new MonthDuration(event.data.strategyB);
-    const displayStrategy = new DisplayedStrategy(strategyA, strategyB);
-    strategies[event.data.finalAgeA - minAge][event.data.finalAgeB - minAge] =
-      displayStrategy;
 
+    scenarioTable.RecordStrategy(
+      event.data.finalAgeA,
+      event.data.finalAgeB,
+      strategyA,
+      strategyB
+    );
+
+    // If we have a strategy that starts person A at age 70, we can fill in the
+    // rest of that row since we can never strart later than 70.
     if (event.data.strategyA == 70 * 12) {
-      for (let i = event.data.finalAgeA - minAge; i < tableWidth; i++) {
-        strategies[i][event.data.finalAgeB - minAge] = displayStrategy;
+      for (let i = event.data.finalAgeA; i < ScenarioTable.maxAge; i++) {
+        scenarioTable.RecordStrategy(
+          i,
+          event.data.finalAgeB,
+          strategyA,
+          strategyB
+        );
       }
     }
+    // Same for person B. However, in addition if person B has zero PIA,
+    // there is no reason to start later than 67.
     if (
       event.data.strategyB == 70 * 12 ||
       (scenario.piaB == 0 && event.data.strategyB == 67 * 12)
     ) {
-      for (let i = event.data.finalAgeB - minAge; i < tableWidth; i++) {
-        strategies[event.data.finalAgeA - minAge][i] = displayStrategy;
+      for (let i = event.data.finalAgeB; i < ScenarioTable.maxAge; i++) {
+        scenarioTable.RecordStrategy(
+          event.data.finalAgeA,
+          i,
+          strategyA,
+          strategyB
+        );
       }
     }
 
-    if (!SendNextInput(event.data.workerIdx)) {
-      numWorkers -= 1;
-      workers[event.data.workerIdx].terminate();
-      if (numWorkers == 0) {
-        timeElapsed = Math.floor((Date.now() - startTime) / 100) / 10;
-        // Done, swap the arrays:
-        displayedStrategies = strategies.map((row) => row.slice());
-        done = true;
-      }
-    }
+    SendNextInput(event.data.workerIdx);
   }
 
   function leftborder(
@@ -196,26 +285,12 @@
   let numWorkers = 0;
   onMount(() => {
     startTime = Date.now();
-
-    for (let i = 0; i < tableWidth; i++) {
-      let row: DisplayedStrategy[] = [];
-      for (let j = 0; j < tableWidth; j++) {
-        row.push(
-          new DisplayedStrategy(new MonthDuration(0), new MonthDuration(0))
-        );
-      }
-      strategies.push(row);
-    }
-    displayedStrategies = strategies.map((row) => row.slice());
-
     // Parrallelize the calculation by using a worker for each available core.
-
     numWorkers = Math.max(maxWorkers, window.navigator.hardwareConcurrency);
 
     for (let i = 0; i < numWorkers; i++) {
       workers.push(new StrategyWorker());
-      workers[i].addEventListener("message", WorkerEventListener);
-      SendSetup(i);
+      SetupWorker(i);
     }
     for (let i = 0; i < numWorkers; i++) {
       SendNextInput(i);
@@ -251,24 +326,24 @@
     seems worth pursuing.
   </p>
   <p>
-    Calculating... {progress}% ({numWorkers} threads)
+    Calculating... ({numWorkers} threads working)
   </p>
 
   {#if done}
     <p>Time Elapsed: {timeElapsed}s</p>
-    <p>Skipped: {skipped}</p>
-    <p>Called: {called}</p>
 
     <br />
 
     <table>
       <tr>
         <td colspan="2"></td>
-        <th colspan={tableWidth}>Person B Death Age:</th></tr
+        <th colspan={scenarioTable.displayedStrategies_.length}
+          >Person B Death Age:</th
+        ></tr
       >
       <tr>
         <th
-          rowspan={tableWidth + 1}
+          rowspan={scenarioTable.displayedStrategies_.length + 1}
           style="writing-mode: vertical-rl; white-space:nowrap; transform:scale(-1) "
         >
           <span>Person A Death Age:</span></th
@@ -280,36 +355,40 @@
             <div class="divider"></div>
           </div>
         </td>
-        {#each displayedStrategies[0] as header, colIndex}
+        {#each scenarioTable.displayedStrategies_[0] as header, colIndex}
           <th>{colIndex + 62}</th>
         {/each}
       </tr>
 
-      {#each displayedStrategies as row, rowIndex}
+      {#each scenarioTable.displayedStrategies_ as row, rowIndex}
         <tr>
           <th>{rowIndex + 62}</th>
           {#each row as cell, colIndex}
             <td
               class:leftborder={leftborder(
-                displayedStrategies,
+                scenarioTable.displayedStrategies_,
                 rowIndex,
                 colIndex
               )}
               class:topborder={topborder(
-                displayedStrategies,
+                scenarioTable.displayedStrategies_,
                 rowIndex,
                 colIndex
               )}
-              style="background-color: {displayedStrategies[rowIndex][
-                colIndex
-              ].color()}"
+              style="background-color: {scenarioTable.displayedStrategies_[
+                rowIndex
+              ][colIndex].color()}"
             >
               <div class="cell">
                 <span class="cellA"
-                  >{displayedStrategies[rowIndex][colIndex].textA()}</span
+                  >{scenarioTable.displayedStrategies_[rowIndex][
+                    colIndex
+                  ].textA()}</span
                 >
                 <span class="cellB"
-                  >{displayedStrategies[rowIndex][colIndex].textB()}</span
+                  >{scenarioTable.displayedStrategies_[rowIndex][
+                    colIndex
+                  ].textB()}</span
                 >
                 <div class="divider"></div>
               </div>
