@@ -16,7 +16,7 @@ function PersonalBenefitStrategySum(
   recipient: Recipient,
   filingDate: MonthDate,
   finalDate: MonthDate
-) {
+): number {
   // personal benefit is only one of 3 values: 0, the benefit for a few months
   // after filing, and the benefit for the rest of the time. If we calculate
   // these 3 values and their number of months, we can avoid the loop and
@@ -31,19 +31,18 @@ function PersonalBenefitStrategySum(
     new MonthDuration(monthsRemainingInFilingYear)
   );
 
-  const initialPersonalBenefit = recipient.benefitOnDate(
-    filingDate,
-    filingDate
-  );
+  const initialPersonalBenefit = recipient
+    .benefitOnDate(filingDate, filingDate)
+    .cents();
 
-  const finalPersonalBenefit = recipient.benefitOnDate(
-    filingDate,
-    janAfterFilingDate
-  );
+  const finalPersonalBenefit = recipient
+    .benefitOnDate(filingDate, janAfterFilingDate)
+    .cents();
 
-  return initialPersonalBenefit
-    .times(monthsRemainingInFilingYear)
-    .plus(finalPersonalBenefit.times(numMonthsAfterInitialYear));
+  return (
+    initialPersonalBenefit * monthsRemainingInFilingYear +
+    finalPersonalBenefit * numMonthsAfterInitialYear
+  );
 }
 
 function SpousalBenefitStrategySum(
@@ -52,18 +51,16 @@ function SpousalBenefitStrategySum(
   filingDate: MonthDate,
   filingDateSpouse: MonthDate,
   finalDate: MonthDate
-) {
+): number {
   const startDate = filingDate.greaterThan(filingDateSpouse)
     ? filingDate
     : filingDateSpouse;
-  const spousalBenefit = recipient.spousalBenefitOnDate(
-    spouse,
-    filingDateSpouse,
-    filingDate,
-    startDate
-  );
-  const numMonths = finalDate.subtractDate(startDate).asMonths() + 1;
-  return spousalBenefit.times(numMonths);
+  const spousalBenefitCents = recipient
+    .spousalBenefitOnDateGivenStartDate(spouse, startDate, startDate)
+    .cents();
+  const numMonths: number =
+    finalDate.monthsSinceEpoch() - startDate.monthsSinceEpoch() + 1;
+  return spousalBenefitCents * numMonths;
 }
 
 let settings = {
@@ -101,22 +98,10 @@ function setup(config: any) {
 
 function run(config: any) {
   let bestStrategy = {
-    strategySum: Money.from(0),
+    strategySumCents: 0,
     ageA: new MonthDuration(0),
     ageB: new MonthDuration(0),
   };
-
-  /*
-  self.postMessage({
-    //strategySum: bestStrategy.strategySum.string(),
-    workerIdx: settings.workerIdx,
-    finalAgeA: config.finalAgeA,
-    finalAgeB: config.finalAgeB,
-    strategyA: bestStrategy.ageA.asMonths(),
-    strategyB: bestStrategy.ageB.asMonths(),
-  });
-  return;
-  */
 
   const finalAgeA = MonthDuration.initFromYearsMonths({
     years: config.finalAgeA,
@@ -131,7 +116,7 @@ function run(config: any) {
 
   // TODO: Add survivor benefit.
   // TODO: Account for time value.
-  const personalBSums: Array<Money> = [];
+  const personalBSums: Array<number> = [];
   for (
     let stratB = minStrategyAge;
     stratB.lessThanOrEqual(maxStrategyAge);
@@ -146,10 +131,10 @@ function run(config: any) {
   for (
     let stratA = minStrategyAge;
     stratA.lessThanOrEqual(maxStrategyAge);
+    // Why doesn't stratA.increment() work?
     stratA = stratA.add(new MonthDuration(1))
   ) {
     const stratADate = settings.recipientA.birthdate.dateAtLayAge(stratA);
-
     const personalASum = PersonalBenefitStrategySum(
       settings.recipientA,
       stratADate,
@@ -161,29 +146,30 @@ function run(config: any) {
       stratB.lessThanOrEqual(maxStrategyAge);
       stratB = stratB.add(new MonthDuration(1))
     ) {
-      let strategySum = personalASum.plus(personalBSums[i++]);
+      let strategySumCents = personalASum + personalBSums[i++];
 
       const stratBDate = settings.recipientB.birthdate.dateAtLayAge(stratB);
       if (settings.eligibleForSpousal) {
-        strategySum = strategySum.plus(
-          SpousalBenefitStrategySum(
-            settings.recipientB,
-            settings.recipientA,
-            stratBDate,
-            stratADate,
-            finalDateB
-          )
+        strategySumCents += SpousalBenefitStrategySum(
+          settings.recipientB,
+          settings.recipientA,
+          stratBDate,
+          stratADate,
+          finalDateB
         );
       }
 
-      if (strategySum.value() > bestStrategy.strategySum.value()) {
-        bestStrategy = { strategySum, ageA: stratA, ageB: stratB };
+      if (strategySumCents > bestStrategy.strategySumCents) {
+        bestStrategy = {
+          strategySumCents: strategySumCents,
+          ageA: stratA,
+          ageB: stratB,
+        };
       }
     }
   }
 
   self.postMessage({
-    strategySum: bestStrategy.strategySum.string(),
     workerIdx: settings.workerIdx,
     finalAgeA: config.finalAgeA,
     finalAgeB: config.finalAgeB,
@@ -192,7 +178,9 @@ function run(config: any) {
   });
 }
 
-self.addEventListener("message", function (event) {
+function eventHandler(event: any) {
   if (event.data.command == "setup") setup(event.data);
   else if (event.data.command == "run") run(event.data);
-});
+}
+
+self.addEventListener("message", eventHandler);

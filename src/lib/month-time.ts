@@ -1,4 +1,4 @@
-import * as constants from './constants'
+import * as constants from "./constants";
 
 /**
  * In social security calculations, days don't really matter for much.
@@ -44,14 +44,14 @@ export class MonthDate {
    */
   static initFromYearsMonthsStr(years: number, monthStr: string): MonthDate {
     console.assert(Number.isInteger(years), years);
-    console.assert(typeof monthStr === 'string');
+    console.assert(typeof monthStr === "string");
     console.assert(years >= 0, years);
 
-    const monthIndex = constants.ALL_MONTHS.indexOf(monthStr)
+    const monthIndex = constants.ALL_MONTHS.indexOf(monthStr);
     console.assert(monthIndex >= 0, monthStr);
     console.assert(monthIndex < 12, monthStr);
 
-    return MonthDate.initFromYearsMonths({years: years, months: monthIndex});
+    return MonthDate.initFromYearsMonths({ years: years, months: monthIndex });
   }
 
   /**
@@ -94,7 +94,8 @@ export class MonthDate {
    */
   subtractDate(other: MonthDate): MonthDuration {
     return new MonthDuration(
-        this.monthsSinceEpoch() - other.monthsSinceEpoch());
+      this.monthsSinceEpoch() - other.monthsSinceEpoch()
+    );
   }
 
   /**
@@ -158,7 +159,6 @@ export class MonthDuration {
    * @constructor
    */
   constructor(months: number = 0) {
-    console.assert(Number.isInteger(months), months);
     this.months_ = months;
   }
 
@@ -176,13 +176,15 @@ export class MonthDuration {
   static initFromYearsMonths(yearsMonths: YearsMonths): MonthDuration {
     console.assert(Number.isInteger(yearsMonths.months), yearsMonths.months);
     console.assert(
-        yearsMonths.months < 12 && yearsMonths.months > -12,
-        yearsMonths.months);
+      yearsMonths.months < 12 && yearsMonths.months > -12,
+      yearsMonths.months
+    );
     console.assert(Number.isInteger(yearsMonths.years), yearsMonths.years);
     // Negative durations are OK, but shouldn't have both positive and negative.
     console.assert(
-        Math.sign(yearsMonths.years) * Math.sign(yearsMonths.months) >= 0,
-        (yearsMonths.years + ' ' + yearsMonths.months));
+      Math.sign(yearsMonths.years) * Math.sign(yearsMonths.months) >= 0,
+      yearsMonths.years + " " + yearsMonths.months
+    );
     return new MonthDuration(yearsMonths.years * 12 + yearsMonths.months);
   }
 
@@ -249,6 +251,13 @@ export class MonthDuration {
    */
   add(other: MonthDuration): MonthDuration {
     return new MonthDuration(this.asMonths() + other.asMonths());
+  }
+
+  /**
+   * Returns a new MonthDuration that is this one incremented by 1 month.
+   */
+  increment() {
+    this.months_ += 1;
   }
 }
 

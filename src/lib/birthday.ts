@@ -21,13 +21,23 @@ export class Birthdate {
    * Birthdate is stored internally as a Date object. We don't expose Date
    * objects as part of the API though, because of the UTC issues.
    */
-  private birthdate_: Date;
+  private layBirthdate_: Date;
+
+  /**
+   * Same as birthdate_, but as a MonthDate object.
+   */
+  private layBirthMonthDate_: MonthDate;
 
   /**
    * SSA follows English common law that finds that a person "attains" an age
    * on the day before their birthdate.
    */
   private ssaBirthdate_: Date;
+
+  /**
+   * Same as ssaBirthdate_, but as a MonthDate object.
+   */
+  private ssaBirthMonthDate_: MonthDate;
 
   /**
    * Creates a new Birthdate object.
@@ -37,12 +47,20 @@ export class Birthdate {
    * It is very important that this is provided as a UTC date.
    */
   private constructor(layBirthdate: Date = new Date(Date.UTC(1980, 0, 1))) {
-    this.birthdate_ = layBirthdate;
+    this.layBirthdate_ = layBirthdate;
+    this.layBirthMonthDate_ = MonthDate.initFromYearsMonths({
+      years: this.layBirthdate_.getUTCFullYear(),
+      months: this.layBirthdate_.getUTCMonth(),
+    });
 
     // Subtract 24 hours to get the common law date:
     this.ssaBirthdate_ = new Date(
-      this.birthdate_.getTime() - 24 * 60 * 60 * 1000
+      this.layBirthdate_.getTime() - 24 * 60 * 60 * 1000
     );
+    this.ssaBirthMonthDate_ = MonthDate.initFromYearsMonths({
+      years: this.ssaBirthdate_.getUTCFullYear(),
+      months: this.ssaBirthdate_.getUTCMonth(),
+    });
   }
 
   /**
@@ -57,7 +75,7 @@ export class Birthdate {
    * for example Jan 1.
    */
   isFirstOfMonth(): boolean {
-    return this.birthdate_.getUTCDate() == 1;
+    return this.layBirthdate_.getUTCDate() == 1;
   }
 
   /**
@@ -66,8 +84,8 @@ export class Birthdate {
   layBirthdateString(): string {
     // Adjust by the timezone offset because toLocaleDateString() uses local
     // time, not UTC.
-    const timeDiff = this.birthdate_.getTimezoneOffset() * 60000;
-    const adjustedDate = new Date(this.birthdate_.valueOf() + timeDiff);
+    const timeDiff = this.layBirthdate_.getTimezoneOffset() * 60000;
+    const adjustedDate = new Date(this.layBirthdate_.valueOf() + timeDiff);
     return adjustedDate.toLocaleDateString("en-us", {
       month: "short",
       year: "numeric",
@@ -80,7 +98,6 @@ export class Birthdate {
    * on the day before their birthdate.
    */
   ssaBirthdate(): Date {
-    // We subtract 24 hours:
     return this.ssaBirthdate_;
   }
 
@@ -90,36 +107,29 @@ export class Birthdate {
    * This function subtracts 1 day, and returns the result as a MonthDate.
    */
   ssaBirthMonthDate(): MonthDate {
-    const ebd = this.ssaBirthdate();
-    return MonthDate.initFromYearsMonths({
-      years: ebd.getUTCFullYear(),
-      months: ebd.getUTCMonth(),
-    });
+    return this.ssaBirthMonthDate_;
   }
 
   /** @returns 4 digit number representing the year */
   layBirthYear(): number {
-    return this.birthdate_.getUTCFullYear();
+    return this.layBirthdate_.getUTCFullYear();
   }
   /**
    * @returns Index of the month. January is 0, Feb is 1, and so on.
    */
   layBirthMonth(): number {
-    return this.birthdate_.getUTCMonth();
+    return this.layBirthdate_.getUTCMonth();
   }
   /** @returns number representing the day of the month (from 1 to 31). */
   layBirthDayOfMonth(): number {
-    return this.birthdate_.getUTCDate();
+    return this.layBirthdate_.getUTCDate();
   }
 
   /**
    * @returns date at a given age, as determined by lay ages.
    */
   dateAtLayAge(age: MonthDuration): MonthDate {
-    return MonthDate.initFromYearsMonths({
-      years: this.layBirthYear(),
-      months: this.layBirthMonth(),
-    }).addDuration(age);
+    return this.layBirthMonthDate_.addDuration(age);
   }
 
   /**

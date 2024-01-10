@@ -25,6 +25,20 @@ export class Money {
     return new Money(Math.round(dollars * 100));
   }
 
+  /**
+   * @param cents The amount of money in cents.
+   */
+  public static fromCents(cents: number): Money {
+    return new Money(cents);
+  }
+
+  /**
+   * Returns a Money object with a value of 0.
+   */
+  public static zero(): Money {
+    return new Money(0);
+  }
+
   public static min(a: Money, b: Money): Money {
     return new Money(Math.min(a.cents_, b.cents_));
   }
@@ -38,6 +52,13 @@ export class Money {
    */
   value(): number {
     return Math.round(this.cents_) / 100;
+  }
+
+  /**
+   * @return The amount of money in cents.
+   */
+  cents(): number {
+    return this.cents_;
   }
 
   /**

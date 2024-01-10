@@ -7,6 +7,7 @@
   const maxAge = 110;
   const minAge = 62;
   const tableWidth = maxAge - minAge + 1;
+  const maxWorkers = 4;
 
   let progress = 0;
   let startTime: number;
@@ -71,18 +72,7 @@
   }
 
   let strategies: DisplayedStrategy[][] = [];
-  for (let i = 0; i < tableWidth; i++) {
-    let row: DisplayedStrategy[] = [];
-    for (let j = 0; j < tableWidth; j++) {
-      row.push(
-        new DisplayedStrategy(new MonthDuration(0), new MonthDuration(0))
-      );
-    }
-    strategies.push(row);
-  }
-  let displayedStrategies: DisplayedStrategy[][] = strategies.map((row) =>
-    row.slice()
-  );
+  let displayedStrategies: DisplayedStrategy[][] = [];
 
   let ageA = minAge;
   let ageB = minAge;
@@ -122,6 +112,7 @@
       }
     }
     called += 1;
+
     workers[workerIdx].postMessage({
       finalAgeA: ageA,
       finalAgeB: ageB,
@@ -169,12 +160,15 @@
     }
 
     if (!SendNextInput(event.data.workerIdx)) {
-      // Done, swap the arrays:
-      done = true;
-      displayedStrategies = strategies.map((row) => row.slice());
+      numWorkers -= 1;
+      workers[event.data.workerIdx].terminate();
+      if (numWorkers == 0) {
+        timeElapsed = Math.floor((Date.now() - startTime) / 100) / 10;
+        // Done, swap the arrays:
+        displayedStrategies = strategies.map((row) => row.slice());
+        done = true;
+      }
     }
-
-    timeElapsed = Math.floor((Date.now() - startTime) / 100) / 10;
   }
 
   function leftborder(
@@ -199,25 +193,36 @@
     );
   }
 
+  let numWorkers = 0;
   onMount(() => {
-    const maxWorkers = 16;
-    // Parrallelize the calculation by using a worker for each available core.
-    for (
-      let i = 0;
-      i < Math.max(maxWorkers, window.navigator.hardwareConcurrency);
-      i++
-    ) {
-      workers.push(new StrategyWorker());
-    }
     startTime = Date.now();
-    for (let i = 0; i < workers.length; i++) {
+
+    for (let i = 0; i < tableWidth; i++) {
+      let row: DisplayedStrategy[] = [];
+      for (let j = 0; j < tableWidth; j++) {
+        row.push(
+          new DisplayedStrategy(new MonthDuration(0), new MonthDuration(0))
+        );
+      }
+      strategies.push(row);
+    }
+    displayedStrategies = strategies.map((row) => row.slice());
+
+    // Parrallelize the calculation by using a worker for each available core.
+
+    numWorkers = Math.max(maxWorkers, window.navigator.hardwareConcurrency);
+
+    for (let i = 0; i < numWorkers; i++) {
+      workers.push(new StrategyWorker());
       workers[i].addEventListener("message", WorkerEventListener);
       SendSetup(i);
+    }
+    for (let i = 0; i < numWorkers; i++) {
       SendNextInput(i);
     }
   });
   onDestroy(() => {
-    for (let i = 0; i < workers.length; i++) {
+    for (let i = 0; i < numWorkers; i++) {
       workers[i].terminate();
     }
   });
@@ -246,70 +251,74 @@
     seems worth pursuing.
   </p>
   <p>
-    Calculating... {progress}% ({window.navigator.hardwareConcurrency} threads)
+    Calculating... {progress}% ({numWorkers} threads)
   </p>
 
   {#if done}
     <p>Time Elapsed: {timeElapsed}s</p>
     <p>Skipped: {skipped}</p>
     <p>Called: {called}</p>
-  {/if}
 
-  <br />
+    <br />
 
-  <table>
-    <tr>
-      <td colspan="2"></td>
-      <th colspan={tableWidth}>Person B Death Age:</th></tr
-    >
-    <tr>
-      <th
-        rowspan={tableWidth + 1}
-        style="writing-mode: vertical-rl; white-space:nowrap; transform:scale(-1) "
-      >
-        <span>Person A Death Age:</span></th
-      >
-      <td>
-        <div class="cell">
-          <span class="cellA1">A</span>
-          <span class="cellB1">B</span>
-          <div class="divider"></div>
-        </div>
-      </td>
-      {#each displayedStrategies[0] as header, colIndex}
-        <th>{colIndex + 62}</th>
-      {/each}
-    </tr>
-
-    {#each displayedStrategies as row, rowIndex}
+    <table>
       <tr>
-        <th>{rowIndex + 62}</th>
-        {#each row as cell, colIndex}
-          <td
-            class:leftborder={leftborder(
-              displayedStrategies,
-              rowIndex,
-              colIndex
-            )}
-            class:topborder={topborder(displayedStrategies, rowIndex, colIndex)}
-            style="background-color: {displayedStrategies[rowIndex][
-              colIndex
-            ].color()}"
-          >
-            <div class="cell">
-              <span class="cellA"
-                >{displayedStrategies[rowIndex][colIndex].textA()}</span
-              >
-              <span class="cellB"
-                >{displayedStrategies[rowIndex][colIndex].textB()}</span
-              >
-              <div class="divider"></div>
-            </div>
-          </td>
+        <td colspan="2"></td>
+        <th colspan={tableWidth}>Person B Death Age:</th></tr
+      >
+      <tr>
+        <th
+          rowspan={tableWidth + 1}
+          style="writing-mode: vertical-rl; white-space:nowrap; transform:scale(-1) "
+        >
+          <span>Person A Death Age:</span></th
+        >
+        <td>
+          <div class="cell">
+            <span class="cellA1">A</span>
+            <span class="cellB1">B</span>
+            <div class="divider"></div>
+          </div>
+        </td>
+        {#each displayedStrategies[0] as header, colIndex}
+          <th>{colIndex + 62}</th>
         {/each}
       </tr>
-    {/each}
-  </table>
+
+      {#each displayedStrategies as row, rowIndex}
+        <tr>
+          <th>{rowIndex + 62}</th>
+          {#each row as cell, colIndex}
+            <td
+              class:leftborder={leftborder(
+                displayedStrategies,
+                rowIndex,
+                colIndex
+              )}
+              class:topborder={topborder(
+                displayedStrategies,
+                rowIndex,
+                colIndex
+              )}
+              style="background-color: {displayedStrategies[rowIndex][
+                colIndex
+              ].color()}"
+            >
+              <div class="cell">
+                <span class="cellA"
+                  >{displayedStrategies[rowIndex][colIndex].textA()}</span
+                >
+                <span class="cellB"
+                  >{displayedStrategies[rowIndex][colIndex].textB()}</span
+                >
+                <div class="divider"></div>
+              </div>
+            </td>
+          {/each}
+        </tr>
+      {/each}
+    </table>
+  {/if}
 </main>
 
 <style>
