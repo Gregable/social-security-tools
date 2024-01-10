@@ -6,7 +6,7 @@
   const workers = [];
   const maxAge = 110;
   const minAge = 62;
-  const maxWorkers = 4;
+  const maxWorkers = 2;
 
   let startTime: number;
   let timeElapsed: number = 0;
@@ -203,7 +203,7 @@
       workers[workerIdx].terminate();
       numWorkers--;
       if (numWorkers == 0) {
-        timeElapsed = Math.floor((Date.now() - startTime) / 100) / 10;
+        timeElapsed = (Date.now() - startTime) / 1000;
         scenarioTable.SwapStrategies();
         done = true;
       }
@@ -286,7 +286,7 @@
   onMount(() => {
     startTime = Date.now();
     // Parrallelize the calculation by using a worker for each available core.
-    numWorkers = Math.max(maxWorkers, window.navigator.hardwareConcurrency);
+    numWorkers = Math.min(maxWorkers, window.navigator.hardwareConcurrency);
 
     for (let i = 0; i < numWorkers; i++) {
       workers.push(new StrategyWorker());
