@@ -583,45 +583,66 @@ export class Recipient {
     filingDate: MonthDate,
     atDate: MonthDate
   ): Money {
-    let piaAmount: Money = this.pia().primaryInsuranceAmount();
-    let spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
-
-    // If the spouse has lower earnings, return $0:
-    if (this.higherEarningsThan(spouse)) return Money.from(0);
-
     // Calculate the starting date as the latest of the two filing dates:
-    let startDate = spouseFilingDate.greaterThan(filingDate)
+    const startDate = spouseFilingDate.greaterThan(filingDate)
       ? spouseFilingDate
       : filingDate;
 
+    return this.spousalBenefitOnDateGivenStartDate(
+      spouse,
+      startDate,
+      atDate
+    ).floorToDollar();
+  }
+
+  /**
+   * Helper function for spousalBenefitOnDate.
+   * Used directly in strategy calculations.
+   */
+  spousalBenefitOnDateGivenStartDate(
+    spouse: Recipient,
+    startDate: MonthDate,
+    atDate: MonthDate
+  ): Money {
+    // If the spouse has lower earnings, return $0:
+    if (this.higherEarningsThan(spouse)) return Money.zero();
+
     // If the start date is in the future, return $0:
-    if (startDate.greaterThan(atDate)) return Money.from(0);
+    if (startDate.greaterThan(atDate)) return Money.zero();
+
+    const piaAmountCents: number = this.pia().primaryInsuranceAmount().cents();
+    const spousePiaAmountCents: number = spouse
+      .pia()
+      .primaryInsuranceAmount()
+      .cents();
 
     // Calculate the base spousal benefit amount:
-    let maxSpousal = spousePiaAmount.div(2);
-    let spousal: Money = maxSpousal.sub(piaAmount);
-    if (spousal.value() <= 0) {
-      return Money.from(0);
+    const spousalCents = spousePiaAmountCents / 2 - piaAmountCents;
+    if (spousalCents <= 0) {
+      return Money.zero();
     }
 
-    if (startDate.greaterThanOrEqual(this.normalRetirementDate())) {
-      return spousal;
+    const normalRetirementDate = this.normalRetirementDate();
+    if (startDate.greaterThanOrEqual(normalRetirementDate)) {
+      return Money.fromCents(spousalCents);
     }
 
-    let monthsBeforeNra: number = this.normalRetirementDate()
-      .subtractDate(startDate)
-      .asMonths();
+    let monthsBeforeNra: number =
+      normalRetirementDate.monthsSinceEpoch() - startDate.monthsSinceEpoch();
     if (monthsBeforeNra <= 36) {
       // 25 / 36 of one percent for each month:
-      return spousal.times(1 - monthsBeforeNra / 144);
+      return Money.fromCents(spousalCents * (1 - monthsBeforeNra / 144));
     } else {
       // 25% for the first 36 months:
-      const firstReduction: Money = spousal.times(0.25);
+      const firstReductionCents: number = spousalCents * 0.25;
       monthsBeforeNra = monthsBeforeNra - 36;
       // 5 / 12 of one percent for each additional month:
-      const secondReduction: Money = spousal.times(monthsBeforeNra / 240);
+      const secondReductionCents: number =
+        spousalCents * (monthsBeforeNra / 240);
 
-      return spousal.sub(firstReduction).sub(secondReduction);
+      return Money.fromCents(
+        spousalCents - firstReductionCents - secondReductionCents
+      );
     }
   }
 

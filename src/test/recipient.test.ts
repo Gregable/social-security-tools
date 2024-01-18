@@ -584,7 +584,7 @@ describe("Recipient", () => {
           MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
         )
         .value()
-    ).toEqual(458.33);
+    ).toEqual(458);
 
     // Reductions are applied monthly, unlike delayed retirement credits, so
     // adding 6 months should be only a 4.165% reduction:
@@ -597,7 +597,7 @@ describe("Recipient", () => {
           MonthDate.initFromYearsMonths({ years: 2026, months: 6 })
         )
         .value()
-    ).toEqual(479.17);
+    ).toEqual(479);
 
     // 3 years of reductions should be 25%
     expect(
@@ -621,7 +621,7 @@ describe("Recipient", () => {
           MonthDate.initFromYearsMonths({ years: 2023, months: 11 })
         )
         .value()
-    ).toEqual(372.92);
+    ).toEqual(372);
 
     // Delayed retirement should not add any additional benefit:
     expect(
