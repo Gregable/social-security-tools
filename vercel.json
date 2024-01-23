@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/workers/:path*",
+      "source": "/_app/immutable/workers/:path*",
       "headers": [
         {
           "key": "Cross-Origin-Embedder-Policy",
