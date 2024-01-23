@@ -96,7 +96,7 @@
       if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
         return "";
       }
-      return this.strategyA_.years() + "\n" + this.strategyB_.years();
+      return this.textA() + "\n" + this.textB();
     }
 
     textA(): string {

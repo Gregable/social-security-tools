@@ -588,11 +588,7 @@ export class Recipient {
       ? spouseFilingDate
       : filingDate;
 
-    return this.spousalBenefitOnDateGivenStartDate(
-      spouse,
-      startDate,
-      atDate
-    ).floorToDollar();
+    return this.spousalBenefitOnDateGivenStartDate(spouse, startDate, atDate);
   }
 
   /**
@@ -624,14 +620,16 @@ export class Recipient {
 
     const normalRetirementDate = this.normalRetirementDate();
     if (startDate.greaterThanOrEqual(normalRetirementDate)) {
-      return Money.fromCents(spousalCents);
+      return Money.fromCents(spousalCents).floorToDollar();
     }
 
     let monthsBeforeNra: number =
       normalRetirementDate.monthsSinceEpoch() - startDate.monthsSinceEpoch();
     if (monthsBeforeNra <= 36) {
       // 25 / 36 of one percent for each month:
-      return Money.fromCents(spousalCents * (1 - monthsBeforeNra / 144));
+      return Money.fromCents(
+        spousalCents * (1 - monthsBeforeNra / 144)
+      ).floorToDollar();
     } else {
       // 25% for the first 36 months:
       const firstReductionCents: number = spousalCents * 0.25;
@@ -642,7 +640,8 @@ export class Recipient {
 
       return Money.fromCents(
         spousalCents - firstReductionCents - secondReductionCents
-      );
+      ).floorToDollar();
+
     }
   }
 

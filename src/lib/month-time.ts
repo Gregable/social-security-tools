@@ -259,6 +259,13 @@ export class MonthDuration {
   increment() {
     this.months_ += 1;
   }
+
+  /**
+   * Returns a new MonthDuration that is this one decremented by 1 month.
+   */
+  decrement() {
+    this.months_ -= 1;
+  }
 }
 
 /**
