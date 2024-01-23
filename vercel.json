@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/workers/*",
+      "source": "/workers/:path*",
       "headers": [
         {
           "key": "Cross-Origin-Embedder-Policy",
