@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/strategy",
+      "source": "/workers/.*",
       "headers": [
         {
           "key": "Cross-Origin-Embedder-Policy",
