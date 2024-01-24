@@ -92,7 +92,6 @@
     }
 
     text(): string {
-      this.initialize();
       if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
         return "";
       }
@@ -100,7 +99,6 @@
     }
 
     textA(): string {
-      this.initialize();
       if (this.strategyA_.years() == 0) {
         return "";
       }
@@ -108,7 +106,6 @@
     }
 
     textB(): string {
-      this.initialize();
       if (this.strategyB_.years() == 0) {
         return "";
       }
@@ -116,7 +113,6 @@
     }
 
     color(): string {
-      this.initialize();
       if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
         return "rgb(255, 255, 255)";
       }
@@ -129,10 +125,20 @@
       );
       return `rgb(0, ${255 - colorValue}, ${colorValue + 55})`;
     }
+
+    strategyA70(): boolean {
+      return this.strategyA_.years() == 70;
+    }
+
+    strategyB70(): boolean {
+      return this.strategyB_.years() == 70;
+    }
   }
 
   class ScenarioTable {
     public displayedStrategies_: DisplayedStrategy[][] = [];
+    public finalAIndex_ = 0;
+    public finalBIndex_ = 0;
 
     constructor() {
       // Displayed Strategy table:
@@ -154,6 +160,26 @@
           );
         }
         this.displayedStrategies_.push(row);
+      }
+    }
+
+    markDone() {
+      for (let i = 0; i < tableWidth; i++) {
+        for (let j = 0; j < tableWidth; j++) {
+          this.displayedStrategies_[i][j].initialize();
+          if (
+            this.finalAIndex_ <= i &&
+            !this.displayedStrategies_[i][j].strategyA70()
+          ) {
+            this.finalAIndex_ = i + 1;
+          }
+          if (
+            this.finalBIndex_ <= j &&
+            !this.displayedStrategies_[i][j].strategyB70()
+          ) {
+            this.finalBIndex_ = j + 1;
+          }
+        }
       }
     }
   }
@@ -186,6 +212,7 @@
   function WorkerEventListener() {
     done = true;
     timeElapsed = (Date.now() - startTime) / 1000;
+    scenarioTable.markDone();
   }
 
   function leftborder(
@@ -269,15 +296,23 @@
             <div class="divider"></div>
           </div>
         </td>
-        {#each scenarioTable.displayedStrategies_[0] as header, colIndex}
-          <th>{colIndex + 62}</th>
+        {#each { length: scenarioTable.finalBIndex_ + 1 } as _, colIndex}
+          {#if colIndex == scenarioTable.finalBIndex_}
+            <th>{colIndex + 62}+</th>
+          {:else}
+            <th>{colIndex + 62}</th>
+          {/if}
         {/each}
       </tr>
 
-      {#each scenarioTable.displayedStrategies_ as row, rowIndex}
+      {#each { length: scenarioTable.finalAIndex_ + 1 } as _, rowIndex}
         <tr>
-          <th>{rowIndex + 62}</th>
-          {#each row as cell, colIndex}
+          {#if rowIndex == scenarioTable.finalAIndex_}
+            <th>{rowIndex + 62}+</th>
+          {:else}
+            <th>{rowIndex + 62}</th>
+          {/if}
+          {#each { length: scenarioTable.finalBIndex_ + 1 } as cell, colIndex}
             <td
               class:leftborder={leftborder(
                 scenarioTable.displayedStrategies_,
