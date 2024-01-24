@@ -13,6 +13,9 @@
   let timeElapsed: number = 0;
   let done = false;
 
+  let nameA = "Alex";
+  let nameB = "Chris";
+
   let buffer_: SharedArrayBuffer;
   // For each "final age" (A, B) pair, create one shared array to hold
   // each one of the results of the calculation. The index into the array is
@@ -248,18 +251,21 @@
 </script>
 
 <main>
+  Recipient #1 Name: <input type="text" bind:value={nameA} />
+  <br />
+  Recipient #2 Name: <input type="text" bind:value={nameB} />
   <p>
     This page shows the optimal Social Security claiming strategy for a couple
     with the following characteristics:
   </p>
   <ul>
-    <li>Person A: PIA = $1,000, born April 15, 1960</li>
-    <li>Person B: PIA = $300, born April 15, 1960</li>
+    <li>{nameA}: PIA = $1,000, born April 15, 1960</li>
+    <li>{nameB}: PIA = $300, born April 15, 1960</li>
   </ul>
   <p>
     For each possible pair of death ages (A, B), the optimal filing strategy is
-    shown in the corresponding cell. The bottom left number is person A's
-    recommended filing age, and the top right number is person B's recommended
+    shown in the corresponding cell. The bottom left number is {nameA}'s
+    recommended filing age, and the top right number is {nameB}'s recommended
     filing age, in years.
   </p>
   <p>
@@ -279,20 +285,20 @@
       <tr>
         <td colspan="2"></td>
         <th colspan={scenarioTable.displayedStrategies_.length}
-          >Person B Death Age:</th
+          >{nameB} survives until age:</th
         ></tr
       >
       <tr>
         <th
           rowspan={scenarioTable.displayedStrategies_.length + 1}
-          style="writing-mode: vertical-rl; white-space:nowrap; transform:scale(-1) "
+          class="nameASurviveCell"
         >
-          <span>Person A Death Age:</span></th
+          <span>{nameA} survives until age:</span></th
         >
         <td>
-          <div class="cell">
-            <span class="cellA1">A</span>
-            <span class="cellB1">B</span>
+          <div class="cell cellAB">
+            <span class="cellA1">{nameA} files</span>
+            <span class="cellB1">{nameB} files</span>
             <div class="divider"></div>
           </div>
         </td>
@@ -365,6 +371,16 @@
     width: 30px;
     height: 30px;
   }
+  .nameASurviveCell {
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+    transform: scale(-1);
+  }
+  .cellAB {
+    position: relative;
+    top: -20px;
+    left: -20px;
+  }
   .cellB {
     position: absolute;
     top: 0;
@@ -379,11 +395,15 @@
     position: absolute;
     top: 0;
     left: 16px;
+    white-space: nowrap;
   }
   .cellA1 {
     position: absolute;
-    top: 13px;
+    top: 20px;
     left: 3px;
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+    transform: scale(-1);
   }
   .divider {
     position: absolute;
