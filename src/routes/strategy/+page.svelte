@@ -13,6 +13,9 @@
   let timeElapsed: number = 0;
   let done = false;
 
+  let nameA = "Alex";
+  let nameB = "Chris";
+
   let buffer_: SharedArrayBuffer;
   // For each "final age" (A, B) pair, create one shared array to hold
   // each one of the results of the calculation. The index into the array is
@@ -92,7 +95,6 @@
     }
 
     text(): string {
-      this.initialize();
       if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
         return "";
       }
@@ -100,7 +102,6 @@
     }
 
     textA(): string {
-      this.initialize();
       if (this.strategyA_.years() == 0) {
         return "";
       }
@@ -108,7 +109,6 @@
     }
 
     textB(): string {
-      this.initialize();
       if (this.strategyB_.years() == 0) {
         return "";
       }
@@ -116,7 +116,6 @@
     }
 
     color(): string {
-      this.initialize();
       if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
         return "rgb(255, 255, 255)";
       }
@@ -129,10 +128,20 @@
       );
       return `rgb(0, ${255 - colorValue}, ${colorValue + 55})`;
     }
+
+    strategyA70(): boolean {
+      return this.strategyA_.years() == 70;
+    }
+
+    strategyB70(): boolean {
+      return this.strategyB_.years() == 70;
+    }
   }
 
   class ScenarioTable {
     public displayedStrategies_: DisplayedStrategy[][] = [];
+    public finalAIndex_ = 0;
+    public finalBIndex_ = 0;
 
     constructor() {
       // Displayed Strategy table:
@@ -154,6 +163,26 @@
           );
         }
         this.displayedStrategies_.push(row);
+      }
+    }
+
+    markDone() {
+      for (let i = 0; i < tableWidth; i++) {
+        for (let j = 0; j < tableWidth; j++) {
+          this.displayedStrategies_[i][j].initialize();
+          if (
+            this.finalAIndex_ <= i &&
+            !this.displayedStrategies_[i][j].strategyA70()
+          ) {
+            this.finalAIndex_ = i + 1;
+          }
+          if (
+            this.finalBIndex_ <= j &&
+            !this.displayedStrategies_[i][j].strategyB70()
+          ) {
+            this.finalBIndex_ = j + 1;
+          }
+        }
       }
     }
   }
@@ -186,6 +215,7 @@
   function WorkerEventListener() {
     done = true;
     timeElapsed = (Date.now() - startTime) / 1000;
+    scenarioTable.markDone();
   }
 
   function leftborder(
@@ -221,18 +251,21 @@
 </script>
 
 <main>
+  Recipient #1 Name: <input type="text" bind:value={nameA} />
+  <br />
+  Recipient #2 Name: <input type="text" bind:value={nameB} />
   <p>
     This page shows the optimal Social Security claiming strategy for a couple
     with the following characteristics:
   </p>
   <ul>
-    <li>Person A: PIA = $1,000, born April 15, 1960</li>
-    <li>Person B: PIA = $300, born April 15, 1960</li>
+    <li>{nameA}: PIA = $1,000, born April 15, 1960</li>
+    <li>{nameB}: PIA = $300, born April 15, 1960</li>
   </ul>
   <p>
     For each possible pair of death ages (A, B), the optimal filing strategy is
-    shown in the corresponding cell. The bottom left number is person A's
-    recommended filing age, and the top right number is person B's recommended
+    shown in the corresponding cell. The bottom left number is {nameA}'s
+    recommended filing age, and the top right number is {nameB}'s recommended
     filing age, in years.
   </p>
   <p>
@@ -252,32 +285,40 @@
       <tr>
         <td colspan="2"></td>
         <th colspan={scenarioTable.displayedStrategies_.length}
-          >Person B Death Age:</th
+          >{nameB} survives until age:</th
         ></tr
       >
       <tr>
         <th
           rowspan={scenarioTable.displayedStrategies_.length + 1}
-          style="writing-mode: vertical-rl; white-space:nowrap; transform:scale(-1) "
+          class="nameASurviveCell"
         >
-          <span>Person A Death Age:</span></th
+          <span>{nameA} survives until age:</span></th
         >
         <td>
-          <div class="cell">
-            <span class="cellA1">A</span>
-            <span class="cellB1">B</span>
+          <div class="cell cellAB">
+            <span class="cellA1">{nameA} files</span>
+            <span class="cellB1">{nameB} files</span>
             <div class="divider"></div>
           </div>
         </td>
-        {#each scenarioTable.displayedStrategies_[0] as header, colIndex}
-          <th>{colIndex + 62}</th>
+        {#each { length: scenarioTable.finalBIndex_ + 1 } as _, colIndex}
+          {#if colIndex == scenarioTable.finalBIndex_}
+            <th>{colIndex + 62}+</th>
+          {:else}
+            <th>{colIndex + 62}</th>
+          {/if}
         {/each}
       </tr>
 
-      {#each scenarioTable.displayedStrategies_ as row, rowIndex}
+      {#each { length: scenarioTable.finalAIndex_ + 1 } as _, rowIndex}
         <tr>
-          <th>{rowIndex + 62}</th>
-          {#each row as cell, colIndex}
+          {#if rowIndex == scenarioTable.finalAIndex_}
+            <th>{rowIndex + 62}+</th>
+          {:else}
+            <th>{rowIndex + 62}</th>
+          {/if}
+          {#each { length: scenarioTable.finalBIndex_ + 1 } as cell, colIndex}
             <td
               class:leftborder={leftborder(
                 scenarioTable.displayedStrategies_,
@@ -330,6 +371,16 @@
     width: 30px;
     height: 30px;
   }
+  .nameASurviveCell {
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+    transform: scale(-1);
+  }
+  .cellAB {
+    position: relative;
+    top: -20px;
+    left: -20px;
+  }
   .cellB {
     position: absolute;
     top: 0;
@@ -344,11 +395,15 @@
     position: absolute;
     top: 0;
     left: 16px;
+    white-space: nowrap;
   }
   .cellA1 {
     position: absolute;
-    top: 13px;
+    top: 20px;
     left: 3px;
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+    transform: scale(-1);
   }
   .divider {
     position: absolute;
