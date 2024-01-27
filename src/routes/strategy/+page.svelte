@@ -1,5 +1,7 @@
 <script lang="ts">
   import { MonthDuration } from "$lib/month-time";
+  import { Recipient } from "$lib/recipient";
+  import RecipientName from "$lib/components/RecipientName.svelte";
   import StrategyWorker from "$lib/workers/strategy?worker";
   import { onDestroy, onMount } from "svelte";
 
@@ -13,8 +15,18 @@
   let timeElapsed: number = 0;
   let done = false;
 
+  let recipientA = new Recipient();
+  let recipientB = new Recipient();
+  recipientA.markFirst();
+  recipientB.markSecond();
+
   let nameA = "Alex";
   let nameB = "Chris";
+
+  $: {
+    recipientA.name = nameA;
+    recipientB.name = nameB;
+  }
 
   let buffer_: SharedArrayBuffer;
   // For each "final age" (A, B) pair, create one shared array to hold
@@ -259,14 +271,22 @@
     with the following characteristics:
   </p>
   <ul>
-    <li>{nameA}: PIA = $1,000, born April 15, 1960</li>
-    <li>{nameB}: PIA = $300, born April 15, 1960</li>
+    <li>
+      <RecipientName r={recipientA}></RecipientName> PIA = $1,000, born April 15,
+      1960
+    </li>
+    <li>
+      <RecipientName r={recipientB}></RecipientName>: PIA = $300, born April 15,
+      1960
+    </li>
   </ul>
   <p>
     For each possible pair of death ages (A, B), the optimal filing strategy is
     shown in the corresponding cell. The bottom left number is {nameA}'s
-    recommended filing age, and the top right number is {nameB}'s recommended
-    filing age, in years.
+    recommended filing age, and the top right number is <RecipientName
+      r={recipientB}
+      apos
+    ></RecipientName> recommended filing age, in years.
   </p>
   <p>
     Note that this page is a work in progress. The calculation is actually
@@ -285,7 +305,7 @@
       <tr>
         <td colspan="2"></td>
         <th colspan={scenarioTable.displayedStrategies_.length}
-          >{nameB} survives until age:</th
+          ><RecipientName r={recipientB}></RecipientName> survives until age:</th
         ></tr
       >
       <tr>
@@ -293,12 +313,18 @@
           rowspan={scenarioTable.displayedStrategies_.length + 1}
           class="nameASurviveCell"
         >
-          <span>{nameA} survives until age:</span></th
+          <span
+            ><RecipientName r={recipientA}></RecipientName> survives until age:</span
+          ></th
         >
         <td>
           <div class="cell cellAB">
-            <span class="cellA1">{nameA} files</span>
-            <span class="cellB1">{nameB} files</span>
+            <span class="cellA1"
+              ><RecipientName r={recipientA}></RecipientName> files</span
+            >
+            <span class="cellB1"
+              ><RecipientName r={recipientB}></RecipientName> files</span
+            >
             <div class="divider"></div>
           </div>
         </td>
