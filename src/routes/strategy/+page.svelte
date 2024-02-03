@@ -1,15 +1,15 @@
 <script lang="ts">
   import { MonthDuration } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
+  import { Money } from "$lib/money";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import StrategyWorker from "$lib/workers/strategy?worker";
   import { onDestroy, onMount } from "svelte";
+  import { run } from "svelte/internal";
 
-  // TODO: All Caps?
-  const worker: Worker = new StrategyWorker();
   const MAX_AGE = 110;
   const MIN_AGE = 62;
-  const tableWidth = MAX_AGE - MIN_AGE + 1;
+  const TABLE_WIDTH = MAX_AGE - MIN_AGE + 1;
 
   let startTime: number;
   let timeElapsed: number = 0;
@@ -22,11 +22,8 @@
 
   let nameA = "Alex";
   let nameB = "Chris";
-
-  $: {
-    recipientA.name = nameA;
-    recipientB.name = nameB;
-  }
+  let piaA = 1000;
+  let piaB = 1000;
 
   let buffer_: SharedArrayBuffer;
   // For each "final age" (A, B) pair, create one shared array to hold
@@ -46,25 +43,25 @@
     // Shared buffer:
     buffer_ = new SharedArrayBuffer(
       // 2 bytes per Uint16Array element, 4 per Unit32Array element.
-      tableWidth * tableWidth * (2 + 2 + 4)
+      TABLE_WIDTH * TABLE_WIDTH * (2 + 2 + 4)
     );
     let offset = 0;
     sharedAgeAUint16Array = new Uint16Array(
       buffer_,
       offset,
-      tableWidth * tableWidth
+      TABLE_WIDTH * TABLE_WIDTH
     );
-    offset += tableWidth * tableWidth * 2;
+    offset += TABLE_WIDTH * TABLE_WIDTH * 2;
     sharedAgeBUint16Array = new Uint16Array(
       buffer_,
       offset,
-      tableWidth * tableWidth
+      TABLE_WIDTH * TABLE_WIDTH
     );
-    offset += tableWidth * tableWidth * 2;
+    offset += TABLE_WIDTH * TABLE_WIDTH * 2;
     sharedStrategySumUint32Array = new Uint32Array(
       buffer_,
       offset,
-      tableWidth * tableWidth
+      TABLE_WIDTH * TABLE_WIDTH
     );
   }
 
@@ -87,11 +84,11 @@
     }
 
     bufferIndex(ageAMonths: number, ageBMonths: number): number {
-      const tableWidth = MAX_AGE - MIN_AGE + 1;
+      const TABLE_WIDTH = MAX_AGE - MIN_AGE + 1;
       const offsetAgeAMonths = ageAMonths - MIN_AGE;
       const offsetAgeBMonths = ageBMonths - MIN_AGE;
 
-      return offsetAgeAMonths * tableWidth + offsetAgeBMonths;
+      return offsetAgeAMonths * TABLE_WIDTH + offsetAgeBMonths;
     }
 
     initialize() {
@@ -152,15 +149,15 @@
 
   class ScenarioTable {
     public displayedStrategies_: DisplayedStrategy[][] = [];
-    public finalAIndex_ = 0;
-    public finalBIndex_ = 0;
+    public finalAIndex_ = 10;
+    public finalBIndex_ = 10;
 
     constructor() {
       // Displayed Strategy table:
       this.displayedStrategies_ = [];
-      for (let i = 0; i < tableWidth; i++) {
+      for (let i = 0; i < TABLE_WIDTH; i++) {
         let row: DisplayedStrategy[] = [];
-        for (let j = 0; j < tableWidth; j++) {
+        for (let j = 0; j < TABLE_WIDTH; j++) {
           row.push(
             new DisplayedStrategy(
               MonthDuration.initFromYearsMonths({
@@ -179,9 +176,10 @@
     }
 
     markDone() {
-      for (let i = 0; i < tableWidth; i++) {
-        for (let j = 0; j < tableWidth; j++) {
+      for (let i = 0; i < TABLE_WIDTH; i++) {
+        for (let j = 0; j < TABLE_WIDTH; j++) {
           this.displayedStrategies_[i][j].initialize();
+
           if (
             this.finalAIndex_ <= i &&
             !this.displayedStrategies_[i][j].strategyA70()
@@ -196,15 +194,15 @@
           }
         }
       }
+      this.finalAIndex_ = Math.min(this.finalAIndex_, TABLE_WIDTH - 1);
+      this.finalBIndex_ = Math.min(this.finalBIndex_, TABLE_WIDTH - 1);
     }
   }
 
-  let scenarioTable = new ScenarioTable();
-
   function SetupWorker() {
     let scenario = {
-      piaA: 1000,
-      piaB: 300,
+      piaA: piaA,
+      piaB: piaB,
       birthdateA: {
         year: 1960,
         month: 4,
@@ -220,14 +218,8 @@
       ageBValues: sharedAgeBUint16Array,
       strategySumValues: sharedStrategySumUint32Array,
     };
-    worker.addEventListener("message", WorkerEventListener);
+    //worker.addEventListener("message", WorkerEventListener);
     worker.postMessage(scenario);
-  }
-
-  function WorkerEventListener() {
-    done = true;
-    timeElapsed = (Date.now() - startTime) / 1000;
-    scenarioTable.markDone();
   }
 
   function leftborder(
@@ -252,10 +244,39 @@
     );
   }
 
-  onMount(() => {
+  let workerPromise: Promise<void>;
+  let runId_ = 0;
+  let worker: Worker = new StrategyWorker();
+  let scenarioTable = new ScenarioTable();
+
+  function startWork() {
     startTime = Date.now();
     initializeBuffer();
+    worker.terminate();
+    workerPromise = new Promise((resolve, reject) => {
+      worker = new StrategyWorker();
+      worker.addEventListener("message", (event) => {
+        done = true;
+        runId_++;
+        timeElapsed = (Date.now() - startTime) / 1000;
+        scenarioTable = new ScenarioTable();
+        scenarioTable.markDone();
+        resolve();
+      });
+    });
     SetupWorker();
+  }
+
+  $: {
+    recipientA.name = nameA;
+    recipientB.name = nameB;
+    recipientA.setPia(Money.from(piaA));
+    recipientB.setPia(Money.from(piaB));
+    startWork();
+  }
+
+  onMount(() => {
+    startWork();
   });
   onDestroy(() => {
     worker.terminate();
@@ -263,21 +284,31 @@
 </script>
 
 <main>
-  Recipient #1 Name: <input type="text" bind:value={nameA} />
+  Name: <input type="text" bind:value={nameA} />
   <br />
-  Recipient #2 Name: <input type="text" bind:value={nameB} />
+  <RecipientName r={recipientA}></RecipientName> PIA:
+  <input type="number" bind:value={piaA} />
+  <br />
+  Name: <input type="text" bind:value={nameB} />
+  <br />
+  <RecipientName r={recipientB}></RecipientName> PIA:
+  <input type="number" bind:value={piaB} />
   <p>
     This page shows the optimal Social Security claiming strategy for a couple
     with the following characteristics:
   </p>
   <ul>
     <li>
-      <RecipientName r={recipientA}></RecipientName> PIA = $1,000, born April 15,
-      1960
+      <RecipientName r={recipientA}></RecipientName> PIA = {recipientA
+        .pia()
+        .primaryInsuranceAmount()
+        .string()}, born April 15, 1960
     </li>
     <li>
-      <RecipientName r={recipientB}></RecipientName>: PIA = $300, born April 15,
-      1960
+      <RecipientName r={recipientB}></RecipientName>: PIA = {recipientB
+        .pia()
+        .primaryInsuranceAmount()
+        .string()}, born April 15, 1960
     </li>
   </ul>
   <p>
@@ -296,88 +327,91 @@
     seems worth pursuing.
   </p>
 
-  {#if done}
+  {#if runId_ > 0}
     <p>Time Elapsed: {timeElapsed}s</p>
+    {runId_}
 
     <br />
 
-    <table>
-      <tr>
-        <td colspan="2"></td>
-        <th colspan={scenarioTable.displayedStrategies_.length}
-          ><RecipientName r={recipientB}></RecipientName> survives until age:</th
-        ></tr
-      >
-      <tr>
-        <th
-          rowspan={scenarioTable.displayedStrategies_.length + 1}
-          class="nameASurviveCell"
-        >
-          <span
-            ><RecipientName r={recipientA}></RecipientName> survives until age:</span
-          ></th
-        >
-        <td>
-          <div class="cell cellAB">
-            <span class="cellA1"
-              ><RecipientName r={recipientA}></RecipientName> files</span
-            >
-            <span class="cellB1"
-              ><RecipientName r={recipientB}></RecipientName> files</span
-            >
-            <div class="divider"></div>
-          </div>
-        </td>
-        {#each { length: scenarioTable.finalBIndex_ + 1 } as _, colIndex}
-          {#if colIndex == scenarioTable.finalBIndex_}
-            <th>{colIndex + 62}+</th>
-          {:else}
-            <th>{colIndex + 62}</th>
-          {/if}
-        {/each}
-      </tr>
-
-      {#each { length: scenarioTable.finalAIndex_ + 1 } as _, rowIndex}
+    {#key runId_}
+      <table>
         <tr>
-          {#if rowIndex == scenarioTable.finalAIndex_}
-            <th>{rowIndex + 62}+</th>
-          {:else}
-            <th>{rowIndex + 62}</th>
-          {/if}
-          {#each { length: scenarioTable.finalBIndex_ + 1 } as cell, colIndex}
-            <td
-              class:leftborder={leftborder(
-                scenarioTable.displayedStrategies_,
-                rowIndex,
-                colIndex
-              )}
-              class:topborder={topborder(
-                scenarioTable.displayedStrategies_,
-                rowIndex,
-                colIndex
-              )}
-              style="background-color: {scenarioTable.displayedStrategies_[
-                rowIndex
-              ][colIndex].color()}"
-            >
-              <div class="cell">
-                <span class="cellA"
-                  >{scenarioTable.displayedStrategies_[rowIndex][
-                    colIndex
-                  ].textA()}</span
-                >
-                <span class="cellB"
-                  >{scenarioTable.displayedStrategies_[rowIndex][
-                    colIndex
-                  ].textB()}</span
-                >
-                <div class="divider"></div>
-              </div>
-            </td>
+          <td colspan="2"></td>
+          <th colspan={scenarioTable.displayedStrategies_.length}
+            ><RecipientName r={recipientB}></RecipientName> survives until age:</th
+          ></tr
+        >
+        <tr>
+          <th
+            rowspan={scenarioTable.displayedStrategies_.length + 1}
+            class="nameASurviveCell"
+          >
+            <span
+              ><RecipientName r={recipientA}></RecipientName> survives until age:</span
+            ></th
+          >
+          <td>
+            <div class="cell cellAB">
+              <span class="cellA1"
+                ><RecipientName r={recipientA}></RecipientName> files</span
+              >
+              <span class="cellB1"
+                ><RecipientName r={recipientB}></RecipientName> files</span
+              >
+              <div class="divider"></div>
+            </div>
+          </td>
+          {#each { length: scenarioTable.finalBIndex_ + 1 } as _, colIndex}
+            {#if colIndex == scenarioTable.finalBIndex_}
+              <th>{colIndex + 62}+</th>
+            {:else}
+              <th>{colIndex + 62}</th>
+            {/if}
           {/each}
         </tr>
-      {/each}
-    </table>
+
+        {#each { length: scenarioTable.finalAIndex_ + 1 } as _, rowIndex}
+          <tr>
+            {#if rowIndex == scenarioTable.finalAIndex_}
+              <th>{rowIndex + 62}+</th>
+            {:else}
+              <th>{rowIndex + 62}</th>
+            {/if}
+            {#each { length: scenarioTable.finalBIndex_ + 1 } as cell, colIndex}
+              <td
+                class:leftborder={leftborder(
+                  scenarioTable.displayedStrategies_,
+                  rowIndex,
+                  colIndex
+                )}
+                class:topborder={topborder(
+                  scenarioTable.displayedStrategies_,
+                  rowIndex,
+                  colIndex
+                )}
+                style="background-color: {scenarioTable.displayedStrategies_[
+                  rowIndex
+                ][colIndex].color()}"
+              >
+                <div class="cell">
+                  <span class="cellA"
+                    >{scenarioTable.displayedStrategies_[rowIndex][
+                      colIndex
+                    ].textA()}</span
+                  >
+                  <span class="cellB"
+                    >{scenarioTable.displayedStrategies_[rowIndex][
+                      colIndex
+                    ].textB()}</span
+                  >
+                  <div class="divider"></div>
+                </div>
+              </td>
+            {/each}
+          </tr>
+        {/each}
+      </table>
+    {/key}
   {/if}
 </main>
 

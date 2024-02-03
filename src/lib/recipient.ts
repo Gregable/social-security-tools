@@ -641,7 +641,6 @@ export class Recipient {
       return Money.fromCents(
         spousalCents - firstReductionCents - secondReductionCents
       ).floorToDollar();
-
     }
   }
 
