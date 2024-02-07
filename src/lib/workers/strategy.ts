@@ -222,16 +222,20 @@ function run(finalAgeAYears: number, finalAgeBYears: number) {
   }
 
   // Search for the best strategy by brute force:
-  for (
-    let stratA = MonthDuration.copyFrom(minStrategyAge);
-    stratA.lessThanOrEqual(maxStrategyAge);
-    stratA.increment()
-  ) {
-    for (
-      let stratB = MonthDuration.copyFrom(minStrategyAge);
-      stratB.lessThanOrEqual(maxStrategyAge);
-      stratB.increment()
-    ) {
+  let stratA = MonthDuration.copyFrom(minStrategyAge);
+  // If the birthdate is after the 2nd of the month, then we can't file until
+  // the next month, so increment the strategy by 1 month.
+  if (settings.recipientA.birthdate.layBirthDayOfMonth() > 2) {
+    stratA.increment();
+  }
+  for (; stratA.lessThanOrEqual(maxStrategyAge); stratA.increment()) {
+    let stratB = MonthDuration.copyFrom(minStrategyAge);
+    // If the birthdate is after the 2nd of the month, then we can't file until
+    // the next month, so increment the strategy by 1 month.
+    if (settings.recipientB.birthdate.layBirthDayOfMonth() > 2) {
+      stratB.increment();
+    }
+    for (; stratB.lessThanOrEqual(maxStrategyAge); stratB.increment()) {
       const sum = strategySumCents(finalDateB, stratA, stratB);
 
       if (sum > bestStrategy.strategySumCents) {

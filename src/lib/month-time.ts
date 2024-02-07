@@ -10,7 +10,7 @@ export class MonthDate {
   private monthsSinceEpoch_: number;
 
   /**
-   * Default constructor, returns a MonthDate of January, Year 0.s
+   * Default constructor, returns a MonthDate of January, Year 0.
    */
   constructor(monthsSinceEpoch: number = 0) {
     // Internally a MonthDate tracks time from January, Year 0 and counts
