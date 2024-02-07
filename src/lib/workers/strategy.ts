@@ -1,3 +1,9 @@
+// This worker calculates the optimal Social Security filing strategy for a
+// married couple at every survival age. It uses a brute force algorithm to
+// search for the best strategy, and then stores the results in shared memory.
+// Several optimizations are used to reduce the number of iterations, including
+// memoization and early stopping.
+
 import { Recipient } from "$lib/recipient";
 import { Money } from "$lib/money";
 import { Birthdate } from "$lib/birthday";
@@ -7,11 +13,11 @@ import { MonthDate, MonthDuration } from "$lib/month-time";
 const MIN_AGE = 62;
 const MAX_AGE = 110;
 
-const minStrategyAge = MonthDuration.initFromYearsMonths({
+const minStratAge = MonthDuration.initFromYearsMonths({
   years: 62,
   months: 0,
 });
-const maxStrategyAge = MonthDuration.initFromYearsMonths({
+const maxStratAge = MonthDuration.initFromYearsMonths({
   years: 70,
   months: 0,
 });
@@ -23,12 +29,11 @@ let sharedAgeBUint16Array: Uint16Array;
 // sharedStrategySumUint16Array holds the sum of the strategy, in cents.
 let sharedStrategySumUint32Array: Uint32Array;
 
-function bufferIndex(ageAMonths: number, ageBMonths: number): number {
+// Returns the index into the shared arrays for a given pair of ages.
+function bufferIndex(ageMonths: Array<number>): number {
   const tableWidth = MAX_AGE - MIN_AGE + 1;
-  const offsetAgeAMonths = ageAMonths - MIN_AGE;
-  const offsetAgeBMonths = ageBMonths - MIN_AGE;
-
-  return offsetAgeAMonths * tableWidth + offsetAgeBMonths;
+  const offsetAgeMonths = [ageMonths[0] - MIN_AGE, ageMonths[1] - MIN_AGE];
+  return offsetAgeMonths[0] * tableWidth + offsetAgeMonths[1];
 }
 
 // Sum the personal benefit for a given recipient given a filing date and a
@@ -89,54 +94,35 @@ function MemoizedSpousalBenefitCents(
 }
 
 let settings = {
-  recipientA: null,
-  recipientB: null,
+  recipients: [null, null],
   eligibleForSpousal: false,
 };
 
-let personalASums: Array<number> = [];
-let personalBSums: Array<number> = [];
+let personalSums: Array<Array<number>> = [[], []];
 
 function setup(config: any) {
   memoizedSpousalBenefit = new Map();
-  sharedAgeAUint16Array = config.ageAValues;
-  sharedAgeBUint16Array = config.ageBValues;
+  sharedAgeAUint16Array = config.ageValues[0];
+  sharedAgeBUint16Array = config.ageValues[1];
   sharedStrategySumUint32Array = config.strategySumValues;
 
   // TODO: Ensure that recipientA is always the higher earner.
-  settings.recipientA = new Recipient();
-  settings.recipientB = new Recipient();
-  settings.recipientA.setPia(Money.from(config.piaA));
-  settings.recipientB.setPia(Money.from(config.piaB));
+  for (let i = 0; i < 2; i++) {
+    settings.recipients[i] = new Recipient();
+    settings.recipients[i].setPia(Money.from(config.pias[i]));
+    settings.recipients[i].birthdate = new Birthdate(config.birthdates[i]);
 
-  settings.recipientA.birthdate = Birthdate.FromYMD(
-    config.birthdateA.year,
-    config.birthdateA.month,
-    config.birthdateA.day
-  );
-  settings.recipientB.birthdate = Birthdate.FromYMD(
-    config.birthdateB.year,
-    config.birthdateB.month,
-    config.birthdateB.day
-  );
+    // Pre-allocate the personalSums arrays. They are reused on each iteration,
+    // not reallocated.
+    personalSums[i] = [];
+    for (let j = minStratAge.asMonths(); j <= maxStratAge.asMonths(); j++) {
+      personalSums[i].push(0);
+    }
+  }
 
   // Precalculate spousal eligibility:
-  settings.eligibleForSpousal = settings.recipientB.eligibleForSpousalBenefit(
-    settings.recipientA
-  );
-
-  // Pre-allocate the personal*Sums arrays. They are reused on each iteration,
-  // not reallocated.
-  personalASums = [];
-  personalBSums = [];
-  for (
-    let i = MonthDuration.copyFrom(minStrategyAge);
-    i.lessThanOrEqual(maxStrategyAge);
-    i.increment()
-  ) {
-    personalASums.push(0);
-    personalBSums.push(0);
-  }
+  settings.eligibleForSpousal =
+    settings.recipients[1].eligibleForSpousalBenefit(settings.recipients[0]);
 }
 
 // TODO: Add survivor benefit.
@@ -145,29 +131,24 @@ function setup(config: any) {
 // Sums the personal and spousal benefits for a given strategy and final age.
 function strategySumCents(
   finalDateB: MonthDate,
-  stratA: MonthDuration,
-  stratB: MonthDuration
+  strats: Array<MonthDuration>
 ): number {
-  const stratADate: MonthDate =
-    settings.recipientA.birthdate.dateAtLayAge(stratA);
-  const personalASum =
-    personalASums[stratA.asMonths() - minStrategyAge.asMonths()];
-  const stratBDate = settings.recipientB.birthdate.dateAtLayAge(stratB);
-  const personalBSum =
-    personalBSums[stratB.asMonths() - minStrategyAge.asMonths()];
-
-  let strategySumCents = personalASum + personalBSum;
+  let strategySumCents = 0;
+  let stratDates: Array<MonthDate> = [null, null];
+  for (let i = 0; i < 2; i++) {
+    stratDates[i] = settings.recipients[i].birthdate.dateAtLayAge(strats[i]);
+    strategySumCents +=
+      personalSums[i][strats[i].asMonths() - minStratAge.asMonths()];
+  }
 
   if (settings.eligibleForSpousal) {
-    const spousalStartDate = stratBDate.greaterThan(stratADate)
-      ? stratBDate
-      : stratADate;
+    const spousalStartDate = MonthDate.max(stratDates[0], stratDates[1]);
     const numMonths =
       finalDateB.monthsSinceEpoch() - spousalStartDate.monthsSinceEpoch() + 1;
     if (numMonths > 0) {
       const spousalBenefitCents = MemoizedSpousalBenefitCents(
-        settings.recipientB,
-        settings.recipientA,
+        settings.recipients[1],
+        settings.recipients[0],
         spousalStartDate
       );
 
@@ -177,98 +158,91 @@ function strategySumCents(
   return strategySumCents;
 }
 
-function run(finalAgeAYears: number, finalAgeBYears: number) {
-  const finalAgeA = MonthDuration.initFromYearsMonths({
-    years: finalAgeAYears,
-    months: 11,
-  });
-  const finalAgeB = MonthDuration.initFromYearsMonths({
-    years: finalAgeBYears,
-    months: 11,
-  });
-  const finalDateA: MonthDate =
-    settings.recipientA.birthdate.dateAtLayAge(finalAgeA);
-  const finalDateB: MonthDate =
-    settings.recipientB.birthdate.dateAtLayAge(finalAgeB);
-
-  const exhaustiveSearch = true;
-
+function run(finalAgeYears: [number, number]) {
   let bestStrategy = {
     strategySumCents: 0,
-    ageA: MonthDuration.copyFrom(minStrategyAge),
-    ageB: MonthDuration.copyFrom(minStrategyAge),
+    ages: [
+      MonthDuration.copyFrom(minStratAge),
+      MonthDuration.copyFrom(minStratAge),
+    ],
   };
-  // Pre-calculate the personal benefits once for each strategy:
-  // Personal benefits for person A:
+
+  const birthdates: Array<Birthdate> = settings.recipients.map(
+    (r) => r.birthdate
+  );
+
+  let finalDates: Array<MonthDate> = [null, null];
+  for (let i = 0; i < 2; i++) {
+    const finalDate = birthdates[i].dateAtLayAge(
+      MonthDuration.initFromYearsMonths({
+        years: finalAgeYears[i],
+        months: 11,
+      })
+    );
+    finalDates[i] = finalDate;
+    // Pre-calculate the personal benefits once for each strategy:
+    for (
+      let strat = MonthDuration.copyFrom(minStratAge);
+      strat.lessThanOrEqual(maxStratAge);
+      strat.increment()
+    ) {
+      const stratDate = birthdates[i].dateAtLayAge(strat);
+      personalSums[i][strat.asMonths() - minStratAge.asMonths()] =
+        PersonalBenefitStrategySum(
+          settings.recipients[i],
+          stratDate,
+          finalDate
+        );
+    }
+  }
+
+  // Main Loop for a single final age pair:
+  // Search for the best strategy by brute force.
   for (
-    let stratA = MonthDuration.copyFrom(minStrategyAge);
-    stratA.lessThanOrEqual(maxStrategyAge);
+    let stratA = birthdates[0].earliestFilingMonth();
+    stratA.lessThanOrEqual(maxStratAge);
     stratA.increment()
   ) {
-    const stratADate = settings.recipientA.birthdate.dateAtLayAge(stratA);
-    personalASums[stratA.asMonths() - minStrategyAge.asMonths()] =
-      PersonalBenefitStrategySum(settings.recipientA, stratADate, finalDateA);
-  }
-
-  // Personal benefits for person B:
-  for (
-    let stratB = MonthDuration.copyFrom(minStrategyAge);
-    stratB.lessThanOrEqual(maxStrategyAge);
-    stratB.increment()
-  ) {
-    const stratBDate = settings.recipientB.birthdate.dateAtLayAge(stratB);
-    personalBSums[stratB.asMonths() - minStrategyAge.asMonths()] =
-      PersonalBenefitStrategySum(settings.recipientB, stratBDate, finalDateB);
-  }
-
-  // Search for the best strategy by brute force:
-  let stratA = MonthDuration.copyFrom(minStrategyAge);
-  // If the birthdate is after the 2nd of the month, then we can't file until
-  // the next month, so increment the strategy by 1 month.
-  if (settings.recipientA.birthdate.layBirthDayOfMonth() > 2) {
-    stratA.increment();
-  }
-  for (; stratA.lessThanOrEqual(maxStrategyAge); stratA.increment()) {
-    let stratB = MonthDuration.copyFrom(minStrategyAge);
-    // If the birthdate is after the 2nd of the month, then we can't file until
-    // the next month, so increment the strategy by 1 month.
-    if (settings.recipientB.birthdate.layBirthDayOfMonth() > 2) {
-      stratB.increment();
-    }
-    for (; stratB.lessThanOrEqual(maxStrategyAge); stratB.increment()) {
-      const sum = strategySumCents(finalDateB, stratA, stratB);
+    for (
+      let stratB = birthdates[1].earliestFilingMonth();
+      stratB.lessThanOrEqual(maxStratAge);
+      stratB.increment()
+    ) {
+      const sum = strategySumCents(finalDates[1], [stratA, stratB]);
 
       if (sum > bestStrategy.strategySumCents) {
         bestStrategy = {
           strategySumCents: sum,
-          ageA: MonthDuration.copyFrom(stratA),
-          ageB: MonthDuration.copyFrom(stratB),
+          ages: [
+            MonthDuration.copyFrom(stratA),
+            MonthDuration.copyFrom(stratB),
+          ],
         };
       }
     }
   }
 
-  const idx = bufferIndex(finalAgeAYears, finalAgeBYears);
-  sharedAgeAUint16Array[idx] = bestStrategy.ageA.asMonths();
-  sharedAgeBUint16Array[idx] = bestStrategy.ageB.asMonths();
+  const idx = bufferIndex(finalAgeYears);
+  sharedAgeAUint16Array[idx] = bestStrategy.ages[0].asMonths();
+  sharedAgeBUint16Array[idx] = bestStrategy.ages[1].asMonths();
   sharedStrategySumUint32Array[idx] = bestStrategy.strategySumCents;
 
   // Optimization: If the best strategy is to file at 70, then we can assume
   // all later ages also have a best strategy of 70.
-  if (bestStrategy.ageA.asMonths() == 70 * 12) {
-    for (let i = finalAgeAYears + 1; i <= MAX_AGE; i++) {
-      const idx = bufferIndex(i, finalAgeBYears);
-      sharedAgeAUint16Array[idx] = bestStrategy.ageA.asMonths();
-      sharedAgeBUint16Array[idx] = bestStrategy.ageB.asMonths();
+  if (bestStrategy.ages[0].asMonths() == 70 * 12) {
+    for (let i = finalAgeYears[0] + 1; i <= MAX_AGE; i++) {
+      const idx = bufferIndex([i, finalAgeYears[1]]);
+      sharedAgeAUint16Array[idx] = bestStrategy.ages[0].asMonths();
+      sharedAgeBUint16Array[idx] = bestStrategy.ages[1].asMonths();
       sharedStrategySumUint32Array[idx] = bestStrategy.strategySumCents;
     }
   }
 
-  if (bestStrategy.ageB.asMonths() == 70 * 12) {
-    for (let i = finalAgeBYears + 1; i <= MAX_AGE; i++) {
-      const idx = bufferIndex(finalAgeAYears, i);
-      sharedAgeAUint16Array[idx] = bestStrategy.ageA.asMonths();
-      sharedAgeBUint16Array[idx] = bestStrategy.ageB.asMonths();
+  if (bestStrategy.ages[1].asMonths() == 70 * 12) {
+    for (let i = finalAgeYears[1] + 1; i <= MAX_AGE; i++) {
+      const idx = bufferIndex([finalAgeYears[0], i]);
+      sharedAgeAUint16Array[idx] = bestStrategy.ages[0].asMonths();
+      sharedAgeBUint16Array[idx] = bestStrategy.ages[1].asMonths();
       sharedStrategySumUint32Array[idx] = bestStrategy.strategySumCents;
     }
   }
@@ -278,10 +252,10 @@ function eventHandler(event: any) {
   setup(event.data);
   for (let a = MIN_AGE; a <= MAX_AGE; a++) {
     for (let b = MIN_AGE; b <= MAX_AGE; b++) {
-      const idx = bufferIndex(a, b);
+      const idx = bufferIndex([a, b]);
       // Skip if we've already calculated this value:
       if (sharedAgeAUint16Array[idx] == 0) {
-        run(a, b);
+        run([a, b]);
       }
     }
   }

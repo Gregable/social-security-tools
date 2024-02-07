@@ -139,6 +139,13 @@ export class MonthDate {
   greaterThanOrEqual(other: MonthDate): boolean {
     return this.monthsSinceEpoch() >= other.monthsSinceEpoch();
   }
+
+  /**
+   * Returns the maximum of two MonthDates.
+   */
+  static max(a: MonthDate, b: MonthDate): MonthDate {
+    return a.greaterThanOrEqual(b) ? a : b;
+  }
 }
 
 /**

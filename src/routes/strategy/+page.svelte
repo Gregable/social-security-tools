@@ -16,17 +16,15 @@
   let timeElapsed: number = 0;
   let done = false;
 
-  let recipientA = new Recipient();
-  let recipientB = new Recipient();
-  recipientA.markFirst();
-  recipientB.markSecond();
-  recipientA.birthdate = Birthdate.FromYMD(1960, 3, 15);
-  recipientB.birthdate = Birthdate.FromYMD(1960, 3, 15);
+  let recipients = [new Recipient(), new Recipient()];
+  recipients[0].markFirst();
+  recipients[1].markSecond();
+  recipients[0].birthdate = Birthdate.FromYMD(1960, 3, 15);
+  recipients[1].birthdate = Birthdate.FromYMD(1960, 3, 15);
+  recipients[0].name = "Alex";
+  recipients[1].name = "Chris";
 
-  let nameA = "Alex";
-  let nameB = "Chris";
-  let piaA = 1000;
-  let piaB = 1000;
+  let pia = [1000, 300];
 
   let buffer_: SharedArrayBuffer;
   // For each "final age" (A, B) pair, create one shared array to hold
@@ -72,27 +70,23 @@
     private static minYearSum_ = MIN_AGE * 2;
     private static maxYearSum_ = 70 * 2 - DisplayedStrategy.minYearSum_;
 
-    finalAgeA_: MonthDuration;
-    finalAgeB_: MonthDuration;
     sharedIdx_: number;
 
-    strategyA_: MonthDuration;
-    strategyB_: MonthDuration;
+    strategy_: Array<MonthDuration> = [null, null];
     strategySum_: Money;
     initialized_: boolean = false;
 
     constructor(finalAgeA: MonthDuration, finalAgeB: MonthDuration) {
-      this.finalAgeA_ = finalAgeA;
-      this.finalAgeB_ = finalAgeB;
-      this.sharedIdx_ = this.bufferIndex(finalAgeA.years(), finalAgeB.years());
+      this.sharedIdx_ = this.bufferIndex([
+        finalAgeA.years(),
+        finalAgeB.years(),
+      ]);
     }
 
-    bufferIndex(ageAMonths: number, ageBMonths: number): number {
-      const TABLE_WIDTH = MAX_AGE - MIN_AGE + 1;
-      const offsetAgeAMonths = ageAMonths - MIN_AGE;
-      const offsetAgeBMonths = ageBMonths - MIN_AGE;
-
-      return offsetAgeAMonths * TABLE_WIDTH + offsetAgeBMonths;
+    bufferIndex(ageMonths: Array<number>): number {
+      const tableWidth = MAX_AGE - MIN_AGE + 1;
+      const offsetAgeMonths = [ageMonths[0] - MIN_AGE, ageMonths[1] - MIN_AGE];
+      return offsetAgeMonths[0] * tableWidth + offsetAgeMonths[1];
     }
 
     initialize() {
@@ -100,10 +94,13 @@
       if (this.initialized_) {
         return;
       }
-      const monthsA = sharedAgeAUint16Array[this.sharedIdx_];
-      const monthsB = sharedAgeBUint16Array[this.sharedIdx_];
-      this.strategyA_ = new MonthDuration(monthsA);
-      this.strategyB_ = new MonthDuration(monthsB);
+
+      this.strategy_[0] = new MonthDuration(
+        sharedAgeAUint16Array[this.sharedIdx_]
+      );
+      this.strategy_[1] = new MonthDuration(
+        sharedAgeBUint16Array[this.sharedIdx_]
+      );
       this.strategySum_ = Money.fromCents(
         sharedStrategySumUint32Array[this.sharedIdx_]
       );
@@ -111,13 +108,19 @@
     }
 
     text(long = false): string {
-      if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
+      if (!this.initialized_) {
         return "";
       }
-      return this.textA(long) + "\n" + this.textB(long);
+      return this.recipientText(0, long) + "\n" + this.recipientText(1, long);
     }
 
-    static strategyText(strategy: MonthDuration, long: boolean): string {
+    /**
+     * Returns the text for both recipients, separated by a newline.
+     * @param idx The index of the recipient.
+     * @param long If true, return the long form of the text.
+     */
+    strategyText(idx: number, long: boolean): string {
+      const strategy = this.strategy_[idx];
       if (strategy.years() == 0) {
         return "";
       }
@@ -133,21 +136,22 @@
       return strategy.years().toString();
     }
 
-    textA(long = false): string {
-      return DisplayedStrategy.strategyText(this.strategyA_, long);
-    }
-
-    textB(long = false): string {
-      return DisplayedStrategy.strategyText(this.strategyB_, long);
+    /**
+     * Returns the text for the recipient at the given index.
+     * @param idx The index of the recipient.
+     * @param long If true, return the long form of the text.
+     */
+    recipientText(idx: number, long = false): string {
+      return this.strategyText(idx, long);
     }
 
     color(): string {
-      if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
+      if (!this.initialized_) {
         return "rgb(255, 255, 255)";
       }
       const yearsSum =
-        this.strategyA_.years() +
-        this.strategyB_.years() -
+        this.strategy_[0].years() +
+        this.strategy_[1].years() -
         DisplayedStrategy.minYearSum_;
       const colorValue = Math.round(
         (yearsSum / DisplayedStrategy.maxYearSum_) * 200
@@ -155,33 +159,20 @@
       return `rgb(0, ${255 - colorValue}, ${colorValue + 55})`;
     }
 
-    strategyA70(): boolean {
-      return this.strategyA_.years() == 70;
-    }
-
-    strategyB70(): boolean {
-      return this.strategyB_.years() == 70;
+    /**
+     * Returns true if the strategy for the given recipient is to file at 70.
+     * @param idx
+     */
+    strategy70(idx: number): boolean {
+      return this.strategy_[idx].years() == 70;
     }
 
     click() {
       selectedStrategy = this;
     }
 
-    strategyADate(): MonthDate {
-      return recipientA.birthdate.dateAtLayAge(this.strategyA_);
-    }
-
-    strategyBDate(): MonthDate {
-      return recipientB.birthdate.dateAtLayAge(this.strategyB_);
-    }
-
-    strategyADateString(): string {
-      const date = this.strategyADate();
-      return date.monthName() + " " + date.year();
-    }
-
-    strategyBDateString(): string {
-      const date = this.strategyBDate();
+    strategyDateString(idx: number): string {
+      const date = recipients[idx].birthdate.dateAtLayAge(this.strategy_[idx]);
       return date.monthName() + " " + date.year();
     }
 
@@ -194,6 +185,9 @@
 
   class ScenarioTable {
     public displayedStrategies_: DisplayedStrategy[][] = [];
+    // Track the index of the last row and column that we want to display. Once
+    // the strategies stop changing in that direction, we can stop displaying
+    // them.
     public finalAIndex_ = 10;
     public finalBIndex_ = 10;
 
@@ -224,16 +218,19 @@
       for (let i = 0; i < TABLE_WIDTH; i++) {
         for (let j = 0; j < TABLE_WIDTH; j++) {
           this.displayedStrategies_[i][j].initialize();
-
+        }
+      }
+      for (let i = 0; i < TABLE_WIDTH; i++) {
+        for (let j = 0; j < TABLE_WIDTH; j++) {
           if (
             this.finalAIndex_ <= i &&
-            !this.displayedStrategies_[i][j].strategyA70()
+            !this.displayedStrategies_[i][j].strategy70(0)
           ) {
             this.finalAIndex_ = i + 1;
           }
           if (
             this.finalBIndex_ <= j &&
-            !this.displayedStrategies_[i][j].strategyB70()
+            !this.displayedStrategies_[i][j].strategy70(1)
           ) {
             this.finalBIndex_ = j + 1;
           }
@@ -246,24 +243,14 @@
 
   function SetupWorker() {
     let scenario = {
-      piaA: piaA,
-      piaB: piaB,
-      birthdateA: {
-        year: 1960,
-        month: 4,
-        day: 15,
-      },
-      birthdateB: {
-        year: 1960,
-        month: 4,
-        day: 15,
-      },
-      command: "setup",
-      ageAValues: sharedAgeAUint16Array,
-      ageBValues: sharedAgeBUint16Array,
+      pias: pia,
+      birthdates: [
+        recipients[0].birthdate.layBirthdate(),
+        recipients[1].birthdate.layBirthdate(),
+      ],
+      ageValues: [sharedAgeAUint16Array, sharedAgeBUint16Array],
       strategySumValues: sharedStrategySumUint32Array,
     };
-    //worker.addEventListener("message", WorkerEventListener);
     worker.postMessage(scenario);
   }
 
@@ -313,15 +300,10 @@
   }
 
   $: {
-    recipientA.name = nameA;
-    recipientB.name = nameB;
-    recipientA.setPia(Money.from(piaA));
-    recipientB.setPia(Money.from(piaB));
+    for (let i = 0; i < recipients.length; i++) {
+      recipients[i].setPia(Money.from(pia[i]));
+    }
     startWork();
-  }
-
-  $: {
-    console.log(selectedStrategy);
   }
 
   onMount(() => {
@@ -333,38 +315,38 @@
 </script>
 
 <main>
-  Name: <input type="text" bind:value={nameA} />
+  Name: <input type="text" bind:value={recipients[0].name} />
   <br />
-  <RecipientName r={recipientA}></RecipientName> PIA:
-  <input type="number" bind:value={piaA} />
+  <RecipientName r={recipients[0]}></RecipientName> PIA:
+  <input type="number" bind:value={pia[0]} />
   <br />
-  Name: <input type="text" bind:value={nameB} />
+  Name: <input type="text" bind:value={recipients[1].name} />
   <br />
-  <RecipientName r={recipientB}></RecipientName> PIA:
-  <input type="number" bind:value={piaB} />
+  <RecipientName r={recipients[1]}></RecipientName> PIA:
+  <input type="number" bind:value={pia[1]} />
   <p>
     This page shows the optimal Social Security claiming strategy for a couple
     with the following characteristics:
   </p>
   <ul>
     <li>
-      <RecipientName r={recipientA}></RecipientName> PIA = {recipientA
+      <RecipientName r={recipients[0]}></RecipientName> PIA = {recipients[0]
         .pia()
         .primaryInsuranceAmount()
-        .string()}, born {recipientA.birthdate.layBirthdateString()}
+        .string()}, born {recipients[0].birthdate.layBirthdateString()}
     </li>
     <li>
-      <RecipientName r={recipientB}></RecipientName>: PIA = {recipientB
+      <RecipientName r={recipients[1]}></RecipientName>: PIA = {recipients[1]
         .pia()
         .primaryInsuranceAmount()
-        .string()}, born {recipientA.birthdate.layBirthdateString()}
+        .string()}, born {recipients[0].birthdate.layBirthdateString()}
     </li>
   </ul>
   <p>
     For each possible pair of death ages (A, B), the optimal filing strategy is
-    shown in the corresponding cell. The bottom left number is {nameA}'s
-    recommended filing age, and the top right number is <RecipientName
-      r={recipientB}
+    shown in the corresponding cell. The bottom left number is {recipients[0]
+      .name}'s recommended filing age, and the top right number is <RecipientName
+      r={recipients[1]}
       apos
     ></RecipientName> recommended filing age, in years.
   </p>
@@ -383,7 +365,7 @@
         <tr>
           <td colspan="2"></td>
           <th colspan={scenarioTable.displayedStrategies_.length}
-            ><RecipientName r={recipientB}></RecipientName> survives until age:</th
+            ><RecipientName r={recipients[1]}></RecipientName> survives until age:</th
           ></tr
         >
 
@@ -394,7 +376,7 @@
             class="nameASurviveCell"
           >
             <span
-              ><RecipientName r={recipientA}></RecipientName> survives until age:</span
+              ><RecipientName r={recipients[0]}></RecipientName> survives until age:</span
             ></th
           >
 
@@ -402,10 +384,10 @@
           <td>
             <div class="cell cellAB">
               <span class="cellA1"
-                ><RecipientName r={recipientA}></RecipientName> files</span
+                ><RecipientName r={recipients[0]}></RecipientName> files</span
               >
               <span class="cellB1"
-                ><RecipientName r={recipientB}></RecipientName> files</span
+                ><RecipientName r={recipients[1]}></RecipientName> files</span
               >
               <div class="divider"></div>
             </div>
@@ -457,12 +439,12 @@
                   <span class="cellA"
                     >{scenarioTable.displayedStrategies_[rowIndex][
                       colIndex
-                    ].textA()}</span
+                    ].recipientText(0)}</span
                   >
                   <span class="cellB"
                     >{scenarioTable.displayedStrategies_[rowIndex][
                       colIndex
-                    ].textB()}</span
+                    ].recipientText(1)}</span
                   >
                   <div class="divider"></div>
                 </div>
@@ -478,16 +460,16 @@
 
     <p>Selected Strategy:</p>
     <p>
-      <RecipientName r={recipientA}></RecipientName> files at age {selectedStrategy.strategyA_.years()}
-      years, {selectedStrategy.strategyA_.modMonths()} months:
+      <RecipientName r={recipients[0]}></RecipientName> files at age {selectedStrategy.strategy_[0].years()}
+      years, {selectedStrategy.strategy_[0].modMonths()} months:
 
-      {selectedStrategy.strategyADateString()}
+      {selectedStrategy.strategyDateString(0)}
     </p>
     <p>
-      <RecipientName r={recipientB}></RecipientName> files at age {selectedStrategy.strategyB_.years()}
-      years, {selectedStrategy.strategyB_.modMonths()} months
+      <RecipientName r={recipients[1]}></RecipientName> files at age {selectedStrategy.strategy_[1].years()}
+      years, {selectedStrategy.strategy_[1].modMonths()} months
 
-      {selectedStrategy.strategyBDateString()}
+      {selectedStrategy.strategyDateString(1)}
     </p>
 
     <p>Sum of benefits: {selectedStrategy.strategySum().wholeDollars()}</p>

@@ -46,7 +46,7 @@ export class Birthdate {
    * commonly celebrated. It is the date at the moment the person was born.
    * It is very important that this is provided as a UTC date.
    */
-  private constructor(layBirthdate: Date = new Date(Date.UTC(1980, 0, 1))) {
+  constructor(layBirthdate: Date = new Date(Date.UTC(1980, 0, 1))) {
     this.layBirthdate_ = layBirthdate;
     this.layBirthMonthDate_ = MonthDate.initFromYearsMonths({
       years: this.layBirthdate_.getUTCFullYear(),
@@ -70,12 +70,12 @@ export class Birthdate {
   static FromYMD(year: number, month: number, day: number) {
     return new Birthdate(new Date(Date.UTC(year, month, day)));
   }
+
   /**
-   * Returns true iff the lay birthdate lies on the first of the month,
-   * for example Jan 1.
+   * Returns the lay birthdate.
    */
-  isFirstOfMonth(): boolean {
-    return this.layBirthdate_.getUTCDate() == 1;
+  layBirthdate(): Date {
+    return this.layBirthdate_;
   }
 
   /**
@@ -91,6 +91,14 @@ export class Birthdate {
       year: "numeric",
       day: "numeric",
     });
+  }
+
+  /**
+   * Returns true iff the lay birthdate lies on the first of the month,
+   * for example Jan 1.
+   */
+  isFirstOfMonth(): boolean {
+    return this.layBirthdate_.getUTCDate() == 1;
   }
 
   /**
@@ -170,6 +178,20 @@ export class Birthdate {
     return this.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: yearsOld, months: 0 })
     ).year();
+  }
+
+  /**
+   * Returns the earliest filing month for the given birthdate. Does not take
+   * into account PIA.
+   *
+   * @returns the earliest filing month for the given birthdate.
+   */
+  earliestFilingMonth(): MonthDuration {
+    let month = MonthDuration.initFromYearsMonths({ years: 62, months: 0 });
+    if (this.layBirthDayOfMonth() > 2) {
+      month.increment();
+    }
+    return month;
   }
 
   /**
