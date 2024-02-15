@@ -130,21 +130,34 @@ function setup(config: any) {
 
 // Sums the personal and spousal benefits for a given strategy and final age.
 function strategySumCents(
-  finalDateB: MonthDate,
-  strats: Array<MonthDuration>
+  finalDates: [MonthDate, MonthDate],
+  strats: [MonthDuration, MonthDuration]
 ): number {
   let strategySumCents = 0;
-  let stratDates: Array<MonthDate> = [null, null];
+  let stratDates: [MonthDate, MonthDate] = [null, null];
   for (let i = 0; i < 2; i++) {
     stratDates[i] = settings.recipients[i].birthdate.dateAtLayAge(strats[i]);
     strategySumCents +=
       personalSums[i][strats[i].asMonths() - minStratAge.asMonths()];
   }
 
+  // Start the month after the final date of the higher earner or the start of
+  // their strategy, whichever is later:
+  const survivorStartDate = MonthDate.max(
+    finalDates[1].addDuration(new MonthDuration(1)),
+    stratDates[0]
+  );
+
+  // Add in spousal benefits, if eligible:
   if (settings.eligibleForSpousal) {
     const spousalStartDate = MonthDate.max(stratDates[0], stratDates[1]);
-    const numMonths =
-      finalDateB.monthsSinceEpoch() - spousalStartDate.monthsSinceEpoch() + 1;
+    const spousalEndDate = MonthDate.min(
+      survivorStartDate,
+      // Include the month of the final date:
+      finalDates[1].addDuration(new MonthDuration(1))
+    );
+    const numMonths = spousalEndDate.monthsSinceEpoch();
+    spousalStartDate.monthsSinceEpoch();
     if (numMonths > 0) {
       const spousalBenefitCents = MemoizedSpousalBenefitCents(
         settings.recipients[1],
@@ -155,6 +168,17 @@ function strategySumCents(
       strategySumCents += spousalBenefitCents * numMonths;
     }
   }
+
+  // Add in survivor benefits, if eligible:
+  if (finalDates[0].greaterThan(survivorStartDate)) {
+    // https://www.ssa.gov/benefits/survivors/survivorchartred.html shows the
+    // adjustment if filing before FRA.
+    const numMonths = survivorStartDate.subtractDate(finalDates[1]).asMonths();
+    if (numMonths > 0) {
+      //TODO: We've stopped adding spousal benefits above if the spouse is dead, but we are still adding personal benefits. We need to stop adding personal benefits and start adding spousal benefits at this time. One way to do this is to adjust personalSums to take into account the date of death of the spouse. I'm too tired to implement this now without making a mistake.
+    }
+  }
+
   return strategySumCents;
 }
 
@@ -173,12 +197,15 @@ function run(finalAgeYears: [number, number]) {
 
   let finalDates: Array<MonthDate> = [null, null];
   for (let i = 0; i < 2; i++) {
-    const finalDate = birthdates[i].dateAtLayAge(
+    let finalDate = birthdates[i].dateAtLayAge(
       MonthDuration.initFromYearsMonths({
         years: finalAgeYears[i],
-        months: 11,
+        months: 11 - settings.recipients[i].birthdate.layBirthMonth(),
       })
     );
+    // Set the final date to the last month of the year the person turns the
+    // given age:
+    finalDate.addDuration(new MonthDuration(11 - finalDate.monthIndex()));
     finalDates[i] = finalDate;
     // Pre-calculate the personal benefits once for each strategy:
     for (
@@ -208,7 +235,7 @@ function run(finalAgeYears: [number, number]) {
       stratB.lessThanOrEqual(maxStratAge);
       stratB.increment()
     ) {
-      const sum = strategySumCents(finalDates[1], [stratA, stratB]);
+      const sum = strategySumCents(finalDates, [stratA, stratB]);
 
       if (sum > bestStrategy.strategySumCents) {
         bestStrategy = {
@@ -228,7 +255,7 @@ function run(finalAgeYears: [number, number]) {
   sharedStrategySumUint32Array[idx] = bestStrategy.strategySumCents;
 
   // Optimization: If the best strategy is to file at 70, then we can assume
-  // all later ages also have a best strategy of 70.
+  // all later ages also have a best strategy of 70 rather than calculating it.
   if (bestStrategy.ages[0].asMonths() == 70 * 12) {
     for (let i = finalAgeYears[0] + 1; i <= MAX_AGE; i++) {
       const idx = bufferIndex([i, finalAgeYears[1]]);
@@ -250,6 +277,7 @@ function run(finalAgeYears: [number, number]) {
 
 function eventHandler(event: any) {
   setup(event.data);
+  // Loop over all possible final ages and calculate the best strategy for each.
   for (let a = MIN_AGE; a <= MAX_AGE; a++) {
     for (let b = MIN_AGE; b <= MAX_AGE; b++) {
       const idx = bufferIndex([a, b]);

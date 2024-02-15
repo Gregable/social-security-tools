@@ -1,12 +1,13 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
   import { Birthdate } from "$lib/birthday";
-  import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { MonthDuration } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
   import RecipientName from "$lib/components/RecipientName.svelte";
-  import StrategyWorker from "$lib/workers/strategy?worker";
+  import StrategyWorker from "$lib/workers/strategy-worker?worker";
   import { onDestroy, onMount } from "svelte";
+  import { StrategySequence } from "$lib/strategy";
 
   const MAX_AGE = 110;
   const MIN_AGE = 62;
@@ -24,7 +25,7 @@
   recipients[0].name = "Alex";
   recipients[1].name = "Chris";
 
-  let pia = [1000, 300];
+  let pia: [number, number] = [1000, 300];
 
   let buffer_: SharedArrayBuffer;
   // For each "final age" (A, B) pair, create one shared array to hold
@@ -72,14 +73,23 @@
 
     sharedIdx_: number;
 
-    strategy_: Array<MonthDuration> = [null, null];
+    finalAge_: [MonthDuration, MonthDuration] = [null, null];
+    strategy_: [MonthDuration, MonthDuration] = [null, null];
     strategySum_: Money;
     initialized_: boolean = false;
 
-    constructor(finalAgeA: MonthDuration, finalAgeB: MonthDuration) {
+    constructor(finalAgeYears: [number, number]) {
+      for (let i = 0; i < 2; i++) {
+        // Assume the recipient lives the entire year of the birthdate, so
+        // until December.
+        this.finalAge_[i] = MonthDuration.initFromYearsMonths({
+          years: finalAgeYears[i],
+          months: 11 - recipients[i].birthdate.layBirthMonth(),
+        });
+      }
       this.sharedIdx_ = this.bufferIndex([
-        finalAgeA.years(),
-        finalAgeB.years(),
+        this.finalAge_[0].years(),
+        this.finalAge_[1].years(),
       ]);
     }
 
@@ -169,6 +179,15 @@
 
     click() {
       selectedStrategy = this;
+      strategySequence = StrategySequence({
+        pias: pia,
+        birthdates: [
+          recipients[0].birthdate.layBirthdate(),
+          recipients[1].birthdate.layBirthdate(),
+        ],
+        strategy: [this.strategy_[0].asMonths(), this.strategy_[1].asMonths()],
+        finalAge: [this.finalAge_[0].asMonths(), this.finalAge_[1].asMonths()],
+      });
     }
 
     strategyDateString(idx: number): string {
@@ -182,6 +201,7 @@
   }
 
   let selectedStrategy: DisplayedStrategy = null;
+  let strategySequence = [];
 
   class ScenarioTable {
     public displayedStrategies_: DisplayedStrategy[][] = [];
@@ -197,18 +217,7 @@
       for (let i = 0; i < TABLE_WIDTH; i++) {
         let row: DisplayedStrategy[] = [];
         for (let j = 0; j < TABLE_WIDTH; j++) {
-          row.push(
-            new DisplayedStrategy(
-              MonthDuration.initFromYearsMonths({
-                years: i + MIN_AGE,
-                months: 0,
-              }),
-              MonthDuration.initFromYearsMonths({
-                years: j + MIN_AGE,
-                months: 0,
-              })
-            )
-          );
+          row.push(new DisplayedStrategy([i + MIN_AGE, j + MIN_AGE]));
         }
         this.displayedStrategies_.push(row);
       }
@@ -282,6 +291,8 @@
   let scenarioTable = new ScenarioTable();
 
   function startWork() {
+    selectedStrategy = null;
+    strategySequence = [];
     startTime = Date.now();
     initializeBuffer();
     worker.terminate();
@@ -358,9 +369,13 @@
     seems worth pursuing.
   </p>
 
+  {#if selectedStrategy != null}
+    {selectedStrategy.finalAge_[1].years()}
+  {/if}
+
   {#if runId_ > 0}
     {#key runId_}
-      <table>
+      <table class:selectedStrategy={selectedStrategy != null}>
         <!-- 2nd Recipient "survives until" text -->
         <tr>
           <td colspan="2"></td>
@@ -395,25 +410,39 @@
 
           <!-- Survival age labels for 2nd recipient -->
           {#each { length: scenarioTable.finalBIndex_ + 1 } as _, colIndex}
-            {#if colIndex == scenarioTable.finalBIndex_}
-              <th>{colIndex + 62}+</th>
-            {:else}
-              <th>{colIndex + 62}</th>
-            {/if}
+            <th
+              class="survivalAgeCell"
+              class:clicked={selectedStrategy != null &&
+                selectedStrategy.finalAge_[1].years() == colIndex + 62}
+            >
+              {#if colIndex == scenarioTable.finalBIndex_}
+                {colIndex + 62}+
+              {:else}
+                {colIndex + 62}
+              {/if}
+            </th>
           {/each}
         </tr>
 
         {#each { length: scenarioTable.finalAIndex_ + 1 } as _, rowIndex}
           <tr>
             <!-- Survival age labels for 1st recipient -->
-            {#if rowIndex == scenarioTable.finalAIndex_}
-              <th>{rowIndex + 62}+</th>
-            {:else}
-              <th>{rowIndex + 62}</th>
-            {/if}
+            <th
+              class="survivalAgeCell"
+              class:clicked={selectedStrategy != null &&
+                selectedStrategy.finalAge_[0].years() == rowIndex + 62}
+            >
+              {#if rowIndex == scenarioTable.finalAIndex_}
+                {rowIndex + 62}+
+              {:else}
+                {rowIndex + 62}
+              {/if}</th
+            >
+
             <!-- Grid of suggested filing dates -->
             {#each { length: scenarioTable.finalBIndex_ + 1 } as cell, colIndex}
               <td
+                class="filingDateCell"
                 class:leftborder={leftborder(
                   scenarioTable.displayedStrategies_,
                   rowIndex,
@@ -473,6 +502,10 @@
     </p>
 
     <p>Sum of benefits: {selectedStrategy.strategySum().wholeDollars()}</p>
+
+    {#each strategySequence as el}
+      <p>{el}</p>
+    {/each}
   {/if}
 </main>
 
@@ -492,8 +525,14 @@
     width: 32px;
     height: 32px;
   }
-  .clicked {
+  .filingDateCell.clicked {
     outline: 1px solid red;
+  }
+  .selectedStrategy .filingDateCell:not(.clicked) {
+    opacity: 0.5;
+  }
+  .selectedStrategy .survivalAgeCell:not(.clicked) {
+    opacity: 0.5;
   }
   .nameASurviveCell {
     writing-mode: vertical-rl;

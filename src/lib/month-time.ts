@@ -146,6 +146,27 @@ export class MonthDate {
   static max(a: MonthDate, b: MonthDate): MonthDate {
     return a.greaterThanOrEqual(b) ? a : b;
   }
+
+  /**
+   * Returns the minimum of two MonthDates.
+   */
+  static min(a: MonthDate, b: MonthDate): MonthDate {
+    return a.lessThanOrEqual(b) ? a : b;
+  }
+
+  /**
+   * Returns a new MonthDuration that is this one incremented by 1 month.
+   */
+  increment() {
+    this.monthsSinceEpoch_ += 1;
+  }
+
+  /**
+   * Returns a new MonthDuration that is this one decremented by 1 month.
+   */
+  decrement() {
+    this.monthsSinceEpoch_ -= 1;
+  }
 }
 
 /**
