@@ -1,20 +1,31 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
+  import { Birthdate } from "$lib/birthday";
   import { MonthDuration } from "$lib/month-time";
-  import StrategyWorker from "$lib/workers/strategy?worker";
+  import { Recipient } from "$lib/recipient";
+  import { Money } from "$lib/money";
+  import RecipientName from "$lib/components/RecipientName.svelte";
+  import StrategyWorker from "$lib/workers/strategy-worker?worker";
   import { onDestroy, onMount } from "svelte";
+  import { StrategySequence } from "$lib/strategy";
 
-  // TODO: All Caps?
-  const worker: Worker = new StrategyWorker();
   const MAX_AGE = 110;
   const MIN_AGE = 62;
-  const tableWidth = MAX_AGE - MIN_AGE + 1;
+  const TABLE_WIDTH = MAX_AGE - MIN_AGE + 1;
 
   let startTime: number;
   let timeElapsed: number = 0;
   let done = false;
 
-  let nameA = "Alex";
-  let nameB = "Chris";
+  let recipients = [new Recipient(), new Recipient()];
+  recipients[0].markFirst();
+  recipients[1].markSecond();
+  recipients[0].birthdate = Birthdate.FromYMD(1960, 3, 15);
+  recipients[1].birthdate = Birthdate.FromYMD(1960, 3, 15);
+  recipients[0].name = "Alex";
+  recipients[1].name = "Chris";
+
+  let pia: [number, number] = [1000, 300];
 
   let buffer_: SharedArrayBuffer;
   // For each "final age" (A, B) pair, create one shared array to hold
@@ -34,25 +45,25 @@
     // Shared buffer:
     buffer_ = new SharedArrayBuffer(
       // 2 bytes per Uint16Array element, 4 per Unit32Array element.
-      tableWidth * tableWidth * (2 + 2 + 4)
+      TABLE_WIDTH * TABLE_WIDTH * (2 + 2 + 4)
     );
     let offset = 0;
     sharedAgeAUint16Array = new Uint16Array(
       buffer_,
       offset,
-      tableWidth * tableWidth
+      TABLE_WIDTH * TABLE_WIDTH
     );
-    offset += tableWidth * tableWidth * 2;
+    offset += TABLE_WIDTH * TABLE_WIDTH * 2;
     sharedAgeBUint16Array = new Uint16Array(
       buffer_,
       offset,
-      tableWidth * tableWidth
+      TABLE_WIDTH * TABLE_WIDTH
     );
-    offset += tableWidth * tableWidth * 2;
+    offset += TABLE_WIDTH * TABLE_WIDTH * 2;
     sharedStrategySumUint32Array = new Uint32Array(
       buffer_,
       offset,
-      tableWidth * tableWidth
+      TABLE_WIDTH * TABLE_WIDTH
     );
   }
 
@@ -60,26 +71,32 @@
     private static minYearSum_ = MIN_AGE * 2;
     private static maxYearSum_ = 70 * 2 - DisplayedStrategy.minYearSum_;
 
-    finalAgeA_: MonthDuration;
-    finalAgeB_: MonthDuration;
     sharedIdx_: number;
 
-    strategyA_: MonthDuration;
-    strategyB_: MonthDuration;
+    finalAge_: [MonthDuration, MonthDuration] = [null, null];
+    strategy_: [MonthDuration, MonthDuration] = [null, null];
+    strategySum_: Money;
     initialized_: boolean = false;
 
-    constructor(finalAgeA: MonthDuration, finalAgeB: MonthDuration) {
-      this.finalAgeA_ = finalAgeA;
-      this.finalAgeB_ = finalAgeB;
-      this.sharedIdx_ = this.bufferIndex(finalAgeA.years(), finalAgeB.years());
+    constructor(finalAgeYears: [number, number]) {
+      for (let i = 0; i < 2; i++) {
+        // Assume the recipient lives the entire year of the birthdate, so
+        // until December.
+        this.finalAge_[i] = MonthDuration.initFromYearsMonths({
+          years: finalAgeYears[i],
+          months: 11 - recipients[i].birthdate.layBirthMonth(),
+        });
+      }
+      this.sharedIdx_ = this.bufferIndex([
+        this.finalAge_[0].years(),
+        this.finalAge_[1].years(),
+      ]);
     }
 
-    bufferIndex(ageAMonths: number, ageBMonths: number): number {
+    bufferIndex(ageMonths: Array<number>): number {
       const tableWidth = MAX_AGE - MIN_AGE + 1;
-      const offsetAgeAMonths = ageAMonths - MIN_AGE;
-      const offsetAgeBMonths = ageBMonths - MIN_AGE;
-
-      return offsetAgeAMonths * tableWidth + offsetAgeBMonths;
+      const offsetAgeMonths = [ageMonths[0] - MIN_AGE, ageMonths[1] - MIN_AGE];
+      return offsetAgeMonths[0] * tableWidth + offsetAgeMonths[1];
     }
 
     initialize() {
@@ -87,41 +104,64 @@
       if (this.initialized_) {
         return;
       }
-      const monthsA = sharedAgeAUint16Array[this.sharedIdx_];
-      const monthsB = sharedAgeBUint16Array[this.sharedIdx_];
-      this.strategyA_ = new MonthDuration(monthsA);
-      this.strategyB_ = new MonthDuration(monthsB);
+
+      this.strategy_[0] = new MonthDuration(
+        sharedAgeAUint16Array[this.sharedIdx_]
+      );
+      this.strategy_[1] = new MonthDuration(
+        sharedAgeBUint16Array[this.sharedIdx_]
+      );
+      this.strategySum_ = Money.fromCents(
+        sharedStrategySumUint32Array[this.sharedIdx_]
+      );
       this.initialized_ = true;
     }
 
-    text(): string {
-      if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
+    text(long = false): string {
+      if (!this.initialized_) {
         return "";
       }
-      return this.textA() + "\n" + this.textB();
+      return this.recipientText(0, long) + "\n" + this.recipientText(1, long);
     }
 
-    textA(): string {
-      if (this.strategyA_.years() == 0) {
+    /**
+     * Returns the text for both recipients, separated by a newline.
+     * @param idx The index of the recipient.
+     * @param long If true, return the long form of the text.
+     */
+    strategyText(idx: number, long: boolean): string {
+      const strategy = this.strategy_[idx];
+      if (strategy.years() == 0) {
         return "";
       }
-      return this.strategyA_.years().toString();
+      if (long) {
+        return (
+          strategy.years().toString() +
+          " years" +
+          " " +
+          strategy.modMonths().toString() +
+          " months"
+        );
+      }
+      return strategy.years().toString();
     }
 
-    textB(): string {
-      if (this.strategyB_.years() == 0) {
-        return "";
-      }
-      return this.strategyB_.years().toString();
+    /**
+     * Returns the text for the recipient at the given index.
+     * @param idx The index of the recipient.
+     * @param long If true, return the long form of the text.
+     */
+    recipientText(idx: number, long = false): string {
+      return this.strategyText(idx, long);
     }
 
     color(): string {
-      if (this.strategyA_.years() == 0 && this.strategyB_.years() == 0) {
+      if (!this.initialized_) {
         return "rgb(255, 255, 255)";
       }
       const yearsSum =
-        this.strategyA_.years() +
-        this.strategyB_.years() -
+        this.strategy_[0].years() +
+        this.strategy_[1].years() -
         DisplayedStrategy.minYearSum_;
       const colorValue = Math.round(
         (yearsSum / DisplayedStrategy.maxYearSum_) * 200
@@ -129,93 +169,98 @@
       return `rgb(0, ${255 - colorValue}, ${colorValue + 55})`;
     }
 
-    strategyA70(): boolean {
-      return this.strategyA_.years() == 70;
+    /**
+     * Returns true if the strategy for the given recipient is to file at 70.
+     * @param idx
+     */
+    strategy70(idx: number): boolean {
+      return this.strategy_[idx].years() == 70;
     }
 
-    strategyB70(): boolean {
-      return this.strategyB_.years() == 70;
+    click() {
+      selectedStrategy = this;
+      strategySequence = StrategySequence({
+        pias: pia,
+        birthdates: [
+          recipients[0].birthdate.layBirthdate(),
+          recipients[1].birthdate.layBirthdate(),
+        ],
+        strategy: [this.strategy_[0].asMonths(), this.strategy_[1].asMonths()],
+        finalAge: [this.finalAge_[0].asMonths(), this.finalAge_[1].asMonths()],
+      });
+    }
+
+    strategyDateString(idx: number): string {
+      const date = recipients[idx].birthdate.dateAtLayAge(this.strategy_[idx]);
+      return date.monthName() + " " + date.year();
+    }
+
+    strategySum(): Money {
+      return this.strategySum_;
     }
   }
 
+  let selectedStrategy: DisplayedStrategy = null;
+  let strategySequence = [];
+
   class ScenarioTable {
     public displayedStrategies_: DisplayedStrategy[][] = [];
-    public finalAIndex_ = 0;
-    public finalBIndex_ = 0;
+    // Track the index of the last row and column that we want to display. Once
+    // the strategies stop changing in that direction, we can stop displaying
+    // them.
+    public finalAIndex_ = 10;
+    public finalBIndex_ = 10;
 
     constructor() {
       // Displayed Strategy table:
       this.displayedStrategies_ = [];
-      for (let i = 0; i < tableWidth; i++) {
+      for (let i = 0; i < TABLE_WIDTH; i++) {
         let row: DisplayedStrategy[] = [];
-        for (let j = 0; j < tableWidth; j++) {
-          row.push(
-            new DisplayedStrategy(
-              MonthDuration.initFromYearsMonths({
-                years: i + MIN_AGE,
-                months: 0,
-              }),
-              MonthDuration.initFromYearsMonths({
-                years: j + MIN_AGE,
-                months: 0,
-              })
-            )
-          );
+        for (let j = 0; j < TABLE_WIDTH; j++) {
+          row.push(new DisplayedStrategy([i + MIN_AGE, j + MIN_AGE]));
         }
         this.displayedStrategies_.push(row);
       }
     }
 
     markDone() {
-      for (let i = 0; i < tableWidth; i++) {
-        for (let j = 0; j < tableWidth; j++) {
+      for (let i = 0; i < TABLE_WIDTH; i++) {
+        for (let j = 0; j < TABLE_WIDTH; j++) {
           this.displayedStrategies_[i][j].initialize();
+        }
+      }
+      for (let i = 0; i < TABLE_WIDTH; i++) {
+        for (let j = 0; j < TABLE_WIDTH; j++) {
           if (
             this.finalAIndex_ <= i &&
-            !this.displayedStrategies_[i][j].strategyA70()
+            !this.displayedStrategies_[i][j].strategy70(0)
           ) {
             this.finalAIndex_ = i + 1;
           }
           if (
             this.finalBIndex_ <= j &&
-            !this.displayedStrategies_[i][j].strategyB70()
+            !this.displayedStrategies_[i][j].strategy70(1)
           ) {
             this.finalBIndex_ = j + 1;
           }
         }
       }
+      this.finalAIndex_ = Math.min(this.finalAIndex_, TABLE_WIDTH - 1);
+      this.finalBIndex_ = Math.min(this.finalBIndex_, TABLE_WIDTH - 1);
     }
   }
 
-  let scenarioTable = new ScenarioTable();
-
   function SetupWorker() {
     let scenario = {
-      piaA: 1000,
-      piaB: 300,
-      birthdateA: {
-        year: 1960,
-        month: 4,
-        day: 15,
-      },
-      birthdateB: {
-        year: 1960,
-        month: 4,
-        day: 15,
-      },
-      command: "setup",
-      ageAValues: sharedAgeAUint16Array,
-      ageBValues: sharedAgeBUint16Array,
+      pias: pia,
+      birthdates: [
+        recipients[0].birthdate.layBirthdate(),
+        recipients[1].birthdate.layBirthdate(),
+      ],
+      ageValues: [sharedAgeAUint16Array, sharedAgeBUint16Array],
       strategySumValues: sharedStrategySumUint32Array,
     };
-    worker.addEventListener("message", WorkerEventListener);
     worker.postMessage(scenario);
-  }
-
-  function WorkerEventListener() {
-    done = true;
-    timeElapsed = (Date.now() - startTime) / 1000;
-    scenarioTable.markDone();
   }
 
   function leftborder(
@@ -240,10 +285,40 @@
     );
   }
 
-  onMount(() => {
+  let workerPromise: Promise<void>;
+  let runId_ = 0;
+  let worker: Worker = new StrategyWorker();
+  let scenarioTable = new ScenarioTable();
+
+  function startWork() {
+    selectedStrategy = null;
+    strategySequence = [];
     startTime = Date.now();
     initializeBuffer();
+    worker.terminate();
+    workerPromise = new Promise((resolve, reject) => {
+      worker = new StrategyWorker();
+      worker.addEventListener("message", (event) => {
+        done = true;
+        runId_++;
+        timeElapsed = (Date.now() - startTime) / 1000;
+        scenarioTable = new ScenarioTable();
+        scenarioTable.markDone();
+        resolve();
+      });
+    });
     SetupWorker();
+  }
+
+  $: {
+    for (let i = 0; i < recipients.length; i++) {
+      recipients[i].setPia(Money.from(pia[i]));
+    }
+    startWork();
+  }
+
+  onMount(() => {
+    startWork();
   });
   onDestroy(() => {
     worker.terminate();
@@ -251,22 +326,40 @@
 </script>
 
 <main>
-  Recipient #1 Name: <input type="text" bind:value={nameA} />
+  Name: <input type="text" bind:value={recipients[0].name} />
   <br />
-  Recipient #2 Name: <input type="text" bind:value={nameB} />
+  <RecipientName r={recipients[0]}></RecipientName> PIA:
+  <input type="number" bind:value={pia[0]} />
+  <br />
+  Name: <input type="text" bind:value={recipients[1].name} />
+  <br />
+  <RecipientName r={recipients[1]}></RecipientName> PIA:
+  <input type="number" bind:value={pia[1]} />
   <p>
     This page shows the optimal Social Security claiming strategy for a couple
     with the following characteristics:
   </p>
   <ul>
-    <li>{nameA}: PIA = $1,000, born April 15, 1960</li>
-    <li>{nameB}: PIA = $300, born April 15, 1960</li>
+    <li>
+      <RecipientName r={recipients[0]}></RecipientName> PIA = {recipients[0]
+        .pia()
+        .primaryInsuranceAmount()
+        .string()}, born {recipients[0].birthdate.layBirthdateString()}
+    </li>
+    <li>
+      <RecipientName r={recipients[1]}></RecipientName>: PIA = {recipients[1]
+        .pia()
+        .primaryInsuranceAmount()
+        .string()}, born {recipients[0].birthdate.layBirthdateString()}
+    </li>
   </ul>
   <p>
     For each possible pair of death ages (A, B), the optimal filing strategy is
-    shown in the corresponding cell. The bottom left number is {nameA}'s
-    recommended filing age, and the top right number is {nameB}'s recommended
-    filing age, in years.
+    shown in the corresponding cell. The bottom left number is {recipients[0]
+      .name}'s recommended filing age, and the top right number is <RecipientName
+      r={recipients[1]}
+      apos
+    ></RecipientName> recommended filing age, in years.
   </p>
   <p>
     Note that this page is a work in progress. The calculation is actually
@@ -276,82 +369,143 @@
     seems worth pursuing.
   </p>
 
-  {#if done}
-    <p>Time Elapsed: {timeElapsed}s</p>
+  {#if selectedStrategy != null}
+    {selectedStrategy.finalAge_[1].years()}
+  {/if}
 
-    <br />
-
-    <table>
-      <tr>
-        <td colspan="2"></td>
-        <th colspan={scenarioTable.displayedStrategies_.length}
-          >{nameB} survives until age:</th
-        ></tr
-      >
-      <tr>
-        <th
-          rowspan={scenarioTable.displayedStrategies_.length + 1}
-          class="nameASurviveCell"
-        >
-          <span>{nameA} survives until age:</span></th
-        >
-        <td>
-          <div class="cell cellAB">
-            <span class="cellA1">{nameA} files</span>
-            <span class="cellB1">{nameB} files</span>
-            <div class="divider"></div>
-          </div>
-        </td>
-        {#each { length: scenarioTable.finalBIndex_ + 1 } as _, colIndex}
-          {#if colIndex == scenarioTable.finalBIndex_}
-            <th>{colIndex + 62}+</th>
-          {:else}
-            <th>{colIndex + 62}</th>
-          {/if}
-        {/each}
-      </tr>
-
-      {#each { length: scenarioTable.finalAIndex_ + 1 } as _, rowIndex}
+  {#if runId_ > 0}
+    {#key runId_}
+      <table class:selectedStrategy={selectedStrategy != null}>
+        <!-- 2nd Recipient "survives until" text -->
         <tr>
-          {#if rowIndex == scenarioTable.finalAIndex_}
-            <th>{rowIndex + 62}+</th>
-          {:else}
-            <th>{rowIndex + 62}</th>
-          {/if}
-          {#each { length: scenarioTable.finalBIndex_ + 1 } as cell, colIndex}
-            <td
-              class:leftborder={leftborder(
-                scenarioTable.displayedStrategies_,
-                rowIndex,
-                colIndex
-              )}
-              class:topborder={topborder(
-                scenarioTable.displayedStrategies_,
-                rowIndex,
-                colIndex
-              )}
-              style="background-color: {scenarioTable.displayedStrategies_[
-                rowIndex
-              ][colIndex].color()}"
+          <td colspan="2"></td>
+          <th colspan={scenarioTable.displayedStrategies_.length}
+            ><RecipientName r={recipients[1]}></RecipientName> survives until age:</th
+          ></tr
+        >
+
+        <tr>
+          <!-- 1st Recipient "survives until" text -->
+          <th
+            rowspan={scenarioTable.displayedStrategies_.length + 1}
+            class="nameASurviveCell"
+          >
+            <span
+              ><RecipientName r={recipients[0]}></RecipientName> survives until age:</span
+            ></th
+          >
+
+          <!-- Corner cell: "A files / B files" -->
+          <td>
+            <div class="cell cellAB">
+              <span class="cellA1"
+                ><RecipientName r={recipients[0]}></RecipientName> files</span
+              >
+              <span class="cellB1"
+                ><RecipientName r={recipients[1]}></RecipientName> files</span
+              >
+              <div class="divider"></div>
+            </div>
+          </td>
+
+          <!-- Survival age labels for 2nd recipient -->
+          {#each { length: scenarioTable.finalBIndex_ + 1 } as _, colIndex}
+            <th
+              class="survivalAgeCell"
+              class:clicked={selectedStrategy != null &&
+                selectedStrategy.finalAge_[1].years() == colIndex + 62}
             >
-              <div class="cell">
-                <span class="cellA"
-                  >{scenarioTable.displayedStrategies_[rowIndex][
-                    colIndex
-                  ].textA()}</span
-                >
-                <span class="cellB"
-                  >{scenarioTable.displayedStrategies_[rowIndex][
-                    colIndex
-                  ].textB()}</span
-                >
-                <div class="divider"></div>
-              </div>
-            </td>
+              {#if colIndex == scenarioTable.finalBIndex_}
+                {colIndex + 62}+
+              {:else}
+                {colIndex + 62}
+              {/if}
+            </th>
           {/each}
         </tr>
-      {/each}
-    </table>
+
+        {#each { length: scenarioTable.finalAIndex_ + 1 } as _, rowIndex}
+          <tr>
+            <!-- Survival age labels for 1st recipient -->
+            <th
+              class="survivalAgeCell"
+              class:clicked={selectedStrategy != null &&
+                selectedStrategy.finalAge_[0].years() == rowIndex + 62}
+            >
+              {#if rowIndex == scenarioTable.finalAIndex_}
+                {rowIndex + 62}+
+              {:else}
+                {rowIndex + 62}
+              {/if}</th
+            >
+
+            <!-- Grid of suggested filing dates -->
+            {#each { length: scenarioTable.finalBIndex_ + 1 } as cell, colIndex}
+              <td
+                class="filingDateCell"
+                class:leftborder={leftborder(
+                  scenarioTable.displayedStrategies_,
+                  rowIndex,
+                  colIndex
+                )}
+                class:topborder={topborder(
+                  scenarioTable.displayedStrategies_,
+                  rowIndex,
+                  colIndex
+                )}
+                style="background-color: {scenarioTable.displayedStrategies_[
+                  rowIndex
+                ][colIndex].color()}"
+                on:click={() => {
+                  scenarioTable.displayedStrategies_[rowIndex][
+                    colIndex
+                  ].click();
+                }}
+                class:clicked={selectedStrategy ==
+                  scenarioTable.displayedStrategies_[rowIndex][colIndex]}
+              >
+                <div class="cell">
+                  <span class="cellA"
+                    >{scenarioTable.displayedStrategies_[rowIndex][
+                      colIndex
+                    ].recipientText(0)}</span
+                  >
+                  <span class="cellB"
+                    >{scenarioTable.displayedStrategies_[rowIndex][
+                      colIndex
+                    ].recipientText(1)}</span
+                  >
+                  <div class="divider"></div>
+                </div>
+              </td>
+            {/each}
+          </tr>
+        {/each}
+      </table>
+    {/key}
+  {/if}
+  {#if selectedStrategy != null}
+    <br />
+
+    <p>Selected Strategy:</p>
+    <p>
+      <RecipientName r={recipients[0]}></RecipientName> files at age {selectedStrategy.strategy_[0].years()}
+      years, {selectedStrategy.strategy_[0].modMonths()} months:
+
+      {selectedStrategy.strategyDateString(0)}
+    </p>
+    <p>
+      <RecipientName r={recipients[1]}></RecipientName> files at age {selectedStrategy.strategy_[1].years()}
+      years, {selectedStrategy.strategy_[1].modMonths()} months
+
+      {selectedStrategy.strategyDateString(1)}
+    </p>
+
+    <p>Sum of benefits: {selectedStrategy.strategySum().wholeDollars()}</p>
+
+    {#each strategySequence as el}
+      <p>{el}</p>
+    {/each}
   {/if}
 </main>
 
@@ -368,8 +522,17 @@
   }
   .cell {
     position: relative;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+  }
+  .filingDateCell.clicked {
+    outline: 1px solid red;
+  }
+  .selectedStrategy .filingDateCell:not(.clicked) {
+    opacity: 0.5;
+  }
+  .selectedStrategy .survivalAgeCell:not(.clicked) {
+    opacity: 0.5;
   }
   .nameASurviveCell {
     writing-mode: vertical-rl;
