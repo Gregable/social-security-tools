@@ -19,8 +19,8 @@
     <p>
       ProjectionLab models your entire retirement plan, runs Monte Carlo
       simulations using historical market data, and provides clear
-      visualizations. Like this site, you can even try ProjectionLab out
-      initially for free with no sign-up.
+      visualizations. Like this site, you can even try out ProjectionLab for
+      free.
     </p>
     <p>
       <a href="https://projectionlab.com?ref=ssa-tools">

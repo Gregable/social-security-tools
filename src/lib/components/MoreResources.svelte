@@ -4,6 +4,7 @@
   import FacebookImg from "$lib/images/facebook.svg";
   import TwitterImg from "$lib/images/twitter.svg";
   import GithubImg from "$lib/images/github.svg";
+  import KoFiImg from "$lib/images/kofi.png";
 </script>
 
 <div class="container pageBreakAvoid pageBreakBefore">
@@ -65,7 +66,7 @@
           height="55"
           width="214"
           style="border:0px"
-          src="https://cdn.ko-fi.com/cdn/kofi1.png?v=3"
+          src={KoFiImg}
           alt="Buy me a coffee if you found this useful"
         /></a
       >
