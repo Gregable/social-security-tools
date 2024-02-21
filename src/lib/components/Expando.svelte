@@ -81,7 +81,13 @@
   style:--expanded-border-color={expanded_border_color}
   style:--expanded-background-color={expanded_background_color}
 >
-  <div class="label noprint" on:click={toggle} on:keydown={toggle}>
+  <div
+    class="label noprint"
+    on:click={toggle}
+    on:keydown={toggle}
+    role="button"
+    tabindex="0"
+  >
     {expanded ? expandedText : collapsedText}
   </div>
 
