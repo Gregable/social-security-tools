@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import HeroImage from "./hero.png";
 
   import EarningsRecordExampleImage from "./example-earnings-record-simplified.jpg";
 
@@ -27,8 +28,18 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <h1>How inflation rate affects Social Security benefit calculations.</h1>
+  <h1>Social Security and Inflation</h1>
   <p class="postdate">November 23, 2018</p>
+
+  <figure class="hero-image">
+    <img
+      src={HeroImage}
+      width="512"
+      height="512"
+      alt="Chalkboard with unintelligble mathematics writing"
+    />
+  </figure>
+
   <p>
     Many people know that the inflation rate reduces the real value of their
     savings every year. For example, using CPI data, $1 had the same spending

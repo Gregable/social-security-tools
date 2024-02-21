@@ -1,6 +1,6 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
-  import HeroImage from "./hero.svg";
+  import HeroImage from "./hero.png";
   import ErrorMessageImage from "./error.png";
   import EarnignsRecordLinkImage from "./earnings-record-link.png";
   import StatementImage from "./statement.png";

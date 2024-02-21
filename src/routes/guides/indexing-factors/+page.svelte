@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import HeroImage from "./hero.png";
 
   const title = "Social Security Indexing Factors";
   const description =
@@ -24,6 +25,16 @@
 <div class="guide-page">
   <h1>{title}</h1>
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+
+  <figure class="hero-image">
+    <img
+      src={HeroImage}
+      width="512"
+      height="512"
+      alt="Chalkboard with unintelligble mathematics writing"
+    />
+  </figure>
+
   <p>
     Yesterday, Josh Scandlen posted a <a
       href="https://www.youtube.com/watch?v=JZXymvFm8uw&t=78s">YouTube video</a

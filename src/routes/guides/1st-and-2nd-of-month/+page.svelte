@@ -1,7 +1,7 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
-  import HeroImage from "./calendar.svg";
+  import HeroImage from "./hero.png";
 
   const title = "Extra rules for those born on the 1st or 2nd of the month";
   const description =
@@ -27,22 +27,24 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <img
-    class="hero"
-    src={HeroImage}
-    width="233"
-    height="200"
-    alt="Clipart of a calendar"
-  />
-
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
   <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
+
+  <figure class="hero-image">
+    <img
+      src={HeroImage}
+      width="512"
+      height="512"
+      alt="Birthday poster hung on a wall with cake and balloons"
+    />
+  </figure>
+
   <p>
     Social Security calculates and pays benefits <i>monthly</i>. However there
     are still several rules that are affected by the day of the month that you
     were born.
   </p>
-  <div style="clear: both;" />
+
   <h2>Eligibility</h2>
   <p>
     Eligibility rules have to do with what is the earliest month you are first
