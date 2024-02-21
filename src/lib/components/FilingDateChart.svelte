@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import "$lib/global.css";
+
   import type { Birthdate } from "$lib/birthday";
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import type { EarningRecord } from "$lib/earning-record";
 
   export let earningsRecords: Array<EarningRecord> = [];

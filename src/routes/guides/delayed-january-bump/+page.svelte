@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 
@@ -27,7 +26,7 @@
   {@html schema.render()}
 </svelte:head>
 
-<div>
+<div class="guide-page">
   <h1>{title}</h1>
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
   <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
@@ -116,5 +115,3 @@
   </blockquote>
   <GuideFooter />
 </div>
-
-<style src="../guide.css"></style>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   export let active = "none";
 
   let navOptions = [

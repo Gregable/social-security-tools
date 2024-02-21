@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import { GuidesSchema } from "$lib/schema-org";
   import HeroImage from "./hero.svg";
   import ErrorMessageImage from "./error.png";
@@ -30,7 +29,7 @@
   {@html schema.render()}
 </svelte:head>
 
-<div>
+<div class="guide-page">
   <h1>{title}</h1>
 
   <figure class="hero-image">
@@ -166,5 +165,3 @@
 
   <GuideFooter />
 </div>
-
-<style src="../guide.css"></style>

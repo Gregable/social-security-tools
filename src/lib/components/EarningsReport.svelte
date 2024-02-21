@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import EarningsTable from "./EarningsTable.svelte";
   import FutureEarningsSliders from "./FutureEarningsSliders.svelte";
   import RecipientName from "./RecipientName.svelte";

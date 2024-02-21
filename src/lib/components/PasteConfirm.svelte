@@ -14,7 +14,6 @@
 -->
 
 <script lang="ts">
-  import "$lib/global.css";
   import { createEventDispatcher } from "svelte";
   import type { EarningRecord } from "$lib/earning-record";
 

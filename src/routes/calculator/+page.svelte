@@ -1,6 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
-
   import { context } from "$lib/context";
 
   import Header from "$lib/components/Header.svelte";

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
-
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 
@@ -30,7 +28,7 @@
   {@html schema.render()}
 </svelte:head>
 
-<div>
+<div class="guide-page">
   <h1>{title}</h1>
 
   <figure class="hero-image">
@@ -198,5 +196,3 @@
   </p>
   <GuideFooter />
 </div>
-
-<style src="../guide.css"></style>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import * as constants from "$lib/constants";
   import { Recipient } from "$lib/recipient";
   import BendpointChart from "./BendpointChart.svelte";
@@ -275,10 +274,18 @@
   }
 
   .insetTextBox {
-    box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -webkit-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -moz-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -o-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
+    box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -webkit-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -moz-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -o-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
     margin: 6px 1em 15px 1em;
     padding: 10px;
   }

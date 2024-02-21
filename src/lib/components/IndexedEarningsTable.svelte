@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import { Recipient } from "$lib/recipient";
 
   export let recipient: Recipient = new Recipient();

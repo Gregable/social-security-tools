@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import { createEventDispatcher, onMount } from "svelte";
   import { context } from "$lib/context";
   import { Birthdate } from "$lib/birthday";

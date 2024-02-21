@@ -1,6 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
-
   import { onMount } from "svelte";
   import { context } from "$lib/context";
 

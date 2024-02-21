@@ -1,6 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
-
   import FacebookImg from "$lib/images/facebook.svg";
   import TwitterImg from "$lib/images/twitter.svg";
   import GithubImg from "$lib/images/github.svg";
