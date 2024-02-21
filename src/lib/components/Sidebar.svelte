@@ -2,7 +2,6 @@
   import "$lib/global.css";
 
   import { onMount } from "svelte";
-  import { ChevronRight } from "svelte-bootstrap-icons";
   import { context } from "$lib/context";
 
   function scrollTo(section: SidebarSection) {
@@ -143,7 +142,7 @@
             {section.label}
           </div>
 
-          <span class="chevron"><ChevronRight /></span>
+          <span class="chevron">&rsaquo;</span>
         </li>
       {/each}
     </ul>
@@ -253,5 +252,6 @@
     position: absolute;
     top: 10px;
     right: 4px;
+    font-size: 24px;
   }
 </style>
