@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import EligibilityTable from "./EligibilityTable.svelte";
   import Expando from "./Expando.svelte";
   import { Recipient } from "$lib/recipient";
@@ -188,10 +187,18 @@
     padding: 1em 0 1em 1em;
   }
   .insetTextBox {
-    box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -webkit-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -moz-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -o-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
+    box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -webkit-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -moz-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -o-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
     margin: 6px 1em;
     padding: 10px;
   }

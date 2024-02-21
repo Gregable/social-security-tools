@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import { onMount } from "svelte";
   import * as constants from "$lib/constants";
   import Slider from "./Slider.svelte";

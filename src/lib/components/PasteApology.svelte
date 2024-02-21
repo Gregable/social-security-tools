@@ -13,7 +13,6 @@
 -->
 
 <script lang="ts">
-  import "$lib/global.css";
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import { Recipient } from "$lib/recipient";
   import SpousalBenefit from "./SpousalBenefit.svelte";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import "$lib/global.css";
+
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
   import Slider from "./Slider.svelte";
@@ -1134,10 +1134,18 @@
     }
   }
   .narrowWarningBox {
-    box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -webkit-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -moz-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
-    -o-box-shadow: inset 0px 0px 10px 0px #ababab, 5px 5px 5px 1px #dddddd;
+    box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -webkit-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -moz-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
+    -o-box-shadow:
+      inset 0px 0px 10px 0px #ababab,
+      5px 5px 5px 1px #dddddd;
     margin: 6px 1em;
     padding: 10px;
   }

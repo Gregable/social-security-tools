@@ -1,6 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
-
   import { Money } from "$lib/money";
 
   import { Recipient } from "$lib/recipient";

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import SponsorImage from "$lib/images/projection-lab.png";
 </script>
 

@@ -16,7 +16,6 @@
 -->
 
 <script lang="ts">
-  import "$lib/global.css";
   import { createEventDispatcher } from "svelte";
   import { parsePaste } from "$lib/ssa-parse";
   import { Recipient } from "$lib/recipient";

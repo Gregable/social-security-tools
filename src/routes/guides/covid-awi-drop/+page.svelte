@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "$lib/global.css";
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 
@@ -29,7 +28,7 @@
   {@html schema.render()}
 </svelte:head>
 
-<div>
+<div class="guide-page">
   <h1>{title}</h1>
   <img class="hero" src={HeroImage} alt="Artist depiction of Covid-19 virus" />
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
@@ -192,5 +191,3 @@
   </p>
   <GuideFooter />
 </div>
-
-<style src="../guide.css"></style>
