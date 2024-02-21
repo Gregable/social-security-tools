@@ -28,7 +28,6 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <h1>Social Security and Inflation</h1>
   <p class="postdate">November 23, 2018</p>
 
   <figure class="hero-image">
