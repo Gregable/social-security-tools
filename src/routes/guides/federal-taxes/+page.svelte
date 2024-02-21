@@ -28,14 +28,14 @@
   <h1>{title}</h1>
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
-  <img
-    src={HeroImage}
-    class="hero"
-    width="512"
-    height="302"
-    style="margin: 40px auto 40px auto; display: block;"
-    alt="Clipart depicting a tax form"
-  />
+  <figure class="hero-image">
+    <img
+      src={HeroImage}
+      width="512"
+      height="302"
+      alt="Clipart depicting a tax form"
+    />
+  </figure>
 
   <p>
     As Americans, we all know that paying taxes is an important part of our

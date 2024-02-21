@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import HeroImage from "./hero.png";
 
   const title = "Social Security International Agreements";
   const description = "How does working abroad affect social security?";
@@ -23,6 +24,16 @@
 <div class="guide-page">
   <h1>{title}</h1>
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+
+  <figure class="hero-image">
+    <img
+      src={HeroImage}
+      width="512"
+      height="512"
+      alt="Depiction of the earth with North Amerca in the center"
+    />
+  </figure>
+
   <p>
     SSA.tools calculates social security benefits based on a person's earnings
     record, copy/pasted from ssa.gov. In cases of work abroad, this record may

@@ -40,6 +40,8 @@
     border: 1px solid #ccc;
     max-width: 80vw;
     height: auto;
+    /* Rounded edges */
+    border-radius: 10px;
   }
   :global(.guide-page figure.hero-image) {
     float: right;
@@ -48,6 +50,9 @@
   :global(.guide-page .hero-image img) {
     height: 24vw;
     width: auto;
+
+    /* Subtle shadow */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   }
   :global(.guide-page figcaption) {
     font-size: 0.8em;
