@@ -137,6 +137,7 @@
           on:keydown={scrollTo(section)}
           class:active={section.active}
           class:sponsor={section.sponsor}
+          role="presentation"
         >
           <div class="navlabel" class:indent={hasHeading && !section.heading}>
             {section.label}
