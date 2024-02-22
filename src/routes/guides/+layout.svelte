@@ -11,6 +11,7 @@
   :global(div.guide-page) {
     max-width: 1080px;
     margin: 0 auto;
+    padding: 0 1em;
   }
   :global(.guide-page h1) {
     font-size: 2.5em;
