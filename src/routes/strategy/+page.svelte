@@ -326,7 +326,12 @@
 </script>
 
 <main>
-  Name: <input type="text" bind:value={recipients[0].name} />
+  <h1>
+    Warning: This is a work in progress and probably incorrect. Please
+    disregard.
+  </h1>
+
+  Name:<input type="text" bind:value={recipients[0].name} />
   <br />
   <RecipientName r={recipients[0]}></RecipientName> PIA:
   <input type="number" bind:value={pia[0]} />
