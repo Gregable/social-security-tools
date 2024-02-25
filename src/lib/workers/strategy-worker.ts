@@ -43,9 +43,13 @@ function PersonalBenefitStrategySum(
   filingDate: MonthDate,
   finalDate: MonthDate
 ): number {
-  // personal benefit is only one of 3 values: 0, the benefit for a few months
-  // after filing, and the benefit for the rest of the time. If we calculate
-  // these 3 values and their number of months, we can avoid a loop
+  // personal benefit is only one of 3 values:
+  //  - 0
+  //  - benefit for a few months after filing (see
+  //    https://ssa.tools/guides/delayed-january-bump)
+  //  - benefit for the rest of the time.
+  // If we calculate these 3 values and their number of months, we can avoid a
+  // loop which is a significant performance improvement.
   const monthsRemainingInFilingYear = 12 - filingDate.monthIndex();
   const numMonthsAfterInitialYear =
     finalDate.subtractDate(filingDate).asMonths() +
@@ -134,6 +138,8 @@ function strategySumCents(
   strats: [MonthDuration, MonthDuration]
 ): number {
   let strategySumCents = 0;
+  // stratDates is the MonthDate version of the |strats| values relative to the
+  // birthdates of the recipients.
   let stratDates: [MonthDate, MonthDate] = [null, null];
   for (let i = 0; i < 2; i++) {
     stratDates[i] = settings.recipients[i].birthdate.dateAtLayAge(strats[i]);
@@ -169,7 +175,44 @@ function strategySumCents(
     }
   }
 
-  // Add in survivor benefits, if eligible:
+  // TODO: Survivor benefits.
+  //
+  // Don't add the personalSums[1] or spouse's benefit above if recipient[0]
+  // dies before recipient[1].
+  //
+  // Instead, recalculate the personalSums[1] to take into account the date of
+  // death of recipient[0] and their filing strategy.
+  // The rules are complicated, see especially the 2nd link:
+  // https://www.ssa.gov/benefits/survivors/onyourown.html#h5
+  // https://articles.opensocialsecurity.com/survivor-benefit-calculation/
+  // The survivor benefit amount calculation depends on:
+  // - The deceased's PIA
+  // - The deceased's age at death
+  // - The survivor's age
+  // - Whether or not the deceased had already filed for benefits at the time
+  //   of death
+  //
+  // As a result, we can't precalculate the survivor benefit amount until we
+  // have selected a specific filing strategy for the deceased.
+  //
+  // First, calculate the base survivor benefit amount {
+  //
+  //   If the deceased had not filed before dying, then:
+  //   - If the deceased died before FRA, the base is the deceased's PIA.
+  //   - If the deceased died after FRA, the base is the deceased's benefit
+  //     amount.
+  //
+  //   If the deceased had filed before dying, then the base is the greater of:
+  //   - The amount the deceased was receiving at the time of death.
+  //   - 82.5% of the deceased's PIA.
+  //
+  // }
+  //
+  // Next, adjust the base survivor benefit amount based on the survivor's age:
+  // - If the survivor is older than FRA, the benefit is not adjusted.
+  // - If the survivor is younger than FRA, the benefit is adjusted
+  //   proportionally between 71.5% and 100% of the base amount based on the
+  //   survivor's age between 60 and FRA.
   if (finalDates[0].greaterThan(survivorStartDate)) {
     // https://www.ssa.gov/benefits/survivors/survivorchartred.html shows the
     // adjustment if filing before FRA.
@@ -183,6 +226,7 @@ function strategySumCents(
 }
 
 function run(finalAgeYears: [number, number]) {
+  // Track the best strategy for this final age pair, seen so far:
   let bestStrategy = {
     strategySumCents: 0,
     ages: [
@@ -195,30 +239,31 @@ function run(finalAgeYears: [number, number]) {
     (r) => r.birthdate
   );
 
-  let finalDates: Array<MonthDate> = [null, null];
+  // Pre-calculate the final dates for each recipient:
+  let finalDates: [MonthDate, MonthDate] = [null, null];
   for (let i = 0; i < 2; i++) {
-    let finalDate = birthdates[i].dateAtLayAge(
+    // We assume that the person will live until the last month of the year
+    // in which they die in order to calculate the final benefit.
+    finalDates[i] = birthdates[i].dateAtLayAge(
       MonthDuration.initFromYearsMonths({
         years: finalAgeYears[i],
         months: 11 - settings.recipients[i].birthdate.layBirthMonth(),
       })
     );
-    // Set the final date to the last month of the year the person turns the
-    // given age:
-    finalDate.addDuration(new MonthDuration(11 - finalDate.monthIndex()));
-    finalDates[i] = finalDate;
-    // Pre-calculate the personal benefits once for each strategy:
+    // Pre-calculate the personal benefits once for each strategy. First,
+    // loop over all strategies and calculate the personal benefit for each.
     for (
       let strat = MonthDuration.copyFrom(minStratAge);
       strat.lessThanOrEqual(maxStratAge);
       strat.increment()
     ) {
       const stratDate = birthdates[i].dateAtLayAge(strat);
+      // Calculate the personal benefit for this strategy and final date.
       personalSums[i][strat.asMonths() - minStratAge.asMonths()] =
         PersonalBenefitStrategySum(
           settings.recipients[i],
           stratDate,
-          finalDate
+          finalDates[i]
         );
     }
   }

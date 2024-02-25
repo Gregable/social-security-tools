@@ -669,6 +669,74 @@ export class Recipient {
   }
 
   /**
+   * Detemines the survivor benefit for this recipient.
+   * @param deceased The deceased recipient.
+   * @param deceasedFilingDate The date the deceased recipient filed for
+   * benefits. If the deceased recipient did not file for benefits, use the
+   * date of death or any date later.
+   * @param deceasedDeathDate The date of death of the deceased recipient.
+   */
+  survivorBenefit(
+    deceased: Recipient,
+    deceasedFilingDate: MonthDate,
+    deceasedDeathDate: MonthDate
+  ): Money {
+    // First calculate the base survivor benefit. There are two situations based
+    // on if the deceased recipient filed for benefits before death or not.
+    let baseSurvivorBenefit: Money;
+
+    if (deceasedFilingDate.greaterThanOrEqual(deceasedDeathDate)) {
+      // If the deceased recipient did not file for benefits before death:
+      if (deceasedDeathDate.lessThan(deceased.normalRetirementDate())) {
+        // If the deceased died before Normal Retirement Age, the survivor benefitis based on the deceased recipient's PIA.
+        baseSurvivorBenefit = deceased.pia().primaryInsuranceAmount();
+      } else {
+        // If the deceased died after Normal Retirement Age, the survivor
+        // benefit is based on the deceased recipient's benefit as though they
+        // filed for benefits on the date of death.
+        baseSurvivorBenefit = deceased.benefitOnDate(
+          deceasedDeathDate,
+          deceasedDeathDate
+        );
+      }
+    } else {
+      // If the deceased recipient filed for benefits before death, then the base survivor benefit is the greater of the deceased recipient's benefit at the time of death or 82.5% of the deceased recipient's PIA.
+      baseSurvivorBenefit = Money.max(
+        deceased.pia().primaryInsuranceAmount().times(0.825),
+        deceased.benefitOnDate(deceasedFilingDate, deceasedDeathDate)
+      );
+    }
+
+    // Next, calculate the survivor benefit for the recipient based on the
+    // survivor's age. If the survivor is at or above Full Retirement Age,
+    // the survivor benefit is the base survivor benefit. If the survivor is
+    // below Full Retirement Age, the survivor benefit is reduced based on the
+    // survivor's age, adjusted proportionally between 71.5% and 100% of the
+    // base amount based on the survivor's age between 60 and Full Retirement
+    // Age.
+    const survivorAge = this.birthdate.ageAtSsaDate(deceasedDeathDate);
+    if (survivorAge.greaterThanOrEqual(this.normalRetirementAge())) {
+      return baseSurvivorBenefit;
+    } else {
+      const monthsBetween60AndNRA = this.normalRetirementAge()
+        .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
+        .asMonths();
+      const monthsBetweenAge60AndSurvivorAge = survivorAge
+        .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
+        .asMonths();
+
+      const reductionRatio = Math.max(
+        0,
+        monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
+      );
+      const minSurvivorBenefitRatio = 0.715;
+      return baseSurvivorBenefit.times(
+        minSurvivorBenefitRatio + (1 - minSurvivorBenefitRatio) * reductionRatio
+      );
+    }
+  }
+
+  /**
    * Returns a dark, medium, and light color for the recipient.
    * First and only recipients are orange, while second recipients are green.
    */
