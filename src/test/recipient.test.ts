@@ -636,7 +636,7 @@ describe("Recipient", () => {
     ).toEqual(500.0);
   });
 
-  it("correctly calculates spousal benefits for a specific example", () => {
+  it("calculates spousal benefits for a specific example", () => {
     let r = new Recipient();
     r.setPia(Money.from(1000.0));
 
@@ -655,5 +655,98 @@ describe("Recipient", () => {
         )
         .value()
     ).toEqual(275);
+  });
+
+  it("calculates survivor benefits", () => {
+    // Two recipients, one with a PIA of $1000, and the other with a PIA of
+    // $3000. The first recipient is the survivor, and the second recipient is
+    // the deceased. Both born in Jan 1960, so FRA of 67 is in Jan 2027.
+    let recipient = new Recipient();
+    recipient.setPia(Money.from(1000.0));
+    recipient.birthdate = Birthdate.FromYMD(1960, 0, 5);
+
+    let deceased = new Recipient();
+    deceased.setPia(Money.from(3000.0));
+    deceased.birthdate = Birthdate.FromYMD(1960, 0, 5);
+
+    // Scenario 1: Deceased died at age 60 before filing.
+    {
+      const deceasedDeathDate = MonthDate.initFromYearsMonths({
+        years: 2020,
+        months: 0,
+      });
+      const deceasedFilingDate = MonthDate.initFromYearsMonths({
+        years: 2027,
+        months: 0,
+      });
+
+      // In this situation, the base survivor benefit is the full deceased's PIA
+      // of $3000. Since the recipient files for survivor benefits at the
+      // earliest age 60, the benefit is reduced to only 71.5% of the PIA.
+      // $3,000 * 0.715 = $2,145.
+      expect(
+        recipient
+          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .value()
+      ).toEqual(2145);
+    }
+
+    // Scenario 2: Deceased died at age 68 without filing, after FRA.
+    {
+      const deceasedDeathDate = MonthDate.initFromYearsMonths({
+        years: 2028,
+        months: 0,
+      });
+      const deceasedFilingDate = MonthDate.initFromYearsMonths({
+        years: 2028,
+        months: 0,
+      });
+
+      // In this situation, the base survivor benefit is the deceased benefit
+      // at age 68 which is 8% higher than the PIA. $3,000 * 1.08 = $3,240.
+      // Since the recipient
+      expect(
+        recipient
+          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .value()
+      ).toEqual(3240);
+    }
+
+    // Scenario 3: Deceased filed for benefits at age 62, and died at age 67.
+    {
+      const deceasedDeathDate = MonthDate.initFromYearsMonths({
+        years: 2027,
+        months: 0,
+      });
+      const deceasedFilingDate = MonthDate.initFromYearsMonths({
+        years: 2022,
+        months: 1,
+      });
+      // In this situation, the base survivor benefit is the minimum: 82.5% of
+      // the deceased's PIA. $3,000 * 0.825 = $2,475.
+      expect(
+        recipient
+          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .value()
+      ).toEqual(2475);
+    }
+
+    // Scenario 3: Deceased filed for benefits at age 68, and died at age 69.
+    {
+      const deceasedDeathDate = MonthDate.initFromYearsMonths({
+        years: 2029,
+        months: 0,
+      });
+      const deceasedFilingDate = MonthDate.initFromYearsMonths({
+        years: 2028,
+        months: 0,
+      });
+      // In this situation, the base survivor benefit is the deceased's benefit, which is 108% of their PIA. $3,000 * 1.08 = $3,240.
+      expect(
+        recipient
+          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .value()
+      ).toEqual(3240);
+    }
   });
 });
