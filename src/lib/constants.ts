@@ -89,6 +89,10 @@ export const EARNINGS_PER_CREDIT: { [key: number]: Money } = {
   2024: Money.from(1730),
 };
 
+export const MAX_EARNINGS_PER_CREDIT: number = Math.max(
+  ...Object.keys(EARNINGS_PER_CREDIT).map(Number)
+);
+
 /**
  * Maximum earnings in each year which contribute to social security benefits.
  */
