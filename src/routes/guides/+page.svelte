@@ -10,6 +10,17 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Feb 26, 2023</span>
+        <h3 class="posttitle">
+          <a href="/guides/work-credits">Social Security Work Credits </a>
+        </h3>
+        <p class="description">
+          How do work credits work and how many do I need to qualify for Social
+          Security benefits?
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 12, 2023</span>
         <h3 class="posttitle">
           <a href="/guides/earnings-record-paste"
