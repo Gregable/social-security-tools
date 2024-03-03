@@ -675,11 +675,14 @@ export class Recipient {
    * benefits. If the deceased recipient did not file for benefits, use the
    * date of death or any date later.
    * @param deceasedDeathDate The date of death of the deceased recipient.
+   * @param survivorFilingDate The date the survivor recipient filed for
+   * benefits.
    */
   survivorBenefit(
     deceased: Recipient,
     deceasedFilingDate: MonthDate,
-    deceasedDeathDate: MonthDate
+    deceasedDeathDate: MonthDate,
+    survivorFilingDate: MonthDate
   ): Money {
     // First calculate the base survivor benefit. There are two situations based
     // on if the deceased recipient filed for benefits before death or not.
@@ -714,7 +717,7 @@ export class Recipient {
     // survivor's age, adjusted proportionally between 71.5% and 100% of the
     // base amount based on the survivor's age between 60 and Full Retirement
     // Age.
-    const survivorAge = this.birthdate.ageAtSsaDate(deceasedDeathDate);
+    const survivorAge = this.birthdate.ageAtSsaDate(survivorFilingDate);
     if (survivorAge.greaterThanOrEqual(this.normalRetirementAge())) {
       return baseSurvivorBenefit;
     } else {
