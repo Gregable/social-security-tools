@@ -4,15 +4,13 @@ Website Source for <https://ssa.tools/>.
 
 The code here builds what is statically served at that site.
 
-## Running Locally
+## Docker
 
-The website can be run locally as a Docker container. You will need git and Docker.
+The website can be run locally as a Docker container. Run the latest image
+from Docker Hub:
 
 ```
-git clone https://github.com/Gregable/social-security-tools.git
-cd social-security-tools
-docker build -t ssa-tools .
-docker run -p 4173:4173 --name=ssatools ssa-tools
+docker run -p 4173:4173 gregable/ssa-tools:latest
 ```
 
 Then load https://localhost:4173/ in your browser.
