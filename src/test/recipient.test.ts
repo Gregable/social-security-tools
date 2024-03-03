@@ -686,7 +686,12 @@ describe("Recipient", () => {
       // $3,000 * 0.715 = $2,145.
       expect(
         recipient
-          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .survivorBenefit(
+            deceased,
+            deceasedFilingDate,
+            deceasedDeathDate,
+            deceasedDeathDate
+          )
           .value()
       ).toEqual(2145);
     }
@@ -707,7 +712,12 @@ describe("Recipient", () => {
       // Since the recipient
       expect(
         recipient
-          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .survivorBenefit(
+            deceased,
+            deceasedFilingDate,
+            deceasedDeathDate,
+            deceasedDeathDate
+          )
           .value()
       ).toEqual(3240);
     }
@@ -726,7 +736,12 @@ describe("Recipient", () => {
       // the deceased's PIA. $3,000 * 0.825 = $2,475.
       expect(
         recipient
-          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .survivorBenefit(
+            deceased,
+            deceasedFilingDate,
+            deceasedDeathDate,
+            deceasedDeathDate
+          )
           .value()
       ).toEqual(2475);
     }
@@ -744,7 +759,12 @@ describe("Recipient", () => {
       // In this situation, the base survivor benefit is the deceased's benefit, which is 108% of their PIA. $3,000 * 1.08 = $3,240.
       expect(
         recipient
-          .survivorBenefit(deceased, deceasedFilingDate, deceasedDeathDate)
+          .survivorBenefit(
+            deceased,
+            deceasedFilingDate,
+            deceasedDeathDate,
+            deceasedDeathDate
+          )
           .value()
       ).toEqual(3240);
     }
