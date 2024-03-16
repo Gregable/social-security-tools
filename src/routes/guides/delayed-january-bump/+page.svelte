@@ -51,8 +51,8 @@
 
   <p>
     When someone chooses to delay collecting social security past the Normal
-    Retirement Age, they earn delayed credits that increase their benefit by
-    6.67% per year (0.56% per month) in exchange for waiting a little longer.
+    Retirement Age, they earn delayed credits that increase their benefit by 8%
+    per year (0.67% per month) in exchange for waiting a little longer.
   </p>
 
   <p>
