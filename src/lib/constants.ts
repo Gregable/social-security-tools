@@ -600,3 +600,100 @@ export const FULL_RETIREMENT_AGE: Array<{
       delayedIncreaseAnnual: 0.08,
     },
   ];
+
+/**
+ * Full retirement age (FRA) for survivor benefits for each year of birth.
+ * - `minYear` and `maxYear` are inclusive
+ * - `ageYears` and `ageMonths` are the age at FRA.
+ * My understanding is that these dates are all just +2 years from the
+ * corresponding retirement age.
+ */
+export const FULL_RETIREMENT_AGE_SURVIVOR: Array<{
+  minYear: number;
+  maxYear: number;
+  ageYears: number;
+  ageMonths: number;
+}> =
+  /* https://www.ssa.gov/pubs/EN-05-10084.pdf
+   * https://www.ssa.gov/benefits/survivors/survivorchartred.html
+   */
+  [
+    {
+      minYear: 0,
+      maxYear: 1939,
+      ageYears: 65,
+      ageMonths: 0,
+    },
+    {
+      minYear: 1940,
+      maxYear: 1940,
+      ageYears: 65,
+      ageMonths: 2,
+    },
+    {
+      minYear: 1941,
+      maxYear: 1941,
+      ageYears: 65,
+      ageMonths: 4,
+    },
+    {
+      minYear: 1942,
+      maxYear: 1942,
+      ageYears: 65,
+      ageMonths: 6,
+    },
+    {
+      minYear: 1943,
+      maxYear: 1943,
+      ageYears: 65,
+      ageMonths: 8,
+    },
+    {
+      minYear: 1944,
+      maxYear: 1944,
+      ageYears: 65,
+      ageMonths: 10,
+    },
+    {
+      minYear: 1945,
+      maxYear: 1956,
+      ageYears: 66,
+      ageMonths: 0,
+    },
+    {
+      minYear: 1957,
+      maxYear: 1957,
+      ageYears: 66,
+      ageMonths: 2,
+    },
+    {
+      minYear: 1958,
+      maxYear: 1958,
+      ageYears: 66,
+      ageMonths: 4,
+    },
+    {
+      minYear: 1959,
+      maxYear: 1959,
+      ageYears: 66,
+      ageMonths: 6,
+    },
+    {
+      minYear: 1960,
+      maxYear: 1960,
+      ageYears: 66,
+      ageMonths: 8,
+    },
+    {
+      minYear: 1961,
+      maxYear: 1961,
+      ageYears: 66,
+      ageMonths: 10,
+    },
+    {
+      minYear: 1962,
+      maxYear: 10000,
+      ageYears: 67,
+      ageMonths: 0,
+    },
+  ];
