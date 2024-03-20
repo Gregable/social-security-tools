@@ -237,6 +237,13 @@ export class Recipient {
   private normalRetirementAge_: MonthDuration;
 
   /**
+   * The recipient's normal retirement age for survivor benefits.
+   *
+   * Recalculated when birthdate is updated.
+   */
+  private survivorNormalRetirementAge_: MonthDuration;
+
+  /**
    * The recipient's annual delayed retirement increase.
    *
    * Recalculated when birthdate is updated.
@@ -262,6 +269,14 @@ export class Recipient {
     this.normalRetirementAge_ = MonthDuration.initFromYearsMonths({
       years: retirementAgeBracket.ageYears,
       months: retirementAgeBracket.ageMonths,
+    });
+
+    const survivorRetirementAgeBracket = this.survivorRetirementAgeBracket();
+
+    // Recompute the survivor NRA based on the new birthdate.
+    this.survivorNormalRetirementAge_ = MonthDuration.initFromYearsMonths({
+      years: survivorRetirementAgeBracket.ageYears,
+      months: survivorRetirementAgeBracket.ageMonths,
     });
 
     // Recompute the delayed retirement increase based on the new birthdate.
@@ -291,6 +306,28 @@ export class Recipient {
     return retirementAgeBracket;
   }
 
+  private survivorRetirementAgeBracket(): {
+    minYear: number;
+    maxYear: number;
+    ageYears: number;
+    ageMonths: number;
+    delayedIncreaseAnnual: number;
+  } {
+    // Find the retirement age bracket data for this recipient.
+    let retirementAgeBracket = undefined;
+    for (let i = 0; i < constants.FULL_RETIREMENT_AGE_SURVIVOR.length; ++i) {
+      let ageBracket = constants.FULL_RETIREMENT_AGE_SURVIVOR[i];
+      if (
+        this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
+        this.birthdate_.ssaBirthYear() <= ageBracket.maxYear
+      ) {
+        retirementAgeBracket = ageBracket;
+      }
+    }
+    console.assert(retirementAgeBracket !== undefined);
+    return retirementAgeBracket;
+  }
+
   /*
    * Recipient's normal retirement age.
    */
@@ -309,6 +346,22 @@ export class Recipient {
     return this.birthdate_
       .ssaBirthMonthDate()
       .addDuration(this.normalRetirementAge());
+  }
+
+  /*
+   * Recipient's normal retirement age for survivor benefits.
+   */
+  survivorNormalRetirementAge(): MonthDuration {
+    return this.survivorNormalRetirementAge_;
+  }
+
+  /*
+   * Recipient's normal retirement date for survivor benefits.
+   */
+  survivorNormalRetirementDate(): MonthDate {
+    return this.birthdate_
+      .ssaBirthMonthDate()
+      .addDuration(this.survivorNormalRetirementAge());
   }
 
   /**
@@ -691,7 +744,8 @@ export class Recipient {
     if (deceasedFilingDate.greaterThanOrEqual(deceasedDeathDate)) {
       // If the deceased recipient did not file for benefits before death:
       if (deceasedDeathDate.lessThan(deceased.normalRetirementDate())) {
-        // If the deceased died before Normal Retirement Age, the survivor benefitis based on the deceased recipient's PIA.
+        // If the deceased died before Normal Retirement Age, the survivor
+        // benefit is based on the deceased recipient's PIA.
         baseSurvivorBenefit = deceased.pia().primaryInsuranceAmount();
       } else {
         // If the deceased died after Normal Retirement Age, the survivor
@@ -718,10 +772,10 @@ export class Recipient {
     // base amount based on the survivor's age between 60 and Full Retirement
     // Age.
     const survivorAge = this.birthdate.ageAtSsaDate(survivorFilingDate);
-    if (survivorAge.greaterThanOrEqual(this.normalRetirementAge())) {
+    if (survivorAge.greaterThanOrEqual(this.survivorNormalRetirementAge())) {
       return baseSurvivorBenefit;
     } else {
-      const monthsBetween60AndNRA = this.normalRetirementAge()
+      const monthsBetween60AndNRA = this.survivorNormalRetirementAge()
         .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
         .asMonths();
       const monthsBetweenAge60AndSurvivorAge = survivorAge

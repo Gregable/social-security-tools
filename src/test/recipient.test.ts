@@ -124,7 +124,7 @@ describe("Recipient", () => {
   it("calculates normal retirement", () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
-    // day before the birthday.
+    // day before the birthday. 1957 should be 66 and 6 months.
     r.birthdate = Birthdate.FromYMD(1957, 0, 2);
 
     expect(r.normalRetirementAge()).toEqual(
@@ -132,6 +132,20 @@ describe("Recipient", () => {
     );
     expect(r.normalRetirementDate()).toEqual(
       MonthDate.initFromYearsMonths({ years: 2023, months: 6 })
+    );
+  });
+
+  it("calculates survivor normal retirement", () => {
+    let r = new Recipient();
+    // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
+    // day before the birthday. 1957 should be 66 and 2 months.
+    r.birthdate = Birthdate.FromYMD(1957, 0, 2);
+
+    expect(r.survivorNormalRetirementAge()).toEqual(
+      MonthDuration.initFromYearsMonths({ years: 66, months: 2 })
+    );
+    expect(r.survivorNormalRetirementDate()).toEqual(
+      MonthDate.initFromYearsMonths({ years: 2023, months: 2 })
     );
   });
 
@@ -660,7 +674,7 @@ describe("Recipient", () => {
   it("calculates survivor benefits", () => {
     // Two recipients, one with a PIA of $1000, and the other with a PIA of
     // $3000. The first recipient is the survivor, and the second recipient is
-    // the deceased. Both born in Jan 1960, so FRA of 67 is in Jan 2027.
+    // the deceased.
     let recipient = new Recipient();
     recipient.setPia(Money.from(1000.0));
     recipient.birthdate = Birthdate.FromYMD(1960, 0, 5);
@@ -669,26 +683,32 @@ describe("Recipient", () => {
     deceased.setPia(Money.from(3000.0));
     deceased.birthdate = Birthdate.FromYMD(1960, 0, 5);
 
-    // Scenario 1: Deceased died at age 60 before filing.
+    // Both born in Jan 1960, so FRA of 67.
+    expect(deceased.normalRetirementAge()).toEqual(
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 })
+    );
+    // The survivor's FRA is 66 and 8 months.
+    expect(recipient.survivorNormalRetirementAge()).toEqual(
+      MonthDuration.initFromYearsMonths({ years: 66, months: 8 })
+    );
+
+    // Scenario 1: Deceased died at age 60 before filing. Survivor files
+    // immediately, also at age 60.
     {
       const deceasedDeathDate = MonthDate.initFromYearsMonths({
         years: 2020,
         months: 0,
       });
-      const deceasedFilingDate = MonthDate.initFromYearsMonths({
-        years: 2027,
-        months: 0,
-      });
-
       // In this situation, the base survivor benefit is the full deceased's PIA
-      // of $3000. Since the recipient files for survivor benefits at the
-      // earliest age 60, the benefit is reduced to only 71.5% of the PIA.
+      // of $3000 since they died without filing before FRA.
+      // Since the recipient files for survivor benefits at the minimum age,
+      // 60, the benefit is reduced to only 71.5% of the PIA.
       // $3,000 * 0.715 = $2,145.
       expect(
         recipient
           .survivorBenefit(
             deceased,
-            deceasedFilingDate,
+            deceasedDeathDate,
             deceasedDeathDate,
             deceasedDeathDate
           )
@@ -696,25 +716,22 @@ describe("Recipient", () => {
       ).toEqual(2145);
     }
 
-    // Scenario 2: Deceased died at age 68 without filing, after FRA.
+    // Scenario 2: Deceased died at age 68 without filing, 1 year after FRA.
     {
       const deceasedDeathDate = MonthDate.initFromYearsMonths({
-        years: 2028,
-        months: 0,
-      });
-      const deceasedFilingDate = MonthDate.initFromYearsMonths({
         years: 2028,
         months: 0,
       });
 
       // In this situation, the base survivor benefit is the deceased benefit
       // at age 68 which is 8% higher than the PIA. $3,000 * 1.08 = $3,240.
-      // Since the recipient
+      // Since the recipient files after the surivor FRA, the benefit is not
+      // reduced further.
       expect(
         recipient
           .survivorBenefit(
             deceased,
-            deceasedFilingDate,
+            deceasedDeathDate,
             deceasedDeathDate,
             deceasedDeathDate
           )
@@ -733,7 +750,8 @@ describe("Recipient", () => {
         months: 1,
       });
       // In this situation, the base survivor benefit is the minimum: 82.5% of
-      // the deceased's PIA. $3,000 * 0.825 = $2,475.
+      // the deceased's PIA. $3,000 * 0.825 = $2,475. Since the recipient files
+      // at age 67 after the survivor FRA, there is no further reduction.
       expect(
         recipient
           .survivorBenefit(
@@ -746,7 +764,7 @@ describe("Recipient", () => {
       ).toEqual(2475);
     }
 
-    // Scenario 3: Deceased filed for benefits at age 68, and died at age 69.
+    // Scenario 4: Deceased filed for benefits at age 68, and died at age 69.
     {
       const deceasedDeathDate = MonthDate.initFromYearsMonths({
         years: 2029,
@@ -767,6 +785,66 @@ describe("Recipient", () => {
           )
           .value()
       ).toEqual(3240);
+    }
+
+    // Scenario 5: Deceased died at age 60 before filing. Recipient files
+    // at age 62.
+    {
+      const deceasedDeathDate = MonthDate.initFromYearsMonths({
+        years: 2020,
+        months: 0,
+      });
+      const survivorFilingDate = MonthDate.initFromYearsMonths({
+        years: 2022,
+        months: 0,
+      });
+
+      // In this situation, the base survivor benefit is the full deceased's PIA
+      // of $3000. The recipient filed at age 62, 24 months after the minimum
+      // (age 60) and 56 months before the survivor FRA (age 66 and 8 months).
+      // The benefit is thus reduced by 56 / 80 of the 28.5% reduction for a
+      // final reduction of 20.05%. $3,000 * 0.8005 = $2,401.50.
+
+      expect(
+        recipient
+          .survivorBenefit(
+            deceased,
+            deceasedDeathDate,
+            deceasedDeathDate,
+            survivorFilingDate
+          )
+          .value()
+      ).toEqual(2401.5);
+    }
+
+    // Scenario 6: Deceased died at age 60 before filing. Recipient files
+    // at age 65.
+    {
+      const deceasedDeathDate = MonthDate.initFromYearsMonths({
+        years: 2020,
+        months: 0,
+      });
+      const survivorFilingDate = MonthDate.initFromYearsMonths({
+        years: 2025,
+        months: 0,
+      });
+
+      // In this situation, the base survivor benefit is the full deceased's PIA
+      // of $3000. The recipient filed at age 65, 60 months after the minimum
+      // (age 60) and 20 months before the survivor FRA (age 66 and 8 months).
+      // The benefit is thus reduced by 20 / 80 of the 28.5% reduction for a
+      // final reduction of 7.125%. $3,000 * 0.92875 = $2,786.25.
+
+      expect(
+        recipient
+          .survivorBenefit(
+            deceased,
+            deceasedDeathDate,
+            deceasedDeathDate,
+            survivorFilingDate
+          )
+          .value()
+      ).toEqual(2786.25);
     }
   });
 });
