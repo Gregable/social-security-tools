@@ -636,12 +636,13 @@ export class Recipient {
     filingDate: MonthDate,
     atDate: MonthDate
   ): Money {
-    // Calculate the starting date as the latest of the two filing dates:
-    const startDate = spouseFilingDate.greaterThan(filingDate)
-      ? spouseFilingDate
-      : filingDate;
-
-    return this.spousalBenefitOnDateGivenStartDate(spouse, startDate, atDate);
+    // TODO: Remove this function since it's just aliased now.
+    return this.spousalBenefitOnDateGivenStartDate(
+      spouse,
+      spouseFilingDate,
+      filingDate,
+      atDate
+    );
   }
 
   /**
@@ -650,9 +651,15 @@ export class Recipient {
    */
   spousalBenefitOnDateGivenStartDate(
     spouse: Recipient,
-    startDate: MonthDate,
+    spouseFilingDate: MonthDate,
+    filingDate: MonthDate,
     atDate: MonthDate
   ): Money {
+    // Calculate the starting date as the latest of the two filing dates:
+    const startDate = spouseFilingDate.greaterThan(filingDate)
+      ? spouseFilingDate
+      : filingDate;
+
     // If the spouse has lower earnings, return $0:
     if (this.higherEarningsThan(spouse)) return Money.zero();
 
@@ -672,10 +679,31 @@ export class Recipient {
     }
 
     const normalRetirementDate = this.normalRetirementDate();
+
+    // Spousal Benefits start on after normal retirement date:
     if (startDate.greaterThanOrEqual(normalRetirementDate)) {
-      return Money.fromCents(spousalCents).floorToDollar();
+      if (filingDate.lessThanOrEqual(normalRetirementDate)) {
+        return Money.fromCents(spousalCents).floorToDollar();
+      }
+      // https://www.bogleheads.org/forum/viewtopic.php?p=3986794#p3986794
+      // https://secure.ssa.gov/apps10/poms.nsf/lnx/0300615694
+      // The combined spousal and personal benefits cannot be greater than
+      // 50% of the higher earner's PIA, except in the case where personal
+      // benefits alone are higher than 50% of the higher earner's PIA.
+      // The way this is computed is to reduce the spousal benefit if the sum
+      // of the spousal and personal benefits exceeds 50% of the higher
+      // earner's PIA.
+      const personalBenefit = this.benefitOnDate(filingDate, atDate);
+      const spouseBenefitCents =
+        spousePiaAmountCents / 2 - personalBenefit.cents();
+      if (spouseBenefitCents <= 0) {
+        return Money.zero();
+      } else {
+        return Money.fromCents(spouseBenefitCents).floorToDollar();
+      }
     }
 
+    // Spousal Benefits start before normal retirement date:
     let monthsBeforeNra: number =
       normalRetirementDate.monthsSinceEpoch() - startDate.monthsSinceEpoch();
     if (monthsBeforeNra <= 36) {
