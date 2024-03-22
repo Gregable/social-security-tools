@@ -561,6 +561,7 @@ describe("Recipient", () => {
     s.setPia(Money.from(3000.0));
 
     // If they haven't filed yet, they should have zero benefit:
+    // 1960 birthdays are a age 67 NRA.
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     s.birthdate = Birthdate.FromYMD(1960, 0, 5);
     expect(
@@ -637,17 +638,28 @@ describe("Recipient", () => {
         .value()
     ).toEqual(372);
 
-    // Delayed retirement should not add any additional benefit:
+    // Delaying spousal benefit should not increase spousal benefit:
     expect(
       r
         .spousalBenefitOnDate(
           s,
-          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+          // s files at age 69
           MonthDate.initFromYearsMonths({ years: 2029, months: 0 }),
+          // r files at age 67
+          MonthDate.initFromYearsMonths({ years: 2027, months: 0 }),
+          // spousal benefit at age 69
           MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
         )
         .value()
     ).toEqual(500.0);
+
+    // However delayed retirement can decrease spousal benefit, since
+    // the total benefit is capped at half of the spousal PIA.
+    const age70 = MonthDate.initFromYearsMonths({ years: 2030, months: 0 });
+    expect(r.benefitOnDate(age70, age70).value()).toEqual(1240.0);
+    expect(r.spousalBenefitOnDate(s, age70, age70, age70).value()).toEqual(
+      260.0 // 3000 / 2 - 1240 = 260
+    );
   });
 
   it("calculates spousal benefits for a specific example", () => {
@@ -663,8 +675,11 @@ describe("Recipient", () => {
       s
         .spousalBenefitOnDate(
           r,
+          // s files at age 66
           MonthDate.initFromYearsMonths({ years: 2028, months: 0 }),
+          // r files at age 62
           MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
+          // spousal benefit at age 67
           MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
         )
         .value()

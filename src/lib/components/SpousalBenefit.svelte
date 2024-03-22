@@ -254,8 +254,8 @@
             </ul>
             <p>
               Since <RName {r} apos /> personal and spousal benefits may begin on
-              different dates, the reduction factors for early filing may applied
-              from different starting dates for each of the two benefits.
+              different dates, the reduction factors for early filing may apply from
+              different starting dates for each of the two benefits.
             </p>
           {/if}
           <h4>Early Filing for Spousal Benefits</h4>
@@ -299,6 +299,14 @@
             than <RName {r} apos /> normal retirement age, unlike personal benefits,
             there are no additional delayed retirement credits to increase spousal
             benefits.
+          </p>
+          <p>
+            Furthermore, the spousal benefit amount cannot increase the combined
+            benefit for <RName {r} /> to an amount greater than half of <RName
+              r={s}
+              apos
+            /> Primary Insurance Amount. Therefore, <RName {r} apos /> delayed credits
+            can potentially reduce the spousal benefit by same amount.
           </p>
           <h4>Spousal Benefit Filing Date Examples</h4>
           <p>

@@ -220,7 +220,7 @@
       src={LateFile100Image}
       width="620"
       height="566"
-      alt="Screenshot of benefit chart for two users, Alex and Chris. Alex filed at 67 while Chris filed at 70. Alex's benefit is $1,000 / mo and Chris's combined benefit is now $524 / mo."
+      alt="Screenshot of benefit chart for two users, Alex and Chris. Alex filed at 67 while Chris filed at 70. Alex's benefit is $1,000 / mo and Chris's combined benefit is now $500 / mo."
     />
   </figure>
 
@@ -230,12 +230,15 @@
     delayed credits from filing late.
   </p>
   <p>
-    Chris's spousal benefit is not increased however because spousal benefits do
-    not increase from delayed credits. The spousal benefit is still $400 / mo.
+    However, the spousal benefit cannot increase the combined benefit for Chris
+    to an amount greater than half of Alex's PIA. So, the spousal benefit is
+    reduced by $24 / mo to $376 / mo to keep the total benefit at $500 / mo. [<a
+      href="https://secure.ssa.gov/apps10/poms.nsf/lnx/0300615694">ssa.gov</a
+    >].
   </p>
   <p>
-    The resulting total is $524 / mo, which is $124 / mo from Chris's personal
-    and $400 / mo from the spousal benefit.
+    The resulting total is $500 / mo, which is $124 / mo from Chris's personal
+    and $376 / mo from the spousal benefit.
   </p>
 
   <br class="clear" />
