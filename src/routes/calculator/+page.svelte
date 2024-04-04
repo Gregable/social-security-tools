@@ -136,14 +136,14 @@
             spouse={context.spouse}
           />
         </SidebarSection>
-        <SidebarSection label="Survivor Benefit">
-          <SurvivorReport
+        <SidebarSection label="Filing Dates">
+          <CombinedChart
             recipient={context.recipient}
             spouse={context.spouse}
           />
         </SidebarSection>
-        <SidebarSection label="Filing Dates">
-          <CombinedChart
+        <SidebarSection label="Survivor Benefit">
+          <SurvivorReport
             recipient={context.recipient}
             spouse={context.spouse}
           />
