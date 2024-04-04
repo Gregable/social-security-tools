@@ -15,6 +15,7 @@
   import CombinedHeading from "$lib/components/CombinedHeading.svelte";
   import CombinedChart from "$lib/components/CombinedChart.svelte";
   import SpousalReport from "$lib/components/SpousalReport.svelte";
+  import SurvivorReport from "$lib/components/SurvivorReport.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import Sponsor from "$lib/components/Sponsor.svelte";
 
@@ -131,6 +132,12 @@
         </SidebarSection>
         <SidebarSection label="Spousal Benefits">
           <SpousalReport
+            recipient={context.recipient}
+            spouse={context.spouse}
+          />
+        </SidebarSection>
+        <SidebarSection label="Survivor Benefit">
+          <SurvivorReport
             recipient={context.recipient}
             spouse={context.spouse}
           />

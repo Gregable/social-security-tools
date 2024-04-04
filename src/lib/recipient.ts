@@ -781,14 +781,21 @@ export class Recipient {
         // filed for benefits on the date of death.
         baseSurvivorBenefit = deceased.benefitOnDate(
           deceasedDeathDate,
-          deceasedDeathDate
+          deceased.birthdate.dateAtSsaAge(
+            MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
+          )
         );
       }
     } else {
       // If the deceased recipient filed for benefits before death, then the base survivor benefit is the greater of the deceased recipient's benefit at the time of death or 82.5% of the deceased recipient's PIA.
       baseSurvivorBenefit = Money.max(
         deceased.pia().primaryInsuranceAmount().times(0.825),
-        deceased.benefitOnDate(deceasedFilingDate, deceasedDeathDate)
+        deceased.benefitOnDate(
+          deceasedFilingDate,
+          deceased.birthdate.dateAtSsaAge(
+            MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
+          )
+        )
       );
     }
 

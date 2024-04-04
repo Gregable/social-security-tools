@@ -278,6 +278,9 @@
       ticks.forEach((element) => {
         element.x = valueToPosition(element.value, floor, ceiling, width);
       });
+      ticks = ticks.filter(
+        (element) => element.value >= floor && element.value <= ceiling
+      );
     } else {
       for (let i = floor; i <= ceil; i += step) {
         ticks.push({
