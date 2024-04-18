@@ -36,11 +36,11 @@
   let fileVsDeath: string = "fileBeforeDeath";
 
   // sliderMonths_ is bound to the value of the slider, in months.
-  // This is set once in onMount to the user's NRA, typically 66 * 12.
+  // This is set once in onMount to the user's NRA, typically 67 * 12.
   // It is not set again, even if the users's birthday / NRA changes so that
   // we don't override the user's selection should they have changed it
   // manually.
-  let beforeDeathSliderMonths_: number = 66 * 12;
+  let beforeDeathSliderMonths_: number = 67 * 12;
   let afterDeathSliderMonths_: number = 68 * 12;
   let survivorSliderMonths_: number = 60 * 12;
 
@@ -472,9 +472,12 @@
           bind:value={survivorSliderMonths_}
           floor={60 * 12}
           userFloor={60 * 12}
-          ceiling={66 * 12}
+          ceiling={lowerEarner.survivorNormalRetirementAge().asMonths()}
           step={1}
-          translate={translateSliderLabel(null, 66 * 12)}
+          translate={translateSliderLabel(
+            null,
+            lowerEarner.survivorNormalRetirementAge().asMonths()
+          )}
           showTicks={true}
           ticksArray={survivorTicks_}
           barLeftColor={lowerEarner.colors().light}
