@@ -57,7 +57,7 @@
       </div>
 
       <div class="text" style="width: 70%">
-        <p>Save More with Mint Mobile!</p>
+        <p>$15 per month phone plans!</p>
         <p>
           Looking to cut down on expenses? Sign up through ssa.tools before
           August and get $15 in free credit from Mint Mobile. Enjoy affordable,
