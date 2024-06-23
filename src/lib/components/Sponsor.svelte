@@ -38,14 +38,14 @@
 </div>
 -->
 
-<a href="http://fbuy.me/tqYrC" class="ad-anchor">
+<a href="/mint-mobile" class="ad-anchor">
   <div class="pageBreakAvoid sponsor">
     <h2>Mint Mobile</h2>
     <h4>Sponsor</h4>
 
     <div class="ad-container">
       <div style="width: 30%">
-        <a href="http://fbuy.me/tqYrC">
+        <a href="/mint-mobile">
           <img
             src={MintImage}
             width="324px"
