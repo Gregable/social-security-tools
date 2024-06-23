@@ -154,7 +154,6 @@
       false,
       true
     );
-    console.log(survivorTicks_);
   });
 </script>
 

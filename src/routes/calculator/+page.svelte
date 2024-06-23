@@ -62,7 +62,7 @@
           <SidebarSection label="Primary Insurance Amount" underSticky>
             <PiaReport recipient={context.recipient} />
           </SidebarSection>
-          <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
+          <SidebarSection label="Sponsor - Mint Mobile" sponsor underSticky>
             <Sponsor />
           </SidebarSection>
           <SidebarSection label="Normal Retirement Age" underSticky>
@@ -75,7 +75,7 @@
           <SidebarSection label="Primary Insurance Amount" underSticky>
             <PiaReport recipient={context.recipient} />
           </SidebarSection>
-          <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
+          <SidebarSection label="Sponsor - Mint Mobile" sponsor underSticky>
             <Sponsor />
           </SidebarSection>
           <SidebarSection label="Normal Retirement Age">
