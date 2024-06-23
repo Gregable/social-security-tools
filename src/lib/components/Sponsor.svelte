@@ -1,7 +1,9 @@
 <script lang="ts">
-  import SponsorImage from "$lib/images/projection-lab.png";
+  import ProjectionLabImage from "$lib/images/projection-lab.png";
+  import MintImage from "$lib/images/evergreen-fox.png";
 </script>
 
+<!--
 <div class="pageBreakAvoid sponsor">
   <h2>ProjectionLab</h2>
   <h4>Sponsor</h4>
@@ -24,7 +26,7 @@
     <p>
       <a href="https://projectionlab.com?ref=ssa-tools">
         <img
-          src={SponsorImage}
+          src={ProjectionLabImage}
           width="1160px"
           height="940px"
           class="sponsor-image image-fit"
@@ -34,15 +36,64 @@
     </p>
   </div>
 </div>
+-->
+
+<a href="http://fbuy.me/tqYrC" class="ad-anchor">
+  <div class="pageBreakAvoid sponsor">
+    <h2>Mint Mobile</h2>
+    <h4>Sponsor</h4>
+
+    <div class="ad-container">
+      <div style="width: 30%">
+        <a href="http://fbuy.me/tqYrC">
+          <img
+            src={MintImage}
+            width="324px"
+            height="426px"
+            class="sponsor-image image-fit"
+            alt="Mint Mobile"
+          />
+        </a>
+      </div>
+
+      <div class="text" style="width: 70%">
+        <p>Save More with Mint Mobile!</p>
+        <p>
+          Looking to cut down on expenses? Sign up through ssa.tools before
+          August and get $15 in free credit from Mint Mobile. Enjoy affordable,
+          reliable phone service and keep your savings on track. Don't miss out
+          on this opportunity to make the most of your budget while planning for
+          retirement!
+        </p>
+      </div>
+    </div>
+  </div>
+</a>
 
 <style>
   .text {
     margin: 0 0.5em;
+    font-size: 1.2em;
   }
 
   h2,
   h4 {
     margin: 0.5em 0;
+  }
+
+  .ad-anchor {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .ad-container {
+    display: flex;
+    padding: 10px;
+  }
+  .ad-container div {
+    padding: 10px;
+    margin: 5px;
   }
 
   .sponsor {
@@ -52,9 +103,8 @@
   }
 
   img.image-fit {
-    width: 100%;
+    width: 100px;
     height: auto;
     object-fit: contain;
-    padding: 0 3em;
   }
 </style>
