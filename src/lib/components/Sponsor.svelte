@@ -38,12 +38,12 @@
 </div>
 -->
 
-<a href="/mint-mobile" class="ad-anchor">
+<a href="/mint-mobile" class="spon-anchor">
   <div class="pageBreakAvoid sponsor">
     <h2>Mint Mobile</h2>
     <h4>Sponsor</h4>
 
-    <div class="ad-container">
+    <div class="spon-container">
       <div style="width: 30%">
         <a href="/mint-mobile">
           <img
@@ -81,17 +81,17 @@
     margin: 0.5em 0;
   }
 
-  .ad-anchor {
+  .spon-anchor {
     display: block;
     text-decoration: none;
     color: inherit;
   }
 
-  .ad-container {
+  .spon-container {
     display: flex;
     padding: 10px;
   }
-  .ad-container div {
+  .spon-container div {
     padding: 10px;
     margin: 5px;
   }
