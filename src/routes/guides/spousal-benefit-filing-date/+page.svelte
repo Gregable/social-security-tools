@@ -75,8 +75,8 @@
     <figure class="float-right">
       <img
         src={EarlyFileImage}
-        width="617"
-        height="576"
+        width="636"
+        height="575"
         alt="Screenshot of benefit chart for two users, Alex and Chris. Both have filed for benefits at age 62 and 1 month. Alex's benefit is $704 / mo and Chris's benefit is $345 / mo."
       />
     </figure>
