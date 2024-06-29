@@ -67,6 +67,7 @@
     display: block;
     text-decoration: none;
     color: inherit;
+    margin: 30px 4px;
   }
 
   .spon-container {
@@ -98,6 +99,23 @@
     grid-column-end: 3;
     grid-row-start: 1;
     grid-row-end: 3;
+  }
+  @media (max-width: 600px) {
+    .left-bottom-region,
+    .left-top-region,
+    li {
+      display: none;
+    }
+    .text {
+      margin: 0;
+    }
+    .spon-container {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .right-region {
+      grid-row: auto;
+    }
   }
   li {
     margin-bottom: 14px;
