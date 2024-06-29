@@ -5,13 +5,6 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (event.url.pathname.startsWith("/calculator.html")) {
     return new Response(null, { status: 301, headers: { location: "/" } });
   }
-  // Sponsor
-  if (event.url.pathname.startsWith("/mint-mobile")) {
-    return new Response(null, {
-      status: 301,
-      headers: { location: "http://fbuy.me/tqYrC" },
-    });
-  }
 
   const oldGuideUrl = /^\/guide\/(.*)\.html$/;
   let matches = event.url.pathname.match(oldGuideUrl);

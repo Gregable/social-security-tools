@@ -1,30 +1,19 @@
 <script lang="ts">
   import ProjectionLabImage from "$lib/images/projection-lab.png";
-  import MintImage from "$lib/images/evergreen-fox.png";
+
+  const currentDate = new Date();
+  // 10% off in {currentMonth} is misleading, but it's not false.
+  const currentMonth = currentDate.toLocaleString("default", { month: "long" });
 </script>
 
-<!--
-<div class="pageBreakAvoid sponsor">
-  <h2>ProjectionLab</h2>
-  <h4>Sponsor</h4>
-
-  <div class="text">
-    <p>
-      Financial planning for retirement is hard, a problem that
-      <a href="https://projectionlab.com?ref=ssa-tools">ProjectionLab</a>, takes
-      on head first. With
-      <a href="https://projectionlab.com?ref=ssa-tools">ProjectionLab</a>, you
-      can build an experiment with a living model of your financial life and
-      chart a course towards the financial future you want.
-    </p>
-    <p>
-      ProjectionLab models your entire retirement plan, runs Monte Carlo
-      simulations using historical market data, and provides clear
-      visualizations. Like this site, you can even try out ProjectionLab for
-      free. Use the code <strong>SSA-TOOLS</strong> for 10% off.
-    </p>
-    <p>
-      <a href="https://projectionlab.com?ref=ssa-tools">
+<a href="https://projectionlab.com?ref=ssa-tools" class="spon-anchor">
+  <div class="pageBreakAvoid sponsor">
+    <div class="spon-container">
+      <div class="left-top-region">
+        <h2>ProjectionLab</h2>
+        <h4>Sponsor</h4>
+      </div>
+      <div class="left-bottom-region">
         <img
           src={ProjectionLabImage}
           width="1160px"
@@ -32,39 +21,32 @@
           class="sponsor-image image-fit"
           alt="ProjectionLab"
         />
-      </a>
-    </p>
-  </div>
-</div>
--->
-
-<a href="/mint-mobile" class="spon-anchor">
-  <div class="pageBreakAvoid sponsor">
-    <h2>Mint Mobile</h2>
-    <h4>Sponsor</h4>
-
-    <div class="spon-container">
-      <div style="width: 30%">
-        <a href="/mint-mobile">
-          <img
-            src={MintImage}
-            width="324px"
-            height="426px"
-            class="sponsor-image image-fit"
-            alt="Mint Mobile"
-          />
-        </a>
       </div>
-
-      <div class="text" style="width: 70%">
-        <p>$15 per month phone plans!</p>
-        <p>
-          Looking to cut down on expenses? Sign up through ssa.tools before
-          August and get $15 in free credit from Mint Mobile. Enjoy affordable,
-          reliable phone service and keep your savings on track. Don't miss out
-          on this opportunity to make the most of your budget while planning for
-          retirement!
-        </p>
+      <div class="right-region">
+        <div class="text">
+          <p>
+            Are you planning for retirement? Discover ProjectionLab, an advanced
+            tool designed to help you simulate and understand your overall plan.
+          </p>
+          <p>
+            Try for free. Use code <strong>SSA-TOOLS</strong> for 10% off in
+            {currentMonth}.
+          </p>
+          <ul>
+            <li>
+              <strong>Simulate the market:</strong> Run Monte Carlo simulations using
+              historical market data.
+            </li>
+            <li>
+              <strong>Visualize your life:</strong> Explore various investment strategies
+              and potential outcomes over time.
+            </li>
+            <li>
+              <strong>Secure your data:</strong> Keep your financial information
+              safe with flexible data persistence options.
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -85,15 +67,58 @@
     display: block;
     text-decoration: none;
     color: inherit;
+    margin: 30px 4px;
   }
 
   .spon-container {
-    display: flex;
-    padding: 10px;
+    display: grid;
+    grid-template-columns: 30% 70%;
+    grid-template-rows: auto auto;
+    gap: 10px;
+    padding: 10px 4px 4px 0;
   }
-  .spon-container div {
-    padding: 10px;
-    margin: 5px;
+  .left-top-region {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 2;
+  }
+  .left-bottom-region {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 2;
+    grid-row-end: 3;
+  }
+  .right-region {
+    display: flex;
+    align-items: center;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 3;
+  }
+  @media (max-width: 600px) {
+    .left-bottom-region,
+    .left-top-region,
+    li {
+      display: none;
+    }
+    .text {
+      margin: 0;
+    }
+    .spon-container {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .right-region {
+      grid-row: auto;
+    }
+  }
+  li {
+    margin-bottom: 14px;
   }
 
   .sponsor {
@@ -103,8 +128,7 @@
   }
 
   img.image-fit {
-    width: 100px;
+    max-width: 100%;
     height: auto;
-    object-fit: contain;
   }
 </style>
