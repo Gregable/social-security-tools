@@ -35,3 +35,4 @@ dist-ssr
 
 # Vercel build output
 .vercel
+.aider*
