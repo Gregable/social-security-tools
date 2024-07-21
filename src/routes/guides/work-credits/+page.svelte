@@ -28,105 +28,97 @@
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
   <p>
-    In order to qualify for Social Security benefits, you need to have earned
-    enough work credits. Work credits are earned by working and paying Social
-    Security taxes. This mechanism forms a kind of "minimum" required work to
-    qualify for benefits.
+    Understanding work credits is crucial for anyone planning their retirement or considering Social Security benefits. This guide explains what work credits are, how to earn them, and why they matter for your Social Security eligibility.
+  </p>
+
+  <h2>What Are Work Credits?</h2>
+
+  <p>
+    <strong>Work credits</strong> are the building blocks of your Social Security eligibility. They are earned by working and paying Social Security taxes. This system ensures a minimum level of work contribution before qualifying for benefits.
   </p>
 
   <h2>How Many Work Credits Do I Need?</h2>
 
+  <h3>For Retirement Benefits</h3>
   <p>
-    For retirement benefits, you need 40 work credits to qualify. This requires
-    at least 10 years of work.
+    <strong>You need 40 work credits to qualify for retirement benefits.</strong> This typically requires at least 10 years of work.
   </p>
+
+  <h3>For Survivor's Benefits</h3>
   <p>
-    For survivor's benefits, for a spouse or child, the number of work credits
-    that you must have earned in order for your family members to qualify
-    depends on your age at the time of your death. The younger you are, the
-    fewer credits are required. However, no one needs more than 40 credits to be
-    eligible for any Social Security benefit.
+    The number of work credits required for your family to qualify for survivor's benefits depends on your age at the time of death:
   </p>
+  <ul>
+    <li>Younger individuals need fewer credits</li>
+    <li>The maximum required is 40 credits, regardless of age</li>
+  </ul>
+
+  <h3>For Disability Benefits</h3>
   <p>
-    This site doesn't currently have support for disability benefits, but the
-    number of work credits required for disability benefits depends on your age
-    at the time you become disabled. See <a
-      href="https://www.ssa.gov/benefits/retirement/planner/credits.html#h3"
-      >ssa.gov</a
-    > for more information.
+    The required number of work credits for disability benefits varies based on your age when you become disabled. For more details, visit the <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html#h3">official SSA website</a>.
   </p>
 
   <h2>How Do I Earn Work Credits?</h2>
 
-  <p>
-    You earn work credits by working and paying Social Security taxes on wages.
-    Each calendar year you work, you may be eligible to earn up to 4 work
-    credits, but never more.
-  </p>
-  <p>
-    In years before 1987, you could earn one work credit for each calendar
-    quarter where you earned at least $250 in wages. Thus the 4 credits per
-    year. You may also see "quarters of coverage" (QCs) mentioned in some
-    places. This is the same thing as work credits.
-  </p>
-  <p>
-    After 1987, the quarters requirement was removed and instead you earn one
-    credit a year for each fixed dollar amount of earnings, up to 4 credits per
-    year. The amount of earnings required to earn a credit changes each year. It
-    is adjusted to keep pace with wage growth. For example, in year 2000, you
-    would earn one credit for each $780 of earnings.
-  </p>
-  <p>You cannot earn partial credits.</p>
+  <h3>Basic Rules</h3>
+  <ul>
+    <li>Work credits are earned by working and paying Social Security taxes</li>
+    <li>You can earn up to 4 work credits per calendar year</li>
+    <li>Partial credits cannot be earned</li>
+  </ul>
 
-  <h2>Amount of earnings needed per credit</h2>
-
+  <h3>Before 1987</h3>
   <p>
-    The amount of earnings needed to earn a credit changes each year. See the
-    following table for the amount of earnings needed to earn a credit for each
-    year after 1978:
+    One work credit was earned for each calendar quarter with at least $250 in wages. These were also known as "quarters of coverage" (QCs).
   </p>
 
-  <div class="earnings-container">
+  <h3>After 1987</h3>
+  <p>
+    The system changed to a yearly basis:
+  </p>
+  <ul>
+    <li>One credit is earned for each fixed dollar amount of earnings</li>
+    <li>The required amount changes annually to keep pace with wage growth</li>
+    <li>Example: In 2000, you would earn one credit for each $780 of earnings</li>
+  </ul>
+
+  <h2>Amount of Earnings Needed per Credit</h2>
+
+  <p>
+    The earnings required to earn a credit change yearly. Here's a table showing the amount needed for each year since 1978:
+  </p>
+
+  <table class="earnings-table">
+    <tr><th>Year</th><th>Earnings Required</th></tr>
     {#each Object.entries(constants.EARNINGS_PER_CREDIT) as [year, earnings]}
-      <div class="earnings-year">
-        <span class="year">{year}:</span>
-        <span class="earnings">{earnings.wholeDollars()}</span>
-      </div>
+      <tr>
+        <td>{year}</td>
+        <td>${earnings.wholeDollars()}</td>
+      </tr>
     {/each}
-  </div>
+  </table>
 
   <p>
-    For example, in 1989 the amount of earnings needed to earn a credit was
-    $500. Therefore someone with $1,700 in earnings in 1989 would earn 3
-    credits. The extra $200 in earnings above $1,500 would not earn partial
-    credits.
+    <strong>Example:</strong> In 1989, $500 earned one credit. With $1,700 in earnings that year, you would earn 3 credits. The extra $200 above $1,500 would not count towards a partial credit.
   </p>
 
   <h2>Qualifying for Spousal Benefits</h2>
 
   <p>
-    Note that to receive spousal benefits from a spouse's work record, you do
-    not need to have earned work credits yourself. You only need to be married
-    to someone who has earned enough work credits.
+    <strong>Important note:</strong> To receive spousal benefits, you don't need to have earned work credits yourself. You only need to be married to someone who has earned enough work credits.
   </p>
 
-  <h2>Additional Links</h2>
+  <h2>Additional Resources</h2>
 
   <ul>
     <li>
-      <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html"
-        >Social Security Administration: How You Earn Credits</a
-      >
+      <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html">Social Security Administration: How You Earn Credits</a>
     </li>
     <li>
-      <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html#h3"
-        >Social Security Administration: How Many Credits You Need</a
-      >
+      <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html#h3">Social Security Administration: How Many Credits You Need</a>
     </li>
     <li>
-      <a href="https://www.ssa.gov/oact/cola/QC.html"
-        >Social Security Administration: Quarters of Coverage</a
-      >
+      <a href="https://www.ssa.gov/oact/cola/QC.html">Social Security Administration: Quarters of Coverage</a>
     </li>
   </ul>
 
@@ -134,25 +126,21 @@
 </div>
 
 <style>
-  .earnings-container {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
+  .earnings-table {
     width: 100%;
-    font-size: 1.3rem;
-    padding: 1rem 0;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
   }
-  .earnings-year {
-    padding: 0.5rem;
-    flex-grow: 1;
+  .earnings-table th, .earnings-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
   }
-  .year {
+  .earnings-table th {
+    background-color: #f2f2f2;
     font-weight: bold;
-    padding-right: 0.5rem;
-    padding-left: 1rem;
   }
-  .earnings {
-    display: inline-block;
-    width: 4em;
+  .earnings-table tr:nth-child(even) {
+    background-color: #f9f9f9;
   }
 </style>
