@@ -148,21 +148,19 @@
 
 <style>
   .earnings-container {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
     width: 100%;
     font-size: 1.3rem;
     padding: 1rem 0;
   }
   .earnings-year {
     padding: 0.5rem;
-    flex-grow: 1;
   }
   .year {
     font-weight: bold;
     padding-right: 0.5rem;
-    padding-left: 1rem;
   }
   .earnings {
     display: inline-block;
