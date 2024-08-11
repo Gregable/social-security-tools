@@ -18,6 +18,7 @@
   import SurvivorReport from "$lib/components/SurvivorReport.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import Sponsor from "$lib/components/Sponsor.svelte";
+  import { Long } from "../../stories/RecipientName.stories";
 
   export let isPasteFlow: boolean = true;
 
@@ -26,6 +27,24 @@
     history.pushState({ id: "top" }, "", "#results");
   }
 </script>
+
+<svelte:head>
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=AW-16669721864"
+  >
+  </script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "AW-16669721864");
+  </script>
+</svelte:head>
 
 <Header active="Calculator" />
 <main>
@@ -153,6 +172,13 @@
         <MoreResources />
       </SidebarSection>
     </Sidebar>
+    <script>
+      gtag("event", "conversion", {
+        send_to: "AW-16669721864/KvxrCIjA3skZEIiK34w-",
+        value: 1.0,
+        currency: "USD",
+      });
+    </script>
   {/if}
 </main>
 
