@@ -15,6 +15,22 @@
   <link rel="canonical" href="https://ssa.tools" />
   <meta property="og:url" content="https://ssa.tools" />
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
+
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=AW-16669721864"
+  >
+  </script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "AW-16669721864");
+  </script>
 </svelte:head>
 
 <Header />
