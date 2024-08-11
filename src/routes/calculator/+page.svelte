@@ -18,7 +18,6 @@
   import SurvivorReport from "$lib/components/SurvivorReport.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import Sponsor from "$lib/components/Sponsor.svelte";
-  import { Long } from "../../stories/RecipientName.stories";
 
   export let isPasteFlow: boolean = true;
 
