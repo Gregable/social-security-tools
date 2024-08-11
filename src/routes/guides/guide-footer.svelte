@@ -1,5 +1,5 @@
 <div class="footer">
-  <h1>Try SSA.tools to see your personalized benefit</h1>
+  <h1>Try SSA.tools to calculate your personalized benefit</h1>
   <p>See your personal benefit data and ask 'What If?' Questions.</p>
   <div class="bigbtn">
     <a class="bigbtn" href="/calculator" role="button"
@@ -36,7 +36,9 @@
     font-weight: 400;
     text-decoration: none;
     display: flex;
-    box-shadow: 0 0 0 1px #5cb85c, 0 1px 2px 0 rgba(31, 42, 55, 0.4);
+    box-shadow:
+      0 0 0 1px #5cb85c,
+      0 1px 2px 0 rgba(31, 42, 55, 0.4);
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease-out;

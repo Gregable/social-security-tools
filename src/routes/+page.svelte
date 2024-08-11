@@ -7,12 +7,10 @@
 </script>
 
 <svelte:head>
-  <title>Social Security Calculator</title>
+  <title>SSA.tools: A Social Security Calculator</title>
   <meta
     name="description"
-    content="A social security calculator that makes
-  understanding social security benefits simple. Estimator runs entirely in your
-  browser making the entire process secure and private."
+    content="An online social security calculator that makes understanding social security retirement benefits quick and simple."
   />
   <link rel="canonical" href="https://ssa.tools" />
   <meta property="og:url" content="https://ssa.tools" />
@@ -53,8 +51,8 @@
       <p>
         Painless entry of your earnings records directly from the "<i>my</i> SocialSecurity"
         section at ssa.gov. Copy and paste your entire record directly into the social
-        security tool in a single quick step. Run entirely from your browser making
-        the process secure and private.
+        security calculator in a single quick step. Run entirely from your browser
+        making the process secure and private.
       </p>
     </div>
     <div>
@@ -111,7 +109,7 @@
       <h1>PIA Calculation</h1>
       <p>
         Visually calculate how your Average Indexed Monthly Earnings (AIME)
-        affects your Primary Insurance Amount (PIA). Use the estimator to see
+        affects your Primary Insurance Amount (PIA). Use the calcluator to see
         how you compare to the two Social Security breakpoints.
       </p>
     </div>
@@ -169,7 +167,7 @@
   <div id="footer">
     <div id="footer-container">
       <h2>What next</h2>
-      <h1>Want to try the calculator now?</h1>
+      <h1>Want to try the social security calculator now?</h1>
       <p>
         Great, <a href="/calculator">get started here</a>.
       </p>
@@ -180,7 +178,7 @@
         <li>Bookmark this in your browser.</li>
         <li>
           <a
-            href="mailto:your-email?body=Here%27s%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator.%0A%0A%20Greg%2C%20the%20creator%2C%20is%20CC%27d%20on%20this%20email.%20Maybe%20reply%20and%20let%20him%20know%20if%20you%20found%20it%20useful%20after%20you%20use%20it.%20He%27ll%20probably%20like%20that.&cc=ggrothau%40gmail.com&amp;subject=Read%20later%3A%20Social%20Security%20Calculator"
+            href="mailto:?subject=Read%20later%3A%20Social%20Security%20Calculator%20(ssa.tools)&body=Here's%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator"
             >Send yourself an email</a
           >.
         </li>
