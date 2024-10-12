@@ -18,7 +18,7 @@ export const MAX_CREDITS: number = 40;
  * manually manipulates the input string.
  * @type {number}
  */
-export const MAX_YEAR: number = 2024;
+export const MAX_YEAR: number = 2025;
 
 /**
  * For years before 1978, an individual was credited with a quarter of coverage
@@ -87,6 +87,7 @@ export const EARNINGS_PER_CREDIT: { [key: number]: Money } = {
   2022: Money.from(1510),
   2023: Money.from(1640),
   2024: Money.from(1730),
+  2025: Money.from(1810),
 };
 
 export const MAX_EARNINGS_PER_CREDIT: number = Math.max(
@@ -186,6 +187,7 @@ export const MAXIMUM_EARNINGS: { [key: number]: Money } = {
   2022: Money.from(147000),
   2023: Money.from(160200),
   2024: Money.from(168600),
+  2025: Money.from(176100),
 };
 /**
  * Earliest Year for which we have data for the maximum earnings.
@@ -274,6 +276,7 @@ export const TAX_RATES: { [key: number]: number } = {
   2022: 0.053,
   2023: 0.053,
   2024: 0.053,
+  2025: 0.053,
 };
 
 // Values from https://www.ssa.gov/oact/cola/piaformula.html
@@ -367,6 +370,7 @@ export const WAGE_INDICES: { [key: number]: Money } = {
   2020: Money.from(55628.6),
   2021: Money.from(60575.07),
   2022: Money.from(63795.13),
+  2023: Money.from(66621.8),
 };
 /**
  * The minimum year for which we have wage index data.
@@ -435,6 +439,7 @@ export const COLA: { [key: number]: number } = {
   2021: 5.9,
   2022: 8.7,
   2023: 3.2,
+  2024: 2.5,
 };
 
 /**
