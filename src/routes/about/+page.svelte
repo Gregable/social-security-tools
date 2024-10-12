@@ -59,7 +59,7 @@
       be made after researching the subject yourself.
     </p>
     <p>
-      The site was most recently updated on Oct 12, 2023 with the latest 3.2%
+      The site was most recently updated on Oct 12, 2024 with the latest 2.5%
       COLA adjustment.
     </p>
     <h3>Why?</h3>
