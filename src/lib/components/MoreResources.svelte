@@ -1,8 +1,8 @@
 <script lang="ts">
   import FacebookImg from "$lib/images/facebook.svg";
-  import TwitterImg from "$lib/images/twitter.svg";
   import GithubImg from "$lib/images/github.svg";
   import KoFiImg from "$lib/images/kofi.png";
+  import BlueskyImg from "$lib/images/bluesky.jpg";
 </script>
 
 <div class="container pageBreakAvoid pageBreakBefore">
@@ -26,15 +26,9 @@
     </p>
     <ul class="socialmedia">
       <li>
-        <a href="https://twitter.com/SsaTools">
-          <img src={TwitterImg} alt="Twitter Icon" />
-          @SSATools
-        </a>
-      </li>
-      <li>
-        <a href="https://www.facebook.com/SsaToolsCalculator">
-          <img src={FacebookImg} alt="Facebook Icon" />
-          SSAToolsCalculator
+        <a href="https://bsky.app/profile/ssa.tools">
+          <img src={BlueskyImg} alt="Bluesky Icon" />
+          @ssa.tools
         </a>
       </li>
       <li>
