@@ -40,6 +40,11 @@
     expanded = initiallyExpanded;
     media_query_list = window.matchMedia("print");
     media_query_list.addEventListener("change", onPrintMediaChange);
+
+    if (initiallyExpanded) {
+      contentsEl.style.maxHeight = contentsEl.scrollHeight + "px";
+    }
+
     return () => {
       removeMediaQueryListener();
     };
