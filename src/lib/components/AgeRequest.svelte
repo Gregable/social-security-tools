@@ -93,6 +93,10 @@
       confirm();
     }
   }
+
+  function init(el) {
+    el.focus();
+  }
 </script>
 
 <svelte:window on:keydown={checkEnter} />
@@ -122,6 +126,7 @@ https://design-system.service.gov.uk/patterns/dates/#asking-for-memorable-dates
         maxlength="2"
         on:keyup={event => handleKeyUp(event, bday_day)}
         bind:value={birthdateMonthStr}
+        use:init
       />
     </div>
     <div class="date-input-item">
