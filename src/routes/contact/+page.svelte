@@ -21,7 +21,7 @@
     </p>
     <ul>
       <li>
-        Email: <a href="mailto:ggrothau@gmail.com">ggrothau@gmail.com</a>
+        Email: <a href="mailto:greg@grot.haus">greg@grot.haus</a>
       </li>
       <li>
         Web: <a href="https://gregable.com">Gregable.com</a>
