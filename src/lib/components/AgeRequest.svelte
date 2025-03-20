@@ -16,6 +16,9 @@
   import { createEventDispatcher } from "svelte";
   import { Birthdate } from "../birthday";
 
+  let bday_day
+  let bday_year
+
   const dispatch = createEventDispatcher();
   function confirm() {
     dispatch("submit", {
@@ -78,7 +81,25 @@
   function isTouchscreen(): boolean {
     return "ontouchstart" in window || navigator.maxTouchPoints > 0;
   }
+
+  function handleKeyUp(event, nextEl) {
+    if (/^[a-zA-Z0-9]$/.test(event.key) && event.target.value.length == 2) {
+      nextEl.focus();
+    }
+  }
+
+  function checkEnter(event) {
+    if (event.key == 'Enter' && !disabled) {
+      confirm();
+    }
+  }
+
+  function init(el) {
+    el.focus();
+  }
 </script>
+
+<svelte:window on:keydown={checkEnter} />
 
 <div class="confirmation">
   <!-- Inspired by
@@ -103,7 +124,9 @@ https://design-system.service.gov.uk/patterns/dates/#asking-for-memorable-dates
         inputmode="numeric"
         placeholder="MM"
         maxlength="2"
+        on:keyup={event => handleKeyUp(event, bday_day)}
         bind:value={birthdateMonthStr}
+        use:init
       />
     </div>
     <div class="date-input-item">
@@ -116,7 +139,9 @@ https://design-system.service.gov.uk/patterns/dates/#asking-for-memorable-dates
         inputmode="numeric"
         placeholder="DD"
         maxlength="2"
+        on:keyup={event => handleKeyUp(event, bday_year)}
         bind:value={birthdateDayStr}
+        bind:this={bday_day}
       />
     </div>
     <div class="date-input-item">
@@ -130,6 +155,7 @@ https://design-system.service.gov.uk/patterns/dates/#asking-for-memorable-dates
         placeholder="YYYY"
         maxlength="4"
         bind:value={birthdateYearStr}
+        bind:this={bday_year}
       />
     </div>
     <button on:click={confirm} {disabled}>
