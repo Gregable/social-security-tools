@@ -10,9 +10,25 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Apr 29, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/agency-changes"
+            >Navigating Social Security During Administrative Changes</a
+          >
+        </h3>
+        <p class="description">
+          If you've tried to access Social Security services recently, you may
+          have encountered longer wait times, website outages, or difficulty
+          reaching representatives. These challenges are not coincidental but
+          stem from significant administrative changes implemented by the Trump
+          administration in 2025.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Feb 26, 2023</span>
         <h3 class="posttitle">
-          <a href="/guides/work-credits">Social Security Work Credits </a>
+          <a href="/guides/work-credits">Social Security Work Credits</a>
         </h3>
         <p class="description">
           How do work credits work and how many do I need to qualify for Social
