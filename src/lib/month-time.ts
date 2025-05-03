@@ -217,6 +217,13 @@ export class MonthDuration {
   }
 
   /**
+   * @returns MonthDuration of exactly 12 months.
+   */
+  static OneYear() {
+    return new MonthDuration(12);
+  }
+
+  /**
    * Returns the number of total months. e.g. if the duration is 1y + 1m, this
    * returns 13. May be negative.
    */

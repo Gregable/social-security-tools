@@ -30,17 +30,18 @@ export function PersonalBenefitStrategySum(
   // If we calculate these 3 values and their number of months, we can avoid a
   // loop which is a significant performance improvement.
 
+  // Total months includes the filing month and the final month (inclusive).
+  const totalMonths = finalDate.subtractDate(filingDate).asMonths() + 1;
+
   // Compute the number of months that (2) applies in the first year.
-  const monthsRemainingInFilingYear =
-    constants.MONTHS_IN_YEAR - filingDate.monthIndex();
+  const monthsRemainingInFilingYear = Math.min(
+    constants.MONTHS_IN_YEAR - filingDate.monthIndex(),
+    totalMonths
+  );
 
   // Compute the number of months that (3) applies. This is:
-  // Total number of months, inclusive (final - filing + 1) -minus- months in
-  // the first year. It includes both the start and end months.
-  const numMonthsAfterInitialYear =
-    finalDate.subtractDate(filingDate).asMonths() +
-    1 -
-    monthsRemainingInFilingYear;
+  // Total number of months -minus- months in the first year.
+  const numMonthsAfterInitialYear = totalMonths - monthsRemainingInFilingYear;
 
   // Compute the first date of the first January after the filing date.
   const janAfterFilingDate = filingDate.addDuration(
@@ -140,6 +141,20 @@ export class RecipientPersonalBenefits {
   }
 
   /**
+   * Gets the benefit amount for a specific recipient and filing age
+   * @param recipientIndex The index of the recipient (0 or 1)
+   * @param filingAge The filing age as a MonthDuration
+   * @returns The calculated benefit total in cents
+   */
+  getLifetimeBenefitForFinalAge(
+    recipientIndex: number,
+    filingAge: MonthDuration
+  ): number {
+    const idx = this.getIndex(recipientIndex, filingAge);
+    return this.data[idx];
+  }
+
+  /**
    * Computes all of the benefit amounts at once in a loop.
    */
   computeAllBenefits(
@@ -165,19 +180,5 @@ export class RecipientPersonalBenefits {
         )
       );
     }
-  }
-
-  /**
-   * Gets the benefit amount for a specific recipient and filing age
-   * @param recipientIndex The index of the recipient (0 or 1)
-   * @param filingAge The filing age as a MonthDuration
-   * @returns The calculated benefit total in cents
-   */
-  getLifetimeBenefitForFinalAge(
-    recipientIndex: number,
-    filingAge: MonthDuration
-  ): number {
-    const idx = this.getIndex(recipientIndex, filingAge);
-    return this.data[idx];
   }
 }
