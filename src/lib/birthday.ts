@@ -68,6 +68,9 @@ export class Birthdate {
    * is zero indexed. Day is one indexed.
    */
   static FromYMD(year: number, month: number, day: number) {
+    if (year < 1900 || year > 2200) throw new Error("Invalid Year:" + year);
+    if (month < 0 || month > 11) throw new Error("Invalid Month:" + month);
+    if (day < 1 || day > 31) throw new Error("Invalid Day:" + day);
     return new Birthdate(new Date(Date.UTC(year, month, day)));
   }
 

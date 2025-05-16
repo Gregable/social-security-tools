@@ -802,6 +802,9 @@ export class Recipient {
           )
         )
       );
+      baseSurvivorBenefit = Money.fromCents(
+        Math.floor(baseSurvivorBenefit.cents())
+      );
     }
 
     // Next, calculate the survivor benefit for the recipient based on the
@@ -811,14 +814,16 @@ export class Recipient {
     // survivor's age, adjusted proportionally between 71.5% and 100% of the
     // base amount based on the survivor's age between 60 and Full Retirement
     // Age.
-    const survivorAge = this.birthdate.ageAtSsaDate(survivorFilingDate);
-    if (survivorAge.greaterThanOrEqual(this.survivorNormalRetirementAge())) {
+    const survivorAgeAtFiling = this.birthdate.ageAtSsaDate(survivorFilingDate);
+    if (
+      survivorAgeAtFiling.greaterThanOrEqual(this.survivorNormalRetirementAge())
+    ) {
       return baseSurvivorBenefit;
     } else {
       const monthsBetween60AndNRA = this.survivorNormalRetirementAge()
         .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
         .asMonths();
-      const monthsBetweenAge60AndSurvivorAge = survivorAge
+      const monthsBetweenAge60AndSurvivorAge = survivorAgeAtFiling
         .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
         .asMonths();
 
@@ -827,9 +832,10 @@ export class Recipient {
         monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
       );
       const minSurvivorBenefitRatio = 0.715;
-      return baseSurvivorBenefit.times(
+      const survivorBenefit = baseSurvivorBenefit.times(
         minSurvivorBenefitRatio + (1 - minSurvivorBenefitRatio) * reductionRatio
       );
+      return Money.fromCents(Math.floor(survivorBenefit.cents()));
     }
   }
 

@@ -167,6 +167,13 @@ export class MonthDate {
   decrement() {
     this.monthsSinceEpoch_ -= 1;
   }
+
+  /**
+   * Returns a human readable string version of the date
+   */
+  toString() {
+    return this.monthName() + " " + this.year();
+  }
 }
 
 /**
