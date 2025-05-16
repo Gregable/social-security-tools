@@ -162,10 +162,6 @@
 
   <div class="text">
     <p>
-      <span class="beta">Beta</span>
-      This section is recently added and is thus more likely to have errors.
-    </p>
-    <p>
       As the spouse with the higher earnings, should <RName r={higherEarner} /> die
       before <RName r={lowerEarner} />,
       <RName r={lowerEarner} /> may be eligible for <u>survivor</u> benefits on <RName
