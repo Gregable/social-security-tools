@@ -566,7 +566,7 @@ describe("Recipient", () => {
     s.birthdate = Birthdate.FromYMD(1960, 0, 5);
     expect(
       r
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           s,
           MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
           // File at NRA, 67:
@@ -580,7 +580,7 @@ describe("Recipient", () => {
     // atDate before spouse files results in no benefit
     expect(
       r
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           s,
           MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
           MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
@@ -592,7 +592,7 @@ describe("Recipient", () => {
     // Early retirement at 66 should be 8.33% reduction:
     expect(
       r
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           s,
           MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
           MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
@@ -605,7 +605,7 @@ describe("Recipient", () => {
     // adding 6 months should be only a 4.165% reduction:
     expect(
       r
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           s,
           MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
           MonthDate.initFromYearsMonths({ years: 2026, months: 6 }),
@@ -617,7 +617,7 @@ describe("Recipient", () => {
     // 3 years of reductions should be 25%
     expect(
       r
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           s,
           MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
           MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
@@ -629,7 +629,7 @@ describe("Recipient", () => {
     // Each month past 3 years should be another 5 / 12 % reduction.
     expect(
       r
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           s,
           MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
           MonthDate.initFromYearsMonths({ years: 2023, months: 11 }),
@@ -641,7 +641,7 @@ describe("Recipient", () => {
     // Delaying spousal benefit should not increase spousal benefit:
     expect(
       r
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           s,
           // s files at age 69
           MonthDate.initFromYearsMonths({ years: 2029, months: 0 }),
@@ -657,7 +657,9 @@ describe("Recipient", () => {
     // the total benefit is capped at half of the spousal PIA.
     const age70 = MonthDate.initFromYearsMonths({ years: 2030, months: 0 });
     expect(r.benefitOnDate(age70, age70).value()).toEqual(1240.0);
-    expect(r.spousalBenefitOnDate(s, age70, age70, age70).value()).toEqual(
+    expect(
+      r.spousalBenefitOnDateGivenStartDate(s, age70, age70, age70).value()
+    ).toEqual(
       260.0 // 3000 / 2 - 1240 = 260
     );
   });
@@ -673,7 +675,7 @@ describe("Recipient", () => {
     s.birthdate = Birthdate.FromYMD(1962, 0, 2);
     expect(
       s
-        .spousalBenefitOnDate(
+        .spousalBenefitOnDateGivenStartDate(
           r,
           // s files at age 66
           MonthDate.initFromYearsMonths({ years: 2028, months: 0 }),

@@ -167,6 +167,13 @@ export class MonthDate {
   decrement() {
     this.monthsSinceEpoch_ -= 1;
   }
+
+  /**
+   * Returns a human readable string version of the date
+   */
+  toString() {
+    return this.monthName() + " " + this.year();
+  }
 }
 
 /**
@@ -214,6 +221,13 @@ export class MonthDuration {
       yearsMonths.years + " " + yearsMonths.months
     );
     return new MonthDuration(yearsMonths.years * 12 + yearsMonths.months);
+  }
+
+  /**
+   * @returns MonthDuration of exactly 12 months.
+   */
+  static OneYear() {
+    return new MonthDuration(12);
   }
 
   /**

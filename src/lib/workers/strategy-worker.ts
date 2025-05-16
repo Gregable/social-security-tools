@@ -5,22 +5,10 @@
 // memoization and early stopping.
 
 import { Recipient } from "$lib/recipient";
-import { Money } from "$lib/money";
 import { Birthdate } from "$lib/birthday";
 import { MonthDate, MonthDuration } from "$lib/month-time";
-
-// Age range to generate strategies for:
-const MIN_AGE = 62;
-const MAX_AGE = 110;
-
-const minStratAge = MonthDuration.initFromYearsMonths({
-  years: 62,
-  months: 0,
-});
-const maxStratAge = MonthDuration.initFromYearsMonths({
-  years: 70,
-  months: 0,
-});
+import { RecipientPersonalBenefits } from "$lib/strategy/recipient-personal-benefits";
+import * as constants from "$lib/strategy/constants";
 
 // sharedAgeAUint16Array hold the recommended filing age for person A.
 let sharedAgeAUint16Array: Uint16Array;
@@ -31,47 +19,12 @@ let sharedStrategySumUint32Array: Uint32Array;
 
 // Returns the index into the shared arrays for a given pair of ages.
 function bufferIndex(ageMonths: Array<number>): number {
-  const tableWidth = MAX_AGE - MIN_AGE + 1;
-  const offsetAgeMonths = [ageMonths[0] - MIN_AGE, ageMonths[1] - MIN_AGE];
+  const tableWidth = constants.MAX_AGE - constants.MIN_AGE + 1;
+  const offsetAgeMonths = [
+    ageMonths[0] - constants.MIN_AGE,
+    ageMonths[1] - constants.MIN_AGE,
+  ];
   return offsetAgeMonths[0] * tableWidth + offsetAgeMonths[1];
-}
-
-// Sum the personal benefit for a given recipient given a filing date and a
-// final benefit date.
-function PersonalBenefitStrategySum(
-  recipient: Recipient,
-  filingDate: MonthDate,
-  finalDate: MonthDate
-): number {
-  // personal benefit is only one of 3 values:
-  //  - 0
-  //  - benefit for a few months after filing (see
-  //    https://ssa.tools/guides/delayed-january-bump)
-  //  - benefit for the rest of the time.
-  // If we calculate these 3 values and their number of months, we can avoid a
-  // loop which is a significant performance improvement.
-  const monthsRemainingInFilingYear = 12 - filingDate.monthIndex();
-  const numMonthsAfterInitialYear =
-    finalDate.subtractDate(filingDate).asMonths() +
-    1 -
-    monthsRemainingInFilingYear;
-
-  const janAfterFilingDate = filingDate.addDuration(
-    new MonthDuration(monthsRemainingInFilingYear)
-  );
-
-  const initialPersonalBenefit = recipient
-    .benefitOnDate(filingDate, filingDate)
-    .cents();
-
-  const finalPersonalBenefit = recipient
-    .benefitOnDate(filingDate, janAfterFilingDate)
-    .cents();
-
-  return (
-    initialPersonalBenefit * monthsRemainingInFilingYear +
-    finalPersonalBenefit * numMonthsAfterInitialYear
-  );
 }
 
 // memoize table for spousal benefit.
@@ -102,27 +55,13 @@ let settings = {
   eligibleForSpousal: false,
 };
 
-let personalSums: Array<Array<number>> = [[], []];
+let recipientPersonalBenefits = new RecipientPersonalBenefits();
 
 function setup(config: any) {
   memoizedSpousalBenefit = new Map();
   sharedAgeAUint16Array = config.ageValues[0];
   sharedAgeBUint16Array = config.ageValues[1];
   sharedStrategySumUint32Array = config.strategySumValues;
-
-  // TODO: Ensure that recipientA is always the higher earner.
-  for (let i = 0; i < 2; i++) {
-    settings.recipients[i] = new Recipient();
-    settings.recipients[i].setPia(Money.from(config.pias[i]));
-    settings.recipients[i].birthdate = new Birthdate(config.birthdates[i]);
-
-    // Pre-allocate the personalSums arrays. They are reused on each iteration,
-    // not reallocated.
-    personalSums[i] = [];
-    for (let j = minStratAge.asMonths(); j <= maxStratAge.asMonths(); j++) {
-      personalSums[i].push(0);
-    }
-  }
 
   // Precalculate spousal eligibility:
   settings.eligibleForSpousal =
@@ -143,8 +82,10 @@ function strategySumCents(
   let stratDates: [MonthDate, MonthDate] = [null, null];
   for (let i = 0; i < 2; i++) {
     stratDates[i] = settings.recipients[i].birthdate.dateAtLayAge(strats[i]);
-    strategySumCents +=
-      personalSums[i][strats[i].asMonths() - minStratAge.asMonths()];
+    strategySumCents += recipientPersonalBenefits.getLifetimeBenefitForFinalAge(
+      i,
+      strats[i]
+    );
   }
 
   // Start the month after the final date of the higher earner or the start of
@@ -177,10 +118,10 @@ function strategySumCents(
 
   // TODO: Survivor benefits.
   //
-  // Don't add the personalSums[1] or spouse's benefit above if recipient[0]
+  // Don't add the recipientPersonalBenefits[1] or spouse's benefit above if recipient[0]
   // dies before recipient[1].
   //
-  // Instead, recalculate the personalSums[1] to take into account the date of
+  // Instead, recalculate the recipientPersonalBenefits[1] to take into account the date of
   // death of recipient[0] and their filing strategy.
   // The rules are complicated, see especially the 2nd link:
   // https://www.ssa.gov/benefits/survivors/onyourown.html#h5
@@ -218,66 +159,90 @@ function strategySumCents(
     // adjustment if filing before FRA.
     const numMonths = survivorStartDate.subtractDate(finalDates[1]).asMonths();
     if (numMonths > 0) {
-      //TODO: We've stopped adding spousal benefits above if the spouse is dead, but we are still adding personal benefits. We need to stop adding personal benefits and start adding spousal benefits at this time. One way to do this is to adjust personalSums to take into account the date of death of the spouse. I'm too tired to implement this now without making a mistake.
+      //TODO: We've stopped adding spousal benefits above if the spouse is dead, but we are still adding personal benefits. We need to stop adding personal benefits and start adding spousal benefits at this time. One way to do this is to adjust recipientPersonalBenefits to take into account the date of death of the spouse. I'm too tired to implement this now without making a mistake.
     }
   }
 
   return strategySumCents;
 }
 
-function run(finalAgeYears: [number, number]) {
+/**
+ * Calculates the final benefit date for a recipient based on their projected
+ * age at death.
+ *
+ * This function determines the last month for which benefits would be paid,
+ * which is December of the year the recipient reaches the specified age.
+ *
+ * @param {number} recipientIdx - Index of the recipient
+ * @param {number} finalAgeYear - The age (in years) at which the recipient is
+ *                                projected to die
+ * @returns {MonthDate} A MonthDate object representing the final month for
+ *                      benefit calculation
+ */
+function calculateFinalBenefitDate(
+  recipientIdx: number,
+  finalAgeYear: number
+): MonthDate {
+  const recipient = settings.recipients[recipientIdx];
+
+  // Get the date when the recipient reaches the specified age
+  const dateAtSpecifiedAge = recipient.birthdate.dateAtLayAge(
+    MonthDuration.initFromYearsMonths({ years: finalAgeYear, months: 0 })
+  );
+
+  // Create a date for December of that year
+  return MonthDate.initFromYearsMonths({
+    years: dateAtSpecifiedAge.year(),
+    months: 11, // December (zero-indexed)
+  });
+}
+
+/**
+ * Calculate the optimal strategy given that the couple dies at the given ages.
+ *
+ * @param {[number, number]} finalAgeYears - A tuple containing the final ages
+ *                                           for both recipients.
+ * @returns {number} Total personal benefit amount in cents across the period.
+ */
+function maximizeBenefitsByFinalAges(finalAgeYears: [number, number]) {
   // Track the best strategy for this final age pair, seen so far:
   let bestStrategy = {
     strategySumCents: 0,
     ages: [
-      MonthDuration.copyFrom(minStratAge),
-      MonthDuration.copyFrom(minStratAge),
+      MonthDuration.copyFrom(constants.MIN_STRATEGY_AGE),
+      MonthDuration.copyFrom(constants.MIN_STRATEGY_AGE),
     ],
   };
 
+  // Extract the birthdates from the recipients.
   const birthdates: Array<Birthdate> = settings.recipients.map(
     (r) => r.birthdate
   );
 
-  // Pre-calculate the final dates for each recipient:
-  let finalDates: [MonthDate, MonthDate] = [null, null];
+  // Calculate the final dates for each recipient:
+  let finalDates: [MonthDate, MonthDate] = [
+    calculateFinalBenefitDate(0, finalAgeYears[0]),
+    calculateFinalBenefitDate(1, finalAgeYears[1]),
+  ];
+
   for (let i = 0; i < 2; i++) {
-    // We assume that the person will live until the last month of the year
-    // in which they die in order to calculate the final benefit.
-    finalDates[i] = birthdates[i].dateAtLayAge(
-      MonthDuration.initFromYearsMonths({
-        years: finalAgeYears[i],
-        months: 11 - settings.recipients[i].birthdate.layBirthMonth(),
-      })
+    recipientPersonalBenefits.computeAllBenefits(
+      i,
+      settings.recipients[i],
+      finalDates[i]
     );
-    // Pre-calculate the personal benefits once for each strategy. First,
-    // loop over all strategies and calculate the personal benefit for each.
-    for (
-      let strat = MonthDuration.copyFrom(minStratAge);
-      strat.lessThanOrEqual(maxStratAge);
-      strat.increment()
-    ) {
-      const stratDate = birthdates[i].dateAtLayAge(strat);
-      // Calculate the personal benefit for this strategy and final date.
-      personalSums[i][strat.asMonths() - minStratAge.asMonths()] =
-        PersonalBenefitStrategySum(
-          settings.recipients[i],
-          stratDate,
-          finalDates[i]
-        );
-    }
   }
 
   // Main Loop for a single final age pair:
   // Search for the best strategy by brute force.
   for (
     let stratA = birthdates[0].earliestFilingMonth();
-    stratA.lessThanOrEqual(maxStratAge);
+    stratA.lessThanOrEqual(constants.MAX_STRATEGY_AGE);
     stratA.increment()
   ) {
     for (
       let stratB = birthdates[1].earliestFilingMonth();
-      stratB.lessThanOrEqual(maxStratAge);
+      stratB.lessThanOrEqual(constants.MAX_STRATEGY_AGE);
       stratB.increment()
     ) {
       const sum = strategySumCents(finalDates, [stratA, stratB]);
@@ -302,7 +267,7 @@ function run(finalAgeYears: [number, number]) {
   // Optimization: If the best strategy is to file at 70, then we can assume
   // all later ages also have a best strategy of 70 rather than calculating it.
   if (bestStrategy.ages[0].asMonths() == 70 * 12) {
-    for (let i = finalAgeYears[0] + 1; i <= MAX_AGE; i++) {
+    for (let i = finalAgeYears[0] + 1; i <= constants.MAX_AGE; i++) {
       const idx = bufferIndex([i, finalAgeYears[1]]);
       sharedAgeAUint16Array[idx] = bestStrategy.ages[0].asMonths();
       sharedAgeBUint16Array[idx] = bestStrategy.ages[1].asMonths();
@@ -311,7 +276,7 @@ function run(finalAgeYears: [number, number]) {
   }
 
   if (bestStrategy.ages[1].asMonths() == 70 * 12) {
-    for (let i = finalAgeYears[1] + 1; i <= MAX_AGE; i++) {
+    for (let i = finalAgeYears[1] + 1; i <= constants.MAX_AGE; i++) {
       const idx = bufferIndex([finalAgeYears[0], i]);
       sharedAgeAUint16Array[idx] = bestStrategy.ages[0].asMonths();
       sharedAgeBUint16Array[idx] = bestStrategy.ages[1].asMonths();
@@ -319,21 +284,3 @@ function run(finalAgeYears: [number, number]) {
     }
   }
 }
-
-function eventHandler(event: any) {
-  setup(event.data);
-  // Loop over all possible final ages and calculate the best strategy for each.
-  for (let a = MIN_AGE; a <= MAX_AGE; a++) {
-    for (let b = MIN_AGE; b <= MAX_AGE; b++) {
-      const idx = bufferIndex([a, b]);
-      // Skip if we've already calculated this value:
-      if (sharedAgeAUint16Array[idx] == 0) {
-        run([a, b]);
-      }
-    }
-  }
-
-  self.postMessage("");
-}
-
-self.addEventListener("message", eventHandler);

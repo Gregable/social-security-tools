@@ -628,26 +628,27 @@ export class Recipient {
   }
 
   /**
-   * Returns the spousal benefit on a given date for this recipient. May be $0.
-   */
-  spousalBenefitOnDate(
-    spouse: Recipient,
-    spouseFilingDate: MonthDate,
-    filingDate: MonthDate,
-    atDate: MonthDate
-  ): Money {
-    // TODO: Remove this function since it's just aliased now.
-    return this.spousalBenefitOnDateGivenStartDate(
-      spouse,
-      spouseFilingDate,
-      filingDate,
-      atDate
-    );
-  }
-
-  /**
-   * Helper function for spousalBenefitOnDate.
-   * Used directly in strategy calculations.
+   * Calculates the spousal benefit amount on a specific date based on filing
+   * dates.
+   *
+   * It accounts for:
+   * - The earnings relationship between spouses (higher vs lower earner)
+   * - Whether the benefit start date has been reached
+   * - Normal retirement age adjustments
+   * - Early filing reductions (different rates for first 36 months vs beyond)
+   * - Delayed retirement credits impact on spousal benefits
+   *
+   * @param {Recipient} spouse - The spouse (higher earner) whose record
+   *                             provides the spousal benefit
+   * @param {MonthDate} spouseFilingDate - The date when the higher-earning
+   *                                       spouse files for benefits
+   * @param {MonthDate} filingDate - The date when this recipient (lower
+   *                                 earner) files for benefits
+   * @param {MonthDate} atDate - The specific date for which to calculate the
+   *                             benefit amount
+   * @returns {Money} The calculated spousal benefit amount for the specified
+   *                  date, reduced appropriately based on filing age relative
+   *                  to normal retirement age.
    */
   spousalBenefitOnDateGivenStartDate(
     spouse: Recipient,
@@ -655,13 +656,13 @@ export class Recipient {
     filingDate: MonthDate,
     atDate: MonthDate
   ): Money {
-    // Calculate the starting date as the latest of the two filing dates:
+    // If the spouse has lower earnings, return $0:
+    if (this.higherEarningsThan(spouse)) return Money.zero();
+
+    // Calculate the starting date as the greater of the two filing dates:
     const startDate = spouseFilingDate.greaterThan(filingDate)
       ? spouseFilingDate
       : filingDate;
-
-    // If the spouse has lower earnings, return $0:
-    if (this.higherEarningsThan(spouse)) return Money.zero();
 
     // If the start date is in the future, return $0:
     if (startDate.greaterThan(atDate)) return Money.zero();
@@ -672,19 +673,11 @@ export class Recipient {
       .primaryInsuranceAmount()
       .cents();
 
-    // Calculate the base spousal benefit amount:
-    const spousalCents = spousePiaAmountCents / 2 - piaAmountCents;
-    if (spousalCents <= 0) {
-      return Money.zero();
-    }
-
     const normalRetirementDate = this.normalRetirementDate();
 
-    // Spousal Benefits start on after normal retirement date:
     if (startDate.greaterThanOrEqual(normalRetirementDate)) {
-      if (filingDate.lessThanOrEqual(normalRetirementDate)) {
-        return Money.fromCents(spousalCents).floorToDollar();
-      }
+      // Case where spousal Benefits start on or after normal retirement date:
+      //
       // https://www.bogleheads.org/forum/viewtopic.php?p=3986794#p3986794
       // https://secure.ssa.gov/apps10/poms.nsf/lnx/0300615694
       // The combined spousal and personal benefits cannot be greater than
@@ -694,34 +687,41 @@ export class Recipient {
       // of the spousal and personal benefits exceeds 50% of the higher
       // earner's PIA.
       const personalBenefit = this.benefitOnDate(filingDate, atDate);
-      const spouseBenefitCents =
-        spousePiaAmountCents / 2 - personalBenefit.cents();
-      if (spouseBenefitCents <= 0) {
+      const spousalCents = spousePiaAmountCents / 2 - personalBenefit.cents();
+      if (spousalCents <= 0) {
         return Money.zero();
       } else {
-        return Money.fromCents(spouseBenefitCents).floorToDollar();
+        return Money.fromCents(spousalCents).floorToDollar();
       }
-    }
-
-    // Spousal Benefits start before normal retirement date:
-    let monthsBeforeNra: number =
-      normalRetirementDate.monthsSinceEpoch() - startDate.monthsSinceEpoch();
-    if (monthsBeforeNra <= 36) {
-      // 25 / 36 of one percent for each month:
-      return Money.fromCents(
-        spousalCents * (1 - monthsBeforeNra / 144)
-      ).floorToDollar();
     } else {
-      // 25% for the first 36 months:
-      const firstReductionCents: number = spousalCents * 0.25;
-      monthsBeforeNra = monthsBeforeNra - 36;
-      // 5 / 12 of one percent for each additional month:
-      const secondReductionCents: number =
-        spousalCents * (monthsBeforeNra / 240);
+      // Case where spousal Benefits start before normal retirement date:
+      //
+      // Calculate the base spousal benefit amount:
+      const spousalCents = spousePiaAmountCents / 2 - piaAmountCents;
+      if (spousalCents <= 0) {
+        return Money.zero();
+      }
 
-      return Money.fromCents(
-        spousalCents - firstReductionCents - secondReductionCents
-      ).floorToDollar();
+      // Spousal Benefits start before normal retirement date:
+      let monthsBeforeNra: number =
+        normalRetirementDate.monthsSinceEpoch() - startDate.monthsSinceEpoch();
+      if (monthsBeforeNra <= 36) {
+        // 25 / 36 of one percent for each month:
+        return Money.fromCents(
+          spousalCents * (1 - monthsBeforeNra / 144)
+        ).floorToDollar();
+      } else {
+        // 25% for the first 36 months:
+        const firstReductionCents: number = spousalCents * 0.25;
+        monthsBeforeNra = monthsBeforeNra - 36;
+        // 5 / 12 of one percent for each additional month:
+        const secondReductionCents: number =
+          spousalCents * (monthsBeforeNra / 240);
+
+        return Money.fromCents(
+          spousalCents - firstReductionCents - secondReductionCents
+        ).floorToDollar();
+      }
     }
   }
 
@@ -735,7 +735,12 @@ export class Recipient {
     atDate: MonthDate
   ): Money {
     return this.benefitOnDate(filingDate, atDate).plus(
-      this.spousalBenefitOnDate(spouse, spouseFilingDate, filingDate, atDate)
+      this.spousalBenefitOnDateGivenStartDate(
+        spouse,
+        spouseFilingDate,
+        filingDate,
+        atDate
+      )
     );
   }
 
@@ -797,6 +802,9 @@ export class Recipient {
           )
         )
       );
+      baseSurvivorBenefit = Money.fromCents(
+        Math.floor(baseSurvivorBenefit.cents())
+      );
     }
 
     // Next, calculate the survivor benefit for the recipient based on the
@@ -806,14 +814,16 @@ export class Recipient {
     // survivor's age, adjusted proportionally between 71.5% and 100% of the
     // base amount based on the survivor's age between 60 and Full Retirement
     // Age.
-    const survivorAge = this.birthdate.ageAtSsaDate(survivorFilingDate);
-    if (survivorAge.greaterThanOrEqual(this.survivorNormalRetirementAge())) {
+    const survivorAgeAtFiling = this.birthdate.ageAtSsaDate(survivorFilingDate);
+    if (
+      survivorAgeAtFiling.greaterThanOrEqual(this.survivorNormalRetirementAge())
+    ) {
       return baseSurvivorBenefit;
     } else {
       const monthsBetween60AndNRA = this.survivorNormalRetirementAge()
         .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
         .asMonths();
-      const monthsBetweenAge60AndSurvivorAge = survivorAge
+      const monthsBetweenAge60AndSurvivorAge = survivorAgeAtFiling
         .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
         .asMonths();
 
@@ -822,9 +832,10 @@ export class Recipient {
         monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
       );
       const minSurvivorBenefitRatio = 0.715;
-      return baseSurvivorBenefit.times(
+      const survivorBenefit = baseSurvivorBenefit.times(
         minSurvivorBenefitRatio + (1 - minSurvivorBenefitRatio) * reductionRatio
       );
+      return Money.fromCents(Math.floor(survivorBenefit.cents()));
     }
   }
 
