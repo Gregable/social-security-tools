@@ -677,15 +677,39 @@ describe("Recipient", () => {
       s
         .spousalBenefitOnDateGivenStartDate(
           r,
-          // s files at age 66
+          // r files at age 66
           MonthDate.initFromYearsMonths({ years: 2028, months: 0 }),
-          // r files at age 62
+          // s files at age 62
           MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
           // spousal benefit at age 67
           MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
         )
         .value()
     ).toEqual(275);
+  });
+
+  it("calculates spousal benefits for another specific example", () => {
+    let r = new Recipient();
+    r.setPia(Money.from(2120.0));
+
+    let s = new Recipient();
+    s.setPia(Money.from(507.6));
+
+    r.birthdate = Birthdate.FromYMD(1950, 6, 2);
+    s.birthdate = Birthdate.FromYMD(1949, 3, 2);
+    expect(
+      s
+        .spousalBenefitOnDateGivenStartDate(
+          r,
+          // r files at age 62
+          MonthDate.initFromYearsMonths({ years: 2016, months: 6 }),
+          // s files at age 65
+          MonthDate.initFromYearsMonths({ years: 2014, months: 3 }),
+          // spousal benefit at age 67
+          MonthDate.initFromYearsMonths({ years: 2017, months: 3 })
+        )
+        .value()
+    ).toEqual(552);
   });
 
   it("calculates survivor benefits", () => {
