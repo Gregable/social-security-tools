@@ -445,8 +445,6 @@
    * Returns the top left coordinates of each box, and the benefit value
    * associated with the y-coordinate of the box.
    *
-   * There should be exactly one or two boxes.
-   *
    * @returns {Array<[number, number, Money]>} The set of boxes to render. Each
    *    box is a tuple of [x, y, benefit].
    */
@@ -462,7 +460,7 @@
       i.lessThanOrEqual(dateX(canvasEl_.width));
       i = i.addDuration(new MonthDuration(1))
     ) {
-      let all = allBenefitsOnDate(ctxR, i);
+      let all = allBenefitsOnDate(ctxR, i, selectedDate);
       if (all.value() != benefit.value()) {
         benefit = all;
         boxes.push([canvasX(i), canvasY(ctxR, benefit), benefit]);
