@@ -734,7 +734,7 @@ describe("Recipient", () => {
     );
 
     // Scenario 1: Deceased died at age 60 before filing. Survivor files
-    // immediately, also at age 60.
+    // immediately after, at age 60 + 1 month.
     {
       const deceasedDeathDate = MonthDate.initFromYearsMonths({
         years: 2020,
@@ -751,10 +751,10 @@ describe("Recipient", () => {
             deceased,
             deceasedDeathDate,
             deceasedDeathDate,
-            deceasedDeathDate
+            deceasedDeathDate.addDuration(new MonthDuration(1))
           )
           .value()
-      ).toEqual(2145);
+      ).toEqual(2155);
     }
 
     // Scenario 2: Deceased died at age 68 without filing, 1 year after FRA.
@@ -774,7 +774,7 @@ describe("Recipient", () => {
             deceased,
             deceasedDeathDate,
             deceasedDeathDate,
-            deceasedDeathDate
+            deceasedDeathDate.addDuration(new MonthDuration(1))
           )
           .value()
       ).toEqual(3240);
@@ -799,7 +799,7 @@ describe("Recipient", () => {
             deceased,
             deceasedFilingDate,
             deceasedDeathDate,
-            deceasedDeathDate
+            deceasedDeathDate.addDuration(new MonthDuration(1))
           )
           .value()
       ).toEqual(2475);
@@ -822,7 +822,7 @@ describe("Recipient", () => {
             deceased,
             deceasedFilingDate,
             deceasedDeathDate,
-            deceasedDeathDate
+            deceasedDeathDate.addDuration(new MonthDuration(1))
           )
           .value()
       ).toEqual(3240);
@@ -855,7 +855,7 @@ describe("Recipient", () => {
             survivorFilingDate
           )
           .value()
-      ).toEqual(2401.5);
+      ).toEqual(2401);
     }
 
     // Scenario 6: Deceased died at age 60 before filing. Recipient files
@@ -885,7 +885,7 @@ describe("Recipient", () => {
             survivorFilingDate
           )
           .value()
-      ).toEqual(2786.25);
+      ).toEqual(2786);
     }
   });
 });
