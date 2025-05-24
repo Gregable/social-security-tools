@@ -763,7 +763,7 @@ export class Recipient {
    * date of death or any date later.
    * @param deceasedDeathDate The date of death of the deceased recipient.
    * @param survivorFilingDate The date the survivor recipient filed for
-   * benefits.
+   * survivor benefits.
    */
   survivorBenefit(
     deceased: Recipient,
@@ -774,6 +774,15 @@ export class Recipient {
     // First calculate the base survivor benefit. There are two situations based
     // on if the deceased recipient filed for benefits before death or not.
     let baseSurvivorBenefit: Money;
+
+    if (survivorFilingDate.lessThanOrEqual(deceasedDeathDate)) {
+      throw new Error(
+        "Filing for survivor benefits before spouse died. " +
+          survivorFilingDate.toString() +
+          " <= " +
+          deceasedDeathDate.toString()
+      );
+    }
 
     if (deceasedFilingDate.greaterThanOrEqual(deceasedDeathDate)) {
       // If the deceased recipient did not file for benefits before death:
@@ -819,7 +828,7 @@ export class Recipient {
     if (
       survivorAgeAtFiling.greaterThanOrEqual(this.survivorNormalRetirementAge())
     ) {
-      return baseSurvivorBenefit;
+      return baseSurvivorBenefit.floorToDollar();
     } else {
       const monthsBetween60AndNRA = this.survivorNormalRetirementAge()
         .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
@@ -836,7 +845,7 @@ export class Recipient {
       const survivorBenefit = baseSurvivorBenefit.times(
         minSurvivorBenefitRatio + (1 - minSurvivorBenefitRatio) * reductionRatio
       );
-      return Money.fromCents(Math.floor(survivorBenefit.cents()));
+      return survivorBenefit.floorToDollar();
     }
   }
 

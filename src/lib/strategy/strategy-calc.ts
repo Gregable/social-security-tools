@@ -106,9 +106,9 @@ export function strategySumCents(
   if (dependentFinalDate.greaterThan(survivorStartDate)) {
     survivorBenefit = dependent.survivorBenefit(
       /*deceased*/ earner,
-      /*deceasedFilintDate*/ earnerStratDate,
+      /*deceasedFilingDate*/ earnerStratDate,
       /*deceasedDeathDate*/ earnerFinalDate,
-      /*survivorFilingDate*/ dependentStratDate
+      /*survivorFilingDate*/ survivorStartDate
     );
 
     // In Social Security rules, survivor benefits replace personal benefits.
@@ -168,4 +168,93 @@ export function strategySumCents(
   }
 
   return totalBenefitCents;
+}
+
+function earliestFiling(
+  recipient: Recipient,
+  currentDate: MonthDate
+): MonthDuration {
+  // The earliest date that a recipient can file for benefits is governed by a
+  // few rules:
+
+  // 1) Cannot file before they are age 62 for an entire month. Essentially
+  //    this means the month after their 62nd birthday, unless born on 1st or
+  //    2nd of the month, then it's the month of their 62nd birthday.
+  //    See: https://ssa.tools/guides/1st-and-2nd-of-month
+  let earliestMonth = recipient.birthdate.earliestFilingMonth();
+
+  const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
+
+  // If that's now or in the future, done:
+  if (earliestMonth.greaterThanOrEqual(currentAge)) {
+    return earliestMonth;
+  }
+
+  // 2) You can only file retroactively back to your normal retirement age.
+  if (recipient.normalRetirementAge().greaterThan(earliestMonth)) {
+    // Though you can always file at the current age:
+    if (recipient.normalRetirementAge().greaterThan(currentAge)) {
+      earliestMonth = currentAge;
+    } else {
+      earliestMonth = recipient.normalRetirementAge();
+    }
+  }
+
+  // 3) You can only file retroactively by at most 6 months.
+  const sixMonthsAgo = currentAge.subtract(new MonthDuration(6));
+  if (earliestMonth.lessThan(sixMonthsAgo)) {
+    earliestMonth = sixMonthsAgo;
+  }
+
+  return earliestMonth;
+}
+
+/**
+ * Calculates the optimal filing ages for a couple so as to maximize lifetime
+ * benefits as returned by strategySumCents
+ *
+ * @param {[Recipient, Recipient]} recipients - An array containing the two
+ *                                              recipients for whom the strategy
+ *                                              results are being calculated.
+ * @param {[MonthDate, MonthDate]} finalDates - An array containing the final
+ *                                              dates (death dates) for each
+ *                                              recipient.
+ * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
+ *                                           filing ages for each recipient.
+ */
+export function optimalStrategy(
+  recipients: [Recipient, Recipient],
+  finalDates: [MonthDate, MonthDate],
+  currentDate: MonthDate
+): [MonthDuration, MonthDuration, number] {
+  let bestStrategy: [MonthDuration, MonthDuration, number] = [
+    new MonthDuration(0),
+    new MonthDuration(0),
+    -1,
+  ];
+
+  const startFilingDate0: number = earliestFiling(
+    recipients[0],
+    currentDate
+  ).asMonths();
+  const startFilingDate1: number = earliestFiling(
+    recipients[1],
+    currentDate
+  ).asMonths();
+
+  for (let i = startFilingDate0; i <= 70 * 12; ++i) {
+    for (let j = startFilingDate1; j <= 70 * 12; ++j) {
+      const strategy: [MonthDuration, MonthDuration] = [
+        new MonthDuration(i),
+        new MonthDuration(j),
+      ];
+
+      const outcome = strategySumCents(recipients, finalDates, strategy);
+      if (outcome > bestStrategy[2]) {
+        bestStrategy = [strategy[0], strategy[1], outcome];
+      }
+    }
+  }
+
+  return bestStrategy;
 }
