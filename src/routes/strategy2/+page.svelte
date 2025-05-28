@@ -10,15 +10,19 @@
   // Constants
   const DEFAULT_BIRTHDATE = "1960-03-15";
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
-  const DEFAULT_DEATH_AGES: [number, number] = [85, 85];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
+  const MIN_DEATH_AGE = 62;
+  const MAX_DEATH_AGE = 90;
 
   // Calculation state
   let startTime: number;
   let timeElapsed: number = 0;
   let isCalculationComplete = false;
   let isCalculationRunning = false;
-  let calculationResult: any = null;
+  let calculationResults: any[][] = [];
+  let deathAgeRange: number[] = [];
+  let calculationProgress = 0;
+  let totalCalculations = 0;
 
   // Form inputs
   let birthdateInputs: [string, string] = [
@@ -26,7 +30,6 @@
     DEFAULT_BIRTHDATE,
   ];
   let piaValues: [number, number] = [...DEFAULT_PIA_VALUES];
-  let deathAges: [number, number] = [...DEFAULT_DEATH_AGES];
 
   // Recipients setup
   let recipients: [Recipient, Recipient] = initializeRecipients();
@@ -71,13 +74,16 @@
   /**
    * Calculate final dates from death ages
    */
-  function calculateFinalDates(): [MonthDate, MonthDate] {
+  function calculateFinalDates(
+    deathAge1: number,
+    deathAge2: number
+  ): [MonthDate, MonthDate] {
     const finalDates: [MonthDate, MonthDate] = [
       recipients[0].birthdate.dateAtLayAge(
-        MonthDuration.initFromYearsMonths({ years: deathAges[0], months: 0 })
+        MonthDuration.initFromYearsMonths({ years: deathAge1, months: 0 })
       ),
       recipients[1].birthdate.dateAtLayAge(
-        MonthDuration.initFromYearsMonths({ years: deathAges[1], months: 0 })
+        MonthDuration.initFromYearsMonths({ years: deathAge2, months: 0 })
       ),
     ];
 
@@ -92,14 +98,41 @@
   }
 
   /**
-   * Main calculation function for optimal strategy
+   * Calculate age range for death ages
    */
-  async function calculateStrategy() {
+  function calculateAgeRange(): number[] {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    // Calculate current ages for both recipients
+    const currentAge1 =
+      currentYear - new Date(birthdateInputs[0]).getFullYear();
+    const currentAge2 =
+      currentYear - new Date(birthdateInputs[1]).getFullYear();
+
+    // Start at the later of age 62 or current age
+    const startAge = Math.max(
+      MIN_DEATH_AGE,
+      Math.max(currentAge1, currentAge2)
+    );
+
+    const ages = [];
+    for (let age = startAge; age <= MAX_DEATH_AGE; age++) {
+      ages.push(age);
+    }
+    return ages;
+  }
+
+  /**
+   * Main calculation function for optimal strategy matrix
+   */
+  async function calculateStrategyMatrix() {
     if (isCalculationRunning) return;
 
     isCalculationRunning = true;
     isCalculationComplete = false;
-    calculationResult = null;
+    calculationResults = [];
+    calculationProgress = 0;
     startTime = Date.now();
 
     try {
@@ -111,8 +144,9 @@
       recipients[0].setPia(Money.from(piaValues[0]));
       recipients[1].setPia(Money.from(piaValues[1]));
 
-      // Calculate final dates from death ages
-      const finalDates = calculateFinalDates();
+      // Calculate age range
+      deathAgeRange = calculateAgeRange();
+      totalCalculations = deathAgeRange.length * deathAgeRange.length;
 
       // Get current date for optimal strategy calculation
       const now = new Date();
@@ -121,33 +155,49 @@
         months: now.getMonth(),
       });
 
-      // Calculate optimal strategy
-      const optimal = optimalStrategy(recipients, finalDates, currentDate);
+      // Initialize results matrix
+      calculationResults = Array(deathAgeRange.length)
+        .fill(null)
+        .map(() => Array(deathAgeRange.length).fill(null));
 
-      // Format the result for display
-      const filingDate1 = recipients[0].birthdate.dateAtLayAge(optimal[0]);
-      const filingDate2 = recipients[1].birthdate.dateAtLayAge(optimal[1]);
+      // Calculate optimal strategy for each death age combination
+      for (let i = 0; i < deathAgeRange.length; i++) {
+        for (let j = 0; j < deathAgeRange.length; j++) {
+          const deathAge1 = deathAgeRange[i];
+          const deathAge2 = deathAgeRange[j];
 
-      calculationResult = {
-        strategy: [
-          {
-            age: optimal[0],
-            benefit: recipients[0].benefitAtAge(optimal[0]),
-            filingDate: filingDate1,
-          },
-          {
-            age: optimal[1],
-            benefit: recipients[1].benefitAtAge(optimal[1]),
-            filingDate: filingDate2,
-          },
-        ],
-        totalLifetimeBenefit: Money.fromCents(optimal[2]),
-      };
+          // Calculate final dates for this combination
+          const finalDates = calculateFinalDates(deathAge1, deathAge2);
+
+          // Calculate optimal strategy
+          const optimal = optimalStrategy(recipients, finalDates, currentDate);
+
+          // Store the result
+          calculationResults[i][j] = {
+            deathAge1,
+            deathAge2,
+            filingAge1: optimal[0],
+            filingAge2: optimal[1],
+            totalBenefit: Money.fromCents(optimal[2]),
+            filingAge1Years: optimal[0].years(),
+            filingAge1Months: optimal[0].modMonths(),
+            filingAge2Years: optimal[1].years(),
+            filingAge2Months: optimal[1].modMonths(),
+          };
+
+          calculationProgress++;
+
+          // Allow UI to update
+          if (calculationProgress % 10 === 0) {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+        }
+      }
 
       isCalculationComplete = true;
     } catch (error) {
       console.error("Calculation error:", error);
-      calculationResult = { error: error.message };
+      calculationResults = [[{ error: error.message }]];
     } finally {
       timeElapsed = (Date.now() - startTime) / 1000;
       isCalculationRunning = false;
@@ -218,61 +268,98 @@
 
   <section class="calculation-section">
     <button
-      on:click={calculateStrategy}
+      on:click={calculateStrategyMatrix}
       disabled={isCalculationRunning}
       class="calculate-button"
     >
-      {isCalculationRunning ? "Calculating..." : "Calculate Optimal Strategy"}
+      {isCalculationRunning
+        ? "Calculating..."
+        : "Calculate Optimal Strategy Matrix"}
     </button>
 
     {#if isCalculationRunning}
       <div class="loading">
-        <span class="spinner"></span> Processing...
+        <span class="spinner"></span> Processing {calculationProgress} of {totalCalculations}
+        combinations...
+      </div>
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          style="width: {totalCalculations > 0
+            ? (calculationProgress / totalCalculations) * 100
+            : 0}%"
+        ></div>
       </div>
     {/if}
 
-    {#if isCalculationComplete}
+    {#if isCalculationComplete && calculationResults.length > 0}
       <div class="result-box">
-        <h3>Calculation Results</h3>
+        <h3>Optimal Strategy Matrix</h3>
         <p>Calculation completed in {timeElapsed.toFixed(2)} seconds</p>
+        <p>
+          Matrix shows optimal filing ages for different death age combinations
+        </p>
 
-        {#if calculationResult && !calculationResult.error}
-          <div class="strategy-results">
-            <h4>Optimal Filing Strategy:</h4>
-            <ul>
-              <li>
-                <RecipientName r={recipients[0]} /> should file at age
-                <strong>{calculationResult.strategy[0].age.years()}</strong>
-                years and
-                <strong>{calculationResult.strategy[0].age.modMonths()}</strong>
-                months ({calculationResult.strategy[0].filingDate.monthName()}
-                {calculationResult.strategy[0].filingDate.year()}) for a benefit
-                of
-                <strong>{calculationResult.strategy[0].benefit.string()}</strong
-                >
-              </li>
-              <li>
-                <RecipientName r={recipients[1]} /> should file at age
-                <strong>{calculationResult.strategy[1].age.years()}</strong>
-                years and
-                <strong>{calculationResult.strategy[1].age.modMonths()}</strong>
-                months ({calculationResult.strategy[1].filingDate.monthName()}
-                {calculationResult.strategy[1].filingDate.year()}) for a benefit
-                of
-                <strong>{calculationResult.strategy[1].benefit.string()}</strong
-                >
-              </li>
-            </ul>
-            <p class="total">
-              Total lifetime benefit: <strong
-                >{calculationResult.totalLifetimeBenefit.string()}</strong
-              >
-            </p>
-          </div>
-        {:else if calculationResult?.error}
+        {#if calculationResults[0][0]?.error}
           <div class="error">
             <h4>Error:</h4>
-            <p>{calculationResult.error}</p>
+            <p>{calculationResults[0][0].error}</p>
+          </div>
+        {:else}
+          <div class="matrix-container">
+            <div class="matrix-legend">
+              <p>
+                <strong>Row:</strong>
+                <RecipientName r={recipients[0]} /> death age
+              </p>
+              <p>
+                <strong>Column:</strong>
+                <RecipientName r={recipients[1]} /> death age
+              </p>
+              <p>
+                <strong>Cell format:</strong> [<RecipientName
+                  r={recipients[0]}
+                /> filing age] / [<RecipientName r={recipients[1]} /> filing age]
+              </p>
+            </div>
+
+            <div class="strategy-matrix">
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    {#each deathAgeRange as deathAge2}
+                      <th>{deathAge2}</th>
+                    {/each}
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each deathAgeRange as deathAge1, i}
+                    <tr>
+                      <th>{deathAge1}</th>
+                      {#each deathAgeRange as deathAge2, j}
+                        <td
+                          class="strategy-cell"
+                          title="Total benefit: {calculationResults[i][
+                            j
+                          ]?.totalBenefit.string() || 'N/A'}"
+                        >
+                          <div class="filing-ages">
+                            {calculationResults[i][j]?.filingAge1Years ||
+                              "N/A"}y{calculationResults[i][j]
+                              ?.filingAge1Months || 0}m
+                            <br />
+                            {calculationResults[i][j]?.filingAge2Years ||
+                              "N/A"}y{calculationResults[i][j]
+                              ?.filingAge2Months || 0}m
+                          </div>
+                        </td>
+                      {/each}
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
           </div>
         {/if}
       </div>
@@ -282,7 +369,7 @@
 
 <style>
   main {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
     font-family: Arial, sans-serif;
@@ -355,6 +442,21 @@
     gap: 0.5rem;
   }
 
+  .progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+  }
+
   .spinner {
     display: inline-block;
     width: 1rem;
@@ -382,30 +484,55 @@
     background-color: #f8f9fa;
   }
 
-  .strategy-results {
+  .matrix-container {
     margin-top: 1rem;
   }
 
-  .strategy-results ul {
-    list-style-type: none;
-    padding: 0;
+  .matrix-legend {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #e9ecef;
+    border-radius: 4px;
   }
 
-  .strategy-results li {
-    margin: 1rem 0;
-    padding: 1rem;
-    background-color: white;
-    border-radius: 4px;
-    border-left: 4px solid #007bff;
+  .matrix-legend p {
+    margin: 0.5rem 0;
   }
 
-  .total {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #e8f4f8;
-    border-radius: 4px;
-    font-size: 1.1rem;
+  .strategy-matrix {
+    overflow-x: auto;
+  }
+
+  .strategy-matrix table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .strategy-matrix th,
+  .strategy-matrix td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
     text-align: center;
+  }
+
+  .strategy-matrix th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+  }
+
+  .strategy-cell {
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .strategy-cell:hover {
+    background-color: #f0f8ff;
+  }
+
+  .filing-ages {
+    line-height: 1.2;
   }
 
   .error {
@@ -420,6 +547,20 @@
   @media (max-width: 768px) {
     .recipient-inputs {
       grid-template-columns: 1fr;
+    }
+
+    main {
+      max-width: 100%;
+      padding: 1rem;
+    }
+
+    .strategy-matrix {
+      font-size: 0.75rem;
+    }
+
+    .strategy-matrix th,
+    .strategy-matrix td {
+      padding: 0.25rem;
     }
   }
 </style>
