@@ -776,7 +776,7 @@ export class Recipient {
     let baseSurvivorBenefit: Money;
 
     if (survivorFilingDate.lessThanOrEqual(deceasedDeathDate)) {
-      throw new Error(
+      console.error(
         "Filing for survivor benefits before spouse died. " +
           survivorFilingDate.toString() +
           " <= " +

@@ -43,6 +43,7 @@
   let beforeDeathSliderMonths_: number = 67 * 12;
   let afterDeathSliderMonths_: number = 68 * 12;
   let survivorSliderMonths_: number = 60 * 12;
+  let survivorActualFilingDate: MonthDate = new MonthDate(3000 * 12);
 
   /**
    * Translation function for slider labels to map months to ages.
@@ -155,6 +156,58 @@
       true
     );
   });
+
+  function minCapSlider() {
+    // beforeDeath is the slider for the higher earner estimating the age they
+    // filed for primary benefits *before* they died.
+    // afterDeath is the slider for the higher earner estimating the age they
+    // filed for primary benefits *after* they died.
+    // Only one of these sliders is shown at a time, depending on fileVsDeath
+
+    let earnerMonths = 0;
+    if (fileVsDeath == "fileBeforeDeath") {
+      earnerMonths = beforeDeathSliderMonths_;
+    } else if (fileVsDeath == "fileAfterDeath") {
+      earnerMonths = afterDeathSliderMonths_;
+    } else {
+      throw new Error("fileVsDeath toggle unexpected value: " + fileVsDeath);
+    }
+
+    let startMonth: MonthDuration = new MonthDuration(survivorSliderMonths_);
+
+    // There's an issue if the survivor tries to file for survivor benefits
+    // before the higher earner dies. In this case, we increase the survivor's
+    // slider value.
+    if (
+      lowerEarner.birthdate
+        .dateAtSsaAge(new MonthDuration(survivorSliderMonths_))
+        .lessThanOrEqual(
+          higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
+        )
+    ) {
+      startMonth = lowerEarner.birthdate
+        .ageAtSsaDate(
+          higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
+        )
+        .add(new MonthDuration(1));
+    }
+
+    // Compute the actual filing date for survivor benefits:
+    survivorActualFilingDate = lowerEarner.birthdate.dateAtSsaAge(startMonth);
+
+    // But the slider shouldn't be greater than the normal retirement age:
+    if (startMonth.greaterThan(lowerEarner.survivorNormalRetirementAge()))
+      startMonth = lowerEarner.survivorNormalRetirementAge();
+
+    // Update the slider:
+    survivorSliderMonths_ = startMonth.asMonths();
+  }
+
+  $: fileVsDeath &&
+    beforeDeathSliderMonths_ &&
+    afterDeathSliderMonths_ &&
+    survivorSliderMonths_ &&
+    minCapSlider();
 </script>
 
 <div class="pageBreakAvoid">
@@ -405,9 +458,9 @@
                 higherEarner.birthdate.dateAtSsaAge(
                   MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
                 ),
-                /* survivorFilingDate = 70 */
+                /* survivorFilingDate = 200 */
                 lowerEarner.birthdate.dateAtSsaAge(
-                  MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+                  MonthDuration.initFromYearsMonths({ years: 200, months: 0 })
                 )
               )
               .wholeDollars()}</b
@@ -450,9 +503,9 @@
                 higherEarner.birthdate.dateAtSsaAge(
                   new MonthDuration(afterDeathSliderMonths_)
                 ),
-                /* survivorFilingDate = 70 */
+                /* survivorFilingDate = 200 */
                 lowerEarner.birthdate.dateAtSsaAge(
-                  MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+                  MonthDuration.initFromYearsMonths({ years: 200, months: 0 })
                 )
               )
               .wholeDollars()}</b
@@ -499,9 +552,7 @@
                 MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
               ),
               /* survivorFilingDate */
-              lowerEarner.birthdate.dateAtSsaAge(
-                new MonthDuration(survivorSliderMonths_)
-              )
+              survivorActualFilingDate
             )
             .wholeDollars()}
         {:else}
@@ -517,9 +568,7 @@
                 new MonthDuration(afterDeathSliderMonths_)
               ),
               /* survivorFilingDate */
-              lowerEarner.birthdate.dateAtSsaAge(
-                new MonthDuration(survivorSliderMonths_)
-              )
+              survivorActualFilingDate
             )
             .wholeDollars()}
         {/if}
