@@ -326,17 +326,40 @@
             <div class="strategy-matrix">
               <table>
                 <thead>
+                  <!-- Column recipient header -->
                   <tr>
                     <th></th>
+                    <th></th>
+                    <th
+                      colspan={deathAgeRange.length}
+                      class="recipient-header col-header"
+                    >
+                      <RecipientName r={recipients[1]} /> Death Age
+                    </th>
+                  </tr>
+                  <!-- Column age numbers -->
+                  <tr>
+                    <th></th>
+                    <th></th>
                     {#each deathAgeRange as deathAge2}
-                      <th>{deathAge2}</th>
+                      <th class="age-header">{deathAge2}</th>
                     {/each}
                   </tr>
                 </thead>
                 <tbody>
                   {#each deathAgeRange as deathAge1, i}
                     <tr>
-                      <th>{deathAge1}</th>
+                      {#if i === 0}
+                        <th
+                          rowspan={deathAgeRange.length}
+                          class="recipient-header row-header"
+                        >
+                          <div class="header-text">
+                            <RecipientName r={recipients[0]} /> Death Age
+                          </div>
+                        </th>
+                      {/if}
+                      <th class="age-header">{deathAge1}</th>
                       {#each deathAgeRange as deathAge2, j}
                         <td
                           class="strategy-cell"
@@ -519,6 +542,39 @@
   .strategy-matrix th {
     background-color: #f8f9fa;
     font-weight: bold;
+  }
+
+  .recipient-header {
+    background-color: #e9ecef !important;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .row-header {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    vertical-align: middle;
+    width: 2rem;
+    min-width: 2rem;
+    max-width: 2rem;
+  }
+
+  .row-header .header-text {
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+
+  .col-header {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .age-header {
+    background-color: #e9ecef !important;
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.8rem;
   }
 
   .strategy-cell {
