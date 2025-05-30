@@ -13,6 +13,8 @@
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
   const MIN_DEATH_AGE = 62;
   const MAX_DEATH_AGE = 90;
+  // Number of different starting age pairs
+  const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
 
   // Calculation state
   let startTime: number;
@@ -124,6 +126,84 @@
   }
 
   /**
+   * Get cell value for comparison (combination of both filing ages)
+   */
+  function getCellValue(result: any): string {
+    if (!result || result.error) return "error";
+    return `${result.filingAge1Years}y${result.filingAge1Months}m-${result.filingAge2Years}y${result.filingAge2Months}m`;
+  }
+
+  /**
+   * Check if cell should have right border removed (same as right neighbor)
+   */
+  function shouldRemoveRightBorder(i: number, j: number): boolean {
+    if (j >= deathAgeRange.length - 1) return false;
+    if (
+      !calculationResults[i] ||
+      !calculationResults[i][j] ||
+      !calculationResults[i][j + 1]
+    )
+      return false;
+    return (
+      getCellValue(calculationResults[i][j]) ===
+      getCellValue(calculationResults[i][j + 1])
+    );
+  }
+
+  /**
+   * Check if cell should have bottom border removed (same as bottom neighbor)
+   */
+  function shouldRemoveBottomBorder(i: number, j: number): boolean {
+    if (i >= deathAgeRange.length - 1) return false;
+    if (
+      !calculationResults[i] ||
+      !calculationResults[i + 1] ||
+      !calculationResults[i][j] ||
+      !calculationResults[i + 1][j]
+    )
+      return false;
+    return (
+      getCellValue(calculationResults[i][j]) ===
+      getCellValue(calculationResults[i + 1][j])
+    );
+  }
+
+  /**
+   * Check if cell should have left border removed (same as left neighbor)
+   */
+  function shouldRemoveLeftBorder(i: number, j: number): boolean {
+    if (j <= 0) return false;
+    if (
+      !calculationResults[i] ||
+      !calculationResults[i][j] ||
+      !calculationResults[i][j - 1]
+    )
+      return false;
+    return (
+      getCellValue(calculationResults[i][j]) ===
+      getCellValue(calculationResults[i][j - 1])
+    );
+  }
+
+  /**
+   * Check if cell should have top border removed (same as top neighbor)
+   */
+  function shouldRemoveTopBorder(i: number, j: number): boolean {
+    if (i <= 0) return false;
+    if (
+      !calculationResults[i] ||
+      !calculationResults[i - 1] ||
+      !calculationResults[i][j] ||
+      !calculationResults[i - 1][j]
+    )
+      return false;
+    return (
+      getCellValue(calculationResults[i][j]) ===
+      getCellValue(calculationResults[i - 1][j])
+    );
+  }
+
+  /**
    * Main calculation function for optimal strategy matrix
    */
   async function calculateStrategyMatrix() {
@@ -146,7 +226,8 @@
 
       // Calculate age range
       deathAgeRange = calculateAgeRange();
-      totalCalculations = deathAgeRange.length * deathAgeRange.length;
+      totalCalculations =
+        deathAgeRange.length * deathAgeRange.length * CALCULATIONS_PER_SCENARIO;
 
       // Get current date for optimal strategy calculation
       const now = new Date();
@@ -185,13 +266,10 @@
             filingAge2Months: optimal[1].modMonths(),
           };
 
-          calculationProgress++;
-
-          // Allow UI to update
-          if (calculationProgress % 10 === 0) {
-            await new Promise((resolve) => setTimeout(resolve, 0));
-          }
+          calculationProgress += CALCULATIONS_PER_SCENARIO;
         }
+        // Allow UI to update
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
 
       isCalculationComplete = true;
@@ -363,6 +441,13 @@
                       {#each deathAgeRange as deathAge2, j}
                         <td
                           class="strategy-cell"
+                          class:no-right-border={shouldRemoveRightBorder(i, j)}
+                          class:no-bottom-border={shouldRemoveBottomBorder(
+                            i,
+                            j
+                          )}
+                          class:no-left-border={shouldRemoveLeftBorder(i, j)}
+                          class:no-top-border={shouldRemoveTopBorder(i, j)}
                           title="Total benefit: {calculationResults[i][
                             j
                           ]?.totalBenefit.string() || 'N/A'}"
@@ -534,7 +619,7 @@
 
   .strategy-matrix th,
   .strategy-matrix td {
-    border: 1px solid #ddd;
+    border: 2px solid #333;
     padding: 0.5rem;
     text-align: center;
   }
@@ -589,6 +674,23 @@
 
   .filing-ages {
     line-height: 1.2;
+  }
+
+  /* Border removal classes for connected cells with same values */
+  .strategy-cell.no-right-border {
+    border-right: none !important;
+  }
+
+  .strategy-cell.no-bottom-border {
+    border-bottom: none !important;
+  }
+
+  .strategy-cell.no-left-border {
+    border-left: none !important;
+  }
+
+  .strategy-cell.no-top-border {
+    border-top: none !important;
   }
 
   .error {
