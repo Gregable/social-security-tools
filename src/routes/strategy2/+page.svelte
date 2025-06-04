@@ -8,7 +8,7 @@
   import { optimalStrategy } from "$lib/strategy/strategy-calc";
 
   // Constants
-  const DEFAULT_BIRTHDATE = "1960-03-15";
+  const DEFAULT_BIRTHDATE = "1965-03-15";
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
   const MIN_DEATH_AGE = 62;
@@ -32,6 +32,10 @@
     DEFAULT_BIRTHDATE,
   ];
   let piaValues: [number, number] = [...DEFAULT_PIA_VALUES];
+  let discountRatePercent: number = 2.5; // New discount rate input in percentage
+
+  // Reactive statement to convert percentage to decimal
+  $: discountRate = discountRatePercent / 100;
 
   // Recipients setup
   let recipients: [Recipient, Recipient] = initializeRecipients();
@@ -235,7 +239,6 @@
         years: now.getFullYear(),
         months: now.getMonth(),
       });
-      const discountRate = 0;
 
       // Initialize results matrix
       calculationResults = Array(deathAgeRange.length)
@@ -330,6 +333,17 @@
         >
         <input id="birthdate2" type="date" bind:value={birthdateInputs[1]} />
       </div>
+    </div>
+
+    <div class="global-input-group">
+      <label for="discountRate">Discount Rate (%):</label>
+      <input
+        id="discountRate"
+        type="number"
+        step="0.1"
+        min="0"
+        bind:value={discountRatePercent}
+      />
     </div>
   </section>
 
@@ -454,7 +468,7 @@
                           )}
                           class:no-left-border={shouldRemoveLeftBorder(i, j)}
                           class:no-top-border={shouldRemoveTopBorder(i, j)}
-                          title="Total benefit: {calculationResults[i][
+                          title="Net present value: {calculationResults[i][
                             j
                           ]?.totalBenefit.string() || 'N/A'}"
                         >
@@ -518,6 +532,23 @@
   }
 
   .recipient-group input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .global-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem; /* Add some space above */
+  }
+
+  .global-input-group label {
+    font-weight: bold;
+  }
+
+  .global-input-group input {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;

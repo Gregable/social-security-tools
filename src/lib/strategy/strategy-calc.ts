@@ -536,13 +536,13 @@ export function optimalStrategy(
         new MonthDuration(j),
       ];
 
-      const outcome = strategySumCents(
+      const outcome = strategySumTotalPeriods(
         recipients,
         finalDates,
         currentDate,
         discountRate,
         strategy
-      );
+      ).cents(); // Get cents value for comparison
       if (outcome > bestStrategy[2]) {
         bestStrategy = [strategy[0], strategy[1], outcome];
       }
