@@ -350,7 +350,7 @@ export function strategySumPeriods(
       dependentFinalDate.addDuration(new MonthDuration(1))
     );
 
-    if (spousalPeriod.endDate.greaterThan(spousalPeriod.startDate)) {
+    if (spousalPeriod.endDate.greaterThanOrEqual(spousalPeriod.startDate)) {
       spousalPeriod.amount = dependent.spousalBenefitOnDateGivenStartDate(
         /*spouse=*/ earner,
         /*spouseFilingDate=*/ earnerStratDate,
@@ -362,6 +362,95 @@ export function strategySumPeriods(
   }
 
   return periods;
+}
+
+/**
+ * Calculates the net present value of all benefit periods.
+ *
+ * This function calls strategySumPeriods to get an array of benefit periods,
+ * and then calculates the net present value of the payments during those periods,
+ * accounting for the duration of each period and discounting future payments.
+ *
+ * @param {[Recipient, Recipient]} recipients - An array containing the two
+ *                                              recipients for whom the strategy
+ *                                              results are being calculated.
+ * @param {[MonthDate, MonthDate]} finalDates - An array containing the final
+ *                                              dates (death dates) for each
+ *                                              recipient.
+ * @param {MonthDate} currentDate - Today's date, used as the reference for NPV calculation.
+ * @param {number} discountRate - Annual discount rate (e.g., 0.03 for 3%).
+ * @param {[MonthDuration, MonthDuration]} strats - An array containing the
+ *                                                  filing ages (as
+ *                                                  MonthDuration)
+ *                                                  for each recipient.
+ * @returns {Money} The net present value of all payments across all periods.
+ */
+export function strategySumTotalPeriods(
+  recipients: [Recipient, Recipient],
+  finalDates: [MonthDate, MonthDate],
+  currentDate: MonthDate,
+  discountRate: number,
+  strats: [MonthDuration, MonthDuration]
+): Money {
+  const periods = strategySumPeriods(recipients, finalDates, strats);
+  let totalNPVCents = 0;
+
+  // Calculate monthly discount rate
+  let monthlyDiscountRate: number;
+  if (discountRate === 0) {
+    monthlyDiscountRate = 0;
+  } else {
+    monthlyDiscountRate = Math.pow(1 + discountRate, 1 / 12) - 1;
+  }
+
+  for (const period of periods) {
+    const monthlyPaymentCents = period.amount.cents();
+
+    // Determine the effective start and end dates for payments, considering currentDate
+    // Payments are assumed to be received at the end of the month for the previous month's benefits.
+    const firstPaymentDate = period.startDate.addDuration(new MonthDuration(1));
+    const lastPaymentDate = period.endDate.addDuration(new MonthDuration(1));
+
+    // The effective start of payments for NPV calculation is the later of currentDate + 1 month or firstPaymentDate
+    const effectiveStartPaymentDate = MonthDate.max(
+      currentDate.addDuration(new MonthDuration(1)),
+      firstPaymentDate
+    );
+    const effectiveEndPaymentDate = lastPaymentDate;
+
+    // If the effective start date is after the effective end date, no payments from this period contribute to NPV.
+    if (effectiveStartPaymentDate.greaterThan(effectiveEndPaymentDate)) {
+      continue;
+    }
+
+    const numberOfPayments =
+      effectiveEndPaymentDate.monthsSinceEpoch() -
+      effectiveStartPaymentDate.monthsSinceEpoch() +
+      1;
+
+    // Number of months from currentDate to the first payment of this effective period
+    const monthsToFirstPayment =
+      effectiveStartPaymentDate.monthsSinceEpoch() -
+      currentDate.monthsSinceEpoch();
+
+    if (monthlyDiscountRate === 0) {
+      totalNPVCents += monthlyPaymentCents * numberOfPayments;
+    } else {
+      // Present value of an ordinary annuity formula: PV = P * [1 - (1 + r_m)^(-N)] / r_m
+      // Then discount this PV back to currentDate: PV_discounted = PV * (1 + r_m)^(-k)
+      const pvFactor =
+        (1 - Math.pow(1 + monthlyDiscountRate, -numberOfPayments)) /
+        monthlyDiscountRate;
+      const discountFactorToCurrentDate = Math.pow(
+        1 + monthlyDiscountRate,
+        -monthsToFirstPayment
+      );
+      totalNPVCents +=
+        monthlyPaymentCents * pvFactor * discountFactorToCurrentDate;
+    }
+  }
+
+  return Money.fromCents(totalNPVCents);
 }
 
 function earliestFiling(
