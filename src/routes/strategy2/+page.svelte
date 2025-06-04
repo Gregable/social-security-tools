@@ -119,7 +119,7 @@
     );
 
     const ages = [];
-    for (let age = startAge; age <= MAX_DEATH_AGE; age++) {
+    for (let age = startAge; age <= MAX_DEATH_AGE; age += 2) {
       ages.push(age);
     }
     return ages;
@@ -235,6 +235,7 @@
         years: now.getFullYear(),
         months: now.getMonth(),
       });
+      const discountRate = 0;
 
       // Initialize results matrix
       calculationResults = Array(deathAgeRange.length)
@@ -251,7 +252,12 @@
           const finalDates = calculateFinalDates(deathAge1, deathAge2);
 
           // Calculate optimal strategy
-          const optimal = optimalStrategy(recipients, finalDates, currentDate);
+          const optimal = optimalStrategy(
+            recipients,
+            finalDates,
+            currentDate,
+            discountRate
+          );
 
           // Store the result
           calculationResults[i][j] = {

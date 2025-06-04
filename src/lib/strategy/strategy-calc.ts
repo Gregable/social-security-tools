@@ -1,7 +1,10 @@
 import { MonthDate, MonthDuration } from "$lib/month-time";
 import { Money } from "$lib/money";
 import { Recipient } from "$lib/recipient";
-import { PersonalBenefitStrategySum } from "$lib/strategy/recipient-personal-benefits";
+import {
+  PersonalBenefitPeriods,
+  PersonalBenefitStrategySum,
+} from "$lib/strategy/recipient-personal-benefits";
 
 /**
  * Calculates the total lifetime benefit in cents for a given Social Security
@@ -17,6 +20,9 @@ import { PersonalBenefitStrategySum } from "$lib/strategy/recipient-personal-ben
  * @param {[MonthDate, MonthDate]} finalDates - An array containing the final
  *                                              dates (death dates) for each
  *                                              recipient.
+ * @param {MonthDate} currentDate - Today's date.
+ * @param {number} discountRate - Rate used for present value calculation. 0
+ *                                means no discount.
  * @param {[MonthDuration, MonthDuration]} strats - An array containing the
  *                                                  filing ages (as
  *                                                  MonthDuration)
@@ -26,6 +32,8 @@ import { PersonalBenefitStrategySum } from "$lib/strategy/recipient-personal-ben
 export function strategySumCents(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
+  currentDate: MonthDate,
+  discountRate: number,
   strats: [MonthDuration, MonthDuration]
 ): number {
   // Declare variables to hold recipient information, final dates, filing
@@ -170,6 +178,192 @@ export function strategySumCents(
   return totalBenefitCents;
 }
 
+class BenefitPeriod {
+  constructor() {}
+
+  // startDate and endDate are inclusive on both sides:
+  public startDate: MonthDate;
+  public endDate: MonthDate;
+  public amount: Money;
+} // class BenefitPeriod
+
+/**
+ * Calculates the total lifetime benefit in cents for a given Social Security
+ * filing strategy for a couple.
+ *
+ * This function computes the sum of personal, spousal, and survivor benefits
+ * for both recipients based on their selected filing ages and expected final
+ * ages (death dates).
+ *
+ * @param {[Recipient, Recipient]} recipients - An array containing the two
+ *                                              recipients for whom the strategy
+ *                                              results are being calculated.
+ * @param {[MonthDate, MonthDate]} finalDates - An array containing the final
+ *                                              dates (death dates) for each
+ *                                              recipient.
+ * @param {MonthDate} currentDate - Today's date.
+ * @param {number} discountRate - Rate used for present value calculation. 0
+ *                                means no discount.
+ * @param {[MonthDuration, MonthDuration]} strats - An array containing the
+ *                                                  filing ages (as
+ *                                                  MonthDuration)
+ *                                                  for each recipient.
+ */
+export function strategySumPeriods(
+  recipients: [Recipient, Recipient],
+  finalDates: [MonthDate, MonthDate],
+  strats: [MonthDuration, MonthDuration]
+): BenefitPeriod[] {
+  let periods: BenefitPeriod[] = new Array();
+
+  // Declare variables to hold recipient information, final dates, filing
+  // strategies (ages), and calculated filing dates.
+  let earner: Recipient;
+  let dependent: Recipient;
+  let earnerFinalDate: MonthDate;
+  let dependentFinalDate: MonthDate;
+  let earnerStrat: MonthDuration;
+  let dependentStrat: MonthDuration;
+  let earnerStratDate: MonthDate;
+  let dependentStratDate: MonthDate;
+
+  // Calculate the MonthDate version of the filing strategy ages by offsetting
+  // the strategy ages from each recipient's birthdate.
+  let stratDates: [MonthDate, MonthDate] = [null, null];
+  for (let i = 0; i < 2; i++) {
+    stratDates[i] = recipients[i].birthdate.dateAtSsaAge(strats[i]);
+  }
+
+  // Determine the higher and lower earner based on their Primary Insurance
+  // Amount (PIA).
+  if (recipients[0].higherEarningsThan(recipients[1])) {
+    earner = recipients[0];
+    dependent = recipients[1];
+    earnerFinalDate = finalDates[0];
+    dependentFinalDate = finalDates[1];
+    earnerStrat = strats[0];
+    dependentStrat = strats[1];
+    earnerStratDate = stratDates[0];
+    dependentStratDate = stratDates[1];
+  } else {
+    earner = recipients[1];
+    dependent = recipients[0];
+    earnerFinalDate = finalDates[1];
+    dependentFinalDate = finalDates[0];
+    earnerStrat = strats[1];
+    dependentStrat = strats[0];
+    earnerStratDate = stratDates[1];
+    dependentStratDate = stratDates[0];
+  }
+
+  // If the dependent has 0 PIA, then they can't file earlier than the earner.
+  // Move the dependent's filing date up to the earner's:
+  if (
+    dependent.pia().primaryInsuranceAmount().cents() == 0 &&
+    dependentStratDate.lessThan(earnerStratDate)
+  ) {
+    dependentStrat = earnerStrat;
+    dependentStratDate = earnerStratDate;
+  }
+
+  // Determine the start date for survivor benefits. This is the later of:
+  // 1. The month after the earner's death date.
+  // 2. The dependent's filing date.
+  const survivorStartDate = MonthDate.max(
+    earnerFinalDate.addDuration(new MonthDuration(1)),
+    dependentStratDate
+  );
+
+  // Determine the dependent's survivor benefit amount:
+  let isSurvivorBenefitApplicable = false;
+  let survivorBenefit: Money = Money.zero();
+  if (dependentFinalDate.greaterThan(survivorStartDate)) {
+    survivorBenefit = dependent.survivorBenefit(
+      /*deceased*/ earner,
+      /*deceasedFilingDate*/ earnerStratDate,
+      /*deceasedDeathDate*/ earnerFinalDate,
+      /*survivorFilingDate*/ survivorStartDate
+    );
+    // Note that if the survivor's personal benefit is greater than their
+    // survivor benefit, they will not switch to a survivor benefit.
+    const dependentFinalPersonalBenefit = dependent.benefitOnDate(
+      /*filingDate*/ dependentStratDate,
+      // Add a year to include all late filing credits.
+      /*atDate*/ dependentStratDate.addDuration(MonthDuration.OneYear())
+    );
+    if (dependentFinalPersonalBenefit.cents() < survivorBenefit.cents()) {
+      isSurvivorBenefitApplicable = true;
+    }
+  }
+
+  // Earner's Personal Benefit:
+  // Earner is simple as they will never have spousal or survivor benefits:
+  periods.push(
+    ...PersonalBenefitPeriods(
+      earner,
+      earner.birthdate.dateAtSsaAge(earnerStrat),
+      earnerFinalDate
+    )
+  );
+  // The latest that the dependent will be collecting a personal benefit is the
+  // month before starting a survivor benefit.
+  let dependentFinalPersonalDate = dependentFinalDate;
+  if (
+    isSurvivorBenefitApplicable &&
+    dependentFinalDate.greaterThanOrEqual(survivorStartDate)
+  ) {
+    dependentFinalPersonalDate = survivorStartDate.subtractDuration(
+      new MonthDuration(1)
+    );
+  }
+  // Dependent's Personal Benefit:
+  periods.push(
+    ...PersonalBenefitPeriods(
+      dependent,
+      dependent.birthdate.dateAtSsaAge(dependentStrat),
+      dependentFinalPersonalDate
+    )
+  );
+
+  // Dependent's Survivor Benefit:
+  if (isSurvivorBenefitApplicable) {
+    let survivorPeriod = new BenefitPeriod();
+    survivorPeriod.amount = survivorBenefit;
+    survivorPeriod.startDate = survivorStartDate;
+    survivorPeriod.endDate = dependentFinalDate;
+    periods.push(survivorPeriod);
+  }
+
+  // Dependent's Spousal Benefit:
+  if (dependent.eligibleForSpousalBenefit(earner)) {
+    let spousalPeriod = new BenefitPeriod();
+    // The start date for spousal benefits is the later of the two filing dates.
+    spousalPeriod.startDate = MonthDate.max(
+      earnerStratDate,
+      dependentStratDate
+    );
+    // The end date for spousal benefits is the earlier of when the dependent
+    // starts receiving survivor benefits or their own death date.
+    spousalPeriod.endDate = MonthDate.min(
+      survivorStartDate.subtractDuration(new MonthDuration(1)),
+      // Include the month of the final date:
+      dependentFinalDate.addDuration(new MonthDuration(1))
+    );
+
+    if (spousalPeriod.endDate.greaterThan(spousalPeriod.startDate)) {
+      spousalPeriod.amount = dependent.spousalBenefitOnDateGivenStartDate(
+        /*spouse=*/ earner,
+        /*spouseFilingDate=*/ earnerStratDate,
+        /*filingDate=*/ dependentStratDate,
+        /*atDate=*/ spousalPeriod.startDate
+      );
+      periods.push(spousalPeriod);
+    }
+  }
+
+  return periods;
+}
+
 function earliestFiling(
   recipient: Recipient,
   currentDate: MonthDate
@@ -219,13 +413,17 @@ function earliestFiling(
  * @param {[MonthDate, MonthDate]} finalDates - An array containing the final
  *                                              dates (death dates) for each
  *                                              recipient.
+ * @param {MonthDate} currentDate - Today's date.
+ * @param {number} discountRate - Rate used for present value calculation. 0
+ *                                means no discount.
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
 export function optimalStrategy(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
-  currentDate: MonthDate
+  currentDate: MonthDate,
+  discountRate: number
 ): [MonthDuration, MonthDuration, number] {
   let bestStrategy: [MonthDuration, MonthDuration, number] = [
     new MonthDuration(0),
@@ -249,7 +447,13 @@ export function optimalStrategy(
         new MonthDuration(j),
       ];
 
-      const outcome = strategySumCents(recipients, finalDates, strategy);
+      const outcome = strategySumCents(
+        recipients,
+        finalDates,
+        currentDate,
+        discountRate,
+        strategy
+      );
       if (outcome > bestStrategy[2]) {
         bestStrategy = [strategy[0], strategy[1], outcome];
       }

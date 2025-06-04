@@ -20,6 +20,11 @@ function calculateStrategySum({
   finalAge2,
   strategy1Year,
   strategy2Year,
+  currentDate = MonthDate.initFromYearsMonths({
+    years: 200,
+    months: 0,
+  }),
+  discountRate = 0,
 }) {
   let recipient1 = new Recipient();
   recipient1.birthdate = birthdate1;
@@ -58,7 +63,13 @@ function calculateStrategySum({
   }
 
   return (
-    strategySumCents([recipient1, recipient2], finalDates, strategies) / 100
+    strategySumCents(
+      [recipient1, recipient2],
+      finalDates,
+      currentDate,
+      discountRate,
+      strategies
+    ) / 100
   );
 }
 
@@ -331,6 +342,7 @@ function calculateOptimalStrategy({
   finalAge1,
   finalAge2,
   currentDate,
+  discountRate,
 }) {
   let recipient1 = new Recipient();
   recipient1.birthdate = birthdate1;
@@ -356,7 +368,12 @@ function calculateOptimalStrategy({
     );
   }
 
-  return optimalStrategy([recipient1, recipient2], finalDates, currentDate);
+  return optimalStrategy(
+    [recipient1, recipient2],
+    finalDates,
+    currentDate,
+    discountRate
+  );
 }
 
 describe("optimalStrategy", () => {
@@ -373,6 +390,7 @@ describe("optimalStrategy", () => {
       finalAge1: 70,
       finalAge2: 71,
       currentDate: currentDate,
+      discountRate: 0,
     });
     expect(strategy[0].asMonths()).toEqual(62 * 12 + 1);
     expect(strategy[1].asMonths()).toEqual(62 * 12 + 1);
