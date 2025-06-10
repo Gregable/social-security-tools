@@ -66,24 +66,13 @@ function calculateStrategySum({
     strategies[1] = strategies[1].add(new MonthDuration(1));
   }
 
-  const centsResult =
-    strategySumCents(
-      [recipient1, recipient2],
-      finalDates,
-      currentDate,
-      discountRate,
-      strategies
-    ) / 100;
-
-  const totalPaidResult = strategySumTotalPeriods(
+  return strategySumTotalPeriods(
     [recipient1, recipient2],
     finalDates,
     currentDate,
     discountRate,
     strategies
   ).value();
-
-  return { centsResult, totalPaidResult };
 }
 
 describe("strategySumCents", () => {
@@ -215,13 +204,14 @@ describe("strategySumCents", () => {
   it.each(testCases)(
     "calculates correct values for strategySumCents for %j",
     (testcase) => {
-      const { centsResult } = calculateStrategySum(testcase);
-      expect(centsResult).toBe(testcase["expectedTotalBenefit"]);
+      expect(calculateStrategySum(testcase)).toBe(
+        testcase["expectedTotalBenefit"]
+      );
     }
   );
 
   it("works with zero pia", () => {
-    const { centsResult } = calculateStrategySum({
+    const result1 = calculateStrategySum({
       pia1: Money.from(0),
       pia2: Money.from(0),
       birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
@@ -231,11 +221,11 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 70,
     });
-    expect(centsResult).toBe(0);
+    expect(result1).toBe(0);
   });
 
   it("either recipient can be the primary earner", () => {
-    const { centsResult: centsResult1 } = calculateStrategySum({
+    const result2 = calculateStrategySum({
       pia1: Money.from(1000),
       pia2: Money.from(0),
       birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
@@ -245,9 +235,9 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 70,
     });
-    expect(centsResult1).toBe(438480);
+    expect(result2).toBe(438480);
 
-    const { centsResult: centsResult2 } = calculateStrategySum({
+    const result3 = calculateStrategySum({
       pia1: Money.from(0),
       pia2: Money.from(1000),
       birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
@@ -257,13 +247,13 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 70,
     });
-    expect(centsResult2).toBe(438480);
+    expect(result3).toBe(438480);
   });
 
   // This test is a duplicate of the earlier "works with zero pia" test.
   // Keeping it for now, but it could be removed.
   it("works with zero pia (duplicate)", () => {
-    const { centsResult } = calculateStrategySum({
+    const result = calculateStrategySum({
       pia1: Money.from(0),
       pia2: Money.from(0),
       birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
@@ -273,11 +263,11 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 70,
     });
-    expect(centsResult).toBe(0);
+    expect(result).toBe(0);
   });
 
   it("works with Dec birthdate", () => {
-    const { centsResult } = calculateStrategySum({
+    const result = calculateStrategySum({
       pia1: Money.from(1000),
       pia2: Money.from(500),
       birthdate1: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
@@ -287,7 +277,7 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 70,
     });
-    expect(centsResult).toBe(448260);
+    expect(result).toBe(448260);
   });
 
   it("works with only 1 month survival", () => {
@@ -295,7 +285,7 @@ describe("strategySumCents", () => {
     // They also die in Dec 20230, so they only collect benefits for a month.
     // Delayed filing of 3 years @ 8% per year is 24% increase in benefits.
     // $1,000 x 1.24 = $1,240. $1,240 x 2 recipients is $2,480.
-    const { centsResult } = calculateStrategySum({
+    const result = calculateStrategySum({
       pia1: Money.from(1000),
       pia2: Money.from(1000),
       birthdate1: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
@@ -305,14 +295,14 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 70,
     });
-    expect(centsResult).toBe(2480);
+    expect(result).toBe(2480);
   });
 
   it("works with only 2 months survival", () => {
     // This is identical to "works with only 1 month survival", except that the
     // recipients are born in Nov. They still die in Dec 2030, therefore they
     // collect 2 months, so the benefit is doubled.
-    const { centsResult } = calculateStrategySum({
+    const result = calculateStrategySum({
       pia1: Money.from(1000),
       pia2: Money.from(1000),
       birthdate1: Birthdate.FromYMD(1960, 10, 15), // Nov 15, 1960
@@ -322,7 +312,7 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 70,
     });
-    expect(centsResult).toBe(2480 * 2);
+    expect(result).toBe(2480 * 2);
   });
 
   it("Survivor benefits applied for one year", () => {
@@ -331,7 +321,7 @@ describe("strategySumCents", () => {
     // spousal benefits for that month: $500.
     // The second recipient then collects 12 additional months of survivor
     // benefits.
-    const { centsResult } = calculateStrategySum({
+    const result = calculateStrategySum({
       pia1: Money.from(1000),
       pia2: Money.from(0),
       birthdate1: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
@@ -341,237 +331,8 @@ describe("strategySumCents", () => {
       strategy1Year: 70,
       strategy2Year: 69,
     });
-    expect(centsResult).toBe(1240 * 13 + 500);
+    expect(result).toBe(1240 * 13 + 500);
   });
-});
-
-describe("strategySumTotalPeriods vs strategySumCents", () => {
-  const testCasesForComparison = [
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(1000),
-      birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      finalAge1: 85,
-      finalAge2: 85,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1500),
-      pia2: Money.from(1200),
-      birthdate1: Birthdate.FromYMD(1962, 5, 10), // June 10, 1962
-      birthdate2: Birthdate.FromYMD(1963, 8, 20), // Sep 20, 1963
-      finalAge1: 90,
-      finalAge2: 88,
-      strategy1Year: 67,
-      strategy2Year: 65,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(2000),
-      pia2: Money.from(0),
-      birthdate1: Birthdate.FromYMD(1958, 11, 1), // Dec 1, 1958
-      birthdate2: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      finalAge1: 95,
-      finalAge2: 95,
-      strategy1Year: 69,
-      strategy2Year: 68,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(800),
-      pia2: Money.from(1800),
-      birthdate1: Birthdate.FromYMD(1965, 2, 25), // Mar 25, 1965
-      birthdate2: Birthdate.FromYMD(1961, 7, 5), // Aug 5, 1961
-      finalAge1: 80,
-      finalAge2: 92,
-      strategy1Year: 63,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(2500),
-      pia2: Money.from(2500),
-      birthdate1: Birthdate.FromYMD(1959, 6, 30), // July 30, 1959
-      birthdate2: Birthdate.FromYMD(1959, 6, 30), // July 30, 1959
-      finalAge1: 87,
-      finalAge2: 87,
-      strategy1Year: 68,
-      strategy2Year: 68,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1200),
-      pia2: Money.from(1500),
-      birthdate1: Birthdate.FromYMD(1964, 9, 12), // Oct 12, 1964
-      birthdate2: Birthdate.FromYMD(1964, 9, 12), // Oct 12, 1964
-      finalAge1: 89,
-      finalAge2: 89,
-      strategy1Year: 66,
-      strategy2Year: 69,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1800),
-      pia2: Money.from(800),
-      birthdate1: Birthdate.FromYMD(1961, 7, 5), // Aug 5, 1961
-      birthdate2: Birthdate.FromYMD(1965, 2, 25), // Mar 25, 1965
-      finalAge1: 92,
-      finalAge2: 80,
-      strategy1Year: 70,
-      strategy2Year: 63,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(0),
-      pia2: Money.from(2000),
-      birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      birthdate2: Birthdate.FromYMD(1958, 11, 1), // Dec 1, 1958
-      finalAge1: 95,
-      finalAge2: 95,
-      strategy1Year: 63,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(1000),
-      birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      finalAge1: 80,
-      finalAge2: 80,
-      strategy1Year: 65,
-      strategy2Year: 65,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(1000),
-      birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      finalAge1: 90,
-      finalAge2: 90,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(0),
-      birthdate1: Birthdate.FromYMD(1970, 3, 15), // Apr 15, 1970
-      birthdate2: Birthdate.FromYMD(1970, 3, 15), // Apr 15, 1970
-      finalAge1: 70,
-      finalAge2: 71,
-      strategy1Year: 62,
-      strategy2Year: 62,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(0),
-      pia2: Money.from(0),
-      birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      finalAge1: 90,
-      finalAge2: 90,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(0),
-      birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      finalAge1: 90,
-      finalAge2: 90,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(0),
-      pia2: Money.from(1000),
-      birthdate1: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 0, 15), // Jan 15, 1960
-      finalAge1: 90,
-      finalAge2: 90,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(500),
-      birthdate1: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
-      finalAge1: 90,
-      finalAge2: 90,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(1000),
-      birthdate1: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
-      finalAge1: 70,
-      finalAge2: 70,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(1000),
-      birthdate1: Birthdate.FromYMD(1960, 10, 15), // Nov 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 10, 15), // Nov 15, 1960
-      finalAge1: 70,
-      finalAge2: 70,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-    {
-      pia1: Money.from(1000),
-      pia2: Money.from(0),
-      birthdate1: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
-      birthdate2: Birthdate.FromYMD(1960, 11, 15), // Dec 15, 1960
-      finalAge1: 70,
-      finalAge2: 71,
-      strategy1Year: 70,
-      strategy2Year: 70,
-      currentDate: MonthDate.initFromYearsMonths({ years: 2025, months: 0 }),
-      discountRate: 0,
-    },
-  ];
-
-  it.each(testCasesForComparison)(
-    "strategySumTotalPeriods matches strategySumCents for %j",
-    (testcase) => {
-      const { centsResult, totalPaidResult } = calculateStrategySum(testcase);
-      expect(totalPaidResult).toBeCloseTo(centsResult, 0); // Use toBeCloseTo for floating point comparison
-    }
-  );
 });
 
 function calculateOptimalStrategy({
