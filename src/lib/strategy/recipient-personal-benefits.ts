@@ -1,8 +1,17 @@
-import * as constants from "$lib/strategy/constants";
-
 import { Recipient } from "$lib/recipient";
 import { MonthDate, MonthDuration } from "$lib/month-time";
 import { Money } from "$lib/money";
+
+// Minimum / Maximum age that a person could file at.
+const MIN_STRATEGY_AGE = MonthDuration.initFromYearsMonths({
+  years: 62,
+  months: 0,
+});
+const MAX_STRATEGY_AGE = MonthDuration.initFromYearsMonths({
+  years: 70,
+  months: 0,
+});
+const MONTHS_IN_YEAR = 12;
 
 /**
  * Calculates the total sum of personal benefits a recipient would receive
@@ -36,7 +45,7 @@ export function PersonalBenefitStrategySum(
 
   // Compute the number of months that (2) applies in the first year.
   const monthsRemainingInFilingYear = Math.min(
-    constants.MONTHS_IN_YEAR - filingDate.monthIndex(),
+    MONTHS_IN_YEAR - filingDate.monthIndex(),
     totalMonths
   );
 
@@ -107,7 +116,7 @@ export function PersonalBenefitPeriods(
 
   // Compute the number of months that (2) applies in the first year.
   const monthsRemainingInFilingYear = Math.min(
-    constants.MONTHS_IN_YEAR - filingDate.monthIndex(),
+    MONTHS_IN_YEAR - filingDate.monthIndex(),
     totalMonths
   );
 
@@ -159,10 +168,7 @@ export class RecipientPersonalBenefits {
    * nested objects.
    */
   private readonly arraySize =
-    2 *
-    (constants.MAX_STRATEGY_AGE.asMonths() -
-      constants.MIN_STRATEGY_AGE.asMonths() +
-      1);
+    2 * (MAX_STRATEGY_AGE.asMonths() - MIN_STRATEGY_AGE.asMonths() + 1);
   private data: number[];
 
   /**
@@ -190,18 +196,16 @@ export class RecipientPersonalBenefits {
 
     const ageMonths = filingAge.asMonths();
     if (
-      ageMonths < constants.MIN_STRATEGY_AGE.asMonths() ||
-      ageMonths > constants.MAX_STRATEGY_AGE.asMonths()
+      ageMonths < MIN_STRATEGY_AGE.asMonths() ||
+      ageMonths > MAX_STRATEGY_AGE.asMonths()
     ) {
       throw new Error(`Filing age ${ageMonths} months is outside valid range.`);
     }
 
-    const ageOffset = ageMonths - constants.MIN_STRATEGY_AGE.asMonths();
+    const ageOffset = ageMonths - MIN_STRATEGY_AGE.asMonths();
     const recipientOffset =
       recipientIndex *
-      (constants.MAX_STRATEGY_AGE.asMonths() -
-        constants.MIN_STRATEGY_AGE.asMonths() +
-        1);
+      (MAX_STRATEGY_AGE.asMonths() - MIN_STRATEGY_AGE.asMonths() + 1);
 
     return recipientOffset + ageOffset;
   }
@@ -246,8 +250,8 @@ export class RecipientPersonalBenefits {
     const birthdate = recipient.birthdate;
 
     for (
-      let strategyAge = MonthDuration.copyFrom(constants.MIN_STRATEGY_AGE);
-      strategyAge.lessThanOrEqual(constants.MAX_STRATEGY_AGE);
+      let strategyAge = MonthDuration.copyFrom(MIN_STRATEGY_AGE);
+      strategyAge.lessThanOrEqual(MAX_STRATEGY_AGE);
       strategyAge.increment()
     ) {
       // Calculate the personal benefit:
