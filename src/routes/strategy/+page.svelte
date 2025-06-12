@@ -15,6 +15,9 @@
   const MAX_DEATH_AGE = 90;
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
+  
+  // Track currently hovered cell for cross-table highlighting
+  let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
 
   // Calculation state
   let startTime: number;
@@ -130,13 +133,38 @@
   }
 
   /**
-   * Creates a function to extract filing age value for a specific recipient
+   * Converts filing age to filing date for a recipient
+   * @param recipientIndex The recipient index (0 or 1)
+   * @param filingAgeYears Years component of filing age
+   * @param filingAgeMonths Months component of filing age
+   */
+  function getFilingDate(recipientIndex: number, filingAgeYears: number, filingAgeMonths: number): string {
+    const birthdate = recipients[recipientIndex].birthdate;
+    const filingAge = MonthDuration.initFromYearsMonths({
+      years: filingAgeYears,
+      months: filingAgeMonths
+    });
+    const filingDate = birthdate.dateAtLayAge(filingAge);
+    
+    // Format as MMM YYYY (e.g., "Jan 2025")
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${months[filingDate.monthIndex()]} ${filingDate.year()}`;
+  }
+
+  /**
+   * Creates a function to extract filing date value for a specific recipient
    * @param recipientIndex The recipient index (1 or 2)
    */
   function createValueExtractor(recipientIndex: number): (result: any) => string {
     return (result: any): string => {
       if (!result || result.error) return "error";
-      return `${result[`filingAge${recipientIndex}Years`]}y${result[`filingAge${recipientIndex}Months`]}m`;
+      // Convert to 0-based index for internal functions
+      const zeroBasedIndex = recipientIndex - 1;
+      return getFilingDate(
+        zeroBasedIndex,
+        result[`filingAge${recipientIndex}Years`],
+        result[`filingAge${recipientIndex}Months`]
+      );
     };
   }
 
@@ -393,10 +421,10 @@
 
     {#if isCalculationComplete && calculationResults.length > 0}
       <div class="result-box">
-        <h3>Optimal Filing Age Strategies</h3>
+        <h3>Optimal Filing Date Strategies</h3>
         <p>Calculation completed in {timeElapsed.toFixed(2)} seconds</p>
         <p>
-          Tables show optimal filing ages for each recipient across different death age combinations
+          Tables show optimal filing dates for each recipient across different death age combinations
         </p>
 
         {#if calculationResults[0][0]?.error}
@@ -410,7 +438,7 @@
               <!-- Table for Recipient {recipientIndex + 1}'s optimal filing age -->
               <div class="matrix-container recipient{recipientIndex + 1}-matrix">
                 <div class="matrix-title">
-                  <h4>Optimal Filing Age for <RecipientName r={recipients[recipientIndex]} /></h4>
+                  <h4>Optimal Filing Date for <RecipientName r={recipients[recipientIndex]} /></h4>
                 </div>
                 <div class="matrix-legend">
                   <p>
@@ -422,7 +450,7 @@
                     <RecipientName r={recipients[1]} /> death age
                   </p>
                   <p>
-                    <strong>Cell shows:</strong> <RecipientName r={recipients[recipientIndex]} />'s optimal filing age
+                    <strong>Cell shows:</strong> <RecipientName r={recipients[recipientIndex]} />'s optimal filing date
                   </p>
                 </div>
 
@@ -444,14 +472,14 @@
                       <tr>
                         <th></th>
                         <th></th>
-                        {#each deathAgeRange as deathAge2}
-                          <th class="age-header">{deathAge2}</th>
+                        {#each deathAgeRange as deathAge2, j}
+                          <th class="age-header" class:highlighted-column={hoveredCell && hoveredCell.colIndex === j}>{deathAge2}</th>
                         {/each}
                       </tr>
                     </thead>
                     <tbody>
                       {#each deathAgeRange as deathAge1, i}
-                        <tr>
+                        <tr class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i}>
                           {#if i === 0}
                             <th
                               rowspan={deathAgeRange.length}
@@ -462,7 +490,7 @@
                               </div>
                             </th>
                           {/if}
-                          <th class="age-header">{deathAge1}</th>
+                          <th class="age-header" class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i}>{deathAge1}</th>
                           {#each deathAgeRange as deathAge2, j}
                             {@const recipientBorderFuncs = borderRemovalFunctions[recipientIndex]}
                             <td
@@ -471,11 +499,23 @@
                               class:no-bottom-border={recipientBorderFuncs.bottom(i, j)}
                               class:no-left-border={recipientBorderFuncs.left(i, j)}
                               class:no-top-border={recipientBorderFuncs.top(i, j)}
+                              class:highlighted-cell={hoveredCell && hoveredCell.rowIndex === i && hoveredCell.colIndex === j}
+                              class:highlighted-column={hoveredCell && hoveredCell.colIndex === j && hoveredCell.rowIndex !== i}
+                              class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i && hoveredCell.colIndex !== j}
+                              on:mouseover={() => (hoveredCell = { rowIndex: i, colIndex: j })}
+                              on:mouseout={() => (hoveredCell = null)}
                               title="Net present value: {calculationResults[i][j]?.totalBenefit.string() || 'N/A'}"
                             >
-                              <div class="filing-ages">
-                                {calculationResults[i][j]?.[`filingAge${recipientIndex + 1}Years`] || "N/A"}y
-                                {calculationResults[i][j]?.[`filingAge${recipientIndex + 1}Months`] || 0}m
+                              <div class="filing-dates">
+                                {#if calculationResults[i][j]}
+                                  {getFilingDate(
+                                    recipientIndex,
+                                    calculationResults[i][j][`filingAge${recipientIndex + 1}Years`],
+                                    calculationResults[i][j][`filingAge${recipientIndex + 1}Months`]
+                                  )}
+                                {:else}
+                                  N/A
+                                {/if}
                               </div>
                             </td>
                           {/each}
@@ -746,11 +786,22 @@
     transition: background-color 0.2s;
   }
 
-  .strategy-cell:hover {
-    background-color: #f0f8ff;
+  /* Highlighting classes */
+  tr.highlighted-row > td.highlighted-cell {
+    background-color: #007bff !important;
+    color: white;
+  }
+  
+  tr.highlighted-row > td,
+  th.highlighted-row {
+    background-color: #e6f3ff !important;
+  }
+  
+  .highlighted-column {
+    background-color: #e6f3ff !important;
   }
 
-  .filing-ages {
+  .filing-dates {
     line-height: 1.2;
   }
 
