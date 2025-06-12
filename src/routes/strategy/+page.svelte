@@ -130,82 +130,94 @@
   }
 
   /**
-   * Get cell value for comparison (combination of both filing ages)
+   * Creates a function to extract filing age value for a specific recipient
+   * @param recipientIndex The recipient index (1 or 2)
    */
-  function getCellValue(result: any): string {
-    if (!result || result.error) return "error";
-    return `${result.filingAge1Years}y${result.filingAge1Months}m-${result.filingAge2Years}y${result.filingAge2Months}m`;
+  function createValueExtractor(recipientIndex: number): (result: any) => string {
+    return (result: any): string => {
+      if (!result || result.error) return "error";
+      return `${result[`filingAge${recipientIndex}Years`]}y${result[`filingAge${recipientIndex}Months`]}m`;
+    };
   }
 
-  /**
-   * Check if cell should have right border removed (same as right neighbor)
-   */
-  function shouldRemoveRightBorder(i: number, j: number): boolean {
-    if (j >= deathAgeRange.length - 1) return false;
-    if (
-      !calculationResults[i] ||
-      !calculationResults[i][j] ||
-      !calculationResults[i][j + 1]
-    )
-      return false;
-    return (
-      getCellValue(calculationResults[i][j]) ===
-      getCellValue(calculationResults[i][j + 1])
-    );
-  }
+  // Create value extractors
+  const getRecipient1Value = createValueExtractor(1);   // Recipient 1 value
+  const getRecipient2Value = createValueExtractor(2);   // Recipient 2 value
 
   /**
-   * Check if cell should have bottom border removed (same as bottom neighbor)
+   * Factory function to create border removal functions
+   * @param valueExtractor Function that extracts the value to compare
+   * @returns Object with functions for each border direction
    */
-  function shouldRemoveBottomBorder(i: number, j: number): boolean {
-    if (i >= deathAgeRange.length - 1) return false;
-    if (
-      !calculationResults[i] ||
-      !calculationResults[i + 1] ||
-      !calculationResults[i][j] ||
-      !calculationResults[i + 1][j]
-    )
-      return false;
-    return (
-      getCellValue(calculationResults[i][j]) ===
-      getCellValue(calculationResults[i + 1][j])
-    );
+  function createBorderRemovalFunctions(valueExtractor: (result: any) => string) {
+    return {
+      right: (i: number, j: number): boolean => {
+        if (j >= deathAgeRange.length - 1) return false;
+        if (
+          !calculationResults[i] ||
+          !calculationResults[i][j] ||
+          !calculationResults[i][j + 1]
+        )
+          return false;
+        return (
+          valueExtractor(calculationResults[i][j]) ===
+          valueExtractor(calculationResults[i][j + 1])
+        );
+      },
+      
+      bottom: (i: number, j: number): boolean => {
+        if (i >= deathAgeRange.length - 1) return false;
+        if (
+          !calculationResults[i] ||
+          !calculationResults[i + 1] ||
+          !calculationResults[i][j] ||
+          !calculationResults[i + 1][j]
+        )
+          return false;
+        return (
+          valueExtractor(calculationResults[i][j]) ===
+          valueExtractor(calculationResults[i + 1][j])
+        );
+      },
+      
+      left: (i: number, j: number): boolean => {
+        if (j <= 0) return false;
+        if (
+          !calculationResults[i] ||
+          !calculationResults[i][j] ||
+          !calculationResults[i][j - 1]
+        )
+          return false;
+        return (
+          valueExtractor(calculationResults[i][j]) ===
+          valueExtractor(calculationResults[i][j - 1])
+        );
+      },
+      
+      top: (i: number, j: number): boolean => {
+        if (i <= 0) return false;
+        if (
+          !calculationResults[i] ||
+          !calculationResults[i - 1] ||
+          !calculationResults[i][j] ||
+          !calculationResults[i - 1][j]
+        )
+          return false;
+        return (
+          valueExtractor(calculationResults[i][j]) ===
+          valueExtractor(calculationResults[i - 1][j])
+        );
+      }
+    };
   }
 
-  /**
-   * Check if cell should have left border removed (same as left neighbor)
-   */
-  function shouldRemoveLeftBorder(i: number, j: number): boolean {
-    if (j <= 0) return false;
-    if (
-      !calculationResults[i] ||
-      !calculationResults[i][j] ||
-      !calculationResults[i][j - 1]
-    )
-      return false;
-    return (
-      getCellValue(calculationResults[i][j]) ===
-      getCellValue(calculationResults[i][j - 1])
-    );
-  }
-
-  /**
-   * Check if cell should have top border removed (same as top neighbor)
-   */
-  function shouldRemoveTopBorder(i: number, j: number): boolean {
-    if (i <= 0) return false;
-    if (
-      !calculationResults[i] ||
-      !calculationResults[i - 1] ||
-      !calculationResults[i][j] ||
-      !calculationResults[i - 1][j]
-    )
-      return false;
-    return (
-      getCellValue(calculationResults[i][j]) ===
-      getCellValue(calculationResults[i - 1][j])
-    );
-  }
+  // Create border removal functions for each recipient
+  // Index 0: Recipient 1 table border functions
+  // Index 1: Recipient 2 table border functions
+  const borderRemovalFunctions = [
+    createBorderRemovalFunctions(getRecipient1Value),   // Recipient 1
+    createBorderRemovalFunctions(getRecipient2Value)    // Recipient 2
+  ];
 
   /**
    * Main calculation function for optimal strategy matrix
@@ -308,31 +320,20 @@
     <h2>Recipient Information</h2>
 
     <div class="recipient-inputs">
-      <div class="recipient-group">
-        <label for="name1">Name:</label>
-        <input id="name1" type="text" bind:value={recipients[0].name} />
+      {#each [0, 1] as idx}
+        <div class="recipient-group">
+          <label for="name{idx+1}">Name:</label>
+          <input id="name{idx+1}" type="text" bind:value={recipients[idx].name} />
 
-        <label for="pia1"><RecipientName r={recipients[0]} /> PIA:</label>
-        <input id="pia1" type="number" bind:value={piaValues[0]} />
+          <label for="pia{idx+1}"><RecipientName r={recipients[idx]} /> PIA:</label>
+          <input id="pia{idx+1}" type="number" bind:value={piaValues[idx]} />
 
-        <label for="birthdate1"
-          ><RecipientName r={recipients[0]} /> Birthdate:</label
-        >
-        <input id="birthdate1" type="date" bind:value={birthdateInputs[0]} />
-      </div>
-
-      <div class="recipient-group">
-        <label for="name2">Name:</label>
-        <input id="name2" type="text" bind:value={recipients[1].name} />
-
-        <label for="pia2"><RecipientName r={recipients[1]} /> PIA:</label>
-        <input id="pia2" type="number" bind:value={piaValues[1]} />
-
-        <label for="birthdate2"
-          ><RecipientName r={recipients[1]} /> Birthdate:</label
-        >
-        <input id="birthdate2" type="date" bind:value={birthdateInputs[1]} />
-      </div>
+          <label for="birthdate{idx+1}"
+            ><RecipientName r={recipients[idx]} /> Birthdate:</label
+          >
+          <input id="birthdate{idx+1}" type="date" bind:value={birthdateInputs[idx]} />
+        </div>
+      {/each}
     </div>
 
     <div class="global-input-group">
@@ -372,7 +373,7 @@
     >
       {isCalculationRunning
         ? "Calculating..."
-        : "Calculate Optimal Strategy Matrix"}
+        : "Calculate Optimal Filing Strategies"}
     </button>
 
     {#if isCalculationRunning}
@@ -392,10 +393,10 @@
 
     {#if isCalculationComplete && calculationResults.length > 0}
       <div class="result-box">
-        <h3>Optimal Strategy Matrix</h3>
+        <h3>Optimal Filing Age Strategies</h3>
         <p>Calculation completed in {timeElapsed.toFixed(2)} seconds</p>
         <p>
-          Matrix shows optimal filing ages for different death age combinations
+          Tables show optimal filing ages for each recipient across different death age combinations
         </p>
 
         {#if calculationResults[0][0]?.error}
@@ -404,90 +405,87 @@
             <p>{calculationResults[0][0].error}</p>
           </div>
         {:else}
-          <div class="matrix-container">
-            <div class="matrix-legend">
-              <p>
-                <strong>Row:</strong>
-                <RecipientName r={recipients[0]} /> death age
-              </p>
-              <p>
-                <strong>Column:</strong>
-                <RecipientName r={recipients[1]} /> death age
-              </p>
-              <p>
-                <strong>Cell format:</strong> [<RecipientName
-                  r={recipients[0]}
-                /> filing age] / [<RecipientName r={recipients[1]} /> filing age]
-              </p>
-            </div>
+          <div class="matrices-container">
+            {#each [0, 1] as recipientIndex}
+              <!-- Table for Recipient {recipientIndex + 1}'s optimal filing age -->
+              <div class="matrix-container recipient{recipientIndex + 1}-matrix">
+                <div class="matrix-title">
+                  <h4>Optimal Filing Age for <RecipientName r={recipients[recipientIndex]} /></h4>
+                </div>
+                <div class="matrix-legend">
+                  <p>
+                    <strong>Row:</strong>
+                    <RecipientName r={recipients[0]} /> death age
+                  </p>
+                  <p>
+                    <strong>Column:</strong>
+                    <RecipientName r={recipients[1]} /> death age
+                  </p>
+                  <p>
+                    <strong>Cell shows:</strong> <RecipientName r={recipients[recipientIndex]} />'s optimal filing age
+                  </p>
+                </div>
 
-            <div class="strategy-matrix">
-              <table>
-                <thead>
-                  <!-- Column recipient header -->
-                  <tr>
-                    <th></th>
-                    <th></th>
-                    <th
-                      colspan={deathAgeRange.length}
-                      class="recipient-header col-header"
-                    >
-                      <RecipientName r={recipients[1]} /> Death Age
-                    </th>
-                  </tr>
-                  <!-- Column age numbers -->
-                  <tr>
-                    <th></th>
-                    <th></th>
-                    {#each deathAgeRange as deathAge2}
-                      <th class="age-header">{deathAge2}</th>
-                    {/each}
-                  </tr>
-                </thead>
-                <tbody>
-                  {#each deathAgeRange as deathAge1, i}
-                    <tr>
-                      {#if i === 0}
+                <div class="strategy-matrix">
+                  <table>
+                    <thead>
+                      <!-- Column recipient header -->
+                      <tr>
+                        <th></th>
+                        <th></th>
                         <th
-                          rowspan={deathAgeRange.length}
-                          class="recipient-header row-header"
+                          colspan={deathAgeRange.length}
+                          class="recipient-header col-header"
                         >
-                          <div class="header-text">
-                            <RecipientName r={recipients[0]} /> Death Age
-                          </div>
+                          <RecipientName r={recipients[1]} /> Death Age
                         </th>
-                      {/if}
-                      <th class="age-header">{deathAge1}</th>
-                      {#each deathAgeRange as deathAge2, j}
-                        <td
-                          class="strategy-cell"
-                          class:no-right-border={shouldRemoveRightBorder(i, j)}
-                          class:no-bottom-border={shouldRemoveBottomBorder(
-                            i,
-                            j
-                          )}
-                          class:no-left-border={shouldRemoveLeftBorder(i, j)}
-                          class:no-top-border={shouldRemoveTopBorder(i, j)}
-                          title="Net present value: {calculationResults[i][
-                            j
-                          ]?.totalBenefit.string() || 'N/A'}"
-                        >
-                          <div class="filing-ages">
-                            {calculationResults[i][j]?.filingAge1Years ||
-                              "N/A"}y{calculationResults[i][j]
-                              ?.filingAge1Months || 0}m
-                            <br />
-                            {calculationResults[i][j]?.filingAge2Years ||
-                              "N/A"}y{calculationResults[i][j]
-                              ?.filingAge2Months || 0}m
-                          </div>
-                        </td>
+                      </tr>
+                      <!-- Column age numbers -->
+                      <tr>
+                        <th></th>
+                        <th></th>
+                        {#each deathAgeRange as deathAge2}
+                          <th class="age-header">{deathAge2}</th>
+                        {/each}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {#each deathAgeRange as deathAge1, i}
+                        <tr>
+                          {#if i === 0}
+                            <th
+                              rowspan={deathAgeRange.length}
+                              class="recipient-header row-header"
+                            >
+                              <div class="header-text">
+                                <RecipientName r={recipients[0]} /> Death Age
+                              </div>
+                            </th>
+                          {/if}
+                          <th class="age-header">{deathAge1}</th>
+                          {#each deathAgeRange as deathAge2, j}
+                            {@const recipientBorderFuncs = borderRemovalFunctions[recipientIndex]}
+                            <td
+                              class="strategy-cell"
+                              class:no-right-border={recipientBorderFuncs.right(i, j)}
+                              class:no-bottom-border={recipientBorderFuncs.bottom(i, j)}
+                              class:no-left-border={recipientBorderFuncs.left(i, j)}
+                              class:no-top-border={recipientBorderFuncs.top(i, j)}
+                              title="Net present value: {calculationResults[i][j]?.totalBenefit.string() || 'N/A'}"
+                            >
+                              <div class="filing-ages">
+                                {calculationResults[i][j]?.[`filingAge${recipientIndex + 1}Years`] || "N/A"}y
+                                {calculationResults[i][j]?.[`filingAge${recipientIndex + 1}Months`] || 0}m
+                              </div>
+                            </td>
+                          {/each}
+                        </tr>
                       {/each}
-                    </tr>
-                  {/each}
-                </tbody>
-              </table>
-            </div>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            {/each}
           </div>
         {/if}
       </div>
@@ -629,8 +627,51 @@
     background-color: #f8f9fa;
   }
 
+  .matrices-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
   .matrix-container {
     margin-top: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #ffffff;
+  }
+
+  .recipient1-matrix {
+    background-color: #f8f9ff;
+  }
+
+  .recipient2-matrix {
+    background-color: #f9fff8;
+  }
+
+  .matrix-title {
+    margin-bottom: 0.5rem;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+
+  .recipient1-matrix .matrix-title {
+    background-color: #e6eeff;
+  }
+
+  .recipient2-matrix .matrix-title {
+    background-color: #e6ffe6;
+  }
+
+  .matrix-title h4 {
+    margin: 0;
+    color: #0056b3;
+  }
+
+  .recipient2-matrix .matrix-title h4 {
+    color: #005600;
   }
 
   .matrix-legend {
@@ -742,6 +783,11 @@
   @media (max-width: 768px) {
     .recipient-inputs {
       grid-template-columns: 1fr;
+    }
+
+    .matrices-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
     }
 
     main {
