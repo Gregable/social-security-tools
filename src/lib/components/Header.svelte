@@ -11,16 +11,12 @@
 </script>
 
 <div class="header">
-  <h3><a href="/">SSA.tools Social Security Calculator</a></h3>
+  <h3><a href="/">SSA.tools</a></h3>
 
   <div class="navpills" style:--pill-count={navOptions.length.toString()}>
     {#each navOptions as option}
       <div class="pill noprint" class:active={option.active}>
-        {#if option.active}
-          <span>{option.name}</span>
-        {:else}
-          <a href="/{option.link}">{option.name}</a>
-        {/if}
+        <a href="/{option.link}">{option.name}</a>
       </div>
     {/each}
   </div>
@@ -32,22 +28,23 @@
   .header {
     display: grid;
     grid-template-columns: 1fr auto auto;
+    align-items: center; /* Added for vertical alignment */
     width: 100%;
     border-bottom: 1px solid #c5c5c5;
-    margin-bottom: 20px;
+    margin-bottom: 1.5em; /* Adjusted for better spacing */
   }
 
   h3 {
     margin: 0;
-    line-height: 40px;
-    color: rgb(150, 150, 150);
+    /* Removed line-height: 40px; as align-items handles vertical centering */
+    color: #333; /* Made title more prominent */
     font-weight: 500;
-    font-size: 24px;
-    padding-left: 20px;
+    font-size: 28px; /* Increased font size */
+    padding-left: 1em; /* Adjusted padding */
     white-space: nowrap;
   }
   h3 a {
-    color: rgb(150, 150, 150);
+    color: #333; /* Made title more prominent */
   }
   .printurl {
     margin: 0 1em;
@@ -63,7 +60,7 @@
     display: grid !important;
     grid-template-columns: repeat(var(--pill-count), auto);
     column-gap: 10px;
-    margin: 5px;
+    margin: 0.5em 1em; /* Adjusted margin */
   }
   .pill {
     /** Vertically aligns he pill */
@@ -77,9 +74,14 @@
     text-decoration: none;
     vertical-align: middle;
   }
-  .pill.active span {
+  .pill a:hover {
+    background-color: #f0f0f0; /* Added hover effect */
+  }
+  .pill.active a {
+    /* Changed from span to a */
     color: #fff;
     background-color: #337ab7;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Added subtle shadow */
   }
 
   @media screen and (max-width: 675px) {
