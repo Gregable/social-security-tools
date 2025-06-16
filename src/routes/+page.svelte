@@ -451,11 +451,11 @@
     }
 
     #footer-container {
-      width: 70%;
+      width: 90%; /* Increased width to prevent unnecessary wrapping */
     }
 
     #footer p {
-      margin-bottom: 3rem;
+      margin-bottom: 1.5rem; /* Reduced margin for better spacing */
     }
 
     #footer li {

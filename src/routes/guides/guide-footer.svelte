@@ -17,7 +17,7 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-    margin: auto auto;
+    margin: 3em auto 3em auto; /* Added top and bottom margin for separation */
   }
   .bigbtn {
     position: relative;
@@ -43,9 +43,13 @@
     justify-content: center;
     transition: all 0.2s ease-out;
     width: min-content;
+    max-width: 300px; /* Added max-width for desktop button */
     margin: auto;
   }
-  .footer h1,
+  .footer h1 {
+    text-align: center;
+    font-size: 2em; /* Adjusted font size for footer h1 */
+  }
   .footer p {
     text-align: center;
   }
@@ -60,5 +64,16 @@
     border-radius: 4px;
     margin-left: 10px;
     padding: 3px 5px;
+  }
+
+  @media (max-width: 600px) {
+    .footer h1 {
+      font-size: 1.5em; /* Smaller font for h1 on mobile */
+    }
+    .bigbtn a {
+      font-size: 20px; /* Smaller font for button on mobile */
+      padding: 12px 20px; /* Smaller padding */
+      width: 90%; /* Make button wider on mobile */
+    }
   }
 </style>

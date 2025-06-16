@@ -11,7 +11,9 @@
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/indexing-factors";
   schema.title = title;
+  schema.image = HeroImage; // Added HeroImage to schema
   schema.datePublished = publishDate.toISOString();
+  schema.description = description; // Pass the description to the schema
 </script>
 
 <svelte:head>

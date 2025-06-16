@@ -14,10 +14,11 @@
   const publishDate = new Date("2020-12-01T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/1st-and-2nd-of-month";
+  schema.url = "https://ssa.tools/guides/covid-awi-drop"; // Corrected URL
   schema.title = title;
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
+  schema.description = description; // Pass the description to the schema
 </script>
 
 <svelte:head>

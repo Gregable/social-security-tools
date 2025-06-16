@@ -10,7 +10,9 @@
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/will-social-security-run-out";
   schema.title = title;
+  schema.image = "/laptop-piggybank.jpg"; // Added a generic hero image for the schema
   schema.datePublished = publishDate.toISOString();
+  schema.description = description; // Pass the description to the schema
 </script>
 
 <svelte:head>

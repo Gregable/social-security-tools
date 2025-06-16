@@ -18,6 +18,7 @@
   schema.title = title;
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
+  schema.description = description; // Pass the description to the schema
 </script>
 
 <svelte:head>

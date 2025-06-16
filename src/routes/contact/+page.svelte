@@ -1,5 +1,6 @@
 <script lang="ts">
   import Header from "$lib/components/Header.svelte";
+  import KoFiImg from "$lib/images/kofi.png";
 </script>
 
 <svelte:head>
@@ -33,6 +34,31 @@
         </a>
       </li>
     </ul>
+
+    <div class="kofi-section">
+      <h3>Thank you</h3>
+      <p>Many have asked me if they can support this site.</p>
+      <p class="noprint">
+        While absolutely not necessary, if you would like to say thanks you can
+        contribute by clicking the button below:
+      </p>
+      <p class="onlyprint">
+        While absolutely not necessary, if you would like to say thanks you can
+        contribute at:
+      </p>
+      <p class="onlyprint kofi-url">https://ko-fi.com/ssatools</p>
+      <p class="kofi-button">
+        <a href="https://ko-fi.com/ssatools" target="_blank"
+          ><img
+            height="55"
+            width="214"
+            style="border:0px"
+            src={KoFiImg}
+            alt="Buy me a coffee if you found this useful"
+          /></a
+        >
+      </p>
+    </div>
   </div>
 </main>
 
@@ -43,5 +69,28 @@
   main {
     max-width: 1080px;
     margin: 0 auto;
+  }
+
+  .kofi-section {
+    margin-top: 2em; /* Add some space above the new section */
+  }
+
+  .kofi-section p {
+    /* Removed text-align: center; to match page style */
+  }
+
+  .kofi-section .kofi-url {
+    font-size: 1.8em;
+  }
+
+  .kofi-section .kofi-button img {
+    display: block; /* Make image a block element for margin:auto */
+    margin: auto; /* Center the image */
+  }
+
+  @media (max-width: 768px) {
+    main {
+      padding: 0 1.5em; /* Added horizontal padding for mobile */
+    }
   }
 </style>
