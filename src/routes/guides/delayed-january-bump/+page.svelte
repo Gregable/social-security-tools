@@ -16,6 +16,7 @@
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
+  schema.description = description; // Pass the description to the schema
 </script>
 
 <svelte:head>
@@ -28,8 +29,10 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
-  <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
+  <p class="postdate">
+    Published: {publishDate.toLocaleDateString()}<br />
+    Updated: {updateDate.toLocaleDateString()}
+  </p>
 
   <p>
     When using the ssa.tools calculator, you may have noticed a small notch or
@@ -43,7 +46,7 @@
     src={HeroImage}
     width="285"
     height="503"
-    style="margin: 40px 40px 40px 40px; display: block; border: 1px solid"
+    style="margin: 40px auto; display: block; border: 1px solid"
     alt="Screenshot of benefit chart showing a bump in January"
   />
 

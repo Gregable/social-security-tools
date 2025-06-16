@@ -16,6 +16,7 @@
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
+  schema.description = description; // Pass the description to the schema
 </script>
 
 <svelte:head>
@@ -28,8 +29,10 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
-  <p class="postdate">Updated: {updateDate.toLocaleDateString()}</p>
+  <p class="postdate">
+    Published: {publishDate.toLocaleDateString()}<br />
+    Updated: {updateDate.toLocaleDateString()}
+  </p>
 
   <figure class="hero-image">
     <img

@@ -32,11 +32,11 @@
   }
   :global(.guide-page figure) {
     margin: 0;
-    width: min-content;
   }
   :global(.guide-page figure.float-right) {
     float: right;
     margin: 0 0 3vw 4vw;
+    width: 45%; /* Adjusted for better readability on desktop */
   }
   :global(.guide-page img) {
     border: 1px solid #ccc;
@@ -48,6 +48,7 @@
   :global(.guide-page figure.hero-image) {
     float: right;
     margin: 0 0 3vw 4vw;
+    width: 40%; /* Added for desktop visibility */
   }
   :global(.guide-page .hero-image img) {
     height: auto; /* Changed from 24vw */

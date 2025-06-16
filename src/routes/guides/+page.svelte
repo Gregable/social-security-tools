@@ -2,7 +2,11 @@
 </script>
 
 <svelte:head>
-  <title>Social Security Calculator - Guides</title>
+  <title>Social Security Guides & Resources - SSA.tools</title>
+  <meta
+    name="description"
+    content="Explore comprehensive guides on Social Security benefits, eligibility, taxes, and retirement planning. Find answers to common questions and understand how Social Security works."
+  />
 </svelte:head>
 
 <main>
