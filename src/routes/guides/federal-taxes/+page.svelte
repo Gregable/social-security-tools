@@ -58,9 +58,7 @@
     as the state does not tax Social Security benefits at all:
   </p>
 
-  <ul
-    style="display: flex; flex-direction: column; flex-wrap: wrap; height: 350px;"
-  >
+  <ul class="state-list">
     <li>Alabama</li>
     <li>Alaska</li>
     <li>Arizona</li>
@@ -252,3 +250,32 @@
   </p>
   <GuideFooter />
 </div>
+
+<style>
+  .state-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
+    gap: 10px 20px; /* Gap between rows and columns */
+    padding-left: 1.5em; /* Add padding for bullets */
+    margin: 1em 0; /* Adjust margin */
+  }
+
+  .state-list li {
+    padding: 5px 0;
+  }
+
+  @media (max-width: 768px) {
+    .state-list {
+      grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
+    }
+  }
+
+  @media (max-width: 480px) {
+    .state-list {
+      grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+    }
+    .state-list li {
+      font-size: 0.9em; /* Smaller font size for list items on mobile */
+    }
+  }
+</style>

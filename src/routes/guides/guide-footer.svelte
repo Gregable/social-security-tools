@@ -61,4 +61,12 @@
     margin-left: 10px;
     padding: 3px 5px;
   }
+
+  @media (max-width: 600px) {
+    .bigbtn a {
+      font-size: 20px; /* Smaller font for button on mobile */
+      padding: 12px 20px; /* Smaller padding */
+      width: 90%; /* Make button wider on mobile */
+    }
+  }
 </style>

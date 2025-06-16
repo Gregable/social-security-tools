@@ -10,6 +10,24 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jun 15, 2025</span>
+        <h3 class="posttitle">
+          How much Social Security will I get based on my income?
+        </h3>
+        <p class="description">
+          A series of guides estimating your Social Security benefits based on
+          different annual income levels.
+        </p>
+        <ul>
+          <li><a href="/guides/25k-income">If you make $25,000 / year</a></li>
+          <li><a href="/guides/40k-income">If you make $40,000 / year</a></li>
+          <li><a href="/guides/60k-income">If you make $60,000 / year</a></li>
+          <li><a href="/guides/80k-income">If you make $80,000 / year</a></li>
+          <li><a href="/guides/100k-income">If you make $100,000 / year</a></li>
+        </ul>
+      </li>
+
+      <li>
         <span class="postdate">Apr 29, 2025</span>
         <h3 class="posttitle">
           <a href="/guides/agency-changes"
@@ -31,8 +49,10 @@
           <a href="/guides/work-credits">Social Security Work Credits</a>
         </h3>
         <p class="description">
-          How do work credits work and how many do I need to qualify for Social
-          Security benefits?
+          Social Security work credits determine your eligibility for benefits.
+          This guide explains how these credits are earned throughout your
+          working life and the number required to qualify for retirement,
+          disability, and survivor benefits.
         </p>
       </li>
 
@@ -44,10 +64,10 @@
           </a>
         </h3>
         <p class="description">
-          SSA.tools accepts a copy and pasted earnings record from the Social
-          Security Administration's website. This guide explains If your
-          earnings record is not being parsed correctly, this guide may help you
-          understand why and how to fix it.
+          SSA.tools relies on accurate parsing of your earnings record from the
+          Social Security Administration's website. If your earnings data isn't
+          loading correctly, this guide identifies common reasons for parsing
+          errors and provides troubleshooting tips to help you resolve them.
         </p>
       </li>
 
@@ -72,9 +92,10 @@
           <a href="/guides/filing-date-chart">Navigate the Filing Date Chart</a>
         </h3>
         <p class="description">
-          This site's calculator shows a information dense chart of how filing
-          dates affect your benefits. The chart can be a little confusing at
-          first, so here's a guide to help you understand it.
+          The SSA.tools calculator features a detailed chart illustrating how
+          different Social Security filing dates impact your benefit amount.
+          This guide demystifies the chart, helping you interpret its data to
+          make informed decisions about when to claim your benefits.
         </p>
       </li>
 
@@ -100,9 +121,11 @@
           </a>
         </h3>
         <p class="description">
-          For those starting benefits after Normal Retirement Age, there is a
-          small delay in some of the delayed credits until the following
-          January.
+          If you delay claiming Social Security benefits past your Normal
+          Retirement Age, you earn delayed retirement credits. This guide
+          explains a specific nuance: a small portion of these credits may be
+          delayed until the January following the year you become eligible,
+          impacting your initial payments.
         </p>
       </li>
 
@@ -127,7 +150,10 @@
           </a>
         </h3>
         <p class="description">
-          How does working abroad affect social security?
+          Working abroad can impact your Social Security benefits. This guide
+          explains how international agreements, known as Totalization
+          Agreements, coordinate Social Security coverage and benefits between
+          the U.S. and other countries, helping you understand your eligibility.
         </p>
       </li>
 
@@ -139,8 +165,10 @@
           </a>
         </h3>
         <p class="description">
-          Learn more about how Social Security law is affected by the day of the
-          month one was born in.
+          Social Security rules can sometimes have surprising details. This
+          guide explains a specific regulation that affects individuals born on
+          the 1st or 2nd day of the month, potentially impacting their
+          eligibility for benefits or the timing of their payments.
         </p>
       </li>
 
@@ -153,8 +181,11 @@
           </a>
         </h3>
         <p class="description">
-          SSA.gov publishes estimated future indexing factors based on economic
-          projections. Should ssa.tools use these factors and why?
+          The Social Security Administration uses indexing factors to adjust
+          past earnings for inflation. This guide delves into why SSA.tools uses
+          current year indexing factors for younger individuals, rather than
+          projected future factors, and the implications of this approach for
+          benefit estimates.
         </p>
       </li>
 
@@ -166,9 +197,10 @@
           </a>
         </h3>
         <p class="description">
-          For earners who were born in 1960, the effect of a potentially much
-          lower average wage in 2020 may have an outsized impact on their
-          lifetime benefit.
+          The Average Wage Index (AWI) plays a crucial role in calculating
+          Social Security benefits. This guide examines how the unexpected
+          decline in AWI during 2020 due to the COVID-19 pandemic specifically
+          impacts the lifetime benefits of individuals born in 1960.
         </p>
       </li>
 
@@ -178,7 +210,11 @@
           <a href="/guides/earnings-cap">Earnings Caps</a>
         </h3>
         <p class="description">
-          How do Social Security annual earnings caps work?
+          Social Security applies an annual earnings cap, meaning income above a
+          certain threshold is not subject to Social Security taxes and does not
+          count towards your benefit calculation. This guide explains how these
+          earnings caps work, their historical changes, and their impact on your
+          Social Security benefits.
         </p>
       </li>
 
@@ -188,8 +224,10 @@
           <a href="/guides/maximum">Maximum Benefits </a>
         </h3>
         <p class="description">
-          What is the maximum possible Social Security benefit that someone can
-          receive?
+          Curious about the highest possible Social Security benefit? This guide
+          explains the factors that determine the maximum monthly payment,
+          including your earnings history and the age at which you claim
+          benefits, providing insight into the upper limits of Social Security.
         </p>
       </li>
       <li>
@@ -198,8 +236,11 @@
           <a href="/guides/inflation">Social Security and Inflation </a>
         </h3>
         <p class="description">
-          Learn how two different types of inflation, wage increase and consumer
-          price index, each interact to affect your social security benefit.
+          Inflation significantly impacts the value of your Social Security
+          benefits. This guide differentiates between two key types of
+          inflation—wage increases and the Consumer Price Index—and explains how
+          each uniquely influences the calculation and purchasing power of your
+          Social Security payments.
         </p>
       </li>
     </ul>
@@ -221,6 +262,7 @@
   }
   ul.guides > li {
     list-style-type: none;
+    margin-bottom: 2em; /* Add space between list items */
   }
   ul.guides > li > span.postdate {
     float: right;
@@ -231,5 +273,32 @@
   }
   ul.guides > li > p {
     font-size: 1.4em;
+  }
+
+  @media (max-width: 768px) {
+    main {
+      padding: 0 1em; /* Add padding to main for consistent spacing */
+    }
+    p.description {
+      text-align: left; /* Remove justify on mobile */
+      margin: 0; /* Adjust margin for better mobile spacing */
+    }
+    ul.guides > li > p {
+      font-size: 1.1em; /* Smaller font size for descriptions on mobile */
+    }
+    ul.guides > li > span.postdate {
+      float: none; /* Remove float on mobile */
+      display: block; /* Make it a block element */
+      margin-left: 0; /* Remove left margin */
+      text-align: left; /* Align to left */
+      font-size: 0.8em; /* Slightly smaller postdate */
+      margin-bottom: 0.5em; /* Add space below postdate */
+    }
+    ul.guides {
+      padding: 0; /* Remove padding from ul.guides as main now has it */
+    }
+    ul.guides > li > h3.posttitle {
+      margin-top: 0.5em; /* Add space above heading */
+    }
   }
 </style>
