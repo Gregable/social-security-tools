@@ -5,7 +5,10 @@
   import { Money } from "$lib/money";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import RecipientName from "$lib/components/RecipientName.svelte";
-  import { optimalStrategy } from "$lib/strategy/strategy-calc";
+  import {
+    optimalStrategy,
+    strategySumTotalPeriods,
+  } from "$lib/strategy/strategy-calc";
   import { ALL_MONTHS } from "$lib/constants";
 
   // Import components
@@ -31,6 +34,8 @@
   const MAX_DEATH_AGE = 90;
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
+  // Strategy tolerance percentage for creating larger grouped areas
+  const STRATEGY_TOLERANCE_PERCENT = 0.2;
 
   // Calculation state
   let startTime: number;
@@ -254,17 +259,83 @@
             discountRate
           );
 
-          // Store the result
+          // Strategy smoothing: check if we can use a neighboring strategy within tolerance
+          let chosenStrategy = [optimal[0], optimal[1]];
+          let chosenValue = optimal[2];
+
+          // Helper function to check if a strategy is within tolerance
+          const isWithinTolerance = (
+            neighborValue: number,
+            optimalValue: number
+          ): boolean => {
+            const toleranceRatio = STRATEGY_TOLERANCE_PERCENT / 100;
+            // Ensure tolerance is reasonable (between 0 and 100%)
+            if (toleranceRatio < 0 || toleranceRatio > 1) {
+              console.warn(
+                `Invalid tolerance percentage: ${STRATEGY_TOLERANCE_PERCENT}%. Using optimal strategy.`
+              );
+              return false;
+            }
+            return neighborValue / optimalValue >= 1 - toleranceRatio;
+          };
+
+          // Helper function to evaluate a strategy for the current scenario
+          const evaluateStrategy = (
+            strategy: [MonthDuration, MonthDuration]
+          ): number => {
+            return strategySumTotalPeriods(
+              recipients,
+              finalDates,
+              currentDate,
+              discountRate,
+              strategy
+            ).cents();
+          };
+
+          // Track if we are still using the optimal strategy or not:
+          let modifiedStrategy: boolean = false;
+
+          // Check left neighbor first (same row, previous column)
+          if (j > 0 && calculationResults[i][j - 1]) {
+            const leftNeighbor = calculationResults[i][j - 1];
+            const leftStrategy: [MonthDuration, MonthDuration] = [
+              leftNeighbor.filingAge1,
+              leftNeighbor.filingAge2,
+            ];
+            const leftValue = evaluateStrategy(leftStrategy);
+
+            if (isWithinTolerance(leftValue, optimal[2])) {
+              modifiedStrategy = true;
+              chosenStrategy = leftStrategy;
+              chosenValue = leftValue;
+            }
+          }
+
+          if (!modifiedStrategy && i > 0 && calculationResults[i - 1][j]) {
+            const aboveNeighbor = calculationResults[i - 1][j];
+            const aboveStrategy: [MonthDuration, MonthDuration] = [
+              aboveNeighbor.filingAge1,
+              aboveNeighbor.filingAge2,
+            ];
+            const aboveValue = evaluateStrategy(aboveStrategy);
+
+            if (isWithinTolerance(aboveValue, optimal[2])) {
+              chosenStrategy = aboveStrategy;
+              chosenValue = aboveValue;
+            }
+          }
+
+          // Store the result using the chosen strategy
           calculationResults[i][j] = {
             deathAge1,
             deathAge2,
-            filingAge1: optimal[0],
-            filingAge2: optimal[1],
-            totalBenefit: Money.fromCents(optimal[2]),
-            filingAge1Years: optimal[0].years(),
-            filingAge1Months: optimal[0].modMonths(),
-            filingAge2Years: optimal[1].years(),
-            filingAge2Months: optimal[1].modMonths(),
+            filingAge1: chosenStrategy[0],
+            filingAge2: chosenStrategy[1],
+            totalBenefit: Money.fromCents(chosenValue),
+            filingAge1Years: chosenStrategy[0].years(),
+            filingAge1Months: chosenStrategy[0].modMonths(),
+            filingAge2Years: chosenStrategy[1].years(),
+            filingAge2Months: chosenStrategy[1].modMonths(),
           };
 
           calculationProgress += CALCULATIONS_PER_SCENARIO;
