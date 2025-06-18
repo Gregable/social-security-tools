@@ -2,11 +2,13 @@
   import type { Recipient } from "$lib/recipient";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { createEventDispatcher } from "svelte";
+  import { MonthDate } from "$lib/month-time";
   import {
     getFilingDate,
     createValueExtractor,
     createBorderRemovalFunctions,
   } from "../utils/StrategyCalculationUtils";
+  import { getMonthYearColor } from "../utils/colorUtils";
 
   // Props
   export let recipientIndex: number; // 0 or 1
@@ -14,6 +16,8 @@
   export let deathAgeRange: number[];
   export let calculationResults: any[][];
   export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
+  export let minMonthsSinceEpoch: number | null;
+  export let maxMonthsSinceEpoch: number | null;
 
   // Event dispatcher
   const dispatch = createEventDispatcher();
@@ -126,6 +130,25 @@
                 title="Net present value: {calculationResults[i][
                   j
                 ]?.totalBenefit.string() || 'N/A'}"
+                style={calculationResults[i][j] &&
+                minMonthsSinceEpoch !== null &&
+                maxMonthsSinceEpoch !== null
+                  ? `background-color: ${(() => {
+                      const filingAge =
+                        calculationResults[i][j][
+                          `filingAge${recipientIndex + 1}`
+                        ];
+                      const filingDate =
+                        recipients[recipientIndex].birthdate.dateAtLayAge(
+                          filingAge
+                        );
+                      return getMonthYearColor(
+                        filingDate.monthsSinceEpoch(),
+                        minMonthsSinceEpoch,
+                        maxMonthsSinceEpoch
+                      );
+                    })()};`
+                  : ""}
               >
                 <div class="filing-dates">
                   {#if calculationResults[i][j]}
@@ -260,7 +283,7 @@
   }
 
   .strategy-cell {
-    background-color: white;
+    /* background-color will be set by inline style */
     cursor: pointer;
     transition: background-color 0.2s;
   }

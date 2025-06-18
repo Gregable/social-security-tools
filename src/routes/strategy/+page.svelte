@@ -35,7 +35,7 @@
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
   // Strategy tolerance percentage for creating larger grouped areas
-  const STRATEGY_TOLERANCE_PERCENT = 0.2;
+  const STRATEGY_TOLERANCE_PERCENT = 0.01;
 
   // Calculation state
   let startTime: number;
@@ -46,6 +46,8 @@
   let deathAgeRange: number[] = [];
   let calculationProgress = 0;
   let totalCalculations = 0;
+  let minMonthsSinceEpoch: number | null = null;
+  let maxMonthsSinceEpoch: number | null = null;
 
   // Form inputs
   let birthdateInputs: [string, string] = [
@@ -354,6 +356,37 @@
     }
   }
 
+  // Calculate min and max monthsSinceEpoch for color coding
+  $: {
+    if (isCalculationComplete && calculationResults.length > 0) {
+      let monthsSinceEpochValues: number[] = [];
+      calculationResults.forEach((row) => {
+        row.forEach((cell) => {
+          if (cell && !cell.error) {
+            const filingDate1 = recipients[0].birthdate.dateAtLayAge(
+              cell.filingAge1
+            );
+            const filingDate2 = recipients[1].birthdate.dateAtLayAge(
+              cell.filingAge2
+            );
+            monthsSinceEpochValues.push(filingDate1.monthsSinceEpoch());
+            monthsSinceEpochValues.push(filingDate2.monthsSinceEpoch());
+          }
+        });
+      });
+      if (monthsSinceEpochValues.length > 0) {
+        minMonthsSinceEpoch = Math.min(...monthsSinceEpochValues);
+        maxMonthsSinceEpoch = Math.max(...monthsSinceEpochValues);
+      } else {
+        minMonthsSinceEpoch = null;
+        maxMonthsSinceEpoch = null;
+      }
+    } else {
+      minMonthsSinceEpoch = null;
+      maxMonthsSinceEpoch = null;
+    }
+  }
+
   // Reactive formatted birthdates
   $: formattedBirthdates = [
     formatBirthdateUtil(birthdateInputs[0]),
@@ -392,6 +425,8 @@
         {calculationResults}
         {timeElapsed}
         {isCalculationComplete}
+        {minMonthsSinceEpoch}
+        {maxMonthsSinceEpoch}
       />
     {/if}
   </section>

@@ -8,6 +8,8 @@
   export let calculationResults: any[][];
   export let timeElapsed: number;
   export let isCalculationComplete: boolean;
+  export let minMonthsSinceEpoch: number | null;
+  export let maxMonthsSinceEpoch: number | null;
 
   // Shared state for matrix hovering
   let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
@@ -40,6 +42,8 @@
           {deathAgeRange}
           {calculationResults}
           {hoveredCell}
+          {minMonthsSinceEpoch}
+          {maxMonthsSinceEpoch}
           on:hovercell={handleHoverCell}
         />
       {/each}
