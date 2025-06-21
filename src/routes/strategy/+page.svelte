@@ -17,6 +17,7 @@
   import StrategySummary from "./components/StrategySummary.svelte";
   import CalculationControls from "./components/CalculationControls.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
+  import StrategyDetails from "./components/StrategyDetails.svelte";
 
   // Import utility functions
   import {
@@ -48,6 +49,18 @@
   let totalCalculations = 0;
   let minMonthsSinceEpoch: number | null = null;
   let maxMonthsSinceEpoch: number | null = null;
+
+  let selectedCellData: {
+    deathAge1: number;
+    deathAge2: number;
+    filingAge1Years: number;
+    filingAge1Months: number;
+    filingDate1: MonthDate;
+    filingAge2Years: number;
+    filingAge2Months: number;
+    filingDate2: MonthDate;
+    netPresentValue: Money;
+  } | null = null;
 
   // Form inputs
   let birthdateInputs: [string, string] = [
@@ -392,6 +405,10 @@
     formatBirthdateUtil(birthdateInputs[0]),
     formatBirthdateUtil(birthdateInputs[1]),
   ] as [string, string];
+
+  function handleCellSelect(event: CustomEvent) {
+    selectedCellData = event.detail;
+  }
 </script>
 
 <main>
@@ -427,7 +444,24 @@
         {isCalculationComplete}
         {minMonthsSinceEpoch}
         {maxMonthsSinceEpoch}
+        {selectedCellData}
+        on:selectcell={handleCellSelect}
       />
+
+      {#if selectedCellData}
+        <StrategyDetails
+          deathAge1={selectedCellData.deathAge1}
+          deathAge2={selectedCellData.deathAge2}
+          filingAge1Years={selectedCellData.filingAge1Years}
+          filingAge1Months={selectedCellData.filingAge1Months}
+          filingDate1={selectedCellData.filingDate1}
+          filingAge2Years={selectedCellData.filingAge2Years}
+          filingAge2Months={selectedCellData.filingAge2Months}
+          filingDate2={selectedCellData.filingDate2}
+          netPresentValue={selectedCellData.netPresentValue}
+          {recipients}
+        />
+      {/if}
     {/if}
   </section>
 </main>

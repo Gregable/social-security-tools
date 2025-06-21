@@ -3,6 +3,7 @@
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { createEventDispatcher } from "svelte";
   import { MonthDate } from "$lib/month-time";
+  import type { Money } from "$lib/money";
   import {
     getFilingDate,
     createValueExtractor,
@@ -18,6 +19,17 @@
   export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
   export let minMonthsSinceEpoch: number | null;
   export let maxMonthsSinceEpoch: number | null;
+  export let selectedCellData: {
+    deathAge1: number;
+    deathAge2: number;
+    filingAge1Years: number;
+    filingAge1Months: number;
+    filingDate1: MonthDate;
+    filingAge2Years: number;
+    filingAge2Months: number;
+    filingDate2: MonthDate;
+    netPresentValue: Money;
+  } | null;
 
   // Event dispatcher
   const dispatch = createEventDispatcher();
@@ -36,6 +48,28 @@
 
   function handleMouseOut() {
     dispatch("hovercell", null);
+  }
+
+  function handleClick(i: number, j: number) {
+    const result = calculationResults[i][j];
+    if (result) {
+      const filingAge1 = result.filingAge1;
+      const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
+      const filingAge2 = result.filingAge2;
+      const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
+
+      dispatch("selectcell", {
+        deathAge1: deathAgeRange[i],
+        deathAge2: deathAgeRange[j],
+        filingAge1Years: result.filingAge1Years,
+        filingAge1Months: result.filingAge1Months,
+        filingDate1: filingDate1,
+        filingAge2Years: result.filingAge2Years,
+        filingAge2Months: result.filingAge2Months,
+        filingDate2: filingDate2,
+        netPresentValue: result.totalBenefit,
+      });
+    }
   }
 </script>
 
@@ -121,10 +155,14 @@
                 class:highlighted-row={hoveredCell &&
                   hoveredCell.rowIndex === i &&
                   hoveredCell.colIndex !== j}
+                class:selected-cell={selectedCellData &&
+                  selectedCellData.deathAge1 === deathAgeRange[i] &&
+                  selectedCellData.deathAge2 === deathAgeRange[j]}
                 on:mouseover={() => handleMouseOver(i, j)}
                 on:mouseout={handleMouseOut}
                 on:focus={() => handleMouseOver(i, j)}
                 on:blur={handleMouseOut}
+                on:click={() => handleClick(i, j)}
                 tabindex="0"
                 role="gridcell"
                 title="Net present value: {calculationResults[i][
@@ -305,6 +343,12 @@
 
   .filing-dates {
     line-height: 1.2;
+  }
+
+  .strategy-cell.selected-cell {
+    font-weight: bolder;
+    background-color: #d6e3ff !important;
+    color: #0056b3;
   }
 
   /* Border removal classes for connected cells with same values */
