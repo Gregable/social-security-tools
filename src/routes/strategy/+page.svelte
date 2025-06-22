@@ -1,10 +1,8 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
-  import { Birthdate } from "$lib/birthday";
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
   import { MonthDate, MonthDuration } from "$lib/month-time";
-  import RecipientName from "$lib/components/RecipientName.svelte";
   import {
     optimalStrategy,
     strategySumTotalPeriods,
@@ -14,8 +12,7 @@
   // Import components
   import RecipientInputs from "./components/RecipientInputs.svelte";
   import DiscountRateInput from "./components/DiscountRateInput.svelte";
-  import StrategySummary from "./components/StrategySummary.svelte";
-  import CalculationControls from "./components/CalculationControls.svelte";
+    import CalculationControls from "./components/CalculationControls.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
 
@@ -424,8 +421,6 @@
 
     <DiscountRateInput bind:discountRatePercent />
   </section>
-
-  <StrategySummary {recipients} {piaValues} {formattedBirthdates} />
 
   <section class="calculation-section">
     <CalculationControls
