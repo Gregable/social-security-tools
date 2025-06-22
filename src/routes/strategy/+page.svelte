@@ -409,6 +409,7 @@
 </script>
 
 <main>
+  <div class="limited-width">
   <h1>
     Warning: This is a work in progress and probably incorrect. Please
     disregard.
@@ -421,15 +422,17 @@
 
     <DiscountRateInput bind:discountRatePercent />
   </section>
+  </div>
 
-  <section class="calculation-section">
+  <section class="calculation-section limited-width">
     <CalculationControls
       {isCalculationRunning}
       {calculationProgress}
       {totalCalculations}
       on:calculate={() => calculateStrategyMatrix()}
     />
-
+  </section>
+  <section class="calculation-section">
     {#if isCalculationComplete && calculationResults.length > 0}
       <StrategyMatrixDisplay
         {recipients}
@@ -442,8 +445,10 @@
         {selectedCellData}
         on:selectcell={handleCellSelect}
       />
-
-      {#if selectedCellData}
+    {/if}
+  </section>
+  <section class="limited-width">
+    {#if isCalculationComplete && calculationResults.length > 0 && selectedCellData}
         <StrategyDetails
           deathAge1={selectedCellData.deathAge1}
           deathAge2={selectedCellData.deathAge2}
@@ -457,16 +462,20 @@
           {recipients}
         />
       {/if}
-    {/if}
   </section>
 </main>
 
 <style>
   main {
+    margin: 0 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .limited-width {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
-    font-family: Arial, sans-serif;
   }
 
   .input-section {
