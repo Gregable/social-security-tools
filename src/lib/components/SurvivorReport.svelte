@@ -584,14 +584,6 @@
   .expando > p {
     padding: 1em 0 0 1em;
   }
-  .beta {
-    background-color: #f09090;
-    padding: 0.25em 0.5em;
-    border-radius: 0.25em;
-    font-size: 0.9em;
-    font-weight: 700;
-    color: #333;
-  }
   .indent {
     padding-left: 2em;
   }

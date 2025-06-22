@@ -66,8 +66,7 @@
     /** Vertically aligns he pill */
     display: flex;
   }
-  .pill a,
-  .pill span {
+  .pill a {
     text-align: center;
     border-radius: 4px;
     padding: 10px 15px;

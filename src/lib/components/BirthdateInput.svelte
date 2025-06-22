@@ -164,11 +164,6 @@
   .date-input-container {
     margin-bottom: 10px;
   }
-  .hint {
-    margin: -5px 0 15px 0;
-    font-weight: 400;
-    color: #505a5f;
-  }
   .date-input-item {
     display: inline-block;
     margin-right: 20px;
