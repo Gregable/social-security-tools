@@ -12,7 +12,7 @@
   // Import components
   import RecipientInputs from "./components/RecipientInputs.svelte";
   import DiscountRateInput from "./components/DiscountRateInput.svelte";
-    import CalculationControls from "./components/CalculationControls.svelte";
+  import CalculationControls from "./components/CalculationControls.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
 

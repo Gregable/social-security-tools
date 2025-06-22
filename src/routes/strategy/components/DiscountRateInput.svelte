@@ -26,8 +26,18 @@
   }
 
   .global-input-group input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    font-size: 1.2em;
+    line-height: 1.3;
+    height: 2.5em;
+    padding: 5px;
+    border: 2px solid #0b0c0c;
+    border-radius: 0;
+    appearance: none;
+  }
+
+  .global-input-group input:focus {
+    outline: 3px solid #fd0;
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
   }
 </style>
