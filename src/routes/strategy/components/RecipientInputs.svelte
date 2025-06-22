@@ -55,7 +55,7 @@
       </div>
       <div class="input-group">
         <label for="pia{i}">
-          <RecipientName r={recipient} /> PIA:
+          <RecipientName r={recipient} apos/> Primary Insurance Amount (PIA):
         </label>
         <input
           id="pia{i}"
@@ -67,7 +67,7 @@
       </div>
       <div class="input-group">
         <label for="birthdate{i}">
-          <RecipientName r={recipient} /> Birthdate:
+          <RecipientName r={recipient} apos/> Birthdate:
         </label>
         <BirthdateInput
           bind:birthdate={birthdates[i]}

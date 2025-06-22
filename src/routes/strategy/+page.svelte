@@ -59,6 +59,8 @@
     netPresentValue: Money;
   } | null = null;
 
+  let matrixDisplayElement: HTMLElement;
+
   // Form inputs
   let birthdateInputs: [string, string] = [
     DEFAULT_BIRTHDATE,
@@ -406,25 +408,57 @@
   function handleCellSelect(event: CustomEvent) {
     selectedCellData = event.detail;
   }
+
+  let showHint = false;
+  let hintTimeout: ReturnType<typeof setTimeout>;
+
+  $: if (selectedCellData) {
+    clearTimeout(hintTimeout);
+    showHint = true;
+    hintTimeout = setTimeout(() => {
+      showHint = false;
+    }, 3000); // Show hint for 3 seconds
+  }
+
+  import { tick } from 'svelte';
+
+  // Scroll to matrix when calculation is complete
+  $: if (isCalculationComplete && matrixDisplayElement) {
+    (async () => {
+      await tick(); // Wait for DOM to update
+      window.scrollTo({
+        top: matrixDisplayElement.offsetTop,
+        behavior: "smooth"
+      });
+    })();
+  }
 </script>
 
 <main>
   <div class="limited-width">
-  <h1>
-    Warning: This is a work in progress and probably incorrect. Please
-    disregard.
-  </h1>
+    <h1>
+      Warning: This is a work in progress and probably incorrect. Please
+      disregard.
+    </h1>
 
-  <section class="input-section">
-    <h2>Recipient Information</h2>
+    <p>
+      This calculation shows an "optimal" social security filing strategy for
+      your personal situation, for all possible years of death ranging from 62
+      to 90. Optimal is defined as the largest sum of money, adjusted by the
+      discount rate such that a dollar today is worth more than a dollar in 
+      the future. 
+    </p>
 
-    <RecipientInputs {recipients} {piaValues} {birthdateInputs} />
+    <section class="input-section">
+      <h2>Recipient Information</h2>
 
-    <DiscountRateInput bind:discountRatePercent />
-  </section>
+      <RecipientInputs {recipients} {piaValues} {birthdateInputs} />
+
+      <DiscountRateInput bind:discountRatePercent />
+    </section>
   </div>
 
-  <section class="calculation-section limited-width">
+  <section class="limited-width">
     <CalculationControls
       {isCalculationRunning}
       {calculationProgress}
@@ -432,7 +466,7 @@
       on:calculate={() => calculateStrategyMatrix()}
     />
   </section>
-  <section class="calculation-section">
+  <section class="calculation-section" bind:this={matrixDisplayElement}>
     {#if isCalculationComplete && calculationResults.length > 0}
       <StrategyMatrixDisplay
         {recipients}
@@ -463,6 +497,13 @@
         />
       {/if}
   </section>
+
+  {#if showHint}
+    <div class="scroll-hint">
+      <p>Scroll for detail</p>
+      <div class="arrow-down"></div>
+    </div>
+  {/if}
 </main>
 
 <style>
@@ -475,11 +516,11 @@
   .limited-width {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 0.5rem;
   }
 
   .input-section {
-    margin-bottom: 2rem;
+    margin-bottom: 0;
     padding: 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -494,5 +535,43 @@
       max-width: 100%;
       padding: 1rem;
     }
+  }
+
+  .scroll-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeInOut 3s forwards;
+  }
+
+  .scroll-hint p {
+    margin: 0;
+    font-size: 0.9em;
+  }
+
+  .arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+    margin-top: 5px;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
   }
 </style>
