@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import { getRecommendedDiscountRate } from "$lib/strategy/treasury-yields";
+
   export let discountRatePercent: number;
   let highlightInput = false;
 
@@ -44,15 +47,81 @@
 </div>
 
 <style>
+  .discount-rate-container {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+  }
+
+  .discount-rate-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .discount-rate-header h3 {
+    margin: 0;
+  }
+
+  .toggle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .toggle-label input {
+    margin-right: 0.5rem;
+  }
+
+  .last-updated {
+    display: flex;
+    align-items: center;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  .refresh-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-left: 0.5rem;
+    color: #0066cc;
+  }
+
+  .refresh-button:hover {
+    color: #004499;
+  }
+
+  .refresh-button:disabled {
+    color: #999;
+    cursor: not-allowed;
+  }
+
   .global-input-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 
   .global-input-group label {
     font-weight: bold;
+  }
+
+  .input-with-status {
+    position: relative;
   }
 
   .global-input-group input {
@@ -63,6 +132,7 @@
     border: 2px solid #0b0c0c;
     border-radius: 0;
     appearance: none;
+    width: 100%;
   }
 
   .global-input-group input:focus {
