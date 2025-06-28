@@ -1,15 +1,45 @@
 <script lang="ts">
   export let discountRatePercent: number;
+  let highlightInput = false;
+
+  const presetRates = [
+    { label: "20-year Treasury rate (2.5%)", value: 2.5 },
+    { label: "US Stock 10y expected (3.5%)", value: 3.5 },
+    { label: "US Stock historical (7%)", value: 7 },
+  ];
+
+  function triggerHighlight() {
+    highlightInput = true;
+    setTimeout(() => {
+      highlightInput = false;
+    }, 500); // Match this duration to the CSS animation duration
+  }
 </script>
 
 <div class="global-input-group">
   <label for="discountRate">Discount Rate (%):</label>
+  <div class="preset-buttons">
+    {#each presetRates as preset}
+      <button
+        type="button"
+        class="preset-button"
+        class:active={discountRatePercent === preset.value}
+        on:click={() => {
+          discountRatePercent = preset.value;
+          triggerHighlight();
+        }}
+      >
+        {preset.label}
+      </button>
+    {/each}
+  </div>
   <input
     id="discountRate"
     type="number"
     step="0.1"
     min="0"
     bind:value={discountRatePercent}
+    class:highlight={highlightInput}
   />
 </div>
 
@@ -39,5 +69,66 @@
     outline: 3px solid #fd0;
     outline-offset: 0;
     box-shadow: inset 0 0 0 2px;
+  }
+
+  .global-input-group input.highlight {
+    animation: highlight-flash 0.5s ease-out;
+  }
+
+  @keyframes highlight-flash {
+    0% {
+      box-shadow: 0 0 0 0px rgba(0, 94, 165, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 5px rgba(0, 94, 165, 0.7);
+    }
+    100% {
+      box-shadow: 0 0 0 0px rgba(0, 94, 165, 0);
+    }
+  }
+
+  .preset-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+  }
+
+  .preset-button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8em;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .preset-button:hover {
+    background-color: #e8e8e8;
+    border-color: #999;
+  }
+
+  .preset-button.active {
+    background-color: #005ea5;
+    color: #fff;
+    border-color: #005ea5;
+  }
+
+  .preset-button:focus {
+    outline: 3px solid #fd0;
+    outline-offset: 0;
+  }
+
+  @media (max-width: 600px) {
+    .preset-buttons {
+      flex-direction: column;
+    }
+
+    .preset-button {
+      width: 100%;
+      text-align: center;
+    }
   }
 </style>
