@@ -4,9 +4,10 @@
 
   export let discountRatePercent: number;
   let highlightInput = false;
+  let treasuryRate: number = 2.5; // Default value
 
-  const presetRates = [
-    { label: "20-year Treasury rate (2.5%)", value: 2.5 },
+  let presetRates = [
+    { label: `20-year Treasury rate (${treasuryRate}%)`, value: treasuryRate },
     { label: "US Stock 10y expected (3.5%)", value: 3.5 },
     { label: "US Stock historical (7%)", value: 7 },
   ];
@@ -17,6 +18,38 @@
       highlightInput = false;
     }, 500); // Match this duration to the CSS animation duration
   }
+
+  onMount(async () => {
+    try {
+      // getRecommendedDiscountRate returns the rate as a decimal (e.g., 0.038 for 3.8%)
+      const rate = await getRecommendedDiscountRate();
+
+      // Convert to percentage value by multiplying by 100
+      treasuryRate = parseFloat((rate * 100).toFixed(2));
+
+      console.log(
+        `Fetched treasury rate: ${rate} (decimal) -> ${treasuryRate}% (percentage)`
+      );
+
+      // Update the presetRates array with the new treasury rate
+      presetRates = [
+        {
+          label: `20-year Treasury rate (${treasuryRate}%)`,
+          value: treasuryRate,
+        },
+        { label: "US Stock 10y expected (3.5%)", value: 3.5 },
+        { label: "US Stock historical (7%)", value: 7 },
+      ];
+
+      // Update the discountRatePercent if it's currently set to our default treasury rate (2.5%)
+      if (discountRatePercent === 2.5) {
+        discountRatePercent = treasuryRate;
+      }
+    } catch (error) {
+      console.error("Failed to fetch recommended discount rate:", error);
+      // Keep default 2.5% if fetch fails
+    }
+  });
 </script>
 
 <div class="global-input-group">
@@ -47,68 +80,6 @@
 </div>
 
 <style>
-  .discount-rate-container {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-  }
-
-  .discount-rate-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .discount-rate-header h3 {
-    margin: 0;
-  }
-
-  .toggle-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
-  .toggle-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .toggle-label input {
-    margin-right: 0.5rem;
-  }
-
-  .last-updated {
-    display: flex;
-    align-items: center;
-    margin-top: 0.25rem;
-    font-size: 0.8rem;
-    color: #666;
-  }
-
-  .refresh-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-left: 0.5rem;
-    color: #0066cc;
-  }
-
-  .refresh-button:hover {
-    color: #004499;
-  }
-
-  .refresh-button:disabled {
-    color: #999;
-    cursor: not-allowed;
-  }
-
   .global-input-group {
     display: flex;
     flex-direction: column;
@@ -120,10 +91,6 @@
     font-weight: bold;
   }
 
-  .input-with-status {
-    position: relative;
-  }
-
   .global-input-group input {
     font-size: 1.2em;
     line-height: 1.3;
@@ -132,7 +99,6 @@
     border: 2px solid #0b0c0c;
     border-radius: 0;
     appearance: none;
-    width: 100%;
   }
 
   .global-input-group input:focus {
