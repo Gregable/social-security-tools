@@ -8,6 +8,7 @@
     strategySumTotalPeriods,
   } from "$lib/strategy/strategy-calc";
   import { ALL_MONTHS } from "$lib/constants";
+  import { getLifeTableData, type LifeTableEntry } from "$lib/life-tables";
 
   // Import components
   import RecipientInputs from "./components/RecipientInputs.svelte";
@@ -231,6 +232,24 @@
       recipients[0].setPia(Money.from(piaValues[0]));
       recipients[1].setPia(Money.from(piaValues[1]));
 
+      // Get birth years for both recipients
+      const birthYear1 = recipients[0].birthdate.layBirthYear();
+      const birthYear2 = recipients[1].birthdate.layBirthYear();
+
+      // Get gender from recipient objects
+      const gender1 = recipients[0].gender;
+      const gender2 = recipients[1].gender;
+
+      // Fetch life table data for both recipients
+      const lifeTableData1Promise = getLifeTableData(gender1, birthYear1);
+      const lifeTableData2Promise = getLifeTableData(gender2, birthYear2);
+
+      // Wait for both promises to resolve
+      const [lifeTableData1, lifeTableData2] = await Promise.all([
+        lifeTableData1Promise,
+        lifeTableData2Promise,
+      ]);
+
       // Calculate age range
       deathAgeRange = calculateAgeRangeUtil(
         MIN_DEATH_AGE,
@@ -339,10 +358,24 @@
             }
           }
 
-          // Store the result using the chosen strategy
+          // Find probability for these death ages
+          const probEntry1 = lifeTableData1?.find(
+            (entry) => entry.x === deathAge1
+          );
+          const probEntry2 = lifeTableData2?.find(
+            (entry) => entry.x === deathAge2
+          );
+
+          // Get death probability (q_x) for these ages, or default to null if not found
+          const deathProb1 = probEntry1?.q_x || null;
+          const deathProb2 = probEntry2?.q_x || null;
+
+          // Store the result using the chosen strategy with probability data
           calculationResults[i][j] = {
             deathAge1,
             deathAge2,
+            deathProb1,
+            deathProb2,
             filingAge1: chosenStrategy[0],
             filingAge2: chosenStrategy[1],
             totalBenefit: Money.fromCents(chosenValue),
@@ -420,7 +453,7 @@
     }, 3000); // Show hint for 3 seconds
   }
 
-  import { tick } from 'svelte';
+  import { tick } from "svelte";
 
   // Scroll to matrix when calculation is complete
   $: if (isCalculationComplete && matrixDisplayElement) {
@@ -428,7 +461,7 @@
       await tick(); // Wait for DOM to update
       window.scrollTo({
         top: matrixDisplayElement.offsetTop,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     })();
   }
@@ -445,8 +478,8 @@
       This calculation shows an "optimal" social security filing strategy for
       your personal situation, for all possible years of death ranging from 62
       to 90. Optimal is defined as the largest sum of money, adjusted by the
-      discount rate such that a dollar today is worth more than a dollar in 
-      the future. 
+      discount rate such that a dollar today is worth more than a dollar in the
+      future.
     </p>
 
     <section class="input-section">
@@ -483,19 +516,19 @@
   </section>
   <section class="limited-width">
     {#if isCalculationComplete && calculationResults.length > 0 && selectedCellData}
-        <StrategyDetails
-          deathAge1={selectedCellData.deathAge1}
-          deathAge2={selectedCellData.deathAge2}
-          filingAge1Years={selectedCellData.filingAge1Years}
-          filingAge1Months={selectedCellData.filingAge1Months}
-          filingDate1={selectedCellData.filingDate1}
-          filingAge2Years={selectedCellData.filingAge2Years}
-          filingAge2Months={selectedCellData.filingAge2Months}
-          filingDate2={selectedCellData.filingDate2}
-          netPresentValue={selectedCellData.netPresentValue}
-          {recipients}
-        />
-      {/if}
+      <StrategyDetails
+        deathAge1={selectedCellData.deathAge1}
+        deathAge2={selectedCellData.deathAge2}
+        filingAge1Years={selectedCellData.filingAge1Years}
+        filingAge1Months={selectedCellData.filingAge1Months}
+        filingDate1={selectedCellData.filingDate1}
+        filingAge2Years={selectedCellData.filingAge2Years}
+        filingAge2Months={selectedCellData.filingAge2Months}
+        filingDate2={selectedCellData.filingDate2}
+        netPresentValue={selectedCellData.netPresentValue}
+        {recipients}
+      />
+    {/if}
   </section>
 
   {#if showHint}
@@ -569,9 +602,17 @@
   }
 
   @keyframes fadeInOut {
-    0% { opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 </style>

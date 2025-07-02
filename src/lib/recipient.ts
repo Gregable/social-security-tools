@@ -16,6 +16,11 @@ export class RecipientColors {
   light: string;
 }
 
+// In this case, blended means that the user hasn't made a
+// selection in the UI. For mortality, we take the average
+// of male and female.
+export type GenderOption = "male" | "female" | "blended";
+
 /**
  * A Recipient object manages calculating a user's SSA and IRS data.
  */
@@ -24,6 +29,16 @@ export class Recipient {
    * Creates a Recipient object.
    */
   constructor() {}
+
+  /** The recipient's gender (for mortality calculation). */
+  private gender_: GenderOption = "blended";
+  get gender(): GenderOption {
+    return this.gender_;
+  }
+  set gender(gender: GenderOption) {
+    this.gender_ = gender;
+    this.publish_();
+  }
 
   /**
    * Subscribers to call back for changes to this Recipient.
