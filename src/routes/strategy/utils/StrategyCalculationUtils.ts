@@ -57,17 +57,16 @@ export function calculateFinalDates(
 export function calculateAgeRange(
   MIN_DEATH_AGE: number,
   MAX_DEATH_AGE: number,
-  birthdateInputs: [string, string]
+  birthdateInput: string
 ): number[] {
   const now = new Date();
   const currentYear = now.getFullYear();
 
   // Calculate current ages for both recipients
-  const currentAge1 = currentYear - new Date(birthdateInputs[0]).getFullYear();
-  const currentAge2 = currentYear - new Date(birthdateInputs[1]).getFullYear();
+  const currentAge = currentYear - new Date(birthdateInput).getFullYear();
 
   // Start at the later of age 62 or current age
-  const startAge = Math.max(MIN_DEATH_AGE, Math.max(currentAge1, currentAge2));
+  const startAge = Math.max(MIN_DEATH_AGE, currentAge);
 
   const ages = [];
   for (let age = startAge; age <= MAX_DEATH_AGE; age += 2) {

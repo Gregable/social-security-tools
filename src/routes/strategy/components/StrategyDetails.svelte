@@ -14,17 +14,37 @@
   export let filingDate2: MonthDate;
   export let netPresentValue: Money;
   export let recipients: [Recipient, Recipient];
+
+  // Optional death probability fields (may be available from calculationResults)
+  export let deathProb1: number | null = null;
+  export let deathProb2: number | null = null;
+
+  // Format probability for display (as percentage with 2 decimal places)
+  function formatProbability(prob: number | null): string {
+    if (prob === null) return "Unknown";
+    return (prob * 100).toFixed(2) + "%";
+  }
 </script>
 
 <div class="strategy-details-container">
   <h3>Selected Strategy Details</h3>
   <div class="detail-item">
-    <strong>Recipient 1 Death Age:</strong>
+    <strong><RecipientName r={recipients[0]} apos /> Death Age:</strong>
     {deathAge1}
+    {#if deathProb1 !== null}
+      <span class="probability-badge">
+        Probability: {formatProbability(deathProb1)}
+      </span>
+    {/if}
   </div>
   <div class="detail-item">
-    <strong>Recipient 2 Death Age:</strong>
+    <strong><RecipientName r={recipients[1]} apos /> Death Age:</strong>
     {deathAge2}
+    {#if deathProb2 !== null}
+      <span class="probability-badge">
+        Probability: {formatProbability(deathProb2)}
+      </span>
+    {/if}
   </div>
   <h4><RecipientName r={recipients[0]} apos /> Filing Strategy</h4>
   <div class="detail-item">
@@ -94,5 +114,15 @@
 
   .detail-item strong {
     color: #003366;
+  }
+
+  .probability-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 6px;
+    font-size: 0.85rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
   }
 </style>

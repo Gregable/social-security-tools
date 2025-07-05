@@ -1,3 +1,4 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
   import RecipientName from "$lib/components/RecipientName.svelte";
@@ -10,11 +11,13 @@
     createBorderRemovalFunctions,
   } from "../utils/StrategyCalculationUtils";
   import { getMonthYearColor } from "../utils/colorUtils";
+  import { calculateGridTemplates } from "../utils/probabilitySizeUtils";
 
   // Props
-  export let recipientIndex: number; // 0 or 1
+  export let recipientIndex: number;
   export let recipients: [Recipient, Recipient];
-  export let deathAgeRange: number[];
+  export let deathAgeRange1: number[];
+  export let deathAgeRange2: number[];
   export let calculationResults: any[][];
   export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
   export let minMonthsSinceEpoch: number | null;
@@ -34,14 +37,25 @@
   // Event dispatcher
   const dispatch = createEventDispatcher();
 
-  // Extractors for recipient values
-  $: valueExtractor = createValueExtractor(recipients, recipientIndex + 1);
+  // Extractor for recipient values
   $: borderRemovalFuncs = createBorderRemovalFunctions(
-    valueExtractor,
+    createValueExtractor(recipients, recipientIndex + 1),
     calculationResults
   );
 
-  // Handle mouse events
+  // Calculate grid templates based on probabilities
+  $: rowTemplate = calculateGridTemplates(
+    deathAgeRange1,
+    calculationResults,
+    "row"
+  );
+  $: columnTemplate = calculateGridTemplates(
+    deathAgeRange2,
+    calculationResults,
+    "column"
+  );
+
+  // Handle events
   function handleMouseOver(i: number, j: number) {
     dispatch("hovercell", { rowIndex: i, colIndex: j });
   }
@@ -59,8 +73,8 @@
       const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
 
       dispatch("selectcell", {
-        deathAge1: deathAgeRange[i],
-        deathAge2: deathAgeRange[j],
+        deathAge1: deathAgeRange1[i],
+        deathAge2: deathAgeRange2[j],
         filingAge1Years: result.filingAge1Years,
         filingAge1Months: result.filingAge1Months,
         filingDate1: filingDate1,
@@ -73,7 +87,7 @@
   }
 </script>
 
-<div class="matrix-container recipient{recipientIndex + 1}-matrix">
+<div class="matrix-container recipient-matrix">
   <div class="matrix-title">
     <h4>
       Optimal Filing Date for <RecipientName r={recipients[recipientIndex]} />
@@ -81,135 +95,136 @@
   </div>
   <div class="matrix-legend">
     <p>
-      <strong>Row:</strong>
-      <RecipientName r={recipients[0]} /> death age
-    </p>
-    <p>
-      <strong>Column:</strong>
-      <RecipientName r={recipients[1]} /> death age
-    </p>
-    <p>
-      <strong>Cell shows:</strong>
-      <RecipientName r={recipients[recipientIndex]} />'s optimal filing date
+      <strong>Size</strong>: Row and Column width / height indicate the relative
+      probability of each person's death at that age range.
     </p>
   </div>
 
-  <div class="strategy-matrix">
-    <table>
-      <thead>
-        <!-- Column recipient header -->
-        <tr>
-          <th></th>
-          <th></th>
-          <th
-            colspan={deathAgeRange.length}
-            class="recipient-header col-header"
+  <div class="strategy-grid-container">
+    <!-- Column headers -->
+    <div class="grid-headers">
+      <div
+        class="recipient-header col-header"
+        style="grid-column: span {deathAgeRange2.length}"
+      >
+        <RecipientName r={recipients[1]} /> Death Age
+      </div>
+    </div>
+
+    <div class="grid-headers age-headers">
+      <div class="empty-corner"></div>
+      <div class="empty-corner"></div>
+      <div
+        class="age-header-container"
+        style="grid-template-columns: {columnTemplate}; width: 100%;"
+      >
+        {#each deathAgeRange2 as deathAge, j}
+          <div
+            class="age-header"
+            class:highlighted-column={hoveredCell && hoveredCell.colIndex === j}
           >
-            <RecipientName r={recipients[1]} /> Death Age
-          </th>
-        </tr>
-        <!-- Column age numbers -->
-        <tr>
-          <th></th>
-          <th></th>
-          {#each deathAgeRange as deathAge2, j}
-            <th
-              class="age-header"
-              class:highlighted-column={hoveredCell &&
-                hoveredCell.colIndex === j}>{deathAge2}</th
-            >
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each deathAgeRange as deathAge1, i}
-          <tr class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i}>
-            {#if i === 0}
-              <th
-                rowspan={deathAgeRange.length}
-                class="recipient-header row-header"
-              >
-                <div class="header-text">
-                  <RecipientName r={recipients[0]} /> Death Age
-                </div>
-              </th>
-            {/if}
-            <th
+            {deathAge}
+          </div>
+        {/each}
+      </div>
+    </div>
+
+    <!-- Main grid with row headers and cells -->
+    <div class="grid-main-container">
+      <!-- Row headers -->
+      <div class="grid-headers row-headers">
+        <div class="recipient-header row-header header-text">
+          <div class="header-text">
+            <RecipientName r={recipients[0]} apos /> Death Age
+          </div>
+        </div>
+        <div
+          class="age-header-container"
+          style="grid-template-rows: {rowTemplate}"
+        >
+          {#each deathAgeRange1 as deathAge, i}
+            <div
               class="age-header"
               class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i}
-              >{deathAge1}</th
             >
-            {#each deathAgeRange as deathAge2, j}
-              <td
-                class="strategy-cell"
-                class:no-right-border={borderRemovalFuncs.right(i, j)}
-                class:no-bottom-border={borderRemovalFuncs.bottom(i, j)}
-                class:no-left-border={borderRemovalFuncs.left(i, j)}
-                class:no-top-border={borderRemovalFuncs.top(i, j)}
-                class:highlighted-cell={hoveredCell &&
-                  hoveredCell.rowIndex === i &&
-                  hoveredCell.colIndex === j}
-                class:highlighted-column={hoveredCell &&
-                  hoveredCell.colIndex === j &&
-                  hoveredCell.rowIndex !== i}
-                class:highlighted-row={hoveredCell &&
-                  hoveredCell.rowIndex === i &&
-                  hoveredCell.colIndex !== j}
-                class:selected-cell={selectedCellData &&
-                  selectedCellData.deathAge1 === deathAgeRange[i] &&
-                  selectedCellData.deathAge2 === deathAgeRange[j]}
-                on:mouseover={() => handleMouseOver(i, j)}
-                on:mouseout={handleMouseOut}
-                on:focus={() => handleMouseOver(i, j)}
-                on:blur={handleMouseOut}
-                on:click={() => handleClick(i, j)}
-                tabindex="0"
-                role="gridcell"
-                title="Net present value: {calculationResults[i][
-                  j
-                ]?.totalBenefit.string() || 'N/A'}"
-                style={calculationResults[i][j] &&
-                minMonthsSinceEpoch !== null &&
-                maxMonthsSinceEpoch !== null
-                  ? `background-color: ${(() => {
-                      const filingAge =
-                        calculationResults[i][j][
-                          `filingAge${recipientIndex + 1}`
-                        ];
-                      const filingDate =
-                        recipients[recipientIndex].birthdate.dateAtLayAge(
-                          filingAge
-                        );
-                      return getMonthYearColor(
-                        filingDate.monthsSinceEpoch(),
-                        minMonthsSinceEpoch,
-                        maxMonthsSinceEpoch
+              {deathAge}
+            </div>
+          {/each}
+        </div>
+      </div>
+
+      <!-- Grid cells -->
+      <div
+        class="strategy-grid"
+        style="grid-template-columns: {columnTemplate}; grid-template-rows: {rowTemplate}; min-height: 0; display: grid;"
+      >
+        {#each deathAgeRange1 as deathAge1, i}
+          {#each deathAgeRange2 as deathAge2, j}
+            <div
+              class="strategy-cell"
+              class:highlighted-cell={hoveredCell &&
+                hoveredCell.rowIndex === i &&
+                hoveredCell.colIndex === j}
+              class:highlighted-column={hoveredCell &&
+                hoveredCell.colIndex === j &&
+                hoveredCell.rowIndex !== i}
+              class:highlighted-row={hoveredCell &&
+                hoveredCell.rowIndex === i &&
+                hoveredCell.colIndex !== j}
+              class:selected-cell={selectedCellData &&
+                selectedCellData.deathAge1 === deathAgeRange1[i] &&
+                selectedCellData.deathAge2 === deathAgeRange2[j]}
+              on:mouseover={() => handleMouseOver(i, j)}
+              on:mouseout={handleMouseOut}
+              on:focus={() => handleMouseOver(i, j)}
+              on:blur={handleMouseOut}
+              on:click={() => handleClick(i, j)}
+              tabindex="0"
+              role="gridcell"
+              title="Net present value: {calculationResults[i][
+                j
+              ]?.totalBenefit.string() || 'N/A'}"
+              style={calculationResults[i][j] &&
+              minMonthsSinceEpoch !== null &&
+              maxMonthsSinceEpoch !== null
+                ? `background-color: ${(() => {
+                    const filingAge =
+                      calculationResults[i][j][
+                        `filingAge${recipientIndex + 1}`
+                      ];
+                    const filingDate =
+                      recipients[recipientIndex].birthdate.dateAtLayAge(
+                        filingAge
                       );
-                    })()};`
-                  : ""}
-              >
-                <div class="filing-dates">
-                  {#if calculationResults[i][j]}
-                    {getFilingDate(
-                      recipients,
-                      recipientIndex,
-                      calculationResults[i][j][
-                        `filingAge${recipientIndex + 1}Years`
-                      ],
-                      calculationResults[i][j][
-                        `filingAge${recipientIndex + 1}Months`
-                      ]
-                    )}
-                  {:else}
-                    N/A
-                  {/if}
-                </div>
-              </td>
-            {/each}
-          </tr>
+                    return getMonthYearColor(
+                      filingDate.monthsSinceEpoch(),
+                      minMonthsSinceEpoch,
+                      maxMonthsSinceEpoch
+                    );
+                  })()};`
+                : ""}
+            >
+              <div class="filing-dates">
+                {#if calculationResults[i][j]}
+                  {getFilingDate(
+                    recipients,
+                    recipientIndex,
+                    calculationResults[i][j][
+                      `filingAge${recipientIndex + 1}Years`
+                    ],
+                    calculationResults[i][j][
+                      `filingAge${recipientIndex + 1}Months`
+                    ]
+                  )}
+                {:else}
+                  N/A
+                {/if}
+              </div>
+            </div>
+          {/each}
         {/each}
-      </tbody>
-    </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -222,11 +237,7 @@
     background-color: #ffffff;
   }
 
-  .recipient0-matrix {
-    background-color: #f8f9ff;
-  }
-
-  .recipient1-matrix {
+  .recipient-matrix {
     background-color: #f9fff8;
   }
 
@@ -235,14 +246,6 @@
     text-align: center;
     padding: 0.5rem;
     border-radius: 4px;
-  }
-
-  .recipient0-matrix .matrix-title {
-    background-color: #e6eeff;
-  }
-
-  .recipient1-matrix .matrix-title {
-    background-color: #e6ffe6;
   }
 
   .matrix-title h4 {
@@ -265,42 +268,66 @@
     margin: 0.5rem 0;
   }
 
-  .strategy-matrix {
-    overflow-x: auto;
+  .strategy-grid-container {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
   }
 
-  .strategy-matrix table {
+  .grid-headers {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  .age-headers {
+    grid-template-columns: auto auto 1fr;
+  }
+
+  .age-header-container {
+    display: grid;
+    height: 100%;
+  }
+
+  .grid-main-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: stretch; /* Ensure rows stretch to fill the container */
+    height: 100%; /* Force to take up full height */
+  }
+
+  .row-headers {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%; /* Ensure it takes up full height */
+    min-height: 900px;
+    align-self: stretch;
+    justify-self: stretch;
+  }
+
+  .strategy-grid {
+    display: grid;
+    grid-auto-flow: row;
+    /* Force the grid to expand to fill available space */
     width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-  }
-
-  .strategy-matrix th,
-  .strategy-matrix td {
-    border: 2px solid #333;
-    padding: 0.5rem;
-    text-align: center;
-  }
-
-  .strategy-matrix th {
-    background-color: #f8f9fa;
-    font-weight: bold;
+    height: 100%;
   }
 
   .recipient-header {
-    background-color: #e9ecef !important;
+    background-color: #e9ecef;
     font-weight: bold;
     font-size: 0.9rem;
     padding: 0.75rem 0.5rem;
+    text-align: center;
   }
 
   .row-header {
     writing-mode: vertical-lr;
     text-orientation: mixed;
-    vertical-align: middle;
+    height: 100%;
+    min-height: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 2rem;
-    min-width: 2rem;
-    max-width: 2rem;
   }
 
   .row-header .header-text {
@@ -314,26 +341,54 @@
   }
 
   .age-header {
-    background-color: #e9ecef !important;
+    background-color: #e9ecef;
     color: #495057;
     font-weight: 600;
     font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border: 1px solid #ddd;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    align-self: stretch; /* Make sure it stretches to fill grid cell */
+    justify-self: stretch;
+  }
+
+  .row-headers .age-header {
+    min-width: 2rem;
   }
 
   .strategy-cell {
-    /* background-color will be set by inline style */
+    border: 1px solid #333;
+    text-align: center;
     cursor: pointer;
     transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0; /* Important for grid items to prevent content from expanding them */
+    min-width: 0; /* Important for grid items to prevent content from expanding them */
+    width: 100%;
+    height: 100%;
+    align-self: stretch;
+    justify-self: stretch;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   /* Highlighting classes */
-  tr.highlighted-row > td.highlighted-cell {
+  .highlighted-cell {
     background-color: #007bff !important;
     color: white;
   }
 
-  tr.highlighted-row > td,
-  th.highlighted-row {
+  .highlighted-row {
     background-color: #e6f3ff !important;
   }
 
@@ -343,6 +398,11 @@
 
   .filing-dates {
     line-height: 1.2;
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%; /* Prevent text from forcing cell to expand */
   }
 
   .strategy-cell.selected-cell {
@@ -351,31 +411,19 @@
     color: #0056b3;
   }
 
-  /* Border removal classes for connected cells with same values */
-  .strategy-cell.no-right-border {
-    border-right: none !important;
-  }
-
-  .strategy-cell.no-bottom-border {
-    border-bottom: none !important;
-  }
-
-  .strategy-cell.no-left-border {
-    border-left: none !important;
-  }
-
-  .strategy-cell.no-top-border {
-    border-top: none !important;
+  .empty-corner {
+    background-color: #e9ecef;
+    min-width: 2rem;
+    min-height: 2rem;
   }
 
   @media (max-width: 768px) {
-    .strategy-matrix {
+    .filing-dates {
       font-size: 0.75rem;
     }
 
-    .strategy-matrix th,
-    .strategy-matrix td {
-      padding: 0.25rem;
+    .strategy-cell {
+      padding: 0.15rem;
     }
   }
 </style>

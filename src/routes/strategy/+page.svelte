@@ -42,7 +42,8 @@
   let isCalculationComplete = false;
   let isCalculationRunning = false;
   let calculationResults: any[][] = [];
-  let deathAgeRange: number[] = [];
+  let deathAgeRange1: number[] = [];
+  let deathAgeRange2: number[] = [];
   let calculationProgress = 0;
   let totalCalculations = 0;
   let minMonthsSinceEpoch: number | null = null;
@@ -144,7 +145,7 @@
   ) {
     return {
       right: (i: number, j: number): boolean => {
-        if (j >= deathAgeRange.length - 1) return false;
+        if (j >= deathAgeRange1.length - 1) return false;
         if (
           !calculationResults[i] ||
           !calculationResults[i][j] ||
@@ -158,7 +159,7 @@
       },
 
       bottom: (i: number, j: number): boolean => {
-        if (i >= deathAgeRange.length - 1) return false;
+        if (i >= deathAgeRange2.length - 1) return false;
         if (
           !calculationResults[i] ||
           !calculationResults[i + 1] ||
@@ -251,13 +252,20 @@
       ]);
 
       // Calculate age range
-      deathAgeRange = calculateAgeRangeUtil(
+      deathAgeRange1 = calculateAgeRangeUtil(
         MIN_DEATH_AGE,
         MAX_DEATH_AGE,
-        birthdateInputs
+        birthdateInputs[0]
+      );
+      deathAgeRange2 = calculateAgeRangeUtil(
+        MIN_DEATH_AGE,
+        MAX_DEATH_AGE,
+        birthdateInputs[1]
       );
       totalCalculations =
-        deathAgeRange.length * deathAgeRange.length * CALCULATIONS_PER_SCENARIO;
+        deathAgeRange1.length *
+        deathAgeRange2.length *
+        CALCULATIONS_PER_SCENARIO;
 
       // Get current date for optimal strategy calculation
       const now = new Date();
@@ -267,15 +275,17 @@
       });
 
       // Initialize results matrix
-      calculationResults = Array(deathAgeRange.length)
+      calculationResults = Array(deathAgeRange1.length)
         .fill(null)
-        .map(() => Array(deathAgeRange.length).fill(null));
+        .map(() => Array(deathAgeRange2.length).fill(null));
 
       // Calculate optimal strategy for each death age combination
-      for (let i = 0; i < deathAgeRange.length; i++) {
-        for (let j = 0; j < deathAgeRange.length; j++) {
-          const deathAge1 = deathAgeRange[i];
-          const deathAge2 = deathAgeRange[j];
+      let probDeath1 = 0;
+      let probDeath2 = 0;
+      for (let i = 0; i < deathAgeRange1.length; i++) {
+        for (let j = 0; j < deathAgeRange2.length; j++) {
+          const deathAge1 = deathAgeRange1[i];
+          const deathAge2 = deathAgeRange2[j];
 
           // Calculate final dates for this combination
           const finalDates = calculateFinalDatesUtil(
@@ -503,7 +513,8 @@
     {#if isCalculationComplete && calculationResults.length > 0}
       <StrategyMatrixDisplay
         {recipients}
-        {deathAgeRange}
+        {deathAgeRange1}
+        {deathAgeRange2}
         {calculationResults}
         {timeElapsed}
         {isCalculationComplete}
@@ -516,6 +527,16 @@
   </section>
   <section class="limited-width">
     {#if isCalculationComplete && calculationResults.length > 0 && selectedCellData}
+      <!-- Find the cell in calculationResults that corresponds to selectedCellData -->
+      {@const row = deathAgeRange1.findIndex(
+        (age) => age === selectedCellData.deathAge1
+      )}
+      {@const col = deathAgeRange2.findIndex(
+        (age) => age === selectedCellData.deathAge2
+      )}
+      {@const cellData =
+        row >= 0 && col >= 0 ? calculationResults[row][col] : null}
+
       <StrategyDetails
         deathAge1={selectedCellData.deathAge1}
         deathAge2={selectedCellData.deathAge2}
@@ -526,6 +547,8 @@
         filingAge2Months={selectedCellData.filingAge2Months}
         filingDate2={selectedCellData.filingDate2}
         netPresentValue={selectedCellData.netPresentValue}
+        deathProb1={cellData?.deathProb1}
+        deathProb2={cellData?.deathProb2}
         {recipients}
       />
     {/if}

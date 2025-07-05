@@ -9,7 +9,8 @@
   export let recipients: [Recipient, Recipient];
 
   const dispatch = createEventDispatcher();
-  export let deathAgeRange: number[];
+  export let deathAgeRange1: number[];
+  export let deathAgeRange2: number[];
   export let calculationResults: any[][];
   export let timeElapsed: number;
   export let isCalculationComplete: boolean;
@@ -55,7 +56,8 @@
         <StrategyMatrix
           {recipientIndex}
           {recipients}
-          {deathAgeRange}
+          {deathAgeRange1}
+          {deathAgeRange2}
           {calculationResults}
           {hoveredCell}
           {minMonthsSinceEpoch}
