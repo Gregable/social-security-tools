@@ -50,6 +50,60 @@ export async function getLifeTableData(
 }
 
 /**
+ * Returns the probability of death at each future age for a person currently alive.
+ * @param gender The gender ('male', 'female', or 'blended').
+ * @param birthYear The year the person was born.
+ * @param currentYear The current year (defaults to current date's year if not provided).
+ * @returns A promise that resolves to an array of objects containing age and probability of death at that age.
+ */
+export async function getDeathProbabilityDistribution(
+  gender: GenderOption,
+  birthYear: number,
+  currentYear: number = new Date().getFullYear()
+): Promise<{ age: number; probability: number }[] | null> {
+  // Calculate current age
+  const currentAge = currentYear - birthYear;
+
+  // Get the life table data
+  const lifeTableData = await getLifeTableData(gender, birthYear);
+
+  if (!lifeTableData) return null;
+
+  // Filter to only include entries from current age through 119
+  const relevantData = lifeTableData.filter((entry) => entry.x >= currentAge);
+
+  // Calculate the probability of death at each age
+  const deathProbabilities: { age: number; probability: number }[] = [];
+
+  // Survival probability starts at 1.0 (person is alive now)
+  let survivalProbability = 1.0;
+
+  // Calculate for each age from current age to 119
+  for (const entry of relevantData) {
+    // Probability of death at this age = probability of surviving to this age × probability of dying during this year
+    const deathProbability = survivalProbability * entry.q_x;
+
+    deathProbabilities.push({
+      age: entry.x,
+      probability: deathProbability,
+    });
+
+    // Update survival probability for next age
+    survivalProbability *= 1 - entry.q_x;
+  }
+
+  // Add age 120 with the remaining probability (ensure total probability sums to 1.0)
+  if (survivalProbability > 0) {
+    deathProbabilities.push({
+      age: 120,
+      probability: survivalProbability,
+    });
+  }
+
+  return deathProbabilities;
+}
+
+/**
  * Helper function to fetch data directly for a specific gender.
  * @param gender The gender ('male' or 'female').
  * @param year The cohort year.

@@ -8,7 +8,7 @@
     strategySumTotalPeriods,
   } from "$lib/strategy/strategy-calc";
   import { ALL_MONTHS } from "$lib/constants";
-  import { getLifeTableData, type LifeTableEntry } from "$lib/life-tables";
+  import { getDeathProbabilityDistribution } from "$lib/life-tables";
 
   // Import components
   import RecipientInputs from "./components/RecipientInputs.svelte";
@@ -30,7 +30,7 @@
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
   const MIN_DEATH_AGE = 62;
-  const MAX_DEATH_AGE = 90;
+  const MAX_DEATH_AGE = 120;
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
   // Strategy tolerance percentage for creating larger grouped areas
@@ -241,15 +241,24 @@
       const gender1 = recipients[0].gender;
       const gender2 = recipients[1].gender;
 
-      // Fetch life table data for both recipients
-      const lifeTableData1Promise = getLifeTableData(gender1, birthYear1);
-      const lifeTableData2Promise = getLifeTableData(gender2, birthYear2);
+      // Get current year for the probability distribution calculation
+      const currentYear = new Date().getFullYear();
+
+      // Fetch death probability distribution for both recipients
+      const deathProb1Promise = getDeathProbabilityDistribution(
+        gender1,
+        birthYear1,
+        currentYear
+      );
+      const deathProb2Promise = getDeathProbabilityDistribution(
+        gender2,
+        birthYear2,
+        currentYear
+      );
 
       // Wait for both promises to resolve
-      const [lifeTableData1, lifeTableData2] = await Promise.all([
-        lifeTableData1Promise,
-        lifeTableData2Promise,
-      ]);
+      const [deathProbDistribution1, deathProbDistribution2] =
+        await Promise.all([deathProb1Promise, deathProb2Promise]);
 
       // Calculate age range
       deathAgeRange1 = calculateAgeRangeUtil(
@@ -368,17 +377,17 @@
             }
           }
 
-          // Find probability for these death ages
-          const probEntry1 = lifeTableData1?.find(
-            (entry) => entry.x === deathAge1
+          // Find probability for these death ages from probability distributions
+          const probEntry1 = deathProbDistribution1?.find(
+            (entry) => entry.age === deathAge1
           );
-          const probEntry2 = lifeTableData2?.find(
-            (entry) => entry.x === deathAge2
+          const probEntry2 = deathProbDistribution2?.find(
+            (entry) => entry.age === deathAge2
           );
 
-          // Get death probability (q_x) for these ages, or default to null if not found
-          const deathProb1 = probEntry1?.q_x || null;
-          const deathProb2 = probEntry2?.q_x || null;
+          // Get actual death probability for these ages, or default to null if not found
+          const deathProb1 = probEntry1?.probability || null;
+          const deathProb2 = probEntry2?.probability || null;
 
           // Store the result using the chosen strategy with probability data
           calculationResults[i][j] = {
