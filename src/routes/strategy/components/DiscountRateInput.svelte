@@ -53,7 +53,7 @@
 </script>
 
 <div class="global-input-group">
-  <label for="discountRate">Discount Rate (%):</label>
+  <label for="discountRate">Discount Rate (Real %):</label>
   <div class="preset-buttons">
     {#each presetRates as preset}
       <button
