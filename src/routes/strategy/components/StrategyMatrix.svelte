@@ -348,7 +348,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.25rem;
     border: 1px solid #ddd;
     min-width: 0;
     min-height: 0;
