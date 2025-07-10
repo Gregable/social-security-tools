@@ -107,7 +107,7 @@
         class="recipient-header col-header"
         style="grid-column: span {deathAgeRange2.length}"
       >
-        <RecipientName r={recipients[1]} /> Death Age
+        <RecipientName r={recipients[1]} apos /> Death Age
       </div>
     </div>
 
