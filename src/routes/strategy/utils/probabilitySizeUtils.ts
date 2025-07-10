@@ -25,24 +25,14 @@
  * // 90% = ... (70 to 89)
  * // 100% = ... (90 to end)
  */
-export function calculateGridTemplates(
+export function calculateAgeRangePercentages(
   deathAgeRange: number[],
   probDistribution: { age: number; probability: number }[]
-): string {
-  // Generate CSS grid template with summed probability sizing
-  const sizeParts: string[] = [];
-
-  // Calculate total probability
-  const totalProb = probDistribution.reduce(
-    (sum, entry) => sum + entry.probability,
-    0
-  );
+): number[] {
+  const segmentProbabilities: number[] = [];
 
   deathAgeRange.forEach((age, index) => {
-    // Find the corresponding index in probDistribution
     const startIndex = probDistribution.findIndex((entry) => entry.age >= age);
-
-    // Find the index of the next age in deathAgeRange, or end of probDistribution
     const endIndex =
       index < deathAgeRange.length - 1
         ? probDistribution.findIndex(
@@ -50,17 +40,69 @@ export function calculateGridTemplates(
           )
         : probDistribution.length;
 
-    // Sum probabilities from startIndex to endIndex
     const summedProb = probDistribution
       .slice(startIndex, endIndex)
       .reduce((sum, entry) => sum + entry.probability, 0);
 
-    // Calculate the percentage based on summed probability and round to 1 decimal place
-    const percentage = ((summedProb / totalProb) * 100).toFixed(1);
-
-    // Use percentage as grid template value
-    sizeParts.push(`${percentage}%`);
+    segmentProbabilities.push(summedProb);
   });
 
+  const effectiveTotalProb = segmentProbabilities.reduce(
+    (sum, prob) => sum + prob,
+    0
+  );
+
+  const percentages: number[] = [];
+  let sumOfRoundedPercentages = 0;
+
+  for (let i = 0; i < segmentProbabilities.length; i++) {
+    let percentage = (segmentProbabilities[i] / effectiveTotalProb) * 100;
+    let roundedPercentageValue: number;
+
+    if (i === segmentProbabilities.length - 1) {
+      roundedPercentageValue = 100 - sumOfRoundedPercentages;
+    } else {
+      roundedPercentageValue = parseFloat(percentage.toFixed(3));
+    }
+    percentages.push(roundedPercentageValue);
+    sumOfRoundedPercentages += roundedPercentageValue;
+  }
+  return percentages;
+}
+
+export function formatPercentagesToCssGridTemplate(
+  percentages: number[],
+  decimalPlaces: number
+): string {
+  const sizeParts: string[] = [];
+  let sumOfFormattedPercentages = 0;
+
+  for (let i = 0; i < percentages.length; i++) {
+    let formattedPercentageString: string;
+    let formattedPercentageValue: number;
+
+    if (i === percentages.length - 1) {
+      // For the last element, adjust to make sum exactly 100%
+      formattedPercentageValue = 100 - sumOfFormattedPercentages;
+      formattedPercentageString =
+        formattedPercentageValue.toFixed(decimalPlaces);
+    } else {
+      formattedPercentageString = percentages[i].toFixed(decimalPlaces);
+      formattedPercentageValue = parseFloat(formattedPercentageString);
+    }
+    sizeParts.push(`${formattedPercentageString}%`);
+    sumOfFormattedPercentages += formattedPercentageValue;
+  }
   return sizeParts.join(" ");
+}
+
+export function calculateGridTemplates(
+  deathAgeRange: number[],
+  probDistribution: { age: number; probability: number }[]
+): string {
+  const percentages = calculateAgeRangePercentages(
+    deathAgeRange,
+    probDistribution
+  );
+  return formatPercentagesToCssGridTemplate(percentages, 3); // Using 3 decimal places as per previous discussion
 }
