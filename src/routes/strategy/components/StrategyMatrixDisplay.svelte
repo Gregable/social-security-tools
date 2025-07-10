@@ -12,6 +12,8 @@
   export let deathAgeRange1: number[];
   export let deathAgeRange2: number[];
   export let calculationResults: any[][];
+  export let deathProbDistribution1: { age: number; probability: number }[];
+  export let deathProbDistribution2: { age: number; probability: number }[];
   export let timeElapsed: number;
   export let isCalculationComplete: boolean;
   export let minMonthsSinceEpoch: number | null;
@@ -45,12 +47,7 @@
     age combinations
   </p>
 
-  {#if calculationResults[0]?.[0]?.error}
-    <div class="error">
-      <h4>Error:</h4>
-      <p>{calculationResults[0][0].error}</p>
-    </div>
-  {:else if isCalculationComplete && calculationResults.length > 0}
+  {#if isCalculationComplete}
     <div class="matrices-container">
       {#each [0, 1] as recipientIndex}
         <StrategyMatrix
@@ -59,6 +56,8 @@
           {deathAgeRange1}
           {deathAgeRange2}
           {calculationResults}
+          {deathProbDistribution1}
+          {deathProbDistribution2}
           {hoveredCell}
           {minMonthsSinceEpoch}
           {maxMonthsSinceEpoch}
@@ -85,15 +84,6 @@
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     margin-top: 1.5rem;
-  }
-
-  .error {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    color: #721c24;
   }
 
   @media (max-width: 768px) {

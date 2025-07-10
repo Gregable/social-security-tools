@@ -1,44 +1,65 @@
 /**
- * Converts death age probabilities to CSS Grid template values with direct probability scaling
+ * Converts death age probability distributions to CSS Grid template values.
+ *
+ * @param deathAgeRange An array of ages to calculate grid template values for.
+ *   The ages do not need to be contiguous or evenly spaced.
+ * @param probDistribution An array of objects with age and probability properties.
+ *   The age property corresponds to the age, and the probability property is the
+ *   probability of death at that age.
+ * @returns A string of space-separated percentage values to be used as a
+ *   CSS grid-template-columns or grid-template-rows value.
+ *
+ * @example
+ * const deathAgeRange = [62, 65, 70, 90];
+ * const probDistribution = [
+ *   { age: 62, probability: 0.1 },
+ *   { age: 63, probability: 0.2 },
+ *   { age: 64, probability: 0.3 },
+ *   { age: 65, probability: 0.4 },
+ *   ...
+ * ];
+ * const gridTemplate = calculateGridTemplates(deathAgeRange, probDistribution);
+ * // gridTemplate: "20% 50% 90% 100%"
+ * // 20% = 0.1 + 0.2 + 0.3 (62 to 64)
+ * // 50% = 0.4 + ... (65 to 69)
+ * // 90% = ... (70 to 89)
+ * // 100% = ... (90 to end)
  */
 export function calculateGridTemplates(
   deathAgeRange: number[],
-  calculationResults: any[][],
-  dimension: "row" | "column"
+  probDistribution: { age: number; probability: number }[]
 ): string {
-  // Determine which probability to use based on dimension
-  const probabilityKey = dimension === "row" ? "deathProb1" : "deathProb2";
-
-  // Generate CSS grid template with direct probability sizing
+  // Generate CSS grid template with summed probability sizing
   const sizeParts: string[] = [];
 
-  // Calculate total probability to normalize values (ensure they add up to something reasonable)
-  let totalProb = 0;
-  deathAgeRange.forEach((_, index) => {
-    const prob =
-      dimension === "row"
-        ? calculationResults[index][0][probabilityKey]
-        : calculationResults[0][index][probabilityKey];
-    totalProb += prob;
-  });
+  // Calculate total probability
+  const totalProb = probDistribution.reduce(
+    (sum, entry) => sum + entry.probability,
+    0
+  );
 
-  // Scale factor to make grid cells more reasonably sized
-  // The 100 value ensures our fr units aren't too tiny
-  const scaleFactor = 1 / totalProb;
+  deathAgeRange.forEach((age, index) => {
+    // Find the corresponding index in probDistribution
+    const startIndex = probDistribution.findIndex((entry) => entry.age >= age);
 
-  deathAgeRange.forEach((_, index) => {
-    // For rows, use the probability from the first column of each row
-    // For columns, use the probability from the first row of each column
-    const prob =
-      dimension === "row"
-        ? calculationResults[index][0][probabilityKey]
-        : calculationResults[0][index][probabilityKey];
+    // Find the index of the next age in deathAgeRange, or end of probDistribution
+    const endIndex =
+      index < deathAgeRange.length - 1
+        ? probDistribution.findIndex(
+            (entry) => entry.age >= deathAgeRange[index + 1]
+          )
+        : probDistribution.length;
 
-    // Scale the probability to get better visual proportions
-    const scaledProb = 100 * prob * scaleFactor;
+    // Sum probabilities from startIndex to endIndex
+    const summedProb = probDistribution
+      .slice(startIndex, endIndex)
+      .reduce((sum, entry) => sum + entry.probability, 0);
 
-    // Use scaled probability value as fr units
-    sizeParts.push(`${scaledProb}%`);
+    // Calculate the percentage based on summed probability and round to 1 decimal place
+    const percentage = ((summedProb / totalProb) * 100).toFixed(1);
+
+    // Use percentage as grid template value
+    sizeParts.push(`${percentage}%`);
   });
 
   return sizeParts.join(" ");

@@ -44,6 +44,8 @@
   let calculationResults: any[][] = [];
   let deathAgeRange1: number[] = [];
   let deathAgeRange2: number[] = [];
+  let deathProbDistribution1: { age: number; probability: number }[] = [];
+  let deathProbDistribution2: { age: number; probability: number }[] = [];
   let calculationProgress = 0;
   let totalCalculations = 0;
   let minMonthsSinceEpoch: number | null = null;
@@ -257,8 +259,14 @@
       );
 
       // Wait for both promises to resolve
-      const [deathProbDistribution1, deathProbDistribution2] =
-        await Promise.all([deathProb1Promise, deathProb2Promise]);
+      [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
+        deathProb1Promise,
+        deathProb2Promise,
+      ]);
+
+      // Force Svelte update by reassigning arrays
+      deathProbDistribution1 = [...deathProbDistribution1];
+      deathProbDistribution2 = [...deathProbDistribution2];
 
       // Calculate age range
       deathAgeRange1 = calculateAgeRangeUtil(
@@ -377,24 +385,10 @@
             }
           }
 
-          // Find probability for these death ages from probability distributions
-          const probEntry1 = deathProbDistribution1?.find(
-            (entry) => entry.age === deathAge1
-          );
-          const probEntry2 = deathProbDistribution2?.find(
-            (entry) => entry.age === deathAge2
-          );
-
-          // Get actual death probability for these ages, or default to null if not found
-          const deathProb1 = probEntry1?.probability || null;
-          const deathProb2 = probEntry2?.probability || null;
-
-          // Store the result using the chosen strategy with probability data
+          // Store the result using the chosen strategy
           calculationResults[i][j] = {
             deathAge1,
             deathAge2,
-            deathProb1,
-            deathProb2,
             filingAge1: chosenStrategy[0],
             filingAge2: chosenStrategy[1],
             totalBenefit: Money.fromCents(chosenValue),
@@ -519,12 +513,14 @@
     />
   </section>
   <section class="calculation-section" bind:this={matrixDisplayElement}>
-    {#if isCalculationComplete && calculationResults.length > 0}
+    {#if isCalculationComplete && calculationResults.length > 0 && deathProbDistribution1.length > 0 && deathProbDistribution2.length > 0}
       <StrategyMatrixDisplay
         {recipients}
         {deathAgeRange1}
         {deathAgeRange2}
         {calculationResults}
+        {deathProbDistribution1}
+        {deathProbDistribution2}
         {timeElapsed}
         {isCalculationComplete}
         {minMonthsSinceEpoch}

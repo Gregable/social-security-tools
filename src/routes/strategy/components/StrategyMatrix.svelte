@@ -19,6 +19,8 @@
   export let deathAgeRange1: number[];
   export let deathAgeRange2: number[];
   export let calculationResults: any[][];
+  export let deathProbDistribution1: { age: number; probability: number }[];
+  export let deathProbDistribution2: { age: number; probability: number }[];
   export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
   export let minMonthsSinceEpoch: number | null;
   export let maxMonthsSinceEpoch: number | null;
@@ -46,13 +48,11 @@
   // Calculate grid templates based on probabilities
   $: rowTemplate = calculateGridTemplates(
     deathAgeRange1,
-    calculationResults,
-    "row"
+    deathProbDistribution1
   );
   $: columnTemplate = calculateGridTemplates(
     deathAgeRange2,
-    calculationResults,
-    "column"
+    deathProbDistribution2
   );
 
   // Handle events
