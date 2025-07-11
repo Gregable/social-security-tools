@@ -22,8 +22,8 @@
     formatBirthdate as formatBirthdateUtil,
     parseBirthdate as parseBirthdateUtil,
     calculateFinalDates as calculateFinalDatesUtil,
-    calculateAgeRange as calculateAgeRangeUtil,
   } from "./utils/StrategyCalculationUtils";
+  import { generateDeathAgeRange } from "./utils/probabilitySizeUtils";
 
   // Constants
   const DEFAULT_BIRTHDATE = "1965-03-15";
@@ -268,17 +268,15 @@
       deathProbDistribution1 = [...deathProbDistribution1];
       deathProbDistribution2 = [...deathProbDistribution2];
 
-      // Calculate age range
-      deathAgeRange1 = calculateAgeRangeUtil(
-        MIN_DEATH_AGE,
-        MAX_DEATH_AGE,
-        birthdateInputs[0]
-      );
-      deathAgeRange2 = calculateAgeRangeUtil(
-        MIN_DEATH_AGE,
-        MAX_DEATH_AGE,
-        birthdateInputs[1]
-      );
+      // Calculate death age range start ages
+      const currentAge1 = currentYear - new Date(birthdateInputs[0]).getFullYear();
+      const currentAge2 = currentYear - new Date(birthdateInputs[1]).getFullYear();
+      const startAge1 = Math.max(MIN_DEATH_AGE, currentAge1);
+      const startAge2 = Math.max(MIN_DEATH_AGE, currentAge2);
+
+      // Calculate age ranges
+      deathAgeRange1 = generateDeathAgeRange(startAge1);
+      deathAgeRange2 = generateDeathAgeRange(startAge2);
       totalCalculations =
         deathAgeRange1.length *
         deathAgeRange2.length *

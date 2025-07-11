@@ -104,6 +104,19 @@ export function formatPercentagesToCssGridTemplate(
   return sizeParts.join(' ');
 }
 
+/**
+ * Generates a death age range starting from a given age, using every other value up to 120.
+ * @param deathAgeRangeStart The starting age for the range
+ * @returns An array of ages [start, start+2, start+4, ..., up to 120]
+ */
+export function generateDeathAgeRange(deathAgeRangeStart: number): number[] {
+  const deathAgeRange: number[] = [];
+  for (let age = deathAgeRangeStart; age <= 120; age += 2) {
+    deathAgeRange.push(age);
+  }
+  return deathAgeRange;
+}
+
 export function calculateGridTemplates(
   deathAgeRange: number[],
   probDistribution: { age: number; probability: number }[]
