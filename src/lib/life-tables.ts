@@ -1,101 +1,217 @@
 export interface LifeTableEntry {
-  x: number;
-  q_x: number;
+  age: number; // Renamed from 'x' for clarity
+  mortalityRate: number; // Renamed from 'q_x' for clarity
 }
 
 export type GenderOption = 'male' | 'female' | 'blended';
 
-/**
- * Fetches life table data for a specific gender and year from pre-processed JSON files.
- * @param gender The gender ('male', 'female', or 'blended').
- * @param year The cohort year.
- * @returns A promise that resolves to an array of LifeTableEntry objects, or null if not found.
- */
-export async function getLifeTableData(
-  gender: GenderOption,
-  year: number
-): Promise<LifeTableEntry[] | null> {
-  try {
-    if (gender === 'blended') {
-      // Fetch both male and female data
-      const maleDataPromise = fetchLifeTableData('male', year);
-      const femaleDataPromise = fetchLifeTableData('female', year);
+export interface DeathProbability {
+  age: number;
+  probability: number;
+}
 
-      const [maleData, femaleData] = await Promise.all([
-        maleDataPromise,
-        femaleDataPromise,
-      ]);
+// Configuration constants
+const CONFIG = {
+  DATA_PATH_PREFIX: '/data/processed',
+  MAX_AGE: 120,
+  MIN_BIRTH_YEAR: 1900, // Reasonable bounds
+  MAX_BIRTH_YEAR: 2100,
+} as const;
 
-      if (!maleData || !femaleData) return null;
+// Custom error types
+export class LifeTableError extends Error {
+  constructor(
+    message: string,
+    public readonly cause?: unknown
+  ) {
+    super(message);
+    this.name = 'LifeTableError';
+  }
+}
 
-      // Blend the data by averaging probabilities at each age
-      return maleData.map((maleEntry, index) => {
-        const femaleEntry = femaleData[index];
-        return {
-          x: maleEntry.x,
-          q_x: (maleEntry.q_x + femaleEntry.q_x) / 2,
-        };
-      });
-    } else {
-      // For male or female, use direct fetch
-      return await fetchLifeTableData(gender, year);
-    }
-  } catch (error) {
-    console.error(
-      `Error fetching life table data for ${gender} ${year}:`,
-      error
+export class DataNotFoundError extends LifeTableError {
+  constructor(gender: GenderOption, year: number) {
+    super(`Life table data not found for ${gender} ${year}`);
+    this.name = 'DataNotFoundError';
+  }
+}
+
+// Input validation utilities
+function validateGender(gender: GenderOption): void {
+  if (!['male', 'female', 'blended'].includes(gender)) {
+    throw new LifeTableError(`Invalid gender: ${gender}`);
+  }
+}
+
+function validateBirthYear(year: number): void {
+  if (
+    !Number.isInteger(year) ||
+    year < CONFIG.MIN_BIRTH_YEAR ||
+    year > CONFIG.MAX_BIRTH_YEAR
+  ) {
+    throw new LifeTableError(
+      `Invalid birth year: ${year}. Must be between ${CONFIG.MIN_BIRTH_YEAR} and ${CONFIG.MAX_BIRTH_YEAR}`
     );
-    return null;
+  }
+}
+
+function validateCurrentAge(age: number): void {
+  if (!Number.isInteger(age) || age < 0 || age > CONFIG.MAX_AGE) {
+    throw new LifeTableError(
+      `Invalid current age: ${age}. Must be between 0 and ${CONFIG.MAX_AGE}`
+    );
   }
 }
 
 /**
- * Returns the probability of death at each future age for a person currently alive.
+ * Fetches raw life table data for a specific gender and birth year.
+ * This is a low-level function that should typically not be called directly.
+ */
+async function fetchRawLifeTableData(
+  gender: Exclude<GenderOption, 'blended'>,
+  year: number
+): Promise<LifeTableEntry[]> {
+  validateGender(gender);
+  validateBirthYear(year);
+
+  const filePath = `${CONFIG.DATA_PATH_PREFIX}/${gender}_${year}.json`;
+
+  try {
+    const response = await fetch(filePath);
+
+    if (!response.ok) {
+      throw new DataNotFoundError(gender, year);
+    }
+
+    const rawData: { x: number; q_x: number }[] = await response.json();
+
+    // Transform data to use clearer property names
+    return rawData.map((entry) => ({
+      age: entry.x,
+      mortalityRate: entry.q_x,
+    }));
+  } catch (error) {
+    if (error instanceof LifeTableError) {
+      throw error;
+    }
+    throw new LifeTableError(
+      `Failed to fetch life table data for ${gender} ${year}`,
+      error
+    );
+  }
+}
+
+/**
+ * Gets life table data for any gender, including blended data.
+ * Blended data is calculated by averaging male and female mortality rates.
+ * @param gender The gender ('male', 'female', or 'blended').
+ * @param year The cohort year.
+ * @returns A promise that resolves to an array of LifeTableEntry objects.
+ */
+export async function getLifeTableData(
+  gender: GenderOption,
+  year: number
+): Promise<LifeTableEntry[]> {
+  validateGender(gender);
+  validateBirthYear(year);
+
+  if (gender === 'blended') {
+    const [maleData, femaleData] = await Promise.all([
+      fetchRawLifeTableData('male', year),
+      fetchRawLifeTableData('female', year),
+    ]);
+
+    // Ensure both datasets have the same length and age progression
+    if (maleData.length !== femaleData.length) {
+      throw new LifeTableError(
+        'Male and female life table data have different lengths'
+      );
+    }
+
+    return maleData.map((maleEntry, index) => {
+      const femaleEntry = femaleData[index];
+
+      if (maleEntry.age !== femaleEntry.age) {
+        throw new LifeTableError(
+          `Age mismatch at index ${index}: male=${maleEntry.age}, female=${femaleEntry.age}`
+        );
+      }
+
+      return {
+        age: maleEntry.age,
+        mortalityRate:
+          (maleEntry.mortalityRate + femaleEntry.mortalityRate) / 2,
+      };
+    });
+  }
+
+  return fetchRawLifeTableData(gender, year);
+}
+
+/**
+ * Returns the probability of death at each future age for a person currently
+ * alive.
  * @param gender The gender ('male', 'female', or 'blended').
  * @param birthYear The year the person was born.
- * @param currentYear The current year (defaults to current date's year if not provided).
- * @returns A promise that resolves to an array of objects containing age and probability of death at that age.
+ * @param currentYear The current year (defaults to current date's year if not
+ * provided).
+ * @returns A promise that resolves to an array of objects containing age and
+ * probability of death at that age.
  */
 export async function getDeathProbabilityDistribution(
   gender: GenderOption,
   birthYear: number,
   currentYear: number = new Date().getFullYear()
-): Promise<{ age: number; probability: number }[] | null> {
+): Promise<{ age: number; probability: number }[]> {
+  validateGender(gender);
+  validateBirthYear(birthYear);
+
   // Calculate current age
   const currentAge = currentYear - birthYear;
+  validateCurrentAge(currentAge);
 
   // Get the life table data
   const lifeTableData = await getLifeTableData(gender, birthYear);
 
-  if (!lifeTableData) return null;
-
   // Filter to only include entries from current age through 119
-  const relevantData = lifeTableData.filter((entry) => entry.x >= currentAge);
+  const relevantData = lifeTableData.filter((entry) => entry.age >= currentAge);
 
-  // Calculate the probability of death at each age
-  const deathProbabilities: { age: number; probability: number }[] = [];
+  if (relevantData.length === 0) {
+    throw new LifeTableError(
+      `No life table data available for current age ${currentAge}`
+    );
+  }
 
-  // Survival probability starts at 1.0 (person is alive now)
+  return calculateDeathProbabilities(relevantData);
+}
+
+/**
+ * Pure function to calculate death probabilities from life table data.
+ * Separated for easier testing and reusability.
+ */
+function calculateDeathProbabilities(
+  lifeTableData: LifeTableEntry[]
+): DeathProbability[] {
+  const deathProbabilities: DeathProbability[] = [];
   let survivalProbability = 1.0;
 
-  // Calculate for each age from current age to 119
-  for (const entry of relevantData) {
-    // Probability of death at this age = probability of surviving to this age × probability of dying during this year
-    const deathProbability = survivalProbability * entry.q_x;
+  for (const entry of lifeTableData) {
+    // Probability of death at this age = P(survive to this age) × P(die during this year)
+    const deathProbability = survivalProbability * entry.mortalityRate;
 
     deathProbabilities.push({
-      age: entry.x,
+      age: entry.age,
       probability: deathProbability,
     });
 
-    // Update survival probability for next age
-    survivalProbability *= 1 - entry.q_x;
+    // Update survival probability for next iteration
+    survivalProbability *= 1 - entry.mortalityRate;
   }
 
-  // Add age 120 with the remaining probability (ensure total probability sums to 1.0)
+  // Ensure any remaining probability goes to max age
   if (survivalProbability > 0) {
     deathProbabilities.push({
-      age: 120,
+      age: CONFIG.MAX_AGE,
       probability: survivalProbability,
     });
   }
@@ -104,33 +220,32 @@ export async function getDeathProbabilityDistribution(
 }
 
 /**
- * Helper function to fetch data directly for a specific gender.
- * @param gender The gender ('male' or 'female').
- * @param year The cohort year.
- * @returns A promise that resolves to an array of LifeTableEntry objects, or null if not found.
+ * Utility function to get the current age of a person.
  */
-async function fetchLifeTableData(
-  gender: 'male' | 'female',
+export function getCurrentAge(
+  birthYear: number,
+  currentYear: number = new Date().getFullYear()
+): number {
+  validateBirthYear(birthYear);
+  const age = currentYear - birthYear;
+  validateCurrentAge(age);
+  return age;
+}
+
+/**
+ * Utility function to validate if life table data is available for a given year and gender.
+ */
+export async function isLifeTableDataAvailable(
+  gender: GenderOption,
   year: number
-): Promise<LifeTableEntry[] | null> {
+): Promise<boolean> {
   try {
-    const filePath = `/data/processed/${gender}_${year}.json`;
-    const response = await fetch(filePath);
-
-    if (!response.ok) {
-      console.error(
-        `Failed to fetch life table data for ${gender} ${year}: ${response.statusText}`
-      );
-      return null;
-    }
-
-    const data: LifeTableEntry[] = await response.json();
-    return data;
+    await getLifeTableData(gender, year);
+    return true;
   } catch (error) {
-    console.error(
-      `Error fetching life table data for ${gender} ${year}:`,
-      error
-    );
-    return null;
+    if (error instanceof DataNotFoundError) {
+      return false;
+    }
+    throw error; // Re-throw other errors
   }
 }
