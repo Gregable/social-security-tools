@@ -1,8 +1,8 @@
-import { EarningRecord } from "$lib/earning-record";
-import { Money } from "$lib/money";
-import { describe, expect, it } from "vitest";
+import { EarningRecord } from '$lib/earning-record';
+import { Money } from '$lib/money';
+import { describe, expect, it } from 'vitest';
 
-import * as constants from "../lib/constants";
+import * as constants from '../lib/constants';
 
 // Returns a record with the given year and earnings. Medicare earnings
 // are required, but not used by anything interesting.
@@ -14,7 +14,7 @@ function testRecord(year: number, earnings: Money = Money.from(100 * 1000)) {
   });
 }
 
-describe("EarningRecord", () => {
+describe('EarningRecord', () => {
   it(`looks up earnings cap for pre-range past year`, () => {
     const preCapRecord = testRecord(1900);
     expect(preCapRecord.earningsCap()).toEqual(

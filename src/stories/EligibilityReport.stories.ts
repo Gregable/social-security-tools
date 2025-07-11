@@ -1,11 +1,11 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import EligibilityReport from '../lib/components/EligibilityReport.svelte';
 
-import {Recipient} from '$lib/recipient';
-import {parsePaste} from '$lib/ssa-parse';
-import {Birthdate} from '$lib/birthday';
-import {Money} from '$lib/money';
-import {EarningRecord} from '$lib/earning-record';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { Birthdate } from '$lib/birthday';
+import { Money } from '$lib/money';
+import { EarningRecord } from '$lib/earning-record';
 
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 import demo1 from '$lib/pastes/millionpaste.txt?raw';
@@ -25,14 +25,14 @@ const futureEarnings1 = [
   new EarningRecord({
     year: 2022,
     taxedEarnings: Money.from(100000),
-    taxedMedicareEarnings: Money.from(0)
+    taxedMedicareEarnings: Money.from(0),
   }),
   new EarningRecord({
     year: 2023,
     taxedEarnings: Money.from(100000),
-    taxedMedicareEarnings: Money.from(0)
+    taxedMedicareEarnings: Money.from(0),
   }),
-]
+];
 recipient1.futureEarningsRecords = futureEarnings1;
 recipient1.name = 'Alex';
 recipient1.markFirst();
@@ -45,29 +45,29 @@ const futureEarnings2 = [
   new EarningRecord({
     year: 2019,
     taxedEarnings: Money.from(100000),
-    taxedMedicareEarnings: Money.from(0)
+    taxedMedicareEarnings: Money.from(0),
   }),
   new EarningRecord({
     year: 2020,
     taxedEarnings: Money.from(100000),
-    taxedMedicareEarnings: Money.from(0)
+    taxedMedicareEarnings: Money.from(0),
   }),
   new EarningRecord({
     year: 2021,
     taxedEarnings: Money.from(100000),
-    taxedMedicareEarnings: Money.from(0)
+    taxedMedicareEarnings: Money.from(0),
   }),
   new EarningRecord({
     year: 2024,
     taxedEarnings: Money.from(100000),
-    taxedMedicareEarnings: Money.from(0)
+    taxedMedicareEarnings: Money.from(0),
   }),
   new EarningRecord({
     year: 2023,
     taxedEarnings: Money.from(100000),
-    taxedMedicareEarnings: Money.from(0)
+    taxedMedicareEarnings: Money.from(0),
   }),
-]
+];
 recipient2.futureEarningsRecords = futureEarnings2;
 recipient2.name = 'Alex';
 recipient2.markFirst();
@@ -82,7 +82,7 @@ const meta: Meta<EligibilityReport> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: EligibilityReport,
   props: args,
 });

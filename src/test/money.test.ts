@@ -1,5 +1,5 @@
-import {Money} from '$lib/money';
-import {expect, test} from 'vitest'
+import { Money } from '$lib/money';
+import { expect, test } from 'vitest';
 
 test('can be constructed from a float', () => {
   const money = Money.from(123.45);
@@ -12,10 +12,10 @@ test('can be constructed from an integer', () => {
 });
 
 test('can be added to another money', () => {
-  const money = Money.from(0.10);
-  const other = Money.from(0.20);
+  const money = Money.from(0.1);
+  const other = Money.from(0.2);
   const sum = money.plus(other);
-  expect(sum.value()).toEqual(0.30);
+  expect(sum.value()).toEqual(0.3);
 });
 
 test('can be subtracted from another money', () => {
@@ -28,7 +28,7 @@ test('can be subtracted from another money', () => {
 test('can be multiplied by a factor', () => {
   const money = Money.from(123.45);
   const product = money.times(2);
-  expect(product.value()).toEqual(246.90);
+  expect(product.value()).toEqual(246.9);
 });
 
 test('can be divided by a factor', () => {

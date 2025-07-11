@@ -1,5 +1,5 @@
-import type {Meta} from '@storybook/svelte';
-import {action} from '@storybook/addon-actions';
+import type { Meta } from '@storybook/svelte';
+import { action } from '@storybook/addon-actions';
 
 import SpouseQuestion from '../lib/components/SpouseQuestion.svelte';
 
@@ -13,7 +13,7 @@ const meta: Meta<SpouseQuestion> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: SpouseQuestion,
   props: args,
   on: {

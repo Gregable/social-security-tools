@@ -1,9 +1,8 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 
 import RecipientName from './RecipientName.demo.svelte';
 
-import {Recipient} from '$lib/recipient';
-
+import { Recipient } from '$lib/recipient';
 
 const meta: Meta<RecipientName> = {
   component: RecipientName,
@@ -16,7 +15,7 @@ const meta: Meta<RecipientName> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: RecipientName,
   props: args,
 });
@@ -34,17 +33,17 @@ chris.markSecond();
 
 export const Default = Template.bind({});
 Default.args = {
-  r: single
+  r: single,
 };
 
 export const First = Template.bind({});
 First.args = {
-  r: alex
+  r: alex,
 };
 
 export const Second = Template.bind({});
 Second.args = {
-  r: chris
+  r: chris,
 };
 
 let longName = new Recipient();
@@ -53,11 +52,11 @@ longName.markFirst();
 
 export const Long = Template.bind({});
 Long.args = {
-  r: longName
+  r: longName,
 };
 
 export const NoColor = Template.bind({});
 NoColor.args = {
   r: alex,
-  noColor: true
+  noColor: true,
 };

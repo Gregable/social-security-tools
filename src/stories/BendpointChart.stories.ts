@@ -1,9 +1,9 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import BendpointChart from '../lib/components/BendpointChart.svelte';
 
-import {Recipient} from '$lib/recipient';
-import {parsePaste} from '$lib/ssa-parse';
-import {Birthdate} from '$lib/birthday';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { Birthdate } from '$lib/birthday';
 
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
@@ -21,12 +21,12 @@ const meta: Meta<BendpointChart> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: BendpointChart,
   props: args,
 });
 
 export const Default = Template.bind({});
 Default.args = {
-  recipient: recipient
+  recipient: recipient,
 };

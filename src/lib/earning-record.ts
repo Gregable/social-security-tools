@@ -1,5 +1,5 @@
-import * as constants from "$lib/constants";
-import { Money } from "$lib/money";
+import * as constants from '$lib/constants';
+import { Money } from '$lib/money';
 
 /**
  * EarningRecord class
@@ -89,7 +89,7 @@ export class EarningRecord {
    */
   indexFactor(): number {
     if (this.indexingYear < 0) {
-      throw new Error("EarningRecord not initialized with indexingYear");
+      throw new Error('EarningRecord not initialized with indexingYear');
     }
 
     if (this.year >= this.indexingYear) {
@@ -128,7 +128,7 @@ export class EarningRecord {
    */
   indexedEarnings(): Money {
     if (this.indexingYear < 0) {
-      throw new Error("EarningRecord not initialized with indexingYear");
+      throw new Error('EarningRecord not initialized with indexingYear');
     }
 
     const cappedEarning: Money = Money.min(

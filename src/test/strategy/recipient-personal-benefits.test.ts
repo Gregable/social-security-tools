@@ -1,15 +1,15 @@
-import { Recipient } from "$lib/recipient";
-import { MonthDate, MonthDuration } from "$lib/month-time";
-import { Birthdate } from "$lib/birthday";
-import { Money } from "$lib/money";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { Recipient } from '$lib/recipient';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Birthdate } from '$lib/birthday';
+import { Money } from '$lib/money';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 import {
   PersonalBenefitPeriods,
   sumBenefitPeriods,
-} from "$lib/strategy/recipient-personal-benefits";
+} from '$lib/strategy/recipient-personal-benefits';
 
-describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
+describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   let recipient: Recipient;
 
   beforeEach(() => {
@@ -19,9 +19,9 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
     recipient.setPia(Money.from(1000)); // $1000 primary insurance amount
   });
 
-  it("calculates benefits correctly for a single year", () => {
+  it('calculates benefits correctly for a single year', () => {
     // Mock benefitOnDate to return consistent values
-    vi.spyOn(recipient, "benefitOnDate").mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
       (filingDate, atDate) => {
         return Money.from(1000);
       }
@@ -44,9 +44,9 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
     expect(totalBenefit).toBe(1000 * 100 * 12);
   });
 
-  it("calculates benefits correctly across year boundaries", () => {
+  it('calculates benefits correctly across year boundaries', () => {
     // Mock benefitOnDate to return different values in different years
-    vi.spyOn(recipient, "benefitOnDate").mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
       (filingDate, atDate) => {
         if (atDate.year() === 2022) {
           return Money.from(1000);
@@ -72,9 +72,9 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
     expect(totalBenefit).toBe((1000 * 6 + 1030 * 6) * 100);
   });
 
-  it("handles delayed retirement credits correctly", () => {
+  it('handles delayed retirement credits correctly', () => {
     // Mock to simulate delayed retirement credits being applied in January
-    vi.spyOn(recipient, "benefitOnDate").mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
       (filingDate, atDate) => {
         // Initial filing at age 68
         if (atDate.year() === filingDate.year() && atDate.monthIndex() <= 11) {
@@ -103,8 +103,8 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
     expect(totalBenefit).toBe(expectedTotal);
   });
 
-  it("handles benefits when final date is in the same month as filing date", () => {
-    vi.spyOn(recipient, "benefitOnDate").mockImplementation(() => {
+  it('handles benefits when final date is in the same month as filing date', () => {
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(() => {
       return Money.from(1000);
     });
 
@@ -118,8 +118,8 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
     expect(totalBenefit).toBe(1000 * 100);
   });
 
-  it("handles final date before filing date correctly", () => {
-    vi.spyOn(recipient, "benefitOnDate").mockImplementation(() => {
+  it('handles final date before filing date correctly', () => {
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(() => {
       return Money.from(1000);
     });
 
@@ -138,9 +138,9 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
     expect(totalBenefit).toBeLessThanOrEqual(0);
   });
 
-  it("correctly handles the January benefit bump", () => {
+  it('correctly handles the January benefit bump', () => {
     // Mock to simulate actual SSA behavior with delayed retirement credits
-    vi.spyOn(recipient, "benefitOnDate").mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
       (filingDate, atDate) => {
         // Filing at age 69 in July
         const filingMonth = filingDate.monthIndex();
@@ -179,7 +179,7 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
     expect(totalBenefit).toBe(expectedTotal);
   });
 
-  it("calculates benefits correctly for multi-year periods", () => {
+  it('calculates benefits correctly for multi-year periods', () => {
     // Mock with COLA increases over multiple years
     let yearlyBenefits = {
       2022: 1000,
@@ -188,7 +188,7 @@ describe("PersonalBenefitPeriods and sumBenefitPeriods", () => {
       2025: 1093,
     };
 
-    vi.spyOn(recipient, "benefitOnDate").mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
       (filingDate, atDate) => {
         // Get benefit amount based on year of atDate
         const year = atDate.year();

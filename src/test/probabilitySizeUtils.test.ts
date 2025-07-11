@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { calculateGridTemplates } from "../routes/strategy/utils/probabilitySizeUtils";
+import { describe, it, expect } from 'vitest';
+import { calculateGridTemplates } from '../routes/strategy/utils/probabilitySizeUtils';
 
-describe("calculateGridTemplates", () => {
+describe('calculateGridTemplates', () => {
   const testCases = [
     {
       deathAgeRange: [62, 64, 66, 68, 70],
@@ -16,7 +16,7 @@ describe("calculateGridTemplates", () => {
         { age: 69, probability: 0.1 },
         { age: 70, probability: 0.2 },
       ],
-      expected: "20.000% 20.000% 20.000% 20.000% 20.000%",
+      expected: '20.000% 20.000% 20.000% 20.000% 20.000%',
     },
     {
       deathAgeRange: [65, 70, 80, 90],
@@ -24,7 +24,7 @@ describe("calculateGridTemplates", () => {
         age: i + 62,
         probability: i * 0.01,
       })),
-      expected: "1.415% 7.074% 12.733% 78.778%",
+      expected: '1.415% 7.074% 12.733% 78.778%',
     },
     {
       deathAgeRange: [62, 65, 70, 90],
@@ -42,7 +42,7 @@ describe("calculateGridTemplates", () => {
           probability: 1,
         })),
       ],
-      expected: "0.709% 3.546% 23.641% 72.104%",
+      expected: '0.709% 3.546% 23.641% 72.104%',
     },
   ];
 

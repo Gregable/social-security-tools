@@ -3,7 +3,7 @@ export interface LifeTableEntry {
   q_x: number;
 }
 
-export type GenderOption = "male" | "female" | "blended";
+export type GenderOption = 'male' | 'female' | 'blended';
 
 /**
  * Fetches life table data for a specific gender and year from pre-processed JSON files.
@@ -16,10 +16,10 @@ export async function getLifeTableData(
   year: number
 ): Promise<LifeTableEntry[] | null> {
   try {
-    if (gender === "blended") {
+    if (gender === 'blended') {
       // Fetch both male and female data
-      const maleDataPromise = fetchLifeTableData("male", year);
-      const femaleDataPromise = fetchLifeTableData("female", year);
+      const maleDataPromise = fetchLifeTableData('male', year);
+      const femaleDataPromise = fetchLifeTableData('female', year);
 
       const [maleData, femaleData] = await Promise.all([
         maleDataPromise,
@@ -110,7 +110,7 @@ export async function getDeathProbabilityDistribution(
  * @returns A promise that resolves to an array of LifeTableEntry objects, or null if not found.
  */
 async function fetchLifeTableData(
-  gender: "male" | "female",
+  gender: 'male' | 'female',
   year: number
 ): Promise<LifeTableEntry[] | null> {
   try {

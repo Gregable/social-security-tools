@@ -1,6 +1,6 @@
-import { Recipient } from "$lib/recipient";
-import { MonthDate, MonthDuration } from "$lib/month-time";
-import { Money } from "$lib/money";
+import { Recipient } from '$lib/recipient';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Money } from '$lib/money';
 
 // Minimum / Maximum age that a person could file at.
 const MIN_STRATEGY_AGE = MonthDuration.initFromYearsMonths({

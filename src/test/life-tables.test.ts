@@ -1,11 +1,11 @@
 import {
   getDeathProbabilityDistribution,
   type LifeTableEntry,
-} from "$lib/life-tables";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+} from '$lib/life-tables';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 // Mock the entire life-tables module
-vi.mock("$lib/life-tables", () => {
+vi.mock('$lib/life-tables', () => {
   return {
     getLifeTableData: vi.fn(),
     getDeathProbabilityDistribution: vi.fn(),
@@ -13,16 +13,16 @@ vi.mock("$lib/life-tables", () => {
 });
 
 // Import the mocked function to override
-import { getLifeTableData } from "$lib/life-tables";
+import { getLifeTableData } from '$lib/life-tables';
 
-describe("Life Tables", () => {
+describe('Life Tables', () => {
   // Reset mocks before each test
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
-  describe("getDeathProbabilityDistribution", () => {
-    it("returns null when life table data is not available", async () => {
+  describe('getDeathProbabilityDistribution', () => {
+    it('returns null when life table data is not available', async () => {
       // Setup mock to return null
       vi.mocked(getLifeTableData).mockResolvedValue(null);
 
@@ -75,11 +75,11 @@ describe("Life Tables", () => {
         }
       );
 
-      const result = await getDeathProbabilityDistribution("male", 1980, 2025);
+      const result = await getDeathProbabilityDistribution('male', 1980, 2025);
       expect(result).toBeNull();
     });
 
-    it("correctly calculates death probabilities", async () => {
+    it('correctly calculates death probabilities', async () => {
       // Create mock life table data with simple values for easy testing
       const mockLifeTableData: LifeTableEntry[] = [
         { x: 25, q_x: 0.1 }, // 10% chance of dying at 25 if alive at 25
@@ -93,7 +93,7 @@ describe("Life Tables", () => {
       vi.mocked(getLifeTableData).mockResolvedValue(mockLifeTableData);
 
       // Test with birthYear 2000 and currentYear 2025, making the person 25 years old
-      const result = await getDeathProbabilityDistribution("male", 2000, 2025);
+      const result = await getDeathProbabilityDistribution('male', 2000, 2025);
 
       // Verify result is not null
       expect(result).not.toBeNull();
@@ -138,7 +138,7 @@ describe("Life Tables", () => {
       }
     });
 
-    it("adds age 120 with remaining probability", async () => {
+    it('adds age 120 with remaining probability', async () => {
       // Create mock life table data that doesn't include age 120
       const mockLifeTableData: LifeTableEntry[] = [
         { x: 60, q_x: 0.05 },
@@ -149,7 +149,7 @@ describe("Life Tables", () => {
       vi.mocked(getLifeTableData).mockResolvedValue(mockLifeTableData);
 
       const result = await getDeathProbabilityDistribution(
-        "female",
+        'female',
         1960,
         2020
       );
@@ -172,7 +172,7 @@ describe("Life Tables", () => {
       }
     });
 
-    it("filters life table data to start from current age", async () => {
+    it('filters life table data to start from current age', async () => {
       // Create mock life table data with a range of ages
       const mockLifeTableData: LifeTableEntry[] = [
         { x: 30, q_x: 0.01 },
@@ -186,7 +186,7 @@ describe("Life Tables", () => {
 
       // Person is 32 years old (born 1993, current year 2025)
       const result = await getDeathProbabilityDistribution(
-        "blended",
+        'blended',
         1993,
         2025
       );

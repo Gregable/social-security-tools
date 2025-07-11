@@ -1,5 +1,5 @@
-import type {Meta} from '@storybook/svelte';
-import {action} from '@storybook/addon-actions';
+import type { Meta } from '@storybook/svelte';
+import { action } from '@storybook/addon-actions';
 
 import PasteFlow from '../lib/components/PasteFlow.svelte';
 
@@ -13,7 +13,7 @@ const meta: Meta<PasteFlow> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: PasteFlow,
   props: args,
   on: {

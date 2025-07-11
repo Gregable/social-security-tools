@@ -1,9 +1,9 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import FilingDate from '../lib/components/FilingDateReport.svelte';
 
-import {Recipient} from '$lib/recipient';
-import {parsePaste} from '$lib/ssa-parse';
-import {Birthdate} from '$lib/birthday';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { Birthdate } from '$lib/birthday';
 
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
@@ -17,7 +17,7 @@ const meta: Meta<FilingDate> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: FilingDate,
   props: args,
 });
@@ -43,7 +43,6 @@ export const BirthdayOnFirst = Template.bind({});
 BirthdayOnFirst.args = {
   recipient: r2,
 };
-
 
 let r3 = new Recipient();
 r3.earningsRecords = parsePaste(demo0);

@@ -1,6 +1,5 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import Expando from './Expando.demo.svelte';
-
 
 const meta: Meta<Expando> = {
   component: Expando,
@@ -12,7 +11,7 @@ const meta: Meta<Expando> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: Expando,
   props: args,
 });

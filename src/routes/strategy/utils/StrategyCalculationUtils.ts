@@ -1,18 +1,18 @@
-import { Birthdate } from "$lib/birthday";
-import { MonthDate, MonthDuration } from "$lib/month-time";
-import type { Recipient } from "$lib/recipient";
+import { Birthdate } from '$lib/birthday';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
 
 /**
  * Convert date string to formatted birthdate
  */
 export function formatBirthdate(dateString: string): string {
   try {
-    const [year, month, day] = dateString.split("-").map(Number);
+    const [year, month, day] = dateString.split('-').map(Number);
     const birthdate = Birthdate.FromYMD(year, month - 1, day);
     return birthdate.layBirthdateString();
   } catch (error) {
-    console.warn("Invalid date format:", dateString);
-    return "Invalid Date";
+    console.warn('Invalid date format:', dateString);
+    return 'Invalid Date';
   }
 }
 
@@ -20,7 +20,7 @@ export function formatBirthdate(dateString: string): string {
  * Parse date string and return Birthdate object
  */
 export function parseBirthdate(dateString: string): Birthdate {
-  const [year, month, day] = dateString.split("-").map(Number);
+  const [year, month, day] = dateString.split('-').map(Number);
   return Birthdate.FromYMD(year, month - 1, day); // Month is 0-indexed
 }
 
@@ -97,18 +97,18 @@ export function getFilingDate(
 
   // Format as MMM YYYY (e.g., "Jan 2025")
   const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   return `${months[filingDate.monthIndex()]} ${filingDate.year()}`;
 }
@@ -123,7 +123,7 @@ export function createValueExtractor(
   recipientIndex: number
 ): (result: any) => string {
   return (result: any): string => {
-    if (!result || result.error) return "error";
+    if (!result || result.error) return 'error';
     // Convert to 0-based index for internal functions
     const zeroBasedIndex = recipientIndex - 1;
     return getFilingDate(

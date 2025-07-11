@@ -1,4 +1,4 @@
-import * as constants from "./constants";
+import * as constants from './constants';
 
 /**
  * In social security calculations, days don't really matter for much.
@@ -44,7 +44,7 @@ export class MonthDate {
    */
   static initFromYearsMonthsStr(years: number, monthStr: string): MonthDate {
     console.assert(Number.isInteger(years), years);
-    console.assert(typeof monthStr === "string");
+    console.assert(typeof monthStr === 'string');
     console.assert(years >= 0, years);
 
     const monthIndex = constants.ALL_MONTHS.indexOf(monthStr);
@@ -172,7 +172,7 @@ export class MonthDate {
    * Returns a human readable string version of the date
    */
   toString() {
-    return this.monthName() + " " + this.year();
+    return this.monthName() + ' ' + this.year();
   }
 }
 
@@ -218,7 +218,7 @@ export class MonthDuration {
     // Negative durations are OK, but shouldn't have both positive and negative.
     console.assert(
       Math.sign(yearsMonths.years) * Math.sign(yearsMonths.months) >= 0,
-      yearsMonths.years + " " + yearsMonths.months
+      yearsMonths.years + ' ' + yearsMonths.months
     );
     return new MonthDuration(yearsMonths.years * 12 + yearsMonths.months);
   }

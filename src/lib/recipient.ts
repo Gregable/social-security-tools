@@ -1,9 +1,9 @@
-import { Birthdate } from "$lib/birthday";
-import * as constants from "$lib/constants";
-import { EarningRecord } from "$lib/earning-record";
-import { Money } from "$lib/money";
-import { MonthDate, MonthDuration } from "$lib/month-time";
-import { PrimaryInsuranceAmount } from "$lib/pia";
+import { Birthdate } from '$lib/birthday';
+import * as constants from '$lib/constants';
+import { EarningRecord } from '$lib/earning-record';
+import { Money } from '$lib/money';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { PrimaryInsuranceAmount } from '$lib/pia';
 
 export class RecipientColors {
   constructor(dark: string, medium: string, light: string) {
@@ -19,7 +19,7 @@ export class RecipientColors {
 // In this case, blended means that the user hasn't made a
 // selection in the UI. For mortality, we take the average
 // of male and female.
-export type GenderOption = "male" | "female" | "blended";
+export type GenderOption = 'male' | 'female' | 'blended';
 
 /**
  * A Recipient object manages calculating a user's SSA and IRS data.
@@ -31,7 +31,7 @@ export class Recipient {
   constructor() {}
 
   /** The recipient's gender (for mortality calculation). */
-  private gender_: GenderOption = "blended";
+  private gender_: GenderOption = 'blended';
   get gender(): GenderOption {
     return this.gender_;
   }
@@ -86,7 +86,7 @@ export class Recipient {
    */
   shortName(length: number): string {
     if (this.name_.length <= length) return this.name_;
-    return this.name_.substring(0, length - 1) + "…";
+    return this.name_.substring(0, length - 1) + '…';
   }
 
   /** True if this is the only recipient, false if there are two. */
@@ -129,7 +129,7 @@ export class Recipient {
       this.earningsRecords_.length > 0 ||
       this.futureEarningsRecords_.length > 0
     ) {
-      throw new Error("Cannot set PIA when earnings records are present.");
+      throw new Error('Cannot set PIA when earnings records are present.');
     }
     this.isPiaOnly_ = true;
     this.overridePia_ = pia;
@@ -145,7 +145,7 @@ export class Recipient {
   }
   set earningsRecords(earningsRecords: Array<EarningRecord>) {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot set earnings records when PIA is set.");
+      throw new Error('Cannot set earnings records when PIA is set.');
     }
     this.earningsRecords_ = earningsRecords;
     // Update the indexing year for the new records.
@@ -161,7 +161,7 @@ export class Recipient {
   }
   set futureEarningsRecords(futureEarningsRecords: Array<EarningRecord>) {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot set earnings records when PIA is set.");
+      throw new Error('Cannot set earnings records when PIA is set.');
     }
     this.futureEarningsRecords_ = futureEarningsRecords;
     // Update the indexing year for the new records.
@@ -175,7 +175,7 @@ export class Recipient {
    */
   simulateFutureEarningsYears(numYears: number, wage: Money) {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot set earnings records when PIA is set.");
+      throw new Error('Cannot set earnings records when PIA is set.');
     }
     this.futureEarningsRecords_ = [];
 
@@ -239,7 +239,7 @@ export class Recipient {
   private totalIndexedEarnings_: Money = Money.from(0);
   totalIndexedEarnings(): Money {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot get total indexed earnings when PIA is set.");
+      throw new Error('Cannot get total indexed earnings when PIA is set.');
     }
     return this.totalIndexedEarnings_;
   }
@@ -461,7 +461,7 @@ export class Recipient {
    */
   private updateEarningsRecords_() {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot update earnings records when PIA is set.");
+      throw new Error('Cannot update earnings records when PIA is set.');
     }
     const indexingYear = this.indexingYear();
 
@@ -508,7 +508,7 @@ export class Recipient {
 
   hasEarningsBefore1978(): boolean {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot check earnings records when PIA is set.");
+      throw new Error('Cannot check earnings records when PIA is set.');
     }
     // Only check the first earnings record. Future records are after 1978.
     return this.earningsRecords_.length == 0
@@ -522,7 +522,7 @@ export class Recipient {
    */
   cutoffIndexedEarnings(): Money {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot get cutoff indexed earnings when PIA is set.");
+      throw new Error('Cannot get cutoff indexed earnings when PIA is set.');
     }
     return this.top35IndexedEarnings_.length < constants.SSA_EARNINGS_YEARS
       ? Money.from(0)
@@ -536,7 +536,7 @@ export class Recipient {
    */
   monthlyIndexedEarnings(): Money {
     if (this.isPiaOnly_) {
-      throw new Error("Cannot get monthly indexed earnings when PIA is set.");
+      throw new Error('Cannot get monthly indexed earnings when PIA is set.');
     }
     return this.totalIndexedEarnings_
       .div(12)
@@ -792,9 +792,9 @@ export class Recipient {
 
     if (survivorFilingDate.lessThanOrEqual(deceasedDeathDate)) {
       console.error(
-        "Filing for survivor benefits before spouse died. " +
+        'Filing for survivor benefits before spouse died. ' +
           survivorFilingDate.toString() +
-          " <= " +
+          ' <= ' +
           deceasedDeathDate.toString()
       );
     }
@@ -870,9 +870,9 @@ export class Recipient {
    */
   colors(): RecipientColors {
     if (this.first) {
-      return new RecipientColors("#8d6100", "#e69f00", "#f6dfad");
+      return new RecipientColors('#8d6100', '#e69f00', '#f6dfad');
     } else {
-      return new RecipientColors("#004400", "#558855", "#d9ebd9");
+      return new RecipientColors('#004400', '#558855', '#d9ebd9');
     }
   }
 } // class Recipient

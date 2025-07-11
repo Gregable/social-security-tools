@@ -1,6 +1,6 @@
-import * as constants from "./constants";
-import { Money } from "./money";
-import type { Recipient } from "./recipient";
+import * as constants from './constants';
+import { Money } from './money';
+import type { Recipient } from './recipient';
 
 /**
  * A PrimaryInsuranceAmount object manages calculating the user's Primary
@@ -83,10 +83,10 @@ export class PrimaryInsuranceAmount {
    */
   primaryInsuranceAmountByBracket(bracket: number): Money {
     if (bracket != 0 && bracket != 1 && bracket != 2) {
-      throw new Error("Invalid bracket: " + bracket);
+      throw new Error('Invalid bracket: ' + bracket);
     }
     if (this.recipient_.isPiaOnly) {
-      throw new Error("Cannot calculate PIA brackets for PIA-only recipient");
+      throw new Error('Cannot calculate PIA brackets for PIA-only recipient');
     }
     // If the recipient is not eligible for benefits, return $0.
     if (!this.recipient_.isEligible()) {
@@ -124,7 +124,7 @@ export class PrimaryInsuranceAmount {
    */
   primaryInsuranceAmountUnadjusted(): Money {
     if (this.recipient_.isPiaOnly) {
-      throw new Error("Cannot calculate unadjusted PIA for PIA-only recipient");
+      throw new Error('Cannot calculate unadjusted PIA for PIA-only recipient');
     }
     let sum = Money.from(0);
     for (let i = 0; i < 3; ++i)

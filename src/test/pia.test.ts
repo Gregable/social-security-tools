@@ -1,12 +1,12 @@
-import { Birthdate } from "$lib/birthday";
-import { EarningRecord } from "$lib/earning-record";
-import { Money } from "$lib/money";
-import demo0 from "$lib/pastes/averagepaste.txt?raw";
-import { Recipient } from "$lib/recipient";
-import { parsePaste } from "$lib/ssa-parse";
-import { describe, expect, it } from "vitest";
+import { Birthdate } from '$lib/birthday';
+import { EarningRecord } from '$lib/earning-record';
+import { Money } from '$lib/money';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { describe, expect, it } from 'vitest';
 
-import * as constants from "../lib/constants";
+import * as constants from '../lib/constants';
 
 /**
  * Returns a record with the given year and earnings. Medicare earnings
@@ -20,8 +20,8 @@ function testRecord(year: number, earnings: Money = Money.from(10 * 1000)) {
   });
 }
 
-describe("Recipient", () => {
-  it("calculates bendpoints", () => {
+describe('Recipient', () => {
+  it('calculates bendpoints', () => {
     let r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
@@ -31,7 +31,7 @@ describe("Recipient", () => {
     expect(r.pia().secondBendPoint().value()).toEqual(5583);
   });
 
-  it("calculates pia by bracket", () => {
+  it('calculates pia by bracket', () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
@@ -43,7 +43,7 @@ describe("Recipient", () => {
     expect(r.pia().primaryInsuranceAmountUnadjusted().value()).toEqual(sum);
   });
 
-  it("calculates cola adjustments", () => {
+  it('calculates cola adjustments', () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
@@ -68,7 +68,7 @@ describe("Recipient", () => {
     ).toEqual(r.pia().primaryInsuranceAmount().value());
   });
 
-  it("calculates pia from AIME", () => {
+  it('calculates pia from AIME', () => {
     let r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);

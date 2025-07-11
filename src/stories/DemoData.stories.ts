@@ -1,5 +1,5 @@
-import type {Meta} from '@storybook/svelte';
-import {action} from '@storybook/addon-actions';
+import type { Meta } from '@storybook/svelte';
+import { action } from '@storybook/addon-actions';
 
 import DemoData from '../lib/components/DemoData.svelte';
 
@@ -14,7 +14,7 @@ const meta: Meta<DemoData> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: DemoData,
   on: {
     demo: action('demo'),

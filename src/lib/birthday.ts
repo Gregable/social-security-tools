@@ -1,4 +1,4 @@
-import { MonthDate, MonthDuration } from "./month-time";
+import { MonthDate, MonthDuration } from './month-time';
 
 /**
  * This class represents a person's birthdate.
@@ -68,9 +68,9 @@ export class Birthdate {
    * is zero indexed. Day is one indexed.
    */
   static FromYMD(year: number, month: number, day: number) {
-    if (year < 1900 || year > 2200) throw new Error("Invalid Year:" + year);
-    if (month < 0 || month > 11) throw new Error("Invalid Month:" + month);
-    if (day < 1 || day > 31) throw new Error("Invalid Day:" + day);
+    if (year < 1900 || year > 2200) throw new Error('Invalid Year:' + year);
+    if (month < 0 || month > 11) throw new Error('Invalid Month:' + month);
+    if (day < 1 || day > 31) throw new Error('Invalid Day:' + day);
     return new Birthdate(new Date(Date.UTC(year, month, day)));
   }
 
@@ -89,10 +89,10 @@ export class Birthdate {
     // time, not UTC.
     const timeDiff = this.layBirthdate_.getTimezoneOffset() * 60000;
     const adjustedDate = new Date(this.layBirthdate_.valueOf() + timeDiff);
-    return adjustedDate.toLocaleDateString("en-us", {
-      month: "short",
-      year: "numeric",
-      day: "numeric",
+    return adjustedDate.toLocaleDateString('en-us', {
+      month: 'short',
+      year: 'numeric',
+      day: 'numeric',
     });
   }
 

@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.svelte-kit/
+dist/
+build/
+coverage/
+static/
+
+# Generated files
+*.min.js
+*.min.css
+package-lock.json
+.pnpm-lock.yaml
+
+# Data files
+*.json
+*.csv
+*.tsv
+*.xml
+*.yaml
+*.yml
+
+# IDE and tools
+.vscode/
+.svelte-kit/
+.storybook/

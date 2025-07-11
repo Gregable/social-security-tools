@@ -1,5 +1,5 @@
-import type {Meta} from '@storybook/svelte';
-import {action} from '@storybook/addon-actions';
+import type { Meta } from '@storybook/svelte';
+import { action } from '@storybook/addon-actions';
 
 import Slider from '../lib/components/Slider.svelte';
 
@@ -13,7 +13,7 @@ const meta: Meta<Slider> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: Slider,
   props: args,
   on: {
@@ -61,8 +61,6 @@ Colors.args = {
   handleSelectedColor: '#a65f00',
 };
 
-
-
 export const Translate = Template.bind({});
 Translate.args = {
   value: 4,
@@ -81,10 +79,10 @@ CustomTicks.args = {
   step: 1,
   showTicks: true,
   ticksArray: [
-    {value: 0},
-    {value: 32, label: '32°F', legend: 'Freezing'},
-    {value: 98.6, label: '98.6°F', legend: 'Body temp'},
-    {value: 212, label: '212°F', legend: 'Boiling'},
-    {value: 250},
+    { value: 0 },
+    { value: 32, label: '32°F', legend: 'Freezing' },
+    { value: 98.6, label: '98.6°F', legend: 'Body temp' },
+    { value: 212, label: '212°F', legend: 'Boiling' },
+    { value: 250 },
   ],
 };

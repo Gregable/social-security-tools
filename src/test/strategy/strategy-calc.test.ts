@@ -1,13 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { MonthDate, MonthDuration } from "$lib/month-time";
-import { Money } from "$lib/money";
-import { Recipient } from "$lib/recipient";
-import { Birthdate } from "$lib/birthday";
+import { describe, expect, it } from 'vitest';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Money } from '$lib/money';
+import { Recipient } from '$lib/recipient';
+import { Birthdate } from '$lib/birthday';
 import {
   optimalStrategy,
   strategySumCents,
   strategySumTotalPeriods,
-} from "$lib/strategy/strategy-calc";
+} from '$lib/strategy/strategy-calc';
 
 /**
  * Given PIA, birthdate, final age year, and strategy age year, returns the
@@ -75,7 +75,7 @@ function calculateStrategySum({
   ).value();
 }
 
-describe("strategySumCents", () => {
+describe('strategySumCents', () => {
   // Random Tests:
   const testCases = [
     {
@@ -202,15 +202,15 @@ describe("strategySumCents", () => {
   ];
 
   it.each(testCases)(
-    "calculates correct values for strategySumCents for %j",
+    'calculates correct values for strategySumCents for %j',
     (testcase) => {
       expect(calculateStrategySum(testcase)).toBe(
-        testcase["expectedTotalBenefit"]
+        testcase['expectedTotalBenefit']
       );
     }
   );
 
-  it("works with zero pia", () => {
+  it('works with zero pia', () => {
     const result1 = calculateStrategySum({
       pia1: Money.from(0),
       pia2: Money.from(0),
@@ -224,7 +224,7 @@ describe("strategySumCents", () => {
     expect(result1).toBe(0);
   });
 
-  it("either recipient can be the primary earner", () => {
+  it('either recipient can be the primary earner', () => {
     const result2 = calculateStrategySum({
       pia1: Money.from(1000),
       pia2: Money.from(0),
@@ -252,7 +252,7 @@ describe("strategySumCents", () => {
 
   // This test is a duplicate of the earlier "works with zero pia" test.
   // Keeping it for now, but it could be removed.
-  it("works with zero pia (duplicate)", () => {
+  it('works with zero pia (duplicate)', () => {
     const result = calculateStrategySum({
       pia1: Money.from(0),
       pia2: Money.from(0),
@@ -266,7 +266,7 @@ describe("strategySumCents", () => {
     expect(result).toBe(0);
   });
 
-  it("works with Dec birthdate", () => {
+  it('works with Dec birthdate', () => {
     const result = calculateStrategySum({
       pia1: Money.from(1000),
       pia2: Money.from(500),
@@ -280,7 +280,7 @@ describe("strategySumCents", () => {
     expect(result).toBe(448260);
   });
 
-  it("works with only 1 month survival", () => {
+  it('works with only 1 month survival', () => {
     // In this case, both recipients start in Dec 2030, when they turn 70.
     // They also die in Dec 20230, so they only collect benefits for a month.
     // Delayed filing of 3 years @ 8% per year is 24% increase in benefits.
@@ -298,7 +298,7 @@ describe("strategySumCents", () => {
     expect(result).toBe(2480);
   });
 
-  it("works with only 2 months survival", () => {
+  it('works with only 2 months survival', () => {
     // This is identical to "works with only 1 month survival", except that the
     // recipients are born in Nov. They still die in Dec 2030, therefore they
     // collect 2 months, so the benefit is doubled.
@@ -315,7 +315,7 @@ describe("strategySumCents", () => {
     expect(result).toBe(2480 * 2);
   });
 
-  it("Survivor benefits applied for one year", () => {
+  it('Survivor benefits applied for one year', () => {
     // In this case, the first recipient collects only 1 month of benefits in
     // Dec 2030. This is $1,240. The second recipient also collects 1 month of
     // spousal benefits for that month: $500.
@@ -377,8 +377,8 @@ function calculateOptimalStrategy({
   );
 }
 
-describe("optimalStrategy", () => {
-  it("Survivor benefits applied for one year", () => {
+describe('optimalStrategy', () => {
+  it('Survivor benefits applied for one year', () => {
     const currentDate = MonthDate.initFromYearsMonths({
       years: 2032,
       months: 0,

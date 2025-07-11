@@ -1,5 +1,5 @@
-import {MonthDate, MonthDuration} from '$lib/month-time';
-import {describe, expect, it} from 'vitest'
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { describe, expect, it } from 'vitest';
 
 describe('MonthDate Initialization', () => {
   it('constructor from months', () => {
@@ -8,7 +8,7 @@ describe('MonthDate Initialization', () => {
     expect(md.monthIndex()).toBe(1);
   });
   it('FromYearsMonths', () => {
-    let md = MonthDate.initFromYearsMonths({years: 2000, months: 0});
+    let md = MonthDate.initFromYearsMonths({ years: 2000, months: 0 });
     expect(md.year()).toBe(2000);
     expect(md.monthIndex()).toBe(0);
   });
@@ -26,9 +26,8 @@ describe('MonthDate Initialization', () => {
   });
 });
 
-
 describe('MonthDate', () => {
-  let testMd = MonthDate.initFromYearsMonths({years: 2012, months: 9});
+  let testMd = MonthDate.initFromYearsMonths({ years: 2012, months: 9 });
   it('returns monthsSinceEpoch', () => {
     expect(testMd.monthsSinceEpoch()).toBe(2012 * 12 + 9);
   });
@@ -45,49 +44,70 @@ describe('MonthDate', () => {
     expect(testMd.monthFullName()).toBe('October');
   });
   it('correctly compares to another MonthDate', () => {
-    expect(testMd.greaterThan(
-               MonthDate.initFromYearsMonths({years: 2012, months: 8})))
-        .toBe(true);
-    expect(testMd.greaterThan(
-               MonthDate.initFromYearsMonths({years: 2012, months: 9})))
-        .toBe(false);
-    expect(testMd.greaterThan(
-               MonthDate.initFromYearsMonths({years: 2012, months: 10})))
-        .toBe(false);
+    expect(
+      testMd.greaterThan(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 8 })
+      )
+    ).toBe(true);
+    expect(
+      testMd.greaterThan(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 9 })
+      )
+    ).toBe(false);
+    expect(
+      testMd.greaterThan(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 10 })
+      )
+    ).toBe(false);
 
-    expect(testMd.lessThan(
-               MonthDate.initFromYearsMonths({years: 2012, months: 8})))
-        .toBe(false);
-    expect(testMd.lessThan(
-               MonthDate.initFromYearsMonths({years: 2012, months: 9})))
-        .toBe(false);
-    expect(testMd.lessThan(
-               MonthDate.initFromYearsMonths({years: 2012, months: 10})))
-        .toBe(true);
+    expect(
+      testMd.lessThan(MonthDate.initFromYearsMonths({ years: 2012, months: 8 }))
+    ).toBe(false);
+    expect(
+      testMd.lessThan(MonthDate.initFromYearsMonths({ years: 2012, months: 9 }))
+    ).toBe(false);
+    expect(
+      testMd.lessThan(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 10 })
+      )
+    ).toBe(true);
 
-    expect(testMd.greaterThanOrEqual(
-               MonthDate.initFromYearsMonths({years: 2012, months: 8})))
-        .toBe(true);
-    expect(testMd.greaterThanOrEqual(
-               MonthDate.initFromYearsMonths({years: 2012, months: 9})))
-        .toBe(true);
-    expect(testMd.greaterThanOrEqual(
-               MonthDate.initFromYearsMonths({years: 2012, months: 10})))
-        .toBe(false);
+    expect(
+      testMd.greaterThanOrEqual(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 8 })
+      )
+    ).toBe(true);
+    expect(
+      testMd.greaterThanOrEqual(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 9 })
+      )
+    ).toBe(true);
+    expect(
+      testMd.greaterThanOrEqual(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 10 })
+      )
+    ).toBe(false);
 
-    expect(testMd.lessThanOrEqual(
-               MonthDate.initFromYearsMonths({years: 2012, months: 8})))
-        .toBe(false);
-    expect(testMd.lessThanOrEqual(
-               MonthDate.initFromYearsMonths({years: 2012, months: 9})))
-        .toBe(true);
-    expect(testMd.lessThanOrEqual(
-               MonthDate.initFromYearsMonths({years: 2012, months: 10})))
-        .toBe(true);
+    expect(
+      testMd.lessThanOrEqual(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 8 })
+      )
+    ).toBe(false);
+    expect(
+      testMd.lessThanOrEqual(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 9 })
+      )
+    ).toBe(true);
+    expect(
+      testMd.lessThanOrEqual(
+        MonthDate.initFromYearsMonths({ years: 2012, months: 10 })
+      )
+    ).toBe(true);
   });
   it('subtracts a MonthDate', () => {
     let duration = testMd.subtractDate(
-        MonthDate.initFromYearsMonths({years: 2011, months: 9}));
+      MonthDate.initFromYearsMonths({ years: 2011, months: 9 })
+    );
     expect(duration.asMonths()).toBe(12);
   });
   it('subtracts a MonthDuration', () => {
@@ -102,18 +122,17 @@ describe('MonthDate', () => {
   });
 });
 
-
 describe('MonthDuration', () => {
   it('initFromYearsMonths', () => {
-    let md = MonthDuration.initFromYearsMonths({years: 12, months: 1});
+    let md = MonthDuration.initFromYearsMonths({ years: 12, months: 1 });
     expect(md.asMonths()).toBe(12 * 12 + 1);
   });
   it('years are floored', () => {
-    let md = MonthDuration.initFromYearsMonths({years: 12, months: 11});
+    let md = MonthDuration.initFromYearsMonths({ years: 12, months: 11 });
     expect(md.years()).toBe(12);
   });
   it('mods months by 12', () => {
-    let md = MonthDuration.initFromYearsMonths({years: 12, months: 11});
+    let md = MonthDuration.initFromYearsMonths({ years: 12, months: 11 });
     expect(md.modMonths()).toBe(11);
   });
   it('correctly comparse to other MonthDurations', () => {

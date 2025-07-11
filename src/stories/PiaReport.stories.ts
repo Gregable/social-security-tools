@@ -1,9 +1,9 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import PiaReport from '../lib/components/PiaReport.svelte';
 
-import {Recipient} from '$lib/recipient';
-import {parsePaste} from '$lib/ssa-parse';
-import {Birthdate} from '$lib/birthday';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { Birthdate } from '$lib/birthday';
 
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
@@ -23,12 +23,12 @@ const meta: Meta<PiaReport> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: PiaReport,
   props: args,
 });
 
 export const Default = Template.bind({});
 Default.args = {
-  recipient: recipient
+  recipient: recipient,
 };

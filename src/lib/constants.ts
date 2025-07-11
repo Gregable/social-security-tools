@@ -1,4 +1,4 @@
-import { Money } from "$lib/money";
+import { Money } from '$lib/money';
 /**
  * This file holds constants that various bits of code need. Most of these
  * constants are values from the SSA and other IRS laws and require updating
@@ -461,36 +461,36 @@ export let CURRENT_YEAR: number = new Date().getFullYear();
  * All months, in order, as 3-letter abbreviations.
  */
 export const ALL_MONTHS: string[] = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
 /**
  * All months, in order, as full names.
  */
 export const ALL_MONTHS_FULL: string[] = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 /**

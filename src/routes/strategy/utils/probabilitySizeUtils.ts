@@ -3,7 +3,7 @@
  *
  * @param deathAgeRange An array of ages to calculate grid template values for.
  *   The ages do not need to be contiguous or evenly spaced.
- * @param probDistribution An array of objects with age and probability properties.
+ * @param probDistribution An array of objects with age and probability  properties.
  *   The age property corresponds to the age, and the probability property is the
  *   probability of death at that age.
  * @returns A string of space-separated percentage values to be used as a
@@ -93,7 +93,7 @@ export function formatPercentagesToCssGridTemplate(
     sizeParts.push(`${formattedPercentageString}%`);
     sumOfFormattedPercentages += formattedPercentageValue;
   }
-  return sizeParts.join(" ");
+  return sizeParts.join(' ');
 }
 
 export function calculateGridTemplates(

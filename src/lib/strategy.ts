@@ -1,7 +1,7 @@
-import { Recipient } from "$lib/recipient";
-import { Money } from "$lib/money";
-import { Birthdate } from "$lib/birthday";
-import { MonthDate, MonthDuration } from "$lib/month-time";
+import { Recipient } from '$lib/recipient';
+import { Money } from '$lib/money';
+import { Birthdate } from '$lib/birthday';
+import { MonthDate, MonthDuration } from '$lib/month-time';
 
 export interface StrategyParams {
   pias: [number, number];
@@ -50,11 +50,11 @@ export function StrategySequence(config: StrategyParams) {
     if (d.year() > year) {
       out.push(
         year +
-          " " +
+          ' ' +
           benefit[0].string() +
-          "+" +
+          '+' +
           benefit[1].string() +
-          "=" +
+          '=' +
           benefit[0].plus(benefit[1]).string()
       );
       year = d.year();
@@ -83,13 +83,13 @@ export function StrategySequence(config: StrategyParams) {
   }
   out.push(
     year +
-      " " +
+      ' ' +
       benefit[0].string() +
-      "+" +
+      '+' +
       benefit[1].string() +
-      "=" +
+      '=' +
       benefit[0].plus(benefit[1]).string()
   );
-  out.push("Total: " + totalBenefit.string());
+  out.push('Total: ' + totalBenefit.string());
   return out;
 }

@@ -1,10 +1,10 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import App from '../routes/calculator/+page.svelte';
 
-import {context} from '$lib/context';
-import {Recipient} from '$lib/recipient';
-import {parsePaste} from '$lib/ssa-parse';
-import {Birthdate} from '$lib/birthday';
+import { context } from '$lib/context';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { Birthdate } from '$lib/birthday';
 
 import demo from '$lib/pastes/averagepaste.txt?raw';
 import demo_spouse_low from '$lib/pastes/averagepaste-spouse.txt?raw';
@@ -35,22 +35,22 @@ const meta: Meta<App> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: App,
   props: args,
 });
 
 export const Default = Template.bind({});
 Default.args = {
-  isPasteFlow: false
+  isPasteFlow: false,
 };
 
 export const NoSpousal = Template.bind({});
 NoSpousal.args = {
-  isPasteFlow: false
+  isPasteFlow: false,
 };
 
 export const SpouseZeroPia = Template.bind({});
 SpouseZeroPia.args = {
-  isPasteFlow: false
+  isPasteFlow: false,
 };

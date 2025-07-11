@@ -1,14 +1,13 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import CombinedChart from '../lib/components/CombinedChart.svelte';
 
-import {Recipient} from '$lib/recipient';
-import {parsePaste} from '$lib/ssa-parse';
-import {Birthdate} from '$lib/birthday';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { Birthdate } from '$lib/birthday';
 
 import demo from '$lib/pastes/averagepaste.txt?raw';
 import demo_spouse_low from '$lib/pastes/averagepaste-spouse.txt?raw';
 import demo_spouse_high from '$lib/pastes/averagepaste-spouse-2.txt?raw';
-
 
 let recipient = new Recipient();
 recipient.name = 'Alex';
@@ -48,7 +47,7 @@ const meta: Meta<CombinedChart> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: CombinedChart,
   props: args,
 });
@@ -56,17 +55,17 @@ const Template = ({...args}) => ({
 export const Default = Template.bind({});
 Default.args = {
   recipient: recipient,
-  spouse: spouseLowEarner
+  spouse: spouseLowEarner,
 };
 
 export const NoSpousal = Template.bind({});
 NoSpousal.args = {
   recipient: recipient,
-  spouse: spouseHighEarner
+  spouse: spouseHighEarner,
 };
 
 export const SpouseZeroPia = Template.bind({});
 SpouseZeroPia.args = {
   recipient: recipient,
-  spouse: spouseZeroEarner
+  spouse: spouseZeroEarner,
 };

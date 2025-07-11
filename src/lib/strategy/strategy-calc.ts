@@ -1,7 +1,7 @@
-import { MonthDate, MonthDuration } from "$lib/month-time";
-import { Money } from "$lib/money";
-import { Recipient } from "$lib/recipient";
-import { PersonalBenefitPeriods } from "$lib/strategy/recipient-personal-benefits";
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Money } from '$lib/money';
+import { Recipient } from '$lib/recipient';
+import { PersonalBenefitPeriods } from '$lib/strategy/recipient-personal-benefits';
 
 class BenefitPeriod {
   constructor() {}

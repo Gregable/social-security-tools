@@ -1,9 +1,9 @@
-import type {Meta} from '@storybook/svelte';
+import type { Meta } from '@storybook/svelte';
 import SpousalReport from '../lib/components/SpousalReport.svelte';
 
-import {Recipient} from '$lib/recipient';
-import {parsePaste} from '$lib/ssa-parse';
-import {Birthdate} from '$lib/birthday';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import { Birthdate } from '$lib/birthday';
 
 import demo from '$lib/pastes/averagepaste.txt?raw';
 import demo_spouse_low from '$lib/pastes/averagepaste-spouse.txt?raw';
@@ -48,7 +48,7 @@ const meta: Meta<SpousalReport> = {
 };
 export default meta;
 
-const Template = ({...args}) => ({
+const Template = ({ ...args }) => ({
   Component: SpousalReport,
   props: args,
 });
@@ -56,17 +56,17 @@ const Template = ({...args}) => ({
 export const Default = Template.bind({});
 Default.args = {
   recipient: recipient,
-  spouse: spouseLowEarner
+  spouse: spouseLowEarner,
 };
 
 export const NoSpousal = Template.bind({});
 NoSpousal.args = {
   recipient: recipient,
-  spouse: spouseHighEarner
+  spouse: spouseHighEarner,
 };
 
 export const SpouseZeroPia = Template.bind({});
 SpouseZeroPia.args = {
   recipient: recipient,
-  spouse: spouseZeroEarner
+  spouse: spouseZeroEarner,
 };
