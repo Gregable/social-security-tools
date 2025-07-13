@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getRecommendedDiscountRate } from "$lib/strategy/treasury-yields";
+  import { getRecommendedDiscountRate } from "$lib/strategy/data";
 
   export let discountRatePercent: number;
   let highlightInput = false;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateGridTemplates } from '../routes/strategy/utils/probabilitySizeUtils';
+import { calculateGridTemplates } from '$lib/strategy/ui';
 
 describe('calculateGridTemplates', () => {
   const testCases = [

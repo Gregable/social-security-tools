@@ -3,7 +3,7 @@ import {
   fetchLatest20YearTreasuryYield,
   fetchFredDFII20Yield,
   getRecommendedDiscountRate,
-} from '$lib/strategy/treasury-yields';
+} from '$lib/strategy/data';
 
 // Mock global fetch
 const mockFetch = vi.fn();

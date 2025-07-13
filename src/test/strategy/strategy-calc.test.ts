@@ -7,7 +7,7 @@ import {
   optimalStrategy,
   strategySumCents,
   strategySumTotalPeriods,
-} from '$lib/strategy/strategy-calc';
+} from '$lib/strategy/calculations';
 
 /**
  * Given PIA, birthdate, final age year, and strategy age year, returns the

@@ -9,9 +9,9 @@
     getFilingDate,
     createValueExtractor,
     createBorderRemovalFunctions,
-  } from "../utils/StrategyCalculationUtils";
-  import { getMonthYearColor } from "../utils/colorUtils";
-  import { calculateGridTemplates } from "../utils/probabilitySizeUtils";
+  } from "$lib/strategy/ui";
+  import { getMonthYearColor } from "$lib/strategy/ui";
+  import { calculateGridTemplates } from "$lib/strategy/ui";
 
   // Props
   export let recipientIndex: number;

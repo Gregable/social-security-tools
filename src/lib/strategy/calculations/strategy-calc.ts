@@ -1,7 +1,7 @@
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
-import { PersonalBenefitPeriods } from '$lib/strategy/recipient-personal-benefits';
+import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
 
 class BenefitPeriod {
   constructor() {}
@@ -375,4 +375,24 @@ export function optimalStrategy(
   }
 
   return bestStrategy;
+}
+
+/**
+ * Convenience function that returns the strategy sum in cents rather than as a Money object.
+ * This is a wrapper around strategySumTotalPeriods that extracts the cents value.
+ */
+export function strategySumCents(
+  recipients: [Recipient, Recipient],
+  finalDates: [MonthDate, MonthDate],
+  currentDate: MonthDate,
+  discountRate: number,
+  strats: [MonthDuration, MonthDuration]
+): number {
+  return strategySumTotalPeriods(
+    recipients,
+    finalDates,
+    currentDate,
+    discountRate,
+    strats
+  ).cents();
 }

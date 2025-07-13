@@ -6,7 +6,13 @@
   import {
     optimalStrategy,
     strategySumTotalPeriods,
-  } from "$lib/strategy/strategy-calc";
+  } from "$lib/strategy/calculations";
+  import {
+    formatBirthdate as formatBirthdateUtil,
+    parseBirthdate as parseBirthdateUtil,
+    calculateFinalDates as calculateFinalDatesUtil,
+    generateDeathAgeRange,
+  } from "$lib/strategy/ui";
   import { ALL_MONTHS } from "$lib/constants";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
 
@@ -16,14 +22,6 @@
   import CalculationControls from "./components/CalculationControls.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
-
-  // Import utility functions
-  import {
-    formatBirthdate as formatBirthdateUtil,
-    parseBirthdate as parseBirthdateUtil,
-    calculateFinalDates as calculateFinalDatesUtil,
-  } from "./utils/StrategyCalculationUtils";
-  import { generateDeathAgeRange } from "./utils/probabilitySizeUtils";
 
   // Constants
   const DEFAULT_BIRTHDATE = "1965-03-15";
