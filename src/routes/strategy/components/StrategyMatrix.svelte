@@ -39,6 +39,18 @@
   // Event dispatcher
   const dispatch = createEventDispatcher();
 
+  // Matrix width tracking
+  let matrixWidth: number = 0;
+
+  // Fixed height constant (matches CSS)
+  const MATRIX_HEIGHT = 900;
+
+  // Calculate grid templates based on probabilities
+  function getCellDimensions(rowIndex: number, colIndex: number): { width: number; height: number } {
+    // Use the reactive cell dimensions matrix
+    return cellDimensions[rowIndex]?.[colIndex] || { width: 0, height: 0 };
+  }
+
   // Extractor for recipient values
   $: borderRemovalFuncs = createBorderRemovalFunctions(
     createValueExtractor(recipients, recipientIndex + 1),
@@ -53,6 +65,18 @@
   $: columnTemplate = calculateGridTemplates(
     deathAgeRange2,
     deathProbDistribution2
+  );
+  
+  // Calculate the actual percentage for each cell based on grid templates
+  $: rowPercentages = rowTemplate.split(' ').map(p => parseFloat(p.replace('%', '')) / 100);
+  $: columnPercentages = columnTemplate.split(' ').map(p => parseFloat(p.replace('%', '')) / 100);
+
+  // Create reactive cell dimensions matrix that updates when matrixWidth changes
+  $: cellDimensions = deathAgeRange1.map((_, i) => 
+    deathAgeRange2.map((_, j) => ({
+      width: matrixWidth * (columnPercentages[j] || 0),
+      height: MATRIX_HEIGHT * (rowPercentages[i] || 0)
+    }))
   );
 
   // Handle events
@@ -156,6 +180,7 @@
       <!-- Grid cells -->
       <div
         class="strategy-grid"
+        bind:clientWidth={matrixWidth}
         style="grid-template-columns: {columnTemplate}; grid-template-rows: {rowTemplate}; min-height: 0; display: grid;"
       >
         {#each deathAgeRange1 as deathAge1, i}
@@ -214,7 +239,9 @@
                     ],
                     calculationResults[i][j][
                       `filingAge${recipientIndex + 1}Months`
-                    ]
+                    ],
+                    cellDimensions[i]?.[j]?.width || 0,
+                    cellDimensions[i]?.[j]?.height || 0
                   )}
                 {:else}
                   N/A

@@ -69,6 +69,14 @@ export class MonthDate {
   }
 
   /**
+   * Returns the year as a 2 digit number, e.g. 2000 becomes 0.
+   */
+  twoDigitYear() {
+    const year = this.year();
+    return year % 100;
+  }
+
+  /**
    * Returns the month index. 0 indicates January, 11 indicates December.
    */
   monthIndex() {

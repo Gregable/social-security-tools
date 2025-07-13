@@ -81,12 +81,16 @@ export function calculateAgeRange(
  * @param recipientIndex The recipient index (0 or 1)
  * @param filingAgeYears Years component of filing age
  * @param filingAgeMonths Months component of filing age
+ * @param cellWidth The computed width of the cell in pixels
+ * @param cellHeight The computed height of the cell in pixels
  */
 export function getFilingDate(
   recipients: [Recipient, Recipient],
   recipientIndex: number,
   filingAgeYears: number,
-  filingAgeMonths: number
+  filingAgeMonths: number,
+  cellWidth: number = 0,
+  cellHeight: number = 0
 ): string {
   const birthdate = recipients[recipientIndex].birthdate;
   const filingAge = MonthDuration.initFromYearsMonths({
@@ -95,22 +99,20 @@ export function getFilingDate(
   });
   const filingDate = birthdate.dateAtLayAge(filingAge);
 
-  // Format as MMM YYYY (e.g., "Jan 2025")
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return `${months[filingDate.monthIndex()]} ${filingDate.year()}`;
+  // Use different formats based on cell dimensions
+  if (cellWidth < 35) {
+    // Very small cell - only show the year.
+    return `'${filingDate.twoDigitYear()}`;
+  } else if (cellWidth < 50) {
+    // Very small cell - use MM/YY format
+    return `${(filingDate.monthIndex() + 1).toString().padStart(2, '0')}/${filingDate.twoDigitYear()}`;
+  } else if (cellWidth < 80) {
+    // Medium cell - use MMM YY format
+    return `${filingDate.monthName()} '${filingDate.twoDigitYear()}`;
+  } else {
+    // Large cell - use full MMM YYYY format
+    return `${filingDate.monthName()} ${filingDate.year()}`;
+  }
 }
 
 /**
