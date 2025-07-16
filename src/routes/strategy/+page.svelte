@@ -1,4 +1,3 @@
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
@@ -8,7 +7,6 @@
     strategySumTotalPeriods,
   } from "$lib/strategy/calculations";
   import {
-    formatBirthdate as formatBirthdateUtil,
     parseBirthdate as parseBirthdateUtil,
     calculateFinalDates as calculateFinalDatesUtil,
     generateDeathAgeRange,
@@ -28,7 +26,6 @@
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
   const MIN_DEATH_AGE = 62;
-  const MAX_DEATH_AGE = 120;
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
   // Strategy tolerance percentage for creating larger grouped areas
@@ -207,7 +204,7 @@
   // Create border removal functions for each recipient
   // Index 0: Recipient 1 table border functions
   // Index 1: Recipient 2 table border functions
-  const borderRemovalFunctions = [
+  const _borderRemovalFunctions = [
     createBorderRemovalFunctions(getRecipient1Value),
     createBorderRemovalFunctions(getRecipient2Value),
   ];
@@ -293,8 +290,6 @@
         .map(() => Array(deathAgeRange2.length).fill(null));
 
       // Calculate optimal strategy for each death age combination
-      let probDeath1 = 0;
-      let probDeath2 = 0;
       for (let i = 0; i < deathAgeRange1.length; i++) {
         for (let j = 0; j < deathAgeRange2.length; j++) {
           const deathAge1 = deathAgeRange1[i];
@@ -440,12 +435,6 @@
       maxMonthsSinceEpoch = null;
     }
   }
-
-  // Reactive formatted birthdates
-  $: formattedBirthdates = [
-    formatBirthdateUtil(birthdateInputs[0]),
-    formatBirthdateUtil(birthdateInputs[1]),
-  ] as [string, string];
 
   function handleCellSelect(event: CustomEvent) {
     selectedCellData = event.detail;

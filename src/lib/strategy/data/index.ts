@@ -2,5 +2,5 @@
 export {
   fetchLatest20YearTreasuryYield,
   fetchFredDFII20Yield,
-  getRecommendedDiscountRate
+  getRecommendedDiscountRate,
 } from './treasury-yields.js';

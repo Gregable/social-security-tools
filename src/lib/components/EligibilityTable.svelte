@@ -26,7 +26,7 @@
               {earningRecord.age}
             </td>
             {#if earningRecord.incomplete}
-              <td colspan="3" class="taxedearnings" style="text-align:center">
+              <td colspan="3" class="taxedearnings" style:text-align="center">
                 Not yet recorded
               </td>
             {:else}

@@ -11,7 +11,7 @@ global.fetch = mockFetch;
 
 // Mock DOMParser
 class MockDOMParser {
-  parseFromString(text: string, type: string) {
+  parseFromString(_text: string, _type: string) {
     return {
       getElementsByTagName: (tag: string) => {
         if (tag === 'entry') {

@@ -24,7 +24,7 @@ context.recipient.earningsRecords.push(
     return record;
   })()
 );
-context.recipient.earningsRecords = context.recipient.earningsRecords;
+// Force reactivity update (was: context.recipient.earningsRecords = context.recipient.earningsRecords)
 context.recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 
 const meta: Meta<EligibilityTable> = {

@@ -4,7 +4,6 @@
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
   import * as constants from "$lib/constants";
-  import { update_keyed_each } from "svelte/internal";
 
   export let recipient: Recipient = new Recipient();
 
@@ -26,6 +25,7 @@
   });
 
   function updateCanvas() {
+    if (!canvasEl) return; // Guard against undefined canvasEl
     canvasEl.setAttribute("width", getComputedStyle(canvasEl).width);
     canvasEl.setAttribute("height", getComputedStyle(canvasEl).height);
     ctx = canvasEl.getContext("2d");
@@ -33,21 +33,16 @@
     chartWidth = calcChartWidth();
     chartHeight = calcChartHeight();
 
-    ctx.fillStyle = "rgb(200, 0, 0)";
-    ctx.fillRect(10, 10, 50, 50);
-
-    ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-    ctx.fillRect(30, 30, 50, 50);
-
     render();
   }
 
   let innerWidth: number = 0;
-  $: innerWidth && updateCanvas();
+  $: innerWidth && mounted && updateCanvas();
 
   let mouseToggle: boolean = true;
   let lastMouseX_: number = -1;
   function onClick(event: MouseEvent) {
+    if (!canvasEl) return; // Guard against undefined canvasEl
     if (mouseToggle) {
       mouseToggle = false;
     } else {
@@ -58,24 +53,25 @@
   }
 
   function onMove(event: MouseEvent) {
-    if (!mouseToggle) return;
+    if (!mouseToggle || !canvasEl) return;
     lastMouseX_ = event.clientX - canvasEl.getBoundingClientRect().left;
     render();
   }
 
-  function onOut(event: MouseEvent) {
+  function onOut(_event: MouseEvent) {
     if (!mouseToggle) return;
     lastMouseX_ = -1;
     render();
   }
 
-  function onBlur(event: FocusEvent) {
+  function onBlur(_event: FocusEvent) {
     if (!mouseToggle) return;
     lastMouseX_ = -1;
     render();
   }
 
   function calcChartWidth() {
+    if (!canvasEl || !ctx) return 0;
     // A 6-digit social security payment would be about the highest we
     // would imagine someone receiving, so we reserve space on the right
     // to display such a value with a little added padding.
@@ -85,6 +81,7 @@
   }
 
   function calcChartHeight() {
+    if (!canvasEl) return 0;
     // A 12pt font is 16 pixels high. We reserve a little extra for padding.
     let reservedHeight = 16 + 10;
     let usableHeight = canvasEl.height - reservedHeight;
@@ -443,6 +440,7 @@
    *  Render the breakpoint chart.
    */
   function render() {
+    if (!canvasEl || !ctx) return;
     ctx.save();
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 

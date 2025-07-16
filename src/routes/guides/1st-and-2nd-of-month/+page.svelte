@@ -65,7 +65,7 @@
       particular age through the entire month.
     </li>
   </ol>
-  <br style="clear:all" />
+  <br style:clear="all" />
   <p>
     Rule #2 interacts with rule #1. Let's illustrate with three example
     birthdays:

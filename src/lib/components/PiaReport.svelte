@@ -78,7 +78,8 @@
             </p>
 
             <table class="benefitBrackets pageBreakAvoid">
-              <tr>
+              <tbody>
+                <tr>
                 <td>
                   Any amount less than
                   {recipient.pia().firstBendPoint().wholeDollars()}
@@ -92,7 +93,7 @@
                       .string()}</b
                   >
                 </td>
-                <td />
+                <td></td>
               </tr>
               <tr>
                 <td>
@@ -110,7 +111,7 @@
                       .string()}</b
                   >
                 </td>
-                <td />
+                <td></td>
               </tr>
               <tr>
                 <td>
@@ -127,7 +128,7 @@
                       .string()}
                   </b>
                 </td>
-                <td />
+                <td></td>
               </tr>
               <tr>
                 <td>Total:</td>
@@ -141,6 +142,7 @@
                 </td>
                 <td class="nowrap">&nbsp;/ month</td>
               </tr>
+              </tbody>
             </table>
 
             <div class="insetTextBox">
@@ -206,7 +208,7 @@
 
   {#if !recipient.isPiaOnly && $recipient.isEligible()}
     <div class="text pageBreakAvoid">
-      <p style="margin-top: 1em">
+      <p style:margin-top="1em">
         In the following chart, you can see what <RName {r} apos>your</RName>
         PIA would be if <RName {r} apos>your</RName> AIME changed.
         <span class="noprint"

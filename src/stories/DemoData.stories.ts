@@ -14,7 +14,7 @@ const meta: Meta<DemoData> = {
 };
 export default meta;
 
-const Template = ({ ...args }) => ({
+const Template = ({ ..._args }) => ({
   Component: DemoData,
   on: {
     demo: action('demo'),

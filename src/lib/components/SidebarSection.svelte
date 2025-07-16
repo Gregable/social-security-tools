@@ -43,7 +43,7 @@
   data-sponsor={sponsor ? "true" : "false"}
   class:underSticky
 >
-  <slot />
+  <slot></slot>
 </div>
 
 <style>

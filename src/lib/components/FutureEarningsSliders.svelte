@@ -103,7 +103,7 @@
   let isStuck: boolean = false;
   let isVisible: boolean = false;
   const stickyObserver = new IntersectionObserver(
-    (entries, _) => {
+    (entries, _observer) => {
       entries.forEach((entry) => {
         isStuck =
           entry.intersectionRatio < 1 &&
@@ -118,7 +118,7 @@
     }
   );
   const stickyContainerObserver = new IntersectionObserver(
-    (entries, _) => {
+    (entries, _observer) => {
       entries.forEach((entry) => {
         isVisible = entry.intersectionRatio > 0;
         updateStuckness();
@@ -171,8 +171,8 @@
     </div>
     <div class="item right">per year.</div>
   </div>
-  <div class="sticky-shadow" />
-  <div class="sticky-shadow-cover" />
+  <div class="sticky-shadow"></div>
+  <div class="sticky-shadow-cover"></div>
 </div>
 
 <style>

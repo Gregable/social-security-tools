@@ -5,7 +5,6 @@ import { Recipient } from '$lib/recipient';
 import { Birthdate } from '$lib/birthday';
 import {
   optimalStrategy,
-  strategySumCents,
   strategySumTotalPeriods,
 } from '$lib/strategy/calculations';
 

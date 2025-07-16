@@ -1,7 +1,6 @@
 <script lang="ts">
   import EarningsTable from "./EarningsTable.svelte";
   import FutureEarningsSliders from "./FutureEarningsSliders.svelte";
-  import RecipientName from "./RecipientName.svelte";
   import { Recipient } from "$lib/recipient";
   import Expando from "./Expando.svelte";
 

@@ -55,6 +55,7 @@
   });
 
   function updateCanvas() {
+    if (!canvasEl_) return;
     canvasEl_.setAttribute("width", getComputedStyle(canvasEl_).width);
     canvasEl_.setAttribute("height", getComputedStyle(canvasEl_).height);
 
@@ -72,7 +73,7 @@
   // By binding to window.innerWidth, we update positions when the window
   // size changes:
   let innerWidth: number = 0;
-  $: innerWidth && updateCanvas();
+  $: innerWidth && mounted_ && updateCanvas();
   // Similarly, we want to bind to print events so we resize correctly for those
   // too:
   let media_query_list: MediaQueryList;
@@ -86,6 +87,7 @@
   let lastMouseX_: number = -1;
   let lastMouseDate_: MonthDate = new MonthDate(0);
   function onClick(event: MouseEvent) {
+    if (!canvasEl_) return;
     if (mouseToggle_) {
       mouseToggle_ = false;
     } else {
@@ -97,6 +99,7 @@
 
   function onMove(event: MouseEvent) {
     if (!mouseToggle_) return;
+    if (!canvasEl_) return;
     lastMouseX_ = event.clientX - canvasEl_.getBoundingClientRect().left;
     // Avoid redrawing if the mouse hasn't moved to a new month.
     const mouseDate = dateX(lastMouseX_);
@@ -107,13 +110,13 @@
     render();
   }
 
-  function onOut(event: MouseEvent) {
+  function onOut(_event: MouseEvent) {
     if (!mouseToggle_) return;
     lastMouseX_ = -1;
     render();
   }
 
-  function onBlur(event: FocusEvent) {
+  function onBlur(_event: FocusEvent) {
     if (!mouseToggle_) return;
     lastMouseX_ = -1;
     render();
@@ -357,6 +360,7 @@
         });
       }
     }
+    // eslint-disable-next-line no-self-assign
     customTicks_ = customTicks_;
   }
 
@@ -418,7 +422,7 @@
       // First draw horizontally to the same date but the previous benefit.
       // This avoids a diagonal line when the benefit changes.
       if (i != 0) {
-        let [x0, y0, _] = boxes[i - 1];
+        let [_x0, y0, _benefit] = boxes[i - 1];
         ctx_.lineTo(x, y0);
       }
       ctx_.lineTo(x, y);
@@ -601,6 +605,7 @@
    */
   function render() {
     if (!mounted_) return;
+    if (!canvasEl_) return;
 
     updateSlider();
 
@@ -697,7 +702,7 @@
     on:pointermove={onMove}
     on:mouseout={onOut}
     on:blur={onBlur}
-  />
+  ></canvas>
   <div
     class="selectedDateBox"
     style:--selected-date-border-color={blueish_}

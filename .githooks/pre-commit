@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Pre-commit hook to prevent code quality regressions
+# Checks for self-closing HTML tags and other issues
+
+echo "🔍 Running code quality checks..."
+
+# Run ESLint to catch self-closing tag issues
+echo "Checking for self-closing HTML tag issues..."
+if ! npm run lint; then
+  echo "❌ ESLint found issues. Please fix them before committing."
+  exit 1
+fi
+
+# Run Prettier check
+echo "Checking code formatting..."
+if ! npm run format:check; then
+  echo "❌ Code formatting issues found. Run 'npm run format' to fix them."
+  exit 1
+fi
+
+echo "✅ All code quality checks passed!"
+exit 0

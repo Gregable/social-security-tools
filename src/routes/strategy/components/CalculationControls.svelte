@@ -33,7 +33,7 @@
     <div class="progress-bar">
       <div
         class="progress-fill"
-        style="width: {totalCalculations > 0
+        style:width="{totalCalculations > 0
           ? (calculationProgress / totalCalculations) * 100
           : 0}%"
       ></div>

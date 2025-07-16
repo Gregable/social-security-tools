@@ -1,12 +1,12 @@
 // Core strategy calculation functions
-export { 
-  strategySumPeriods, 
-  strategySumTotalPeriods, 
+export {
+  strategySumPeriods,
+  strategySumTotalPeriods,
   strategySumCents,
-  optimalStrategy 
+  optimalStrategy,
 } from './strategy-calc.js';
 
-export { 
-  PersonalBenefitPeriods, 
-  sumBenefitPeriods 
+export {
+  PersonalBenefitPeriods,
+  sumBenefitPeriods,
 } from './recipient-personal-benefits.js';

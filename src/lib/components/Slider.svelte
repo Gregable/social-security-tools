@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { afterUpdate, createEventDispatcher, onMount } from "svelte";
+  import { afterUpdate, onMount, tick } from "svelte";
 
   let sliderEl: HTMLDivElement;
   let handleEl: HTMLSpanElement;
   let handleLabelEl: HTMLSpanElement;
+  let mounted: boolean = false;
+  let initialCalculationDone: boolean = false;
 
   export let value: number = 0;
 
@@ -93,13 +95,15 @@
    * - `'ceiling'`: The high label
    * - `'floor'`: The low label
    */
-  export let translate: (value: number, label: string) => string = (
+  export let translate: (value: number, _label: string) => string = (
     value,
     _label
   ) => value.toLocaleString();
+  
+  export let onchange: ((event: { value: number }) => void) | undefined = undefined;
 
-  const dispatch = createEventDispatcher();
-  $: dispatch("change", { value: value });
+  // Reactive statement to call the callback when value changes
+  $: onchange?.({ value });
 
   // By binding to window.innerWidth, we can update the width when the
   // window is resized and update the slider position visibly.
@@ -112,13 +116,15 @@
   }
   let innerWidth: number = window.innerWidth;
   let width: number = 0;
-  $: width = getWidth(innerWidth, sliderEl);
+  $: width = mounted && initialCalculationDone && sliderEl ? getWidth(innerWidth, sliderEl) : 0;
 
   // Similarly, we want to bind to print events so we resize correctly for those
   // too:
   let media_query_list: MediaQueryList;
   function onPrintMediaChange() {
-    width = getWidth(innerWidth, sliderEl);
+    if (mounted && sliderEl) {
+      width = getWidth(innerWidth, sliderEl);
+    }
   }
   function removeMediaQueryListener() {
     if (media_query_list) {
@@ -126,8 +132,28 @@
     }
   }
   onMount(() => {
-    media_query_list = window.matchMedia("print");
-    media_query_list.addEventListener("change", onPrintMediaChange);
+    const initAsync = async () => {
+      mounted = true;
+      // Wait for the DOM to be fully updated before calculating dimensions
+      await tick();
+      
+      // Additional timeout to ensure everything is fully rendered
+      setTimeout(() => {
+        if (sliderEl) {
+          const newWidth = getWidth(innerWidth, sliderEl);
+          if (newWidth > 0) {
+            width = newWidth;
+            initialCalculationDone = true;
+          }
+        }
+      }, 0);
+      
+      media_query_list = window.matchMedia("print");
+      media_query_list.addEventListener("change", onPrintMediaChange);
+    };
+    
+    initAsync();
+    
     return () => {
       removeMediaQueryListener();
     };
@@ -138,10 +164,10 @@
   // the user clicks elsewhere.
   let dragging: boolean = false;
   let selected: boolean = false;
-  function onFocus(event: FocusEvent) {
+  function onFocus(_event: FocusEvent) {
     selected = true;
   }
-  function onBlur(event: FocusEvent) {
+  function onBlur(_event: FocusEvent) {
     selected = false;
   }
 
@@ -157,7 +183,7 @@
       dragTo(event.clientX);
     }
   }
-  function onEnd(event: PointerEvent) {
+  function onEnd(_event: PointerEvent) {
     dragging = false;
   }
   function onKeyDown(event: KeyboardEvent) {
@@ -203,6 +229,7 @@
    * @param eventX The x coordinate of the event.
    */
   function dragTo(eventX: number) {
+    if (!mounted || !initialCalculationDone || !sliderEl || width <= 0) return;
     const percent = (eventX - sliderEl.getBoundingClientRect().left) / width;
     let val = floor + percent * (ceiling - floor);
     val = Math.round(val / step) * step;
@@ -229,7 +256,7 @@
     return Math.floor(percent * width);
   }
   let sliderPosition: string = "0px";
-  $: sliderPosition = valueToPosition(value, floor, ceiling, width) + "px";
+  $: sliderPosition = mounted && initialCalculationDone && width > 0 ? valueToPosition(value, floor, ceiling, width) + "px" : "0px";
 
   // When the label for the handle changes, it's width may change as well.
   // We need to update it's position to be centered over the handle.
@@ -242,14 +269,25 @@
    * rendered before we try to measure it.
    */
   function updateHandleLabel(widthIn = width) {
-    if (!handleLabelEl) return;
+    if (!mounted || !initialCalculationDone || !handleLabelEl || widthIn <= 0) return;
     const rect = handleLabelEl.getBoundingClientRect();
     const percent = (value - floor) / (ceiling - floor);
     handleLabelEl.style.left =
       Math.floor(percent * widthIn) - rect.width / 2 + "px";
   }
-  afterUpdate(updateHandleLabel);
-  $: updateHandleLabel(width);
+  afterUpdate(() => {
+    updateHandleLabel();
+    // Force recalculation of width and ticks after DOM updates
+    if (mounted && sliderEl && !initialCalculationDone) {
+      const newWidth = getWidth(innerWidth, sliderEl);
+      if (newWidth > 0) {
+        width = newWidth;
+        initialCalculationDone = true;
+      }
+    }
+  });
+  
+  $: mounted && initialCalculationDone && width > 0 && updateHandleLabel(width);
 
   /**
    * Update the list of ticks based on the current input values.
@@ -299,7 +337,7 @@
     color?: string;
     x?: number;
   }> = [];
-  $: ticks = updateTicks(width, floor, ceiling, step, showTicks, ticksArray);
+  $: ticks = mounted && initialCalculationDone && width > 0 ? updateTicks(width, floor, ceiling, step, showTicks, ticksArray) : [];
 </script>
 
 <svelte:window bind:innerWidth />
@@ -328,7 +366,7 @@
     on:pointermove={onMove}
     on:pointerup={onEnd}
   >
-    <span class="bar" />
+    <span class="bar"></span>
   </span>
   <span
     class="barWrapper selection noTouchAction"
@@ -336,7 +374,7 @@
     on:pointermove={onMove}
     on:pointerup={onEnd}
   >
-    <span class="bar selection" />
+    <span class="bar selection"></span>
   </span>
   <span
     class="handle noTouchAction"
@@ -354,7 +392,7 @@
     on:blur={onBlur}
     on:keydown={onKeyDown}
     bind:this={handleEl}
-  />
+  ></span>
   <span class="handleLabel" bind:this={handleLabelEl}>{handleLabel}</span>
   <ul class="ticks">
     {#each ticks as tick}

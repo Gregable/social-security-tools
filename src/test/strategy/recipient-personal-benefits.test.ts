@@ -1,5 +1,5 @@
 import { Recipient } from '$lib/recipient';
-import { MonthDate, MonthDuration } from '$lib/month-time';
+import { MonthDate } from '$lib/month-time';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
@@ -21,11 +21,9 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('calculates benefits correctly for a single year', () => {
     // Mock benefitOnDate to return consistent values
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
-      (filingDate, atDate) => {
-        return Money.from(1000);
-      }
-    );
+    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(() => {
+      return Money.from(1000);
+    });
 
     // Filing in January and living until December of the same year
     const filingDate = MonthDate.initFromYearsMonths({
@@ -143,8 +141,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
       (filingDate, atDate) => {
         // Filing at age 69 in July
-        const filingMonth = filingDate.monthIndex();
-        const atMonth = atDate.monthIndex();
+        const _filingMonth = filingDate.monthIndex();
+        const _atMonth = atDate.monthIndex();
         const atYear = atDate.year();
 
         // If atDate is in the same year as filing

@@ -46,7 +46,7 @@
   $: ctxB_.r = $spouse;
 
   let mounted_: boolean = false;
-  $: $recipient && $spouse && render();
+  $: $recipient && $spouse && mounted_ && ctxA_.sliderMonths && ctxB_.sliderMonths && render();
 
   let sliderEl_: Slider;
   let canvasEl_: HTMLCanvasElement;
@@ -75,6 +75,7 @@
 
   $: onMount(() => {
     mounted_ = true;
+    if (!canvasEl_) return;
 
     ctx_ = canvasEl_.getContext("2d");
     ctx_.font = "bold 14px Helvetica";
@@ -89,6 +90,7 @@
   let lastMouseX_: number = -1;
   let lastMouseDate_: MonthDate = new MonthDate(0);
   function onClick(event: MouseEvent) {
+    if (!canvasEl_) return;
     if (mouseToggle_) {
       mouseToggle_ = false;
     } else {
@@ -100,6 +102,7 @@
 
   function onMove(event: MouseEvent) {
     if (!mouseToggle_) return;
+    if (!canvasEl_) return;
     let mouseY = event.clientY - canvasEl_.getBoundingClientRect().top;
     // 150 pixels is the height of the slider portion of the chart. Having the
     // mouse move when the user wants to drag sliders is distracting, so we
@@ -116,13 +119,13 @@
     render();
   }
 
-  function onOut(event: MouseEvent) {
+  function onOut(_event: MouseEvent) {
     if (!mouseToggle_) return;
     lastMouseX_ = -1;
     render();
   }
 
-  function onBlur(event: FocusEvent) {
+  function onBlur(_event: FocusEvent) {
     if (!mouseToggle_) return;
     lastMouseX_ = -1;
     render();
@@ -163,7 +166,7 @@
    * the chart. This is the maximum benefit the first recipient.
    */
   function maxRenderedYDollars(): Money {
-    const [youngerRecipient, olderRecipient_] = YoungerOlder();
+    const [youngerRecipient, _olderRecipient] = YoungerOlder();
     let endDate = youngerRecipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
     );
@@ -175,7 +178,7 @@
    * the chart. This is the maximum benefit the secont recipient.
    */
   function minRenderedYDollars(): Money {
-    const [youngerRecipient, olderRecipient_] = YoungerOlder();
+    const [youngerRecipient, _olderRecipient_] = YoungerOlder();
     let endDate = youngerRecipient.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
     );
@@ -413,6 +416,7 @@
         });
       }
     }
+    // eslint-disable-next-line no-self-assign
     ctxR.ticks = ctxR.ticks;
   }
 
@@ -492,7 +496,7 @@
       // First draw horizontally to the same date but the previous benefit.
       // This avoids a diagonal line when the benefit changes.
       if (i != 0) {
-        let [x0, y0, _] = boxes[i - 1];
+        let [_x0, y0, _benefit] = boxes[i - 1];
         ctx_.lineTo(x, y0);
       }
       ctx_.lineTo(x, y);
@@ -519,7 +523,7 @@
     let bestBox = 0;
     let bestDimen = 0;
     for (let i = 1; i < boxes.length; i++) {
-      let [boxX, boxY, benefit_] = boxes[i];
+      let [boxX, boxY, _benefit] = boxes[i];
       const yDim = Math.abs(boxY - zeroLineY);
       let xDim = 0;
       if (boxes.length > i + 1) {
@@ -856,6 +860,7 @@
    */
   function render() {
     if (!mounted_) return;
+    if (!canvasEl_) return;
 
     layoutMonths();
     updateSlider(ctxA_);
@@ -1023,8 +1028,8 @@
       on:pointermove={onMove}
       on:mouseout={onOut}
       on:blur={onBlur}
-    />
-    <div style="height: 362px" />
+    ></canvas>
+    <div style:height="362px"></div>
     <div
       class="selectedDateBox"
       style:--selected-date-border-color={blueish_}
@@ -1034,16 +1039,17 @@
     >
       {#if lastMouseX_ > 0}
         <table class="combinedBenefit">
-          <tr>
-            <td colspan="3" class="date">
-              In <span class="selectedDate"
-                >{dateX(lastMouseX_).monthName()}
-                {dateX(lastMouseX_).year()}</span
-              >,
-            </td>
-          </tr>
-          <tr>
-            <td class="indent" />
+          <tbody>
+            <tr>
+              <td colspan="3" class="date">
+                In <span class="selectedDate"
+                  >{dateX(lastMouseX_).monthName()}
+                  {dateX(lastMouseX_).year()}</span
+                >,
+              </td>
+            </tr>
+            <tr>
+            <td class="indent"></td>
             <td class="label">
               <RecipientName r={ctxA_.r} apos shortenTo={50} /> Benefit:
             </td>
@@ -1052,7 +1058,7 @@
             </td>
           </tr>
           <tr>
-            <td class="indent" />
+            <td class="indent"></td>
             <td class="label">
               <RecipientName r={ctxB_.r} apos shortenTo={50} /> Benefit:
             </td>
@@ -1061,7 +1067,7 @@
             </td>
           </tr>
           <tr>
-            <td class="indent" />
+            <td class="indent"></td>
             <td class="label">
               <b>Total</b> Benefit:
             </td>
@@ -1074,6 +1080,7 @@
                 .wholeDollars()}</td
             >
           </tr>
+          </tbody>
         </table>
       {:else}
         <!-- This text shouldn't ever be visible,

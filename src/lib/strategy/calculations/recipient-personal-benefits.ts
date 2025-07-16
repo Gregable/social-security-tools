@@ -2,15 +2,6 @@ import { Recipient } from '$lib/recipient';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Money } from '$lib/money';
 
-// Minimum / Maximum age that a person could file at.
-const MIN_STRATEGY_AGE = MonthDuration.initFromYearsMonths({
-  years: 62,
-  months: 0,
-});
-const MAX_STRATEGY_AGE = MonthDuration.initFromYearsMonths({
-  years: 70,
-  months: 0,
-});
 const MONTHS_IN_YEAR = 12;
 
 /**

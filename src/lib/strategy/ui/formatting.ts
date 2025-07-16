@@ -10,7 +10,7 @@ export function formatBirthdate(dateString: string): string {
     const [year, month, day] = dateString.split('-').map(Number);
     const birthdate = Birthdate.FromYMD(year, month - 1, day);
     return birthdate.layBirthdateString();
-  } catch (error) {
+  } catch {
     console.warn('Invalid date format:', dateString);
     return 'Invalid Date';
   }
@@ -90,7 +90,7 @@ export function getFilingDate(
   filingAgeYears: number,
   filingAgeMonths: number,
   cellWidth: number = 0,
-  cellHeight: number = 0
+  _cellHeight: number = 0
 ): string {
   const birthdate = recipients[recipientIndex].birthdate;
   const filingAge = MonthDuration.initFromYearsMonths({
@@ -123,16 +123,16 @@ export function getFilingDate(
 export function createValueExtractor(
   recipients: [Recipient, Recipient],
   recipientIndex: number
-): (result: any) => string {
-  return (result: any): string => {
-    if (!result || result.error) return 'error';
+) {
+  return (calculationResult: any): string => {
+    if (!calculationResult || calculationResult.error) return 'error';
     // Convert to 0-based index for internal functions
     const zeroBasedIndex = recipientIndex - 1;
     return getFilingDate(
       recipients,
       zeroBasedIndex,
-      result[`filingAge${recipientIndex}Years`],
-      result[`filingAge${recipientIndex}Months`]
+      calculationResult[`filingAge${recipientIndex}Years`],
+      calculationResult[`filingAge${recipientIndex}Months`]
     );
   };
 }

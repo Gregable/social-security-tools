@@ -6,7 +6,7 @@ export {
   calculateAgeRange,
   getFilingDate,
   createValueExtractor,
-  createBorderRemovalFunctions
+  createBorderRemovalFunctions,
 } from './formatting.js';
 
 export { getMonthYearColor } from './colors.js';
@@ -15,5 +15,5 @@ export {
   calculateAgeRangePercentages,
   formatPercentagesToCssGridTemplate,
   generateDeathAgeRange,
-  calculateGridTemplates
+  calculateGridTemplates,
 } from './grid-sizing.js';

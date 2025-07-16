@@ -45,6 +45,7 @@
   }
   h3 a {
     color: #333; /* Made title more prominent */
+    text-decoration: none; /* Remove underline */
   }
   .printurl {
     margin: 0 1em;
@@ -52,6 +53,13 @@
     color: rgb(50, 50, 50);
     font-weight: 900;
     font-size: 20px;
+    display: none; /* Hidden by default, shown only in print */
+  }
+
+  @media print {
+    .printurl {
+      display: block; /* Show in print */
+    }
   }
 
   /* Navigation Pills */
@@ -98,8 +106,7 @@
       font-size: 20px;
       line-height: 30px;
     }
-    .pill a,
-    .pill span {
+    .pill a {
       padding: 5px 5px;
     }
   }

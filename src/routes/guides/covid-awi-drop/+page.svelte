@@ -49,7 +49,7 @@
     permanently reduced by 9.1%. How true is this? Let's use the SSA.Tools calculator
     to understand this better.
   </p>
-  <br style="clear:both" />
+  <br style:clear="both" />
   <p>We want to simulate a earner who:</p>
   <ul>
     <li>Has 35 years of average earnings records.</li>
@@ -67,7 +67,7 @@
   <p>The resulting earnings table will look like this:</p>
   <img
     src={CovidEarningsImage}
-    style="margin: 2em auto 2em auto; display: block; border: 1px solid black"
+    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
     alt="Earnings table screenshot"
   />
   <p>
@@ -78,7 +78,7 @@
   </p>
   <img
     src={CovidAimeImage}
-    style="margin: 2em auto 2em auto; display: block; border: 1px solid black"
+    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
     alt="AIME calculation resulting in $4,375"
   />
   <p>
@@ -97,38 +97,42 @@
     the multiplier year. So, for someone who turns 60 in year 2020:
   </p>
 
-  <table style="margin: auto">
-    <tr>
-      <td rowspan="2" style="padding: 6px; text-align: center;"
-        >Multiplier (year X) =</td
-      >
-      <td
-        style="border-bottom: 1px solid black; padding: 6px; text-align: center;"
-        >AWI (year 2020)</td
-      >
+  <table style:margin="auto">
+    <tbody>
+      <tr>
+        <td rowspan="2" style:padding="6px" style:text-align="center"
+          >Multiplier (year X) =</td
+        >
+        <td
+          style:border-bottom="1px solid black" style:padding="6px" style:text-align="center"
+          >AWI (year 2020)</td
+        >
+      </tr>
+      <tr>
+      <td style:padding="6px" style:text-align="center">AWI (year X)</td>
     </tr>
-    <tr>
-      <td style="padding: 6px; text-align: center;">AWI (year X)</td>
-    </tr>
+    </tbody>
   </table>
   <p>
     We can then multiply this by Taxed Earnings to see how AWI affects the
     Indexed Earnings in each year:
   </p>
-  <table style="margin: auto">
-    <tr>
-      <td rowspan="2" style="padding: 6px; text-align: center;"
-        >Indexed Earnings (year X) =</td
-      >
-      <td
-        style="border-bottom: 1px solid black; padding: 6px; text-align: center;"
-        >Taxed Earnings (year X) x
-        <b>AWI (year 2020)</b>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 6px; text-align: center;">AWI (year X)</td>
-    </tr>
+  <table style:margin="auto">
+    <tbody>
+      <tr>
+        <td rowspan="2" style:padding="6px" style:text-align="center"
+          >Indexed Earnings (year X) =</td
+        >
+        <td
+          style:border-bottom="1px solid black" style:padding="6px" style:text-align="center"
+          >Taxed Earnings (year X) x
+          <b>AWI (year 2020)</b>
+        </td>
+      </tr>
+      <tr>
+        <td style:padding="6px" style:text-align="center">AWI (year X)</td>
+      </tr>
+    </tbody>
   </table>
   <p>
     We can also see why calculations are made 2-years "late". The AWI for a
@@ -169,19 +173,16 @@
   </p>
   <img
     src={CovidPiaImage}
-    style="margin: 2em auto 2em auto; display: block; border: 1px solid
-      black"
+    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
     alt="PIA without covid, predicted at $1,977.60"
   />
 
-  <p>Next, adjust both the AIME and the bendpoints downward by 9.1%:</p>
+  <p>Next, adjust both the AIME and the bendpoints downward by 9.1%:
   <img
     src={CovidPia2Image}
-    style="margin: 2em auto 2em auto; display: block; border: 1px solid
-      black"
+    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
     alt="PIA with covid, predicted at $1,798.40"
   />
-  <p>
     Going from $1,977.60 to $1,798.40 is a 9.06% drop, very similar to the 9.1%
     number we started with. In conclusion, a significant drop in AWI in a single
     year can have an similarly outsized effect on the Social Security benefits

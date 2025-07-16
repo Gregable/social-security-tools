@@ -1,5 +1,4 @@
 <script lang="ts">
-  import FacebookImg from "$lib/images/facebook.svg";
   import GithubImg from "$lib/images/github.svg";
   import KoFiImg from "$lib/images/kofi.png";
   import BlueskyImg from "$lib/images/bluesky.jpg";
@@ -49,15 +48,15 @@
       While absolutely not necessary, if you would like to say thanks you can
       contribute at:
     </p>
-    <p class="onlyprint" style="text-align:center; font-size: 1.8em">
+    <p class="onlyprint" style:text-align="center" style:font-size="1.8em">
       https://ko-fi.com/ssatools
     </p>
-    <p style="text-align:center">
+    <p style:text-align="center">
       <a href="https://ko-fi.com/ssatools" target="_blank"
         ><img
           height="55"
           width="214"
-          style="border:0px"
+          style:border="0px"
           src={KoFiImg}
           alt="Buy me a coffee if you found this useful"
         /></a

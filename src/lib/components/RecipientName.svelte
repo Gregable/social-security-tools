@@ -57,7 +57,7 @@
 </script>
 
 <span
-  >{#if r.only}<slot />{:else}<span
+  >{#if r.only}<slot></slot>{:else}<span
       class="name"
       class:noColor
       class:first={r.first}

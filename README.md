@@ -6,14 +6,14 @@ The code here builds what is statically served at that site.
 
 ## Docker
 
-The website can be run locally as a Docker container. Run the latest image
-from Docker Hub:
+The website can be run locally as a Docker container. Run the latest image from
+Docker Hub:
 
-```
+```sh
 docker run -p 4173:4173 gregable/ssa-tools:latest
 ```
 
-Then load https://localhost:4173/ in your browser.
+Then load <https://localhost:4173/> in your browser.
 
 ## Star History
 

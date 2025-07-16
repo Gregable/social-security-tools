@@ -33,7 +33,7 @@
     maximum? The short answer is that the maximum monthly Social Security
     benefit that an individual who files a claim in 2025 can receive is:
   </p>
-  <blockquote style="font-size: 18px">
+  <blockquote style:font-size="18px">
     <b>$5,108 / month</b>
   </blockquote>
   <p>In order to reach this high of a benefit, someone must have:</p>
@@ -54,7 +54,7 @@
 
   <h2>Different filing ages</h2>
   <p>At other filing ages, the maximum possible benefit would be smaller:</p>
-  <p />
+  <p></p>
   <ul>
     <li>$4,018 / month at age 67</li>
     <li>$2,831 / month at age 62</li>

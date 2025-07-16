@@ -74,7 +74,7 @@
   </p>
   <img
     src="/indexing-factors-guide-earnings-record.jpg"
-    style="margin: auto; display: block"
+    style:margin="auto" style:display="block"
     alt="Earnings record for a hypothetical user"
   />
   <p>
@@ -90,7 +90,7 @@
   </p>
   <img
     src="/indexing-factors-guide-awi-factors.jpg"
-    style="margin: auto; display: block"
+    style:margin="auto" style:display="block"
     alt="ssa.gov's index factors for 2032"
   />
   <p>
@@ -106,7 +106,7 @@
   </p>
   <img
     src="/indexing-factors-guide-year-of-eligibility.jpg"
-    style="margin: auto; display: block; border: 1px solid #aaa;"
+    style:margin="auto" style:display="block" style:border="1px solid #aaa"
     alt="Year of eligibility: Note if you select a year after 2021, we will use
     the average wage changes that were estimated under the intermediate
     assumptions in the latest Trustees Report."
@@ -127,19 +127,21 @@
     (AWI) in the year she turned 60 divided by the AWI of the multiplier year:
   </p>
 
-  <table style="margin: auto;">
-    <tr>
-      <td rowspan="2" style="padding: 6px; text-align: center;"
-        >Multiplier (year X) =</td
-      >
-      <td
-        style="border-bottom: 1px solid black; padding: 6px; text-align: center;"
-        >AWI (year 2030)</td
-      >
+  <table style:margin="auto">
+    <tbody>
+      <tr>
+        <td rowspan="2" style:padding="6px" style:text-align="center"
+          >Multiplier (year X) =</td
+        >
+        <td
+          style:border-bottom="1px solid black" style:padding="6px" style:text-align="center"
+          >AWI (year 2030)</td
+        >
+      </tr>
+      <tr>
+      <td style:padding="6px" style:text-align="center">AWI (year X)</td>
     </tr>
-    <tr>
-      <td style="padding: 6px; text-align: center;">AWI (year X)</td>
-    </tr>
+    </tbody>
   </table>
 
   <p>

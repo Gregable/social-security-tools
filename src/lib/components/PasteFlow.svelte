@@ -17,25 +17,25 @@
 
   // The mode of the paste flow. This is a state machine that controls
   // which component is rendered.
-  enum Mode {
+  const Mode = {
     // Starting in initial mode, we render <PastePrompt> and request
     // either a ssa.gov paste or to load demo data.
-    INITIAL,
+    INITIAL: 0,
     // When ssa.gov data is entered, we initially display the earings record
     // in the same css style as ssa.gov, and have a "yes / no" confirmation box.
     // This is <PasteConfirm>.
-    PASTE_CONFIRMATION,
+    PASTE_CONFIRMATION: 1,
     // If the user selects "no" to the paste, we display a "Sorry" view with a
     // button to call reset(). This is <PasteApology>.
-    PASTE_APOLOGY,
+    PASTE_APOLOGY: 2,
     // If the user selects "yes", we then prompt them to enter their age. This
     // is <AgeRequest>.
-    AGE_REQUEST,
+    AGE_REQUEST: 3,
     // After entering an age, we prompt the user to enter their spouse's
     // data if they so choose.
-    SPOUSE_QUESTION,
-  }
-  let mode: Mode = Mode.INITIAL;
+    SPOUSE_QUESTION: 4,
+  } as const;
+  let mode: number = Mode.INITIAL;
 
   // The flow supports data entry for two people. The first person is always
   // "recipient", set to context.recipient. The second person is "spouse", set
@@ -95,7 +95,6 @@
     const name1str: string | null = params.get("name1");
     const name2str: string | null = params.get("name2");
 
-    const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
     let recipient1 = parseRecipient(pia1str, dob1str, name1str);
     let recipient2 = parseRecipient(pia2str, dob2str, name2str);
 

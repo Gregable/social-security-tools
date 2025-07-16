@@ -1,9 +1,11 @@
 import adapter from '@sveltejs/adapter-vercel';
-import preprocess from 'svelte-preprocess';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 export default {
-  preprocess: preprocess(),
+  preprocess: vitePreprocess({
+    script: true,
+  }),
 
   kit: {
     adapter: adapter({

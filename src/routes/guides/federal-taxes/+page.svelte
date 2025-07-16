@@ -156,8 +156,7 @@
     src="/Federal_Taxation_of_SSA.png"
     width="961"
     height="359"
-    style="box-shadow: 0px 0px 8px rgba(0,0,0,1); margin: 40px auto 40px auto;
-      display: block;"
+    style:box-shadow="0px 0px 8px rgba(0,0,0,1)" style:margin="40px auto 40px auto" style:display="block"
     alt="Infographic showing the steps to calculate the taxable portion of Social Security Benefits"
   />
 

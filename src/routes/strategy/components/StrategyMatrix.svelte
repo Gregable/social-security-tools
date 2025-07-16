@@ -1,4 +1,3 @@
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
   import RecipientName from "$lib/components/RecipientName.svelte";
@@ -46,13 +45,13 @@
   const MATRIX_HEIGHT = 900;
 
   // Calculate grid templates based on probabilities
-  function getCellDimensions(rowIndex: number, colIndex: number): { width: number; height: number } {
+  function _getCellDimensions(rowIndex: number, colIndex: number): { width: number; height: number } {
     // Use the reactive cell dimensions matrix
     return cellDimensions[rowIndex]?.[colIndex] || { width: 0, height: 0 };
   }
 
   // Extractor for recipient values
-  $: borderRemovalFuncs = createBorderRemovalFunctions(
+  $: _borderRemovalFuncs = createBorderRemovalFunctions(
     createValueExtractor(recipients, recipientIndex + 1),
     calculationResults
   );
@@ -129,7 +128,7 @@
     <div class="grid-headers">
       <div
         class="recipient-header col-header"
-        style="grid-column: span {deathAgeRange2.length}"
+        style:grid-column="span {deathAgeRange2.length}"
       >
         <RecipientName r={recipients[1]} apos /> Death Age
       </div>
@@ -140,7 +139,7 @@
       <div class="empty-corner"></div>
       <div
         class="age-header-container"
-        style="grid-template-columns: {columnTemplate}; width: 100%;"
+        style:grid-template-columns="{columnTemplate}" style:width="100%"
       >
         {#each deathAgeRange2 as deathAge, j}
           <div
@@ -164,7 +163,7 @@
         </div>
         <div
           class="age-header-container"
-          style="grid-template-rows: {rowTemplate}"
+          style:grid-template-rows="{rowTemplate}"
         >
           {#each deathAgeRange1 as deathAge, i}
             <div
@@ -181,10 +180,10 @@
       <div
         class="strategy-grid"
         bind:clientWidth={matrixWidth}
-        style="grid-template-columns: {columnTemplate}; grid-template-rows: {rowTemplate}; min-height: 0; display: grid;"
+        style:grid-template-columns="{columnTemplate}" style:grid-template-rows="{rowTemplate}" style:display="grid" style:min-height="0"
       >
-        {#each deathAgeRange1 as deathAge1, i}
-          {#each deathAgeRange2 as deathAge2, j}
+        {#each deathAgeRange1 as _deathAge1, i}
+          {#each deathAgeRange2 as _deathAge2, j}
             <div
               class="strategy-cell"
               class:highlighted-cell={hoveredCell &&
@@ -204,6 +203,7 @@
               on:focus={() => handleMouseOver(i, j)}
               on:blur={handleMouseOut}
               on:click={() => handleClick(i, j)}
+              on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(i, j); } }}
               tabindex="0"
               role="gridcell"
               title="Net present value: {calculationResults[i][
@@ -278,10 +278,6 @@
   .matrix-title h4 {
     margin: 0;
     color: #0056b3;
-  }
-
-  .recipient1-matrix .matrix-title h4 {
-    color: #005600;
   }
 
   .matrix-legend {

@@ -6,7 +6,6 @@
   import RName from "./RecipientName.svelte";
 
   import HorizCurlyImg from "$lib/images/horiz-curly.png";
-  import RecipientName from "./RecipientName.svelte";
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -153,20 +152,20 @@
             </p>
 
             <div class="curlyvisualization">
-              <div style="width: 100%">
-                <div class="curlyText" style="width: {spousalBenefitFraction}%">
+              <div style:width="100%">
+                <div class="curlyText" style:width="{spousalBenefitFraction}%">
                   Personal (<b
                     >{$recipient.pia().primaryInsuranceAmount().string()}</b
                   >)
                 </div>
                 <div
                   class="curlyText"
-                  style="width: {100 - spousalBenefitFraction}%"
+                  style:width="{100 - spousalBenefitFraction}%"
                 >
                   Spousal (<b>{spousalBenefit.string()}</b>)
                 </div>
               </div>
-              <br style="clear: both" />
+              <br style:clear="both" />
               <div
                 class="fullCurlyBar"
                 class:firstRecipient={r.first}
@@ -176,8 +175,8 @@
                   class="leftCurlyBar"
                   class:firstRecipient={!r.first}
                   class:secondRecipient={r.first}
-                  style="width: {spousalBenefitFraction}%"
-                />
+                  style:width="{spousalBenefitFraction}%"
+                ></div>
               </div>
               <img
                 class="horiz-curly"
@@ -185,7 +184,7 @@
                 alt="Horizontal curly brace indicating to sum the personal and
               spousal benefit amounts."
               />
-              <div style="width: 100%; text-align: center;">
+              <div style:width="100%" style:text-align="center">
                 Total: <b
                   >{$recipient
                     .pia()

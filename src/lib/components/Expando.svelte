@@ -95,7 +95,7 @@
   </div>
 
   <div class="expandContents" bind:this={contentsEl}>
-    <slot />
+    <slot></slot>
   </div>
 </section>
 

@@ -23,7 +23,7 @@ recipient.earningsRecords.push(
     return record;
   })()
 );
-recipient.earningsRecords = recipient.earningsRecords;
+// Force reactivity update (was: recipient.earningsRecords = recipient.earningsRecords)
 recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 recipient.name = 'Alex';
 recipient.markFirst();

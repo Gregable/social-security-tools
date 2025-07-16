@@ -135,7 +135,7 @@
           ><img
             height="55"
             width="214"
-            style="border:0px"
+            style:border="0px"
             src={KoFiImg}
             alt="Buy me a coffee if you found this useful"
           /></a
@@ -156,10 +156,6 @@
 
   .kofi-section {
     margin-top: 2em; /* Add some space above the new section */
-  }
-
-  .kofi-section p {
-    /* Removed text-align: center; to match page style */
   }
 
   .kofi-section .kofi-url {

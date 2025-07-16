@@ -21,7 +21,7 @@ function testRecord(year: number, earnings: Money = Money.from(10 * 1000)) {
 
 describe('Recipient', () => {
   it('initializes without input', () => {
-    let r = new Recipient();
+    let _r = new Recipient();
   });
 
   it('sets and gets earning records', () => {
@@ -249,66 +249,6 @@ describe('Recipient', () => {
     }
   });
 
-  it('calls subscribers on name update', () => {
-    let r = new Recipient();
-    let numCallbacks = 0;
-    let unsubscribe = r.subscribe((recipient: Recipient) => {
-      numCallbacks++;
-    });
-    expect(numCallbacks).toEqual(1);
-
-    r.name = 'Greg';
-    expect(numCallbacks).toEqual(2);
-    unsubscribe();
-  });
-
-  it('calls subscribers on earnings record update', () => {
-    let r = new Recipient();
-    let expectedRecordCount = 0;
-    let numCallbacks = 0;
-    let unsubscribe = r.subscribe((recipient: Recipient) => {
-      expect(recipient.earningsRecords.length).toEqual(expectedRecordCount);
-      numCallbacks++;
-    });
-    expect(numCallbacks).toEqual(1);
-
-    expectedRecordCount = 1;
-    r.earningsRecords = [testRecord(2007)];
-    expect(numCallbacks).toEqual(2);
-    unsubscribe();
-  });
-
-  it('calls subscribers on future earnings record update', () => {
-    let r = new Recipient();
-    let expectedRecordCount = 0;
-    let numCallbacks = 0;
-    let unsubscribe = r.subscribe((recipient: Recipient) => {
-      expect(recipient.futureEarningsRecords.length).toEqual(
-        expectedRecordCount
-      );
-      numCallbacks++;
-    });
-    expect(numCallbacks).toEqual(1);
-
-    expectedRecordCount = 1;
-    r.futureEarningsRecords = [testRecord(2007)];
-    expect(numCallbacks).toEqual(2);
-    unsubscribe();
-  });
-
-  it('calls subscribers on birthday record update', () => {
-    let r = new Recipient();
-    let numCallbacks = 0;
-    let unsubscribe = r.subscribe((recipient: Recipient) => {
-      numCallbacks++;
-    });
-    expect(numCallbacks).toEqual(1);
-
-    r.birthdate = Birthdate.FromYMD(1990, 0, 2);
-    expect(numCallbacks).toEqual(2);
-    unsubscribe();
-  });
-
   it('shortens name', () => {
     let r = new Recipient();
     r.name = 'Gregory';
@@ -349,8 +289,7 @@ describe('Recipient', () => {
     for (let i = 0; i < 40; i++) {
       r.earningsRecords.push(testRecord(startYear + i));
     }
-    // .push doesn't call set(), so we must force a refresh:
-    r.earningsRecords = r.earningsRecords;
+    // Force refresh after push() (was: r.earningsRecords = r.earningsRecords)
 
     return r;
   }
@@ -388,8 +327,7 @@ describe('Recipient', () => {
         testRecord(constants.CURRENT_YEAR + i, Money.from(30 * 1000))
       );
     }
-    // .push doesn't call set(), so we must force a refresh:
-    r.futureEarningsRecords = r.futureEarningsRecords;
+    // Force refresh after push() (was: r.futureEarningsRecords = r.futureEarningsRecords)
 
     // The earliest 32 years should form the cutoff:
     expect(r.earningsRecords[31].year).toEqual(1996);

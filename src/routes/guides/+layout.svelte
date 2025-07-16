@@ -4,7 +4,7 @@
 
 <Header active="Guides" />
 <main>
-  <slot />
+  <slot></slot>
 </main>
 
 <style>

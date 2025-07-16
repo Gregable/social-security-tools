@@ -129,10 +129,10 @@
   <div class="pasteArea">
     <div>
       <textarea
-        wrap="off"
+        wrap="soft"
         placeholder={"\n\nPaste Result Here"}
         bind:value={pasteContents}
-      />
+      ></textarea>
       <div class="privateDataNotice">
         <span class="lockIcon">&#x1f512;</span>
         <p>

@@ -67,12 +67,13 @@
       lastActiveSection = sidebarSections[visibleSections[0]];
       lastActiveSection.active = true;
     }
+    // eslint-disable-next-line no-self-assign
     sidebarSections = sidebarSections;
   }
 
   let observer: IntersectionObserver | null = null;
 
-  function createObserver(isStuck: boolean = false) {
+  function createObserver(_isStuck: boolean = false) {
     if (!mainColumn) return;
     if (observer) observer.disconnect();
     observer = new IntersectionObserver(observeCallback, {
@@ -119,6 +120,7 @@
         sponsor: child.getAttribute("data-sponsor") == "true",
       });
     }
+    // eslint-disable-next-line no-self-assign
     sidebarSections = sidebarSections;
     createObserver();
   });
@@ -147,7 +149,7 @@
     </ul>
   </div>
   <div class="mainColumn" bind:this={mainColumn}>
-    <slot />
+    <slot></slot>
   </div>
 </div>
 

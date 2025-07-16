@@ -6,7 +6,6 @@ import {
   isLifeTableDataAvailable,
   LifeTableError,
   DataNotFoundError,
-  type LifeTableEntry,
 } from '$lib/life-tables';
 
 // Mock fetch globally

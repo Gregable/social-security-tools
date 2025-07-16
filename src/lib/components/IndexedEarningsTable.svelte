@@ -51,13 +51,13 @@
           <th class="workyear">Year</th>
           <th class="age onlyDisplayLarge">Age</th>
           <th class="taxedearnings">Taxed Earnings</th>
-          <th class="multsymbol" />
+          <th class="multsymbol"></th>
           <th class="multiplier"
             ><span class="onlyDisplayLarge">Multiplier</span></th
           >
-          <th class="eqymbol" />
+          <th class="eqymbol"></th>
           <th class="indexedearnings">Indexed Earnings</th>
-          <th class="top35indicators" />
+          <th class="top35indicators"></th>
         </tr>
       </thead>
       <tbody>
@@ -69,7 +69,7 @@
                 {earningRecord.age}
               </td>
               {#if earningRecord.incomplete}
-                <td colspan="5" class="taxedearnings" style="text-align:center">
+                <td colspan="5" class="taxedearnings" style:text-align="center">
                   Not yet recorded
                 </td>
               {:else}

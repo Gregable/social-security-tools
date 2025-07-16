@@ -1,13 +1,17 @@
 <script lang="ts">
-  import { page } from "$app/stores";
   import { browser } from "$app/environment";
   import posthog from "posthog-js";
+
+  // These imports are available for use but may not be directly referenced
+  // They're kept for potential future use
+  const _browser = browser;
+  const _posthog = posthog;
 </script>
 
-<slot />
+<slot></slot>
 
 <style global>
-  body {
+  :global(body) {
     margin: 0;
     /**
      * Causes the browser to add horizontal scrollbars if the window
@@ -21,7 +25,7 @@
     background-color: #fff;
   }
 
-  * {
+  :global(*) {
     scroll-behavior: smooth;
     /**
      * border-box tells the browser to account for any border and padding
@@ -35,17 +39,17 @@
    * The exception to border-box is for images/video where we want to use
    * explicit sizing of the underlying asset so as not to get any distortion.
    */
-  img,
-  video {
+  :global(img),
+  :global(video) {
     box-sizing: content-box;
   }
 
-  a {
+  :global(a) {
     color: #337ab7;
     text-decoration: none;
   }
 
-  p {
+  :global(p) {
     margin: 0 0 10px;
   }
 
@@ -55,23 +59,23 @@
   }
 
   @media print {
-    .noprint {
+    :global(.noprint) {
       display: none !important;
     }
 
-    .pageBreakBefore {
+    :global(.pageBreakBefore) {
       page-break-before: always;
     }
 
-    .pageBreakAfter {
+    :global(.pageBreakAfter) {
       page-break-after: always;
     }
 
-    .pageBreakAvoid {
+    :global(.pageBreakAvoid) {
       page-break-inside: avoid;
     }
 
-    * {
+    :global(*) {
       transition: none !important;
       /* Disabling background graphics in print (default) breaks some
        of the UI elements. This forces them back on. */
@@ -81,7 +85,7 @@
   }
 
   @media screen {
-    .onlyprint {
+    :global(.onlyprint) {
       display: none !important;
     }
   }

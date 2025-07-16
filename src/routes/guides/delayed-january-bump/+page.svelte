@@ -46,7 +46,7 @@
     src={HeroImage}
     width="285"
     height="503"
-    style="margin: 40px auto; display: block; border: 1px solid"
+    style:margin="40px auto" style:display="block" style:border="1px solid"
     alt="Screenshot of benefit chart showing a bump in January"
   />
 

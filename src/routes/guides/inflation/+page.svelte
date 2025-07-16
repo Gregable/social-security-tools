@@ -71,7 +71,7 @@
   <p>Consider the following example earnings record from 2005 to 2017:</p>
   <img
     src={EarningsRecordExampleImage}
-    style="margin: auto; display: block"
+    style:margin="auto" style:display="block"
     alt="Example earnings record"
   />
   <p>

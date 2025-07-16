@@ -1,24 +1,10 @@
 import { Birthdate } from '$lib/birthday';
-import { EarningRecord } from '$lib/earning-record';
-import { Money } from '$lib/money';
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
 import { describe, expect, it } from 'vitest';
 
 import * as constants from '../lib/constants';
-
-/**
- * Returns a record with the given year and earnings. Medicare earnings
- * are required, but not used by anything interesting.
- */
-function testRecord(year: number, earnings: Money = Money.from(10 * 1000)) {
-  return new EarningRecord({
-    year: year,
-    taxedEarnings: earnings,
-    taxedMedicareEarnings: earnings,
-  });
-}
 
 describe('Recipient', () => {
   it('calculates bendpoints', () => {

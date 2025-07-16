@@ -1,0 +1,44 @@
+name: ESLint Quality Gate
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  eslint-quality-gate:
+    runs-on: ubuntu-latest
+    name: ESLint Zero-Tolerance Check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run ESLint Quality Gate
+      run: |
+        echo "🔍 Running ESLint quality gate..."
+        echo "Zero-tolerance policy: no ESLint errors or warnings allowed"
+        echo ""
+        
+        if npm run lint --silent; then
+          echo "✅ Perfect! No ESLint issues found."
+          echo "✅ ESLint quality gate passed!"
+        else
+          echo "❌ ESLint found issues that must be fixed:"
+          echo ""
+          npm run lint
+          echo ""
+          echo "💡 Since we maintain zero-tolerance policy, all issues must be resolved."
+          echo "Please fix all ESLint errors and warnings before merging."
+          exit 1
+        fi

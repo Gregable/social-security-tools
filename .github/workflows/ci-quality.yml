@@ -1,0 +1,61 @@
+name: CI Quality Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    name: Code Quality Gate
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run Prettier Format Check
+      run: |
+        echo "🎨 Checking code formatting..."
+        npm run format:check
+        
+    - name: Run ESLint (Zero Tolerance)
+      run: |
+        echo "🔍 Running ESLint quality gate..."
+        echo "Zero-tolerance policy: no ESLint errors or warnings allowed"
+        npm run lint
+        
+    - name: Run Svelte Check
+      run: |
+        echo "🔧 Running Svelte type checking..."
+        npm run check
+        
+    - name: Run Full Test Suite
+      run: |
+        echo "🧪 Running full test suite..."
+        npm test
+        
+    - name: Build Check
+      run: |
+        echo "🏗️ Verifying production build..."
+        npm run build
+        
+    - name: Quality Gate Summary
+      if: success()
+      run: |
+        echo "✅ All quality checks passed!"
+        echo "✅ Code formatting: PASSED"
+        echo "✅ ESLint (zero tolerance): PASSED" 
+        echo "✅ Svelte type checking: PASSED"
+        echo "✅ Full test suite: PASSED"
+        echo "✅ Production build: PASSED"

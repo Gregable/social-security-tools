@@ -14,7 +14,7 @@ const meta: Meta<PastePrompt> = {
 };
 export default meta;
 
-const Template = ({ ...args }) => ({
+const Template = ({ ..._args }) => ({
   Component: PastePrompt,
   on: {
     paste: action('paste'),
