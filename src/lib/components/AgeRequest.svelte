@@ -58,7 +58,6 @@
     </legend>
     <div class="hint">For example, 09 22 1975</div>
 
-    <div class="hint">For example, 09 22 1975</div>
     <BirthdateInput bind:birthdate bind:isValid on:change={handleChange} {inputId} autoFocus/>
     
     <button on:click={confirm} disabled={!isValid}>
