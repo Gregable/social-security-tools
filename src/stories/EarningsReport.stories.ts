@@ -23,7 +23,8 @@ recipient.earningsRecords.push(
     return record;
   })()
 );
-// Force reactivity update (was: recipient.earningsRecords = recipient.earningsRecords)
+// eslint-disable-next-line no-self-assign
+recipient.earningsRecords = recipient.earningsRecords;
 recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 recipient.name = 'Alex';
 recipient.markFirst();

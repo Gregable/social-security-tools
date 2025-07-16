@@ -24,7 +24,9 @@ context.recipient.earningsRecords.push(
     return record;
   })()
 );
-// Force reactivity update (was: context.recipient.earningsRecords = context.recipient.earningsRecords)
+// Force reactivity update
+// eslint-disable-next-line no-self-assign
+context.recipient.earningsRecords = context.recipient.earningsRecords;
 context.recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 
 const meta: Meta<EarningsTable> = {

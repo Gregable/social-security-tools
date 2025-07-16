@@ -289,7 +289,9 @@ describe('Recipient', () => {
     for (let i = 0; i < 40; i++) {
       r.earningsRecords.push(testRecord(startYear + i));
     }
-    // Force refresh after push() (was: r.earningsRecords = r.earningsRecords)
+    // Force refresh after push() to trigger updateEarningsRecords_()
+    // eslint-disable-next-line no-self-assign
+    r.earningsRecords = r.earningsRecords;
 
     return r;
   }
@@ -327,7 +329,9 @@ describe('Recipient', () => {
         testRecord(constants.CURRENT_YEAR + i, Money.from(30 * 1000))
       );
     }
-    // Force refresh after push() (was: r.futureEarningsRecords = r.futureEarningsRecords)
+    // Force refresh after push() to trigger updateEarningsRecords_()
+    // eslint-disable-next-line no-self-assign
+    r.futureEarningsRecords = r.futureEarningsRecords;
 
     // The earliest 32 years should form the cutoff:
     expect(r.earningsRecords[31].year).toEqual(1996);
