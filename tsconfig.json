@@ -18,6 +18,12 @@
     "src/**/*.js",
     "src/**/*.svelte",
   ],
+  "exclude": [
+    "node_modules/@storybook/**/*",
+    ".storybook/**/*",
+    "**/*.stories.*",
+    "storybook-static/**/*"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"
