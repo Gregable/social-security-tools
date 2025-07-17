@@ -2,11 +2,10 @@
   import type { Recipient } from "$lib/recipient";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { createEventDispatcher } from "svelte";
-  import { MonthDate } from "$lib/month-time";
+  import { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Money } from "$lib/money";
   import {
     getFilingDate,
-    createValueExtractor,
     createBorderRemovalFunctions,
   } from "$lib/strategy/ui";
   import { getMonthYearColor } from "$lib/strategy/ui";
@@ -50,9 +49,31 @@
     return cellDimensions[rowIndex]?.[colIndex] || { width: 0, height: 0 };
   }
 
-  // Extractor for recipient values
-  $: _borderRemovalFuncs = createBorderRemovalFunctions(
-    createValueExtractor(recipients, recipientIndex + 1),
+  // Create normalized value extractor that compares actual dates, not display strings
+  function createNormalizedValueExtractor(recipientIndex: number) {
+    return (calculationResult: any): string => {
+      if (!calculationResult || calculationResult.error) return 'error';
+      
+      // Get the filing age and convert to a normalized date string
+      const filingAgeYears = calculationResult[`filingAge${recipientIndex + 1}Years`];
+      const filingAgeMonths = calculationResult[`filingAge${recipientIndex + 1}Months`];
+      
+      // Create a normalized string that represents the same date regardless of display format
+      // Format: "YYYY-MM" for consistent comparison
+      const birthdate = recipients[recipientIndex].birthdate;
+      const filingAge = MonthDuration.initFromYearsMonths({
+        years: filingAgeYears,
+        months: filingAgeMonths,
+      });
+      const filingDate = birthdate.dateAtLayAge(filingAge);
+      
+      return `${filingDate.year()}-${(filingDate.monthIndex() + 1).toString().padStart(2, '0')}`;
+    };
+  }
+
+  // Extractor for recipient values using normalized date comparison
+  $: borderRemovalFuncs = createBorderRemovalFunctions(
+    createNormalizedValueExtractor(recipientIndex),
     calculationResults
   );
 
@@ -77,6 +98,49 @@
       height: MATRIX_HEIGHT * (rowPercentages[i] || 0)
     }))
   );
+
+  // Calculate cell styles including background color and border removal
+  function getCellStyle(i: number, j: number): string {
+    let style = '';
+    
+    // Add background color based on filing date
+    if (calculationResults[i][j] && minMonthsSinceEpoch !== null && maxMonthsSinceEpoch !== null) {
+      const filingAge = calculationResults[i][j][`filingAge${recipientIndex + 1}`];
+      const filingDate = recipients[recipientIndex].birthdate.dateAtLayAge(filingAge);
+      const backgroundColor = getMonthYearColor(
+        filingDate.monthsSinceEpoch(),
+        minMonthsSinceEpoch,
+        maxMonthsSinceEpoch
+      );
+      style += `background-color: ${backgroundColor}; `;
+    }
+    
+    // Apply border removal logic
+    let bordersRemoved = 0;
+    if (borderRemovalFuncs.right(i, j)) {
+      style += 'border-right: none; ';
+      bordersRemoved++;
+    }
+    if (borderRemovalFuncs.bottom(i, j)) {
+      style += 'border-bottom: none; ';
+      bordersRemoved++;
+    }
+    if (borderRemovalFuncs.left(i, j)) {
+      style += 'border-left: none; ';
+      bordersRemoved++;
+    }
+    if (borderRemovalFuncs.top(i, j)) {
+      style += 'border-top: none; ';
+      bordersRemoved++;
+    }
+    
+    // Add subtle visual indicator when borders are removed
+    if (bordersRemoved > 0) {
+      style += 'box-shadow: inset 0 0 2px rgba(0, 123, 255, 0.3); ';
+    }
+    
+    return style;
+  }
 
   // Handle events
   function handleMouseOver(i: number, j: number) {
@@ -209,25 +273,7 @@
               title="Net present value: {calculationResults[i][
                 j
               ]?.totalBenefit.string() || 'N/A'}"
-              style={calculationResults[i][j] &&
-              minMonthsSinceEpoch !== null &&
-              maxMonthsSinceEpoch !== null
-                ? `background-color: ${(() => {
-                    const filingAge =
-                      calculationResults[i][j][
-                        `filingAge${recipientIndex + 1}`
-                      ];
-                    const filingDate =
-                      recipients[recipientIndex].birthdate.dateAtLayAge(
-                        filingAge
-                      );
-                    return getMonthYearColor(
-                      filingDate.monthsSinceEpoch(),
-                      minMonthsSinceEpoch,
-                      maxMonthsSinceEpoch
-                    );
-                  })()};`
-                : ""}
+              style={getCellStyle(i, j)}
             >
               <div class="filing-dates">
                 {#if calculationResults[i][j]}

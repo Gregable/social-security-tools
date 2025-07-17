@@ -11,7 +11,6 @@
     calculateFinalDates as calculateFinalDatesUtil,
     generateDeathAgeRange,
   } from "$lib/strategy/ui";
-  import { ALL_MONTHS } from "$lib/constants";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
 
   // Import components
@@ -88,126 +87,6 @@
 
     return [recipient1, recipient2];
   }
-
-  /**
-   * Converts filing age to human readable filing date string for a recipient
-   * @param recipientIndex The recipient index (0 or 1)
-   * @param filingAgeYears Years component of filing age
-   * @param filingAgeMonths Months component of filing age
-   */
-  function getFilingDate(
-    recipient: Recipient,
-    filingAgeYears: number,
-    filingAgeMonths: number
-  ): string {
-    const birthdate = recipient.birthdate;
-    const filingAge = MonthDuration.initFromYearsMonths({
-      years: filingAgeYears,
-      months: filingAgeMonths,
-    });
-    const filingDate = birthdate.dateAtLayAge(filingAge);
-
-    // Format as MMM YYYY (e.g., "Jan 2025")
-    return `${ALL_MONTHS[filingDate.monthIndex()]} ${filingDate.year()}`;
-  }
-
-  /**
-   * Creates a function to extract filing date value for a specific recipient
-   * @param recipientIndex The recipient index (1 or 2)
-   */
-  function createValueExtractor(
-    recipientIndex: number
-  ): (result: any) => string {
-    return (result: any): string => {
-      if (!result || result.error) return "error";
-      return getFilingDate(
-        recipients[recipientIndex],
-        result[`filingAge${recipientIndex}Years`],
-        result[`filingAge${recipientIndex}Months`]
-      );
-    };
-  }
-
-  // Create value extractors
-  const getRecipient1Value = createValueExtractor(0);
-  const getRecipient2Value = createValueExtractor(1);
-
-  /**
-   * Factory function to create border removal functions
-   * @param valueExtractor Function that extracts the value to compare
-   * @returns Object with functions for each border direction
-   */
-  function createBorderRemovalFunctions(
-    valueExtractor: (result: any) => string
-  ) {
-    return {
-      right: (i: number, j: number): boolean => {
-        if (j >= deathAgeRange1.length - 1) return false;
-        if (
-          !calculationResults[i] ||
-          !calculationResults[i][j] ||
-          !calculationResults[i][j + 1]
-        )
-          return false;
-        return (
-          valueExtractor(calculationResults[i][j]) ===
-          valueExtractor(calculationResults[i][j + 1])
-        );
-      },
-
-      bottom: (i: number, j: number): boolean => {
-        if (i >= deathAgeRange2.length - 1) return false;
-        if (
-          !calculationResults[i] ||
-          !calculationResults[i + 1] ||
-          !calculationResults[i][j] ||
-          !calculationResults[i + 1][j]
-        )
-          return false;
-        return (
-          valueExtractor(calculationResults[i][j]) ===
-          valueExtractor(calculationResults[i + 1][j])
-        );
-      },
-
-      left: (i: number, j: number): boolean => {
-        if (j <= 0) return false;
-        if (
-          !calculationResults[i] ||
-          !calculationResults[i][j] ||
-          !calculationResults[i][j - 1]
-        )
-          return false;
-        return (
-          valueExtractor(calculationResults[i][j]) ===
-          valueExtractor(calculationResults[i][j - 1])
-        );
-      },
-
-      top: (i: number, j: number): boolean => {
-        if (i <= 0) return false;
-        if (
-          !calculationResults[i] ||
-          !calculationResults[i - 1] ||
-          !calculationResults[i][j] ||
-          !calculationResults[i - 1][j]
-        )
-          return false;
-        return (
-          valueExtractor(calculationResults[i][j]) ===
-          valueExtractor(calculationResults[i - 1][j])
-        );
-      },
-    };
-  }
-
-  // Create border removal functions for each recipient
-  // Index 0: Recipient 1 table border functions
-  // Index 1: Recipient 2 table border functions
-  const _borderRemovalFunctions = [
-    createBorderRemovalFunctions(getRecipient1Value),
-    createBorderRemovalFunctions(getRecipient2Value),
-  ];
 
   /**
    * Main calculation function for optimal strategy matrix
