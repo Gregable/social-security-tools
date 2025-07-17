@@ -48,7 +48,7 @@
 <Header active="Calculator" />
 <main>
   {#if isPasteFlow}
-    <PasteFlow on:done={pasteDone} />
+    <PasteFlow ondone={pasteDone} />
   {:else}
     <Sidebar>
       <!--

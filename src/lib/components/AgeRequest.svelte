@@ -17,7 +17,6 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { Birthdate } from "../birthday";
   import BirthdateInput from "./BirthdateInput.svelte";
 
@@ -25,17 +24,18 @@
   export let birthdate: Birthdate = null;
   export let inputId = "birthdate";
 
-  const dispatch = createEventDispatcher();
+  // Callback prop for submit event
+  export let onsubmit: ((detail: { birthdate: Birthdate }) => void) | undefined = undefined;
   let isValid = false;
 
   function confirm() {
     if (birthdate) {
-      dispatch("submit", { birthdate });
+      onsubmit?.({ birthdate });
     }
   }
 
-  function handleChange(event) {
-    birthdate = event.detail.birthdate;
+  function handleChange(detail: { birthdate: Birthdate }) {
+    birthdate = detail.birthdate;
   }
 
   function checkEnter(event) {
@@ -58,7 +58,7 @@
     </legend>
     <div class="hint">For example, 09 22 1975</div>
 
-    <BirthdateInput bind:birthdate bind:isValid on:change={handleChange} {inputId} autoFocus/>
+    <BirthdateInput bind:birthdate bind:isValid onchange={handleChange} {inputId} autoFocus/>
     
     <button on:click={confirm} disabled={!isValid}>
       <ico>&#10003;</ico> Next

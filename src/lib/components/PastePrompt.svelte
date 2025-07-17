@@ -13,7 +13,6 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { parsePaste } from "$lib/ssa-parse";
   import { Recipient } from "$lib/recipient";
   import Expando from "$lib/components/Expando.svelte";
@@ -22,7 +21,8 @@
   import EarningsRecordLinkImage from "$lib/images/earnings-record-link.png";
   import { Money } from "$lib/money";
 
-  const dispatch = createEventDispatcher();
+  // Callback prop for paste event
+  export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined = undefined;
 
   let pasteContents: string = "";
   let pasteError: boolean = false;
@@ -37,7 +37,7 @@
       let recipient: Recipient = new Recipient();
       recipient.earningsRecords = records;
 
-      dispatch("paste", {
+      onpaste?.({
         recipient: recipient,
       });
     } else {
@@ -54,7 +54,7 @@
     let recipient: Recipient = new Recipient();
     recipient.setPia(Money.from(piaInput));
 
-    dispatch("paste", {
+    onpaste?.({
       recipient: recipient,
     });
   }

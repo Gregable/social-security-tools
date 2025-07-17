@@ -14,10 +14,11 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import type { EarningRecord } from "$lib/earning-record";
 
-  const dispatch = createEventDispatcher();
+  // Callback props for events
+  export let onconfirm: (() => void) | undefined = undefined;
+  export let ondecline: (() => void) | undefined = undefined;
 
   export let earningsRecords: EarningRecord[] = [];
   // Display the records in the same order as the SSA website: reverse
@@ -32,10 +33,10 @@
   }
 
   function confirm() {
-    dispatch("confirm");
+    onconfirm?.();
   }
   function decline() {
-    dispatch("decline");
+    ondecline?.();
   }
 </script>
 

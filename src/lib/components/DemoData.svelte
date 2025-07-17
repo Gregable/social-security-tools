@@ -16,7 +16,6 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { parsePaste } from "$lib/ssa-parse";
   import { Recipient } from "$lib/recipient";
   import { Birthdate } from "$lib/birthday";
@@ -27,7 +26,8 @@
   import demo2 from "$lib/pastes/youngpaste.txt?raw";
   import demo2_spouse from "$lib/pastes/youngpaste-spouse.txt?raw";
 
-  const dispatch = createEventDispatcher();
+  // Callback prop for demo event
+  export let ondemo: ((detail: { recipient: Recipient; spouse: Recipient | null }) => void) | undefined = undefined;
 
   function loadDemoData(demoId: number) {
     return () => {
@@ -64,7 +64,7 @@
       } else {
         throw new Error("Unknown demo ID: " + demoId);
       }
-      dispatch("demo", {
+      ondemo?.({
         recipient: recipient,
         spouse: spouse,
       });

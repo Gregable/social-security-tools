@@ -13,11 +13,10 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
+  // Callback prop for reset event
+  export let onreset: (() => void) | undefined = undefined;
   function reset() {
-    dispatch("reset");
+    onreset?.();
   }
 </script>
 

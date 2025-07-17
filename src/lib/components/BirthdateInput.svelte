@@ -12,7 +12,6 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { Birthdate } from "../birthday";
 
   // Props
@@ -21,10 +20,11 @@
   export let autoFocus = false;
   export let isValid = false;
 
+  // Callback prop for change event
+  export let onchange: ((detail: { birthdate: Birthdate }) => void) | undefined = undefined;
+
   let bday_day;
   let bday_year;
-
-  const dispatch = createEventDispatcher();
 
   function parseNumberString(input: string): number {
     const parsed = parseInt(input);
@@ -96,7 +96,7 @@
         birthdate.layBirthMonth() !== newBirthdate.layBirthMonth() ||
         birthdate.layBirthDayOfMonth() !== newBirthdate.layBirthDayOfMonth()) {
       birthdate = newBirthdate;
-      dispatch("change", { birthdate });
+      onchange?.({ birthdate });
     }
   }
 

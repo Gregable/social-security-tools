@@ -17,16 +17,15 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
+  // Callback prop for response event
+  export let onresponse: ((detail: { spouse: boolean; name: string; spousename?: string }) => void) | undefined = undefined;
 
   let initial: boolean = true;
   let selfname: string = "Self";
   let spousename: string = "Spouse";
 
   function nospouse() {
-    dispatch("response", {
+    onresponse?.({
       spouse: false,
       name: selfname,
     });
@@ -35,7 +34,7 @@
     initial = false;
   }
   function confirmSpouse() {
-    dispatch("response", {
+    onresponse?.({
       spouse: true,
       name: selfname,
       spousename: spousename,

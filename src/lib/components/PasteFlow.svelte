@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { context } from "$lib/context";
   import { Birthdate } from "$lib/birthday";
   import { Recipient } from "$lib/recipient";
@@ -13,7 +13,8 @@
   import { browser } from "$app/environment";
   import posthog from "posthog-js";
 
-  const dispatch = createEventDispatcher();
+  // Callback prop for done event
+  export let ondone: (() => void) | undefined = undefined;
 
   // The mode of the paste flow. This is a state machine that controls
   // which component is rendered.
@@ -107,7 +108,7 @@
       }
       // Let the app know we're done.
       browser && posthog.capture("Hash Pasted");
-      dispatch("done");
+      ondone?.();
     }
   }
 
@@ -115,34 +116,34 @@
    * Handle the user selecting a demo record. There is no confirmation step
    * for demo records, since the user isn't actually entering data.
    */
-  function handleDemo(event: CustomEvent) {
-    context.recipient = event.detail.recipient;
-    if (event.detail.spouse !== null) {
+  function handleDemo(detail: { recipient: Recipient; spouse: Recipient | null }) {
+    context.recipient = detail.recipient;
+    if (detail.spouse !== null) {
       context.recipient.markFirst();
-      context.spouse = event.detail.spouse;
+      context.spouse = detail.spouse;
       context.spouse.markSecond();
     }
 
     // Let the app know we're done.
     browser && posthog.capture("Demo Loaded");
-    dispatch("done");
+    ondone?.();
   }
 
   /**
    * Handle the user pasting their earnings record. We display a confirmation
    * step, and then prompt for age.
    */
-  function handlePaste(event: CustomEvent) {
+  function handlePaste(detail: { recipient: Recipient }) {
     if (isRecipient) {
-      context.recipient = event.detail.recipient;
+      context.recipient = detail.recipient;
     } else {
       context.recipient.markFirst();
-      context.spouse = event.detail.recipient;
+      context.spouse = detail.recipient;
       context.spouse.markSecond();
       context.spouse.name = spouseName;
     }
 
-    if (event.detail.recipient.isPiaOnly) {
+    if (detail.recipient.isPiaOnly) {
       // If the user only pasted their PIA, we skip the confirmation step.
       mode = Mode.AGE_REQUEST;
     } else {
@@ -176,14 +177,14 @@
   /**
    * Handle the user submitting their age. We're done!
    */
-  function handleAgeSubmit(event: CustomEvent) {
+  function handleAgeSubmit(detail: { birthdate: Birthdate }) {
     if (isRecipient) {
-      context.recipient.birthdate = event.detail.birthdate;
+      context.recipient.birthdate = detail.birthdate;
     } else {
-      context.spouse.birthdate = event.detail.birthdate;
+      context.spouse.birthdate = detail.birthdate;
       browser && posthog.capture("Pasted with spousal");
       // Let the app know we're done.
-      dispatch("done");
+      ondone?.();
     }
     mode = Mode.SPOUSE_QUESTION;
   }
@@ -192,17 +193,17 @@
    * Handle the user responding to the spouse question. If they have a spouse,
    * we repeat the flow for the spouse. If not, we're done!
    */
-  function handleSpouseQuestion(event: CustomEvent) {
-    context.recipient.name = event.detail.name;
-    if (event.detail.spouse) {
+  function handleSpouseQuestion(detail: { spouse: boolean; name: string; spousename?: string }) {
+    context.recipient.name = detail.name;
+    if (detail.spouse) {
       // Mark the recipient as first. Spouse will be marked second later.
       isRecipient = false;
-      spouseName = event.detail.spousename;
+      spouseName = detail.spousename;
       mode = Mode.INITIAL;
     } else {
       browser && posthog.capture("Pasted");
       // Let the app know we're done.
-      dispatch("done");
+      ondone?.();
     }
   }
 </script>
@@ -217,29 +218,29 @@
   {/if}
   {#if mode === Mode.INITIAL}
     {#if isRecipient}
-      <DemoData on:demo={handleDemo} />
+      <DemoData ondemo={handleDemo} />
     {/if}
-    <PastePrompt on:demo={handleDemo} on:paste={handlePaste} />
+    <PastePrompt onpaste={handlePaste} />
   {:else if mode === Mode.PASTE_CONFIRMATION}
     {#if isRecipient}
       <PasteConfirm
-        on:confirm={handleConfirm}
-        on:decline={handleDecline}
+        onconfirm={handleConfirm}
+        ondecline={handleDecline}
         earningsRecords={context.recipient.earningsRecords}
       />
     {:else}
       <PasteConfirm
-        on:confirm={handleConfirm}
-        on:decline={handleDecline}
+        onconfirm={handleConfirm}
+        ondecline={handleDecline}
         earningsRecords={context.spouse.earningsRecords}
       />
     {/if}
   {:else if mode === Mode.PASTE_APOLOGY}
-    <PasteApology on:reset={handleReset} />
+    <PasteApology onreset={handleReset} />
   {:else if mode === Mode.AGE_REQUEST}
-    <AgeRequest on:submit={handleAgeSubmit} />
+    <AgeRequest onsubmit={handleAgeSubmit} />
   {:else if mode === Mode.SPOUSE_QUESTION}
-    <SpouseQuestion on:response={handleSpouseQuestion} />
+    <SpouseQuestion onresponse={handleSpouseQuestion} />
   {/if}
 </div>
 
