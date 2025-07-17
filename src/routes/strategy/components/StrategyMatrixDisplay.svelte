@@ -3,12 +3,12 @@
   import type { MonthDate } from "$lib/month-time";
   import type { Money } from "$lib/money";
   import StrategyMatrix from "./StrategyMatrix.svelte";
-  import { createEventDispatcher } from "svelte";
 
   // Props
   export let recipients: [Recipient, Recipient];
 
-  const dispatch = createEventDispatcher();
+  // Callback props for events
+  export let onselectcell: ((detail: any) => void) | undefined = undefined;
   export let deathAgeRange1: number[];
   export let deathAgeRange2: number[];
   export let calculationResults: any[][];
@@ -63,7 +63,7 @@
           {maxMonthsSinceEpoch}
           {selectedCellData}
           on:hovercell={handleHoverCell}
-          on:selectcell={(event) => dispatch("selectcell", event.detail)}
+          on:selectcell={(event) => onselectcell?.(event.detail)}
         />
       {/each}
     </div>

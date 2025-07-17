@@ -315,8 +315,8 @@
     }
   }
 
-  function handleCellSelect(event: CustomEvent) {
-    selectedCellData = event.detail;
+  function handleCellSelect(detail: any) {
+    selectedCellData = detail;
   }
 
   let showHint = false;
@@ -390,7 +390,7 @@
         {minMonthsSinceEpoch}
         {maxMonthsSinceEpoch}
         {selectedCellData}
-        on:selectcell={handleCellSelect}
+        onselectcell={handleCellSelect}
       />
     {/if}
   </section>
