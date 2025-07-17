@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
   import RecipientName from "$lib/components/RecipientName.svelte";
-  import { createEventDispatcher } from "svelte";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Money } from "$lib/money";
   import {
@@ -34,8 +33,9 @@
     netPresentValue: Money;
   } | null;
 
-  // Event dispatcher
-  const dispatch = createEventDispatcher();
+  // Callback props for events
+  export let onhovercell: ((detail: { rowIndex: number; colIndex: number } | null) => void) | undefined = undefined;
+  export let onselectcell: ((detail: any) => void) | undefined = undefined;
 
   // Matrix width tracking
   let matrixWidth: number = 0;
@@ -144,11 +144,11 @@
 
   // Handle events
   function handleMouseOver(i: number, j: number) {
-    dispatch("hovercell", { rowIndex: i, colIndex: j });
+    onhovercell?.({ rowIndex: i, colIndex: j });
   }
 
   function handleMouseOut() {
-    dispatch("hovercell", null);
+    onhovercell?.(null);
   }
 
   function handleClick(i: number, j: number) {
@@ -159,7 +159,7 @@
       const filingAge2 = result.filingAge2;
       const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
 
-      dispatch("selectcell", {
+      onselectcell?.({
         deathAge1: deathAgeRange1[i],
         deathAge2: deathAgeRange2[j],
         filingAge1Years: result.filingAge1Years,

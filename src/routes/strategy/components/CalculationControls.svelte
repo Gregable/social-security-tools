@@ -4,13 +4,12 @@
   export let calculationProgress: number;
   export let totalCalculations: number;
 
-  // Events
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  // Callback prop for events
+  export let oncalculate: (() => void) | undefined = undefined;
 
   function triggerCalculation() {
-    // Dispatch a custom event to trigger calculation in the parent component
-    dispatch("calculate");
+    // Call the callback function to trigger calculation in the parent component
+    oncalculate?.();
   }
 </script>
 

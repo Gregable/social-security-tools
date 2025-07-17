@@ -34,8 +34,8 @@
   let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
 
   // Handle hover cell events from child components
-  function handleHoverCell(event: CustomEvent) {
-    hoveredCell = event.detail; // event.detail will be null or { rowIndex, colIndex }
+  function handleHoverCell(detail: { rowIndex: number; colIndex: number } | null) {
+    hoveredCell = detail; // detail will be null or { rowIndex, colIndex }
   }
 </script>
 
@@ -62,8 +62,8 @@
           {minMonthsSinceEpoch}
           {maxMonthsSinceEpoch}
           {selectedCellData}
-          on:hovercell={handleHoverCell}
-          on:selectcell={(event) => onselectcell?.(event.detail)}
+          onhovercell={handleHoverCell}
+          onselectcell={(detail) => onselectcell?.(detail)}
         />
       {/each}
     </div>

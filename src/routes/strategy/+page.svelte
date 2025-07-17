@@ -373,7 +373,7 @@
       {isCalculationRunning}
       {calculationProgress}
       {totalCalculations}
-      on:calculate={() => calculateStrategyMatrix()}
+      oncalculate={() => calculateStrategyMatrix()}
     />
   </section>
   <section class="calculation-section" bind:this={matrixDisplayElement}>
