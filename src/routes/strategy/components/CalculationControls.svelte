@@ -7,6 +7,9 @@
   // Callback prop for events
   export let oncalculate: (() => void) | undefined = undefined;
 
+  // Derived variable for progress bar width
+  $: progressWidth = `${totalCalculations > 0 ? (calculationProgress / totalCalculations) * 100 : 0}%`;
+
   function triggerCalculation() {
     // Call the callback function to trigger calculation in the parent component
     oncalculate?.();
@@ -32,9 +35,7 @@
     <div class="progress-bar">
       <div
         class="progress-fill"
-        style:width="{totalCalculations > 0
-          ? (calculationProgress / totalCalculations) * 100
-          : 0}%"
+        style:width={progressWidth}
       ></div>
     </div>
   {/if}

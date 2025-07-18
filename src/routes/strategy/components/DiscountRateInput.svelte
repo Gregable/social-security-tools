@@ -84,6 +84,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin-top: 2rem;
     margin-bottom: 1rem;
   }
 
