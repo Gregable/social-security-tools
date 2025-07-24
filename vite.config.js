@@ -20,6 +20,9 @@ const config = {
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}'],
   },
+  build: {
+    sourcemap: true, // This line will enable sourcemaps for production builds
+  },
 };
 
 export default config;
