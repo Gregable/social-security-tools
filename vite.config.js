@@ -22,6 +22,11 @@ const config = {
   },
   build: {
     sourcemap: true, // This line will enable sourcemaps for production builds
+    minify: 'terser',
+    terserOptions: {
+      keep_fnames: true,
+      keep_classnames: true,
+    },
   },
 };
 
