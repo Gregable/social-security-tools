@@ -1,10 +1,9 @@
 <script lang="ts">
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
-  import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { MonthDate } from "$lib/month-time";
   import {
     optimalStrategy,
-    strategySumTotalPeriods,
   } from "$lib/strategy/calculations";
   import {
     parseBirthdate as parseBirthdateUtil,
