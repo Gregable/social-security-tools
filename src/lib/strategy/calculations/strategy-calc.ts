@@ -190,6 +190,20 @@ export function strategySumPeriods(
 }
 
 /**
+ * Converts an annual discount rate to a monthly discount rate.
+ *
+ * @param {number} annualDiscountRate - Annual discount rate (e.g., 0.03 for 3%).
+ * @returns {number} Monthly discount rate.
+ */
+function calculateMonthlyDiscountRate(annualDiscountRate: number): number {
+  if (annualDiscountRate === 0) {
+    return 0;
+  } else {
+    return Math.pow(1 + annualDiscountRate, 1 / 12) - 1;
+  }
+}
+
+/**
  * Calculates the net present value of all benefit periods.
  *
  * This function calls strategySumPeriods to get an array of benefit periods,
@@ -203,7 +217,7 @@ export function strategySumPeriods(
  *                                              dates (death dates) for each
  *                                              recipient.
  * @param {MonthDate} currentDate - Today's date, used as the reference for NPV calculation.
- * @param {number} discountRate - Annual discount rate (e.g., 0.03 for 3%).
+ * @param {number} monthlyDiscountRate - Monthly discount rate (pre-calculated from annual rate).
  * @param {[MonthDuration, MonthDuration]} strats - An array containing the
  *                                                  filing ages (as
  *                                                  MonthDuration)
@@ -214,19 +228,11 @@ export function strategySumTotalPeriods(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
-  discountRate: number,
+  monthlyDiscountRate: number,
   strats: [MonthDuration, MonthDuration]
 ): Money {
   const periods = strategySumPeriods(recipients, finalDates, strats);
   let totalNPVCents = 0;
-
-  // Calculate monthly discount rate
-  let monthlyDiscountRate: number;
-  if (discountRate === 0) {
-    monthlyDiscountRate = 0;
-  } else {
-    monthlyDiscountRate = Math.pow(1 + discountRate, 1 / 12) - 1;
-  }
 
   for (const period of periods) {
     const monthlyPaymentCents = period.amount.cents();
@@ -345,6 +351,9 @@ export function optimalStrategy(
     -1,
   ];
 
+  // Calculate monthly discount rate once, since it doesn't change during optimization
+  const monthlyDiscountRate = calculateMonthlyDiscountRate(discountRate);
+
   const startFilingDate0: number = earliestFiling(
     recipients[0],
     currentDate
@@ -361,13 +370,13 @@ export function optimalStrategy(
         new MonthDuration(j),
       ];
 
-      const outcome = strategySumTotalPeriods(
+      const outcome = strategySumCents(
         recipients,
         finalDates,
         currentDate,
-        discountRate,
+        monthlyDiscountRate,
         strategy
-      ).cents(); // Get cents value for comparison
+      );
       if (outcome > bestStrategy[2]) {
         bestStrategy = [strategy[0], strategy[1], outcome];
       }
@@ -388,11 +397,13 @@ export function strategySumCents(
   discountRate: number,
   strats: [MonthDuration, MonthDuration]
 ): number {
+  const monthlyDiscountRate = calculateMonthlyDiscountRate(discountRate);
+
   return strategySumTotalPeriods(
     recipients,
     finalDates,
     currentDate,
-    discountRate,
+    monthlyDiscountRate,
     strats
   ).cents();
 }
