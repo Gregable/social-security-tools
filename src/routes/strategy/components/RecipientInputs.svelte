@@ -3,6 +3,7 @@
   import RecipientName from "$lib/components/RecipientName.svelte";
   import BirthdateInput from "$lib/components/BirthdateInput.svelte";
   import { Birthdate } from "$lib/birthday";
+  import { onMount } from "svelte";
 
   // Props
   export let recipients: [Recipient, Recipient];
@@ -11,16 +12,12 @@
 
   // Convert string dates to Birthdate objects for the BirthdateInput component
   let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
-  let birthdateValidity: boolean[] = [false, false];
+  export let birthdateValidity: boolean[] = [false, false];
 
-  // Initialize birthdates from birthdateInputs
-  $: {
+  // Initialize birthdates from birthdateInputs on mount
+  onMount(() => {
     birthdateInputs.forEach((dateStr, index) => {
-      if (
-        dateStr &&
-        (!birthdates[index] ||
-          birthdateInputs[index] !== formatDateForInput(birthdates[index]))
-      ) {
+      if (dateStr) {
         const date = new Date(dateStr);
         if (!isNaN(date.getTime())) {
           birthdates[index] = Birthdate.FromYMD(
@@ -31,12 +28,12 @@
         }
       }
     });
-  }
+  });
 
-  // Update birthdateInputs when birthdates change
-  function updateBirthdateInput(index: number) {
-    if (birthdates[index]) {
-      birthdateInputs[index] = formatDateForInput(birthdates[index]);
+  // Update birthdateInputs when birthdates change from BirthdateInput component
+  function handleBirthdateChange(index: number, newBirthdate: Birthdate) {
+    if (newBirthdate) {
+      birthdateInputs[index] = formatDateForInput(newBirthdate);
     }
   }
 
@@ -76,7 +73,7 @@
         <BirthdateInput
           bind:birthdate={birthdates[i]}
           bind:isValid={birthdateValidity[i]}
-          on:change={() => updateBirthdateInput(i)}
+          on:change={(event) => handleBirthdateChange(i, event.detail.birthdate)}
           inputId={`birthdate${i}`}
         />
       </div>
