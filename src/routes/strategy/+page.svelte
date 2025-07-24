@@ -27,8 +27,6 @@
   const MIN_DEATH_AGE = 62;
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
-  // Strategy tolerance percentage for creating larger grouped areas
-  const STRATEGY_TOLERANCE_PERCENT = 0.01;
 
   // Calculation state
   let startTime: number;
@@ -192,68 +190,6 @@
           // Strategy smoothing: check if we can use a neighboring strategy within tolerance
           let chosenStrategy = [optimal[0], optimal[1]];
           let chosenValue = optimal[2];
-
-          // Helper function to check if a strategy is within tolerance
-          const isWithinTolerance = (
-            neighborValue: number,
-            optimalValue: number
-          ): boolean => {
-            const toleranceRatio = STRATEGY_TOLERANCE_PERCENT / 100;
-            // Ensure tolerance is reasonable (between 0 and 100%)
-            if (toleranceRatio < 0 || toleranceRatio > 1) {
-              console.warn(
-                `Invalid tolerance percentage: ${STRATEGY_TOLERANCE_PERCENT}%. Using optimal strategy.`
-              );
-              return false;
-            }
-            return neighborValue / optimalValue >= 1 - toleranceRatio;
-          };
-
-          // Helper function to evaluate a strategy for the current scenario
-          const evaluateStrategy = (
-            strategy: [MonthDuration, MonthDuration]
-          ): number => {
-            return strategySumTotalPeriods(
-              recipients,
-              finalDates,
-              currentDate,
-              discountRate,
-              strategy
-            ).cents();
-          };
-
-          // Track if we are still using the optimal strategy or not:
-          let modifiedStrategy: boolean = false;
-
-          // Check left neighbor first (same row, previous column)
-          if (j > 0 && calculationResults[i][j - 1]) {
-            const leftNeighbor = calculationResults[i][j - 1];
-            const leftStrategy: [MonthDuration, MonthDuration] = [
-              leftNeighbor.filingAge1,
-              leftNeighbor.filingAge2,
-            ];
-            const leftValue = evaluateStrategy(leftStrategy);
-
-            if (isWithinTolerance(leftValue, optimal[2])) {
-              modifiedStrategy = true;
-              chosenStrategy = leftStrategy;
-              chosenValue = leftValue;
-            }
-          }
-
-          if (!modifiedStrategy && i > 0 && calculationResults[i - 1][j]) {
-            const aboveNeighbor = calculationResults[i - 1][j];
-            const aboveStrategy: [MonthDuration, MonthDuration] = [
-              aboveNeighbor.filingAge1,
-              aboveNeighbor.filingAge2,
-            ];
-            const aboveValue = evaluateStrategy(aboveStrategy);
-
-            if (isWithinTolerance(aboveValue, optimal[2])) {
-              chosenStrategy = aboveStrategy;
-              chosenValue = aboveValue;
-            }
-          }
 
           // Store the result using the chosen strategy
           calculationResults[i][j] = {
