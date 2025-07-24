@@ -204,6 +204,51 @@ function calculateMonthlyDiscountRate(annualDiscountRate: number): number {
 }
 
 /**
+ * Calculates NPV for a single period with optional memoization.
+ * This helper can be used by both the original and optimized functions.
+ */
+function calculatePeriodNPV(
+  monthlyPaymentCents: number,
+  numberOfPayments: number,
+  monthsToFirstPayment: number,
+  monthlyDiscountRate: number,
+  pvFactorCache?: Map<number, number>,
+  discountFactorCache?: Map<number, number>
+): number {
+  if (monthlyDiscountRate === 0) {
+    return monthlyPaymentCents * numberOfPayments;
+  }
+
+  let pvFactor: number;
+  let discountFactorToCurrentDate: number;
+
+  // Use memoization if caches are provided
+  if (pvFactorCache && discountFactorCache) {
+    pvFactor = getMemoizedPVFactor(
+      numberOfPayments,
+      monthlyDiscountRate,
+      pvFactorCache
+    );
+    discountFactorToCurrentDate = getMemoizedDiscountFactor(
+      monthsToFirstPayment,
+      monthlyDiscountRate,
+      discountFactorCache
+    );
+  } else {
+    // Direct calculation for non-memoized case
+    pvFactor =
+      (1 - Math.pow(1 + monthlyDiscountRate, -numberOfPayments)) /
+      monthlyDiscountRate;
+    discountFactorToCurrentDate = Math.pow(
+      1 + monthlyDiscountRate,
+      -monthsToFirstPayment
+    );
+  }
+
+  return monthlyPaymentCents * pvFactor * discountFactorToCurrentDate;
+}
+
+/**
  * Calculates the net present value of all benefit periods.
  *
  * This function calls strategySumPeriods to get an array of benefit periods,
@@ -259,26 +304,16 @@ export function strategySumTotalPeriods(
       effectiveStartPaymentDate.monthsSinceEpoch() +
       1;
 
-    // Number of months from currentDate to the first payment of this effective period
     const monthsToFirstPayment =
       effectiveStartPaymentDate.monthsSinceEpoch() -
       currentDate.monthsSinceEpoch();
 
-    if (monthlyDiscountRate === 0) {
-      totalNPVCents += monthlyPaymentCents * numberOfPayments;
-    } else {
-      // Present value of an ordinary annuity formula: PV = P * [1 - (1 + r_m)^(-N)] / r_m
-      // Then discount this PV back to currentDate: PV_discounted = PV * (1 + r_m)^(-k)
-      const pvFactor =
-        (1 - Math.pow(1 + monthlyDiscountRate, -numberOfPayments)) /
-        monthlyDiscountRate;
-      const discountFactorToCurrentDate = Math.pow(
-        1 + monthlyDiscountRate,
-        -monthsToFirstPayment
-      );
-      totalNPVCents +=
-        monthlyPaymentCents * pvFactor * discountFactorToCurrentDate;
-    }
+    totalNPVCents += calculatePeriodNPV(
+      monthlyPaymentCents,
+      numberOfPayments,
+      monthsToFirstPayment,
+      monthlyDiscountRate
+    );
   }
 
   return Money.fromCents(totalNPVCents);
@@ -324,6 +359,318 @@ function earliestFiling(
 }
 
 /**
+ * Cache for memoizing expensive NPV calculations.
+ */
+interface NPVCache {
+  pvFactorCache: Map<number, number>;
+  discountFactorCache: Map<number, number>;
+}
+
+/**
+ * Memoized calculation of present value factor for an annuity.
+ * PV Factor = [1 - (1 + r)^(-N)] / r
+ */
+function getMemoizedPVFactor(
+  numberOfPayments: number,
+  monthlyDiscountRate: number,
+  cache: Map<number, number>
+): number {
+  if (cache.has(numberOfPayments)) {
+    return cache.get(numberOfPayments)!;
+  }
+
+  const pvFactor =
+    (1 - Math.pow(1 + monthlyDiscountRate, -numberOfPayments)) /
+    monthlyDiscountRate;
+
+  cache.set(numberOfPayments, pvFactor);
+  return pvFactor;
+}
+
+/**
+ * Memoized calculation of discount factor to current date.
+ * Discount Factor = (1 + r)^(-k) where k is months to first payment
+ */
+function getMemoizedDiscountFactor(
+  monthsToFirstPayment: number,
+  monthlyDiscountRate: number,
+  cache: Map<number, number>
+): number {
+  if (cache.has(monthsToFirstPayment)) {
+    return cache.get(monthsToFirstPayment)!;
+  }
+
+  const discountFactor = Math.pow(
+    1 + monthlyDiscountRate,
+    -monthsToFirstPayment
+  );
+
+  cache.set(monthsToFirstPayment, discountFactor);
+  return discountFactor;
+}
+
+/**
+ * Optimized context for strategy calculations that extracts invariant computations.
+ */
+interface OptimizationContext {
+  earner: Recipient;
+  dependent: Recipient;
+  earnerFinalDate: MonthDate;
+  dependentFinalDate: MonthDate;
+  earnerIndex: number;
+  dependentIndex: number;
+  dependentHasZeroPia: boolean;
+  isSpousalBenefitEligible: boolean;
+  monthlyDiscountRate: number;
+  currentDatePlusOne: MonthDate;
+  npvCache: NPVCache;
+}
+
+/**
+ * Creates an optimization context by pre-computing invariant values.
+ */
+function createOptimizationContext(
+  recipients: [Recipient, Recipient],
+  finalDates: [MonthDate, MonthDate],
+  currentDate: MonthDate,
+  monthlyDiscountRate: number
+): OptimizationContext {
+  // Determine the higher and lower earner based on their Primary Insurance Amount (PIA).
+  let earner: Recipient;
+  let dependent: Recipient;
+  let earnerFinalDate: MonthDate;
+  let dependentFinalDate: MonthDate;
+  let earnerIndex: number;
+  let dependentIndex: number;
+
+  if (recipients[0].higherEarningsThan(recipients[1])) {
+    earner = recipients[0];
+    dependent = recipients[1];
+    earnerFinalDate = finalDates[0];
+    dependentFinalDate = finalDates[1];
+    earnerIndex = 0;
+    dependentIndex = 1;
+  } else {
+    earner = recipients[1];
+    dependent = recipients[0];
+    earnerFinalDate = finalDates[1];
+    dependentFinalDate = finalDates[0];
+    earnerIndex = 1;
+    dependentIndex = 0;
+  }
+
+  const dependentHasZeroPia =
+    dependent.pia().primaryInsuranceAmount().cents() == 0;
+  const isSpousalBenefitEligible = dependent.eligibleForSpousalBenefit(earner);
+
+  return {
+    earner,
+    dependent,
+    earnerFinalDate,
+    dependentFinalDate,
+    earnerIndex,
+    dependentIndex,
+    dependentHasZeroPia,
+    isSpousalBenefitEligible,
+    monthlyDiscountRate,
+    currentDatePlusOne: currentDate.addDuration(new MonthDuration(1)),
+    npvCache: {
+      pvFactorCache: new Map<number, number>(),
+      discountFactorCache: new Map<number, number>(),
+    },
+  };
+}
+
+/**
+ * Optimized strategy sum calculation using pre-computed context.
+ */
+function strategySumCentsOptimized(
+  recipients: [Recipient, Recipient],
+  finalDates: [MonthDate, MonthDate],
+  currentDate: MonthDate,
+  context: OptimizationContext,
+  strats: [MonthDuration, MonthDuration]
+): number {
+  // Extract strategy values based on earner/dependent roles
+  const earnerStrat = strats[context.earnerIndex];
+  const dependentStrat = strats[context.dependentIndex];
+
+  // Calculate filing dates
+  let earnerStratDate = context.earner.birthdate.dateAtSsaAge(earnerStrat);
+  let dependentStratDate =
+    context.dependent.birthdate.dateAtSsaAge(dependentStrat);
+
+  // If the dependent has 0 PIA, then they can't file earlier than the earner.
+  // Move the dependent's filing date up to the earner's:
+  if (
+    context.dependentHasZeroPia &&
+    dependentStratDate.lessThan(earnerStratDate)
+  ) {
+    dependentStratDate = earnerStratDate;
+  }
+
+  const periods = strategySumPeriodsOptimized(
+    context,
+    earnerStratDate,
+    dependentStratDate
+  );
+
+  let totalNPVCents = 0;
+
+  for (const period of periods) {
+    const monthlyPaymentCents = period.amount.cents();
+
+    // Determine the effective start and end dates for payments, considering currentDate
+    // Payments are assumed to be received at the end of the month for the previous month's benefits.
+    const firstPaymentDate = period.startDate.addDuration(new MonthDuration(1));
+    const lastPaymentDate = period.endDate.addDuration(new MonthDuration(1));
+
+    // The effective start of payments for NPV calculation is the later of currentDate + 1 month or firstPaymentDate
+    const effectiveStartPaymentDate = MonthDate.max(
+      context.currentDatePlusOne,
+      firstPaymentDate
+    );
+    const effectiveEndPaymentDate = lastPaymentDate;
+
+    // If the effective start date is after the effective end date, no payments from this period contribute to NPV.
+    if (effectiveStartPaymentDate.greaterThan(effectiveEndPaymentDate)) {
+      continue;
+    }
+
+    const numberOfPayments =
+      effectiveEndPaymentDate.monthsSinceEpoch() -
+      effectiveStartPaymentDate.monthsSinceEpoch() +
+      1;
+
+    const monthsToFirstPayment =
+      effectiveStartPaymentDate.monthsSinceEpoch() -
+      currentDate.monthsSinceEpoch();
+
+    totalNPVCents += calculatePeriodNPV(
+      monthlyPaymentCents,
+      numberOfPayments,
+      monthsToFirstPayment,
+      context.monthlyDiscountRate,
+      context.npvCache.pvFactorCache,
+      context.npvCache.discountFactorCache
+    );
+  }
+
+  return totalNPVCents;
+}
+
+/**
+ * Optimized version of strategySumPeriods using pre-computed context.
+ */
+function strategySumPeriodsOptimized(
+  context: OptimizationContext,
+  earnerStratDate: MonthDate,
+  dependentStratDate: MonthDate
+): BenefitPeriod[] {
+  let periods: BenefitPeriod[] = new Array();
+
+  // Determine the start date for survivor benefits. This is the later of:
+  // 1. The month after the earner's death date.
+  // 2. The dependent's filing date.
+  const survivorStartDate = MonthDate.max(
+    context.earnerFinalDate.addDuration(new MonthDuration(1)),
+    dependentStratDate
+  );
+
+  // Determine the dependent's survivor benefit amount:
+  let isSurvivorBenefitApplicable = false;
+  let survivorBenefit: Money = Money.zero();
+  if (context.dependentFinalDate.greaterThan(survivorStartDate)) {
+    survivorBenefit = context.dependent.survivorBenefit(
+      /*deceased*/ context.earner,
+      /*deceasedFilingDate*/ earnerStratDate,
+      /*deceasedDeathDate*/ context.earnerFinalDate,
+      /*survivorFilingDate*/ survivorStartDate
+    );
+    // Note that if the survivor's personal benefit is greater than their
+    // survivor benefit, they will not switch to a survivor benefit.
+    const dependentFinalPersonalBenefit = context.dependent.benefitOnDate(
+      /*filingDate*/ dependentStratDate,
+      // Add a year to include all late filing credits.
+      /*atDate*/ dependentStratDate.addDuration(MonthDuration.OneYear())
+    );
+    if (dependentFinalPersonalBenefit.cents() < survivorBenefit.cents()) {
+      isSurvivorBenefitApplicable = true;
+    }
+  }
+
+  // Earner's Personal Benefit:
+  // Earner is simple as they will never have spousal or survivor benefits:
+  periods.push(
+    ...PersonalBenefitPeriods(
+      context.earner,
+      earnerStratDate,
+      context.earnerFinalDate
+    )
+  );
+
+  // The latest that the dependent will be collecting a personal benefit is the
+  // month before starting a survivor benefit.
+  let dependentFinalPersonalDate = context.dependentFinalDate;
+  if (
+    isSurvivorBenefitApplicable &&
+    context.dependentFinalDate.greaterThanOrEqual(survivorStartDate)
+  ) {
+    dependentFinalPersonalDate = survivorStartDate.subtractDuration(
+      new MonthDuration(1)
+    );
+  }
+
+  // Dependent's Personal Benefit:
+  periods.push(
+    ...PersonalBenefitPeriods(
+      context.dependent,
+      dependentStratDate,
+      dependentFinalPersonalDate
+    )
+  );
+
+  // Dependent's Survivor Benefit:
+  if (isSurvivorBenefitApplicable) {
+    let survivorPeriod = new BenefitPeriod();
+    survivorPeriod.amount = survivorBenefit;
+    survivorPeriod.startDate = survivorStartDate;
+    survivorPeriod.endDate = context.dependentFinalDate;
+    periods.push(survivorPeriod);
+  }
+
+  // Dependent's Spousal Benefit:
+  if (context.isSpousalBenefitEligible) {
+    let spousalPeriod = new BenefitPeriod();
+    // The start date for spousal benefits is the later of the two filing dates.
+    spousalPeriod.startDate = MonthDate.max(
+      earnerStratDate,
+      dependentStratDate
+    );
+    // The end date for spousal benefits is the earlier of when the dependent
+    // starts receiving survivor benefits or their own death date.
+    spousalPeriod.endDate = MonthDate.min(
+      survivorStartDate.subtractDuration(new MonthDuration(1)),
+      // Include the month of the final date:
+      context.dependentFinalDate.addDuration(new MonthDuration(1))
+    );
+
+    if (spousalPeriod.endDate.greaterThanOrEqual(spousalPeriod.startDate)) {
+      spousalPeriod.amount =
+        context.dependent.spousalBenefitOnDateGivenStartDate(
+          /*spouse=*/ context.earner,
+          /*spouseFilingDate=*/ earnerStratDate,
+          /*filingDate=*/ dependentStratDate,
+          /*atDate=*/ spousalPeriod.startDate
+        );
+      periods.push(spousalPeriod);
+    }
+  }
+
+  return periods;
+}
+
+/**
  * Calculates the optimal filing ages for a couple so as to maximize lifetime
  * benefits as returned by strategySumCents
  *
@@ -354,6 +701,14 @@ export function optimalStrategy(
   // Calculate monthly discount rate once, since it doesn't change during optimization
   const monthlyDiscountRate = calculateMonthlyDiscountRate(discountRate);
 
+  // Pre-compute optimization context to avoid repeated calculations
+  const context = createOptimizationContext(
+    recipients,
+    finalDates,
+    currentDate,
+    monthlyDiscountRate
+  );
+
   const startFilingDate0: number = earliestFiling(
     recipients[0],
     currentDate
@@ -370,11 +725,11 @@ export function optimalStrategy(
         new MonthDuration(j),
       ];
 
-      const outcome = strategySumCents(
+      const outcome = strategySumCentsOptimized(
         recipients,
         finalDates,
         currentDate,
-        monthlyDiscountRate,
+        context,
         strategy
       );
       if (outcome > bestStrategy[2]) {

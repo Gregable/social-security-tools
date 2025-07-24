@@ -111,7 +111,7 @@ export function formatPercentagesToCssGridTemplate(
  */
 export function generateDeathAgeRange(deathAgeRangeStart: number): number[] {
   const deathAgeRange: number[] = [];
-  for (let age = deathAgeRangeStart; age <= 120; age += 2) {
+  for (let age = deathAgeRangeStart; age <= 100; age += 2) {
     deathAgeRange.push(age);
   }
   return deathAgeRange;

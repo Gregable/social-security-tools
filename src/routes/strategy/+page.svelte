@@ -23,7 +23,7 @@
   const DEFAULT_BIRTHDATE = "1965-03-15";
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
-  const MIN_DEATH_AGE = 62;
+  const MIN_DEATH_AGE = 66;
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
 
