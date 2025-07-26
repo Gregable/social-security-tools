@@ -18,7 +18,7 @@ const MONTHS_IN_YEAR = 12;
  * @param {MonthDate} finalDate - The final date to calculate benefits through
  * @returns {number} Total personal benefit amount in cents across the period
  */
-class BenefitPeriod {
+export class BenefitPeriod {
   constructor() {}
 
   // startDate and endDate are inclusive on both sides:

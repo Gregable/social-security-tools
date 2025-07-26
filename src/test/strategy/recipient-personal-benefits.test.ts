@@ -7,7 +7,8 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import {
   PersonalBenefitPeriods,
   sumBenefitPeriods,
-} from '$lib/strategy/calculations';
+  BenefitPeriod,
+} from '$lib/strategy/calculations/recipient-personal-benefits';
 
 describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   let recipient: Recipient;
@@ -21,7 +22,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('calculates benefits correctly for a single year', () => {
     // Mock benefitOnDate to return consistent values
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(() => {
+    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(() => {
       return Money.from(1000);
     });
 
@@ -35,7 +36,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
       months: 11,
     }); // Dec 2022
 
-    const periods = PersonalBenefitPeriods(recipient, filingDate, finalDate);
+    const periods: BenefitPeriod[] = [];
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Should be $1000/month * 12 months = $12,000 (in cents)
@@ -44,7 +46,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('calculates benefits correctly across year boundaries', () => {
     // Mock benefitOnDate to return different values in different years
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
       (filingDate, atDate) => {
         if (atDate.year() === 2022) {
           return Money.from(1000);
@@ -61,7 +63,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     }); // July 2022
     const finalDate = MonthDate.initFromYearsMonths({ years: 2023, months: 5 }); // June 2023
 
-    const periods = PersonalBenefitPeriods(recipient, filingDate, finalDate);
+    const periods: BenefitPeriod[] = [];
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // 2022: $1000/month * 6 months (July-Dec) = $6,000
@@ -72,7 +75,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('handles delayed retirement credits correctly', () => {
     // Mock to simulate delayed retirement credits being applied in January
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
       (filingDate, atDate) => {
         // Initial filing at age 68
         if (atDate.year() === filingDate.year() && atDate.monthIndex() <= 11) {
@@ -91,7 +94,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     // Final date at age 85
     const finalDate = MonthDate.initFromYearsMonths({ years: 2045, months: 0 }); // January 2045
 
-    const periods = PersonalBenefitPeriods(recipient, filingDate, finalDate);
+    const periods: BenefitPeriod[] = [];
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // 2028: $1160/month * 6 months (July-Dec) = $6,960
@@ -102,14 +106,15 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   });
 
   it('handles benefits when final date is in the same month as filing date', () => {
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(() => {
+    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(() => {
       return Money.from(1000);
     });
 
     // Filing and dying in the same month
     const sameDate = MonthDate.initFromYearsMonths({ years: 2022, months: 5 }); // June 2022
 
-    const periods = PersonalBenefitPeriods(recipient, sameDate, sameDate);
+    const periods: BenefitPeriod[] = [];
+    PersonalBenefitPeriods(recipient, sameDate, sameDate, periods);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Should be $1000 for 1 month
@@ -117,7 +122,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   });
 
   it('handles final date before filing date correctly', () => {
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(() => {
+    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(() => {
       return Money.from(1000);
     });
 
@@ -128,7 +133,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     }); // July 2022
     const finalDate = MonthDate.initFromYearsMonths({ years: 2022, months: 5 }); // June 2022
 
-    const periods = PersonalBenefitPeriods(recipient, filingDate, finalDate);
+    const periods: BenefitPeriod[] = [];
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Should handle this gracefully - no benefits received
@@ -138,7 +144,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('correctly handles the January benefit bump', () => {
     // Mock to simulate actual SSA behavior with delayed retirement credits
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
       (filingDate, atDate) => {
         // Filing at age 69 in July
         const _filingMonth = filingDate.monthIndex();
@@ -167,7 +173,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     // Final date a year later
     const finalDate = MonthDate.initFromYearsMonths({ years: 2030, months: 6 }); // July 2030
 
-    const periods = PersonalBenefitPeriods(recipient, filingDate, finalDate);
+    const periods: BenefitPeriod[] = [];
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // 2029: $1200/month * 6 months (July-Dec) = $7,200
@@ -186,7 +193,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
       2025: 1093,
     };
 
-    vi.spyOn(recipient, 'benefitOnDate').mockImplementation(
+    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
       (filingDate, atDate) => {
         // Get benefit amount based on year of atDate
         const year = atDate.year();
@@ -205,7 +212,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
       months: 11,
     }); // Dec 2025
 
-    const periods = PersonalBenefitPeriods(recipient, filingDate, finalDate);
+    const periods: BenefitPeriod[] = [];
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Due to the way our function works, all months after January 2023
