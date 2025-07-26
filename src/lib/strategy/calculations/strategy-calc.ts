@@ -692,6 +692,66 @@ export function optimalStrategy(
     -1,
   ];
 
+  const startFilingDate0: number = earliestFiling(
+    recipients[0],
+    currentDate
+  ).asMonths();
+  const startFilingDate1: number = earliestFiling(
+    recipients[1],
+    currentDate
+  ).asMonths();
+
+  for (let i = startFilingDate0; i <= 70 * 12; ++i) {
+    for (let j = startFilingDate1; j <= 70 * 12; ++j) {
+      const strategy: [MonthDuration, MonthDuration] = [
+        new MonthDuration(i),
+        new MonthDuration(j),
+      ];
+
+      const outcome = strategySumCents(
+        recipients,
+        finalDates,
+        currentDate,
+        discountRate,
+        strategy
+      );
+      if (outcome > bestStrategy[2]) {
+        bestStrategy = [strategy[0], strategy[1], outcome];
+      }
+    }
+  }
+
+  return bestStrategy;
+}
+
+/**
+ * Calculates the optimal filing ages for a couple so as to maximize lifetime
+ * benefits as returned by strategySumCents
+ *
+ * @param {[Recipient, Recipient]} recipients - An array containing the two
+ *                                              recipients for whom the strategy
+ *                                              results are being calculated.
+ * @param {[MonthDate, MonthDate]} finalDates - An array containing the final
+ *                                              dates (death dates) for each
+ *                                              recipient.
+ * @param {MonthDate} currentDate - Today's date.
+ * @param {number} discountRate - Rate used for present value calculation. 0
+ *                                means no discount.
+ * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
+ *                                           filing ages for each recipient.
+ */
+export function optimalStrategyOptimized(
+  recipients: [Recipient, Recipient],
+  finalDates: [MonthDate, MonthDate],
+  currentDate: MonthDate,
+  discountRate: number
+): [MonthDuration, MonthDuration, number] {
+  let bestStrategy: [MonthDuration, MonthDuration, number] = [
+    new MonthDuration(0),
+    new MonthDuration(0),
+    -1,
+  ];
+
   // Calculate monthly discount rate once, since it doesn't change during optimization
   const monthlyDiscountRate = calculateMonthlyDiscountRate(discountRate);
 

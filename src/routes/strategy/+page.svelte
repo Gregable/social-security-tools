@@ -179,7 +179,7 @@
           );
 
           // Calculate optimal strategy
-          const optimal = optimalStrategy(
+          const optimal = optimalStrategyOptimized(
             recipients,
             finalDates,
             currentDate,
@@ -266,6 +266,7 @@
   }
 
   import { tick } from "svelte";
+  import { optimalStrategyOptimized } from "$lib/strategy/calculations/strategy-calc";
 
   // Scroll to matrix when calculation is complete
   $: if (isCalculationComplete && matrixDisplayElement) {

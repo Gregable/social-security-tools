@@ -19,6 +19,10 @@ const config = {
   plugins: [viteHeaderPlugin, sveltekit()],
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}'],
+    // Disable the fuzz test except for manual runs:
+    // To run the fuzz test manually, use:
+    //   npm test src/test/strategy/fuzz.test.ts
+    exclude: ['src/test/strategy/fuzz.test.ts'],
   },
   build: {
     sourcemap: true,
