@@ -123,12 +123,11 @@ export function strategySumPeriods(
 
   // Earner's Personal Benefit:
   // Earner is simple as they will never have spousal or survivor benefits:
-  periods.push(
-    ...PersonalBenefitPeriods(
-      earner,
-      earner.birthdate.dateAtSsaAge(earnerStrat),
-      earnerFinalDate
-    )
+  PersonalBenefitPeriods(
+    earner,
+    earner.birthdate.dateAtSsaAge(earnerStrat),
+    earnerFinalDate,
+    periods
   );
   // The latest that the dependent will be collecting a personal benefit is the
   // month before starting a survivor benefit.
@@ -142,12 +141,11 @@ export function strategySumPeriods(
     );
   }
   // Dependent's Personal Benefit:
-  periods.push(
-    ...PersonalBenefitPeriods(
-      dependent,
-      dependent.birthdate.dateAtSsaAge(dependentStrat),
-      dependentFinalPersonalDate
-    )
+  PersonalBenefitPeriods(
+    dependent,
+    dependent.birthdate.dateAtSsaAge(dependentStrat),
+    dependentFinalPersonalDate,
+    periods
   );
 
   // Dependent's Survivor Benefit:
@@ -485,8 +483,6 @@ function createOptimizationContext(
  * Optimized strategy sum calculation using pre-computed context.
  */
 function strategySumCentsOptimized(
-  recipients: [Recipient, Recipient],
-  finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
   context: OptimizationContext,
   strats: [MonthDuration, MonthDuration]
@@ -601,12 +597,11 @@ function strategySumPeriodsOptimized(
 
   // Earner's Personal Benefit:
   // Earner is simple as they will never have spousal or survivor benefits:
-  periods.push(
-    ...PersonalBenefitPeriods(
-      context.earner,
-      earnerStratDate,
-      context.earnerFinalDate
-    )
+  PersonalBenefitPeriods(
+    context.earner,
+    earnerStratDate,
+    context.earnerFinalDate,
+    periods
   );
 
   // The latest that the dependent will be collecting a personal benefit is the
@@ -622,12 +617,11 @@ function strategySumPeriodsOptimized(
   }
 
   // Dependent's Personal Benefit:
-  periods.push(
-    ...PersonalBenefitPeriods(
-      context.dependent,
-      dependentStratDate,
-      dependentFinalPersonalDate
-    )
+  PersonalBenefitPeriods(
+    context.dependent,
+    dependentStratDate,
+    dependentFinalPersonalDate,
+    periods
   );
 
   // Dependent's Survivor Benefit:
@@ -725,13 +719,14 @@ export function optimalStrategy(
         new MonthDuration(j),
       ];
 
-      const outcome = strategySumCentsOptimized(
+      const outcome = strategySumCentsOptimized(currentDate, context, strategy);
+      /*const outcome = strategySumCents(
         recipients,
         finalDates,
         currentDate,
-        context,
+        discountRate,
         strategy
-      );
+      );*/
       if (outcome > bestStrategy[2]) {
         bestStrategy = [strategy[0], strategy[1], outcome];
       }

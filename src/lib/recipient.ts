@@ -633,6 +633,46 @@ export class Recipient {
   }
 
   /**
+   * Given a certain filing date and current date, returns the benefit amount
+   * for the recipient on that date. Does not include spousal benefits.
+   */
+  benefitOnDateOptimized(filingDate: MonthDate, atDate: MonthDate): Money {
+    const filingAge = this.birthdate.ageAtSsaDate(filingDate);
+
+    // If this is the year after filing, delayed credits are fully applied.
+    if (filingDate.year() < atDate.year()) return this.benefitAtAge(filingAge);
+
+    const normalRetirementDate: MonthDate = this.normalRetirementDate();
+
+    // If you are filing before normal retirement, no delayed credits apply.
+    if (filingDate.lessThanOrEqual(normalRetirementDate))
+      return this.benefitAtAge(filingAge);
+
+    // 70 is an explicit exception because the SSA likes to make my life harder.
+    // Normally, you'd need to wait until the next year to get delayed credits,
+    // but not if you file at exactly 70.
+    if (filingAge.years() >= 70) return this.benefitAtAge(filingAge);
+
+    // If you file in January, delayed credits are fully applied.
+    if (filingDate.monthIndex() === 0) return this.benefitAtAge(filingAge);
+
+    // Otherwise, you only get credits up to January of this year,
+    // or NRA, whichever is later.
+    const thisJan = MonthDate.initFromYearsMonths({
+      years: filingDate.year(),
+      months: 0,
+    });
+
+    const benefitComputationDate = normalRetirementDate.greaterThan(thisJan)
+      ? normalRetirementDate
+      : thisJan;
+
+    return this.benefitAtAge(
+      this.birthdate.ageAtSsaDate(benefitComputationDate)
+    );
+  }
+
+  /**
    * @returns True if this recipient is eligible for spousal benefits.
    */
   eligibleForSpousalBenefit(spouse: Recipient): boolean {

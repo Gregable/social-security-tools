@@ -59,8 +59,9 @@ export function sumBenefitPeriods(periods: BenefitPeriod[]): number {
 export function PersonalBenefitPeriods(
   recipient: Recipient,
   filingDate: MonthDate,
-  finalDate: MonthDate
-): BenefitPeriod[] {
+  finalDate: MonthDate,
+  periods: BenefitPeriod[]
+): void {
   // personal benefit is only one of 3 values at any given date:
   //  1) $0 prior to filing
   //  2) Benefit for a few months after filing (see
@@ -87,29 +88,33 @@ export function PersonalBenefitPeriods(
     new MonthDuration(monthsRemainingInFilingYear)
   );
 
-  let periods: BenefitPeriod[] = new Array();
-
-  let initialPeriod = new BenefitPeriod();
-  initialPeriod.amount = recipient.benefitOnDate(filingDate, filingDate);
-  initialPeriod.startDate = filingDate;
-  // Subtract 1 so that we get inclusive periods:
-  initialPeriod.endDate = filingDate.addDuration(
-    new MonthDuration(monthsRemainingInFilingYear - 1)
-  );
   // Don't insert an empty period:
   if (monthsRemainingInFilingYear > 0) {
+    let initialPeriod = new BenefitPeriod();
+    initialPeriod.startDate = filingDate;
+    // Subtract 1 so that we get inclusive periods:
+    initialPeriod.endDate = filingDate.addDuration(
+      new MonthDuration(monthsRemainingInFilingYear - 1)
+    );
+    initialPeriod.amount = recipient.benefitOnDateOptimized(
+      filingDate,
+      filingDate
+    );
     periods.push(initialPeriod);
   }
 
-  let finalPeriod = new BenefitPeriod();
-  finalPeriod.amount = recipient.benefitOnDate(filingDate, janAfterFilingDate);
-  finalPeriod.startDate = initialPeriod.endDate.addDuration(
-    new MonthDuration(1)
-  );
-  finalPeriod.endDate = finalPeriod.startDate.addDuration(
-    new MonthDuration(numMonthsAfterInitialYear - 1)
-  );
-  if (numMonthsAfterInitialYear > 0) periods.push(finalPeriod);
-
-  return periods;
+  if (numMonthsAfterInitialYear > 0) {
+    let finalPeriod = new BenefitPeriod();
+    finalPeriod.amount = recipient.benefitOnDateOptimized(
+      filingDate,
+      janAfterFilingDate
+    );
+    finalPeriod.startDate = filingDate.addDuration(
+      new MonthDuration(monthsRemainingInFilingYear)
+    );
+    finalPeriod.endDate = finalPeriod.startDate.addDuration(
+      new MonthDuration(numMonthsAfterInitialYear - 1)
+    );
+    periods.push(finalPeriod);
+  }
 }
