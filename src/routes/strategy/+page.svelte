@@ -3,9 +3,6 @@
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import {
-    optimalStrategy,
-  } from "$lib/strategy/calculations";
-  import {
     parseBirthdate as parseBirthdateUtil,
     calculateFinalDates as calculateFinalDatesUtil,
     generateDeathAgeRange,

@@ -1,11 +1,10 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
   import RecipientName from "$lib/components/RecipientName.svelte";
+  import StrategyCell from "./StrategyCell.svelte";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Money } from "$lib/money";
   import {
-    getFilingDate,
-    getFilingAge,
     createBorderRemovalFunctions,
   } from "$lib/strategy/ui";
   import { getMonthYearColor } from "$lib/strategy/ui";
@@ -145,16 +144,18 @@
   }
 
   // Handle events
-  function handleMouseOver(i: number, j: number) {
-    onhovercell?.({ rowIndex: i, colIndex: j });
+  function handleCellHover(event) {
+    const { rowIndex, colIndex } = event.detail;
+    onhovercell?.({ rowIndex, colIndex });
   }
 
-  function handleMouseOut() {
+  function handleCellHoverOut() {
     onhovercell?.(null);
   }
 
-  function handleClick(i: number, j: number) {
-    const result = calculationResults[i][j];
+  function handleCellSelect(event) {
+    const { rowIndex, colIndex } = event.detail;
+    const result = calculationResults[rowIndex][colIndex];
     if (result) {
       const filingAge1 = result.filingAge1;
       const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
@@ -162,8 +163,8 @@
       const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
 
       onselectcell?.({
-        deathAge1: deathAgeRange1[i],
-        deathAge2: deathAgeRange2[j],
+        deathAge1: deathAgeRange1[rowIndex],
+        deathAge2: deathAgeRange2[colIndex],
         filingAge1Years: result.filingAge1Years,
         filingAge1Months: result.filingAge1Months,
         filingDate1: filingDate1,
@@ -250,65 +251,24 @@
       >
         {#each deathAgeRange1 as _deathAge1, i}
           {#each deathAgeRange2 as _deathAge2, j}
-            <div
-              class="strategy-cell"
-              class:highlighted-cell={hoveredCell &&
-                hoveredCell.rowIndex === i &&
-                hoveredCell.colIndex === j}
-              class:highlighted-column={hoveredCell &&
-                hoveredCell.colIndex === j &&
-                hoveredCell.rowIndex !== i}
-              class:highlighted-row={hoveredCell &&
-                hoveredCell.rowIndex === i &&
-                hoveredCell.colIndex !== j}
-              class:selected-cell={selectedCellData &&
-                selectedCellData.deathAge1 === deathAgeRange1[i] &&
-                selectedCellData.deathAge2 === deathAgeRange2[j]}
-              on:mouseover={() => handleMouseOver(i, j)}
-              on:mouseout={handleMouseOut}
-              on:focus={() => handleMouseOver(i, j)}
-              on:blur={handleMouseOut}
-              on:click={() => handleClick(i, j)}
-              on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(i, j); } }}
-              tabindex="0"
-              role="gridcell"
-              title="Net present value: {calculationResults[i][
-                j
-              ]?.totalBenefit.string() || 'N/A'}"
-              style={getCellStyle(i, j)}
-            >
-              <div class="filing-dates">
-                {#if calculationResults[i][j]}
-                  {#if displayAsAges}
-                    {getFilingAge(
-                      calculationResults[i][j][
-                        `filingAge${recipientIndex + 1}Years`
-                      ],
-                      calculationResults[i][j][
-                        `filingAge${recipientIndex + 1}Months`
-                      ],
-                      cellDimensions[i]?.[j]?.width || 0,
-                      cellDimensions[i]?.[j]?.height || 0
-                    )}
-                  {:else}
-                    {getFilingDate(
-                      recipients,
-                      recipientIndex,
-                      calculationResults[i][j][
-                        `filingAge${recipientIndex + 1}Years`
-                      ],
-                      calculationResults[i][j][
-                        `filingAge${recipientIndex + 1}Months`
-                      ],
-                      cellDimensions[i]?.[j]?.width || 0,
-                      cellDimensions[i]?.[j]?.height || 0
-                    )}
-                  {/if}
-                {:else}
-                  N/A
-                {/if}
-              </div>
-            </div>
+            <StrategyCell
+              rowIndex={i}
+              colIndex={j}
+              calculationResult={calculationResults[i][j]}
+              {displayAsAges}
+              {recipients}
+              {recipientIndex}
+              {hoveredCell}
+              {selectedCellData}
+              {deathAgeRange1}
+              {deathAgeRange2}
+              cellWidth={cellDimensions[i]?.[j]?.width || 0}
+              cellHeight={cellDimensions[i]?.[j]?.height || 0}
+              cellStyle={getCellStyle(i, j)}
+              on:hover={handleCellHover}
+              on:hoverout={handleCellHoverOut}
+              on:select={handleCellSelect}
+            />
           {/each}
         {/each}
       </div>
@@ -447,66 +407,9 @@
     min-width: 2rem;
   }
 
-  .strategy-cell {
-    border: 1px solid #333;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 0; /* Important for grid items to prevent content from expanding them */
-    min-width: 0; /* Important for grid items to prevent content from expanding them */
-    width: 100%;
-    height: 100%;
-    align-self: stretch;
-    justify-self: stretch;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  /* Highlighting classes */
-  .highlighted-cell {
-    background-color: #007bff !important;
-    color: white;
-  }
-
-  .highlighted-row {
-    background-color: #e6f3ff !important;
-  }
-
-  .highlighted-column {
-    background-color: #e6f3ff !important;
-  }
-
-  .filing-dates {
-    line-height: 1.2;
-    font-size: 0.85rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%; /* Prevent text from forcing cell to expand */
-  }
-
-  .strategy-cell.selected-cell {
-    font-weight: bolder;
-    background-color: #d6e3ff !important;
-    color: #0056b3;
-  }
-
   .empty-corner {
     background-color: #e9ecef;
     min-width: 2rem;
     min-height: 2rem;
-  }
-
-  @media (max-width: 768px) {
-    .filing-dates {
-      font-size: 0.75rem;
-    }
-
-    .strategy-cell {
-      padding: 0.15rem;
-    }
   }
 </style>
