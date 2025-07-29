@@ -176,28 +176,24 @@
           );
 
           // Calculate optimal strategy
-          const optimal = optimalStrategyOptimized(
+          const [optimalFilingAge1, optimalFilingAge2, netPresentValue] = optimalStrategyOptimized(
             recipients,
             finalDates,
             currentDate,
             discountRate
           );
 
-          // Strategy smoothing: check if we can use a neighboring strategy within tolerance
-          let chosenStrategy = [optimal[0], optimal[1]];
-          let chosenValue = optimal[2];
-
           // Store the result using the chosen strategy
           calculationResults[i][j] = {
             deathAge1,
             deathAge2,
-            filingAge1: chosenStrategy[0],
-            filingAge2: chosenStrategy[1],
-            totalBenefit: Money.fromCents(chosenValue),
-            filingAge1Years: chosenStrategy[0].years(),
-            filingAge1Months: chosenStrategy[0].modMonths(),
-            filingAge2Years: chosenStrategy[1].years(),
-            filingAge2Months: chosenStrategy[1].modMonths(),
+            filingAge1: optimalFilingAge1,
+            filingAge2: optimalFilingAge2,
+            totalBenefit: Money.fromCents(netPresentValue),
+            filingAge1Years: optimalFilingAge1.years(),
+            filingAge1Months: optimalFilingAge1.modMonths(),
+            filingAge2Years: optimalFilingAge2.years(),
+            filingAge2Months: optimalFilingAge2.modMonths(),
           };
 
           calculationProgress += CALCULATIONS_PER_SCENARIO;
