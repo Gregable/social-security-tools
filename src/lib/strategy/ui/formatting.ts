@@ -138,6 +138,36 @@ export function createValueExtractor(
 }
 
 /**
+ * Get a formatted string representing the filing age based on cell dimensions
+ * @param filingAgeYears Years component of filing age
+ * @param filingAgeMonths Months component of filing age
+ * @param cellWidth The computed width of the cell in pixels
+ * @param cellHeight The computed height of the cell in pixels
+ */
+export function getFilingAge(
+  filingAgeYears: number,
+  filingAgeMonths: number,
+  cellWidth: number = 0,
+  _cellHeight: number = 0
+): string {
+  // Use different formats based on cell dimensions
+  if (filingAgeMonths === 0) {
+    return `${filingAgeYears}`;
+  } else if (cellWidth < 40) {
+    // Very small cell - only show the years
+    return `${filingAgeYears}...`;
+  } else if (cellWidth < 50) {
+    // Small cell - show years with abbreviated months if any
+    return `${filingAgeYears} ${filingAgeMonths}m`;
+  } else if (cellWidth < 80) {
+    return `${filingAgeYears} ${filingAgeMonths}mo`;
+  } else {
+    const monthText = filingAgeMonths === 1 ? 'month' : 'months';
+    return `${filingAgeYears} ${filingAgeMonths} ${monthText}`;
+  }
+}
+
+/**
  * Factory function to create border removal functions
  * @param valueExtractor Function that extracts the value to compare
  * @returns Object with functions for each border direction

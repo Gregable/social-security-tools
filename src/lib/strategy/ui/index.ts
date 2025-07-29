@@ -5,6 +5,7 @@ export {
   calculateFinalDates,
   calculateAgeRange,
   getFilingDate,
+  getFilingAge,
   createValueExtractor,
   createBorderRemovalFunctions,
 } from './formatting.js';

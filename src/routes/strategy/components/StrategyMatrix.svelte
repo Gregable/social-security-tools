@@ -5,6 +5,7 @@
   import type { Money } from "$lib/money";
   import {
     getFilingDate,
+    getFilingAge,
     createBorderRemovalFunctions,
   } from "$lib/strategy/ui";
   import { getMonthYearColor } from "$lib/strategy/ui";
@@ -13,6 +14,7 @@
   // Props
   export let recipientIndex: number;
   export let recipients: [Recipient, Recipient];
+  export let displayAsAges: boolean = false;
   export let deathAgeRange1: number[];
   export let deathAgeRange2: number[];
   export let calculationResults: any[][];
@@ -177,7 +179,7 @@
 <div class="matrix-container recipient-matrix">
   <div class="matrix-title">
     <h4>
-      Optimal Filing Date for <RecipientName r={recipients[recipientIndex]} />
+      Optimal Filing {displayAsAges ? 'Age' : 'Date'} for <RecipientName r={recipients[recipientIndex]} />
     </h4>
   </div>
   <div class="matrix-legend">
@@ -277,18 +279,31 @@
             >
               <div class="filing-dates">
                 {#if calculationResults[i][j]}
-                  {getFilingDate(
-                    recipients,
-                    recipientIndex,
-                    calculationResults[i][j][
-                      `filingAge${recipientIndex + 1}Years`
-                    ],
-                    calculationResults[i][j][
-                      `filingAge${recipientIndex + 1}Months`
-                    ],
-                    cellDimensions[i]?.[j]?.width || 0,
-                    cellDimensions[i]?.[j]?.height || 0
-                  )}
+                  {#if displayAsAges}
+                    {getFilingAge(
+                      calculationResults[i][j][
+                        `filingAge${recipientIndex + 1}Years`
+                      ],
+                      calculationResults[i][j][
+                        `filingAge${recipientIndex + 1}Months`
+                      ],
+                      cellDimensions[i]?.[j]?.width || 0,
+                      cellDimensions[i]?.[j]?.height || 0
+                    )}
+                  {:else}
+                    {getFilingDate(
+                      recipients,
+                      recipientIndex,
+                      calculationResults[i][j][
+                        `filingAge${recipientIndex + 1}Years`
+                      ],
+                      calculationResults[i][j][
+                        `filingAge${recipientIndex + 1}Months`
+                      ],
+                      cellDimensions[i]?.[j]?.width || 0,
+                      cellDimensions[i]?.[j]?.height || 0
+                    )}
+                  {/if}
                 {:else}
                   N/A
                 {/if}
