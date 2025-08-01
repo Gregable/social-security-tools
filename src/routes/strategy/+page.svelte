@@ -15,6 +15,7 @@
   import CalculationControls from "./components/CalculationControls.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
+  import AlternativeStrategiesSection from "./components/AlternativeStrategiesSection.svelte";
 
   // Constants
   const DEFAULT_BIRTHDATE = "1965-03-15";
@@ -348,6 +349,12 @@
         deathProb1={cellData?.deathProb1}
         deathProb2={cellData?.deathProb2}
         {recipients}
+      />
+
+      <AlternativeStrategiesSection
+        {recipients}
+        {selectedCellData}
+        {discountRate}
       />
     {/if}
   </section>
