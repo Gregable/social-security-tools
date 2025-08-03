@@ -18,8 +18,8 @@
   let filingAgeRange1 = [];
   let filingAgeRange2 = [];
   let isCalculating = false;
-  let minNPV = null;
-  let maxNPV = null;
+  let _minNPV = null;
+  let _maxNPV = null;
 
   // Calculate current date
   const now = new Date();
@@ -204,8 +204,8 @@
       
       // Calculate min/max for color coding
       if (npvValues.length > 0) {
-        minNPV = Math.min(...npvValues);
-        maxNPV = Math.max(...npvValues);
+        _minNPV = Math.min(...npvValues);
+        _maxNPV = Math.max(...npvValues);
       }
       
     } catch (error) {
@@ -270,10 +270,10 @@
    * Formats an age for display in year headers (years only).
    * 
    * @param {number} years - The age in years
-   * @param {number} months - The additional months (ignored in this format)
+   * @param {number} _months - The additional months (ignored in this format)
    * @returns {string} The age formatted as years only (e.g., "65")
    */
-  function formatAge(years, months) {
+  function _formatAge(years, _months) {
     return `${years}`;
   }
   
@@ -322,7 +322,7 @@
           {#each yearHeaders2 as yearHeader}
             <div 
               class="year-header-cell"
-              style="width: {yearHeader.colspan * 8}px"
+              style:width="{yearHeader.colspan * 8}px"
               title="{recipients[1].name}: Age {yearHeader.year}"
             >
               {yearHeader.year === 70 ? '' : yearHeader.year}
@@ -337,7 +337,7 @@
             {#each yearHeaders1 as yearHeader1}
               <div 
                 class="row-year-header"
-                style="height: {yearHeader1.colspan * 8}px"
+                style:height="{yearHeader1.colspan * 8}px"
                 title="{recipients[0].name}: Age {yearHeader1.year}"
               >
                 <span class="year-text">{yearHeader1.year === 70 ? '' : yearHeader1.year}</span>
@@ -347,13 +347,13 @@
           
           <!-- Data grid -->
           <div class="data-grid">
-            {#each filingAgeRange1 as age1, i}
+            {#each filingAgeRange1 as _age1, i}
               <div class="grid-row">
-                {#each filingAgeRange2 as age2, j}
+                {#each filingAgeRange2 as _age2, j}
                   {@const result = alternativeResults[i][j]}
                   <div 
                     class="data-cell"
-                    style="background-color: {getColor(result.percentOfOptimal, result.npv, optimalNPV.cents())}"
+                    style:background-color="{getColor(result.percentOfOptimal, result.npv, optimalNPV.cents())}"
                     title="Filing ages:
 {recipients[0].name}: {formatFullAge(result.filingAge1Years, result.filingAge1Months)}
 {recipients[1].name}: {formatFullAge(result.filingAge2Years, result.filingAge2Months)}
@@ -373,27 +373,27 @@ NPV: {formatCurrency(result.npv)} ({result.percentOfOptimal.toFixed(1)}% of opti
         <h4>Legend</h4>
         <div class="legend-items">
           <div class="legend-item">
-            <div class="legend-color" style="background-color: rgb(0, 100, 0)"></div>
+            <div class="legend-color" style:background-color="rgb(0, 100, 0)"></div>
             <span>Exact optimal match (100%)</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background-color: rgb(34, 139, 34)"></div>
+            <div class="legend-color" style:background-color="rgb(34, 139, 34)"></div>
             <span>95-100% of optimal</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background-color: rgb(154, 205, 50)"></div>
+            <div class="legend-color" style:background-color="rgb(154, 205, 50)"></div>
             <span>90-95% of optimal</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background-color: rgb(255, 215, 0)"></div>
+            <div class="legend-color" style:background-color="rgb(255, 215, 0)"></div>
             <span>85-90% of optimal</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background-color: rgb(255, 165, 0)"></div>
+            <div class="legend-color" style:background-color="rgb(255, 165, 0)"></div>
             <span>80-85% of optimal</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background-color: rgb(220, 20, 60)"></div>
+            <div class="legend-color" style:background-color="rgb(220, 20, 60)"></div>
             <span>&lt;80% of optimal</span>
           </div>
         </div>

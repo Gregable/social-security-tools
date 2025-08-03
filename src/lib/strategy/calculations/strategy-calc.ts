@@ -773,8 +773,14 @@ export function optimalStrategyOptimized(
   ).asMonths();
 
   // Pre-compute final loop bounds to avoid expensive calculations in loops
-  const endFilingAge0: number = Math.min(70 * 12, recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths());
-  const endFilingAge1: number = Math.min(70 * 12, recipients[1].birthdate.ageAtSsaDate(finalDates[1]).asMonths());
+  const endFilingAge0: number = Math.min(
+    70 * 12,
+    recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths()
+  );
+  const endFilingAge1: number = Math.min(
+    70 * 12,
+    recipients[1].birthdate.ageAtSsaDate(finalDates[1]).asMonths()
+  );
 
   for (let i = startFilingDate0; i <= endFilingAge0; ++i) {
     for (let j = startFilingDate1; j <= endFilingAge1; ++j) {
