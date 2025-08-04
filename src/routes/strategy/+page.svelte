@@ -39,6 +39,7 @@
   let totalCalculations = 0;
   let minMonthsSinceEpoch: number | null = null;
   let maxMonthsSinceEpoch: number | null = null;
+  let displayAsAges: boolean = false;
 
   let selectedCellData: {
     deathAge1: number;
@@ -320,6 +321,7 @@
         {minMonthsSinceEpoch}
         {maxMonthsSinceEpoch}
         {selectedCellData}
+        bind:displayAsAges
         onselectcell={handleCellSelect}
       />
     {/if}
@@ -355,6 +357,7 @@
         {recipients}
         {selectedCellData}
         {discountRate}
+        bind:displayAsAges
       />
     {/if}
   </section>

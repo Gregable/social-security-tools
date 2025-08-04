@@ -6,7 +6,7 @@
 
   // Props
   export let recipients: [Recipient, Recipient];
-  export let displayAsAges: boolean = false;
+  export let displayAsAges: boolean;
 
   // Callback props for events
   export let onselectcell: ((detail: any) => void) | undefined = undefined;
