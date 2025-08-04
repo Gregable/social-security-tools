@@ -407,25 +407,36 @@
     
     <div 
       class="grid-wrapper"
-      style:grid-template-columns="25px repeat({range2Length}, 8px)"
-      style:grid-template-rows="20px repeat({range1Length}, 8px)"
+      style:grid-template-columns="20px 25px repeat({range2Length}, 8px)"
+      style:grid-template-rows="20px 20px repeat({range1Length}, 8px)"
       on:mouseleave={handleGridMouseLeave}
       role="grid"
       tabindex="0"
     >
-        <!-- Corner cell -->
+        <!-- Top-left corner cells -->
         <div class="corner-cell" style:grid-column="1" style:grid-row="1"></div>
+        <div class="corner-cell" style:grid-column="2" style:grid-row="1"></div>
+        <div class="corner-cell" style:grid-column="1" style:grid-row="2"></div>
+        <div class="corner-cell" style:grid-column="2" style:grid-row="2"></div>
+        
+        <!-- Recipient name headers -->
+        <div class="recipient-header recipient-header-column" style:grid-column="3 / {range2Length + 3}" style:grid-row="1">
+          <RecipientName r={recipients[1]} apos/>&nbsp;Filing {displayAsAges ? 'Age' : 'Date'}
+        </div>
+        <div class="recipient-header recipient-header-row" style:grid-column="1" style:grid-row="3 / {range1Length + 3}">
+          <span class="recipient-text"><RecipientName r={recipients[0]} apos /> Filing {displayAsAges ? 'Age' : 'Date'}</span>
+        </div>
         
         <!-- Column headers (Recipient 2 ages) - spanning headers -->
         {#each yearHeaders2 as yearHeader, headerIndex}
-          {@const colOffset = 2}
+          {@const colOffset = 3}
           {@const startCol = colOffset + (headerIndex > 0 ? yearHeaders2.slice(0, headerIndex).reduce((sum, h) => sum + h.colspan, 0) : 0)}
           {@const endCol = startCol + yearHeader.colspan}
           {@const isHighlighted = displayedColIndex >= 0 && displayedColIndex >= (startCol - colOffset) && displayedColIndex < (endCol - colOffset)}
           <div 
             class="column-header-cell {isHighlighted ? 'highlighted' : ''}"
             style:grid-column="{startCol} / {endCol}"
-            style:grid-row="1"
+            style:grid-row="2"
           >
             {#if displayAsAges ? yearHeader.colspan >= 2 : yearHeader.colspan >= 4}
               {yearHeader.year}
@@ -435,13 +446,13 @@
         
         <!-- Row headers (Recipient 1 ages) - spanning headers -->
         {#each yearHeaders1 as yearHeader, headerIndex}
-          {@const rowOffset = 2}
+          {@const rowOffset = 3}
           {@const startRow = rowOffset + (headerIndex > 0 ? yearHeaders1.slice(0, headerIndex).reduce((sum, h) => sum + h.colspan, 0) : 0)}
           {@const endRow = startRow + yearHeader.colspan}
           {@const isHighlighted = displayedRowIndex >= 0 && displayedRowIndex >= (startRow - rowOffset) && displayedRowIndex < (endRow - rowOffset)}
           <div 
             class="row-header-cell {isHighlighted ? 'highlighted' : ''}"
-            style:grid-column="1"
+            style:grid-column="2"
             style:grid-row="{startRow} / {endRow}"
           >
             {#if displayAsAges ? yearHeader.colspan >= 2 : yearHeader.colspan >= 4}
@@ -458,8 +469,8 @@
             {@const isPinnedCell = isPinned && pinnedRowIndex === i && pinnedColIndex === j}
             <div 
               class="data-cell {isHovered ? 'hovered' : ''} {isPinnedCell ? 'pinned' : ''}"
-              style:grid-column="{j + 2}"
-              style:grid-row="{i + 2}"
+              style:grid-column="{j + 3}"
+              style:grid-row="{i + 3}"
               style:background-color="{getColor(result.percentOfOptimal, result.npv, optimalNPV)}"
               on:mouseenter={() => handleCellMouseEnter(i, j, result)}
               on:click={() => handleCellClick(i, j, result)}
@@ -590,7 +601,7 @@
   }
 
   .column-header-cell {
-    background-color: #f5f5f5;
+    background-color: #f0f0f0;
     border-right: 1px solid #ddd;
     border-bottom: 1px solid #ccc;
     display: flex;
@@ -623,6 +634,27 @@
     background-color: #dd6600;
     color: white;
     font-weight: bold;
+  }
+
+  .recipient-header {
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #333;
+  }
+
+  .recipient-header-row {
+    /* Row header spans vertically */
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+
+  .recipient-text {
+    transform: rotate(180deg);
+    white-space: nowrap;
   }
 
   .data-cell {
@@ -694,8 +726,8 @@
     }
     
     .grid-wrapper {
-      grid-template-columns: 20px repeat(var(--grid-cols, 100), 6px);
-      grid-template-rows: 15px repeat(var(--grid-rows, 100), 6px);
+      grid-template-columns: 15px 20px repeat(var(--grid-cols, 100), 6px);
+      grid-template-rows: 15px 15px repeat(var(--grid-rows, 100), 6px);
     }
     
     .corner-cell {
@@ -708,6 +740,10 @@
     
     .row-header-cell {
       font-size: 0.6rem;
+    }
+
+    .recipient-header {
+      font-size: 0.7rem;
     }
   }
 </style>
