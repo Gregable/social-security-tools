@@ -133,6 +133,16 @@ export class Money {
     return new Money(Math.floor(this.cents_ / 10) * 10);
   }
 
+  /**
+   * Checks if this Money object is equal to another Money object.
+   *
+   * @param other - The Money object to compare with
+   * @returns true if both Money objects represent the same value, false otherwise
+   */
+  equals(other: Money): boolean {
+    return this.cents_ === other.cents_;
+  }
+
   private constructor(cents: number) {
     if (isNaN(cents)) {
       throw new Error('Money constructor called with NaN');

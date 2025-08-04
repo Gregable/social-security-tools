@@ -57,3 +57,50 @@ test('can determine a maximum', () => {
   const max = Money.max(money, other);
   expect(max.value()).toEqual(123.45);
 });
+
+test('can check equality with another money object', () => {
+  const money1 = Money.from(123.45);
+  const money2 = Money.from(123.45);
+  const money3 = Money.from(67.89);
+
+  expect(money1.equals(money2)).toBe(true);
+  expect(money1.equals(money3)).toBe(false);
+  expect(money2.equals(money3)).toBe(false);
+});
+
+test('equality works with fromCents constructor', () => {
+  const money1 = Money.fromCents(12345);
+  const money2 = Money.from(123.45);
+
+  expect(money1.equals(money2)).toBe(true);
+});
+
+test('wholeDollars formats as currency without decimal places', () => {
+  const money1 = Money.from(1234.56);
+  expect(money1.wholeDollars()).toBe('$1,235');
+
+  const money2 = Money.from(1000000.99);
+  expect(money2.wholeDollars()).toBe('$1,000,001');
+
+  const money3 = Money.from(0.49);
+  expect(money3.wholeDollars()).toBe('$0');
+
+  const money4 = Money.from(0.5);
+  expect(money4.wholeDollars()).toBe('$1');
+});
+
+test('wholeDollars handles negative values correctly', () => {
+  const money1 = Money.from(-1234.56);
+  expect(money1.wholeDollars()).toBe('-$1,235');
+
+  const money2 = Money.from(-0.49);
+  expect(money2.wholeDollars()).toBe('-$0');
+
+  const money3 = Money.from(-0.51);
+  expect(money3.wholeDollars()).toBe('-$1');
+});
+
+test('wholeDollars handles zero correctly', () => {
+  const money = Money.from(0);
+  expect(money.wholeDollars()).toBe('$0');
+});

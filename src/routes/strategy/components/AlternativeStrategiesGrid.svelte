@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
-  import type { Money } from "$lib/money";
+  
   import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { MonthDurationRange } from "$lib/month-duration-range";
+  import { Money } from "$lib/money";
   import { calculateFinalDates as calculateFinalDatesUtil } from "$lib/strategy/ui";
   import { strategySumCents } from "$lib/strategy/calculations/strategy-calc";
   import RecipientName from "$lib/components/RecipientName.svelte";
@@ -14,91 +16,82 @@
   export let optimalNPV: Money;
 
   // State
-  let alternativeResults = [];
-  let filingAgeRange1 = [];
-  let filingAgeRange2 = [];
-  let isCalculating = false;
-  let _minNPV = null;
-  let _maxNPV = null;
+  interface AlternativeResult {
+    filingAge1: MonthDuration;
+    filingAge2: MonthDuration;
+    npv: Money;
+    percentOfOptimal: number;
+  }
+  
+  let alternativeResults: AlternativeResult[][] = [];
+  let filingAgeRange1: MonthDurationRange;
+  let filingAgeRange2: MonthDurationRange;
+  let isCalculating: boolean = false;
+  const currentDate: MonthDate = MonthDate.initFromNow();
 
-  // Calculate current date
-  const now = new Date();
-  let currentDate;
-  $: currentDate = MonthDate.initFromYearsMonths({
-    years: now.getFullYear(),
-    months: now.getMonth(),
-  });
+  // Hover state tracking
+  let hoveredRowIndex: number = -1;
+  let hoveredColIndex: number = -1;
+  let hoveredResult: AlternativeResult | null = null;
+  
+  // Pin state tracking
+  let isPinned: boolean = false;
+  let pinnedRowIndex: number = -1;
+  let pinnedColIndex: number = -1;
+  let pinnedResult: AlternativeResult | null = null;
 
-  // Generate filing age ranges (all months from earliest filing age to 70+0, clipped to future dates)
   /**
-   * Generates all possible filing age combinations for both recipients.
+   * Creates a filing age range for a given recipient.
    * 
-   * This function creates monthly filing age ranges from each recipient's 
-   * earliest eligible filing month (typically 62+0 or 62+1 based on birth day) 
-   * up to exactly age 70+0. The ranges are clipped to exclude any ages in the 
-   * past.
+   * This function calculates the earliest and latest possible filing ages
+   * for a recipient. The earliest is typically 62+0 or 62+1 based on birth day,
+   * clipped to exclude any ages in the past. The latest is exactly age 70+0.
    * 
-   * @returns {Array<Array<{years: number, months: number}>>} A 2-element array
-   * where each element contains an array of age objects with years and
-   * months properties.
-   *    Index 0 is for recipient 1, index 1 is for recipient 2.
+   * @param recipient - The recipient for whom to generate filing age ranges
+   * @returns A MonthDurationRange representing possible filing ages
    */
-  function generateFilingAgeRanges() {
-    const ranges = [[], []];
+  function createFilingAgeRange(recipient: Recipient): MonthDurationRange {
+    const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
     
-    for (let recipientIndex = 0; recipientIndex < 2; recipientIndex++) {
-      const recipient = recipients[recipientIndex];
-      const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
-      const currentAgeMonths = currentAge.asMonths();
-      
-      // Get the earliest filing age for this recipient
-      const earliestFiling = recipient.birthdate.earliestFilingMonth();
-      const earliestFilingMonths = earliestFiling.asMonths();
-      
-      // Start from the maximum of earliest filing age or current age
-      const startingAgeMonths = Math.max(earliestFilingMonths, currentAgeMonths);
-      
-      // Generate all monthly combinations from starting age to exactly 70+0
-      for (let totalMonths = startingAgeMonths; totalMonths <= 70 * 12; totalMonths++) {
-        const years = Math.floor(totalMonths / 12);
-        const months = totalMonths % 12;
-        
-        ranges[recipientIndex].push({ years, months });
-      }
-    }
+    // Get the earliest filing age for this recipient
+    const earliestFiling = recipient.birthdate.earliestFilingMonth();
     
-    return ranges;
+    // Start from the maximum of earliest filing age or current age
+    const startingAge = currentAge.greaterThan(earliestFiling) ? currentAge : earliestFiling;
+    
+    const end = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
+    
+    return new MonthDurationRange(startingAge, end);
   }
 
-  // Generate year headers with month spans
   /**
    * Creates year-based header objects that span across multiple months.
    * 
-   * Takes an array of monthly age ranges and groups them by year, calculating
-   * how many months each year spans. This is used to create column and row
-   * headers that show only the year (e.g., "62", "63") but span across all
-   * the months within that year in the grid.
+   * Takes an array of MonthDuration objects and groups them by year, 
+   * calculating how many months each year spans. This is used to create column 
+   * and row headers that show only the year (e.g., "62", "63") but span across 
+   * all the months within that year in the grid.
    *
-   * @param {Array<{years: number, months: number}>} ageRange - Array of age
-   * objects containing years and months properties
+   * @param {MonthDuration[]} ageRange - Array of MonthDuration objects
    * @returns {Array<{year: number, colspan: number}>} Array of header objects
    * where each object contains the year to display and the number of months it 
    * spans
    */
-  function generateYearHeaders(ageRange) {
+  function generateYearHeaders(ageRange: MonthDuration[]): Array<{year: number, colspan: number}> {
     const yearHeaders = [];
     let currentYear = null;
     let monthCount = 0;
     
-    for (const age of ageRange) {
-      if (age.years !== currentYear) {
+    for (const duration of ageRange) {
+      const years = duration.years();
+      if (years !== currentYear) {
         if (currentYear !== null && monthCount > 0) {
           yearHeaders.push({
             year: currentYear,
             colspan: monthCount
           });
         }
-        currentYear = age.years;
+        currentYear = years;
         monthCount = 1;
       } else {
         monthCount++;
@@ -117,7 +110,7 @@
   }
 
   // Calculate alternative strategies when inputs change
-  $: if (recipients && deathAge1 && deathAge2 && discountRate !== undefined && optimalNPV) {
+  $: if (recipients && deathAge1 && deathAge2 && discountRate && optimalNPV) {
     calculateAlternativeStrategies();
   }
 
@@ -129,71 +122,60 @@
    * between the two recipients. The calculation respects each recipient's
    * earliest eligible filing age and current age constraints.
    * 
-   * The function runs asynchronously with periodic yielding to prevent UI blocking
-   * during large calculations (potentially 100x100 = 10,000 combinations).
+   * The function runs asynchronously with periodic yielding to prevent UI 
+   * blocking during large calculations (potentially 100x100 = 10,000 
+   * combinations).
    * 
    * Updates the component state with:
    * - alternativeResults: 2D array of NPV results and metadata
-   * - minNPV/maxNPV: Range values for color coding
    * - isCalculating: Loading state flag
+   * - filingAgeRange1/filingAgeRange2: The ranges of filing ages for each 
+   *     recipient
    */
-  async function calculateAlternativeStrategies() {
+  async function calculateAlternativeStrategies(): Promise<void> {
     if (isCalculating) return;
     
     isCalculating = true;
     
     try {
       // Generate age ranges
-      [filingAgeRange1, filingAgeRange2] = generateFilingAgeRanges();
+      filingAgeRange1 = createFilingAgeRange(recipients[0]);
+      filingAgeRange2 = createFilingAgeRange(recipients[1]);
       
       // Calculate final dates for the death ages
-      const finalDates = calculateFinalDatesUtil(recipients, deathAge1, deathAge2);
+      const finalDates: [MonthDate, MonthDate] = calculateFinalDatesUtil(
+        recipients, deathAge1, deathAge2);
       
       // Initialize results matrix
-      alternativeResults = Array(filingAgeRange1.length)
+      alternativeResults = Array(filingAgeRange1.getLength())
         .fill(null)
-        .map(() => Array(filingAgeRange2.length).fill(null));
-      
-      let npvValues: number[] = [];
-      
+        .map(() => Array(filingAgeRange2.getLength()).fill(null));
+           
       // Calculate NPV for each filing strategy combination (monthly precision)
-      for (let i = 0; i < filingAgeRange1.length; i++) {
-        for (let j = 0; j < filingAgeRange2.length; j++) {
-          const age1 = filingAgeRange1[i];
-          const age2 = filingAgeRange2[j];
-          
-          // Convert to MonthDuration
-          const strategy1 = MonthDuration.initFromYearsMonths({
-            years: age1.years,
-            months: age1.months
-          });
-          const strategy2 = MonthDuration.initFromYearsMonths({
-            years: age2.years,
-            months: age2.months
-          });
+      for (let i = 0; i < filingAgeRange1.getLength(); i++) {
+        for (let j = 0; j < filingAgeRange2.getLength(); j++) {
+          const strategy1 = filingAgeRange1.indexToMonthDuration(i);
+          const strategy2 = filingAgeRange2.indexToMonthDuration(j);
           
           // Calculate NPV for this strategy
-          const npv = strategySumCents(
+          const npvCents = strategySumCents(
             recipients,
             finalDates,
             currentDate,
             discountRate,
             [strategy1, strategy2]
           );
+          const npv = Money.fromCents(npvCents);
           
           // Calculate percentage of optimal
-          const percentOfOptimal = (npv / optimalNPV.cents()) * 100;
+          const percentOfOptimal = npv.div$(optimalNPV) * 100;
           
           alternativeResults[i][j] = {
-            filingAge1Years: age1.years,
-            filingAge1Months: age1.months,
-            filingAge2Years: age2.years,
-            filingAge2Months: age2.months,
+            filingAge1: strategy1,
+            filingAge2: strategy2,
             npv: npv,
             percentOfOptimal
           };
-          
-          npvValues.push(npv);
         }
         
         // Allow UI to update periodically
@@ -201,13 +183,6 @@
           await new Promise(resolve => setTimeout(resolve, 0));
         }
       }
-      
-      // Calculate min/max for color coding
-      if (npvValues.length > 0) {
-        _minNPV = Math.min(...npvValues);
-        _maxNPV = Math.max(...npvValues);
-      }
-      
     } catch (error) {
       console.error("Error calculating alternative strategies:", error);
     } finally {
@@ -232,13 +207,13 @@
    * - Red (rgb(220, 20, 60)): <80% of optimal
    * 
    * @param {number} percentOfOptimal - The NPV as a percentage of the optimal NPV
-   * @param {number} npv - The actual NPV value in cents
-   * @param {number} optimalNPVCents - The optimal NPV value in cents for exact comparison
+   * @param {Money} npv - The actual NPV value as a Money object
+   * @param {Money} optimalNPV - The optimal NPV value as a Money object for exact comparison
    * @returns {string} RGB color string for use in CSS background-color
    */
-  function getColor(percentOfOptimal, npv, optimalNPVCents) {
-    // Special color for exact 100% match (same NPV as optimal)
-    if (npv === optimalNPVCents) return 'rgb(0, 100, 0)'; // Dark green for exact match
+  function getColor(percentOfOptimal: number, npv: Money, optimalNPV: Money): string {
+    // Special color for exact 100% match (same NPV as optimal), Dark green
+    if (npv.equals(optimalNPV)) return 'rgb(0, 100, 0)';
     
     // Color scale from red (bad) to green (optimal)
     if (percentOfOptimal >= 95) return 'rgb(34, 139, 34)'; // Green
@@ -249,50 +224,73 @@
   }
 
   /**
-   * Formats a monetary value in cents to a USD currency string.
-   * 
-   * Converts cents to dollars and formats with proper currency symbols,
-   * thousands separators, and no decimal places for cleaner display.
-   * 
-   * @param {number} cents - The monetary value in cents
-   * @returns {string} Formatted currency string (e.g., "$1,234,567")
+   * Handles mouse enter events on data cells to update hover state.
    */
-  function formatCurrency(cents) {
-    return (cents / 100).toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    });
+  function handleCellMouseEnter(i: number, j: number, result: AlternativeResult): void {
+    if (!isPinned) {
+      hoveredRowIndex = i;
+      hoveredColIndex = j;
+      hoveredResult = result;
+    }
   }
 
   /**
-   * Formats an age for display in year headers (years only).
-   * 
-   * @param {number} years - The age in years
-   * @param {number} _months - The additional months (ignored in this format)
-   * @returns {string} The age formatted as years only (e.g., "65")
+   * Handles mouse leave events on the grid to clear hover state.
    */
-  function _formatAge(years, _months) {
-    return `${years}`;
+  function handleGridMouseLeave(): void {
+    if (!isPinned) {
+      hoveredRowIndex = -1;
+      hoveredColIndex = -1;
+      hoveredResult = null;
+    }
   }
-  
+
   /**
-   * Formats an age for display with full precision (years + months).
-   * 
-   * Used in tooltips and detailed displays where the exact monthly
-   * filing age is important.
-   * 
-   * @param {number} years - The age in years
-   * @param {number} months - The additional months (0-11)
-   * @returns {string} The age formatted as "years+months" (e.g., "65+6") 
-   *   or just "years" if months is 0
+   * Handles click events on data cells to toggle pin state.
    */
-  function formatFullAge(years, months) {
-    if (months === 0) {
-      return `${years}`;
+  function handleCellClick(i: number, j: number, result: AlternativeResult): void {
+    if (isPinned) {
+      // If currently pinned, any click unpins
+      isPinned = false;
+      pinnedRowIndex = -1;
+      pinnedColIndex = -1;
+      pinnedResult = null;
+      // Set hover state to clicked cell
+      hoveredRowIndex = i;
+      hoveredColIndex = j;
+      hoveredResult = result;
     } else {
-      return `${years}+${months}`;
+      // If not pinned, pin to this cell
+      isPinned = true;
+      pinnedRowIndex = i;
+      pinnedColIndex = j;
+      pinnedResult = result;
+      // Clear hover state when pinned
+      hoveredRowIndex = -1;
+      hoveredColIndex = -1;
+      hoveredResult = null;
+    }
+  }
+
+  // Reactive statement to determine which cell should be highlighted and which result to show
+  $: displayedRowIndex = isPinned ? pinnedRowIndex : hoveredRowIndex;
+  $: displayedColIndex = isPinned ? pinnedColIndex : hoveredColIndex;
+  $: displayedResult = isPinned ? pinnedResult : hoveredResult;
+
+  /**
+   * Formats a MonthDuration as a readable age string.
+   * Converts "62+1" format to "Age 62 and 1 month" format.
+   */
+  function formatAge(duration: MonthDuration): string {
+    const years = duration.years();
+    const months = duration.modMonths();
+    
+    if (months === 0) {
+      return `Age ${years}`;
+    } else if (months === 1) {
+      return `Age ${years} and 1 month`;
+    } else {
+      return `Age ${years} and ${months} months`;
     }
   }
 </script>
@@ -310,62 +308,102 @@
       <p>Calculating alternative strategies...</p>
     </div>
   {:else if alternativeResults.length > 0}
-    {@const yearHeaders1 = generateYearHeaders(filingAgeRange1)}
-    {@const yearHeaders2 = generateYearHeaders(filingAgeRange2)}
+    {@const filingAgeRange1Array = filingAgeRange1.toArray()}
+    {@const filingAgeRange2Array = filingAgeRange2.toArray()}
+    {@const yearHeaders1 = generateYearHeaders(filingAgeRange1Array)}
+    {@const yearHeaders2 = generateYearHeaders(filingAgeRange2Array)}
+    {@const range1Length = filingAgeRange1.getLength()}
+    {@const range2Length = filingAgeRange2.getLength()}
     
-    <div class="grid-container">
-      <div class="grid-wrapper">
-        <!-- Year headers (Recipient 2 ages) -->
-        <div class="year-header-row">
-          <div class="corner-cell">
+    <!-- Info Panel -->
+    <div class="info-panel">
+      <h4>Cell Details {isPinned ? '(Pinned - click cell to unpin)' : ''}</h4>
+      {#if displayedResult}
+        <div class="info-content">
+          <div class="info-row">
+            <span class="info-label"><RecipientName r={recipients[0]} />:</span>
+            <span class="info-value">{formatAge(displayedResult.filingAge1)}</span>
           </div>
-          {#each yearHeaders2 as yearHeader}
+          <div class="info-row">
+            <span class="info-label"><RecipientName r={recipients[1]} />:</span>
+            <span class="info-value">{formatAge(displayedResult.filingAge2)}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><abbr title="Net Present Value">NPV</abbr>:</span>
+            <span class="info-value">{displayedResult.npv.wholeDollars()} ({displayedResult.percentOfOptimal.toFixed(1)}% of optimal)</span>
+          </div>
+        </div>
+      {:else}
+        <div class="info-content">
+          <p class="info-hint">Hover over a cell to see filing strategy details{isPinned ? '' : ', or click to pin'}</p>
+        </div>
+      {/if}
+    </div>
+    
+    <div 
+      class="grid-wrapper"
+      style:grid-template-columns="25px repeat({range2Length}, 8px)"
+      style:grid-template-rows="20px repeat({range1Length}, 8px)"
+      on:mouseleave={handleGridMouseLeave}
+      role="grid"
+      tabindex="0"
+    >
+        <!-- Corner cell -->
+        <div class="corner-cell" style:grid-column="1" style:grid-row="1"></div>
+        
+        <!-- Column headers (Recipient 2 ages) - spanning headers -->
+        {#each yearHeaders2 as yearHeader, headerIndex}
+          {@const colOffset = 2}
+          {@const startCol = colOffset + (headerIndex > 0 ? yearHeaders2.slice(0, headerIndex).reduce((sum, h) => sum + h.colspan, 0) : 0)}
+          {@const endCol = startCol + yearHeader.colspan}
+          {@const isHighlighted = displayedColIndex >= 0 && displayedColIndex >= (startCol - colOffset) && displayedColIndex < (endCol - colOffset)}
+          <div 
+            class="column-header-cell {isHighlighted ? 'highlighted' : ''}"
+            style:grid-column="{startCol} / {endCol}"
+            style:grid-row="1"
+          >
+            {#if yearHeader.colspan >= 2}
+              {yearHeader.year}
+            {/if}
+          </div>
+        {/each}
+        
+        <!-- Row headers (Recipient 1 ages) - spanning headers -->
+        {#each yearHeaders1 as yearHeader, headerIndex}
+          {@const rowOffset = 2}
+          {@const startRow = rowOffset + (headerIndex > 0 ? yearHeaders1.slice(0, headerIndex).reduce((sum, h) => sum + h.colspan, 0) : 0)}
+          {@const endRow = startRow + yearHeader.colspan}
+          {@const isHighlighted = displayedRowIndex >= 0 && displayedRowIndex >= (startRow - rowOffset) && displayedRowIndex < (endRow - rowOffset)}
+          <div 
+            class="row-header-cell {isHighlighted ? 'highlighted' : ''}"
+            style:grid-column="1"
+            style:grid-row="{startRow} / {endRow}"
+          >
+            {#if yearHeader.colspan >= 2}
+              <span class="year-text">{yearHeader.year}</span>
+            {/if}
+          </div>
+        {/each}
+        
+        <!-- Data cells -->
+        {#each Array(range1Length) as _, i}
+          {#each Array(range2Length) as _, j}
+            {@const result = alternativeResults[i][j]}
+            {@const isHovered = displayedRowIndex === i && displayedColIndex === j}
+            {@const isPinnedCell = isPinned && pinnedRowIndex === i && pinnedColIndex === j}
             <div 
-              class="year-header-cell"
-              style:width="{yearHeader.colspan * 8}px"
-              title="{recipients[1].name}: Age {yearHeader.year}"
+              class="data-cell {isHovered ? 'hovered' : ''} {isPinnedCell ? 'pinned' : ''}"
+              style:grid-column="{j + 2}"
+              style:grid-row="{i + 2}"
+              style:background-color="{getColor(result.percentOfOptimal, result.npv, optimalNPV)}"
+              on:mouseenter={() => handleCellMouseEnter(i, j, result)}
+              on:click={() => handleCellClick(i, j, result)}
+              role="gridcell"
+              tabindex="0"
             >
-              {yearHeader.year === 70 ? '' : yearHeader.year}
             </div>
           {/each}
-        </div>
-        
-        <!-- Main grid with monthly detail -->
-        <div class="main-grid">
-          <!-- Row year headers column -->
-          <div class="row-year-headers">
-            {#each yearHeaders1 as yearHeader1}
-              <div 
-                class="row-year-header"
-                style:height="{yearHeader1.colspan * 8}px"
-                title="{recipients[0].name}: Age {yearHeader1.year}"
-              >
-                <span class="year-text">{yearHeader1.year === 70 ? '' : yearHeader1.year}</span>
-              </div>
-            {/each}
-          </div>
-          
-          <!-- Data grid -->
-          <div class="data-grid">
-            {#each filingAgeRange1 as _age1, i}
-              <div class="grid-row">
-                {#each filingAgeRange2 as _age2, j}
-                  {@const result = alternativeResults[i][j]}
-                  <div 
-                    class="data-cell"
-                    style:background-color="{getColor(result.percentOfOptimal, result.npv, optimalNPV.cents())}"
-                    title="Filing ages:
-{recipients[0].name}: {formatFullAge(result.filingAge1Years, result.filingAge1Months)}
-{recipients[1].name}: {formatFullAge(result.filingAge2Years, result.filingAge2Months)}
-NPV: {formatCurrency(result.npv)} ({result.percentOfOptimal.toFixed(1)}% of optimal)"
-                  >
-                    <!-- Cell content removed for cleaner visual -->
-                  </div>
-                {/each}
-              </div>
-            {/each}
-          </div>
-        </div>
+        {/each}
       </div>
       
       <!-- Legend -->
@@ -398,13 +436,11 @@ NPV: {formatCurrency(result.npv)} ({result.percentOfOptimal.toFixed(1)}% of opti
           </div>
         </div>
       </div>
-    </div>
   {/if}
 </div>
 
 <style>
   .alternative-strategies-container {
-    margin-top: 2rem;
     padding: 1.5rem;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -424,99 +460,138 @@ NPV: {formatCurrency(result.npv)} ({result.percentOfOptimal.toFixed(1)}% of opti
     color: #666;
   }
 
-  .grid-container {
-    margin-top: 1rem;
+  .info-panel {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    min-height: 120px;
+  }
+
+  .info-panel h4 {
+    margin: 0 0 0.75rem 0;
+    color: #0056b3;
+    font-size: 0.9rem;
+  }
+
+  .info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 88px; /* Consistent height to prevent jumping */
+  }
+
+  .info-row {
+    display: grid;
+    grid-template-columns: minmax(120px, max-content) 1fr;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .info-label {
+    font-weight: 500;
+    color: #333;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .info-value {
+    font-weight: bold;
+    color: #0056b3;
+    text-align: left;
+  }
+
+  .info-hint {
+    color: #666;
+    font-style: italic;
+    margin: 0;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  /* Style the abbreviation */
+  abbr {
+    text-decoration: underline dotted;
+    cursor: help;
   }
 
   .grid-wrapper {
-    overflow-x: auto;
+    display: grid;
+    overflow: auto;
     border: 1px solid #ddd;
     border-radius: 4px;
+    margin-top: 1rem;
+    cursor: crosshair;
   }
 
-  .year-header-row {
-    display: flex;
-    background-color: #f0f0f0;
-    border-bottom: 2px solid #ccc;
-    position: sticky;
-    top: 0;
-    z-index: 2;
+  .corner-cell {
+    background-color: #e0e0e0;
   }
 
-  .year-header-cell {
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+  .column-header-cell {
     background-color: #f5f5f5;
-    font-size: 0.7rem;
     border-right: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    box-sizing: border-box;
-  }
-
-  .main-grid {
-    display: flex;
-  }
-
-  .row-year-headers {
-    display: flex;
-    flex-direction: column;
-    background-color: #f0f0f0;
-    border-right: 2px solid #ccc;
-    position: sticky;
-    left: 0;
-    z-index: 1;
-  }
-
-  .row-year-header {
-    width: 25px;
+    border-bottom: 1px solid #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    background-color: #f0f0f0;
-    border-bottom: 1px solid #ddd;
     font-size: 0.7rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .column-header-cell.highlighted {
+    background-color: #558855;
+    color: white;
+    font-weight: bold;
+  }
+
+  .row-header-cell {
+    background-color: #f0f0f0;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.7rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .row-header-cell.highlighted {
+    background-color: #dd6600;
+    color: white;
+    font-weight: bold;
+  }
+
+  .data-cell {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: crosshair;
     box-sizing: border-box;
+    transition: all 0.1s ease;
+  }
+
+  .data-cell.hovered {
+    border: 3px solid #ffffff !important;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    position: relative;
+    transform: scale(1.1);
+  }
+
+  .data-cell.pinned {
+    border: 3px solid #ffd700 !important;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+    z-index: 15;
+    position: relative;
+    transform: scale(1.15);
   }
 
   .year-text {
     transform: rotate(-90deg);
     white-space: nowrap;
-  }
-
-  .data-grid {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .grid-row {
-    display: flex;
-  }
-
-  .corner-cell {
-    width: 25px;
-    height: 20px;
-    background-color: #e0e0e0;
-    border-right: 2px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.5rem;
-    box-sizing: border-box;
-  }
-
-  .data-cell {
-    width: 8px;
-    height: 8px;
-    border-right: 1px solid #ddd;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-sizing: border-box;
   }
 
   .legend {
@@ -558,29 +633,21 @@ NPV: {formatCurrency(result.npv)} ({result.percentOfOptimal.toFixed(1)}% of opti
       gap: 0.5rem;
     }
     
+    .grid-wrapper {
+      grid-template-columns: 20px repeat(var(--grid-cols, 100), 6px);
+      grid-template-rows: 15px repeat(var(--grid-rows, 100), 6px);
+    }
+    
     .corner-cell {
-      width: 20px;
-      height: 15px;
       font-size: 0.4rem;
-      box-sizing: border-box;
     }
     
-    .year-header-cell {
-      height: 15px;
+    .column-header-cell {
       font-size: 0.6rem;
-      box-sizing: border-box;
     }
     
-    .row-year-header {
-      width: 20px;
+    .row-header-cell {
       font-size: 0.6rem;
-      box-sizing: border-box;
-    }
-    
-    .data-cell {
-      width: 6px;
-      height: 6px;
-      box-sizing: border-box;
     }
   }
 </style>

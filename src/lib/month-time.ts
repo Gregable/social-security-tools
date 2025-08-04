@@ -55,6 +55,18 @@ export class MonthDate {
   }
 
   /**
+   * Initializes a MonthDate to the current date.
+   * @returns A MonthDate initialized to the current date.
+   */
+  static initFromNow(): MonthDate {
+    const now = new Date();
+    return MonthDate.initFromYearsMonths({
+      years: now.getFullYear(),
+      months: now.getMonth(),
+    });
+  }
+
+  /**
    * Returns the number of months since epoch.
    */
   monthsSinceEpoch(): number {
@@ -315,6 +327,25 @@ export class MonthDuration {
    */
   decrement() {
     this.months_ -= 1;
+  }
+
+  /**
+   * Formats this duration for display with full precision (years + months).
+   *
+   * Used in tooltips and detailed displays where the exact monthly
+   * duration is important.
+   *
+   * @returns The duration formatted as "years+months" (e.g., "65+6")
+   *   or just "years" if months is 0
+   */
+  toDisplayString(): string {
+    const years = this.years();
+    const months = this.modMonths();
+    if (months === 0) {
+      return `${years}`;
+    } else {
+      return `${years}+${months}`;
+    }
   }
 }
 
