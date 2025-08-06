@@ -10,6 +10,12 @@
   export let piaValues: [number, number];
   export let birthdateInputs: [string, string];
 
+  // Callbacks for when form values change
+  export let onBirthdateChange: ((index: number, dateString: string) => void) | undefined = undefined;
+  export let onPiaChange: ((index: number, piaValue: number) => void) | undefined = undefined;
+  export let onNameChange: ((index: number, name: string) => void) | undefined = undefined;
+  export let onGenderChange: ((index: number, gender: string) => void) | undefined = undefined;
+
   // Convert string dates to Birthdate objects for the BirthdateInput component
   let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
   export let birthdateValidity: boolean[] = [false, false];
@@ -33,8 +39,31 @@
   // Update birthdateInputs when birthdates change from BirthdateInput component
   function handleBirthdateChange(index: number, newBirthdate: Birthdate) {
     if (newBirthdate) {
-      birthdateInputs[index] = formatDateForInput(newBirthdate);
+      const newDateStr = formatDateForInput(newBirthdate);
+      // Use callback to notify parent component
+      onBirthdateChange?.(index, newDateStr);
     }
+  }
+
+  // Handle PIA value changes
+  function handlePiaChange(index: number, event: Event) {
+    const target = event.target as HTMLInputElement;
+    const piaValue = parseFloat(target.value) || 0;
+    onPiaChange?.(index, piaValue);
+  }
+
+  // Handle name changes
+  function handleNameChange(index: number, event: Event) {
+    const target = event.target as HTMLInputElement;
+    const name = target.value;
+    onNameChange?.(index, name);
+  }
+
+  // Handle gender changes
+  function handleGenderChange(index: number, event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const gender = target.value;
+    onGenderChange?.(index, gender);
   }
 
   // Format Birthdate object to YYYY-MM-DD string for input
@@ -52,7 +81,12 @@
     <div class="recipient-column">
       <div class="input-group">
         <label for="name{i}">Name:</label>
-        <input id="name{i}" type="text" bind:value={recipient.name} />
+        <input 
+          id="name{i}" 
+          type="text" 
+          value={recipient.name}
+          on:input={(event) => handleNameChange(i, event)} 
+        />
       </div>
       <div class="input-group">
         <label for="pia{i}">
@@ -63,7 +97,8 @@
           type="number"
           step="100"
           min="0"
-          bind:value={piaValues[i]}
+          value={piaValues[i]}
+          on:input={(event) => handlePiaChange(i, event)}
         />
       </div>
       <div class="input-group">
@@ -73,7 +108,7 @@
         <BirthdateInput
           bind:birthdate={birthdates[i]}
           bind:isValid={birthdateValidity[i]}
-          on:change={(event) => handleBirthdateChange(i, event.detail.birthdate)}
+          onchange={(event) => handleBirthdateChange(i, event.birthdate)}
           inputId={`birthdate${i}`}
         />
       </div>
@@ -83,7 +118,8 @@
         </label>
         <select
           id="gender{i}"
-          bind:value={recipient.gender}
+          value={recipient.gender}
+          on:change={(event) => handleGenderChange(i, event)}
           class="select-input"
         >
           <option value="blended">Unspecified</option>

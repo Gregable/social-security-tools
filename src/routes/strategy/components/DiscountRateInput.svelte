@@ -3,6 +3,7 @@
   import { getRecommendedDiscountRate } from "$lib/strategy/data";
 
   export let discountRatePercent: number;
+  export let onDiscountRateChange: ((discountRatePercent: number) => void) | undefined = undefined;
   let highlightInput = false;
   let treasuryRate: number = 2.5; // Default value
 
@@ -43,13 +44,18 @@
 
       // Update the discountRatePercent if it's currently set to our default treasury rate (2.5%)
       if (discountRatePercent === 2.5) {
-        discountRatePercent = treasuryRate;
+        handleDiscountRateChange(treasuryRate);
       }
     } catch (error) {
       console.error("Failed to fetch recommended discount rate:", error);
       // Keep default 2.5% if fetch fails
     }
   });
+
+  // Handle discount rate changes
+  function handleDiscountRateChange(newValue: number) {
+    onDiscountRateChange?.(newValue);
+  }
 </script>
 
 <div class="global-input-group">
@@ -61,7 +67,7 @@
         class="preset-button"
         class:active={discountRatePercent === preset.value}
         on:click={() => {
-          discountRatePercent = preset.value;
+          handleDiscountRateChange(preset.value);
           triggerHighlight();
         }}
       >
@@ -74,7 +80,12 @@
     type="number"
     step="0.1"
     min="0"
-    bind:value={discountRatePercent}
+    value={discountRatePercent}
+    on:input={(event) => {
+      const target = event.target as HTMLInputElement;
+      const value = parseFloat(target.value) || 0;
+      handleDiscountRateChange(value);
+    }}
     class:highlight={highlightInput}
   />
 </div>

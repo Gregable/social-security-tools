@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Recipient } from "$lib/recipient";
+  import type { GenderOption } from "$lib/recipient";
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import {
@@ -69,6 +70,70 @@
   // Recipients setup
   let recipients: [Recipient, Recipient] = initializeRecipients();
 
+  // Function to handle birthdate changes from the RecipientInputs component
+  function handleBirthdateChange(index: number, dateString: string) {
+    try {
+      // Update both the input tracking and the recipient directly
+      birthdateInputs[index] = dateString;
+      birthdateInputs = [...birthdateInputs]; // For form state consistency
+      
+      // Update recipient birthdate directly
+      if (dateString && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        recipients[index].birthdate = parseBirthdateUtil(dateString);
+        recipients = [...recipients]; // Force reactivity
+      }
+    } catch (error) {
+      console.warn("Error updating recipient birthdate:", error);
+    }
+  }
+
+  // Function to handle PIA changes from the RecipientInputs component
+  function handlePiaChange(index: number, piaValue: number) {
+    try {
+      // Update both the input tracking and the recipient directly
+      piaValues[index] = piaValue;
+      piaValues = [...piaValues]; // For form state consistency
+      
+      // Update recipient PIA directly
+      recipients[index].setPia(Money.from(piaValue));
+      recipients = [...recipients]; // Force reactivity
+    } catch (error) {
+      console.warn("Error updating recipient PIA:", error);
+    }
+  }
+
+  // Function to handle name changes from the RecipientInputs component
+  function handleNameChange(index: number, name: string) {
+    try {
+      // Update recipient name directly
+      recipients[index].name = name;
+      recipients = [...recipients]; // Force reactivity
+    } catch (error) {
+      console.warn("Error updating recipient name:", error);
+    }
+  }
+
+  // Function to handle gender changes from the RecipientInputs component
+  function handleGenderChange(index: number, gender: string) {
+    try {
+      // Update recipient gender directly
+      recipients[index].gender = gender as GenderOption;
+      recipients = [...recipients]; // Force reactivity
+    } catch (error) {
+      console.warn("Error updating recipient gender:", error);
+    }
+  }
+
+  // Function to handle discount rate changes from the DiscountRateInput component
+  function handleDiscountRateChange(newDiscountRatePercent: number) {
+    try {
+      // Update discount rate percent directly
+      discountRatePercent = newDiscountRatePercent;
+    } catch (error) {
+      console.warn("Error updating discount rate:", error);
+    }
+  }
+
   /**
    * Initialize recipients with default values
    */
@@ -80,6 +145,16 @@
     recipient2.markSecond();
     recipient1.name = DEFAULT_NAMES[0];
     recipient2.name = DEFAULT_NAMES[1];
+
+    // Set initial birthdates and PIA values
+    try {
+      recipient1.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
+      recipient2.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
+      recipient1.setPia(Money.from(DEFAULT_PIA_VALUES[0]));
+      recipient2.setPia(Money.from(DEFAULT_PIA_VALUES[1]));
+    } catch (error) {
+      console.warn("Error setting initial recipient data:", error);
+    }
 
     return [recipient1, recipient2];
   }
@@ -97,14 +172,6 @@
     startTime = Date.now();
 
     try {
-      // Set birthdates from input strings
-      recipients[0].birthdate = parseBirthdateUtil(birthdateInputs[0]);
-      recipients[1].birthdate = parseBirthdateUtil(birthdateInputs[1]);
-
-      // Set PIA for recipients
-      recipients[0].setPia(Money.from(piaValues[0]));
-      recipients[1].setPia(Money.from(piaValues[1]));
-
       // Get birth years for both recipients
       const birthYear1 = recipients[0].birthdate.layBirthYear();
       const birthYear2 = recipients[1].birthdate.layBirthYear();
@@ -139,8 +206,8 @@
       deathProbDistribution2 = [...deathProbDistribution2];
 
       // Calculate death age range start ages
-      const currentAge1 = currentYear - new Date(birthdateInputs[0]).getFullYear();
-      const currentAge2 = currentYear - new Date(birthdateInputs[1]).getFullYear();
+      const currentAge1 = currentYear - recipients[0].birthdate.layBirthYear();
+      const currentAge2 = currentYear - recipients[1].birthdate.layBirthYear();
       const startAge1 = Math.max(MIN_DEATH_AGE, currentAge1);
       const startAge2 = Math.max(MIN_DEATH_AGE, currentAge2);
 
@@ -293,9 +360,20 @@
     <section class="input-section">
       <h2>Recipient Information</h2>
 
-      <RecipientInputs {recipients} {piaValues} {birthdateInputs} />
+      <RecipientInputs 
+        {recipients} 
+        {piaValues} 
+        {birthdateInputs} 
+        onBirthdateChange={handleBirthdateChange}
+        onPiaChange={handlePiaChange}
+        onNameChange={handleNameChange}
+        onGenderChange={handleGenderChange}
+      />
 
-      <DiscountRateInput bind:discountRatePercent />
+      <DiscountRateInput 
+        {discountRatePercent} 
+        onDiscountRateChange={handleDiscountRateChange} 
+      />
     </section>
   </div>
 

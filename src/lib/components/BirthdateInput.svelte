@@ -20,8 +20,7 @@
   export let autoFocus = false;
   export let isValid = false;
 
-  // Callback prop for change event
-  export let onchange: ((detail: { birthdate: Birthdate }) => void) | undefined = undefined;
+  export let onchange: ((event: { birthdate: Birthdate }) => void) | undefined = undefined;
 
   let bday_day;
   let bday_year;
@@ -96,7 +95,7 @@
         birthdate.layBirthMonth() !== newBirthdate.layBirthMonth() ||
         birthdate.layBirthDayOfMonth() !== newBirthdate.layBirthDayOfMonth()) {
       birthdate = newBirthdate;
-      onchange?.({ birthdate });
+      onchange?.({ birthdate: newBirthdate });
     }
   }
 
