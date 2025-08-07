@@ -16,9 +16,22 @@
   export let onNameChange: ((index: number, name: string) => void) | undefined = undefined;
   export let onGenderChange: ((index: number, gender: string) => void) | undefined = undefined;
 
+  // Validation state callback
+  export let onValidityChange: ((isValid: boolean) => void) | undefined = undefined;
+
   // Convert string dates to Birthdate objects for the BirthdateInput component
   let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
   export let birthdateValidity: boolean[] = [false, false];
+  
+  // PIA validation state
+  let piaValidity: boolean[] = [true, true];
+  let piaErrors: string[] = ["", ""];
+  
+  // Overall validity
+  $: isValid = birthdateValidity[0] && birthdateValidity[1] && piaValidity[0] && piaValidity[1];
+  
+  // Notify parent of validity changes
+  $: onValidityChange?.(isValid);
 
   // Initialize birthdates from birthdateInputs on mount
   onMount(() => {
@@ -49,7 +62,28 @@
   function handlePiaChange(index: number, event: Event) {
     const target = event.target as HTMLInputElement;
     const piaValue = parseFloat(target.value) || 0;
+    
+    // Validate PIA
+    validatePia(index, piaValue);
+    
     onPiaChange?.(index, piaValue);
+  }
+  
+  // Validate PIA value
+  function validatePia(index: number, value: number) {
+    if (value < 0) {
+      piaValidity[index] = false;
+      piaErrors[index] = "PIA must be a positive number";
+    } else if (value > 10000) {
+      piaValidity[index] = false;
+      piaErrors[index] = "PIA seems unusually high (max typical value is around $4,000)";
+    } else {
+      piaValidity[index] = true;
+      piaErrors[index] = "";
+    }
+    // Force reactivity
+    piaValidity = [...piaValidity];
+    piaErrors = [...piaErrors];
   }
 
   // Handle name changes
@@ -98,8 +132,12 @@
           step="100"
           min="0"
           value={piaValues[i]}
+          class:invalid={!piaValidity[i]}
           on:input={(event) => handlePiaChange(i, event)}
         />
+        {#if !piaValidity[i] && piaErrors[i]}
+          <span class="error-message">{piaErrors[i]}</span>
+        {/if}
       </div>
       <div class="input-group">
         <label for="birthdate{i}">
@@ -169,6 +207,17 @@
     outline: 3px solid #fd0;
     outline-offset: 0;
     box-shadow: inset 0 0 0 2px;
+  }
+
+  .input-group input.invalid {
+    border-color: #d4351c;
+    background-color: #fee;
+  }
+
+  .error-message {
+    color: #d4351c;
+    font-size: 0.9em;
+    margin-top: 0.25rem;
   }
 
   .select-input {

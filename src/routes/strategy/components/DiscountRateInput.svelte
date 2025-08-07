@@ -4,8 +4,12 @@
 
   export let discountRatePercent: number;
   export let onDiscountRateChange: ((discountRatePercent: number) => void) | undefined = undefined;
+  export let onValidityChange: ((isValid: boolean) => void) | undefined = undefined;
+  
   let highlightInput = false;
   let treasuryRate: number = 2.5; // Default value
+  let isValid = true;
+  let errorMessage = "";
 
   let presetRates = [
     { label: `20-year Treasury rate (${treasuryRate}%)`, value: treasuryRate },
@@ -54,8 +58,30 @@
 
   // Handle discount rate changes
   function handleDiscountRateChange(newValue: number) {
+    validateDiscountRate(newValue);
     onDiscountRateChange?.(newValue);
   }
+
+  // Validate discount rate
+  function validateDiscountRate(value: number) {
+    if (isNaN(value)) {
+      isValid = false;
+      errorMessage = "Please enter a valid number";
+    } else if (value < -10) {
+      isValid = false;
+      errorMessage = "Discount rate cannot be less than -10%";
+    } else if (value > 50) {
+      isValid = false;
+      errorMessage = "Discount rate cannot exceed 50%";
+    } else {
+      isValid = true;
+      errorMessage = "";
+    }
+    onValidityChange?.(isValid);
+  }
+
+  // Validate on mount
+  $: validateDiscountRate(discountRatePercent);
 </script>
 
 <div class="global-input-group">
@@ -79,7 +105,8 @@
     id="discountRate"
     type="number"
     step="0.1"
-    min="0"
+    min="-10"
+    max="50"
     value={discountRatePercent}
     on:input={(event) => {
       const target = event.target as HTMLInputElement;
@@ -87,7 +114,11 @@
       handleDiscountRateChange(value);
     }}
     class:highlight={highlightInput}
+    class:invalid={!isValid}
   />
+  {#if !isValid && errorMessage}
+    <span class="error-message">{errorMessage}</span>
+  {/if}
 </div>
 
 <style>
@@ -121,6 +152,17 @@
 
   .global-input-group input.highlight {
     animation: highlight-flash 0.5s ease-out;
+  }
+
+  .global-input-group input.invalid {
+    border-color: #d4351c;
+    background-color: #fee;
+  }
+
+  .error-message {
+    color: #d4351c;
+    font-size: 0.9em;
+    margin-top: 0.25rem;
   }
 
   @keyframes highlight-flash {

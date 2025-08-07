@@ -64,6 +64,13 @@
   let piaValues: [number, number] = [...DEFAULT_PIA_VALUES];
   let discountRatePercent: number = 2.5;
 
+  // Validation state
+  let recipientInputsValid = false;
+  let discountRateValid = true;
+  
+  // Overall form validity
+  $: formIsValid = recipientInputsValid && discountRateValid;
+
   // Reactive statement to convert percentage to decimal
   $: discountRate = discountRatePercent / 100;
 
@@ -368,11 +375,13 @@
         onPiaChange={handlePiaChange}
         onNameChange={handleNameChange}
         onGenderChange={handleGenderChange}
+        onValidityChange={(isValid) => recipientInputsValid = isValid}
       />
 
       <DiscountRateInput 
         {discountRatePercent} 
-        onDiscountRateChange={handleDiscountRateChange} 
+        onDiscountRateChange={handleDiscountRateChange}
+        onValidityChange={(isValid) => discountRateValid = isValid}
       />
     </section>
   </div>
@@ -382,6 +391,7 @@
       {isCalculationRunning}
       {calculationProgress}
       {totalCalculations}
+      disabled={!formIsValid}
       oncalculate={() => calculateStrategyMatrix()}
     />
   </section>

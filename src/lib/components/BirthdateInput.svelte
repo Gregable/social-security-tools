@@ -13,6 +13,7 @@
 
 <script lang="ts">
   import { Birthdate } from "../birthday";
+  import { ALL_MONTHS_FULL } from "../constants";
 
   // Props
   export let birthdate: Birthdate = null;
@@ -35,19 +36,59 @@
     day: string,
     month: string,
     year: string
-  ): Date | null {
+  ): { date: Date | null; errors: string[] } {
+    const errors = [];
     let birthdateDay = parseNumberString(day);
-    let birthdateMonth = parseNumberString(month) - 1;
+    let birthdateMonth = parseNumberString(month);
     let birthdateYear = parseNumberString(year);
 
-    if (birthdateDay < 1 || birthdateDay > 31) return null;
-    if (birthdateMonth < 0 || birthdateMonth > 11) return null;
-    if (birthdateYear < 1900 || birthdateYear > 2100) return null;
+    // Only validate fields that have content
+    // Validate month (1-12) - only if month field has content
+    if (month && (birthdateMonth < 1 || birthdateMonth > 12)) {
+      errors.push("Month must be between 1 and 12");
+    }
 
-    return new Date(
-      new Date(Date.UTC(birthdateYear, birthdateMonth, birthdateDay))
-    );
+    // Validate year (not in future, not more than 125 years ago) - only if year field has content
+    if (year) {
+      const currentYear = new Date().getFullYear();
+      const minYear = currentYear - 125;
+      if (birthdateYear > currentYear) {
+        errors.push("Year cannot be in the future");
+      } else if (birthdateYear < minYear) {
+        errors.push(`Year cannot be more than 125 years ago (${minYear})`);
+      }
+    }
+
+    // Validate day (basic range first) - only if day field has content
+    if (day && (birthdateDay < 1 || birthdateDay > 31)) {
+      errors.push("Day must be between 1 and 31");
+    }
+
+    // Only do advanced validation if all fields have content and basic validation passed
+    if (month && day && year && errors.length === 0) {
+      const testDate = new Date(birthdateYear, birthdateMonth - 1, birthdateDay);
+      
+      // Check if the date rolled over (invalid day for month)
+      if (testDate.getFullYear() !== birthdateYear || 
+          testDate.getMonth() !== (birthdateMonth - 1) || 
+          testDate.getDate() !== birthdateDay) {
+        errors.push(`Invalid day for ${ALL_MONTHS_FULL[birthdateMonth - 1]} ${birthdateYear}`);
+      } else {
+        // Check if date is not in the future
+        if (testDate > new Date()) {
+          errors.push("Date cannot be in the future");
+        }
+        
+        return { 
+          date: new Date(Date.UTC(birthdateYear, birthdateMonth - 1, birthdateDay)), 
+          errors: [] 
+        };
+      }
+    }
+
+    return { date: null, errors };
   }
+
 
   // Svelte binds the value of the input to a string, so we need to parse it
   // and store it in a Date object.
@@ -55,6 +96,7 @@
   let birthdateDayStr = "";
   let birthdateMonthStr = "";
   let birthdateYearStr = "";
+  let validationErrors: string[] = [];
 
   // One-way initializing of string values from birthdate prop
   function initializeFromBirthdate() {
@@ -72,15 +114,15 @@
 
   // Update parsed date and validity when inputs change
   $: {
-    parsedDate = parseDateInputValue(
+    const result = parseDateInputValue(
       birthdateDayStr,
       birthdateMonthStr,
       birthdateYearStr
     );
     
-    isValid = !!parsedDate && 
-              parsedDate <= new Date() && 
-              parsedDate >= new Date(1900, 0, 1);
+    parsedDate = result.date;
+    validationErrors = result.errors;
+    isValid = !!parsedDate && validationErrors.length === 0;
   }
   
   // Create Birthdate object and emit change event when valid
@@ -117,6 +159,7 @@
     <label class="date-input-label" for="{inputId}-month">Month</label>
     <input
       class="input input-width-2"
+      class:invalid={!isValid && birthdateMonthStr}
       id="{inputId}-month"
       name="{inputId}-month"
       type="text"
@@ -132,6 +175,7 @@
     <label class="date-input-label" for="{inputId}-day">Day</label>
     <input
       class="input input-width-2"
+      class:invalid={!isValid && birthdateDayStr}
       id="{inputId}-day"
       name="{inputId}-day"
       type="text"
@@ -147,6 +191,7 @@
     <label class="date-input-label" for="{inputId}-year">Year</label>
     <input
       class="input input-width-4"
+      class:invalid={!isValid && birthdateYearStr}
       id="{inputId}-year"
       name="{inputId}-year"
       type="text"
@@ -158,6 +203,14 @@
     />
   </div>
 </div>
+
+{#if validationErrors.length > 0 && (birthdateMonthStr || birthdateDayStr || birthdateYearStr)}
+  <div class="error-messages">
+    {#each validationErrors as error}
+      <span class="error-message">{error}</span>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .date-input-container {
@@ -192,5 +245,21 @@
   }
   .input-width-4 {
     max-width: 4.5em;
+  }
+  
+  .input.invalid {
+    border-color: #d4351c;
+    background-color: #fee;
+  }
+  
+  .error-messages {
+    margin-top: 0.5rem;
+  }
+  
+  .error-message {
+    display: block;
+    color: #d4351c;
+    font-size: 0.9em;
+    margin-bottom: 0.25rem;
   }
 </style>

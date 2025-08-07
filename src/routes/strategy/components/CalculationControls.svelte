@@ -3,6 +3,7 @@
   export let isCalculationRunning: boolean;
   export let calculationProgress: number;
   export let totalCalculations: number;
+  export let disabled: boolean = false;
 
   // Callback prop for events
   export let oncalculate: (() => void) | undefined = undefined;
@@ -19,8 +20,9 @@
 <div class="calculation-controls">
   <button
     on:click={triggerCalculation}
-    disabled={isCalculationRunning}
+    disabled={isCalculationRunning || disabled}
     class="calculate-button"
+    title={disabled && !isCalculationRunning ? "Please fix input errors before calculating" : ""}
   >
     {isCalculationRunning
       ? "Calculating..."
