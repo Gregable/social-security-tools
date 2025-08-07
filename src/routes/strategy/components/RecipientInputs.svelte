@@ -59,14 +59,11 @@
   }
 
   // Handle PIA value changes
-  function handlePiaChange(index: number, event: Event) {
-    const target = event.target as HTMLInputElement;
-    const piaValue = parseFloat(target.value) || 0;
-    
+  function handlePiaChange(index: number, value: number) {
     // Validate PIA
-    validatePia(index, piaValue);
+    validatePia(index, value);
     
-    onPiaChange?.(index, piaValue);
+    onPiaChange?.(index, value);
   }
   
   // Validate PIA value
@@ -87,16 +84,12 @@
   }
 
   // Handle name changes
-  function handleNameChange(index: number, event: Event) {
-    const target = event.target as HTMLInputElement;
-    const name = target.value;
+  function handleNameChange(index: number, name: string) {
     onNameChange?.(index, name);
   }
 
   // Handle gender changes
-  function handleGenderChange(index: number, event: Event) {
-    const target = event.target as HTMLSelectElement;
-    const gender = target.value;
+  function handleGenderChange(index: number, gender: string) {
     onGenderChange?.(index, gender);
   }
 
@@ -119,7 +112,7 @@
           id="name{i}" 
           type="text" 
           value={recipient.name}
-          on:input={(event) => handleNameChange(i, event)} 
+          on:input={(event) => handleNameChange(i, event.currentTarget.value)} 
         />
       </div>
       <div class="input-group">

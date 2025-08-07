@@ -109,8 +109,7 @@
     max="50"
     value={discountRatePercent}
     on:input={(event) => {
-      const target = event.target as HTMLInputElement;
-      const value = parseFloat(target.value) || 0;
+      const value = parseFloat(event.currentTarget.value) || 0;
       handleDiscountRateChange(value);
     }}
     class:highlight={highlightInput}
