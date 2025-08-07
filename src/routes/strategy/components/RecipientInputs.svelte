@@ -126,7 +126,7 @@
           min="0"
           value={piaValues[i]}
           class:invalid={!piaValidity[i]}
-          on:input={(event) => handlePiaChange(i, event)}
+          on:input={(event) => handlePiaChange(i, parseFloat(event.currentTarget.value) || 0)}
         />
         {#if !piaValidity[i] && piaErrors[i]}
           <span class="error-message">{piaErrors[i]}</span>
@@ -150,7 +150,7 @@
         <select
           id="gender{i}"
           value={recipient.gender}
-          on:change={(event) => handleGenderChange(i, event)}
+          on:change={(event) => handleGenderChange(i, event.currentTarget.value)}
           class="select-input"
         >
           <option value="blended">Unspecified</option>
