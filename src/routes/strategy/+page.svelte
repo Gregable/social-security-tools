@@ -103,6 +103,10 @@
       const gender1 = recipients[0].gender;
       const gender2 = recipients[1].gender;
 
+      // Health multipliers
+      const health1 = recipients[0].healthMultiplier ?? 1.0;
+      const health2 = recipients[1].healthMultiplier ?? 1.0;
+
       // Get current year for the probability distribution calculation
       const currentYear = new Date().getFullYear();
 
@@ -110,12 +114,14 @@
       const deathProb1Promise = getDeathProbabilityDistribution(
         gender1,
         birthYear1,
-        currentYear
+        currentYear,
+        health1
       );
       const deathProb2Promise = getDeathProbabilityDistribution(
         gender2,
         birthYear2,
-        currentYear
+        currentYear,
+        health2
       );
 
       // Wait for both promises to resolve

@@ -111,6 +111,34 @@
     onUpdate?.();
   }
 
+  // Handle health multiplier changes
+  function handleHealthChange(index: number, value: number) {
+    const clamped = Math.max(0.7, Math.min(2.5, value));
+    recipients[index].healthMultiplier = clamped;
+    recipients = [...recipients];
+    onUpdate?.();
+  }
+
+  function getHealthCategory(multiplier: number): string {
+    // Map to closest anchor label
+    const anchors: { value: number; label: string }[] = [
+      { value: 0.7, label: 'Exceptional Health' },
+      { value: 0.8, label: 'Excellent Health' },
+      { value: 0.9, label: 'Good Health' },
+      { value: 1.0, label: 'Average Health' },
+      { value: 1.3, label: 'Fair Health' },
+      { value: 1.7, label: 'Poor Health' },
+      { value: 2.5, label: 'Very Poor Health' },
+    ];
+    let best = anchors[0];
+    for (const a of anchors) {
+      if (Math.abs(a.value - multiplier) < Math.abs(best.value - multiplier)) {
+        best = a;
+      }
+    }
+    return best.label;
+  }
+
   // Format Birthdate object to YYYY-MM-DD string for input
   function formatDateForInput(birthdate: Birthdate | null): string {
     if (!birthdate) return "";
@@ -176,6 +204,24 @@
           <option value="female">Female</option>
         </select>
       </div>
+      <div class="input-group">
+        <label for="health{i}">
+          <RecipientName r={recipient} apos /> Health adjustment to yearly mortality q(x):
+        </label>
+        <input
+          id="health{i}"
+          type="range"
+          min="0.7"
+          max="2.5"
+          step="0.1"
+          value={recipient.healthMultiplier}
+          on:input={(event) => handleHealthChange(i, parseFloat(event.currentTarget.value))}
+        />
+        <div class="health-display">
+          <span class="health-value">{recipient.healthMultiplier.toFixed(1)}x</span>
+          <span class="health-category">{getHealthCategory(recipient.healthMultiplier)}</span>
+        </div>
+      </div>
     </div>
   {/each}
 </div>
@@ -203,7 +249,8 @@
     font-weight: bold;
   }
 
-  .input-group input {
+  /* Apply bordered style to non-range inputs only */
+  .input-group input:not([type="range"]) {
     font-size: 1.2em;
     line-height: 1.3;
     height: 2.5em;
@@ -213,7 +260,27 @@
     appearance: none;
   }
 
-  .input-group input:focus,
+  /* Range input: no border and native appearance */
+  .input-group input[type="range"] {
+    height: 1.5em;
+    padding: 0;
+    border: none;
+    appearance: auto;
+    background: transparent;
+  }
+
+  .health-display {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .health-value {
+    font-weight: bold;
+  }
+
+  /* Remove focus highlight from range inputs; keep for others */
+  .input-group input:not([type="range"]):focus,
   .input-group select:focus {
     outline: 3px solid #fd0;
     outline-offset: 0;

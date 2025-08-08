@@ -30,6 +30,19 @@ export class Recipient {
    */
   constructor() {}
 
+  /** Health multiplier to scale mortality q(x) values (0.7–2.5). */
+  private healthMultiplier_: number = 1.0;
+  get healthMultiplier(): number {
+    return this.healthMultiplier_;
+  }
+  set healthMultiplier(multiplier: number) {
+    // Clamp within supported UI range to avoid invalid inputs
+    const clamped = Math.max(0.7, Math.min(2.5, Number(multiplier)));
+    if (!Number.isFinite(clamped)) return;
+    this.healthMultiplier_ = clamped;
+    this.publish_();
+  }
+
   /** The recipient's gender (for mortality calculation). */
   private gender_: GenderOption = 'blended';
   get gender(): GenderOption {
