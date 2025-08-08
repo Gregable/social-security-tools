@@ -17,13 +17,6 @@
     { label: "US Stock historical (7%)", value: 7 },
   ];
 
-  function triggerHighlight() {
-    highlightInput = true;
-    setTimeout(() => {
-      highlightInput = false;
-    }, 500); // Match this duration to the CSS animation duration
-  }
-
   onMount(async () => {
     try {
       // getRecommendedDiscountRate returns the rate as a decimal (e.g., 0.038 for 3.8%)
@@ -31,10 +24,6 @@
 
       // Convert to percentage value by multiplying by 100
       treasuryRate = parseFloat((rate * 100).toFixed(2));
-
-      console.log(
-        `Fetched treasury rate: ${rate} (decimal) -> ${treasuryRate}% (percentage)`
-      );
 
       // Update the presetRates array with the new treasury rate
       presetRates = [
@@ -47,9 +36,7 @@
       ];
 
       // Update the discountRatePercent if it's currently set to our default treasury rate (2.5%)
-      if (discountRatePercent === 2.5) {
-        handleDiscountRateChange(treasuryRate);
-      }
+      handleDiscountRateChange(treasuryRate);
     } catch (error) {
       console.error("Failed to fetch recommended discount rate:", error);
       // Keep default 2.5% if fetch fails
@@ -67,9 +54,9 @@
     if (isNaN(value)) {
       isValid = false;
       errorMessage = "Please enter a valid number";
-    } else if (value < -10) {
+    } else if (value < 0) {
       isValid = false;
-      errorMessage = "Discount rate cannot be less than -10%";
+      errorMessage = "Discount rate cannot be less than 0%";
     } else if (value > 50) {
       isValid = false;
       errorMessage = "Discount rate cannot exceed 50%";
@@ -94,7 +81,7 @@
         class:active={discountRatePercent === preset.value}
         on:click={() => {
           handleDiscountRateChange(preset.value);
-          triggerHighlight();
+          highlightInput = true;
         }}
       >
         {preset.label}
@@ -105,7 +92,7 @@
     id="discountRate"
     type="number"
     step="0.1"
-    min="-10"
+    min="0"
     max="50"
     value={discountRatePercent}
     on:input={(event) => {
@@ -149,10 +136,6 @@
     box-shadow: inset 0 0 0 2px;
   }
 
-  .global-input-group input.highlight {
-    animation: highlight-flash 0.5s ease-out;
-  }
-
   .global-input-group input.invalid {
     border-color: #d4351c;
     background-color: #fee;
@@ -162,18 +145,6 @@
     color: #d4351c;
     font-size: 0.9em;
     margin-top: 0.25rem;
-  }
-
-  @keyframes highlight-flash {
-    0% {
-      box-shadow: 0 0 0 0px rgba(0, 94, 165, 0.7);
-    }
-    50% {
-      box-shadow: 0 0 0 5px rgba(0, 94, 165, 0.7);
-    }
-    100% {
-      box-shadow: 0 0 0 0px rgba(0, 94, 165, 0);
-    }
   }
 
   .preset-buttons {

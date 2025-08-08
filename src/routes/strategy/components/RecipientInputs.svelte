@@ -80,7 +80,7 @@
   function validatePia(index: number, value: number) {
     if (value < 0) {
       piaValidity[index] = false;
-      piaErrors[index] = "PIA must be a positive number";
+      piaErrors[index] = "PIA must be a non-negative number";
     } else if (value > 10000) {
       piaValidity[index] = false;
       piaErrors[index] = "PIA seems unusually high (max typical value is around $4,000)";
