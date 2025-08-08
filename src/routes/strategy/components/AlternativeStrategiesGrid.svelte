@@ -46,12 +46,14 @@
    * 
    * This function calculates the earliest and latest possible filing ages
    * for a recipient. The earliest is typically 62+0 or 62+1 based on birth day,
-   * clipped to exclude any ages in the past. The latest is exactly age 70+0.
+   * clipped to exclude any ages in the past. The latest is the minimum of 
+   * age 70+0 or the recipient's death age.
    * 
    * @param recipient - The recipient for whom to generate filing age ranges
+   * @param deathAge - The age at which the recipient dies
    * @returns A MonthDurationRange representing possible filing ages
    */
-  function createFilingAgeRange(recipient: Recipient): MonthDurationRange {
+  function createFilingAgeRange(recipient: Recipient, deathAge: number): MonthDurationRange {
     const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
     
     // Get the earliest filing age for this recipient
@@ -60,7 +62,10 @@
     // Start from the maximum of earliest filing age or current age
     const startingAge = currentAge.greaterThan(earliestFiling) ? currentAge : earliestFiling;
     
-    const end = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
+    // End at the minimum of age 70 or death age
+    const maxAge70 = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
+    const deathAgeMonths = MonthDuration.initFromYearsMonths({ years: deathAge, months: 0 });
+    const end = maxAge70.lessThan(deathAgeMonths) ? maxAge70 : deathAgeMonths;
     
     return new MonthDurationRange(startingAge, end);
   }
@@ -187,8 +192,8 @@
     
     try {
       // Generate age ranges
-      filingAgeRange1 = createFilingAgeRange(recipients[0]);
-      filingAgeRange2 = createFilingAgeRange(recipients[1]);
+      filingAgeRange1 = createFilingAgeRange(recipients[0], deathAge1);
+      filingAgeRange2 = createFilingAgeRange(recipients[1], deathAge2);
       
       // Calculate final dates for the death ages
       const finalDates: [MonthDate, MonthDate] = calculateFinalDatesUtil(
