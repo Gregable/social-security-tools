@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Recipient } from "$lib/recipient";
-  import type { GenderOption } from "$lib/recipient";
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import {
@@ -77,61 +76,17 @@
   // Recipients setup
   let recipients: [Recipient, Recipient] = initializeRecipients();
 
-  // Function to handle birthdate changes from the RecipientInputs component
-  function handleBirthdateChange(index: number, dateString: string) {
+  // Function to handle recipient data changes
+  function handleRecipientUpdate() {
     try {
-      // Update both the input tracking and the recipient directly
-      birthdateInputs[index] = dateString;
-      birthdateInputs = [...birthdateInputs]; // For form state consistency
-      
-      // Update recipient birthdate directly
-      if (dateString && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        recipients[index].birthdate = parseBirthdateUtil(dateString);
-        recipients = [...recipients]; // Force reactivity
-      }
+      // Force reactivity by reassigning the recipients array
+      recipients = [...recipients];
     } catch (error) {
-      console.warn("Error updating recipient birthdate:", error);
+      console.warn("Error updating form data:", error);
     }
   }
 
-  // Function to handle PIA changes from the RecipientInputs component
-  function handlePiaChange(index: number, piaValue: number) {
-    try {
-      // Update both the input tracking and the recipient directly
-      piaValues[index] = piaValue;
-      piaValues = [...piaValues]; // For form state consistency
-      
-      // Update recipient PIA directly
-      recipients[index].setPia(Money.from(piaValue));
-      recipients = [...recipients]; // Force reactivity
-    } catch (error) {
-      console.warn("Error updating recipient PIA:", error);
-    }
-  }
-
-  // Function to handle name changes from the RecipientInputs component
-  function handleNameChange(index: number, name: string) {
-    try {
-      // Update recipient name directly
-      recipients[index].name = name;
-      recipients = [...recipients]; // Force reactivity
-    } catch (error) {
-      console.warn("Error updating recipient name:", error);
-    }
-  }
-
-  // Function to handle gender changes from the RecipientInputs component
-  function handleGenderChange(index: number, gender: string) {
-    try {
-      // Update recipient gender directly
-      recipients[index].gender = gender as GenderOption;
-      recipients = [...recipients]; // Force reactivity
-    } catch (error) {
-      console.warn("Error updating recipient gender:", error);
-    }
-  }
-
-  // Function to handle discount rate changes from the DiscountRateInput component
+    // Function to handle discount rate changes from the DiscountRateInput component
   function handleDiscountRateChange(newDiscountRatePercent: number) {
     try {
       // Update discount rate percent directly
@@ -140,6 +95,7 @@
       console.warn("Error updating discount rate:", error);
     }
   }
+
 
   /**
    * Initialize recipients with default values
@@ -371,10 +327,7 @@
         {recipients} 
         {piaValues} 
         {birthdateInputs} 
-        onBirthdateChange={handleBirthdateChange}
-        onPiaChange={handlePiaChange}
-        onNameChange={handleNameChange}
-        onGenderChange={handleGenderChange}
+        onUpdate={handleRecipientUpdate}
         onValidityChange={(isValid) => recipientInputsValid = isValid}
       />
 

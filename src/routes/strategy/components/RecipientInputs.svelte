@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
+  import { Money } from "$lib/money";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import BirthdateInput from "$lib/components/BirthdateInput.svelte";
   import { Birthdate } from "$lib/birthday";
@@ -10,11 +11,8 @@
   export let piaValues: [number, number];
   export let birthdateInputs: [string, string];
 
-  // Callbacks for when form values change
-  export let onBirthdateChange: ((index: number, dateString: string) => void) | undefined = undefined;
-  export let onPiaChange: ((index: number, piaValue: number) => void) | undefined = undefined;
-  export let onNameChange: ((index: number, name: string) => void) | undefined = undefined;
-  export let onGenderChange: ((index: number, gender: string) => void) | undefined = undefined;
+  // Callback for when form values change
+  export let onUpdate: (() => void) | undefined = undefined;
 
   // Validation state callback
   export let onValidityChange: ((isValid: boolean) => void) | undefined = undefined;
@@ -53,8 +51,14 @@
   function handleBirthdateChange(index: number, newBirthdate: Birthdate) {
     if (newBirthdate) {
       const newDateStr = formatDateForInput(newBirthdate);
-      // Use callback to notify parent component
-      onBirthdateChange?.(index, newDateStr);
+      birthdateInputs[index] = newDateStr;
+      birthdateInputs = [...birthdateInputs];
+      
+      // Update the recipient's birthdate directly
+      recipients[index].birthdate = newBirthdate;
+      recipients = [...recipients];
+      
+      onUpdate?.();
     }
   }
 
@@ -62,8 +66,14 @@
   function handlePiaChange(index: number, value: number) {
     // Validate PIA
     validatePia(index, value);
+    piaValues[index] = value;
+    piaValues = [...piaValues];
     
-    onPiaChange?.(index, value);
+    // Update the recipient's PIA directly
+    recipients[index].setPia(Money.from(value));
+    recipients = [...recipients];
+    
+    onUpdate?.();
   }
   
   // Validate PIA value
@@ -84,13 +94,21 @@
   }
 
   // Handle name changes
-  function handleNameChange(index: number, name: string) {
-    onNameChange?.(index, name);
+  function handleNameChange(index: number, event: Event) {
+    const target = event.target as HTMLInputElement;
+    const name = target.value;
+    recipients[index].name = name;
+    recipients = [...recipients];
+    onUpdate?.();
   }
 
   // Handle gender changes
-  function handleGenderChange(index: number, gender: string) {
-    onGenderChange?.(index, gender);
+  function handleGenderChange(index: number, event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const gender = target.value;
+    recipients[index].gender = gender as 'male' | 'female' | 'blended';
+    recipients = [...recipients];
+    onUpdate?.();
   }
 
   // Format Birthdate object to YYYY-MM-DD string for input
@@ -112,7 +130,7 @@
           id="name{i}" 
           type="text" 
           value={recipient.name}
-          on:input={(event) => handleNameChange(i, event.currentTarget.value)} 
+          on:input={(event) => handleNameChange(i, event)} 
         />
       </div>
       <div class="input-group">
@@ -150,7 +168,7 @@
         <select
           id="gender{i}"
           value={recipient.gender}
-          on:change={(event) => handleGenderChange(i, event.currentTarget.value)}
+          on:change={(event) => handleGenderChange(i, event)}
           class="select-input"
         >
           <option value="blended">Unspecified</option>
