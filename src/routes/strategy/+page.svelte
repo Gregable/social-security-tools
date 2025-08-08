@@ -81,8 +81,64 @@
     try {
       // Force reactivity by reassigning the recipients array
       recipients = [...recipients];
+      
+      // Update death probability distributions if recipients' gender changed
+      updateDeathProbabilityDistributions();
     } catch (error) {
       console.warn("Error updating form data:", error);
+    }
+  }
+
+  /**
+   * Update death probability distributions when gender changes.
+   * This is a lightweight operation compared to the full matrix calculation.
+   */
+  async function updateDeathProbabilityDistributions() {
+    try {
+      // Get birth years for both recipients
+      const birthYear1 = recipients[0].birthdate.layBirthYear();
+      const birthYear2 = recipients[1].birthdate.layBirthYear();
+
+      // Get gender from recipient objects
+      const gender1 = recipients[0].gender;
+      const gender2 = recipients[1].gender;
+
+      // Get current year for the probability distribution calculation
+      const currentYear = new Date().getFullYear();
+
+      // Fetch death probability distribution for both recipients
+      const deathProb1Promise = getDeathProbabilityDistribution(
+        gender1,
+        birthYear1,
+        currentYear
+      );
+      const deathProb2Promise = getDeathProbabilityDistribution(
+        gender2,
+        birthYear2,
+        currentYear
+      );
+
+      // Wait for both promises to resolve
+      [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
+        deathProb1Promise,
+        deathProb2Promise,
+      ]);
+
+      // Force Svelte update by reassigning arrays
+      deathProbDistribution1 = [...deathProbDistribution1];
+      deathProbDistribution2 = [...deathProbDistribution2];
+
+      // Calculate death age range start ages
+      const currentAge1 = currentYear - recipients[0].birthdate.layBirthYear();
+      const currentAge2 = currentYear - recipients[1].birthdate.layBirthYear();
+      const startAge1 = Math.max(MIN_DEATH_AGE, currentAge1);
+      const startAge2 = Math.max(MIN_DEATH_AGE, currentAge2);
+
+      // Calculate age ranges
+      deathAgeRange1 = generateDeathAgeRange(startAge1);
+      deathAgeRange2 = generateDeathAgeRange(startAge2);
+    } catch (error) {
+      console.warn("Error updating death probability distributions:", error);
     }
   }
 
@@ -135,48 +191,10 @@
     startTime = Date.now();
 
     try {
-      // Get birth years for both recipients
-      const birthYear1 = recipients[0].birthdate.layBirthYear();
-      const birthYear2 = recipients[1].birthdate.layBirthYear();
+      // Update death probability distributions first (in case they're not current)
+      await updateDeathProbabilityDistributions();
 
-      // Get gender from recipient objects
-      const gender1 = recipients[0].gender;
-      const gender2 = recipients[1].gender;
-
-      // Get current year for the probability distribution calculation
-      const currentYear = new Date().getFullYear();
-
-      // Fetch death probability distribution for both recipients
-      const deathProb1Promise = getDeathProbabilityDistribution(
-        gender1,
-        birthYear1,
-        currentYear
-      );
-      const deathProb2Promise = getDeathProbabilityDistribution(
-        gender2,
-        birthYear2,
-        currentYear
-      );
-
-      // Wait for both promises to resolve
-      [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
-        deathProb1Promise,
-        deathProb2Promise,
-      ]);
-
-      // Force Svelte update by reassigning arrays
-      deathProbDistribution1 = [...deathProbDistribution1];
-      deathProbDistribution2 = [...deathProbDistribution2];
-
-      // Calculate death age range start ages
-      const currentAge1 = currentYear - recipients[0].birthdate.layBirthYear();
-      const currentAge2 = currentYear - recipients[1].birthdate.layBirthYear();
-      const startAge1 = Math.max(MIN_DEATH_AGE, currentAge1);
-      const startAge2 = Math.max(MIN_DEATH_AGE, currentAge2);
-
-      // Calculate age ranges
-      deathAgeRange1 = generateDeathAgeRange(startAge1);
-      deathAgeRange2 = generateDeathAgeRange(startAge2);
+      // Calculate total calculations needed
       totalCalculations =
         deathAgeRange1.length *
         deathAgeRange2.length *
