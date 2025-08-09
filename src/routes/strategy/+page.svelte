@@ -360,6 +360,7 @@
         onDiscountRateChange={handleDiscountRateChange}
         onValidityChange={(isValid) => discountRateValid = isValid}
       />
+      <p class="mortality-guide-note">Mortality assumptions use SSA cohort life tables. You can adjust relative health using the slider above. Learn more in the <a href="/guides/mortality" target="_blank" rel="noopener">mortality & health adjustment guide</a>.</p>
     </section>
   </div>
 
@@ -455,6 +456,19 @@
     border-radius: 8px;
   }
 
+  .mortality-guide-note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #444;
+  }
+  .mortality-guide-note a {
+    color: #0074d9;
+    text-decoration: none;
+  }
+  .mortality-guide-note a:hover {
+    text-decoration: underline;
+  }
+
   .calculation-section {
     margin-top: 2rem;
   }
@@ -463,6 +477,9 @@
     main {
       max-width: 100%;
       padding: 1rem;
+    }
+    .mortality-guide-note {
+      font-size: 0.85rem;
     }
   }
 

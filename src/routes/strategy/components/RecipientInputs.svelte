@@ -220,6 +220,7 @@
         <div class="health-display">
           <span class="health-value">{recipient.healthMultiplier.toFixed(1)}x</span>
           <span class="health-category">{getHealthCategory(recipient.healthMultiplier)}</span>
+          <a class="health-guide-link" href="/guides/mortality" target="_blank" rel="noopener">What is this?</a>
         </div>
       </div>
     </div>
@@ -273,10 +274,21 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .health-value {
     font-weight: bold;
+  }
+
+  .health-guide-link {
+    font-size: 0.75rem;
+    text-decoration: none;
+    color: #005ea5;
+  }
+
+  .health-guide-link:hover {
+    text-decoration: underline;
   }
 
   /* Remove focus highlight from range inputs; keep for others */
