@@ -5,6 +5,8 @@
   export let discountRatePercent: number;
   export let onDiscountRateChange: ((discountRatePercent: number) => void) | undefined = undefined;
   export let onValidityChange: ((isValid: boolean) => void) | undefined = undefined;
+  // Test hook: allow disabling the async fetch/onMount behavior to make validation deterministic in unit tests
+  export let disableFetch: boolean = false;
   
   let highlightInput = false;
   let treasuryRate: number = 2.5; // Default value
@@ -18,6 +20,7 @@
   ];
 
   onMount(async () => {
+    if (disableFetch) return; // skip async update when testing
     try {
       // getRecommendedDiscountRate returns the rate as a decimal (e.g., 0.038 for 3.8%)
       const rate = await getRecommendedDiscountRate();
@@ -45,8 +48,10 @@
 
   // Handle discount rate changes
   function handleDiscountRateChange(newValue: number) {
-    validateDiscountRate(newValue);
-    onDiscountRateChange?.(newValue);
+  // Persist the new value so reactive validation reflects user input
+  discountRatePercent = newValue;
+  validateDiscountRate(newValue);
+  onDiscountRateChange?.(newValue);
   }
 
   // Validate discount rate
