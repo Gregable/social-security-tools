@@ -10,8 +10,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": true,
-  "isolatedModules": true,
-  "skipLibCheck": true
+    "isolatedModules": true
   },
   "include": [
     "src/**/*.d.ts",
@@ -23,7 +22,7 @@
     "node_modules/@storybook/**/*",
     ".storybook/**/*",
     "**/*.stories.*",
-  "storybook-static/**/*"
+    "storybook-static/**/*"
   ],
   "references": [
     {

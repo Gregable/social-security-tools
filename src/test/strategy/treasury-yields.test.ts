@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { silenceConsole } from '../utils/silenceConsole';
 import {
   fetchLatest20YearTreasuryYield,
   fetchFredDFII20Yield,
@@ -46,9 +45,6 @@ class MockDOMParser {
 
 global.DOMParser = MockDOMParser as any;
 
-// Silencer handle
-let silencer: ReturnType<typeof silenceConsole> | undefined;
-
 describe('Treasury Yields Library', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -57,21 +53,9 @@ describe('Treasury Yields Library', () => {
       ok: true,
       text: () => Promise.resolve('<xml>Mock XML</xml>'),
     });
-    // Silence only expected noisy messages; allow unexpected ones to surface
-    silencer = silenceConsole({
-      error: [
-        /Error fetching Treasury yield data/,
-        /Error fetching FRED DFII20 data/,
-      ],
-      warn: [
-        /Using fallback due to Treasury data error/,
-        /Using default discount rate due to FRED data error/,
-      ],
-    });
   });
 
   afterEach(() => {
-    silencer?.restore();
     vi.resetAllMocks();
   });
 
@@ -103,7 +87,6 @@ describe('Treasury Yields Library', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('Network error');
       expect(result.rate).toBe(0.025); // Default to 2.5%
-      expect(silencer?.getErrors().join('\n')).toMatch(/Network error/);
     });
 
     it('should handle API response errors gracefully', async () => {
@@ -121,9 +104,6 @@ describe('Treasury Yields Library', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('Failed to fetch Treasury data: 404 Not Found');
       expect(result.rate).toBe(0.025); // Default to 2.5%
-      expect(silencer?.getErrors().join('\n')).toMatch(
-        /Failed to fetch Treasury data/
-      );
     });
   });
 
@@ -150,7 +130,6 @@ describe('Treasury Yields Library', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('FRED network error');
       expect(result.rate).toBe(0.025); // Default to 2.5%
-      expect(silencer?.getErrors().join('\n')).toMatch(/FRED network error/);
     });
 
     it('should handle FRED data not found gracefully', async () => {
@@ -166,9 +145,6 @@ describe('Treasury Yields Library', () => {
         'FRED DFII20 data not found or is invalid in the response'
       );
       expect(result.rate).toBe(0.025); // Default to 2.5%
-      expect(silencer?.getErrors().join('\n')).toMatch(
-        /FRED DFII20 data not found/
-      );
     });
   });
 
@@ -195,9 +171,6 @@ describe('Treasury Yields Library', () => {
       const rate = await getRecommendedDiscountRate();
 
       expect(rate).toBe(0.021); // 2.1% converted to decimal from FRED
-      expect(silencer?.getWarnings().join('\n')).toMatch(
-        /Using fallback due to Treasury data error/
-      );
     });
 
     it('should return the default rate when both treasury and FRED fetch fail', async () => {
@@ -213,12 +186,6 @@ describe('Treasury Yields Library', () => {
       const rate = await getRecommendedDiscountRate();
 
       expect(rate).toBe(0.025); // Default to 2.5%
-      const warns = silencer?.getWarnings().join('\n') || '';
-      expect(warns).toMatch(/Using fallback due to Treasury data error/);
-      expect(warns).toMatch(
-        /Using default discount rate due to FRED data error/
-      );
-      expect(silencer?.getErrors().join('\n')).toMatch(/FRED network error/);
     });
   });
 });

@@ -1,24 +1,6 @@
 import { execSync } from 'child_process';
 import { describe, it, expect } from 'vitest';
-import path from 'path';
-import fs from 'fs';
-
-// Resolve project root (directory containing package.json). The test file lives under src/test/quality.
-// Walk up until we find package.json to be resilient if test runner cwd changes.
-function findProjectRoot(startDir: string): string {
-  let dir = startDir;
-  for (let i = 0; i < 10; i++) {
-    if (fs.existsSync(path.join(dir, 'package.json'))) return dir;
-    const parent = path.dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
-  }
-  throw new Error('package.json not found while resolving project root');
-}
-
-// Derive path of this file via import.meta.url (works in ESM) then walk up
-const thisFileDir = path.dirname(new URL(import.meta.url).pathname);
-const projectRoot = findProjectRoot(thisFileDir);
+import process from 'process';
 
 describe('ESLint Regression Prevention', () => {
   it('should have zero warnings and zero errors', () => {
@@ -26,7 +8,7 @@ describe('ESLint Regression Prevention', () => {
       // Run ESLint and capture the output
       const output = execSync('npm run lint', {
         encoding: 'utf8',
-        cwd: projectRoot,
+        cwd: process.cwd(),
         stdio: 'pipe',
       });
 
@@ -98,7 +80,7 @@ describe('ESLint Regression Prevention', () => {
     try {
       const output = execSync('npm run lint', {
         encoding: 'utf8',
-        cwd: projectRoot,
+        cwd: process.cwd(),
         stdio: 'pipe',
       });
 
@@ -141,7 +123,7 @@ describe('ESLint Regression Prevention', () => {
     try {
       const output = execSync('npm run lint', {
         encoding: 'utf8',
-        cwd: projectRoot,
+        cwd: process.cwd(),
         stdio: 'pipe',
       });
 
@@ -188,14 +170,9 @@ describe('ESLint Regression Prevention', () => {
 
     for (const file of criticalFiles) {
       try {
-        const abs = path.join(projectRoot, file);
-        if (!fs.existsSync(abs)) {
-          console.warn(`Skipping ${file} (not found)`);
-          continue;
-        }
         execSync(`npx eslint ${file}`, {
           encoding: 'utf8',
-          cwd: projectRoot,
+          cwd: process.cwd(),
           stdio: 'pipe',
         });
 
