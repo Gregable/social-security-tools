@@ -15,8 +15,6 @@
   export let deathProbDistribution2: { age: number; probability: number }[];
   export let timeElapsed: number;
   export let isCalculationComplete: boolean;
-  export let minMonthsSinceEpoch: number | null;
-  export let maxMonthsSinceEpoch: number | null;
   export let selectedCellData: {
     deathAge1: number;
     deathAge2: number;
@@ -68,8 +66,6 @@
           {deathProbDistribution1}
           {deathProbDistribution2}
           {hoveredCell}
-          {minMonthsSinceEpoch}
-          {maxMonthsSinceEpoch}
           {selectedCellData}
           {displayAsAges}
           onhovercell={handleHoverCell}

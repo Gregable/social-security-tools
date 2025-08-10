@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
-  import { MonthDate } from "$lib/month-time";
+  import { MonthDate, MonthDuration } from "$lib/month-time";
   import {
     parseBirthdate as parseBirthdateUtil,
     calculateFinalDates as calculateFinalDatesUtil,
@@ -9,6 +9,7 @@
   type DeathAgeBucket,
   } from "$lib/strategy/ui";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
+  import { optimalStrategyOptimized } from "$lib/strategy/calculations/strategy-calc";
 
   // Import components
   import RecipientInputs from "./components/RecipientInputs.svelte";
@@ -40,8 +41,6 @@
   let deathProbDistribution2: { age: number; probability: number }[] = [];
   let calculationProgress = 0;
   let totalCalculations = 0;
-  let minMonthsSinceEpoch: number | null = null;
-  let maxMonthsSinceEpoch: number | null = null;
   let displayAsAges: boolean = false;
 
   let selectedCellData: {
@@ -277,64 +276,8 @@
     }
   }
 
-  // Calculate min and max monthsSinceEpoch for color coding
-  $: {
-  if (isCalculationComplete && calculationResults.length > 0) {
-      let monthsSinceEpochValues: number[] = [];
-      calculationResults.forEach((row) => {
-        row.forEach((cell) => {
-          if (cell && !cell.error) {
-            const filingDate1 = recipients[0].birthdate.dateAtLayAge(
-              cell.filingAge1
-            );
-            const filingDate2 = recipients[1].birthdate.dateAtLayAge(
-              cell.filingAge2
-            );
-            monthsSinceEpochValues.push(filingDate1.monthsSinceEpoch());
-            monthsSinceEpochValues.push(filingDate2.monthsSinceEpoch());
-          }
-        });
-      });
-      if (monthsSinceEpochValues.length > 0) {
-        minMonthsSinceEpoch = Math.min(...monthsSinceEpochValues);
-        maxMonthsSinceEpoch = Math.max(...monthsSinceEpochValues);
-      } else {
-        minMonthsSinceEpoch = null;
-        maxMonthsSinceEpoch = null;
-      }
-    } else {
-      minMonthsSinceEpoch = null;
-      maxMonthsSinceEpoch = null;
-    }
-  }
-
   function handleCellSelect(detail: any) {
     selectedCellData = detail;
-  }
-
-  let showHint = false;
-  let hintTimeout: ReturnType<typeof setTimeout>;
-
-  $: if (selectedCellData) {
-    clearTimeout(hintTimeout);
-    showHint = true;
-    hintTimeout = setTimeout(() => {
-      showHint = false;
-    }, 3000); // Show hint for 3 seconds
-  }
-
-  import { tick } from "svelte";
-  import { optimalStrategyOptimized } from "$lib/strategy/calculations/strategy-calc";
-
-  // Scroll to matrix when calculation is complete
-  $: if (isCalculationComplete && matrixDisplayElement) {
-    (async () => {
-      await tick(); // Wait for DOM to update
-      window.scrollTo({
-        top: matrixDisplayElement.offsetTop,
-        behavior: "smooth",
-      });
-    })();
   }
 </script>
 
@@ -391,8 +334,6 @@
         {deathProbDistribution2}
         {timeElapsed}
         {isCalculationComplete}
-        {minMonthsSinceEpoch}
-        {maxMonthsSinceEpoch}
         {selectedCellData}
         bind:displayAsAges
         onselectcell={handleCellSelect}
@@ -434,13 +375,6 @@
       />
     {/if}
   </section>
-
-  {#if showHint}
-    <div class="scroll-hint">
-      <p>Scroll for detail</p>
-      <div class="arrow-down"></div>
-    </div>
-  {/if}
 </main>
 
 <style>

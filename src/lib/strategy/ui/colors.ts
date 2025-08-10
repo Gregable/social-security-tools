@@ -1,14 +1,13 @@
 export function getMonthYearColor(
-  currentMonthsSinceEpoch: number,
-  minMonthsSinceEpoch: number,
-  maxMonthsSinceEpoch: number
+  currentMonths: number,
+  minMonths: number,
+  maxMonths: number
 ): string {
   // Normalize monthsSinceEpoch to a 0-1 range
-  const totalMonthsRange = maxMonthsSinceEpoch - minMonthsSinceEpoch;
+  const totalMonthsRange = maxMonths - minMonths;
   let normalizedMonths = 0;
   if (totalMonthsRange > 0) {
-    normalizedMonths =
-      (currentMonthsSinceEpoch - minMonthsSinceEpoch) / totalMonthsRange;
+    normalizedMonths = (currentMonths - minMonths) / totalMonthsRange;
   }
 
   // Hue: Map normalizedMonths to a range of hues (e.g., 80 to 160 for a greenish palette)

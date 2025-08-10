@@ -18,8 +18,6 @@
   export let deathProbDistribution1: { age: number; probability: number }[];
   export let deathProbDistribution2: { age: number; probability: number }[];
   export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
-  export let minMonthsSinceEpoch: number | null;
-  export let maxMonthsSinceEpoch: number | null;
   export let selectedCellData: {
     deathAge1: string | number;
     deathAge2: string | number;
@@ -185,13 +183,18 @@
     let style = '';
     
     // Add background color based on filing date
-    if (calculationResults[i][j] && minMonthsSinceEpoch !== null && maxMonthsSinceEpoch !== null) {
-      const filingAge = calculationResults[i][j][`filingAge${recipientIndex + 1}`];
-      const filingDate = recipients[recipientIndex].birthdate.dateAtLayAge(filingAge);
+    if (calculationResults[i][j]) {
+      const filingAge: MonthDuration = calculationResults[i][j][`filingAge${recipientIndex + 1}`];
       const backgroundColor = getMonthYearColor(
-        filingDate.monthsSinceEpoch(),
-        minMonthsSinceEpoch,
-        maxMonthsSinceEpoch
+        filingAge.asMonths(),
+        MonthDuration.initFromYearsMonths({
+          years: 62,
+          months: 0
+        }).asMonths(),
+        MonthDuration.initFromYearsMonths({
+          years: 70,
+          months: 0
+        }).asMonths()
       );
       style += `background-color: ${backgroundColor}; `;
     }
