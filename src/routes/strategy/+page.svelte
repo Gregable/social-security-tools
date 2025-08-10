@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Recipient } from "$lib/recipient";
   import { Money } from "$lib/money";
-  import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { MonthDate } from "$lib/month-time";
   import {
     parseBirthdate as parseBirthdateUtil,
     calculateFinalDates as calculateFinalDatesUtil,
@@ -195,6 +195,7 @@
 
     isCalculationRunning = true;
     isCalculationComplete = false;
+    selectedCellData = null;
     calculationResults = [];
     calculationProgress = 0;
     startTime = Date.now();
@@ -341,7 +342,7 @@
     {/if}
   </section>
   <section class="limited-width">
-    {#if isCalculationComplete && calculationResults.length > 0 && selectedCellData}
+    {#if selectedCellData}
       <!-- Find the cell in calculationResults that corresponds to selectedCellData -->
       {@const row = deathAgeBuckets1.findIndex(
         (b) => b.label === String(selectedCellData.deathAge1)
@@ -422,37 +423,6 @@
     .mortality-guide-note {
       font-size: 0.85rem;
     }
-  }
-
-  .scroll-hint {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    animation: fadeInOut 3s forwards;
-  }
-
-  .scroll-hint p {
-    margin: 0;
-    font-size: 0.9em;
-  }
-
-  .arrow-down {
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid white;
-    margin-top: 5px;
   }
 
   @keyframes fadeInOut {
