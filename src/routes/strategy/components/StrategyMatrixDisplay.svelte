@@ -10,8 +10,6 @@
 
   // Callback props for events
   export let onselectcell: ((detail: any) => void) | undefined = undefined;
-  export let deathAgeRange1: number[];
-  export let deathAgeRange2: number[];
   export let calculationResults: any[][];
   export let deathProbDistribution1: { age: number; probability: number }[];
   export let deathProbDistribution2: { age: number; probability: number }[];
@@ -62,12 +60,10 @@
 
   {#if isCalculationComplete}
     <div class="matrices-container">
-      {#each [0, 1] as recipientIndex}
+    {#each [0, 1] as recipientIndex}
         <StrategyMatrix
           {recipientIndex}
           {recipients}
-          {deathAgeRange1}
-          {deathAgeRange2}
           {calculationResults}
           {deathProbDistribution1}
           {deathProbDistribution2}

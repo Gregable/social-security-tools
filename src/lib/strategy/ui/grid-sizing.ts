@@ -117,6 +117,71 @@ export function generateDeathAgeRange(deathAgeRangeStart: number): number[] {
   return deathAgeRange;
 }
 
+export interface DeathAgeBucket {
+  label: string; // Display label (e.g. '63', '66', '101+')
+  // Representative age (middle year for 3-year buckets, or start for + bucket)
+  midAge: number;
+  startAge: number; // Inclusive start age of the bucket
+  endAgeInclusive: number | null; // Inclusive end age; null means open-ended
+  probability: number; // Summed probability mass for the bucket
+}
+
+/**
+ * Generate three‑year buckets starting at startAge: [a, a+1, a+2] with label
+ * `a+1`, then advance by 3. Continue while (midAge < 100). After that, create
+ * a final open-ended bucket starting at the current start age with a "+" label
+ * (e.g. '101+'). Only the final bucket may have a 3‑digit label.
+ *
+ * Depending on alignment the final "+" label could be '99+', '100+' or '101+'.
+ */
+export function generateThreeYearBuckets(
+  startAge: number,
+  probDistribution: { age: number; probability: number }[]
+): DeathAgeBucket[] {
+  const buckets: DeathAgeBucket[] = [];
+
+  let currentStart = startAge;
+
+  const sumProbabilityRange = (from: number, to: number | null): number => {
+    if (to === null) {
+      return probDistribution
+        .filter((e) => e.age >= from)
+        .reduce((s, e) => s + e.probability, 0);
+    }
+    return probDistribution
+      .filter((e) => e.age >= from && e.age <= to)
+      .reduce((s, e) => s + e.probability, 0);
+  };
+
+  // Generate fixed 3-year buckets up to (midAge < 100)
+  while (currentStart + 1 < 100) {
+    const midAge = currentStart + 1;
+    const endAge = currentStart + 2;
+    const probability = sumProbabilityRange(currentStart, endAge);
+    buckets.push({
+      label: String(midAge),
+      midAge,
+      startAge: currentStart,
+      endAgeInclusive: endAge,
+      probability,
+    });
+    currentStart += 3;
+  }
+
+  // Final open-ended bucket
+  const plusLabel = `${currentStart}+`;
+  const finalProb = sumProbabilityRange(currentStart, null);
+  buckets.push({
+    label: plusLabel,
+    midAge: currentStart, // representative age for optimization
+    startAge: currentStart,
+    endAgeInclusive: null,
+    probability: finalProb,
+  });
+
+  return buckets;
+}
+
 export function calculateGridTemplates(
   deathAgeRange: number[],
   probDistribution: { age: number; probability: number }[]

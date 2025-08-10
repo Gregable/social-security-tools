@@ -16,8 +16,8 @@
   export let recipientIndex: number;
   export let hoveredCell: { rowIndex: number; colIndex: number } | null;
   export let selectedCellData: {
-    deathAge1: number;
-    deathAge2: number;
+    deathAge1: string | number;
+    deathAge2: string | number;
     filingAge1Years: number;
     filingAge1Months: number;
     filingDate1: any;
@@ -26,8 +26,9 @@
     filingDate2: any;
     netPresentValue: Money;
   } | null;
-  export let deathAgeRange1: number[];
-  export let deathAgeRange2: number[];
+  // Row / column bucket labels (used only for selection highlighting)
+  export let rowBucketLabels: (string | number)[];
+  export let colBucketLabels: (string | number)[];
   export let cellWidth: number = 0;
   export let cellHeight: number = 0;
   export let cellStyle: string = "";
@@ -48,8 +49,8 @@
     hoveredCell.colIndex !== colIndex;
 
   $: isSelectedCell = selectedCellData && 
-    selectedCellData.deathAge1 === deathAgeRange1[rowIndex] && 
-    selectedCellData.deathAge2 === deathAgeRange2[colIndex];
+    selectedCellData.deathAge1 === rowBucketLabels[rowIndex] && 
+    selectedCellData.deathAge2 === colBucketLabels[colIndex];
 
   // Handle events
   function handleMouseOver() {

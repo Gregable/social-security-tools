@@ -5,7 +5,8 @@
   import {
     parseBirthdate as parseBirthdateUtil,
     calculateFinalDates as calculateFinalDatesUtil,
-    generateDeathAgeRange,
+  generateThreeYearBuckets,
+  type DeathAgeBucket,
   } from "$lib/strategy/ui";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
 
@@ -21,7 +22,7 @@
   const DEFAULT_BIRTHDATE = "1965-03-15";
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
-  const MIN_DEATH_AGE = 66;
+  const MIN_FILING_AGE = 62;
   // Number of different starting age pairs
   const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
 
@@ -31,8 +32,10 @@
   let isCalculationComplete = false;
   let isCalculationRunning = false;
   let calculationResults: any[][] = [];
-  let deathAgeRange1: number[] = [];
-  let deathAgeRange2: number[] = [];
+
+  // New three-year bucket lists
+  let deathAgeBuckets1: DeathAgeBucket[] = [];
+  let deathAgeBuckets2: DeathAgeBucket[] = [];
   let deathProbDistribution1: { age: number; probability: number }[] = [];
   let deathProbDistribution2: { age: number; probability: number }[] = [];
   let calculationProgress = 0;
@@ -90,7 +93,7 @@
   }
 
   /**
-   * Update death probability distributions when gender changes.
+   * Update death probability distributions when gender or health mult changes.
    * This is a lightweight operation compared to the full matrix calculation.
    */
   async function updateDeathProbabilityDistributions() {
@@ -137,12 +140,13 @@
       // Calculate death age range start ages
       const currentAge1 = currentYear - recipients[0].birthdate.layBirthYear();
       const currentAge2 = currentYear - recipients[1].birthdate.layBirthYear();
-      const startAge1 = Math.max(MIN_DEATH_AGE, currentAge1);
-      const startAge2 = Math.max(MIN_DEATH_AGE, currentAge2);
+      const startAge1 = Math.max(MIN_FILING_AGE, currentAge1);
+      const startAge2 = Math.max(MIN_FILING_AGE, currentAge2);
 
-      // Calculate age ranges
-      deathAgeRange1 = generateDeathAgeRange(startAge1);
-      deathAgeRange2 = generateDeathAgeRange(startAge2);
+      deathAgeBuckets1 = generateThreeYearBuckets(
+        startAge1, deathProbDistribution1);
+      deathAgeBuckets2 = generateThreeYearBuckets(
+        startAge2, deathProbDistribution2);
     } catch (error) {
       console.warn("Error updating death probability distributions:", error);
     }
@@ -202,8 +206,8 @@
 
       // Calculate total calculations needed
       totalCalculations =
-        deathAgeRange1.length *
-        deathAgeRange2.length *
+        deathAgeBuckets1.length *
+        deathAgeBuckets2.length *
         CALCULATIONS_PER_SCENARIO;
 
       // Get current date for optimal strategy calculation
@@ -214,15 +218,18 @@
       });
 
       // Initialize results matrix
-      calculationResults = Array(deathAgeRange1.length)
+      calculationResults = Array(deathAgeBuckets1.length)
         .fill(null)
-        .map(() => Array(deathAgeRange2.length).fill(null));
+        .map(() => Array(deathAgeBuckets2.length).fill(null));
 
       // Calculate optimal strategy for each death age combination
-      for (let i = 0; i < deathAgeRange1.length; i++) {
-        for (let j = 0; j < deathAgeRange2.length; j++) {
-          const deathAge1 = deathAgeRange1[i];
-          const deathAge2 = deathAgeRange2[j];
+      for (let i = 0; i < deathAgeBuckets1.length; i++) {
+        for (let j = 0; j < deathAgeBuckets2.length; j++) {
+          const bucket1 = deathAgeBuckets1[i];
+          const bucket2 = deathAgeBuckets2[j];
+          // Representative (middle) ages for optimization
+          const deathAge1 = bucket1.midAge;
+          const deathAge2 = bucket2.midAge;
 
           // Calculate final dates for this combination
           const finalDates = calculateFinalDatesUtil(
@@ -241,8 +248,10 @@
 
           // Store the result using the chosen strategy
           calculationResults[i][j] = {
-            deathAge1,
-            deathAge2,
+            deathAge1: bucket1.label,
+            deathAge2: bucket2.label,
+            bucket1,
+            bucket2,
             filingAge1: optimalFilingAge1,
             filingAge2: optimalFilingAge2,
             totalBenefit: Money.fromCents(netPresentValue),
@@ -270,7 +279,7 @@
 
   // Calculate min and max monthsSinceEpoch for color coding
   $: {
-    if (isCalculationComplete && calculationResults.length > 0) {
+  if (isCalculationComplete && calculationResults.length > 0) {
       let monthsSinceEpochValues: number[] = [];
       calculationResults.forEach((row) => {
         row.forEach((cell) => {
@@ -374,11 +383,9 @@
     />
   </section>
   <section class="calculation-section" bind:this={matrixDisplayElement}>
-    {#if isCalculationComplete && calculationResults.length > 0 && deathProbDistribution1.length > 0 && deathProbDistribution2.length > 0}
+  {#if isCalculationComplete && calculationResults.length > 0 && deathProbDistribution1.length > 0 && deathProbDistribution2.length > 0}
       <StrategyMatrixDisplay
         {recipients}
-        {deathAgeRange1}
-        {deathAgeRange2}
         {calculationResults}
         {deathProbDistribution1}
         {deathProbDistribution2}
@@ -395,11 +402,11 @@
   <section class="limited-width">
     {#if isCalculationComplete && calculationResults.length > 0 && selectedCellData}
       <!-- Find the cell in calculationResults that corresponds to selectedCellData -->
-      {@const row = deathAgeRange1.findIndex(
-        (age) => age === selectedCellData.deathAge1
+      {@const row = deathAgeBuckets1.findIndex(
+        (b) => b.label === String(selectedCellData.deathAge1)
       )}
-      {@const col = deathAgeRange2.findIndex(
-        (age) => age === selectedCellData.deathAge2
+      {@const col = deathAgeBuckets2.findIndex(
+        (b) => b.label === String(selectedCellData.deathAge2)
       )}
       {@const cellData =
         row >= 0 && col >= 0 ? calculationResults[row][col] : null}

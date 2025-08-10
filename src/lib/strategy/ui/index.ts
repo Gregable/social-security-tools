@@ -17,4 +17,7 @@ export {
   formatPercentagesToCssGridTemplate,
   generateDeathAgeRange,
   calculateGridTemplates,
+  generateThreeYearBuckets,
 } from './grid-sizing.js';
+
+export type { DeathAgeBucket } from './grid-sizing.js';
