@@ -1,4 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+import process from 'process';
 import {
   fetchLatest20YearTreasuryYield,
   fetchFredDFII20Yield,
@@ -46,9 +56,26 @@ class MockDOMParser {
 global.DOMParser = MockDOMParser as any;
 
 describe('Treasury Yields Library', () => {
+  let logSpy: ReturnType<typeof vi.spyOn> | undefined;
+  let errorSpy: ReturnType<typeof vi.spyOn> | undefined;
+  let warnSpy: ReturnType<typeof vi.spyOn> | undefined;
+
+  beforeAll(() => {
+    if (!process.env.SHOW_TEST_LOGS) {
+      logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    }
+  });
+
+  afterAll(() => {
+    logSpy?.mockRestore();
+    errorSpy?.mockRestore();
+    warnSpy?.mockRestore();
+  });
   beforeEach(() => {
-    vi.clearAllMocks();
-    // Mock successful response
+    // Reset only fetch mock state so we don't wipe out console spies.
+    mockFetch.mockReset();
     mockFetch.mockResolvedValue({
       ok: true,
       text: () => Promise.resolve('<xml>Mock XML</xml>'),
@@ -56,7 +83,8 @@ describe('Treasury Yields Library', () => {
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    // Do not reset all mocks; leave console spies intact across tests.
+    mockFetch.mockReset();
   });
 
   describe('fetchLatest20YearTreasuryYield', () => {

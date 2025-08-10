@@ -1,8 +1,26 @@
 import { execSync } from 'child_process';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import process from 'process';
 
 describe('ESLint Regression Prevention', () => {
+  let logSpy: ReturnType<typeof vi.spyOn> | undefined;
+  let errorSpy: ReturnType<typeof vi.spyOn> | undefined;
+  let warnSpy: ReturnType<typeof vi.spyOn> | undefined;
+
+  beforeAll(() => {
+    // Silence console output during these quality tests unless explicitly enabled.
+    if (!process.env.SHOW_TEST_LOGS) {
+      logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    }
+  });
+
+  afterAll(() => {
+    logSpy?.mockRestore();
+    errorSpy?.mockRestore();
+    warnSpy?.mockRestore();
+  });
   it('should have zero warnings and zero errors', () => {
     try {
       // Run ESLint and capture the output
