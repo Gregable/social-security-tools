@@ -3,6 +3,7 @@
   import type { MonthDate } from "$lib/month-time";
   import type { Money } from "$lib/money";
   import StrategyMatrix from "./StrategyMatrix.svelte";
+  import type { CalculationResults } from "$lib/strategy/ui";
 
   // Props
   export let recipients: [Recipient, Recipient];
@@ -10,7 +11,7 @@
 
   // Callback props for events
   export let onselectcell: ((detail: any) => void) | undefined = undefined;
-  export let calculationResults: any[][];
+  export let calculationResults: CalculationResults;
   export let deathProbDistribution1: { age: number; probability: number }[];
   export let deathProbDistribution2: { age: number; probability: number }[];
   export let timeElapsed: number;

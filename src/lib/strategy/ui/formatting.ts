@@ -125,7 +125,7 @@ export function createValueExtractor(
   recipientIndex: number
 ) {
   return (calculationResult: any): string => {
-    if (!calculationResult || calculationResult.error) return 'error';
+    if (!calculationResult) return 'error';
     // Convert to 0-based index for internal functions
     const zeroBasedIndex = recipientIndex - 1;
     return getFilingDate(

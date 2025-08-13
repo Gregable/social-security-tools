@@ -5,6 +5,7 @@
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Money } from "$lib/money";
   import type { DeathAgeBucket } from "$lib/strategy/ui";
+  import type { CalculationResults } from "$lib/strategy/ui";
   import {
     createBorderRemovalFunctions,
   } from "$lib/strategy/ui";
@@ -14,7 +15,7 @@
   export let recipientIndex: number;
   export let recipients: [Recipient, Recipient];
   export let displayAsAges: boolean = false;
-  export let calculationResults: any[][];
+  export let calculationResults: CalculationResults;
   export let deathProbDistribution1: { age: number; probability: number }[];
   export let deathProbDistribution2: { age: number; probability: number }[];
   export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
@@ -44,9 +45,7 @@
 
   // Create normalized value extractor that compares actual dates, not display strings
   function createNormalizedValueExtractor(recipientIndex: number) {
-    return (calculationResult: StrategyResultCell): string => {
-      if (!calculationResult || calculationResult.error) return 'error';
-      
+    return (calculationResult: StrategyResultCell): string => {      
       // Get the filing age and convert to a normalized date string
       const filingAgeYears = calculationResult[`filingAge${recipientIndex + 1}Years`];
       const filingAgeMonths = calculationResult[`filingAge${recipientIndex + 1}Months`];
@@ -67,7 +66,7 @@
   // Extractor for recipient values using normalized date comparison
   $: borderRemovalFuncs = createBorderRemovalFunctions(
     createNormalizedValueExtractor(recipientIndex),
-    calculationResults
+    calculationResults.to2D()
   );
 
 
@@ -75,8 +74,8 @@
   // the first cell in each row/column. Every cell in a row shares the same 
   // bucket1; every cell in a column shares the same bucket2, so sampling once 
   // is enough.
-  $: rowBuckets = calculationResults.map(r => r[0].bucket1 as DeathAgeBucket);
-  $: colBuckets = calculationResults[0].map(c => c.bucket2 as DeathAgeBucket);
+  $: rowBuckets = calculationResults.rowBuckets();
+  $: colBuckets = calculationResults.colBuckets();
 
   /**
    * Convert a list of buckets into a CSS grid-template string and parallel
@@ -183,8 +182,9 @@
     let style = '';
     
     // Add background color based on filing date
-    if (calculationResults[i][j]) {
-      const filingAge: MonthDuration = calculationResults[i][j][`filingAge${recipientIndex + 1}`];
+    const cell = calculationResults.get(i, j);
+    if (cell) {
+      const filingAge: MonthDuration = cell[`filingAge${recipientIndex + 1}`];
       const backgroundColor = getMonthYearColor(
         filingAge.asMonths(),
         MonthDuration.initFromYearsMonths({
@@ -238,7 +238,7 @@
 
   function handleCellSelect(event) {
     const { rowIndex, colIndex } = event.detail;
-    const result = calculationResults[rowIndex][colIndex] as StrategyResultCell;
+  const result = calculationResults.get(rowIndex, colIndex) as StrategyResultCell;
     const bucket1 = rowBuckets[rowIndex];
     const bucket2 = colBuckets[colIndex];
     if (!result || !bucket1 || !bucket2) return;
@@ -293,13 +293,13 @@
         class="age-header-container"
         style:grid-template-columns="{columnTemplate}" style:width="100%"
       >
-    {#each calculationResults[0] as cell, j}
+        {#each colBuckets as colBucket, j}
           <div
             class="age-header"
             class:highlighted-column={hoveredCell && hoveredCell.colIndex === j}
-      title={bucketHeaderTitle(cell?.bucket2, deathProbDistribution2)}
+            title={bucketHeaderTitle(colBucket, deathProbDistribution2)}
           >
-      {cell?.bucket2?.label || ''}
+            {colBucket?.label || ''}
           </div>
         {/each}
       </div>
@@ -318,13 +318,13 @@
           class="age-header-container"
           style:grid-template-rows="{rowTemplate}"
         >
-      {#each calculationResults as row, i}
+          {#each rowBuckets as rowBucket, i}
             <div
               class="age-header"
               class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i}
-        title={bucketHeaderTitle(row[0]?.bucket1, deathProbDistribution1)}
+              title={bucketHeaderTitle(rowBucket, deathProbDistribution1)}
             >
-        {row[0]?.bucket1?.label || ''}
+              {rowBucket?.label || ''}
             </div>
           {/each}
         </div>
@@ -336,12 +336,12 @@
         bind:clientWidth={matrixWidth}
         style:grid-template-columns="{columnTemplate}" style:grid-template-rows="{rowTemplate}" style:display="grid" style:min-height="0"
       >
-        {#each calculationResults as _row, i}
-          {#each calculationResults[i] as _cell, j}
+        {#each rowBuckets as _row, i}
+          {#each colBuckets as _col, j}
             <StrategyCell
               rowIndex={i}
               colIndex={j}
-              calculationResult={calculationResults[i][j]}
+              calculationResult={calculationResults.get(i, j)}
               {displayAsAges}
               {recipients}
               {recipientIndex}

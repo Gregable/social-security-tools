@@ -18,6 +18,7 @@
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
   import AlternativeStrategiesSection from "./components/AlternativeStrategiesSection.svelte";
+  import { CalculationResults } from "$lib/strategy/ui";
 
   // Constants
   const DEFAULT_BIRTHDATE = "1965-03-15";
@@ -32,7 +33,7 @@
   let timeElapsed: number = 0;
   let isCalculationComplete = false;
   let isCalculationRunning = false;
-  let calculationResults: any[][] = [];
+  let calculationResults: CalculationResults = new CalculationResults();
 
   // New three-year bucket lists
   let deathAgeBuckets1: DeathAgeBucket[] = [];
@@ -196,7 +197,7 @@
     isCalculationRunning = true;
     isCalculationComplete = false;
     selectedCellData = null;
-    calculationResults = [];
+    calculationResults = new CalculationResults();
     calculationProgress = 0;
     startTime = Date.now();
 
@@ -218,9 +219,10 @@
       });
 
       // Initialize results matrix
-      calculationResults = Array(deathAgeBuckets1.length)
-        .fill(null)
-        .map(() => Array(deathAgeBuckets2.length).fill(null));
+      calculationResults = new CalculationResults(
+        deathAgeBuckets1.length,
+        deathAgeBuckets2.length
+      );
 
       // Calculate optimal strategy for each death age combination
       for (let i = 0; i < deathAgeBuckets1.length; i++) {
@@ -247,7 +249,7 @@
           );
 
           // Store the result using the chosen strategy
-          calculationResults[i][j] = {
+          calculationResults.set(i, j, {
             deathAge1: bucket1.label,
             deathAge2: bucket2.label,
             bucket1,
@@ -259,7 +261,7 @@
             filingAge1Months: optimalFilingAge1.modMonths(),
             filingAge2Years: optimalFilingAge2.years(),
             filingAge2Months: optimalFilingAge2.modMonths(),
-          };
+          });
 
           calculationProgress += CALCULATIONS_PER_SCENARIO;
         }
@@ -270,7 +272,7 @@
       isCalculationComplete = true;
     } catch (error) {
       console.error("Calculation error:", error);
-      calculationResults = [[{ error: error.message }]];
+      calculationResults.setError(error.message || String(error));
     } finally {
       timeElapsed = (Date.now() - startTime) / 1000;
       isCalculationRunning = false;
@@ -327,7 +329,7 @@
     />
   </section>
   <section class="calculation-section" bind:this={matrixDisplayElement}>
-  {#if isCalculationComplete && calculationResults.length > 0 && deathProbDistribution1.length > 0 && deathProbDistribution2.length > 0}
+  {#if isCalculationComplete && calculationResults.rows() > 0 && deathProbDistribution1.length > 0 && deathProbDistribution2.length > 0}
       <StrategyMatrixDisplay
         {recipients}
         {calculationResults}
@@ -350,8 +352,7 @@
       {@const col = deathAgeBuckets2.findIndex(
         (b) => b.label === String(selectedCellData.deathAge2)
       )}
-      {@const cellData =
-        row >= 0 && col >= 0 ? calculationResults[row][col] : null}
+    {@const cellData = row >= 0 && col >= 0 ? calculationResults.get(row, col) :  null}
 
       <StrategyDetails
         deathAge1={selectedCellData.deathAge1}

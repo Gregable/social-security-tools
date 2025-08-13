@@ -21,3 +21,6 @@ export {
 } from './grid-sizing.js';
 
 export type { DeathAgeBucket } from './grid-sizing.js';
+
+export { CalculationResults } from './calculation-results.js';
+export type { StrategyResult } from './calculation-results.js';
