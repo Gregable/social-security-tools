@@ -1,0 +1,60 @@
+body {
+  margin: 0;
+  /* Minimum width to match small mobile devices (iPhone 5/SE width) */
+  min-width: 320px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: rgb(51, 51, 51);
+  background-color: #fff;
+}
+
+* {
+  scroll-behavior: smooth;
+  /* Use border-box for predictable sizing */
+  box-sizing: border-box;
+}
+
+/* Images / videos use content-box to avoid distortion when explicitly sized */
+img,
+video {
+  box-sizing: content-box;
+}
+
+a {
+  color: #337ab7;
+  text-decoration: none;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  .noprint {
+    display: none !important;
+  }
+  .pageBreakBefore {
+    page-break-before: always;
+  }
+  .pageBreakAfter {
+    page-break-after: always;
+  }
+  .pageBreakAvoid {
+    page-break-inside: avoid;
+  }
+  * {
+    transition: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+@media screen {
+  .onlyprint {
+    display: none !important;
+  }
+}

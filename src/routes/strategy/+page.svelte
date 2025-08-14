@@ -18,7 +18,8 @@
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
   import AlternativeStrategiesSection from "./components/AlternativeStrategiesSection.svelte";
-  import { CalculationResults } from "$lib/strategy/ui";
+  import { CalculationResults, CalculationStatus } from "$lib/strategy/ui";
+  import { writable } from 'svelte/store';
 
   // Constants
   const DEFAULT_BIRTHDATE = "1965-03-15";
@@ -31,9 +32,10 @@
   // Calculation state
   let startTime: number;
   let timeElapsed: number = 0;
-  let isCalculationComplete = false;
-  let isCalculationRunning = false;
-  let calculationResults: CalculationResults = new CalculationResults();
+  // Wrap results in a store so internal mutations (status/selection) can trigger UI updates
+  const calculationResultsStore = writable<CalculationResults>(new CalculationResults());
+  let calculationResults: CalculationResults;
+  calculationResultsStore.subscribe(v => calculationResults = v);
 
   // New three-year bucket lists
   let deathAgeBuckets1: DeathAgeBucket[] = [];
@@ -180,12 +182,10 @@
    * Main calculation function for optimal strategy matrix
    */
   async function calculateStrategyMatrix() {
-    if (isCalculationRunning) return;
-
-    isCalculationRunning = true;
-    isCalculationComplete = false;
-    calculationResults.clearSelectedCell();
-    calculationResults = new CalculationResults();
+  if (calculationResults.status() === CalculationStatus.Running) return;
+  const fresh = new CalculationResults();
+  fresh.setStatus(CalculationStatus.Running);
+  calculationResultsStore.set(fresh);
     calculationProgress = 0;
     startTime = Date.now();
 
@@ -207,10 +207,12 @@
       });
 
       // Initialize results matrix
-      calculationResults = new CalculationResults(
+      const sized = new CalculationResults(
         deathAgeBuckets1.length,
         deathAgeBuckets2.length
       );
+      sized.setStatus(CalculationStatus.Running);
+      calculationResultsStore.set(sized);
 
       // Calculate optimal strategy for each death age combination
       for (let i = 0; i < deathAgeBuckets1.length; i++) {
@@ -253,21 +255,26 @@
 
           calculationProgress += CALCULATIONS_PER_SCENARIO;
         }
-        // Allow UI to update
+        calculationResultsStore.set(calculationResults);
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
-
-      isCalculationComplete = true;
+      calculationResults.setStatus(CalculationStatus.Complete);
+      calculationResultsStore.set(calculationResults);
     } catch (error) {
       console.error("Calculation error:", error);
       calculationResults.setError(error.message || String(error));
+      calculationResultsStore.set(calculationResults);
     } finally {
       timeElapsed = (Date.now() - startTime) / 1000;
-      isCalculationRunning = false;
+      if (calculationResults.status() === CalculationStatus.Running) {
+        calculationResults.setStatus(CalculationStatus.Idle);
+        calculationResultsStore.set(calculationResults);
+      }
     }
   }
   function handleCellSelect(detail: any) {
     calculationResults.setSelectedByLabels(String(detail.deathAge1), String(detail.deathAge2));
+    calculationResultsStore.set(calculationResults);
   }
 </script>
 
@@ -308,7 +315,7 @@
 
   <section class="limited-width">
     <CalculationControls
-      {isCalculationRunning}
+      {calculationResults}
       {calculationProgress}
       {totalCalculations}
       disabled={!formIsValid}
@@ -316,14 +323,13 @@
     />
   </section>
   <section class="calculation-section" bind:this={matrixDisplayElement}>
-  {#if isCalculationComplete && calculationResults.rows() > 0 && deathProbDistribution1.length > 0 && deathProbDistribution2.length > 0}
+  {#if calculationResults.status() === CalculationStatus.Complete}
       <StrategyMatrixDisplay
         {recipients}
         {calculationResults}
         {deathProbDistribution1}
         {deathProbDistribution2}
         {timeElapsed}
-        {isCalculationComplete}
         bind:displayAsAges
         onselectcell={handleCellSelect}
       />

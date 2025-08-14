@@ -2,6 +2,7 @@
   import type { Recipient } from "$lib/recipient";
   import StrategyMatrix from "./StrategyMatrix.svelte";
   import type { CalculationResults } from "$lib/strategy/ui";
+  import { CalculationStatus } from "$lib/strategy/ui";
 
   // Props
   export let recipients: [Recipient, Recipient];
@@ -13,7 +14,6 @@
   export let deathProbDistribution1: { age: number; probability: number }[];
   export let deathProbDistribution2: { age: number; probability: number }[];
   export let timeElapsed: number;
-  export let isCalculationComplete: boolean;
 
   // Shared state for matrix hovering
   let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
@@ -44,7 +44,7 @@
     age combinations
   </p>
 
-  {#if isCalculationComplete}
+  {#if calculationResults.status() === CalculationStatus.Complete}
     <div class="matrices-container">
     {#each [0, 1] as recipientIndex}
         <StrategyMatrix

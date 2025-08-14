@@ -18,6 +18,12 @@ export interface StrategyResult {
   deathProb2?: number;
 }
 
+export enum CalculationStatus {
+  Idle = 'idle',
+  Running = 'running',
+  Complete = 'complete',
+}
+
 /**
  * Immutable-ish wrapper around a 2D grid of strategy results providing
  * convenience accessors for row/column counts, buckets, and safe access.
@@ -28,6 +34,7 @@ export class CalculationResults {
   private _error: string | null = null;
   private _selectedRow: number | null = null;
   private _selectedCol: number | null = null;
+  private _status: CalculationStatus = CalculationStatus.Idle;
 
   constructor(rows: number = 0, cols: number = 0) {
     this.grid = Array(rows)
@@ -62,6 +69,7 @@ export class CalculationResults {
     // Clear any selection when an error occurs
     this._selectedRow = null;
     this._selectedCol = null;
+    this._status = CalculationStatus.Idle;
   }
 
   error(): string | null {
@@ -96,6 +104,15 @@ export class CalculationResults {
 
   isSelected(row: number, col: number): boolean {
     return this._selectedRow === row && this._selectedCol === col;
+  }
+
+  // Status API
+  status(): CalculationStatus {
+    return this._status;
+  }
+
+  setStatus(status: CalculationStatus): void {
+    this._status = status;
   }
 
   /** Convenience: get bucket labels for each row. */

@@ -1,6 +1,7 @@
 <script lang="ts">
   // Props
-  export let isCalculationRunning: boolean;
+  import { CalculationStatus, CalculationResults } from "$lib/strategy/ui";
+  export let calculationResults: CalculationResults;
   export let calculationProgress: number;
   export let totalCalculations: number;
   export let disabled: boolean = false;
@@ -10,6 +11,7 @@
 
   // Derived variable for progress bar width
   $: progressWidth = `${totalCalculations > 0 ? (calculationProgress / totalCalculations) * 100 : 0}%`;
+  $: isRunning = calculationResults.status() === CalculationStatus.Running;
 
   function triggerCalculation() {
     // Call the callback function to trigger calculation in the parent component
@@ -20,16 +22,16 @@
 <div class="calculation-controls">
   <button
     on:click={triggerCalculation}
-    disabled={isCalculationRunning || disabled}
+    disabled={isRunning || disabled}
     class="calculate-button"
-    title={disabled && !isCalculationRunning ? "Please fix input errors before calculating" : ""}
+    title={disabled && !isRunning ? "Please fix input errors before calculating" : ""}
   >
-    {isCalculationRunning
+    {isRunning
       ? "Calculating..."
       : "Calculate Optimal Filing Strategies"}
   </button>
 
-  {#if isCalculationRunning}
+  {#if isRunning}
     <div class="loading">
       <span class="spinner"></span> Processing {calculationProgress} of {totalCalculations}
       combinations...

@@ -17,6 +17,12 @@ const viteHeaderPlugin = {
 /** @type {import('vite').UserConfig} */
 const config = {
   plugins: [viteHeaderPlugin, sveltekit()],
+  optimizeDeps: {
+    // Exclude libs that appear to generate unstable pre-bundled chunk names or
+    // are ESM-only / ship conditionally. This prevents Vite from trying to
+    // cache them under hashed chunk filenames that later go missing.
+    exclude: ['posthog-js'],
+  },
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}'],
     // Disable the fuzz test except for manual runs:
