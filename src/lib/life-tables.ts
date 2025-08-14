@@ -159,11 +159,17 @@ export async function getLifeTableData(
  * probability of death at that age.
  */
 export async function getDeathProbabilityDistribution(
-  gender: GenderOption,
-  birthYear: number,
-  currentYear: number = new Date().getFullYear(),
-  healthMultiplier: number = 1.0
+  recipient: {
+    gender: GenderOption;
+    birthdate: { layBirthYear(): number };
+    healthMultiplier: number;
+  },
+  currentYear: number = new Date().getFullYear()
 ): Promise<{ age: number; probability: number }[]> {
+  const gender = recipient.gender;
+  const birthYear = recipient.birthdate.layBirthYear();
+  const healthMultiplier = recipient.healthMultiplier;
+
   validateGender(gender);
   validateBirthYear(birthYear);
 
@@ -184,7 +190,7 @@ export async function getDeathProbabilityDistribution(
     mortalityRate: Math.min(MAX_Q, entry.mortalityRate * multiplier),
   }));
 
-  // Filter to only include entries from current age through 119
+  // Filter to only include entries from current age through MAX_AGE - 1
   const relevantData = lifeTableData.filter((entry) => entry.age >= currentAge);
 
   if (relevantData.length === 0) {

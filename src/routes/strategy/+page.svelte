@@ -79,33 +79,17 @@
    */
   async function updateDeathProbabilityDistributions() {
     try {
-      // Get birth years for both recipients
-      const birthYear1 = recipients[0].birthdate.layBirthYear();
-      const birthYear2 = recipients[1].birthdate.layBirthYear();
-
-      // Get gender from recipient objects
-      const gender1 = recipients[0].gender;
-      const gender2 = recipients[1].gender;
-
-      // Health multipliers
-      const health1 = recipients[0].healthMultiplier ?? 1.0;
-      const health2 = recipients[1].healthMultiplier ?? 1.0;
-
       // Get current year for the probability distribution calculation
       const currentYear = new Date().getFullYear();
 
       // Fetch death probability distribution for both recipients
-      const deathProb1Promise = getDeathProbabilityDistribution(
-        gender1,
-        birthYear1,
-        currentYear,
-        health1
+  const deathProb1Promise: Promise<{ age: number; probability: number }[]> = getDeathProbabilityDistribution(
+        recipients[0],
+        currentYear
       );
-      const deathProb2Promise = getDeathProbabilityDistribution(
-        gender2,
-        birthYear2,
-        currentYear,
-        health2
+  const deathProb2Promise: Promise<{ age: number; probability: number }[]> = getDeathProbabilityDistribution(
+        recipients[1],
+        currentYear
       );
 
       // Wait for both promises to resolve

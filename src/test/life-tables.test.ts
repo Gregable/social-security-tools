@@ -8,6 +8,19 @@ import {
   DataNotFoundError,
 } from '$lib/life-tables';
 
+// Helper to build a minimal recipient-like object without importing Recipient (avoids potential circular deps in unit tests)
+function makeRecipient(
+  gender: 'male' | 'female' | 'blended',
+  birthYear: number,
+  healthMultiplier = 1.0
+) {
+  return {
+    gender,
+    healthMultiplier,
+    birthdate: { layBirthYear: () => birthYear },
+  } as const;
+}
+
 // Mock fetch globally
 global.fetch = vi.fn();
 
@@ -104,7 +117,10 @@ describe('Life Tables', () => {
         json: () => Promise.resolve(mockData),
       } as Response);
 
-      const result = await getDeathProbabilityDistribution('male', 2000, 2025);
+      const result = await getDeathProbabilityDistribution(
+        makeRecipient('male', 2000),
+        2025
+      );
 
       expect(result).toHaveLength(3); // Ages 25, 26, plus age 120
       expect(result[0]).toEqual({ age: 25, probability: expect.closeTo(0.1) });
@@ -121,7 +137,7 @@ describe('Life Tables', () => {
 
     it('throws error for negative current age', async () => {
       await expect(
-        getDeathProbabilityDistribution('male', 2030, 2025) // Born in future
+        getDeathProbabilityDistribution(makeRecipient('male', 2030), 2025) // Born in future
       ).rejects.toThrow(LifeTableError);
     });
 
@@ -132,7 +148,7 @@ describe('Life Tables', () => {
       } as Response);
 
       await expect(
-        getDeathProbabilityDistribution('male', 1980, 2025)
+        getDeathProbabilityDistribution(makeRecipient('male', 1980), 2025)
       ).rejects.toThrow(DataNotFoundError);
     });
   });
