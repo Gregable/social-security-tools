@@ -3,9 +3,7 @@
   import { getRecommendedDiscountRate } from '$lib/strategy/data';
 
   export let discountRatePercent: number;
-  export let onDiscountRateChange:
-    | ((discountRatePercent: number) => void)
-    | undefined = undefined;
+  // Two-way binding now used instead of explicit change callback.
   export let onValidityChange: ((isValid: boolean) => void) | undefined =
     undefined;
 
@@ -49,7 +47,8 @@
   // Handle discount rate changes
   function handleDiscountRateChange(newValue: number) {
     validateDiscountRate(newValue);
-    onDiscountRateChange?.(newValue);
+    // Assign to exported prop to trigger two-way binding update in parent.
+    discountRatePercent = newValue;
   }
 
   // Validate discount rate

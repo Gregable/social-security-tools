@@ -123,15 +123,7 @@
     }
   }
 
-  // Function to handle discount rate changes from the DiscountRateInput component
-  function handleDiscountRateChange(newDiscountRatePercent: number) {
-    try {
-      // Update discount rate percent directly
-      discountRatePercent = newDiscountRatePercent;
-    } catch (error) {
-      console.warn('Error updating discount rate:', error);
-    }
-  }
+  // Discount rate now updated via two-way binding on DiscountRateInput.
 
   /**
    * Initialize recipients with default values
@@ -281,8 +273,7 @@
       />
 
       <DiscountRateInput
-        {discountRatePercent}
-        onDiscountRateChange={handleDiscountRateChange}
+        bind:discountRatePercent
         onValidityChange={(isValid) => (discountRateValid = isValid)}
       />
       <p class="mortality-guide-note">
@@ -300,7 +291,7 @@
     <CalculationControls
       {calculationResults}
       disabled={!formIsValid}
-      oncalculate={() => calculateStrategyMatrix()}
+      oncalculate={calculateStrategyMatrix}
     />
   </section>
   <section class="calculation-section">
