@@ -13,7 +13,6 @@
   export let calculationResults: CalculationResults;
   export let deathProbDistribution1: { age: number; probability: number }[];
   export let deathProbDistribution2: { age: number; probability: number }[];
-  export let timeElapsed: number;
 
   // Shared state for matrix hovering
   let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
@@ -38,7 +37,7 @@
       </h3>
     </div>
   </div>
-  <p>Calculation completed in {timeElapsed.toFixed(2)} seconds</p>
+  <p>Calculation completed in {calculationResults.timeElapsed().toFixed(2)} seconds</p>
   <p>
     Tables show optimal filing {displayAsAges ? 'ages' : 'dates'} for each recipient across different death
     age combinations

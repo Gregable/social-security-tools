@@ -2,15 +2,13 @@
   // Props
   import { CalculationStatus, CalculationResults } from "$lib/strategy/ui";
   export let calculationResults: CalculationResults;
-  export let calculationProgress: number;
-  export let totalCalculations: number;
   export let disabled: boolean = false;
 
   // Callback prop for events
   export let oncalculate: (() => void) | undefined = undefined;
 
   // Derived variable for progress bar width
-  $: progressWidth = `${totalCalculations > 0 ? (calculationProgress / totalCalculations) * 100 : 0}%`;
+  $: progressWidth = `${calculationResults.totalCalculations() > 0 ? (calculationResults.calculationProgress() / calculationResults.totalCalculations()) * 100 : 0}%`;
   $: isRunning = calculationResults.status() === CalculationStatus.Running;
 
   function triggerCalculation() {
@@ -33,7 +31,7 @@
 
   {#if isRunning}
     <div class="loading">
-      <span class="spinner"></span> Processing {calculationProgress} of {totalCalculations}
+  <span class="spinner"></span> Processing {calculationResults.calculationProgress()} of {calculationResults.totalCalculations()}
       combinations...
     </div>
     <div class="progress-bar">

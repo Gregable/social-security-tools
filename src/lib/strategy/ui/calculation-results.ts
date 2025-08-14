@@ -24,6 +24,9 @@ export enum CalculationStatus {
   Complete = 'complete',
 }
 
+// Number of different starting age pairs (per scenario multiplier reference)
+const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
+
 /**
  * Immutable-ish wrapper around a 2D grid of strategy results providing
  * convenience accessors for row/column counts, buckets, and safe access.
@@ -35,6 +38,12 @@ export class CalculationResults {
   private _selectedRow: number | null = null;
   private _selectedCol: number | null = null;
   private _status: CalculationStatus = CalculationStatus.Idle;
+  // Timing & progress
+  private _startTime: number | null = null;
+  private _timeElapsedSeconds = 0;
+  private _progress = 0; // number of sub-calculations completed
+  private _total = 0; // total sub-calculations expected
+  private _perScenarioMultiplier = CALCULATIONS_PER_SCENARIO; // multiplier applied to rows*cols for total calculations
 
   constructor(rows: number = 0, cols: number = 0) {
     this.grid = Array(rows)
@@ -113,6 +122,62 @@ export class CalculationResults {
 
   setStatus(status: CalculationStatus): void {
     this._status = status;
+  }
+
+  // Progress / timing API
+  // Optional override if caller wants custom multiplier
+  setPerScenarioMultiplier(multiplier: number): void {
+    if (multiplier > 0) this._perScenarioMultiplier = multiplier;
+  }
+
+  beginRun(totalCalculations?: number): void {
+    this._error = null;
+    this._progress = 0;
+    if (typeof totalCalculations === 'number') {
+      this._total = totalCalculations;
+    } else {
+      // compute from current grid size * multiplier
+      this._total = this.rows() * this.cols() * this._perScenarioMultiplier;
+    }
+    this._startTime = Date.now();
+    this._timeElapsedSeconds = 0;
+    this.setStatus(CalculationStatus.Running);
+  }
+
+  addProgress(delta: number): void {
+    this._progress += delta;
+    if (this._progress > this._total) this._progress = this._total;
+  }
+
+  addScenarioProgress(): void {
+    this.addProgress(this._perScenarioMultiplier);
+  }
+
+  completeRun(): void {
+    if (this._startTime) {
+      this._timeElapsedSeconds = (Date.now() - this._startTime) / 1000;
+    }
+    this.setStatus(CalculationStatus.Complete);
+  }
+
+  failRun(message: string): void {
+    if (this._startTime) {
+      this._timeElapsedSeconds = (Date.now() - this._startTime) / 1000;
+    }
+    this.setError(message);
+  }
+
+  timeElapsed(): number {
+    return this._timeElapsedSeconds;
+  }
+  calculationProgress(): number {
+    return this._progress;
+  }
+  totalCalculations(): number {
+    return this._total;
+  }
+  startTime(): number | null {
+    return this._startTime;
   }
 
   /** Convenience: get bucket labels for each row. */

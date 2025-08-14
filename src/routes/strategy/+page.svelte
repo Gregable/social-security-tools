@@ -26,12 +26,6 @@
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
   const MIN_FILING_AGE = 62;
-  // Number of different starting age pairs
-  const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
-
-  // Calculation state
-  let startTime: number;
-  let timeElapsed: number = 0;
   // Wrap results in a store so internal mutations (status/selection) can trigger UI updates
   const calculationResultsStore = writable<CalculationResults>(new CalculationResults());
   let calculationResults: CalculationResults;
@@ -42,11 +36,8 @@
   let deathAgeBuckets2: DeathAgeBucket[] = [];
   let deathProbDistribution1: { age: number; probability: number }[] = [];
   let deathProbDistribution2: { age: number; probability: number }[] = [];
-  let calculationProgress = 0;
-  let totalCalculations = 0;
+  // Elapsed time now accessed directly inside StrategyMatrixDisplay
   let displayAsAges: boolean = false;
-
-  let matrixDisplayElement: HTMLElement;
 
   // Form inputs
   let birthdateInputs: [string, string] = [
@@ -184,20 +175,17 @@
   async function calculateStrategyMatrix() {
   if (calculationResults.status() === CalculationStatus.Running) return;
   const fresh = new CalculationResults();
-  fresh.setStatus(CalculationStatus.Running);
   calculationResultsStore.set(fresh);
-    calculationProgress = 0;
-    startTime = Date.now();
 
     try {
       // Update death probability distributions first (in case they're not current)
       await updateDeathProbabilityDistributions();
 
       // Calculate total calculations needed
-      totalCalculations =
-        deathAgeBuckets1.length *
-        deathAgeBuckets2.length *
-        CALCULATIONS_PER_SCENARIO;
+      const sized = new CalculationResults(
+        deathAgeBuckets1.length, deathAgeBuckets2.length);
+      sized.beginRun();
+      calculationResultsStore.set(sized);
 
       // Get current date for optimal strategy calculation
       const now = new Date();
@@ -207,12 +195,6 @@
       });
 
       // Initialize results matrix
-      const sized = new CalculationResults(
-        deathAgeBuckets1.length,
-        deathAgeBuckets2.length
-      );
-      sized.setStatus(CalculationStatus.Running);
-      calculationResultsStore.set(sized);
 
       // Calculate optimal strategy for each death age combination
       for (let i = 0; i < deathAgeBuckets1.length; i++) {
@@ -253,19 +235,18 @@
             filingAge2Months: optimalFilingAge2.modMonths(),
           });
 
-          calculationProgress += CALCULATIONS_PER_SCENARIO;
+          calculationResults.addScenarioProgress();
         }
-        calculationResultsStore.set(calculationResults);
+        calculationResultsStore.set(calculationResults); // update row progress
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
-      calculationResults.setStatus(CalculationStatus.Complete);
+      calculationResults.completeRun();
       calculationResultsStore.set(calculationResults);
     } catch (error) {
       console.error("Calculation error:", error);
-      calculationResults.setError(error.message || String(error));
+      calculationResults.failRun(error.message || String(error));
       calculationResultsStore.set(calculationResults);
     } finally {
-      timeElapsed = (Date.now() - startTime) / 1000;
       if (calculationResults.status() === CalculationStatus.Running) {
         calculationResults.setStatus(CalculationStatus.Idle);
         calculationResultsStore.set(calculationResults);
@@ -316,20 +297,17 @@
   <section class="limited-width">
     <CalculationControls
       {calculationResults}
-      {calculationProgress}
-      {totalCalculations}
       disabled={!formIsValid}
       oncalculate={() => calculateStrategyMatrix()}
     />
   </section>
-  <section class="calculation-section" bind:this={matrixDisplayElement}>
+  <section class="calculation-section">
   {#if calculationResults.status() === CalculationStatus.Complete}
       <StrategyMatrixDisplay
         {recipients}
         {calculationResults}
         {deathProbDistribution1}
         {deathProbDistribution2}
-        {timeElapsed}
         bind:displayAsAges
         onselectcell={handleCellSelect}
       />
