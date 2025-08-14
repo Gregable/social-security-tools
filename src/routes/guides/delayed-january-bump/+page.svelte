@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
 
-  import HeroImage from "./delayed-bump.png";
+  import HeroImage from './delayed-bump.png';
 
-  const title = "Bump in delayed Social Security benefits after January";
+  const title = 'Bump in delayed Social Security benefits after January';
   const description =
-    "For those starting benefits after Normal Retirement Age, there is a small delay in some of the delayed credits until the following January.";
-  const publishDate = new Date("2023-12-29T00:00:00+00:00");
-  const updateDate = new Date("2023-04-29T00:00:00+00:00");
+    'For those starting benefits after Normal Retirement Age, there is a small delay in some of the delayed credits until the following January.';
+  const publishDate = new Date('2023-12-29T00:00:00+00:00');
+  const updateDate = new Date('2023-04-29T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/delayed-january-bump";
+  schema.url = 'https://ssa.tools/guides/delayed-january-bump';
   schema.title = title;
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
@@ -46,7 +46,9 @@
     src={HeroImage}
     width="285"
     height="503"
-    style:margin="40px auto" style:display="block" style:border="1px solid"
+    style:margin="40px auto"
+    style:display="block"
+    style:border="1px solid"
     alt="Screenshot of benefit chart showing a bump in January"
   />
 

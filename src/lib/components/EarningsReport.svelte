@@ -1,8 +1,8 @@
 <script lang="ts">
-  import EarningsTable from "./EarningsTable.svelte";
-  import FutureEarningsSliders from "./FutureEarningsSliders.svelte";
-  import { Recipient } from "$lib/recipient";
-  import Expando from "./Expando.svelte";
+  import EarningsTable from './EarningsTable.svelte';
+  import FutureEarningsSliders from './FutureEarningsSliders.svelte';
+  import { Recipient } from '$lib/recipient';
+  import Expando from './Expando.svelte';
 
   export let recipient: Recipient = new Recipient();
 

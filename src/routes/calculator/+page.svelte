@@ -1,29 +1,29 @@
 <script lang="ts">
-  import { context } from "$lib/context";
+  import { context } from '$lib/context';
 
-  import Header from "$lib/components/Header.svelte";
-  import PasteFlow from "$lib/components/PasteFlow.svelte";
-  import IndexedEarningsReport from "$lib/components/IndexedEarningsReport.svelte";
-  import EarningsReport from "$lib/components/EarningsReport.svelte";
-  import EligibilityReport from "$lib/components/EligibilityReport.svelte";
-  import PiaReport from "$lib/components/PiaReport.svelte";
-  import Sidebar from "$lib/components/Sidebar.svelte";
-  import SidebarSection from "$lib/components/SidebarSection.svelte";
-  import MoreResources from "$lib/components/MoreResources.svelte";
-  import NormalRetirementAgeReport from "$lib/components/NormalRetirementAgeReport.svelte";
-  import FilingDateReport from "$lib/components/FilingDateReport.svelte";
-  import CombinedHeading from "$lib/components/CombinedHeading.svelte";
-  import CombinedChart from "$lib/components/CombinedChart.svelte";
-  import SpousalReport from "$lib/components/SpousalReport.svelte";
-  import SurvivorReport from "$lib/components/SurvivorReport.svelte";
-  import RecipientName from "$lib/components/RecipientName.svelte";
-  import Sponsor from "$lib/components/Sponsor.svelte";
+  import Header from '$lib/components/Header.svelte';
+  import PasteFlow from '$lib/components/PasteFlow.svelte';
+  import IndexedEarningsReport from '$lib/components/IndexedEarningsReport.svelte';
+  import EarningsReport from '$lib/components/EarningsReport.svelte';
+  import EligibilityReport from '$lib/components/EligibilityReport.svelte';
+  import PiaReport from '$lib/components/PiaReport.svelte';
+  import Sidebar from '$lib/components/Sidebar.svelte';
+  import SidebarSection from '$lib/components/SidebarSection.svelte';
+  import MoreResources from '$lib/components/MoreResources.svelte';
+  import NormalRetirementAgeReport from '$lib/components/NormalRetirementAgeReport.svelte';
+  import FilingDateReport from '$lib/components/FilingDateReport.svelte';
+  import CombinedHeading from '$lib/components/CombinedHeading.svelte';
+  import CombinedChart from '$lib/components/CombinedChart.svelte';
+  import SpousalReport from '$lib/components/SpousalReport.svelte';
+  import SurvivorReport from '$lib/components/SurvivorReport.svelte';
+  import RecipientName from '$lib/components/RecipientName.svelte';
+  import Sponsor from '$lib/components/Sponsor.svelte';
 
   export let isPasteFlow: boolean = true;
 
   function pasteDone() {
     isPasteFlow = false;
-    history.pushState({ id: "top" }, "", "#results");
+    history.pushState({ id: 'top' }, '', '#results');
   }
 </script>
 
@@ -39,9 +39,9 @@
     function gtag() {
       dataLayer.push(arguments);
     }
-    gtag("js", new Date());
+    gtag('js', new Date());
 
-    gtag("config", "AW-16669721864");
+    gtag('config', 'AW-16669721864');
   </script>
 </svelte:head>
 
@@ -172,10 +172,10 @@
       </SidebarSection>
     </Sidebar>
     <script>
-      gtag("event", "conversion", {
-        send_to: "AW-16669721864/KvxrCIjA3skZEIiK34w-",
+      gtag('event', 'conversion', {
+        send_to: 'AW-16669721864/KvxrCIjA3skZEIiK34w-',
         value: 1.0,
-        currency: "USD",
+        currency: 'USD',
       });
     </script>
   {/if}

@@ -12,16 +12,17 @@
 -->
 
 <script lang="ts">
-  import { Birthdate } from "../birthday";
-  import { ALL_MONTHS_FULL } from "../constants";
+  import { Birthdate } from '../birthday';
+  import { ALL_MONTHS_FULL } from '../constants';
 
   // Props
   export let birthdate: Birthdate = null;
-  export let inputId = "birthdate";
+  export let inputId = 'birthdate';
   export let autoFocus = false;
   export let isValid = false;
 
-  export let onchange: ((event: { birthdate: Birthdate }) => void) | undefined = undefined;
+  export let onchange: ((event: { birthdate: Birthdate }) => void) | undefined =
+    undefined;
 
   let bday_day;
   let bday_year;
@@ -45,7 +46,7 @@
     // Only validate fields that have content
     // Validate month (1-12) - only if month field has content
     if (month && (birthdateMonth < 1 || birthdateMonth > 12)) {
-      errors.push("Month must be between 1 and 12");
+      errors.push('Month must be between 1 and 12');
     }
 
     // Validate year (not in future, not more than 125 years ago) - only if year field has content
@@ -53,7 +54,7 @@
       const currentYear = new Date().getFullYear();
       const minYear = currentYear - 125;
       if (birthdateYear > currentYear) {
-        errors.push("Year cannot be in the future");
+        errors.push('Year cannot be in the future');
       } else if (birthdateYear < minYear) {
         errors.push(`Year cannot be more than 125 years ago (${minYear})`);
       }
@@ -61,27 +62,37 @@
 
     // Validate day (basic range first) - only if day field has content
     if (day && (birthdateDay < 1 || birthdateDay > 31)) {
-      errors.push("Day must be between 1 and 31");
+      errors.push('Day must be between 1 and 31');
     }
 
     // Only do advanced validation if all fields have content and basic validation passed
     if (month && day && year && errors.length === 0) {
-      const testDate = new Date(birthdateYear, birthdateMonth - 1, birthdateDay);
-      
+      const testDate = new Date(
+        birthdateYear,
+        birthdateMonth - 1,
+        birthdateDay
+      );
+
       // Check if the date rolled over (invalid day for month)
-      if (testDate.getFullYear() !== birthdateYear || 
-          testDate.getMonth() !== (birthdateMonth - 1) || 
-          testDate.getDate() !== birthdateDay) {
-        errors.push(`Invalid day for ${ALL_MONTHS_FULL[birthdateMonth - 1]} ${birthdateYear}`);
+      if (
+        testDate.getFullYear() !== birthdateYear ||
+        testDate.getMonth() !== birthdateMonth - 1 ||
+        testDate.getDate() !== birthdateDay
+      ) {
+        errors.push(
+          `Invalid day for ${ALL_MONTHS_FULL[birthdateMonth - 1]} ${birthdateYear}`
+        );
       } else {
         // Check if date is not in the future
         if (testDate > new Date()) {
-          errors.push("Date cannot be in the future");
+          errors.push('Date cannot be in the future');
         }
-        
-        return { 
-          date: new Date(Date.UTC(birthdateYear, birthdateMonth - 1, birthdateDay)), 
-          errors: [] 
+
+        return {
+          date: new Date(
+            Date.UTC(birthdateYear, birthdateMonth - 1, birthdateDay)
+          ),
+          errors: [],
         };
       }
     }
@@ -89,24 +100,28 @@
     return { date: null, errors };
   }
 
-
   // Svelte binds the value of the input to a string, so we need to parse it
   // and store it in a Date object.
   let parsedDate: Date;
-  let birthdateDayStr = "";
-  let birthdateMonthStr = "";
-  let birthdateYearStr = "";
+  let birthdateDayStr = '';
+  let birthdateMonthStr = '';
+  let birthdateYearStr = '';
   let validationErrors: string[] = [];
 
   // One-way initializing of string values from birthdate prop
   function initializeFromBirthdate() {
     if (birthdate) {
-      birthdateMonthStr = (birthdate.layBirthMonth() + 1).toString().padStart(2, '0');
-      birthdateDayStr = birthdate.layBirthDayOfMonth().toString().padStart(2, '0');
+      birthdateMonthStr = (birthdate.layBirthMonth() + 1)
+        .toString()
+        .padStart(2, '0');
+      birthdateDayStr = birthdate
+        .layBirthDayOfMonth()
+        .toString()
+        .padStart(2, '0');
       birthdateYearStr = birthdate.layBirthYear().toString();
     }
   }
-  
+
   // Initialize values when component mounts
   $: if (birthdate && !birthdateYearStr) {
     initializeFromBirthdate();
@@ -119,12 +134,12 @@
       birthdateMonthStr,
       birthdateYearStr
     );
-    
+
     parsedDate = result.date;
     validationErrors = result.errors;
     isValid = !!parsedDate && validationErrors.length === 0;
   }
-  
+
   // Create Birthdate object and emit change event when valid
   $: if (isValid && parsedDate) {
     const newBirthdate = Birthdate.FromYMD(
@@ -132,10 +147,12 @@
       parsedDate.getUTCMonth(),
       parsedDate.getUTCDate()
     );
-    if (!birthdate || 
-        birthdate.layBirthYear() !== newBirthdate.layBirthYear() ||
-        birthdate.layBirthMonth() !== newBirthdate.layBirthMonth() ||
-        birthdate.layBirthDayOfMonth() !== newBirthdate.layBirthDayOfMonth()) {
+    if (
+      !birthdate ||
+      birthdate.layBirthYear() !== newBirthdate.layBirthYear() ||
+      birthdate.layBirthMonth() !== newBirthdate.layBirthMonth() ||
+      birthdate.layBirthDayOfMonth() !== newBirthdate.layBirthDayOfMonth()
+    ) {
       birthdate = newBirthdate;
       onchange?.({ birthdate: newBirthdate });
     }
@@ -166,7 +183,7 @@
       inputmode="numeric"
       placeholder="MM"
       maxlength="2"
-      on:keyup={event => handleKeyUp(event, bday_day)}
+      on:keyup={(event) => handleKeyUp(event, bday_day)}
       bind:value={birthdateMonthStr}
       use:init
     />
@@ -182,7 +199,7 @@
       inputmode="numeric"
       placeholder="DD"
       maxlength="2"
-      on:keyup={event => handleKeyUp(event, bday_year)}
+      on:keyup={(event) => handleKeyUp(event, bday_year)}
       bind:value={birthdateDayStr}
       bind:this={bday_day}
     />
@@ -246,16 +263,16 @@
   .input-width-4 {
     max-width: 4.5em;
   }
-  
+
   .input.invalid {
     border-color: #d4351c;
     background-color: #fee;
   }
-  
+
   .error-messages {
     margin-top: 0.5rem;
   }
-  
+
   .error-message {
     display: block;
     color: #d4351c;

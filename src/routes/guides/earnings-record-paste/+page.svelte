@@ -1,21 +1,21 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import HeroImage from "./hero.png";
-  import ErrorMessageImage from "./error.png";
-  import EarnignsRecordLinkImage from "./earnings-record-link.png";
-  import StatementImage from "./statement.png";
-  import GuideFooter from "../guide-footer.svelte";
+  import { GuidesSchema } from '$lib/schema-org';
+  import HeroImage from './hero.png';
+  import ErrorMessageImage from './error.png';
+  import EarnignsRecordLinkImage from './earnings-record-link.png';
+  import StatementImage from './statement.png';
+  import GuideFooter from '../guide-footer.svelte';
 
-  const title = "Possible causes of Parsing Errors";
+  const title = 'Possible causes of Parsing Errors';
   const description =
-    "SSA.tools accepts a copy and pasted earnings record from " +
+    'SSA.tools accepts a copy and pasted earnings record from ' +
     "the Social Security Administration's website. This guide explains " +
-    "If your earnings record is not being parsed correctly, this guide " +
-    "may help you understand why and how to fix it.";
-  const publishDate = new Date("2023-09-12T00:00:00+00:00");
+    'If your earnings record is not being parsed correctly, this guide ' +
+    'may help you understand why and how to fix it.';
+  const publishDate = new Date('2023-09-12T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/earnings-record-paste";
+  schema.url = 'https://ssa.tools/guides/earnings-record-paste';
   schema.title = title;
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();

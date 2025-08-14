@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
-  import HeroImage from "./hero.png";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
+  import HeroImage from './hero.png';
 
-  import EarningsRecordExampleImage from "./example-earnings-record-simplified.jpg";
+  import EarningsRecordExampleImage from './example-earnings-record-simplified.jpg';
 
-  const title = "Social Security and Inflation";
+  const title = 'Social Security and Inflation';
   const description =
-    "Learn how two different types of inflation, wage increase and consumer price index, each interact to affect your social security benefit.";
-  const publishDate = new Date("2018-11-23T00:00:00+00:00");
-  const updateDate = new Date("2020-07-19T00:00:00+00:00");
+    'Learn how two different types of inflation, wage increase and consumer price index, each interact to affect your social security benefit.';
+  const publishDate = new Date('2018-11-23T00:00:00+00:00');
+  const updateDate = new Date('2020-07-19T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/inflation";
+  schema.url = 'https://ssa.tools/guides/inflation';
   schema.title = title;
   schema.image = HeroImage; // Added HeroImage to schema
   schema.datePublished = publishDate.toISOString();
@@ -71,7 +71,8 @@
   <p>Consider the following example earnings record from 2005 to 2017:</p>
   <img
     src={EarningsRecordExampleImage}
-    style:margin="auto" style:display="block"
+    style:margin="auto"
+    style:display="block"
     alt="Example earnings record"
   />
   <p>

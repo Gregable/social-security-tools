@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Header from "$lib/components/Header.svelte";
-  import CopyPasteDemoMp4 from "$lib/videos/copy-paste-demo.mp4";
-  import CopyPasteDemoPoster from "$lib/videos/copy-paste-demo-poster.jpg";
-  import CombinedDemoMp4 from "$lib/videos/combined-demo.mp4";
-  import CombinedDemoPoster from "$lib/videos/combined-demo-poster.jpg";
+  import Header from '$lib/components/Header.svelte';
+  import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
+  import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
+  import CombinedDemoMp4 from '$lib/videos/combined-demo.mp4';
+  import CombinedDemoPoster from '$lib/videos/combined-demo-poster.jpg';
 </script>
 
 <svelte:head>
@@ -27,9 +27,9 @@
     function gtag() {
       dataLayer.push(arguments);
     }
-    gtag("js", new Date());
+    gtag('js', new Date());
 
-    gtag("config", "AW-16669721864");
+    gtag('config', 'AW-16669721864');
   </script>
 </svelte:head>
 
@@ -205,7 +205,7 @@
 
 <style>
   main {
-    font-family: "Lato";
+    font-family: 'Lato';
     font-size: 14px;
     line-height: 1.42857143;
     color: #333;

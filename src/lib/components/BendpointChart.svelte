@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
 
-  import { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import * as constants from "$lib/constants";
+  import { Recipient } from '$lib/recipient';
+  import { Money } from '$lib/money';
+  import * as constants from '$lib/constants';
 
   export let recipient: Recipient = new Recipient();
 
@@ -26,10 +26,10 @@
 
   function updateCanvas() {
     if (!canvasEl) return; // Guard against undefined canvasEl
-    canvasEl.setAttribute("width", getComputedStyle(canvasEl).width);
-    canvasEl.setAttribute("height", getComputedStyle(canvasEl).height);
-    ctx = canvasEl.getContext("2d");
-    ctx.font = "bold 14px Helvetica";
+    canvasEl.setAttribute('width', getComputedStyle(canvasEl).width);
+    canvasEl.setAttribute('height', getComputedStyle(canvasEl).height);
+    ctx = canvasEl.getContext('2d');
+    ctx.font = 'bold 14px Helvetica';
     chartWidth = calcChartWidth();
     chartHeight = calcChartHeight();
 
@@ -75,7 +75,7 @@
     // A 6-digit social security payment would be about the highest we
     // would imagine someone receiving, so we reserve space on the right
     // to display such a value with a little added padding.
-    let reservedWidth = Math.ceil(ctx.measureText("$999,999").width) + 10;
+    let reservedWidth = Math.ceil(ctx.measureText('$999,999').width) + 10;
     let usableWidth = canvasEl.width - reservedWidth;
     return usableWidth;
   }
@@ -245,14 +245,14 @@
 
     // Some text indicating the slope of the curve along each section delineated
     // by the vertical bars above.
-    const textWidth = ctx.measureText("XX%").width / 2;
-    ctx.fillStyle = "#78B";
+    const textWidth = ctx.measureText('XX%').width / 2;
+    ctx.fillStyle = '#78B';
 
     // Compute the angle at which the chart dimensions are distoring slopes.
     const chartAngle =
       (chartHeight / chartWidth) *
       maxRenderedXDollars.div$(maxRenderedYDollars);
-    ctx.fillText("32%", 0, 0);
+    ctx.fillText('32%', 0, 0);
 
     ctx.save();
     dollarX = recipient.pia().firstBendPoint().div(2);
@@ -262,7 +262,7 @@
     // so we simply don't show it in this case.
     if (canvasX(dollarX) - canvasX(Money.from(0)) > textWidth + 5) {
       ctx.rotate(-1 * Math.atan(0.9 * chartAngle));
-      ctx.fillText("90%", 0, 0);
+      ctx.fillText('90%', 0, 0);
     }
     ctx.restore();
 
@@ -271,7 +271,7 @@
     dollarY = recipient.pia().piaFromAIME(dollarX);
     ctx.translate(canvasX(dollarX) - textWidth, canvasY(dollarY));
     ctx.rotate(-1 * Math.atan(0.32 * chartAngle));
-    ctx.fillText("32%", 0, 0);
+    ctx.fillText('32%', 0, 0);
     ctx.restore();
 
     ctx.save();
@@ -285,7 +285,7 @@
 
     ctx.translate(canvasX(dollarX) - textWidth, pixelY);
     ctx.rotate(-1 * Math.atan(0.15 * chartAngle));
-    ctx.fillText("15%", 0, 0);
+    ctx.fillText('15%', 0, 0);
     ctx.restore();
 
     ctx.restore();
@@ -310,7 +310,7 @@
   ) {
     ctx.save();
     ctx.beginPath();
-    ctx.lineCap = "square";
+    ctx.lineCap = 'square';
 
     if (squaredCorner === 1) {
       ctx.moveTo(x, y);
@@ -366,7 +366,7 @@
 
     // Thin dashed lines out from the user benefit point
     ctx.lineWidth = 2;
-    ctx.lineCap = "butt";
+    ctx.lineCap = 'butt';
     ctx.setLineDash([3, 5]);
 
     // Both lines starting at the point and radiating out makes a nifty
@@ -419,7 +419,7 @@
       /*squaredCorner=*/ 1
     );
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle = 'white';
     ctx.fillText(
       // Text on the bottom edge.
       xText,
@@ -444,16 +444,16 @@
     ctx.save();
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
-    ctx.strokeStyle = "#666";
+    ctx.strokeStyle = '#666';
     renderBoundingBox();
     renderBreakPoints();
-    ctx.strokeStyle = "#5cb85c";
+    ctx.strokeStyle = '#5cb85c';
 
     renderEarningsPoint(recipient.monthlyIndexedEarnings());
 
     if (lastMouseX_ > 0) {
       ctx.save();
-      ctx.strokeStyle = "#337ab7";
+      ctx.strokeStyle = '#337ab7';
       renderEarningsPoint(earningsX(lastMouseX_));
       ctx.restore();
     }

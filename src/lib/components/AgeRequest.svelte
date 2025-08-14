@@ -17,15 +17,17 @@
 -->
 
 <script lang="ts">
-  import { Birthdate } from "../birthday";
-  import BirthdateInput from "./BirthdateInput.svelte";
+  import { Birthdate } from '../birthday';
+  import BirthdateInput from './BirthdateInput.svelte';
 
   // Props
   export let birthdate: Birthdate = null;
-  export let inputId = "birthdate";
+  export let inputId = 'birthdate';
 
   // Callback prop for submit event
-  export let onsubmit: ((detail: { birthdate: Birthdate }) => void) | undefined = undefined;
+  export let onsubmit:
+    | ((detail: { birthdate: Birthdate }) => void)
+    | undefined = undefined;
   let isValid = false;
 
   function confirm() {
@@ -58,8 +60,14 @@
     </legend>
     <div class="hint">For example, 09 22 1975</div>
 
-    <BirthdateInput bind:birthdate bind:isValid onchange={handleChange} {inputId} autoFocus/>
-    
+    <BirthdateInput
+      bind:birthdate
+      bind:isValid
+      onchange={handleChange}
+      {inputId}
+      autoFocus
+    />
+
     <button on:click={confirm} disabled={!isValid}>
       <ico>&#10003;</ico> Next
     </button>
@@ -111,7 +119,7 @@
     font-size: 22px;
     vertical-align: middle;
   }
-.hint {
+  .hint {
     margin: -5px 0 15px 0;
     font-weight: 400;
     color: #505a5f;

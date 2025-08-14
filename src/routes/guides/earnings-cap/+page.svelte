@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
 
-  const title = "Social Security Earnings Caps"; // Corrected title
-  const description = "How do Social Security annual earnings caps work?";
-  const publishDate = new Date("2020-11-28T00:00:00+00:00");
-  const updateDate = new Date("2023-08-08T00:00:00+00:00");
+  const title = 'Social Security Earnings Caps'; // Corrected title
+  const description = 'How do Social Security annual earnings caps work?';
+  const publishDate = new Date('2020-11-28T00:00:00+00:00');
+  const updateDate = new Date('2023-08-08T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/earnings-cap"; // Corrected URL
+  schema.url = 'https://ssa.tools/guides/earnings-cap'; // Corrected URL
   schema.title = title; // Use the title variable
-  schema.image = "/laptop-piggybank.jpg"; // Add a hero image for the schema
+  schema.image = '/laptop-piggybank.jpg'; // Add a hero image for the schema
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema

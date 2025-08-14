@@ -1,8 +1,8 @@
 <script lang="ts">
-  import * as constants from "$lib/constants";
-  import { Recipient } from "$lib/recipient";
-  import RName from "./RecipientName.svelte";
-  import { Money } from "$lib/money";
+  import * as constants from '$lib/constants';
+  import { Recipient } from '$lib/recipient';
+  import RName from './RecipientName.svelte';
+  import { Money } from '$lib/money';
 
   export let recipient: Recipient = new Recipient();
   const r: Recipient = recipient;

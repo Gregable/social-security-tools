@@ -18,11 +18,13 @@
 
 <script lang="ts">
   // Callback prop for response event
-  export let onresponse: ((detail: { spouse: boolean; name: string; spousename?: string }) => void) | undefined = undefined;
+  export let onresponse:
+    | ((detail: { spouse: boolean; name: string; spousename?: string }) => void)
+    | undefined = undefined;
 
   let initial: boolean = true;
-  let selfname: string = "Self";
-  let spousename: string = "Spouse";
+  let selfname: string = 'Self';
+  let spousename: string = 'Spouse';
 
   function nospouse() {
     onresponse?.({
@@ -122,7 +124,7 @@
     width: max-content;
     margin: 1em auto;
   }
-  input[type="text"] {
+  input[type='text'] {
     font-size: 20px;
   }
   .label {

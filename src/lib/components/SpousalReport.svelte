@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Recipient } from "$lib/recipient";
-  import SpousalBenefit from "./SpousalBenefit.svelte";
+  import { Recipient } from '$lib/recipient';
+  import SpousalBenefit from './SpousalBenefit.svelte';
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();

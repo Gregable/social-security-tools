@@ -1,10 +1,7 @@
 <script lang="ts">
-  import type { Recipient } from "$lib/recipient";
-  import {
-    getFilingDate,
-    getFilingAge,
-  } from "$lib/strategy/ui";
-  import { createEventDispatcher } from "svelte";
+  import type { Recipient } from '$lib/recipient';
+  import { getFilingDate, getFilingAge } from '$lib/strategy/ui';
+  import { createEventDispatcher } from 'svelte';
 
   // Props
   export let rowIndex: number;
@@ -17,21 +14,24 @@
   export let isSelected: boolean = false;
   export let cellWidth: number = 0;
   export let cellHeight: number = 0;
-  export let cellStyle: string = "";
+  export let cellStyle: string = '';
 
   const dispatch = createEventDispatcher();
 
   // Calculate conditional CSS classes
-  $: isHighlightedCell = hoveredCell && 
-    hoveredCell.rowIndex === rowIndex && 
+  $: isHighlightedCell =
+    hoveredCell &&
+    hoveredCell.rowIndex === rowIndex &&
     hoveredCell.colIndex === colIndex;
 
-  $: isHighlightedColumn = hoveredCell && 
-    hoveredCell.colIndex === colIndex && 
+  $: isHighlightedColumn =
+    hoveredCell &&
+    hoveredCell.colIndex === colIndex &&
     hoveredCell.rowIndex !== rowIndex;
 
-  $: isHighlightedRow = hoveredCell && 
-    hoveredCell.rowIndex === rowIndex && 
+  $: isHighlightedRow =
+    hoveredCell &&
+    hoveredCell.rowIndex === rowIndex &&
     hoveredCell.colIndex !== colIndex;
 
   // Handle events
@@ -56,11 +56,11 @@
 
   // Get the display content for the cell (reactive)
   $: cellContent = getCellContentReactive(
-    calculationResult, 
-    displayAsAges, 
-    recipients, 
-    recipientIndex, 
-    cellWidth, 
+    calculationResult,
+    displayAsAges,
+    recipients,
+    recipientIndex,
+    cellWidth,
     cellHeight
   );
 
@@ -76,17 +76,31 @@
       return 'N/A';
     }
 
-    const filingAgeYears = calculationResult[`filingAge${recipientIndex + 1}Years`];
-    const filingAgeMonths = calculationResult[`filingAge${recipientIndex + 1}Months`];
+    const filingAgeYears =
+      calculationResult[`filingAge${recipientIndex + 1}Years`];
+    const filingAgeMonths =
+      calculationResult[`filingAge${recipientIndex + 1}Months`];
 
     // Use a reasonable default width if cellWidth is 0 (during initialization)
     // Default to a larger size to show full format until actual dimensions are available
     const effectiveCellWidth = cellWidth || 100;
 
     if (displayAsAges) {
-      return getFilingAge(filingAgeYears, filingAgeMonths, effectiveCellWidth, cellHeight);
+      return getFilingAge(
+        filingAgeYears,
+        filingAgeMonths,
+        effectiveCellWidth,
+        cellHeight
+      );
     } else {
-      return getFilingDate(recipients, recipientIndex, filingAgeYears, filingAgeMonths, effectiveCellWidth, cellHeight);
+      return getFilingDate(
+        recipients,
+        recipientIndex,
+        filingAgeYears,
+        filingAgeMonths,
+        effectiveCellWidth,
+        cellHeight
+      );
     }
   }
 </script>

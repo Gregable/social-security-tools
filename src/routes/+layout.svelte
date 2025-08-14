@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
-  import posthog from "posthog-js";
-  import "../app.css";
+  import { browser } from '$app/environment';
+  import posthog from 'posthog-js';
+  import '../app.css';
 
   // These imports are available for use but may not be directly referenced
   // They're kept for potential future use

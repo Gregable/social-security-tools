@@ -1,9 +1,9 @@
 <script lang="ts">
-  import ProjectionLabImage from "$lib/images/projection-lab.png";
+  import ProjectionLabImage from '$lib/images/projection-lab.png';
 
   const currentDate = new Date();
   // 10% off in {currentMonth} is misleading, but it's not false.
-  const currentMonth = currentDate.toLocaleString("default", { month: "long" });
+  const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
 </script>
 
 <a href="https://projectionlab.com?ref=ssa-tools" class="spon-anchor">

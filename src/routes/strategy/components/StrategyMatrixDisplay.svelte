@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Recipient } from "$lib/recipient";
-  import StrategyMatrix from "./StrategyMatrix.svelte";
-  import type { CalculationResults } from "$lib/strategy/ui";
-  import { CalculationStatus } from "$lib/strategy/ui";
+  import type { Recipient } from '$lib/recipient';
+  import StrategyMatrix from './StrategyMatrix.svelte';
+  import type { CalculationResults } from '$lib/strategy/ui';
+  import { CalculationStatus } from '$lib/strategy/ui';
 
   // Props
   export let recipients: [Recipient, Recipient];
@@ -18,7 +18,9 @@
   let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
 
   // Handle hover cell events from child components
-  function handleHoverCell(detail: { rowIndex: number; colIndex: number } | null) {
+  function handleHoverCell(
+    detail: { rowIndex: number; colIndex: number } | null
+  ) {
     hoveredCell = detail; // detail will be null or { rowIndex, colIndex }
   }
 </script>
@@ -26,26 +28,35 @@
 <div class="result-box">
   <div class="header-section">
     <div class="header-content">
-      <h3>Optimal Strategies: Filing <span class:active={!displayAsAges} class:inactive={displayAsAges}>Date</span><label class="toggle-label">
+      <h3>
+        Optimal Strategies: Filing <span
+          class:active={!displayAsAges}
+          class:inactive={displayAsAges}>Date</span
+        ><label class="toggle-label">
           <input
             type="checkbox"
             bind:checked={displayAsAges}
             class="toggle-checkbox"
           />
           <span class="toggle-slider"></span>
-        </label><span class:active={displayAsAges} class:inactive={!displayAsAges}>Age</span>
+        </label><span
+          class:active={displayAsAges}
+          class:inactive={!displayAsAges}>Age</span
+        >
       </h3>
     </div>
   </div>
-  <p>Calculation completed in {calculationResults.timeElapsed().toFixed(2)} seconds</p>
   <p>
-    Tables show optimal filing {displayAsAges ? 'ages' : 'dates'} for each recipient across different death
-    age combinations
+    Calculation completed in {calculationResults.timeElapsed().toFixed(2)} seconds
+  </p>
+  <p>
+    Tables show optimal filing {displayAsAges ? 'ages' : 'dates'} for each recipient
+    across different death age combinations
   </p>
 
   {#if calculationResults.status() === CalculationStatus.Complete}
     <div class="matrices-container">
-    {#each [0, 1] as recipientIndex}
+      {#each [0, 1] as recipientIndex}
         <StrategyMatrix
           {recipientIndex}
           {recipients}
@@ -155,7 +166,7 @@
       grid-template-columns: 1fr;
       gap: 2rem;
     }
-    
+
     .header-content h3 {
       flex-direction: column;
       align-items: flex-start;

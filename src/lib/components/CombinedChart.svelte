@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
 
-  import { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import Slider from "./Slider.svelte";
-  import RecipientName from "./RecipientName.svelte";
+  import { Recipient } from '$lib/recipient';
+  import { Money } from '$lib/money';
+  import Slider from './Slider.svelte';
+  import RecipientName from './RecipientName.svelte';
 
-  import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { MonthDate, MonthDuration } from '$lib/month-time';
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -46,7 +46,12 @@
   $: ctxB_.r = $spouse;
 
   let mounted_: boolean = false;
-  $: $recipient && $spouse && mounted_ && ctxA_.sliderMonths && ctxB_.sliderMonths && render();
+  $: $recipient &&
+    $spouse &&
+    mounted_ &&
+    ctxA_.sliderMonths &&
+    ctxB_.sliderMonths &&
+    render();
 
   let sliderEl_: Slider;
   let canvasEl_: HTMLCanvasElement;
@@ -71,14 +76,14 @@
   let reservedRightRecipient_: number = reservedRight_;
   let reservedRightSpouse_: number = reservedRight_;
 
-  let blueish_ = "#337ab7";
+  let blueish_ = '#337ab7';
 
   $: onMount(() => {
     mounted_ = true;
     if (!canvasEl_) return;
 
-    ctx_ = canvasEl_.getContext("2d");
-    ctx_.font = "bold 14px Helvetica";
+    ctx_ = canvasEl_.getContext('2d');
+    ctx_.font = 'bold 14px Helvetica';
 
     ctxA_.sliderMonths = $recipient.normalRetirementAge().asMonths();
     ctxB_.sliderMonths = $spouse.normalRetirementAge().asMonths();
@@ -252,7 +257,7 @@
 
     // First, draw the white box.
     ctx_.save();
-    ctx_.fillStyle = "#FFF";
+    ctx_.fillStyle = '#FFF';
     ctx_.fillRect(x - 7, y - 14, textWidth + 14, 18);
     ctx_.restore();
 
@@ -269,7 +274,7 @@
     let text = dollarY.wholeDollars();
 
     ctx_.save();
-    ctx_.fillStyle = "#AAA";
+    ctx_.fillStyle = '#AAA';
     renderTextInWhiteBox(text, 6, canvasY + 5);
     ctx_.restore();
   }
@@ -281,7 +286,7 @@
   function renderHorizontalLines() {
     ctx_.save();
     // Grey dashed lines.
-    ctx_.strokeStyle = "#BBB";
+    ctx_.strokeStyle = '#BBB';
     ctx_.lineWidth = 1;
     ctx_.setLineDash([2, 2]);
 
@@ -323,7 +328,7 @@
   function renderYearVerticalLines() {
     ctx_.save();
     // Grey dashed lines.
-    ctx_.strokeStyle = "#666";
+    ctx_.strokeStyle = '#666';
     ctx_.setLineDash([2, 2]);
 
     let [startDate, endDate] = DateRange();
@@ -352,14 +357,14 @@
 
       // Print the year vertically atop the line, with a white rectangle behind
       // the text, so that the line isn't going through the text.
-      const text = "" + date.year();
+      const text = '' + date.year();
       let textWidth = ctx_.measureText(text).width;
       let ypos = reservedTop_ - textWidth - 25;
       {
         ctx_.save();
         ctx_.translate(canvasX(date) + 5, ypos);
         ctx_.rotate((-90 * Math.PI) / 180);
-        ctx_.fillStyle = "#999";
+        ctx_.fillStyle = '#999';
         renderTextInWhiteBox(text, 0, 0);
         ctx_.restore();
       }
@@ -394,15 +399,15 @@
         // This tick is the NRA, indicate it with a special legend.
         ctxR.ticks.push({
           value: age.asMonths(),
-          label: translateSliderLabel(age.asMonths(), "tick-value"),
-          legend: "NRA",
+          label: translateSliderLabel(age.asMonths(), 'tick-value'),
+          legend: 'NRA',
           color: ctxR.r.colors().dark,
         });
       } else {
         // Not an NRA tick, so just add it normally.
         ctxR.ticks.push({
           value: age.asMonths(),
-          label: translateSliderLabel(age.asMonths(), "tick-value"),
+          label: translateSliderLabel(age.asMonths(), 'tick-value'),
         });
       }
 
@@ -410,8 +415,8 @@
         // The NRA is between this and the next tick: add a special tick for it.
         ctxR.ticks.push({
           value: ctxR.r.normalRetirementAge().asMonths(),
-          label: "",
-          legend: "NRA",
+          label: '',
+          legend: 'NRA',
           color: ctxR.r.colors().dark,
         });
       }
@@ -569,7 +574,7 @@
     ctx_.save();
     ctx_.fillStyle = ctxR.r.colors().dark;
     for (let font_height = 24; font_height >= 10; font_height--) {
-      ctx_.font = font_height + "px Helvetica";
+      ctx_.font = font_height + 'px Helvetica';
       let textBox = ctx_.measureText(ctxR.r.name);
       // If there is enough space at this font size, draw the user's name,
       // else try a smaller font.
@@ -604,7 +609,7 @@
   ) {
     ctx_.save();
     ctx_.fillStyle = ctxR.r.colors().dark;
-    ctx_.font = "14px Helvetica";
+    ctx_.font = '14px Helvetica';
     let font_height = 12;
 
     for (let boxIt = 0; boxIt < boxes.length; ++boxIt) {
@@ -617,7 +622,7 @@
       if (boxes.length - 1 > boxIt) vertSpace = boxY - boxes[boxIt + 1][1];
 
       // Prefer to fix text above, rather than left.
-      let text = benefit.wholeDollars() + " / mo";
+      let text = benefit.wholeDollars() + ' / mo';
       let textBox = ctx_.measureText(text);
       if (textBox.width + 5 < horizSpace && font_height + 10 < vertSpace) {
         if (ctxR.r.first) {
@@ -649,7 +654,7 @@
       horizSpace = boxX - boxMinX;
       vertSpace = Math.abs(boxMaxY - boxY);
 
-      text = benefit.wholeDollars() + " / mo";
+      text = benefit.wholeDollars() + ' / mo';
       textBox = ctx_.measureText(text);
       if (textBox.width + 15 < horizSpace && font_height + 15 < vertSpace) {
         if (ctxR.r.first) {
@@ -740,13 +745,13 @@
     ctx_.save();
 
     let date = dateX(canvasX);
-    let text = date.monthName() + " " + date.year();
+    let text = date.monthName() + ' ' + date.year();
     let textWidth = ctx_.measureText(text).width;
 
     // blueish_ dashed line:
     ctx_.strokeStyle = blueish_;
     ctx_.setLineDash([6, 4]);
-    ctx_.lineCap = "butt";
+    ctx_.lineCap = 'butt';
     ctx_.lineWidth = 2;
 
     // Draw vertical line.
@@ -764,7 +769,7 @@
       let xpos = reservedTop_ + textWidth - 87;
       ctx_.translate(canvasX + 5, xpos);
       ctx_.rotate((-90 * Math.PI) / 180);
-      ctx_.fillStyle = "#337ab7";
+      ctx_.fillStyle = '#337ab7';
       renderTextInWhiteBox(text, 0, 0);
       ctx_.restore();
     }
@@ -888,16 +893,16 @@
    */
   function translateSliderLabel(value: number, label: string): string {
     const age = new MonthDuration(value);
-    if (label === "value" || label == "ceiling" || label == "floor") {
+    if (label === 'value' || label == 'ceiling' || label == 'floor') {
       if (age.modMonths() === 0) return age.years().toString(10);
-      let out = age.years() + " " + age.modMonths() + " mo";
+      let out = age.years() + ' ' + age.modMonths() + ' mo';
       return out;
     }
     // tick-value is the text above each tick mark
-    if (label === "tick-value") {
+    if (label === 'tick-value') {
       return age.years().toString(10);
     }
-    return "";
+    return '';
   }
 </script>
 
@@ -1049,37 +1054,37 @@
               </td>
             </tr>
             <tr>
-            <td class="indent"></td>
-            <td class="label">
-              <RecipientName r={ctxA_.r} apos shortenTo={50} /> Benefit:
-            </td>
-            <td class="value">
-              {allBenefitsOnDate(ctxA_, dateX(lastMouseX_)).wholeDollars()}
-            </td>
-          </tr>
-          <tr>
-            <td class="indent"></td>
-            <td class="label">
-              <RecipientName r={ctxB_.r} apos shortenTo={50} /> Benefit:
-            </td>
-            <td class="value">
-              {allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).wholeDollars()}
-            </td>
-          </tr>
-          <tr>
-            <td class="indent"></td>
-            <td class="label">
-              <b>Total</b> Benefit:
-            </td>
-            <td class="value sum"
-              >{allBenefitsOnDate(ctxA_, dateX(lastMouseX_))
-                .roundToDollar()
-                .plus(
-                  allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).roundToDollar()
-                )
-                .wholeDollars()}</td
-            >
-          </tr>
+              <td class="indent"></td>
+              <td class="label">
+                <RecipientName r={ctxA_.r} apos shortenTo={50} /> Benefit:
+              </td>
+              <td class="value">
+                {allBenefitsOnDate(ctxA_, dateX(lastMouseX_)).wholeDollars()}
+              </td>
+            </tr>
+            <tr>
+              <td class="indent"></td>
+              <td class="label">
+                <RecipientName r={ctxB_.r} apos shortenTo={50} /> Benefit:
+              </td>
+              <td class="value">
+                {allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).wholeDollars()}
+              </td>
+            </tr>
+            <tr>
+              <td class="indent"></td>
+              <td class="label">
+                <b>Total</b> Benefit:
+              </td>
+              <td class="value sum"
+                >{allBenefitsOnDate(ctxA_, dateX(lastMouseX_))
+                  .roundToDollar()
+                  .plus(
+                    allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).roundToDollar()
+                  )
+                  .wholeDollars()}</td
+              >
+            </tr>
           </tbody>
         </table>
       {:else}

@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
 
-  const title = "Social Security Maximum";
+  const title = 'Social Security Maximum';
   const description =
-    "What is the maximum monthly social security benefit that someone can reach, and what does it take to reach this maximum?";
-  const publishDate = new Date("2019-08-03T00:00:00+00:00");
-  const updateDate = new Date("2025-03-19T00:00:00+00:00");
+    'What is the maximum monthly social security benefit that someone can reach, and what does it take to reach this maximum?';
+  const publishDate = new Date('2019-08-03T00:00:00+00:00');
+  const updateDate = new Date('2025-03-19T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/maximum";
+  schema.url = 'https://ssa.tools/guides/maximum';
   schema.title = title;
-  schema.image = "/laptop-piggybank.jpg"; // Added a generic hero image for the schema
+  schema.image = '/laptop-piggybank.jpg'; // Added a generic hero image for the schema
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema

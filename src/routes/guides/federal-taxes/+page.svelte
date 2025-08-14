@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
 
-  import HeroImage from "./taxes.jpg";
+  import HeroImage from './taxes.jpg';
 
-  const title = "Federal Taxation of Social Security Benefits";
+  const title = 'Federal Taxation of Social Security Benefits';
   const description =
-    "A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI.";
-  const publishDate = new Date("2022-12-04T00:00:00+00:00");
+    'A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI.';
+  const publishDate = new Date('2022-12-04T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/federal-taxes";
+  schema.url = 'https://ssa.tools/guides/federal-taxes';
   schema.title = title;
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
@@ -156,7 +156,9 @@
     src="/Federal_Taxation_of_SSA.png"
     width="961"
     height="359"
-    style:box-shadow="0px 0px 8px rgba(0,0,0,1)" style:margin="40px auto 40px auto" style:display="block"
+    style:box-shadow="0px 0px 8px rgba(0,0,0,1)"
+    style:margin="40px auto 40px auto"
+    style:display="block"
     alt="Infographic showing the steps to calculate the taxable portion of Social Security Benefits"
   />
 

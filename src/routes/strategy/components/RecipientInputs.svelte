@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import RecipientName from "$lib/components/RecipientName.svelte";
-  import BirthdateInput from "$lib/components/BirthdateInput.svelte";
-  import { Birthdate } from "$lib/birthday";
-  import { onMount } from "svelte";
+  import type { Recipient } from '$lib/recipient';
+  import { Money } from '$lib/money';
+  import RecipientName from '$lib/components/RecipientName.svelte';
+  import BirthdateInput from '$lib/components/BirthdateInput.svelte';
+  import { Birthdate } from '$lib/birthday';
+  import { onMount } from 'svelte';
 
   // Props
   export let recipients: [Recipient, Recipient];
@@ -15,19 +15,24 @@
   export let onUpdate: (() => void) | undefined = undefined;
 
   // Validation state callback
-  export let onValidityChange: ((isValid: boolean) => void) | undefined = undefined;
+  export let onValidityChange: ((isValid: boolean) => void) | undefined =
+    undefined;
 
   // Convert string dates to Birthdate objects for the BirthdateInput component
   let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
   export let birthdateValidity: boolean[] = [false, false];
-  
+
   // PIA validation state
   let piaValidity: boolean[] = [true, true];
-  let piaErrors: string[] = ["", ""];
-  
+  let piaErrors: string[] = ['', ''];
+
   // Overall validity
-  $: isValid = birthdateValidity[0] && birthdateValidity[1] && piaValidity[0] && piaValidity[1];
-  
+  $: isValid =
+    birthdateValidity[0] &&
+    birthdateValidity[1] &&
+    piaValidity[0] &&
+    piaValidity[1];
+
   // Notify parent of validity changes
   $: onValidityChange?.(isValid);
 
@@ -53,11 +58,11 @@
       const newDateStr = formatDateForInput(newBirthdate);
       birthdateInputs[index] = newDateStr;
       birthdateInputs = [...birthdateInputs];
-      
+
       // Update the recipient's birthdate directly
       recipients[index].birthdate = newBirthdate;
       recipients = [...recipients];
-      
+
       onUpdate?.();
     }
   }
@@ -68,25 +73,26 @@
     validatePia(index, value);
     piaValues[index] = value;
     piaValues = [...piaValues];
-    
+
     // Update the recipient's PIA directly
     recipients[index].setPia(Money.from(value));
     recipients = [...recipients];
-    
+
     onUpdate?.();
   }
-  
+
   // Validate PIA value
   function validatePia(index: number, value: number) {
     if (value < 0) {
       piaValidity[index] = false;
-      piaErrors[index] = "PIA must be a non-negative number";
+      piaErrors[index] = 'PIA must be a non-negative number';
     } else if (value > 10000) {
       piaValidity[index] = false;
-      piaErrors[index] = "PIA seems unusually high (max typical value is around $4,000)";
+      piaErrors[index] =
+        'PIA seems unusually high (max typical value is around $4,000)';
     } else {
       piaValidity[index] = true;
-      piaErrors[index] = "";
+      piaErrors[index] = '';
     }
     // Force reactivity
     piaValidity = [...piaValidity];
@@ -141,10 +147,10 @@
 
   // Format Birthdate object to YYYY-MM-DD string for input
   function formatDateForInput(birthdate: Birthdate | null): string {
-    if (!birthdate) return "";
+    if (!birthdate) return '';
     const year = birthdate.layBirthYear();
-    const month = (birthdate.layBirthMonth() + 1).toString().padStart(2, "0");
-    const day = birthdate.layBirthDayOfMonth().toString().padStart(2, "0");
+    const month = (birthdate.layBirthMonth() + 1).toString().padStart(2, '0');
+    const day = birthdate.layBirthDayOfMonth().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 </script>
@@ -154,11 +160,11 @@
     <div class="recipient-column">
       <div class="input-group">
         <label for="name{i}">Name:</label>
-        <input 
-          id="name{i}" 
-          type="text" 
+        <input
+          id="name{i}"
+          type="text"
           value={recipient.name}
-          on:input={(event) => handleNameChange(i, event)} 
+          on:input={(event) => handleNameChange(i, event)}
         />
       </div>
       <div class="input-group">
@@ -172,7 +178,8 @@
           min="0"
           value={piaValues[i]}
           class:invalid={!piaValidity[i]}
-          on:input={(event) => handlePiaChange(i, parseFloat(event.currentTarget.value) || 0)}
+          on:input={(event) =>
+            handlePiaChange(i, parseFloat(event.currentTarget.value) || 0)}
         />
         {#if !piaValidity[i] && piaErrors[i]}
           <span class="error-message">{piaErrors[i]}</span>
@@ -206,7 +213,8 @@
       </div>
       <div class="input-group">
         <label for="health{i}">
-          <RecipientName r={recipient} apos /> Health adjustment to yearly mortality q(x):
+          <RecipientName r={recipient} apos /> Health adjustment to yearly mortality
+          q(x):
         </label>
         <input
           id="health{i}"
@@ -215,12 +223,22 @@
           max="2.5"
           step="0.1"
           value={recipient.healthMultiplier}
-          on:input={(event) => handleHealthChange(i, parseFloat(event.currentTarget.value))}
+          on:input={(event) =>
+            handleHealthChange(i, parseFloat(event.currentTarget.value))}
         />
         <div class="health-display">
-          <span class="health-value">{recipient.healthMultiplier.toFixed(1)}x</span>
-          <span class="health-category">{getHealthCategory(recipient.healthMultiplier)}</span>
-          <a class="health-guide-link" href="/guides/mortality" target="_blank" rel="noopener">What is this?</a>
+          <span class="health-value"
+            >{recipient.healthMultiplier.toFixed(1)}x</span
+          >
+          <span class="health-category"
+            >{getHealthCategory(recipient.healthMultiplier)}</span
+          >
+          <a
+            class="health-guide-link"
+            href="/guides/mortality"
+            target="_blank"
+            rel="noopener">What is this?</a
+          >
         </div>
       </div>
     </div>
@@ -251,7 +269,7 @@
   }
 
   /* Apply bordered style to non-range inputs only */
-  .input-group input:not([type="range"]) {
+  .input-group input:not([type='range']) {
     font-size: 1.2em;
     line-height: 1.3;
     height: 2.5em;
@@ -262,7 +280,7 @@
   }
 
   /* Range input: no border and native appearance */
-  .input-group input[type="range"] {
+  .input-group input[type='range'] {
     height: 1.5em;
     padding: 0;
     border: none;
@@ -292,7 +310,7 @@
   }
 
   /* Remove focus highlight from range inputs; keep for others */
-  .input-group input:not([type="range"]):focus,
+  .input-group input:not([type='range']):focus,
   .input-group select:focus {
     outline: 3px solid #fd0;
     outline-offset: 0;

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
 
-  import type { Birthdate } from "$lib/birthday";
-  import { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import Slider from "./Slider.svelte";
-  import RecipientName from "./RecipientName.svelte";
+  import type { Birthdate } from '$lib/birthday';
+  import { Recipient } from '$lib/recipient';
+  import { Money } from '$lib/money';
+  import Slider from './Slider.svelte';
+  import RecipientName from './RecipientName.svelte';
 
-  import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { MonthDate, MonthDuration } from '$lib/month-time';
 
   export let recipient: Recipient = new Recipient();
 
@@ -41,14 +41,14 @@
   // date.
   let reservedRight_: number = 0;
 
-  let blueish_ = "#337ab7";
+  let blueish_ = '#337ab7';
 
   onMount(() => {
     sliderMonths_ = recipient.normalRetirementAge().asMonths();
     updateCanvas();
     mounted_ = true;
-    media_query_list = window.matchMedia("print");
-    media_query_list.addEventListener("change", updateCanvas);
+    media_query_list = window.matchMedia('print');
+    media_query_list.addEventListener('change', updateCanvas);
     return () => {
       removeMediaQueryListener();
     };
@@ -56,16 +56,16 @@
 
   function updateCanvas() {
     if (!canvasEl_) return;
-    canvasEl_.setAttribute("width", getComputedStyle(canvasEl_).width);
-    canvasEl_.setAttribute("height", getComputedStyle(canvasEl_).height);
+    canvasEl_.setAttribute('width', getComputedStyle(canvasEl_).width);
+    canvasEl_.setAttribute('height', getComputedStyle(canvasEl_).height);
 
     // The slider represents 8 years of duration, but we want to render 9
     // years of data. So we reserve the rightmost 1/9th of the canvas after the
     // slider stops.
     reservedRight_ = (canvasEl_.width - reservedLeft_) / 9.0;
 
-    ctx_ = canvasEl_.getContext("2d");
-    ctx_.font = "bold 14px Helvetica";
+    ctx_ = canvasEl_.getContext('2d');
+    ctx_.font = 'bold 14px Helvetica';
 
     render();
   }
@@ -79,7 +79,7 @@
   let media_query_list: MediaQueryList;
   function removeMediaQueryListener() {
     if (media_query_list) {
-      media_query_list.removeEventListener("change", updateCanvas);
+      media_query_list.removeEventListener('change', updateCanvas);
     }
   }
 
@@ -195,7 +195,7 @@
 
     // First, draw the white box.
     ctx_.save();
-    ctx_.fillStyle = "#FFF";
+    ctx_.fillStyle = '#FFF';
     ctx_.fillRect(x - 7, y - 14, textWidth + 14, 18);
     ctx_.restore();
 
@@ -212,7 +212,7 @@
     let text = dollarY.wholeDollars();
 
     ctx_.save();
-    ctx_.fillStyle = "#AAA";
+    ctx_.fillStyle = '#AAA';
     renderTextInWhiteBox(text, 6, canvasY + 5);
     ctx_.restore();
   }
@@ -224,7 +224,7 @@
   function renderHorizontalLines() {
     ctx_.save();
     // Grey dashed lines.
-    ctx_.strokeStyle = "#BBB";
+    ctx_.strokeStyle = '#BBB';
     ctx_.lineWidth = 1;
     ctx_.setLineDash([2, 2]);
 
@@ -256,7 +256,7 @@
   function renderYearVerticalLines() {
     ctx_.save();
     // Grey dashed lines.
-    ctx_.strokeStyle = "#666";
+    ctx_.strokeStyle = '#666';
     ctx_.setLineDash([2, 2]);
 
     let startDate: MonthDate = recipient.birthdate.dateAtSsaAge(
@@ -290,14 +290,14 @@
 
       // Print the year vertically atop the line, with a white rectangle behind
       // the text, so that the line isn't going through the text.
-      const text = "" + date.year();
+      const text = '' + date.year();
       let textWidth = ctx_.measureText(text).width;
       let ypos = reservedTop_ - textWidth - 5;
       {
         ctx_.save();
         ctx_.translate(canvasX(date) + 5, ypos);
         ctx_.rotate((-90 * Math.PI) / 180);
-        ctx_.fillStyle = "#999";
+        ctx_.fillStyle = '#999';
         renderTextInWhiteBox(text, 0, 0);
         ctx_.restore();
       }
@@ -338,15 +338,15 @@
         // This tick is the NRA, indicate it with a special legend.
         customTicks_.push({
           value: age.asMonths(),
-          label: translateSliderLabel(age.asMonths(), "tick-value"),
-          legend: "NRA",
+          label: translateSliderLabel(age.asMonths(), 'tick-value'),
+          legend: 'NRA',
           color: recipient.colors().dark,
         });
       } else {
         // Not an NRA tick, so just add it normally.
         customTicks_.push({
           value: age.asMonths(),
-          label: translateSliderLabel(age.asMonths(), "tick-value"),
+          label: translateSliderLabel(age.asMonths(), 'tick-value'),
         });
       }
 
@@ -354,8 +354,8 @@
         // The NRA is between this and the next tick: add a special tick for it.
         customTicks_.push({
           value: recipient.normalRetirementAge().asMonths(),
-          label: "",
-          legend: "NRA",
+          label: '',
+          legend: 'NRA',
           color: recipient.colors().dark,
         });
       }
@@ -452,7 +452,7 @@
   function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
     ctx_.save();
     ctx_.fillStyle = recipient.colors().dark;
-    ctx_.font = "14px Helvetica";
+    ctx_.font = '14px Helvetica';
     let font_height = 12;
 
     for (let boxIt = 0; boxIt < boxes.length; ++boxIt) {
@@ -464,7 +464,7 @@
       if (boxes.length - 1 > boxIt) vertSpace = boxY - boxes[boxIt + 1][1];
 
       // Prefer to fix text above, rather than left.
-      let text = benefit.wholeDollars() + " / mo";
+      let text = benefit.wholeDollars() + ' / mo';
       let textBox = ctx_.measureText(text);
       if (textBox.width + 10 < horizSpace && font_height + 10 < vertSpace) {
         renderTextInWhiteBox(text, boxX + 5, boxY - 5);
@@ -485,7 +485,7 @@
       horizSpace = boxX - boxMinX;
       vertSpace = boxMaxY - boxY;
 
-      text = benefit.wholeDollars() + " / mo";
+      text = benefit.wholeDollars() + ' / mo';
       textBox = ctx_.measureText(text);
       if (textBox.width + 15 < horizSpace && font_height + 15 < vertSpace) {
         renderTextInWhiteBox(
@@ -568,7 +568,7 @@
     ctx_.save();
 
     let date = dateX(canvasX);
-    let text = date.monthName() + " " + date.year();
+    let text = date.monthName() + ' ' + date.year();
     let textWidth = ctx_.measureText(text).width;
     // This seems to position the year to line up with the vertical year lines.
     // Why 67?  I don't know and didn't bother to figure it out.
@@ -577,7 +577,7 @@
     // blueish_ dashed line:
     ctx_.strokeStyle = blueish_;
     ctx_.setLineDash([6, 4]);
-    ctx_.lineCap = "butt";
+    ctx_.lineCap = 'butt';
     ctx_.lineWidth = 2;
 
     // Draw vertical line.
@@ -592,7 +592,7 @@
       ctx_.save();
       ctx_.translate(canvasX + 5, xpos);
       ctx_.rotate((-90 * Math.PI) / 180);
-      ctx_.fillStyle = "#337ab7";
+      ctx_.fillStyle = '#337ab7';
       renderTextInWhiteBox(text, 0, 0);
       ctx_.restore();
     }
@@ -628,16 +628,16 @@
    */
   function translateSliderLabel(value: number, label: string): string {
     const age = new MonthDuration(value);
-    if (label === "value" || label == "ceiling" || label == "floor") {
+    if (label === 'value' || label == 'ceiling' || label == 'floor') {
       if (age.modMonths() === 0) return age.years().toString(10);
-      let out = age.years() + " " + age.modMonths() + " mo";
+      let out = age.years() + ' ' + age.modMonths() + ' mo';
       return out;
     }
     // tick-value is the text above each tick mark
-    if (label === "tick-value") {
+    if (label === 'tick-value') {
       return age.years().toString(10);
     }
-    return "";
+    return '';
   }
 
   function updateFilingDateString(
@@ -645,9 +645,9 @@
     sliderMonths_: number
   ): string {
     let filingDate = birthdate.dateAtLayAge(new MonthDuration(sliderMonths_));
-    return filingDate.monthName() + " " + filingDate.year();
+    return filingDate.monthName() + ' ' + filingDate.year();
   }
-  let filingDateString_: string = "";
+  let filingDateString_: string = '';
   $: filingDateString_ = updateFilingDateString(
     recipient.birthdate,
     sliderMonths_

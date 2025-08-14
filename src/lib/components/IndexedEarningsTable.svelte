@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Recipient } from "$lib/recipient";
+  import { Recipient } from '$lib/recipient';
 
   export let recipient: Recipient = new Recipient();
 

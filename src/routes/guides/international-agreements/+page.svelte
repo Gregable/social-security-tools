@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
-  import HeroImage from "./hero.png";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
+  import HeroImage from './hero.png';
 
-  const title = "Social Security International Agreements";
-  const description = "How does working abroad affect social security?";
-  const publishDate = new Date("2022-06-26T00:00:00+00:00");
+  const title = 'Social Security International Agreements';
+  const description = 'How does working abroad affect social security?';
+  const publishDate = new Date('2022-06-26T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/international-agreements";
+  schema.url = 'https://ssa.tools/guides/international-agreements';
   schema.title = title;
   schema.image = HeroImage; // Added HeroImage to schema
   schema.datePublished = publishDate.toISOString();

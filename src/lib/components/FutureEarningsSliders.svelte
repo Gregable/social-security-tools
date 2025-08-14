@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import * as constants from "$lib/constants";
-  import Slider from "./Slider.svelte";
-  import type { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import { context } from "$lib/context";
-  import RecipientName from "./RecipientName.svelte";
+  import { onMount } from 'svelte';
+  import * as constants from '$lib/constants';
+  import Slider from './Slider.svelte';
+  import type { Recipient } from '$lib/recipient';
+  import { Money } from '$lib/money';
+  import { context } from '$lib/context';
+  import RecipientName from './RecipientName.svelte';
 
   /**
    * The recipient we are adding future earning years to.
@@ -13,25 +13,25 @@
   export let recipient: Recipient;
 
   function translateFutureYears(value: number, label: string): string {
-    if (label == "value") {
+    if (label == 'value') {
       if (value == 35) {
-        return "35+";
+        return '35+';
       } else {
         return value.toString();
       }
     }
-    return "";
+    return '';
   }
   function translateFutureEarnings(value: number, label: string): string {
-    if (label == "value") {
+    if (label == 'value') {
       if (
         value ==
         constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR].value()
       )
-        return "$" + value.toLocaleString() + "+";
-      else return "$" + value.toLocaleString();
+        return '$' + value.toLocaleString() + '+';
+      else return '$' + value.toLocaleString();
     }
-    return "";
+    return '';
   }
 
   // Computes the remaining years of earnings until the normal retirement age.
@@ -113,7 +113,7 @@
       });
     },
     {
-      rootMargin: "-1px 0px 0px 0px",
+      rootMargin: '-1px 0px 0px 0px',
       threshold: [1],
     }
   );
@@ -130,7 +130,7 @@
     stickyObserver.observe(slidersEl);
     let parent = slidersEl.parentElement;
     while (parent) {
-      if (parent.classList.contains("stickyContainer")) {
+      if (parent.classList.contains('stickyContainer')) {
         stickyContainerObserver.observe(parent);
         break;
       }

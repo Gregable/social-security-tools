@@ -1,9 +1,9 @@
 <script lang="ts">
-  import * as constants from "$lib/constants";
-  import { Recipient } from "$lib/recipient";
-  import BendpointChart from "./BendpointChart.svelte";
-  import Expando from "./Expando.svelte";
-  import RName from "./RecipientName.svelte";
+  import * as constants from '$lib/constants';
+  import { Recipient } from '$lib/recipient';
+  import BendpointChart from './BendpointChart.svelte';
+  import Expando from './Expando.svelte';
+  import RName from './RecipientName.svelte';
 
   export let recipient: Recipient = new Recipient();
   const r: Recipient = recipient;
@@ -80,68 +80,68 @@
             <table class="benefitBrackets pageBreakAvoid">
               <tbody>
                 <tr>
-                <td>
-                  Any amount less than
-                  {recipient.pia().firstBendPoint().wholeDollars()}
-                  is multiplied by 90%:
-                </td>
-                <td>
-                  <b
-                    >{recipient
-                      .pia()
-                      .primaryInsuranceAmountByBracket(0)
-                      .string()}</b
-                  >
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>
-                  The amount more than
-                  {recipient.pia().firstBendPoint().wholeDollars()}
-                  and less than
-                  {recipient.pia().secondBendPoint().wholeDollars()}
-                  is multiplied by 32%:
-                </td>
-                <td>
-                  <b
-                    >{$recipient
-                      .pia()
-                      .primaryInsuranceAmountByBracket(1)
-                      .string()}</b
-                  >
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>
-                  Any <span class="onlydisplay600">remaining</span> amount more
-                  than
-                  {recipient.pia().secondBendPoint().wholeDollars()}
-                  is multiplied by 15%:
-                </td>
-                <td>
-                  <b>
-                    {$recipient
-                      .pia()
-                      .primaryInsuranceAmountByBracket(2)
-                      .string()}
-                  </b>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Total:</td>
-                <td>
-                  <b
-                    >{$recipient
-                      .pia()
-                      .primaryInsuranceAmountUnadjusted()
-                      .string()}</b
-                  >
-                </td>
-                <td class="nowrap">&nbsp;/ month</td>
-              </tr>
+                  <td>
+                    Any amount less than
+                    {recipient.pia().firstBendPoint().wholeDollars()}
+                    is multiplied by 90%:
+                  </td>
+                  <td>
+                    <b
+                      >{recipient
+                        .pia()
+                        .primaryInsuranceAmountByBracket(0)
+                        .string()}</b
+                    >
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>
+                    The amount more than
+                    {recipient.pia().firstBendPoint().wholeDollars()}
+                    and less than
+                    {recipient.pia().secondBendPoint().wholeDollars()}
+                    is multiplied by 32%:
+                  </td>
+                  <td>
+                    <b
+                      >{$recipient
+                        .pia()
+                        .primaryInsuranceAmountByBracket(1)
+                        .string()}</b
+                    >
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>
+                    Any <span class="onlydisplay600">remaining</span> amount
+                    more than
+                    {recipient.pia().secondBendPoint().wholeDollars()}
+                    is multiplied by 15%:
+                  </td>
+                  <td>
+                    <b>
+                      {$recipient
+                        .pia()
+                        .primaryInsuranceAmountByBracket(2)
+                        .string()}
+                    </b>
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Total:</td>
+                  <td>
+                    <b
+                      >{$recipient
+                        .pia()
+                        .primaryInsuranceAmountUnadjusted()
+                        .string()}</b
+                    >
+                  </td>
+                  <td class="nowrap">&nbsp;/ month</td>
+                </tr>
               </tbody>
             </table>
 

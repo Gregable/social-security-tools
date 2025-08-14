@@ -1,8 +1,8 @@
 <script lang="ts">
-  import IndexedEarningsTable from "./IndexedEarningsTable.svelte";
-  import RecipientName from "./RecipientName.svelte";
-  import { Recipient } from "$lib/recipient";
-  import Expando from "./Expando.svelte";
+  import IndexedEarningsTable from './IndexedEarningsTable.svelte';
+  import RecipientName from './RecipientName.svelte';
+  import { Recipient } from '$lib/recipient';
+  import Expando from './Expando.svelte';
 
   export let recipient: Recipient = new Recipient();
 

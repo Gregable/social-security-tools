@@ -4,8 +4,8 @@
    * in Storybook. This is a hack to get around that, by creating a new
    * component that is only used in the demo.
    */
-  import RecipientName from "$lib/components/RecipientName.svelte";
-  import { Recipient } from "$lib/recipient";
+  import RecipientName from '$lib/components/RecipientName.svelte';
+  import { Recipient } from '$lib/recipient';
 
   export let r: Recipient = new Recipient();
   export let noColor: boolean = false;

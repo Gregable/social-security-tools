@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { context } from "$lib/context";
+  import { onMount } from 'svelte';
+  import { context } from '$lib/context';
 
   function scrollTo(section: SidebarSection) {
     return () => {
@@ -8,22 +8,22 @@
       if (element) {
         history.pushState(
           { id: section.id },
-          "",
-          "#" + section.label.replaceAll(" ", "")
+          '',
+          '#' + section.label.replaceAll(' ', '')
         );
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({ behavior: 'smooth' });
       }
     };
   }
 
   function popState(event: PopStateEvent) {
     if (event.state && event.state.id) {
-      if (event.state.id == "top") {
-        mainColumn.scrollIntoView({ behavior: "smooth" });
+      if (event.state.id == 'top') {
+        mainColumn.scrollIntoView({ behavior: 'smooth' });
       } else {
         const element = document.getElementById(event.state.id);
         if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
+          element.scrollIntoView({ behavior: 'smooth' });
         }
       }
     }
@@ -35,7 +35,7 @@
 
   function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
     entries.forEach((entry) => {
-      let id: number = parseInt(entry.target.getAttribute("id").split("-")[1]);
+      let id: number = parseInt(entry.target.getAttribute('id').split('-')[1]);
       // If we use entry.isIntersecting, the element may still be partly
       // intersecting the scroll box, but hidden below a sticky element where
       // it's not visible. So we use the boundingClientRect to check if it's
@@ -78,19 +78,19 @@
     if (observer) observer.disconnect();
     observer = new IntersectionObserver(observeCallback, {
       root: document,
-      rootMargin: "0px",
+      rootMargin: '0px',
       // Every 5%:
       threshold: [...Array(20).keys()].map((i) => i / 20),
     });
-    let children = mainColumn.querySelectorAll("[data-sidebarsection]");
+    let children = mainColumn.querySelectorAll('[data-sidebarsection]');
     for (let i = 0; i < children.length; i++) {
       observer.observe(children[i]);
     }
   }
 
   class SidebarSection {
-    label: string | null = "";
-    id: string = "";
+    label: string | null = '';
+    id: string = '';
     heading: boolean = false;
     active: boolean = false;
     sponsor: boolean = false;
@@ -103,21 +103,21 @@
   onMount(() => {
     // Read the SidebarSection components from the slot and use them to
     // populate the sidebar.
-    let children = mainColumn.querySelectorAll("[data-sidebarsection]");
+    let children = mainColumn.querySelectorAll('[data-sidebarsection]');
     for (let i = 0; i < children.length; i++) {
       let child = children[i];
-      let isHeading = child.getAttribute("data-heading") == "true";
+      let isHeading = child.getAttribute('data-heading') == 'true';
       // If we have no headings, then nothing should be indented. If we have
       // at least one heading, non-heading items should be indented.
       if (isHeading) hasHeading = true;
       sidebarSections.push({
-        label: child.getAttribute("data-label"),
+        label: child.getAttribute('data-label'),
         id: child.id,
         heading: isHeading,
         // active highlights a section if it's visible at the top of
         // the viewport. Initially all false.
         active: false,
-        sponsor: child.getAttribute("data-sponsor") == "true",
+        sponsor: child.getAttribute('data-sponsor') == 'true',
       });
     }
     // eslint-disable-next-line no-self-assign

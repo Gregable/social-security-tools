@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import Expando from "./Expando.svelte";
-  import { Recipient } from "$lib/recipient";
-  import RName from "./RecipientName.svelte";
-  import { MonthDate, MonthDuration } from "$lib/month-time";
-  import Slider from "./Slider.svelte";
+  import { onMount } from 'svelte';
+  import Expando from './Expando.svelte';
+  import { Recipient } from '$lib/recipient';
+  import RName from './RecipientName.svelte';
+  import { MonthDate, MonthDuration } from '$lib/month-time';
+  import Slider from './Slider.svelte';
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -33,7 +33,7 @@
     $lowerEarner.survivorNormalRetirementAge().asMonths() !=
     $lowerEarner.normalRetirementAge().asMonths();
 
-  let fileVsDeath: string = "fileBeforeDeath";
+  let fileVsDeath: string = 'fileBeforeDeath';
 
   // sliderMonths_ is bound to the value of the slider, in months.
   // This is set once in onMount to the user's NRA, typically 67 * 12.
@@ -54,21 +54,21 @@
   ) {
     return (value: number, label: string): string => {
       const age = new MonthDuration(value);
-      if (label === "value" || label === "tick-value") {
-        let out = age.years() + " " + age.modMonths() + " mo";
+      if (label === 'value' || label === 'tick-value') {
+        let out = age.years() + ' ' + age.modMonths() + ' mo';
         if (age.modMonths() === 0) {
           // Special case for no months.
           out = age.years().toString(10);
         }
         if (extendRangeHigh != null && value == extendRangeHigh) {
-          out = ">= " + out;
+          out = '>= ' + out;
         }
         if (extendRangeLow != null && value == extendRangeLow) {
-          out = "<= " + out;
+          out = '<= ' + out;
         }
         return out;
       }
-      return "";
+      return '';
     };
   }
 
@@ -111,7 +111,7 @@
         value: age.asMonths(),
         label: translateSliderLabel(extendLow, extendHigh)(
           age.asMonths(),
-          "tick-value"
+          'tick-value'
         ),
       });
     }
@@ -165,12 +165,12 @@
     // Only one of these sliders is shown at a time, depending on fileVsDeath
 
     let earnerMonths = 0;
-    if (fileVsDeath == "fileBeforeDeath") {
+    if (fileVsDeath == 'fileBeforeDeath') {
       earnerMonths = beforeDeathSliderMonths_;
-    } else if (fileVsDeath == "fileAfterDeath") {
+    } else if (fileVsDeath == 'fileAfterDeath') {
       earnerMonths = afterDeathSliderMonths_;
     } else {
-      throw new Error("fileVsDeath toggle unexpected value: " + fileVsDeath);
+      throw new Error('fileVsDeath toggle unexpected value: ' + fileVsDeath);
     }
 
     let startMonth: MonthDuration = new MonthDuration(survivorSliderMonths_);
@@ -421,7 +421,7 @@
         </fieldset>
       </div>
 
-      {#if fileVsDeath == "fileBeforeDeath"}
+      {#if fileVsDeath == 'fileBeforeDeath'}
         <p>
           2. Estimate the age that <RName r={higherEarner} /> files for benefits:
         </p>
@@ -539,7 +539,7 @@
       </div>
       <div class="survivor-banner">
         Survivor Benefit Amount:
-        {#if fileVsDeath == "fileBeforeDeath"}
+        {#if fileVsDeath == 'fileBeforeDeath'}
           {lowerEarner
             .survivorBenefit(
               higherEarner,

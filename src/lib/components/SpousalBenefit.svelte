@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { Money } from "$lib/money";
+  import { Money } from '$lib/money';
 
-  import { Recipient } from "$lib/recipient";
-  import Expando from "./Expando.svelte";
-  import RName from "./RecipientName.svelte";
+  import { Recipient } from '$lib/recipient';
+  import Expando from './Expando.svelte';
+  import RName from './RecipientName.svelte';
 
-  import HorizCurlyImg from "$lib/images/horiz-curly.png";
+  import HorizCurlyImg from '$lib/images/horiz-curly.png';
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();

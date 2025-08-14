@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { context } from "$lib/context";
-  import { Birthdate } from "$lib/birthday";
-  import { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import AgeRequest from "./AgeRequest.svelte";
-  import DemoData from "./DemoData.svelte";
-  import PasteConfirm from "./PasteConfirm.svelte";
-  import PastePrompt from "./PastePrompt.svelte";
-  import PasteApology from "./PasteApology.svelte";
-  import SpouseQuestion from "./SpouseQuestion.svelte";
-  import { browser } from "$app/environment";
-  import posthog from "posthog-js";
+  import { onMount } from 'svelte';
+  import { context } from '$lib/context';
+  import { Birthdate } from '$lib/birthday';
+  import { Recipient } from '$lib/recipient';
+  import { Money } from '$lib/money';
+  import AgeRequest from './AgeRequest.svelte';
+  import DemoData from './DemoData.svelte';
+  import PasteConfirm from './PasteConfirm.svelte';
+  import PastePrompt from './PastePrompt.svelte';
+  import PasteApology from './PasteApology.svelte';
+  import SpouseQuestion from './SpouseQuestion.svelte';
+  import { browser } from '$app/environment';
+  import posthog from 'posthog-js';
 
   // Callback prop for done event
   export let ondone: (() => void) | undefined = undefined;
@@ -45,16 +45,16 @@
   // the spouse.
   let isRecipient: boolean = true;
 
-  let spouseName: string = "Spouse";
+  let spouseName: string = 'Spouse';
 
   onMount(() => {
     // Reset everything, especially the context.
     mode = Mode.INITIAL;
     isRecipient = true;
-    spouseName = "Spouse";
+    spouseName = 'Spouse';
     context.recipient = null;
     context.spouse = null;
-    if (window.location.hash.startsWith("#pia1")) {
+    if (window.location.hash.startsWith('#pia1')) {
       handleHashPaste();
     }
   });
@@ -76,7 +76,7 @@
       recipient1 = new Recipient();
       recipient1.setPia(Money.from(pia1));
       recipient1.birthdate = Birthdate.FromYMD(year, month, day);
-      recipient1.name = nameStr || "Self";
+      recipient1.name = nameStr || 'Self';
     }
     return recipient1;
   }
@@ -89,12 +89,12 @@
     const hash = fullHash.substring(1);
     const params = new URLSearchParams(hash);
 
-    const pia1str: string | null = params.get("pia1");
-    const pia2str: string | null = params.get("pia2");
-    const dob1str: string | null = params.get("dob1");
-    const dob2str: string | null = params.get("dob2");
-    const name1str: string | null = params.get("name1");
-    const name2str: string | null = params.get("name2");
+    const pia1str: string | null = params.get('pia1');
+    const pia2str: string | null = params.get('pia2');
+    const dob1str: string | null = params.get('dob1');
+    const dob2str: string | null = params.get('dob2');
+    const name1str: string | null = params.get('name1');
+    const name2str: string | null = params.get('name2');
 
     let recipient1 = parseRecipient(pia1str, dob1str, name1str);
     let recipient2 = parseRecipient(pia2str, dob2str, name2str);
@@ -107,7 +107,7 @@
         context.spouse.markSecond();
       }
       // Let the app know we're done.
-      browser && posthog.capture("Hash Pasted");
+      browser && posthog.capture('Hash Pasted');
       ondone?.();
     }
   }
@@ -116,7 +116,10 @@
    * Handle the user selecting a demo record. There is no confirmation step
    * for demo records, since the user isn't actually entering data.
    */
-  function handleDemo(detail: { recipient: Recipient; spouse: Recipient | null }) {
+  function handleDemo(detail: {
+    recipient: Recipient;
+    spouse: Recipient | null;
+  }) {
     context.recipient = detail.recipient;
     if (detail.spouse !== null) {
       context.recipient.markFirst();
@@ -125,7 +128,7 @@
     }
 
     // Let the app know we're done.
-    browser && posthog.capture("Demo Loaded");
+    browser && posthog.capture('Demo Loaded');
     ondone?.();
   }
 
@@ -182,7 +185,7 @@
       context.recipient.birthdate = detail.birthdate;
     } else {
       context.spouse.birthdate = detail.birthdate;
-      browser && posthog.capture("Pasted with spousal");
+      browser && posthog.capture('Pasted with spousal');
       // Let the app know we're done.
       ondone?.();
     }
@@ -193,7 +196,11 @@
    * Handle the user responding to the spouse question. If they have a spouse,
    * we repeat the flow for the spouse. If not, we're done!
    */
-  function handleSpouseQuestion(detail: { spouse: boolean; name: string; spousename?: string }) {
+  function handleSpouseQuestion(detail: {
+    spouse: boolean;
+    name: string;
+    spousename?: string;
+  }) {
     context.recipient.name = detail.name;
     if (detail.spouse) {
       // Mark the recipient as first. Spouse will be marked second later.
@@ -201,7 +208,7 @@
       spouseName = detail.spousename;
       mode = Mode.INITIAL;
     } else {
-      browser && posthog.capture("Pasted");
+      browser && posthog.capture('Pasted');
       // Let the app know we're done.
       ondone?.();
     }

@@ -13,22 +13,23 @@
 -->
 
 <script lang="ts">
-  import { parsePaste } from "$lib/ssa-parse";
-  import { Recipient } from "$lib/recipient";
-  import Expando from "$lib/components/Expando.svelte";
-  import CopyPasteDemoMp4 from "$lib/videos/copy-paste-demo.mp4";
-  import CopyPasteDemoPoster from "$lib/videos/copy-paste-demo-poster.jpg";
-  import EarningsRecordLinkImage from "$lib/images/earnings-record-link.png";
-  import { Money } from "$lib/money";
+  import { parsePaste } from '$lib/ssa-parse';
+  import { Recipient } from '$lib/recipient';
+  import Expando from '$lib/components/Expando.svelte';
+  import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
+  import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
+  import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
+  import { Money } from '$lib/money';
 
   // Callback prop for paste event
-  export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined = undefined;
+  export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
+    undefined;
 
-  let pasteContents: string = "";
+  let pasteContents: string = '';
   let pasteError: boolean = false;
 
   function parsePasteContents(contents: string) {
-    if (contents == "") {
+    if (contents == '') {
       pasteError = false;
       return;
     }
@@ -130,7 +131,7 @@
     <div>
       <textarea
         wrap="soft"
-        placeholder={"\n\nPaste Result Here"}
+        placeholder={'\n\nPaste Result Here'}
         bind:value={pasteContents}
       ></textarea>
       <div class="privateDataNotice">
@@ -217,7 +218,7 @@
     max-width: min(660px, 80%);
   }
   .referenceText {
-    font-family: "Times New Roman", serif;
+    font-family: 'Times New Roman', serif;
   }
   .fit-image {
     width: 100%;

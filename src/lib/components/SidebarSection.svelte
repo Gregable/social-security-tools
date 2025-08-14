@@ -7,7 +7,7 @@
   /**
    * The label to show in the sidebar for this section.
    */
-  export let label: string = "";
+  export let label: string = '';
 
   /**
    * Whether this section is a heading. Headings are styled differently.
@@ -31,7 +31,7 @@
   // by having the sidebar pass it's own unique id down to the section.
 
   // Increment the uniqid to ensure unique ids / labels:
-  let id = "sidebarsection-" + uniqid;
+  let id = 'sidebarsection-' + uniqid;
   uniqid += 1;
 </script>
 
@@ -39,8 +39,8 @@
   {id}
   data-sidebarsection
   data-label={label}
-  data-heading={heading ? "true" : "false"}
-  data-sponsor={sponsor ? "true" : "false"}
+  data-heading={heading ? 'true' : 'false'}
+  data-sponsor={sponsor ? 'true' : 'false'}
   class:underSticky
 >
   <slot></slot>

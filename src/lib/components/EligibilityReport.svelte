@@ -1,8 +1,8 @@
 <script lang="ts">
-  import EligibilityTable from "./EligibilityTable.svelte";
-  import Expando from "./Expando.svelte";
-  import { Recipient } from "$lib/recipient";
-  import RName from "./RecipientName.svelte";
+  import EligibilityTable from './EligibilityTable.svelte';
+  import Expando from './Expando.svelte';
+  import { Recipient } from '$lib/recipient';
+  import RName from './RecipientName.svelte';
 
   export let recipient: Recipient = new Recipient();
   let r = recipient;

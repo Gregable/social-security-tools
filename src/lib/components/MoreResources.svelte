@@ -1,7 +1,7 @@
 <script lang="ts">
-  import GithubImg from "$lib/images/github.svg";
-  import KoFiImg from "$lib/images/kofi.png";
-  import BlueskyImg from "$lib/images/bluesky.jpg";
+  import GithubImg from '$lib/images/github.svg';
+  import KoFiImg from '$lib/images/kofi.png';
+  import BlueskyImg from '$lib/images/bluesky.jpg';
 </script>
 
 <div class="container pageBreakAvoid pageBreakBefore">

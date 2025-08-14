@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
-  import HeroImage from "./hero.png";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
+  import HeroImage from './hero.png';
 
-  const title = "Social Security Indexing Factors";
+  const title = 'Social Security Indexing Factors';
   const description =
     "Why use the current year's indexing factors for someone younger than 62?";
-  const publishDate = new Date("2020-12-28T00:00:00+00:00");
+  const publishDate = new Date('2020-12-28T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/indexing-factors";
+  schema.url = 'https://ssa.tools/guides/indexing-factors';
   schema.title = title;
   schema.image = HeroImage; // Added HeroImage to schema
   schema.datePublished = publishDate.toISOString();
@@ -74,7 +74,8 @@
   </p>
   <img
     src="/indexing-factors-guide-earnings-record.jpg"
-    style:margin="auto" style:display="block"
+    style:margin="auto"
+    style:display="block"
     alt="Earnings record for a hypothetical user"
   />
   <p>
@@ -90,7 +91,8 @@
   </p>
   <img
     src="/indexing-factors-guide-awi-factors.jpg"
-    style:margin="auto" style:display="block"
+    style:margin="auto"
+    style:display="block"
     alt="ssa.gov's index factors for 2032"
   />
   <p>
@@ -106,7 +108,9 @@
   </p>
   <img
     src="/indexing-factors-guide-year-of-eligibility.jpg"
-    style:margin="auto" style:display="block" style:border="1px solid #aaa"
+    style:margin="auto"
+    style:display="block"
+    style:border="1px solid #aaa"
     alt="Year of eligibility: Note if you select a year after 2021, we will use
     the average wage changes that were estimated under the intermediate
     assumptions in the latest Trustees Report."
@@ -134,13 +138,14 @@
           >Multiplier (year X) =</td
         >
         <td
-          style:border-bottom="1px solid black" style:padding="6px" style:text-align="center"
-          >AWI (year 2030)</td
+          style:border-bottom="1px solid black"
+          style:padding="6px"
+          style:text-align="center">AWI (year 2030)</td
         >
       </tr>
       <tr>
-      <td style:padding="6px" style:text-align="center">AWI (year X)</td>
-    </tr>
+        <td style:padding="6px" style:text-align="center">AWI (year X)</td>
+      </tr>
     </tbody>
   </table>
 

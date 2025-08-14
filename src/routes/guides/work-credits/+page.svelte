@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import * as constants from "$lib/constants";
-  import GuideFooter from "../guide-footer.svelte";
+  import { GuidesSchema } from '$lib/schema-org';
+  import * as constants from '$lib/constants';
+  import GuideFooter from '../guide-footer.svelte';
 
-  const title = "Social Security Work Credits";
+  const title = 'Social Security Work Credits';
   const description =
-    "How do work credits work and how many do I need to qualify for Social Security benefits?";
-  const publishDate = new Date("2024-02-26T00:00:00+00:00");
+    'How do work credits work and how many do I need to qualify for Social Security benefits?';
+  const publishDate = new Date('2024-02-26T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/work-credits";
+  schema.url = 'https://ssa.tools/guides/work-credits';
   schema.title = title;
-  schema.image = "/laptop-piggybank.jpg"; // Added a generic hero image for the schema
+  schema.image = '/laptop-piggybank.jpg'; // Added a generic hero image for the schema
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
 </script>

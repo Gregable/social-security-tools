@@ -17,7 +17,7 @@
 -->
 
 <script lang="ts">
-  import { Recipient } from "$lib/recipient";
+  import { Recipient } from '$lib/recipient';
 
   /**
    * Shortened "recipient", to make the tag less verbose.
@@ -28,7 +28,7 @@
    * If set, the string will be appended to the recipeint's name.
    * String will not be appended if the slot is used instead.
    */
-  export let suffix: string = "";
+  export let suffix: string = '';
 
   /**
    * If set, no styling will be applied to the name.
@@ -51,7 +51,7 @@
     } else if (apos) {
       return "'s";
     } else {
-      return "";
+      return '';
     }
   }
 </script>

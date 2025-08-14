@@ -4,7 +4,7 @@
    * in Storybook. This is a hack to get around that, by creating a new
    * component that is only used in the demo.
    */
-  import Expando from "$lib/components/Expando.svelte";
+  import Expando from '$lib/components/Expando.svelte';
 </script>
 
 <div>

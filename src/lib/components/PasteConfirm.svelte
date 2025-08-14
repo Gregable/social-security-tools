@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import type { EarningRecord } from "$lib/earning-record";
+  import type { EarningRecord } from '$lib/earning-record';
 
   // Callback props for events
   export let onconfirm: (() => void) | undefined = undefined;

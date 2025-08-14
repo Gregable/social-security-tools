@@ -1,6 +1,6 @@
 <script lang="ts">
   // Props
-  import { CalculationStatus, CalculationResults } from "$lib/strategy/ui";
+  import { CalculationStatus, CalculationResults } from '$lib/strategy/ui';
   export let calculationResults: CalculationResults;
   export let disabled: boolean = false;
 
@@ -22,23 +22,21 @@
     on:click={triggerCalculation}
     disabled={isRunning || disabled}
     class="calculate-button"
-    title={disabled && !isRunning ? "Please fix input errors before calculating" : ""}
+    title={disabled && !isRunning
+      ? 'Please fix input errors before calculating'
+      : ''}
   >
-    {isRunning
-      ? "Calculating..."
-      : "Calculate Optimal Filing Strategies"}
+    {isRunning ? 'Calculating...' : 'Calculate Optimal Filing Strategies'}
   </button>
 
   {#if isRunning}
     <div class="loading">
-  <span class="spinner"></span> Processing {calculationResults.calculationProgress()} of {calculationResults.totalCalculations()}
+      <span class="spinner"></span> Processing {calculationResults.calculationProgress()}
+      of {calculationResults.totalCalculations()}
       combinations...
     </div>
     <div class="progress-bar">
-      <div
-        class="progress-fill"
-        style:width={progressWidth}
-      ></div>
+      <div class="progress-fill" style:width={progressWidth}></div>
     </div>
   {/if}
 </div>

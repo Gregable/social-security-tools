@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
-  import HeroImage from "./hero.png";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
+  import HeroImage from './hero.png';
 
-  const title = "Navigating Social Security During Administrative Changes";
+  const title = 'Navigating Social Security During Administrative Changes';
   const description =
     "If you've tried to access Social Security services recently, you may have encountered longer wait times, website outages, or difficulty reaching representatives.";
-  const publishDate = new Date("2025-04-30T00:00:00+00:00");
-  const updateDate = new Date("2025-04-30T00:00:00+00:00");
+  const publishDate = new Date('2025-04-30T00:00:00+00:00');
+  const updateDate = new Date('2025-04-30T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/agency-changes";
+  schema.url = 'https://ssa.tools/guides/agency-changes';
   schema.title = title;
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();

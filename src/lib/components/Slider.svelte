@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, onMount, tick } from "svelte";
+  import { afterUpdate, onMount, tick } from 'svelte';
 
   let sliderEl: HTMLDivElement;
   let handleEl: HTMLSpanElement;
@@ -30,35 +30,35 @@
   /**
    * Color of the ticks to the left of the slider handle.
    */
-  export let tickLeftColor: string = "#0db9f0";
+  export let tickLeftColor: string = '#0db9f0';
   /**
    * Color of the ticks to the right of the slider handle.
    */
-  export let tickRightColor: string = "#d8e0f3";
+  export let tickRightColor: string = '#d8e0f3';
   /**
    * Color of the bar to the left of the slider handle.
    */
-  export let barLeftColor: string = "#0db9f0";
+  export let barLeftColor: string = '#0db9f0';
   /**
    * Color of the bar to the right of the slider handle.
    */
-  export let barRightColor: string = "#d8e0f3";
+  export let barRightColor: string = '#d8e0f3';
   /**
    * Color of the slider handle.
    */
-  export let handleColor: string = "#0db9f0";
+  export let handleColor: string = '#0db9f0';
   /**
    * Color of the slider handle inner dot when selected.
    */
-  export let handleSelectedColor: string = "#451aff";
+  export let handleSelectedColor: string = '#451aff';
   /**
    * Text color of the tick labels, as well as the slider handle label.
    */
-  export let tickLabelColor: string = "#000";
+  export let tickLabelColor: string = '#000';
   /**
    * Text color of the tick legends.
    */
-  export let tickLegendColor: string = "#000";
+  export let tickLegendColor: string = '#000';
 
   /**
    * Shows the ticks along the slider bar.
@@ -99,8 +99,9 @@
     value,
     _label
   ) => value.toLocaleString();
-  
-  export let onchange: ((event: { value: number }) => void) | undefined = undefined;
+
+  export let onchange: ((event: { value: number }) => void) | undefined =
+    undefined;
 
   // Reactive statement to call the callback when value changes
   $: onchange?.({ value });
@@ -116,7 +117,10 @@
   }
   let innerWidth: number = window.innerWidth;
   let width: number = 0;
-  $: width = mounted && initialCalculationDone && sliderEl ? getWidth(innerWidth, sliderEl) : 0;
+  $: width =
+    mounted && initialCalculationDone && sliderEl
+      ? getWidth(innerWidth, sliderEl)
+      : 0;
 
   // Similarly, we want to bind to print events so we resize correctly for those
   // too:
@@ -128,7 +132,7 @@
   }
   function removeMediaQueryListener() {
     if (media_query_list) {
-      media_query_list.removeEventListener("change", onPrintMediaChange);
+      media_query_list.removeEventListener('change', onPrintMediaChange);
     }
   }
   onMount(() => {
@@ -136,7 +140,7 @@
       mounted = true;
       // Wait for the DOM to be fully updated before calculating dimensions
       await tick();
-      
+
       // Additional timeout to ensure everything is fully rendered
       setTimeout(() => {
         if (sliderEl) {
@@ -147,13 +151,13 @@
           }
         }
       }, 0);
-      
-      media_query_list = window.matchMedia("print");
-      media_query_list.addEventListener("change", onPrintMediaChange);
+
+      media_query_list = window.matchMedia('print');
+      media_query_list.addEventListener('change', onPrintMediaChange);
     };
-    
+
     initAsync();
-    
+
     return () => {
       removeMediaQueryListener();
     };
@@ -190,17 +194,17 @@
     if (!selected) return;
 
     let val = value;
-    if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
       val = Math.max(userFloor, val - step);
-    } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+    } else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
       val = Math.min(userCeiling, val + step);
-    } else if (event.key === "PageDown") {
+    } else if (event.key === 'PageDown') {
       val = Math.max(userFloor, val - step * 5);
-    } else if (event.key === "PageUp") {
+    } else if (event.key === 'PageUp') {
       val = Math.min(userCeiling, val + step * 5);
-    } else if (event.key === "Home") {
+    } else if (event.key === 'Home') {
       val = userFloor;
-    } else if (event.key === "End") {
+    } else if (event.key === 'End') {
       val = userCeiling;
     } else {
       return;
@@ -255,13 +259,16 @@
     const percent = (value - floor) / (ceiling - floor);
     return Math.floor(percent * width);
   }
-  let sliderPosition: string = "0px";
-  $: sliderPosition = mounted && initialCalculationDone && width > 0 ? valueToPosition(value, floor, ceiling, width) + "px" : "0px";
+  let sliderPosition: string = '0px';
+  $: sliderPosition =
+    mounted && initialCalculationDone && width > 0
+      ? valueToPosition(value, floor, ceiling, width) + 'px'
+      : '0px';
 
   // When the label for the handle changes, it's width may change as well.
   // We need to update it's position to be centered over the handle.
-  let handleLabel: string = "";
-  $: handleLabel = translate(value, "value");
+  let handleLabel: string = '';
+  $: handleLabel = translate(value, 'value');
 
   /**
    * Update the position of the handle label based on the current value and
@@ -269,11 +276,12 @@
    * rendered before we try to measure it.
    */
   function updateHandleLabel(widthIn = width) {
-    if (!mounted || !initialCalculationDone || !handleLabelEl || widthIn <= 0) return;
+    if (!mounted || !initialCalculationDone || !handleLabelEl || widthIn <= 0)
+      return;
     const rect = handleLabelEl.getBoundingClientRect();
     const percent = (value - floor) / (ceiling - floor);
     handleLabelEl.style.left =
-      Math.floor(percent * widthIn) - rect.width / 2 + "px";
+      Math.floor(percent * widthIn) - rect.width / 2 + 'px';
   }
   afterUpdate(() => {
     updateHandleLabel();
@@ -286,7 +294,7 @@
       }
     }
   });
-  
+
   $: mounted && initialCalculationDone && width > 0 && updateHandleLabel(width);
 
   /**
@@ -323,7 +331,7 @@
       for (let i = floor; i <= ceil; i += step) {
         ticks.push({
           value: i,
-          label: translate(i, "tick"),
+          label: translate(i, 'tick'),
           x: valueToPosition(i, floor, ceiling, width),
         });
       }
@@ -337,7 +345,10 @@
     color?: string;
     x?: number;
   }> = [];
-  $: ticks = mounted && initialCalculationDone && width > 0 ? updateTicks(width, floor, ceiling, step, showTicks, ticksArray) : [];
+  $: ticks =
+    mounted && initialCalculationDone && width > 0
+      ? updateTicks(width, floor, ceiling, step, showTicks, ticksArray)
+      : [];
 </script>
 
 <svelte:window bind:innerWidth />
@@ -384,7 +395,7 @@
     aria-valuemin={floor}
     aria-valuemax={ceiling}
     aria-valuenow={value}
-    aria-valuetext={translate(value, "value")}
+    aria-valuetext={translate(value, 'value')}
     on:pointerdown={onStart}
     on:pointermove={onMove}
     on:pointerup={onEnd}
@@ -471,7 +482,7 @@
   }
   .handle::after {
     /* Forms the inner dot on the handle */
-    content: "";
+    content: '';
     width: 8px;
     height: 8px;
     position: absolute;

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Recipient } from "$lib/recipient";
-  import * as constants from "$lib/constants";
-  import { MonthDate, MonthDuration } from "$lib/month-time";
-  import FilingDateChart from "./FilingDateChart.svelte";
-  import RName from "./RecipientName.svelte";
-  import Expando from "./Expando.svelte";
+  import { Recipient } from '$lib/recipient';
+  import * as constants from '$lib/constants';
+  import { MonthDate, MonthDuration } from '$lib/month-time';
+  import FilingDateChart from './FilingDateChart.svelte';
+  import RName from './RecipientName.svelte';
+  import Expando from './Expando.svelte';
 
   export let recipient: Recipient = new Recipient();
   let r: Recipient = recipient;

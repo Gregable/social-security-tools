@@ -1,35 +1,37 @@
 <script lang="ts">
-  import { Recipient } from "$lib/recipient";
-  import { Money } from "$lib/money";
-  import { MonthDate } from "$lib/month-time";
+  import { Recipient } from '$lib/recipient';
+  import { Money } from '$lib/money';
+  import { MonthDate } from '$lib/month-time';
   import {
     parseBirthdate as parseBirthdateUtil,
     calculateFinalDates as calculateFinalDatesUtil,
-  generateThreeYearBuckets,
-  type DeathAgeBucket,
-  } from "$lib/strategy/ui";
-  import { getDeathProbabilityDistribution } from "$lib/life-tables";
-  import { optimalStrategyOptimized } from "$lib/strategy/calculations/strategy-calc";
+    generateThreeYearBuckets,
+    type DeathAgeBucket,
+  } from '$lib/strategy/ui';
+  import { getDeathProbabilityDistribution } from '$lib/life-tables';
+  import { optimalStrategyOptimized } from '$lib/strategy/calculations/strategy-calc';
 
   // Import components
-  import RecipientInputs from "./components/RecipientInputs.svelte";
-  import DiscountRateInput from "./components/DiscountRateInput.svelte";
-  import CalculationControls from "./components/CalculationControls.svelte";
-  import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
-  import StrategyDetails from "./components/StrategyDetails.svelte";
-  import AlternativeStrategiesSection from "./components/AlternativeStrategiesSection.svelte";
-  import { CalculationResults, CalculationStatus } from "$lib/strategy/ui";
+  import RecipientInputs from './components/RecipientInputs.svelte';
+  import DiscountRateInput from './components/DiscountRateInput.svelte';
+  import CalculationControls from './components/CalculationControls.svelte';
+  import StrategyMatrixDisplay from './components/StrategyMatrixDisplay.svelte';
+  import StrategyDetails from './components/StrategyDetails.svelte';
+  import AlternativeStrategiesSection from './components/AlternativeStrategiesSection.svelte';
+  import { CalculationResults, CalculationStatus } from '$lib/strategy/ui';
   import { writable } from 'svelte/store';
 
   // Constants
-  const DEFAULT_BIRTHDATE = "1965-03-15";
+  const DEFAULT_BIRTHDATE = '1965-03-15';
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
-  const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
+  const DEFAULT_NAMES: [string, string] = ['Alex', 'Chris'];
   const MIN_FILING_AGE = 62;
   // Wrap results in a store so internal mutations (status/selection) can trigger UI updates
-  const calculationResultsStore = writable<CalculationResults>(new CalculationResults());
+  const calculationResultsStore = writable<CalculationResults>(
+    new CalculationResults()
+  );
   let calculationResults: CalculationResults;
-  calculationResultsStore.subscribe(v => calculationResults = v);
+  calculationResultsStore.subscribe((v) => (calculationResults = v));
 
   // New three-year bucket lists
   let deathAgeBuckets1: DeathAgeBucket[] = [];
@@ -50,7 +52,7 @@
   // Validation state
   let recipientInputsValid = false;
   let discountRateValid = true;
-  
+
   // Overall form validity
   $: formIsValid = recipientInputsValid && discountRateValid;
 
@@ -65,11 +67,11 @@
     try {
       // Force reactivity by reassigning the recipients array
       recipients = [...recipients];
-      
+
       // Update death probability distributions if recipients' gender changed
       updateDeathProbabilityDistributions();
     } catch (error) {
-      console.warn("Error updating form data:", error);
+      console.warn('Error updating form data:', error);
     }
   }
 
@@ -83,14 +85,10 @@
       const currentYear = new Date().getFullYear();
 
       // Fetch death probability distribution for both recipients
-  const deathProb1Promise: Promise<{ age: number; probability: number }[]> = getDeathProbabilityDistribution(
-        recipients[0],
-        currentYear
-      );
-  const deathProb2Promise: Promise<{ age: number; probability: number }[]> = getDeathProbabilityDistribution(
-        recipients[1],
-        currentYear
-      );
+      const deathProb1Promise: Promise<{ age: number; probability: number }[]> =
+        getDeathProbabilityDistribution(recipients[0], currentYear);
+      const deathProb2Promise: Promise<{ age: number; probability: number }[]> =
+        getDeathProbabilityDistribution(recipients[1], currentYear);
 
       // Wait for both promises to resolve
       [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
@@ -109,24 +107,27 @@
       const startAge2 = Math.max(MIN_FILING_AGE, currentAge2);
 
       deathAgeBuckets1 = generateThreeYearBuckets(
-        startAge1, deathProbDistribution1);
+        startAge1,
+        deathProbDistribution1
+      );
       deathAgeBuckets2 = generateThreeYearBuckets(
-        startAge2, deathProbDistribution2);
+        startAge2,
+        deathProbDistribution2
+      );
     } catch (error) {
-      console.warn("Error updating death probability distributions:", error);
+      console.warn('Error updating death probability distributions:', error);
     }
   }
 
-    // Function to handle discount rate changes from the DiscountRateInput component
+  // Function to handle discount rate changes from the DiscountRateInput component
   function handleDiscountRateChange(newDiscountRatePercent: number) {
     try {
       // Update discount rate percent directly
       discountRatePercent = newDiscountRatePercent;
     } catch (error) {
-      console.warn("Error updating discount rate:", error);
+      console.warn('Error updating discount rate:', error);
     }
   }
-
 
   /**
    * Initialize recipients with default values
@@ -147,7 +148,7 @@
       recipient1.setPia(Money.from(DEFAULT_PIA_VALUES[0]));
       recipient2.setPia(Money.from(DEFAULT_PIA_VALUES[1]));
     } catch (error) {
-      console.warn("Error setting initial recipient data:", error);
+      console.warn('Error setting initial recipient data:', error);
     }
 
     return [recipient1, recipient2];
@@ -157,9 +158,9 @@
    * Main calculation function for optimal strategy matrix
    */
   async function calculateStrategyMatrix() {
-  if (calculationResults.status() === CalculationStatus.Running) return;
-  const fresh = new CalculationResults();
-  calculationResultsStore.set(fresh);
+    if (calculationResults.status() === CalculationStatus.Running) return;
+    const fresh = new CalculationResults();
+    calculationResultsStore.set(fresh);
 
     try {
       // Update death probability distributions first (in case they're not current)
@@ -167,7 +168,9 @@
 
       // Calculate total calculations needed
       const sized = new CalculationResults(
-        deathAgeBuckets1.length, deathAgeBuckets2.length);
+        deathAgeBuckets1.length,
+        deathAgeBuckets2.length
+      );
       sized.beginRun();
       calculationResultsStore.set(sized);
 
@@ -197,12 +200,13 @@
           );
 
           // Calculate optimal strategy
-          const [optimalFilingAge1, optimalFilingAge2, netPresentValue] = optimalStrategyOptimized(
-            recipients,
-            finalDates,
-            currentDate,
-            discountRate
-          );
+          const [optimalFilingAge1, optimalFilingAge2, netPresentValue] =
+            optimalStrategyOptimized(
+              recipients,
+              finalDates,
+              currentDate,
+              discountRate
+            );
 
           // Store the result using the chosen strategy
           calculationResults.set(i, j, {
@@ -227,7 +231,7 @@
       calculationResults.completeRun();
       calculationResultsStore.set(calculationResults);
     } catch (error) {
-      console.error("Calculation error:", error);
+      console.error('Calculation error:', error);
       calculationResults.failRun(error.message || String(error));
       calculationResultsStore.set(calculationResults);
     } finally {
@@ -238,7 +242,10 @@
     }
   }
   function handleCellSelect(detail: any) {
-    calculationResults.setSelectedByLabels(String(detail.deathAge1), String(detail.deathAge2));
+    calculationResults.setSelectedByLabels(
+      String(detail.deathAge1),
+      String(detail.deathAge2)
+    );
     calculationResultsStore.set(calculationResults);
   }
 </script>
@@ -261,20 +268,27 @@
     <section class="input-section">
       <h2>Recipient Information</h2>
 
-      <RecipientInputs 
-        {recipients} 
-        {piaValues} 
-        {birthdateInputs} 
+      <RecipientInputs
+        {recipients}
+        {piaValues}
+        {birthdateInputs}
         onUpdate={handleRecipientUpdate}
-        onValidityChange={(isValid) => recipientInputsValid = isValid}
+        onValidityChange={(isValid) => (recipientInputsValid = isValid)}
       />
 
-      <DiscountRateInput 
-        {discountRatePercent} 
+      <DiscountRateInput
+        {discountRatePercent}
         onDiscountRateChange={handleDiscountRateChange}
-        onValidityChange={(isValid) => discountRateValid = isValid}
+        onValidityChange={(isValid) => (discountRateValid = isValid)}
       />
-      <p class="mortality-guide-note">Mortality assumptions use SSA cohort life tables. You can adjust relative health using the slider above. Learn more in the <a href="/guides/mortality" target="_blank" rel="noopener">mortality & health adjustment guide</a>.</p>
+      <p class="mortality-guide-note">
+        Mortality assumptions use SSA cohort life tables. You can adjust
+        relative health using the slider above. Learn more in the <a
+          href="/guides/mortality"
+          target="_blank"
+          rel="noopener">mortality & health adjustment guide</a
+        >.
+      </p>
     </section>
   </div>
 
@@ -286,7 +300,7 @@
     />
   </section>
   <section class="calculation-section">
-  {#if calculationResults.status() === CalculationStatus.Complete}
+    {#if calculationResults.status() === CalculationStatus.Complete}
       <StrategyMatrixDisplay
         {recipients}
         {calculationResults}
@@ -301,7 +315,10 @@
     {#if calculationResults.getSelectedCellData()}
       {#key calculationResults.getSelectedCellData()}
         <!-- Pull the selected cell from CalculationResults and render details -->
-        <StrategyDetails {recipients} result={calculationResults.getSelectedCellData()} />
+        <StrategyDetails
+          {recipients}
+          result={calculationResults.getSelectedCellData()}
+        />
         <AlternativeStrategiesSection
           {recipients}
           result={calculationResults.getSelectedCellData()}

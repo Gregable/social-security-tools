@@ -1,15 +1,15 @@
 <script lang="ts">
-  import type { Recipient } from "$lib/recipient";
-  import type { StrategyResult } from "$lib/strategy/ui";
-  import RecipientName from "$lib/components/RecipientName.svelte";
+  import type { Recipient } from '$lib/recipient';
+  import type { StrategyResult } from '$lib/strategy/ui';
+  import RecipientName from '$lib/components/RecipientName.svelte';
 
   export let result: StrategyResult;
   export let recipients: [Recipient, Recipient];
 
   // Format probability for display (as percentage with 2 decimal places)
   function formatProbability(prob: number | null): string {
-    if (prob === null) return "Unknown";
-    return (prob * 100).toFixed(2) + "%";
+    if (prob === null) return 'Unknown';
+    return (prob * 100).toFixed(2) + '%';
   }
 
   // Compute filing dates from filing ages
@@ -21,8 +21,8 @@
   <h3>Selected Strategy Details</h3>
   <div class="detail-item">
     <strong><RecipientName r={recipients[0]} apos /> Death Age:</strong>
-  {result.deathAge1}
-  {#if result.deathProb1 !== undefined}
+    {result.deathAge1}
+    {#if result.deathProb1 !== undefined}
       <span class="probability-badge">
         Probability: {formatProbability(result.deathProb1 ?? null)}
       </span>
@@ -30,8 +30,8 @@
   </div>
   <div class="detail-item">
     <strong><RecipientName r={recipients[1]} apos /> Death Age:</strong>
-  {result.deathAge2}
-  {#if result.deathProb2 !== undefined}
+    {result.deathAge2}
+    {#if result.deathProb2 !== undefined}
       <span class="probability-badge">
         Probability: {formatProbability(result.deathProb2 ?? null)}
       </span>
@@ -44,7 +44,7 @@
   </div>
   <div class="detail-item">
     <strong>Date:</strong>
-  {filingDate1.toString()}
+    {filingDate1.toString()}
   </div>
 
   <h4><RecipientName r={recipients[1]} apos /> Filing Strategy</h4>
@@ -54,7 +54,7 @@
   </div>
   <div class="detail-item">
     <strong>Date:</strong>
-  {filingDate2.toString()}
+    {filingDate2.toString()}
   </div>
 
   <div class="detail-item total-npv">

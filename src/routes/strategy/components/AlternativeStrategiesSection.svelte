@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Recipient } from "$lib/recipient";
-  import type { StrategyResult } from "$lib/strategy/ui";
-  import AlternativeStrategiesGrid from "./AlternativeStrategiesGrid.svelte";
+  import type { Recipient } from '$lib/recipient';
+  import type { StrategyResult } from '$lib/strategy/ui';
+  import AlternativeStrategiesGrid from './AlternativeStrategiesGrid.svelte';
 
   // Props
   export let recipients: [Recipient, Recipient];
@@ -14,14 +14,21 @@
   <div class="alternative-strategies-section">
     <div class="header-section">
       <div class="header-content">
-        <h3>Alternative Filing Strategies: Filing <span class:active={!displayAsAges} class:inactive={displayAsAges}>Date</span><label class="toggle-label">
+        <h3>
+          Alternative Filing Strategies: Filing <span
+            class:active={!displayAsAges}
+            class:inactive={displayAsAges}>Date</span
+          ><label class="toggle-label">
             <input
               type="checkbox"
               bind:checked={displayAsAges}
               class="toggle-checkbox"
             />
             <span class="toggle-slider"></span>
-          </label><span class:active={displayAsAges} class:inactive={!displayAsAges}>Age</span>
+          </label><span
+            class:active={displayAsAges}
+            class:inactive={!displayAsAges}>Age</span
+          >
         </h3>
       </div>
     </div>

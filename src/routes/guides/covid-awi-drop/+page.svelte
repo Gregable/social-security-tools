@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { GuidesSchema } from "$lib/schema-org";
-  import GuideFooter from "../guide-footer.svelte";
+  import { GuidesSchema } from '$lib/schema-org';
+  import GuideFooter from '../guide-footer.svelte';
 
-  import HeroImage from "./covid-19.jpg";
-  import CovidAimeImage from "./covid-aime.jpg";
-  import CovidEarningsImage from "./covid-earnings.jpg";
-  import CovidPiaImage from "./covid-pia.jpg";
-  import CovidPia2Image from "./covid-pia-2.jpg";
+  import HeroImage from './covid-19.jpg';
+  import CovidAimeImage from './covid-aime.jpg';
+  import CovidEarningsImage from './covid-earnings.jpg';
+  import CovidPiaImage from './covid-pia.jpg';
+  import CovidPia2Image from './covid-pia-2.jpg';
 
-  const title = "Effect of Covid-19 on Social Security Benefits";
+  const title = 'Effect of Covid-19 on Social Security Benefits';
   const description =
-    "Will a weak economy in 2020 result in a benefits decrease for those born in 1960?";
-  const publishDate = new Date("2020-12-01T00:00:00+00:00");
+    'Will a weak economy in 2020 result in a benefits decrease for those born in 1960?';
+  const publishDate = new Date('2020-12-01T00:00:00+00:00');
 
   let schema: GuidesSchema = new GuidesSchema();
-  schema.url = "https://ssa.tools/guides/covid-awi-drop"; // Corrected URL
+  schema.url = 'https://ssa.tools/guides/covid-awi-drop'; // Corrected URL
   schema.title = title;
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
@@ -67,7 +67,9 @@
   <p>The resulting earnings table will look like this:</p>
   <img
     src={CovidEarningsImage}
-    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
+    style:margin="2em auto 2em auto"
+    style:display="block"
+    style:border="1px solid black"
     alt="Earnings table screenshot"
   />
   <p>
@@ -78,7 +80,9 @@
   </p>
   <img
     src={CovidAimeImage}
-    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
+    style:margin="2em auto 2em auto"
+    style:display="block"
+    style:border="1px solid black"
     alt="AIME calculation resulting in $4,375"
   />
   <p>
@@ -104,13 +108,14 @@
           >Multiplier (year X) =</td
         >
         <td
-          style:border-bottom="1px solid black" style:padding="6px" style:text-align="center"
-          >AWI (year 2020)</td
+          style:border-bottom="1px solid black"
+          style:padding="6px"
+          style:text-align="center">AWI (year 2020)</td
         >
       </tr>
       <tr>
-      <td style:padding="6px" style:text-align="center">AWI (year X)</td>
-    </tr>
+        <td style:padding="6px" style:text-align="center">AWI (year X)</td>
+      </tr>
     </tbody>
   </table>
   <p>
@@ -124,7 +129,9 @@
           >Indexed Earnings (year X) =</td
         >
         <td
-          style:border-bottom="1px solid black" style:padding="6px" style:text-align="center"
+          style:border-bottom="1px solid black"
+          style:padding="6px"
+          style:text-align="center"
           >Taxed Earnings (year X) x
           <b>AWI (year 2020)</b>
         </td>
@@ -173,23 +180,27 @@
   </p>
   <img
     src={CovidPiaImage}
-    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
+    style:margin="2em auto 2em auto"
+    style:display="block"
+    style:border="1px solid black"
     alt="PIA without covid, predicted at $1,977.60"
   />
 
-  <p>Next, adjust both the AIME and the bendpoints downward by 9.1%:
-  <img
-    src={CovidPia2Image}
-    style:margin="2em auto 2em auto" style:display="block" style:border="1px solid black"
-    alt="PIA with covid, predicted at $1,798.40"
-  />
-    Going from $1,977.60 to $1,798.40 is a 9.06% drop, very similar to the 9.1%
-    number we started with. In conclusion, a significant drop in AWI in a single
-    year can have an similarly outsized effect on the Social Security benefits
-    for those who turn 60 in that year. In the history of the Social Security
-    program, there has not been such a dramatic drop in AWI from one year to the
-    next like Covid appears to have produced, so this has never been much of an
-    issue until now.
+  <p>
+    Next, adjust both the AIME and the bendpoints downward by 9.1%:
+    <img
+      src={CovidPia2Image}
+      style:margin="2em auto 2em auto"
+      style:display="block"
+      style:border="1px solid black"
+      alt="PIA with covid, predicted at $1,798.40"
+    />
+    Going from $1,977.60 to $1,798.40 is a 9.06% drop, very similar to the 9.1% number
+    we started with. In conclusion, a significant drop in AWI in a single year can
+    have an similarly outsized effect on the Social Security benefits for those who
+    turn 60 in that year. In the history of the Social Security program, there has
+    not been such a dramatic drop in AWI from one year to the next like Covid appears
+    to have produced, so this has never been much of an issue until now.
   </p>
   <GuideFooter />
 </div>
