@@ -101,10 +101,14 @@
       deathProbDistribution2 = [...deathProbDistribution2];
 
       // Calculate death age range start ages
-      const currentAge1 = currentYear - recipients[0].birthdate.layBirthYear();
-      const currentAge2 = currentYear - recipients[1].birthdate.layBirthYear();
-      const startAge1 = Math.max(MIN_FILING_AGE, currentAge1);
-      const startAge2 = Math.max(MIN_FILING_AGE, currentAge2);
+      const startAge1 = Math.max(
+        MIN_FILING_AGE,
+        recipients[0].birthdate.currentAge()
+      );
+      const startAge2 = Math.max(
+        MIN_FILING_AGE,
+        recipients[1].birthdate.currentAge()
+      );
 
       deathAgeBuckets1 = generateThreeYearBuckets(
         startAge1,

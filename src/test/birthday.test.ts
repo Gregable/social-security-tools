@@ -113,3 +113,21 @@ describe('exampleSsaAge', function () {
     expect(example.age).toBe(73);
   });
 });
+
+describe('currentAge', function () {
+  it('before birthday in year', function () {
+    const bd = Birthdate.FromYMD(2000, 1, 2); // Feb 2 2000
+    const asOf = new Date(Date.UTC(2025, 0, 15)); // Jan 15 2025
+    expect(bd.currentAge(asOf)).toBe(24); // Not yet 25
+  });
+  it('on birthday', function () {
+    const bd = Birthdate.FromYMD(2000, 1, 2); // Feb 2 2000
+    const asOf = new Date(Date.UTC(2025, 1, 2)); // Feb 2 2025
+    expect(bd.currentAge(asOf)).toBe(25);
+  });
+  it('after birthday in year', function () {
+    const bd = Birthdate.FromYMD(2000, 1, 2); // Feb 2 2000
+    const asOf = new Date(Date.UTC(2025, 5, 1)); // Jun 1 2025
+    expect(bd.currentAge(asOf)).toBe(25);
+  });
+});

@@ -198,6 +198,30 @@ export class Birthdate {
   }
 
   /**
+   * Computes the person's current lay age in whole years at the given date.
+   * If no date is supplied, the current system date (now) is used. This is
+   * the commonly understood age: it increments on the lay birthday. All
+   * calculations are performed in UTC to avoid daylight savings issues.
+   *
+   * For example, someone born Feb 2, 2000 has age:
+   *  - 24 on Feb 1, 2025
+   *  - 25 on Feb 2, 2025 and after (until Feb 1, 2026)
+   */
+  currentAge(asOf: Date = new Date()): number {
+    const yearDiff = asOf.getUTCFullYear() - this.layBirthYear();
+    const asOfMonth = asOf.getUTCMonth();
+    const asOfDay = asOf.getUTCDate();
+    const bMonth = this.layBirthMonth();
+    const bDay = this.layBirthDayOfMonth();
+    // If current month precedes birth month, or it's the birth month but the
+    // day has not yet arrived, subtract one year.
+    if (asOfMonth < bMonth || (asOfMonth === bMonth && asOfDay < bDay)) {
+      return yearDiff - 1;
+    }
+    return yearDiff;
+  }
+
+  /**
    * @returns the date in the given year that social security considers it
    * the person's birthdate, as well as their age.
    */
