@@ -26,6 +26,8 @@ export interface StrategyResult {
 export class CalculationResults {
   private grid: StrategyResult[][];
   private _error: string | null = null;
+  private _selectedRow: number | null = null;
+  private _selectedCol: number | null = null;
 
   constructor(rows: number = 0, cols: number = 0) {
     this.grid = Array(rows)
@@ -57,10 +59,93 @@ export class CalculationResults {
   setError(message: string): void {
     this._error = message;
     this.grid = [];
+    // Clear any selection when an error occurs
+    this._selectedRow = null;
+    this._selectedCol = null;
   }
 
   error(): string | null {
     return this._error;
+  }
+
+  setSelectedCell(row: number, col: number): void {
+    if (row < 0 || col < 0 || row >= this.rows() || col >= this.cols()) {
+      this._selectedRow = null;
+      this._selectedCol = null;
+      return;
+    }
+    this._selectedRow = row;
+    this._selectedCol = col;
+  }
+
+  clearSelectedCell(): void {
+    this._selectedRow = null;
+    this._selectedCol = null;
+  }
+
+  getSelectedCell(): { row: number; col: number } | null {
+    if (this._selectedRow === null || this._selectedCol === null) return null;
+    return { row: this._selectedRow, col: this._selectedCol };
+  }
+
+  getSelectedCellData(): StrategyResult | undefined {
+    if (this._selectedRow === null || this._selectedCol === null)
+      return undefined;
+    return this.get(this._selectedRow, this._selectedCol);
+  }
+
+  isSelected(row: number, col: number): boolean {
+    return this._selectedRow === row && this._selectedCol === col;
+  }
+
+  /** Convenience: get bucket labels for each row. */
+  rowLabels(): string[] {
+    return this.rowBuckets().map((b) => b.label);
+  }
+
+  /** Convenience: get bucket labels for each column. */
+  colLabels(): string[] {
+    return this.colBuckets().map((b) => b.label);
+  }
+
+  /** Find row index by its bucket label. Returns -1 if not found. */
+  findRowIndexByLabel(label: string): number {
+    const labels = this.rowLabels();
+    return labels.indexOf(label);
+  }
+
+  /** Find column index by its bucket label. Returns -1 if not found. */
+  findColIndexByLabel(label: string): number {
+    const labels = this.colLabels();
+    return labels.indexOf(label);
+  }
+
+  /** Set selection by bucket labels. Returns true if selection succeeded. */
+  setSelectedByLabels(rowLabel: string, colLabel: string): boolean {
+    const r = this.findRowIndexByLabel(rowLabel);
+    const c = this.findColIndexByLabel(colLabel);
+    if (r < 0 || c < 0) return false;
+    this.setSelectedCell(r, c);
+    return true;
+  }
+
+  /** Get selected bucket labels, or null if no selection. */
+  getSelectedLabels(): { rowLabel: string; colLabel: string } | null {
+    const pos = this.getSelectedCell();
+    if (!pos) return null;
+    const rowLabel = this.rowLabels()[pos.row];
+    const colLabel = this.colLabels()[pos.col];
+    if (rowLabel === undefined || colLabel === undefined) return null;
+    return { rowLabel, colLabel };
+  }
+
+  /** Check selection by bucket labels. */
+  isSelectedLabels(rowLabel: string, colLabel: string): boolean {
+    const pos = this.getSelectedCell();
+    if (!pos) return false;
+    const rOk = this.rowLabels()[pos.row] === rowLabel;
+    const cOk = this.colLabels()[pos.col] === colLabel;
+    return rOk && cOk;
   }
 
   rowBuckets(): DeathAgeBucket[] {

@@ -1,24 +1,16 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
-  import type { Money } from "$lib/money";
+  import type { StrategyResult } from "$lib/strategy/ui";
   import AlternativeStrategiesGrid from "./AlternativeStrategiesGrid.svelte";
 
   // Props
   export let recipients: [Recipient, Recipient];
-  export let selectedCellData: {
-    deathAge1: number;
-    deathAge2: number;
-    filingAge1Years: number;
-    filingAge1Months: number;
-    filingAge2Years: number;
-    filingAge2Months: number;
-    netPresentValue: Money;
-  } | null;
+  export let result: StrategyResult | null = null;
   export let discountRate: number;
   export let displayAsAges: boolean = false;
 </script>
 
-{#if selectedCellData}
+{#if result}
   <div class="alternative-strategies-section">
     <div class="header-section">
       <div class="header-content">
@@ -35,10 +27,10 @@
     </div>
     <AlternativeStrategiesGrid
       {recipients}
-      deathAge1={selectedCellData.deathAge1}
-      deathAge2={selectedCellData.deathAge2}
+      deathAge1={result.bucket1.midAge}
+      deathAge2={result.bucket2.midAge}
       {discountRate}
-      optimalNPV={selectedCellData.netPresentValue}
+      optimalNPV={result.totalBenefit}
       {displayAsAges}
     />
   </div>

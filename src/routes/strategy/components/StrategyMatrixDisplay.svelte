@@ -1,7 +1,5 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
-  import type { MonthDate } from "$lib/month-time";
-  import type { Money } from "$lib/money";
   import StrategyMatrix from "./StrategyMatrix.svelte";
   import type { CalculationResults } from "$lib/strategy/ui";
 
@@ -16,17 +14,6 @@
   export let deathProbDistribution2: { age: number; probability: number }[];
   export let timeElapsed: number;
   export let isCalculationComplete: boolean;
-  export let selectedCellData: {
-    deathAge1: number;
-    deathAge2: number;
-    filingAge1Years: number;
-    filingAge1Months: number;
-    filingDate1: MonthDate;
-    filingAge2Years: number;
-    filingAge2Months: number;
-    filingDate2: MonthDate;
-    netPresentValue: Money;
-  } | null;
 
   // Shared state for matrix hovering
   let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
@@ -67,7 +54,6 @@
           {deathProbDistribution1}
           {deathProbDistribution2}
           {hoveredCell}
-          {selectedCellData}
           {displayAsAges}
           onhovercell={handleHoverCell}
           onselectcell={(detail) => onselectcell?.(detail)}

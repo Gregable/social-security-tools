@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
-  import type { Money } from "$lib/money";
   import {
     getFilingDate,
     getFilingAge,
@@ -15,20 +14,7 @@
   export let recipients: [Recipient, Recipient];
   export let recipientIndex: number;
   export let hoveredCell: { rowIndex: number; colIndex: number } | null;
-  export let selectedCellData: {
-    deathAge1: string | number;
-    deathAge2: string | number;
-    filingAge1Years: number;
-    filingAge1Months: number;
-    filingDate1: any;
-    filingAge2Years: number;
-    filingAge2Months: number;
-    filingDate2: any;
-    netPresentValue: Money;
-  } | null;
-  // Row / column bucket labels (used only for selection highlighting)
-  export let rowBucketLabels: (string | number)[];
-  export let colBucketLabels: (string | number)[];
+  export let isSelected: boolean = false;
   export let cellWidth: number = 0;
   export let cellHeight: number = 0;
   export let cellStyle: string = "";
@@ -47,10 +33,6 @@
   $: isHighlightedRow = hoveredCell && 
     hoveredCell.rowIndex === rowIndex && 
     hoveredCell.colIndex !== colIndex;
-
-  $: isSelectedCell = selectedCellData && 
-    selectedCellData.deathAge1 === rowBucketLabels[rowIndex] && 
-    selectedCellData.deathAge2 === colBucketLabels[colIndex];
 
   // Handle events
   function handleMouseOver() {
@@ -114,7 +96,7 @@
   class:highlighted-cell={isHighlightedCell}
   class:highlighted-column={isHighlightedColumn}
   class:highlighted-row={isHighlightedRow}
-  class:selected-cell={isSelectedCell}
+  class:selected-cell={isSelected}
   on:mouseover={handleMouseOver}
   on:mouseout={handleMouseOut}
   on:focus={handleMouseOver}

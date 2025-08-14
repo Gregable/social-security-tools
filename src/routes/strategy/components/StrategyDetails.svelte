@@ -1,74 +1,65 @@
 <script lang="ts">
-  import type { MonthDate } from "$lib/month-time";
-  import type { Money } from "$lib/money";
   import type { Recipient } from "$lib/recipient";
+  import type { StrategyResult } from "$lib/strategy/ui";
   import RecipientName from "$lib/components/RecipientName.svelte";
 
-  export let deathAge1: number;
-  export let deathAge2: number;
-  export let filingAge1Years: number;
-  export let filingAge1Months: number;
-  export let filingDate1: MonthDate;
-  export let filingAge2Years: number;
-  export let filingAge2Months: number;
-  export let filingDate2: MonthDate;
-  export let netPresentValue: Money;
+  export let result: StrategyResult;
   export let recipients: [Recipient, Recipient];
-
-  // Optional death probability fields (may be available from calculationResults)
-  export let deathProb1: number | null = null;
-  export let deathProb2: number | null = null;
 
   // Format probability for display (as percentage with 2 decimal places)
   function formatProbability(prob: number | null): string {
     if (prob === null) return "Unknown";
     return (prob * 100).toFixed(2) + "%";
   }
+
+  // Compute filing dates from filing ages
+  $: filingDate1 = recipients[0].birthdate.dateAtLayAge(result.filingAge1);
+  $: filingDate2 = recipients[1].birthdate.dateAtLayAge(result.filingAge2);
 </script>
 
 <div class="strategy-details-container">
   <h3>Selected Strategy Details</h3>
   <div class="detail-item">
     <strong><RecipientName r={recipients[0]} apos /> Death Age:</strong>
-    {deathAge1}
-    {#if deathProb1 !== null}
+  {result.deathAge1}
+  {#if result.deathProb1 !== undefined}
       <span class="probability-badge">
-        Probability: {formatProbability(deathProb1)}
+        Probability: {formatProbability(result.deathProb1 ?? null)}
       </span>
     {/if}
   </div>
   <div class="detail-item">
     <strong><RecipientName r={recipients[1]} apos /> Death Age:</strong>
-    {deathAge2}
-    {#if deathProb2 !== null}
+  {result.deathAge2}
+  {#if result.deathProb2 !== undefined}
       <span class="probability-badge">
-        Probability: {formatProbability(deathProb2)}
+        Probability: {formatProbability(result.deathProb2 ?? null)}
       </span>
     {/if}
   </div>
   <h4><RecipientName r={recipients[0]} apos /> Filing Strategy</h4>
   <div class="detail-item">
     <strong>Age:</strong>
-    {filingAge1Years} years, {filingAge1Months} months
+    {result.filingAge1Years} years, {result.filingAge1Months} months
   </div>
   <div class="detail-item">
     <strong>Date:</strong>
-    {filingDate1.toString()}
+  {filingDate1.toString()}
   </div>
 
   <h4><RecipientName r={recipients[1]} apos /> Filing Strategy</h4>
   <div class="detail-item">
     <strong>Age:</strong>
-    {filingAge2Years} years, {filingAge2Months} months
+    {result.filingAge2Years} years, {result.filingAge2Months} months
   </div>
   <div class="detail-item">
     <strong>Date:</strong>
-    {filingDate2.toString()}
+  {filingDate2.toString()}
   </div>
 
   <div class="detail-item total-npv">
     <strong>Net Present Value:</strong>
-    {netPresentValue.string()}
+    {result.totalBenefit.string()}
   </div>
 </div>
 

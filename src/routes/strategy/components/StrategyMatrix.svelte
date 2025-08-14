@@ -2,7 +2,7 @@
   import type { Recipient } from "$lib/recipient";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import StrategyCell from "./StrategyCell.svelte";
-  import { MonthDate, MonthDuration } from "$lib/month-time";
+  import { MonthDuration } from "$lib/month-time";
   import type { Money } from "$lib/money";
   import type { DeathAgeBucket } from "$lib/strategy/ui";
   import type { CalculationResults } from "$lib/strategy/ui";
@@ -19,17 +19,6 @@
   export let deathProbDistribution1: { age: number; probability: number }[];
   export let deathProbDistribution2: { age: number; probability: number }[];
   export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
-  export let selectedCellData: {
-    deathAge1: string | number;
-    deathAge2: string | number;
-    filingAge1Years: number;
-    filingAge1Months: number;
-    filingDate1: MonthDate;
-    filingAge2Years: number;
-    filingAge2Months: number;
-    filingDate2: MonthDate;
-    netPresentValue: Money;
-  } | null;
 
   // Callback props for events
   export let onhovercell: ((detail: { rowIndex: number; colIndex: number } | null) => void) | undefined = undefined;
@@ -238,25 +227,29 @@
 
   function handleCellSelect(event) {
     const { rowIndex, colIndex } = event.detail;
-  const result = calculationResults.get(rowIndex, colIndex) as StrategyResultCell;
+    const result = calculationResults.get(rowIndex, colIndex) as StrategyResultCell;
     const bucket1 = rowBuckets[rowIndex];
     const bucket2 = colBuckets[colIndex];
     if (!result || !bucket1 || !bucket2) return;
+
+    // Set selection on the shared CalculationResults state
+    calculationResults.setSelectedCell(rowIndex, colIndex);
 
     const filingAge1 = result.filingAge1;
     const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
     const filingAge2 = result.filingAge2;
     const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
 
+    // Emit a normalized details payload for external consumers (e.g., details panel)
     onselectcell?.({
-      deathAge1: bucket1.label, // use bucket label (e.g., '100+')
+      deathAge1: bucket1.label,
       deathAge2: bucket2.label,
       filingAge1Years: result.filingAge1Years,
       filingAge1Months: result.filingAge1Months,
-      filingDate1: filingDate1,
+      filingDate1,
       filingAge2Years: result.filingAge2Years,
       filingAge2Months: result.filingAge2Months,
-      filingDate2: filingDate2,
+      filingDate2,
       netPresentValue: result.totalBenefit,
     });
   }
@@ -346,9 +339,7 @@
               {recipients}
               {recipientIndex}
               {hoveredCell}
-              {selectedCellData}
-              rowBucketLabels={rowBuckets.map(b=> b?.label)}
-              colBucketLabels={colBuckets.map(b=> b?.label)}
+              isSelected={calculationResults.isSelected(i, j)}
               cellWidth={cellDimensions[i]?.[j]?.width || 0}
               cellHeight={cellDimensions[i]?.[j]?.height || 0}
               cellStyle={getCellStyle(i, j)}

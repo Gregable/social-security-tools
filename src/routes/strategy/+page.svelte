@@ -44,18 +44,6 @@
   let totalCalculations = 0;
   let displayAsAges: boolean = false;
 
-  let selectedCellData: {
-    deathAge1: number;
-    deathAge2: number;
-    filingAge1Years: number;
-    filingAge1Months: number;
-    filingDate1: MonthDate;
-    filingAge2Years: number;
-    filingAge2Months: number;
-    filingDate2: MonthDate;
-    netPresentValue: Money;
-  } | null = null;
-
   let matrixDisplayElement: HTMLElement;
 
   // Form inputs
@@ -196,7 +184,7 @@
 
     isCalculationRunning = true;
     isCalculationComplete = false;
-    selectedCellData = null;
+    calculationResults.clearSelectedCell();
     calculationResults = new CalculationResults();
     calculationProgress = 0;
     startTime = Date.now();
@@ -278,9 +266,8 @@
       isCalculationRunning = false;
     }
   }
-
   function handleCellSelect(detail: any) {
-    selectedCellData = detail;
+    calculationResults.setSelectedByLabels(String(detail.deathAge1), String(detail.deathAge2));
   }
 </script>
 
@@ -337,44 +324,23 @@
         {deathProbDistribution2}
         {timeElapsed}
         {isCalculationComplete}
-        {selectedCellData}
         bind:displayAsAges
         onselectcell={handleCellSelect}
       />
     {/if}
   </section>
   <section class="limited-width">
-    {#if selectedCellData}
-      <!-- Find the cell in calculationResults that corresponds to selectedCellData -->
-      {@const row = deathAgeBuckets1.findIndex(
-        (b) => b.label === String(selectedCellData.deathAge1)
-      )}
-      {@const col = deathAgeBuckets2.findIndex(
-        (b) => b.label === String(selectedCellData.deathAge2)
-      )}
-    {@const cellData = row >= 0 && col >= 0 ? calculationResults.get(row, col) :  null}
-
-      <StrategyDetails
-        deathAge1={selectedCellData.deathAge1}
-        deathAge2={selectedCellData.deathAge2}
-        filingAge1Years={selectedCellData.filingAge1Years}
-        filingAge1Months={selectedCellData.filingAge1Months}
-        filingDate1={selectedCellData.filingDate1}
-        filingAge2Years={selectedCellData.filingAge2Years}
-        filingAge2Months={selectedCellData.filingAge2Months}
-        filingDate2={selectedCellData.filingDate2}
-        netPresentValue={selectedCellData.netPresentValue}
-        deathProb1={cellData?.deathProb1}
-        deathProb2={cellData?.deathProb2}
-        {recipients}
-      />
-
-      <AlternativeStrategiesSection
-        {recipients}
-        {selectedCellData}
-        {discountRate}
-        bind:displayAsAges
-      />
+    {#if calculationResults.getSelectedCellData()}
+      {#key calculationResults.getSelectedCellData()}
+        <!-- Pull the selected cell from CalculationResults and render details -->
+        <StrategyDetails {recipients} result={calculationResults.getSelectedCellData()} />
+        <AlternativeStrategiesSection
+          {recipients}
+          result={calculationResults.getSelectedCellData()}
+          {discountRate}
+          bind:displayAsAges
+        />
+      {/key}
     {/if}
   </section>
 </main>
