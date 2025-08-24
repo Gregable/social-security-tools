@@ -7,8 +7,8 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import {
   PersonalBenefitPeriods,
   sumBenefitPeriods,
-  BenefitPeriod,
 } from '$lib/strategy/calculations/recipient-personal-benefits';
+import { BenefitPeriod } from '$lib/strategy/calculations/benefit-period';
 
 describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   let recipient: Recipient;

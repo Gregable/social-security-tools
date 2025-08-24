@@ -1,36 +1,8 @@
 import { Recipient } from '$lib/recipient';
 import { MonthDate, MonthDuration } from '$lib/month-time';
-import { Money } from '$lib/money';
-import { BenefitType } from './strategy-calc.js';
+import { BenefitType, BenefitPeriod } from './benefit-period.js';
 
 const MONTHS_IN_YEAR = 12;
-
-/**
- * Calculates the total sum of personal benefits a recipient would receive
- * between their filing date and final date.
- *
- * Instead of iterating through each month, this function calculates total
- * months in each period and multiplies by the appropriate benefit amount,
- * significantly improving performance.
- *
- * @param {Recipient} recipient - The Social Security benefit recipient
- * @param {MonthDate} filingDate - The date when the recipient files for
- *                                 benefits
- * @param {MonthDate} finalDate - The final date to calculate benefits through
- * @returns {number} Total personal benefit amount in cents across the period
- */
-export class BenefitPeriod {
-  constructor() {}
-
-  // startDate and endDate are inclusive on both sides:
-  public startDate: MonthDate;
-  public endDate: MonthDate;
-  public amount: Money;
-  // Index of the recipient (0 or 1) who receives this benefit
-  public recipientIndex: number;
-  // Type of benefit (Personal, Spousal, or Survivor)
-  public benefitType: BenefitType;
-} // class BenefitPeriod
 
 /**
  * Sums the total benefit amount from an array of BenefitPeriod objects.

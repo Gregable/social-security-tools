@@ -2,7 +2,8 @@
   import type { Recipient } from '$lib/recipient';
   import type { StrategyResult } from '$lib/strategy/ui';
   import { MonthDate, MonthDuration } from '$lib/month-time';
-  import { strategySumPeriods, BenefitType } from '$lib/strategy/calculations/strategy-calc';
+  import { strategySumPeriods } from '$lib/strategy/calculations/strategy-calc';
+  import { BenefitType } from '$lib/strategy/calculations/benefit-period';
   import RecipientName from '$lib/components/RecipientName.svelte';
 
   export let result: StrategyResult;
