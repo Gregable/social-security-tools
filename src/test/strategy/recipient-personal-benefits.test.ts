@@ -37,7 +37,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     }); // Dec 2022
 
     const periods: BenefitPeriod[] = [];
-    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods, 0);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Should be $1000/month * 12 months = $12,000 (in cents)
@@ -64,7 +64,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     const finalDate = MonthDate.initFromYearsMonths({ years: 2023, months: 5 }); // June 2023
 
     const periods: BenefitPeriod[] = [];
-    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods, 0);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // 2022: $1000/month * 6 months (July-Dec) = $6,000
@@ -95,7 +95,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     const finalDate = MonthDate.initFromYearsMonths({ years: 2045, months: 0 }); // January 2045
 
     const periods: BenefitPeriod[] = [];
-    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods, 0);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // 2028: $1160/month * 6 months (July-Dec) = $6,960
@@ -114,7 +114,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     const sameDate = MonthDate.initFromYearsMonths({ years: 2022, months: 5 }); // June 2022
 
     const periods: BenefitPeriod[] = [];
-    PersonalBenefitPeriods(recipient, sameDate, sameDate, periods);
+    PersonalBenefitPeriods(recipient, sameDate, sameDate, periods, 0);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Should be $1000 for 1 month
@@ -134,7 +134,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     const finalDate = MonthDate.initFromYearsMonths({ years: 2022, months: 5 }); // June 2022
 
     const periods: BenefitPeriod[] = [];
-    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods, 0);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Should handle this gracefully - no benefits received
@@ -174,7 +174,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     const finalDate = MonthDate.initFromYearsMonths({ years: 2030, months: 6 }); // July 2030
 
     const periods: BenefitPeriod[] = [];
-    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods, 0);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // 2029: $1200/month * 6 months (July-Dec) = $7,200
@@ -213,7 +213,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     }); // Dec 2025
 
     const periods: BenefitPeriod[] = [];
-    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods);
+    PersonalBenefitPeriods(recipient, filingDate, finalDate, periods, 0);
     const totalBenefit = sumBenefitPeriods(periods);
 
     // Due to the way our function works, all months after January 2023

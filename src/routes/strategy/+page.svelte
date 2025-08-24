@@ -17,6 +17,7 @@
   import CalculationControls from './components/CalculationControls.svelte';
   import StrategyMatrixDisplay from './components/StrategyMatrixDisplay.svelte';
   import StrategyDetails from './components/StrategyDetails.svelte';
+  import StrategyTimeline from './components/StrategyTimeline.svelte';
   import AlternativeStrategiesSection from './components/AlternativeStrategiesSection.svelte';
   import { CalculationResults, CalculationStatus } from '$lib/strategy/ui';
   import { writable } from 'svelte/store';
@@ -311,6 +312,10 @@
       {#key calculationResults.getSelectedCellData()}
         <!-- Pull the selected cell from CalculationResults and render details -->
         <StrategyDetails
+          {recipients}
+          result={calculationResults.getSelectedCellData()}
+        />
+        <StrategyTimeline
           {recipients}
           result={calculationResults.getSelectedCellData()}
         />

@@ -3,6 +3,18 @@ import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
 import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
 
+/**
+ * Enum representing the different types of benefits.
+ */
+export enum BenefitType {
+  Personal = 'Personal',
+  Spousal = 'Spousal',
+  Survivor = 'Survivor'
+}
+
+/**
+ * Represents a period of benefits for a recipient.
+ */
 class BenefitPeriod {
   constructor() {}
 
@@ -10,6 +22,10 @@ class BenefitPeriod {
   public startDate: MonthDate;
   public endDate: MonthDate;
   public amount: Money;
+  // Index of the recipient (0 or 1) who receives this benefit
+  public recipientIndex: number;
+  // Type of benefit (Personal, Spousal, or Survivor)
+  public benefitType: BenefitType;
 } // class BenefitPeriod
 
 /**
@@ -61,25 +77,23 @@ export function strategySumPeriods(
 
   // Determine the higher and lower earner based on their Primary Insurance
   // Amount (PIA).
+  let earnerIndex: number;
+  let dependentIndex: number;
   if (recipients[0].higherEarningsThan(recipients[1])) {
-    earner = recipients[0];
-    dependent = recipients[1];
-    earnerFinalDate = finalDates[0];
-    dependentFinalDate = finalDates[1];
-    earnerStrat = strats[0];
-    dependentStrat = strats[1];
-    earnerStratDate = stratDates[0];
-    dependentStratDate = stratDates[1];
+    earnerIndex = 0;
+    dependentIndex = 1;
   } else {
-    earner = recipients[1];
-    dependent = recipients[0];
-    earnerFinalDate = finalDates[1];
-    dependentFinalDate = finalDates[0];
-    earnerStrat = strats[1];
-    dependentStrat = strats[0];
-    earnerStratDate = stratDates[1];
-    dependentStratDate = stratDates[0];
+    earnerIndex = 1;
+    dependentIndex = 0;
   }
+  earner = recipients[earnerIndex];
+  dependent = recipients[dependentIndex];
+  earnerFinalDate = finalDates[earnerIndex];
+  dependentFinalDate = finalDates[dependentIndex];
+  earnerStrat = strats[earnerIndex];
+  dependentStrat = strats[dependentIndex];
+  earnerStratDate = stratDates[earnerIndex];
+  dependentStratDate = stratDates[dependentIndex];
 
   // If the dependent has 0 PIA, then they can't file earlier than the earner.
   // Move the dependent's filing date up to the earner's:
@@ -127,7 +141,8 @@ export function strategySumPeriods(
     earner,
     earner.birthdate.dateAtSsaAge(earnerStrat),
     earnerFinalDate,
-    periods
+    periods,
+    earnerIndex
   );
   // The latest that the dependent will be collecting a personal benefit is the
   // month before starting a survivor benefit.
@@ -145,7 +160,8 @@ export function strategySumPeriods(
     dependent,
     dependent.birthdate.dateAtSsaAge(dependentStrat),
     dependentFinalPersonalDate,
-    periods
+    periods,
+    dependentIndex
   );
 
   // Dependent's Survivor Benefit:
@@ -154,6 +170,8 @@ export function strategySumPeriods(
     survivorPeriod.amount = survivorBenefit;
     survivorPeriod.startDate = survivorStartDate;
     survivorPeriod.endDate = dependentFinalDate;
+    survivorPeriod.recipientIndex = dependentIndex;
+    survivorPeriod.benefitType = BenefitType.Survivor;
     periods.push(survivorPeriod);
   }
 
@@ -180,6 +198,8 @@ export function strategySumPeriods(
         /*filingDate=*/ dependentStratDate,
         /*atDate=*/ spousalPeriod.startDate
       );
+      spousalPeriod.recipientIndex = dependentIndex;
+      spousalPeriod.benefitType = BenefitType.Spousal;
       periods.push(spousalPeriod);
     }
   }
@@ -601,7 +621,8 @@ function strategySumPeriodsOptimized(
     context.earner,
     earnerStratDate,
     context.earnerFinalDate,
-    periods
+    periods,
+    context.earnerIndex
   );
 
   // The latest that the dependent will be collecting a personal benefit is the
@@ -621,7 +642,8 @@ function strategySumPeriodsOptimized(
     context.dependent,
     dependentStratDate,
     dependentFinalPersonalDate,
-    periods
+    periods,
+    context.dependentIndex
   );
 
   // Dependent's Survivor Benefit:
@@ -630,6 +652,7 @@ function strategySumPeriodsOptimized(
     survivorPeriod.amount = survivorBenefit;
     survivorPeriod.startDate = survivorStartDate;
     survivorPeriod.endDate = context.dependentFinalDate;
+    survivorPeriod.recipientIndex = context.dependentIndex;
     periods.push(survivorPeriod);
   }
 
@@ -657,6 +680,8 @@ function strategySumPeriodsOptimized(
           /*filingDate=*/ dependentStratDate,
           /*atDate=*/ spousalPeriod.startDate
         );
+      spousalPeriod.recipientIndex = context.dependentIndex;
+      spousalPeriod.benefitType = BenefitType.Spousal;
       periods.push(spousalPeriod);
     }
   }

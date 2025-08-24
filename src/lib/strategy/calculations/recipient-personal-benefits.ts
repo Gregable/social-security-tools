@@ -1,6 +1,7 @@
 import { Recipient } from '$lib/recipient';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Money } from '$lib/money';
+import { BenefitType } from './strategy-calc.js';
 
 const MONTHS_IN_YEAR = 12;
 
@@ -25,6 +26,10 @@ export class BenefitPeriod {
   public startDate: MonthDate;
   public endDate: MonthDate;
   public amount: Money;
+  // Index of the recipient (0 or 1) who receives this benefit
+  public recipientIndex: number;
+  // Type of benefit (Personal, Spousal, or Survivor)
+  public benefitType: BenefitType;
 } // class BenefitPeriod
 
 /**
@@ -55,12 +60,15 @@ export function sumBenefitPeriods(periods: BenefitPeriod[]): number {
  * @param {MonthDate} filingDate - The date when the recipient files for
  *                                 benefits
  * @param {MonthDate} finalDate - The final date to calculate benefits through
+ * @param {BenefitPeriod[]} periods - Array to append benefit periods to
+ * @param {number} recipientIndex - Index of the recipient (0 or 1)
  */
 export function PersonalBenefitPeriods(
   recipient: Recipient,
   filingDate: MonthDate,
   finalDate: MonthDate,
-  periods: BenefitPeriod[]
+  periods: BenefitPeriod[],
+  recipientIndex: number
 ): void {
   // personal benefit is only one of 3 values at any given date:
   //  1) $0 prior to filing
@@ -88,33 +96,59 @@ export function PersonalBenefitPeriods(
     new MonthDuration(monthsRemainingInFilingYear)
   );
 
-  // Don't insert an empty period:
-  if (monthsRemainingInFilingYear > 0) {
-    let initialPeriod = new BenefitPeriod();
-    initialPeriod.startDate = filingDate;
-    // Subtract 1 so that we get inclusive periods:
-    initialPeriod.endDate = filingDate.addDuration(
-      new MonthDuration(monthsRemainingInFilingYear - 1)
-    );
-    initialPeriod.amount = recipient.benefitOnDateOptimized(
-      filingDate,
-      filingDate
-    );
-    periods.push(initialPeriod);
-  }
+  // The first amount is what the recipient would receive in the first year. It
+  // might be less than the eventual amount in the case of delayed filing.
+  const firstAmount = recipient.benefitOnDateOptimized(filingDate, filingDate);
+  const secondAmount = recipient.benefitOnDateOptimized(
+    filingDate,
+    janAfterFilingDate
+  );
 
-  if (numMonthsAfterInitialYear > 0) {
-    let finalPeriod = new BenefitPeriod();
-    finalPeriod.amount = recipient.benefitOnDateOptimized(
-      filingDate,
-      janAfterFilingDate
+  // In the case where the two amounts are the same and we would otherwise
+  // create two periods, we only insert one period:
+  if (
+    firstAmount.equals(secondAmount) &&
+    monthsRemainingInFilingYear > 0 &&
+    numMonthsAfterInitialYear > 0
+  ) {
+    let period = new BenefitPeriod();
+    period.startDate = filingDate;
+    period.endDate = filingDate.addDuration(
+      new MonthDuration(
+        monthsRemainingInFilingYear + numMonthsAfterInitialYear - 1
+      )
     );
-    finalPeriod.startDate = filingDate.addDuration(
-      new MonthDuration(monthsRemainingInFilingYear)
-    );
-    finalPeriod.endDate = finalPeriod.startDate.addDuration(
-      new MonthDuration(numMonthsAfterInitialYear - 1)
-    );
-    periods.push(finalPeriod);
+    period.amount = firstAmount;
+    period.recipientIndex = recipientIndex;
+    period.benefitType = BenefitType.Personal;
+    periods.push(period);
+  } else {
+    // Don't insert an empty period:
+    if (monthsRemainingInFilingYear > 0) {
+      let initialPeriod = new BenefitPeriod();
+      initialPeriod.startDate = filingDate;
+      // Subtract 1 so that we get inclusive periods:
+      initialPeriod.endDate = filingDate.addDuration(
+        new MonthDuration(monthsRemainingInFilingYear - 1)
+      );
+      initialPeriod.amount = firstAmount;
+      initialPeriod.recipientIndex = recipientIndex;
+      initialPeriod.benefitType = BenefitType.Personal;
+      periods.push(initialPeriod);
+    }
+
+    if (numMonthsAfterInitialYear > 0) {
+      let finalPeriod = new BenefitPeriod();
+      finalPeriod.amount = secondAmount;
+      finalPeriod.startDate = filingDate.addDuration(
+        new MonthDuration(monthsRemainingInFilingYear)
+      );
+      finalPeriod.endDate = finalPeriod.startDate.addDuration(
+        new MonthDuration(numMonthsAfterInitialYear - 1)
+      );
+      finalPeriod.recipientIndex = recipientIndex;
+      finalPeriod.benefitType = BenefitType.Personal;
+      periods.push(finalPeriod);
+    }
   }
 }
