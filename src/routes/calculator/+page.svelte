@@ -81,7 +81,7 @@
             <PiaReport recipient={context.recipient} />
           </SidebarSection>
           <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
-            <Sponsor />
+            <Sponsor recipient={context.recipient} />
           </SidebarSection>
           <SidebarSection label="Normal Retirement Age" underSticky>
             <NormalRetirementAgeReport recipient={context.recipient} />
@@ -94,7 +94,7 @@
             <PiaReport recipient={context.recipient} />
           </SidebarSection>
           <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
-            <Sponsor />
+            <Sponsor recipient={context.recipient} />
           </SidebarSection>
           <SidebarSection label="Normal Retirement Age">
             <NormalRetirementAgeReport recipient={context.recipient} />

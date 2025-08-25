@@ -1,17 +1,69 @@
 <script lang="ts">
   import ProjectionLabImage from '$lib/images/projection-lab.png';
+  import { onMount } from 'svelte';
+  import { Recipient } from '$lib/recipient';
 
-  const currentDate = new Date();
-  // 10% off in {currentMonth} is misleading, but it's not false.
-  const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+  export let recipient: Recipient = new Recipient();
+
+  let sponsorElement: HTMLElement;
+  let isVisible = false;
+
+  onMount(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            isVisible = true;
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.2, // Trigger when 20% of the element is visible
+        rootMargin: '50px', // Start animation slightly before element is fully in view
+      }
+    );
+
+    if (sponsorElement) {
+      observer.observe(sponsorElement);
+    }
+
+    return () => {
+      if (sponsorElement) {
+        observer.unobserve(sponsorElement);
+      }
+    };
+  });
 </script>
 
-<a href="https://projectionlab.com?ref=ssa-tools" class="spon-anchor">
-  <div class="pageBreakAvoid sponsor">
+<a
+  href="https://projectionlab.com?ref=ssa-tools"
+  class="spon-anchor"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <div class="transition-section">
+    <h2>Beyond Social Security: Complete Retirement Planning</h2>
+    <div class="text">
+      <p>
+        You've calculated your Social Security benefit of <b
+          >{$recipient.pia().primaryInsuranceAmount().string()}/month</b
+        >. Now see how this fits into your complete retirement picture.
+        Professional retirement planning goes beyond Social Security to model
+        your entire financial future with advanced tools and projections.
+      </p>
+    </div>
+  </div>
+
+  <div
+    class="pageBreakAvoid sponsor"
+    class:animate-in={isVisible}
+    bind:this={sponsorElement}
+  >
     <div class="spon-container">
       <div class="left-top-region">
-        <h2>ProjectionLab</h2>
-        <h4>Sponsor</h4>
+        <h2 class="project-title">ProjectionLab</h2>
+        <h4 class="sponsor-badge">Sponsor</h4>
       </div>
       <div class="left-bottom-region">
         <img
@@ -24,28 +76,37 @@
       </div>
       <div class="right-region">
         <div class="text">
+          <h3 class="mobile-title">
+            ProjectionLab <span class="mobile-sponsor-badge">Sponsor</span>
+          </h3>
           <p>
-            Are you planning for retirement? Discover ProjectionLab, an advanced
-            tool designed to help you simulate and understand your overall plan.
-          </p>
-          <p>
-            Try for free. Use code <strong>SSA-TOOLS</strong> for 10% off in
-            {currentMonth}.
+            Already optimizing your Social Security? Take your retirement
+            planning to the next level with <span class="inline-link"
+              >ProjectionLab</span
+            >, the comprehensive financial modeling platform trusted by serious
+            planners.
           </p>
           <ul>
             <li>
-              <strong>Simulate the market:</strong> Run Monte Carlo simulations using
-              historical market data.
+              <strong>Monte Carlo simulations:</strong> Run thousands of market scenarios
+              using 150+ years of historical data to stress-test your plan.
             </li>
             <li>
-              <strong>Visualize your life:</strong> Explore various investment strategies
-              and potential outcomes over time.
+              <strong>Advanced modeling:</strong> Model complex strategies including
+              Roth conversions, tax-loss harvesting, and dynamic withdrawal rates.
             </li>
             <li>
-              <strong>Secure your data:</strong> Keep your financial information
-              safe with flexible data persistence options.
+              <strong>Professional-grade analytics:</strong> Analyze success probabilities,
+              sequence of returns risk, and optimal asset allocation across market
+              cycles.
             </li>
           </ul>
+          <div class="cta-section">
+            <div class="cta-button">Try ProjectionLab Free →</div>
+            <div class="discount-reminder">
+              Use code <strong>SSA-TOOLS</strong> for 10% off
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -53,6 +114,24 @@
 </a>
 
 <style>
+  .transition-section {
+    margin: 0;
+    padding: 0;
+  }
+
+  .transition-section h2 {
+    /* Match PiaReport h2 styling */
+    margin: 0.83em 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: inherit;
+  }
+
+  .transition-section .text {
+    /* Match PiaReport .text styling exactly */
+    margin: 0 0.5em;
+  }
+
   .text {
     margin: 0 0.5em;
     font-size: 1.2em;
@@ -68,6 +147,15 @@
     text-decoration: none;
     color: inherit;
     margin: 30px 4px;
+    border-radius: 8px;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .spon-anchor:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .spon-container {
@@ -116,19 +204,236 @@
     .right-region {
       grid-row: auto;
     }
+
+    /* Show mobile title only on small screens */
+    .mobile-title {
+      display: block;
+      margin: 0 0 10px 0;
+    }
+
+    /* Hide link icon on mobile */
+    .sponsor::before {
+      display: none;
+    }
+
+    /* Optimize CTA for mobile */
+    .cta-section {
+      margin-top: 15px;
+    }
+
+    .cta-button {
+      padding: 10px 20px;
+      font-size: 1em;
+    }
   }
   li {
     margin-bottom: 14px;
   }
 
+  /* Scroll-triggered animation styles */
   .sponsor {
-    background-color: aliceblue;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
     padding-left: 20px;
     cursor: pointer;
+    border: 2px solid #337ab7;
+    border-radius: 8px;
+    position: relative;
+  }
+
+  .sponsor.animate-in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition:
+      all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      border-color 0.3s ease,
+      background 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  /* Staggered animation for child elements */
+  .sponsor .left-top-region,
+  .sponsor .left-bottom-region,
+  .sponsor .right-region {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.6s ease;
+    transition-delay: 0.2s;
+  }
+
+  .sponsor.animate-in .left-top-region,
+  .sponsor.animate-in .left-bottom-region,
+  .sponsor.animate-in .right-region {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .sponsor.animate-in .left-bottom-region {
+    transition-delay: 0.3s;
+  }
+
+  .sponsor.animate-in .right-region {
+    transition-delay: 0.4s;
+  }
+
+  /* CTA button entrance animation */
+  .sponsor .cta-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+    transition-delay: 0.6s;
+  }
+
+  .sponsor.animate-in .cta-section {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sponsor:hover {
+    border-color: #23527c;
+    background: linear-gradient(135deg, #e8f4ff 0%, #d4ebff 100%);
+    box-shadow: 0 6px 20px rgba(51, 122, 183, 0.15);
+  }
+
+  .sponsor::before {
+    content: '🔗';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.2em;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+
+  .sponsor:hover::before {
+    opacity: 1;
+    transform: scale(1.1) rotate(15deg);
+  }
+  .project-title {
+    color: #337ab7;
+    text-decoration: underline;
+    text-decoration-color: rgba(51, 122, 183, 0.5);
+    text-underline-offset: 3px;
+    margin: 0.5em 0;
+    transition: all 0.3s ease;
+  }
+
+  .sponsor:hover .project-title {
+    color: #23527c;
+    text-decoration-color: rgba(35, 82, 124, 0.8);
+    transform: translateX(2px);
+  }
+
+  .sponsor-badge {
+    background: #337ab7;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    display: inline-block;
+    margin: 0.5em 0;
+  }
+
+  .inline-link {
+    color: #337ab7;
+    text-decoration: underline;
+    text-decoration-color: rgba(51, 122, 183, 0.5);
+    text-underline-offset: 2px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .sponsor:hover .inline-link {
+    color: #23527c;
+    text-decoration-color: rgba(35, 82, 124, 0.8);
+    transform: translateX(1px);
+  }
+
+  .cta-section {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .cta-button {
+    background: linear-gradient(135deg, #337ab7 0%, #23527c 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 1.1em;
+    display: inline-block;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #23527c 0%, #1a3d5c 100%);
+  }
+
+  .cta-button:hover::before {
+    left: 100%;
+  }
+
+  .discount-reminder {
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+  }
+
+  .mobile-title {
+    display: none; /* Hidden by default, shown only on mobile */
+    color: #337ab7;
+    font-size: 1.4em;
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: rgba(51, 122, 183, 0.5);
+    text-underline-offset: 2px;
+  }
+
+  .mobile-sponsor-badge {
+    background: #337ab7;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.7em;
+    font-weight: normal;
+    margin-left: 8px;
   }
 
   img.image-fit {
     max-width: 100%;
     height: auto;
+    transition:
+      transform 0.3s ease,
+      filter 0.3s ease;
+    border-radius: 4px;
+  }
+
+  .sponsor:hover img.image-fit {
+    transform: scale(1.02);
+    filter: brightness(1.05) saturate(1.1);
   }
 </style>
