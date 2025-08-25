@@ -41,19 +41,21 @@
     .filter((p) => p.recipient === 0)
     .sort((a, b) => {
       // Sort by start date first
-      const startComparison = a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
+      const startComparison =
+        a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
       if (startComparison !== 0) {
         return startComparison;
       }
       // If start dates are equal, sort by end date
       return a.endDate.monthsSinceEpoch() - b.endDate.monthsSinceEpoch();
     });
-  
+
   $: recipient2Periods = formattedPeriods
     .filter((p) => p.recipient === 1)
     .sort((a, b) => {
       // Sort by start date first
-      const startComparison = a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
+      const startComparison =
+        a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
       if (startComparison !== 0) {
         return startComparison;
       }
@@ -94,8 +96,12 @@
             <div class="period-header">
               <span class="benefit-type">{period.type} Benefit</span>
               <div class="benefit-amounts">
-                <span class="benefit-amount monthly">{period.amount} / month</span>
-                <span class="benefit-amount annual">{period.annualAmount} / year</span>
+                <span class="benefit-amount monthly"
+                  >{period.amount} / month</span
+                >
+                <span class="benefit-amount annual"
+                  >{period.annualAmount} / year</span
+                >
               </div>
             </div>
             <div class="period-dates">
@@ -117,8 +123,12 @@
             <div class="period-header">
               <span class="benefit-type">{period.type} Benefit</span>
               <div class="benefit-amounts">
-                <span class="benefit-amount monthly">{period.amount} / month</span>
-                <span class="benefit-amount annual">{period.annualAmount} / year</span>
+                <span class="benefit-amount monthly"
+                  >{period.amount} / month</span
+                >
+                <span class="benefit-amount annual"
+                  >{period.annualAmount} / year</span
+                >
               </div>
             </div>
             <div class="period-dates">
