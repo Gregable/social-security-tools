@@ -28,14 +28,38 @@
 
   $: formattedPeriods = benefitPeriods.map((period) => ({
     type: getBenefitTypeString(period.benefitType),
+    startDate: period.startDate,
+    endDate: period.endDate,
     startFormatted: period.startDate.toString(),
     endFormatted: period.endDate.toString(),
     amount: period.amount.string(),
+    annualAmount: period.amount.times(12).string(),
     recipient: period.recipientIndex,
   }));
 
-  $: recipient1Periods = formattedPeriods.filter((p) => p.recipient === 0);
-  $: recipient2Periods = formattedPeriods.filter((p) => p.recipient === 1);
+  $: recipient1Periods = formattedPeriods
+    .filter((p) => p.recipient === 0)
+    .sort((a, b) => {
+      // Sort by start date first
+      const startComparison = a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
+      if (startComparison !== 0) {
+        return startComparison;
+      }
+      // If start dates are equal, sort by end date
+      return a.endDate.monthsSinceEpoch() - b.endDate.monthsSinceEpoch();
+    });
+  
+  $: recipient2Periods = formattedPeriods
+    .filter((p) => p.recipient === 1)
+    .sort((a, b) => {
+      // Sort by start date first
+      const startComparison = a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
+      if (startComparison !== 0) {
+        return startComparison;
+      }
+      // If start dates are equal, sort by end date
+      return a.endDate.monthsSinceEpoch() - b.endDate.monthsSinceEpoch();
+    });
 
   function getBenefitTypeString(benefitType: BenefitType): string {
     switch (benefitType) {
@@ -55,7 +79,7 @@
   <h3>Payment Timeline</h3>
   <p class="timeline-description">
     This timeline shows when each recipient will receive benefits and the
-    monthly payment amounts.
+    monthly and annual payment amounts.
   </p>
 
   <div class="recipients-timeline">
@@ -69,7 +93,10 @@
           <div class="timeline-period {period.type.toLowerCase()}">
             <div class="period-header">
               <span class="benefit-type">{period.type} Benefit</span>
-              <span class="benefit-amount">{period.amount}/month</span>
+              <div class="benefit-amounts">
+                <span class="benefit-amount monthly">{period.amount} / month</span>
+                <span class="benefit-amount annual">{period.annualAmount} / year</span>
+              </div>
             </div>
             <div class="period-dates">
               {period.startFormatted} - {period.endFormatted}
@@ -89,7 +116,10 @@
           <div class="timeline-period {period.type.toLowerCase()}">
             <div class="period-header">
               <span class="benefit-type">{period.type} Benefit</span>
-              <span class="benefit-amount">{period.amount}/month</span>
+              <div class="benefit-amounts">
+                <span class="benefit-amount monthly">{period.amount} / month</span>
+                <span class="benefit-amount annual">{period.annualAmount} / year</span>
+              </div>
             </div>
             <div class="period-dates">
               {period.startFormatted} - {period.endFormatted}
@@ -177,6 +207,19 @@
     margin-bottom: 0.5rem;
   }
 
+  .benefit-amounts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+
+  @media (max-width: 768px) {
+    .benefit-amounts {
+      align-items: flex-start;
+    }
+  }
+
   .benefit-type {
     font-weight: bold;
     font-size: 0.9rem;
@@ -196,8 +239,16 @@
 
   .benefit-amount {
     font-weight: bold;
-    font-size: 1.1rem;
     color: #155724;
+  }
+
+  .benefit-amount.monthly {
+    font-size: 1.1rem;
+  }
+
+  .benefit-amount.annual {
+    font-size: 0.9rem;
+    opacity: 0.8;
   }
 
   .period-dates {
