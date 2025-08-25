@@ -1,5 +1,11 @@
+html {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  width: 100%;
   /* Minimum width to match small mobile devices (iPhone 5/SE width) */
   min-width: 320px;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;

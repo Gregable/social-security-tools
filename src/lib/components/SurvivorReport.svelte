@@ -609,6 +609,14 @@
   label {
     white-space: nowrap;
   }
+
+  /* Allow label text to wrap on mobile to prevent overflow */
+  @media screen and (max-width: 600px) {
+    label {
+      white-space: normal;
+      word-break: break-word;
+    }
+  }
   .toggle {
     margin: 0 0 0 0;
     display: flex;
@@ -628,7 +636,6 @@
     box-shadow: 0 0 10px rgba(102, 179, 251, 0.5);
     border-color: #4b9dea;
     z-index: 1;
-    font-weight: 600;
   }
   .toggle input + label:first-of-type {
     border-radius: 6px 0 0 6px;
@@ -645,6 +652,7 @@
     border: solid 1px #ddd;
     background-color: #fff;
     font-size: 1em;
+    font-weight: 400;
     line-height: 140%;
     text-align: center;
     transition:
@@ -655,6 +663,32 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    min-width: 0; /* Allow flex items to shrink below content size */
+  }
+
+  /* Improve mobile layout for toggle buttons */
+  @media screen and (max-width: 600px) {
+    .toggle {
+      flex-direction: column;
+    }
+
+    .toggle input + label {
+      flex: 1 1 auto;
+      padding: 0.75em 0.5em;
+      border-radius: 0 !important;
+    }
+
+    .toggle input + label:first-of-type {
+      border-radius: 6px 6px 0 0 !important;
+      border-right: solid 1px #ddd;
+      border-bottom: none;
+    }
+
+    .toggle input + label:last-of-type {
+      border-radius: 0 0 6px 6px !important;
+      border-left: solid 1px #ddd;
+      border-top: none;
+    }
   }
   .slider-box {
     padding-left: 2em;
