@@ -2,6 +2,9 @@ import { execSync } from 'child_process';
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import process from 'process';
 
+// Extend timeout for slower ESLint runs (CI environments especially)
+const ESLINT_TIMEOUT = 60000; // 60s
+
 describe('ESLint Regression Prevention', () => {
   let logSpy: ReturnType<typeof vi.spyOn> | undefined;
   let errorSpy: ReturnType<typeof vi.spyOn> | undefined;
@@ -92,7 +95,7 @@ describe('ESLint Regression Prevention', () => {
         throw error;
       }
     }
-  });
+  }, ESLINT_TIMEOUT);
 
   it('should not have any no-unused-vars violations (now treated as errors)', () => {
     try {
@@ -132,7 +135,7 @@ describe('ESLint Regression Prevention', () => {
         throw error;
       }
     }
-  });
+  }, ESLINT_TIMEOUT);
 
   it('should have zero unused eslint-disable directives', () => {
     // This test ensures that our eslint-disable comments are necessary
@@ -176,7 +179,7 @@ describe('ESLint Regression Prevention', () => {
         throw error;
       }
     }
-  });
+  }, ESLINT_TIMEOUT);
 
   it('should have clean code in critical component files', () => {
     // Test specific core components that should be warning-free
@@ -214,5 +217,5 @@ describe('ESLint Regression Prevention', () => {
         }
       }
     }
-  });
+  }, ESLINT_TIMEOUT);
 });
