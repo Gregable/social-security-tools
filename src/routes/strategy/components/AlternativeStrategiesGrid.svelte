@@ -402,10 +402,10 @@
   <p>
     This grid shows the net present value for all possible filing {displayAsAges
       ? 'age'
-      : 'date'} combinations for the selected death ages (<RecipientName
+      : 'date'} combinations for the modeled death ages (<RecipientName
       r={recipients[0]}
-    />: {deathAge1}, <RecipientName r={recipients[1]} />: {deathAge2}). Values
-    are color-coded relative to the optimal strategy.
+    />: {deathAge1.toAgeString()}, <RecipientName r={recipients[1]} />: {deathAge2.toAgeString()}).
+    Values are color-coded relative to the optimal strategy.
   </p>
 
   {#if isCalculating}
