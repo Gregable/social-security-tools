@@ -330,22 +330,13 @@ export class MonthDuration {
   }
 
   /**
-   * Formats this duration for display with full precision (years + months).
-   *
-   * Used in tooltips and detailed displays where the exact monthly
-   * duration is important.
-   *
-   * @returns The duration formatted as "years+months" (e.g., "65+6")
-   *   or just "years" if months is 0
+   * Formats this duration for age display as "65y 6m" or just "65" if whole years.
    */
-  toDisplayString(): string {
-    const years = this.years();
-    const months = this.modMonths();
-    if (months === 0) {
-      return `${years}`;
-    } else {
-      return `${years}+${months}`;
-    }
+  toAgeString(): string {
+    const y = this.years();
+    const m = this.modMonths();
+    if (m === 0) return `${y}`;
+    return `${y}y ${m}m`;
   }
 }
 

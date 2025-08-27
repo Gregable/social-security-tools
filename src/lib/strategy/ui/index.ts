@@ -2,7 +2,6 @@
 export {
   formatBirthdate,
   parseBirthdate,
-  calculateFinalDates,
   calculateAgeRange,
   getFilingDate,
   getFilingAge,

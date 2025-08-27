@@ -145,14 +145,23 @@
   // Build accessible, consistently formatted title / tooltip text for a bucket header.
   function bucketHeaderTitle(
     bucket: DeathAgeBucket,
-    distribution: { age: number; probability: number }[]
+    distribution: { age: number; probability: number }[],
+    recipient: Recipient
   ): string {
     const p = bucketProbability(bucket, distribution);
     const rangeText =
       bucket.endAgeInclusive !== null
         ? `${bucket.startAge} - ${bucket.endAgeInclusive}`
         : `${bucket.startAge}+`;
-    return `Mortality probability for age ${rangeText} inclusive: ${(p * 100).toFixed(2)}%, Optimal filing date for death age ${bucket.label}`;
+    // Expected modeled fractional age
+    const expected = bucket.expectedAge; // MonthDuration
+    const expYearsInt = expected.years();
+    const expRemMonths = expected.modMonths();
+    const expectedAgeStr = `${expYearsInt}y${expRemMonths ? ' ' + expRemMonths + 'm' : ''}`;
+    // Compute calendar MonthDate for modeled death (lay age)
+    const birth = recipient.birthdate;
+    const deathDate = birth.dateAtLayAge(expected);
+    return `Ages ${rangeText} prob mass ${(p * 100).toFixed(2)}% | Modeled at ${expectedAgeStr} (${deathDate.monthName()} ${deathDate.year()}) | Optimal filing shown for death age ${bucket.label}`;
   }
   interface StrategyResultCell {
     deathAge1: string | number;
@@ -164,8 +173,8 @@
     filingAge1Months: number;
     filingAge2Years: number;
     filingAge2Months: number;
-    bucket1?: DeathAgeBucket;
-    bucket2?: DeathAgeBucket;
+    bucket1: DeathAgeBucket;
+    bucket2: DeathAgeBucket;
     error?: any;
     [key: string]: any; // tolerate additional fields from upstream
   }
@@ -312,7 +321,11 @@
           <div
             class="age-header"
             class:highlighted-column={hoveredCell && hoveredCell.colIndex === j}
-            title={bucketHeaderTitle(colBucket, deathProbDistribution2)}
+            title={bucketHeaderTitle(
+              colBucket,
+              deathProbDistribution2,
+              recipients[1]
+            )}
           >
             {colBucket?.label || ''}
           </div>
@@ -337,7 +350,11 @@
             <div
               class="age-header"
               class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i}
-              title={bucketHeaderTitle(rowBucket, deathProbDistribution1)}
+              title={bucketHeaderTitle(
+                rowBucket,
+                deathProbDistribution1,
+                recipients[0]
+              )}
             >
               {rowBucket?.label || ''}
             </div>

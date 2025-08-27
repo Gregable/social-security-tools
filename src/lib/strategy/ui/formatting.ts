@@ -1,5 +1,5 @@
 import { Birthdate } from '$lib/birthday';
-import { MonthDate, MonthDuration } from '$lib/month-time';
+import { MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 
 /**
@@ -22,33 +22,6 @@ export function formatBirthdate(dateString: string): string {
 export function parseBirthdate(dateString: string): Birthdate {
   const [year, month, day] = dateString.split('-').map(Number);
   return Birthdate.FromYMD(year, month - 1, day); // Month is 0-indexed
-}
-
-/**
- * Calculate final dates from death ages
- */
-export function calculateFinalDates(
-  recipients: [Recipient, Recipient],
-  deathAge1: number,
-  deathAge2: number
-): [MonthDate, MonthDate] {
-  const finalDates: [MonthDate, MonthDate] = [
-    recipients[0].birthdate.dateAtLayAge(
-      MonthDuration.initFromYearsMonths({ years: deathAge1, months: 0 })
-    ),
-    recipients[1].birthdate.dateAtLayAge(
-      MonthDuration.initFromYearsMonths({ years: deathAge2, months: 0 })
-    ),
-  ];
-
-  // Adjust the final dates to be the last month of the year
-  for (let i = 0; i < 2; ++i) {
-    finalDates[i] = finalDates[i].addDuration(
-      new MonthDuration(11 - finalDates[i].monthIndex())
-    );
-  }
-
-  return finalDates;
 }
 
 /**

@@ -4,7 +4,6 @@
   import { MonthDate } from '$lib/month-time';
   import {
     parseBirthdate as parseBirthdateUtil,
-    calculateFinalDates as calculateFinalDatesUtil,
     generateThreeYearBuckets,
     type DeathAgeBucket,
   } from '$lib/strategy/ui';
@@ -186,15 +185,13 @@
           const bucket1 = deathAgeBuckets1[i];
           const bucket2 = deathAgeBuckets2[j];
           // Representative (middle) ages for optimization
-          const deathAge1 = bucket1.midAge;
-          const deathAge2 = bucket2.midAge;
+          const deathAge1 = bucket1.expectedAge;
+          const deathAge2 = bucket2.expectedAge;
 
-          // Calculate final dates for this combination
-          const finalDates = calculateFinalDatesUtil(
-            recipients,
-            deathAge1,
-            deathAge2
-          );
+          const finalDates: [MonthDate, MonthDate] = [
+            recipients[0].birthdate.dateAtLayAge(deathAge1),
+            recipients[1].birthdate.dateAtLayAge(deathAge2),
+          ];
 
           // Calculate optimal strategy
           const [optimalFilingAge1, optimalFilingAge2, netPresentValue] =

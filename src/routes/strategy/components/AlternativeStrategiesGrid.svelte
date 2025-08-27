@@ -4,14 +4,13 @@
   import { MonthDate, MonthDuration } from '$lib/month-time';
   import { MonthDurationRange } from '$lib/month-duration-range';
   import { Money } from '$lib/money';
-  import { calculateFinalDates as calculateFinalDatesUtil } from '$lib/strategy/ui';
   import { strategySumCents } from '$lib/strategy/calculations/strategy-calc';
   import RecipientName from '$lib/components/RecipientName.svelte';
 
   // Props
   export let recipients: [Recipient, Recipient];
-  export let deathAge1: number;
-  export let deathAge2: number;
+  export let deathAge1: MonthDuration;
+  export let deathAge2: MonthDuration;
   export let discountRate: number;
   export let optimalNPV: Money;
   export let displayAsAges: boolean = false;
@@ -55,7 +54,7 @@
    */
   function createFilingAgeRange(
     recipient: Recipient,
-    deathAge: number
+    deathAge: MonthDuration
   ): MonthDurationRange {
     const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
 
@@ -72,11 +71,7 @@
       years: 70,
       months: 0,
     });
-    const deathAgeMonths = MonthDuration.initFromYearsMonths({
-      years: deathAge,
-      months: 0,
-    });
-    const end = maxAge70.lessThan(deathAgeMonths) ? maxAge70 : deathAgeMonths;
+    const end = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
 
     return new MonthDurationRange(startingAge, end);
   }
@@ -178,10 +173,8 @@
     return dateHeaders;
   }
 
-  // Calculate alternative strategies when inputs change
-  $: if (recipients && deathAge1 && deathAge2 && discountRate && optimalNPV) {
-    calculateAlternativeStrategies();
-  }
+  // Calculate alternative strategies when inputs change (inputs always defined)
+  $: calculateAlternativeStrategies();
 
   /**
    * Calculates NPV for all possible filing strategy combinations.
@@ -212,11 +205,10 @@
       filingAgeRange2 = createFilingAgeRange(recipients[1], deathAge2);
 
       // Calculate final dates for the death ages
-      const finalDates: [MonthDate, MonthDate] = calculateFinalDatesUtil(
-        recipients,
-        deathAge1,
-        deathAge2
-      );
+      const finalDates: [MonthDate, MonthDate] = [
+        recipients[0].birthdate.dateAtLayAge(deathAge1),
+        recipients[1].birthdate.dateAtLayAge(deathAge2),
+      ];
 
       // Initialize results matrix
       alternativeResults = Array(filingAgeRange1.getLength())

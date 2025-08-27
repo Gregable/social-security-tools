@@ -15,6 +15,13 @@
   // Compute filing dates from filing ages
   $: filingDate1 = recipients[0].birthdate.dateAtLayAge(result.filingAge1);
   $: filingDate2 = recipients[1].birthdate.dateAtLayAge(result.filingAge2);
+
+  // Expected death ages (probability-weighted modeled midpoint) are always defined.
+  $: expectedAge1 = result.bucket1.expectedAge;
+  $: expectedAge2 = result.bucket2.expectedAge;
+  $: deathDate1 = recipients[0].birthdate.dateAtLayAge(expectedAge1);
+  $: deathDate2 = recipients[1].birthdate.dateAtLayAge(expectedAge2);
+  // Formatting now provided by MonthDuration.toAgeString()
 </script>
 
 <div class="strategy-details-container">
@@ -22,6 +29,10 @@
   <div class="detail-item">
     <strong><RecipientName r={recipients[0]} apos /> Death Age:</strong>
     {result.deathAge1}
+    <span class="assumption-text"
+      >(modeled at {expectedAge1.toAgeString()} – {deathDate1.monthName()}
+      {deathDate1.year()})</span
+    >
     {#if result.deathProb1 !== undefined}
       <span class="probability-badge">
         Probability: {formatProbability(result.deathProb1 ?? null)}
@@ -31,6 +42,10 @@
   <div class="detail-item">
     <strong><RecipientName r={recipients[1]} apos /> Death Age:</strong>
     {result.deathAge2}
+    <span class="assumption-text"
+      >(modeled at {expectedAge2.toAgeString()} – {deathDate2.monthName()}
+      {deathDate2.year()})</span
+    >
     {#if result.deathProb2 !== undefined}
       <span class="probability-badge">
         Probability: {formatProbability(result.deathProb2 ?? null)}
@@ -115,5 +130,10 @@
     background-color: #007bff;
     color: white;
     border-radius: 4px;
+  }
+  .assumption-text {
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 2px;
   }
 </style>

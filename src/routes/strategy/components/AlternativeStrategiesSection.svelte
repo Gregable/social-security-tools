@@ -34,8 +34,8 @@
     </div>
     <AlternativeStrategiesGrid
       {recipients}
-      deathAge1={result.bucket1.midAge}
-      deathAge2={result.bucket2.midAge}
+      deathAge1={result.bucket1.expectedAge}
+      deathAge2={result.bucket2.expectedAge}
       {discountRate}
       optimalNPV={result.totalBenefit}
       {displayAsAges}
