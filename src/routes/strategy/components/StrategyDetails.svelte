@@ -28,9 +28,9 @@
   <h3>Selected Strategy Details</h3>
   <div class="detail-item">
     <strong><RecipientName r={recipients[0]} apos /> Death Age:</strong>
-    {result.deathAge1}
+    {expectedAge1.toAgeString()}
     <span class="assumption-text"
-      >(modeled at {expectedAge1.toAgeString()} – {deathDate1.monthName()}
+      >({deathDate1.monthName()}
       {deathDate1.year()})</span
     >
     {#if result.deathProb1 !== undefined}
@@ -41,9 +41,9 @@
   </div>
   <div class="detail-item">
     <strong><RecipientName r={recipients[1]} apos /> Death Age:</strong>
-    {result.deathAge2}
+    {expectedAge2.toAgeString()}
     <span class="assumption-text"
-      >(modeled at {expectedAge2.toAgeString()} – {deathDate2.monthName()}
+      >({deathDate2.monthName()}
       {deathDate2.year()})</span
     >
     {#if result.deathProb2 !== undefined}
