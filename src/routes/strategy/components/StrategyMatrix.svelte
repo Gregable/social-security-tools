@@ -153,27 +153,6 @@
       .reduce((s, d) => s + d.probability, 0);
   }
 
-  // Build accessible, consistently formatted title / tooltip text for a bucket header.
-  function bucketHeaderTitle(
-    bucket: DeathAgeBucket,
-    distribution: { age: number; probability: number }[],
-    recipient: Recipient
-  ): string {
-    const p = bucketProbability(bucket, distribution);
-    const rangeText =
-      bucket.endAgeInclusive !== null
-        ? `${bucket.startAge} - ${bucket.endAgeInclusive}`
-        : `${bucket.startAge}+`;
-    // Expected modeled fractional age
-    const expected = bucket.expectedAge; // MonthDuration
-    const expYearsInt = expected.years();
-    const expRemMonths = expected.modMonths();
-    const expectedAgeStr = `${expYearsInt}y${expRemMonths ? ' ' + expRemMonths + 'm' : ''}`;
-    // Compute calendar MonthDate for modeled death (lay age)
-    const birth = recipient.birthdate;
-    const deathDate = birth.dateAtLayAge(expected);
-    return `Ages ${rangeText} prob mass ${(p * 100).toFixed(2)}% | Modeled at ${expectedAgeStr} (${deathDate.monthName()} ${deathDate.year()}) | Optimal filing shown for death age ${bucket.label}`;
-  }
   interface StrategyResultCell {
     deathAge1: string | number;
     deathAge2: string | number;
@@ -270,7 +249,6 @@
     recipient: Recipient,
     distribution: { age: number; probability: number }[]
   ) {
-    const rect = (event.target as HTMLElement).getBoundingClientRect();
     headerHoverInfo = {
       type,
       index,

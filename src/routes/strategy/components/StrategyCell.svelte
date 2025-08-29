@@ -48,28 +48,28 @@
   // Handle events
   function handleMouseOver(event: MouseEvent) {
     dispatch('hover', { rowIndex, colIndex });
-    
+
     if (calculationResult) {
       // Calculate filing dates for both recipients
       const filingAge1Years = calculationResult.filingAge1Years;
       const filingAge1Months = calculationResult.filingAge1Months;
       const filingAge2Years = calculationResult.filingAge2Years;
       const filingAge2Months = calculationResult.filingAge2Months;
-      
+
       const filingDate1 = recipients[0].birthdate.dateAtLayAge(
         calculationResult.filingAge1
       );
       const filingDate2 = recipients[1].birthdate.dateAtLayAge(
         calculationResult.filingAge2
       );
-      
+
       cellHoverInfo = {
         x: event.clientX,
         y: event.clientY,
         filingDate1: filingDate1.toString(),
         filingDate2: filingDate2.toString(),
         filingAge1: `${filingAge1Years}y ${filingAge1Months}m`,
-        filingAge2: `${filingAge2Years}y ${filingAge2Months}m`
+        filingAge2: `${filingAge2Years}y ${filingAge2Months}m`,
       };
     }
   }
@@ -177,9 +177,7 @@
     style:left="{cellHoverInfo.x + 10}px"
     style:top="{cellHoverInfo.y - 10}px"
   >
-    <div class="overlay-header">
-      Filing Strategy
-    </div>
+    <div class="overlay-header">Filing Strategy</div>
     <div class="overlay-content">
       <div class="overlay-section">
         <strong><RecipientName r={recipients[0]} />:</strong>
@@ -189,9 +187,7 @@
         <strong><RecipientName r={recipients[1]} />:</strong>
         {cellHoverInfo.filingAge2} ({cellHoverInfo.filingDate2})
       </div>
-      <div class="overlay-footer">
-        Click for full details
-      </div>
+      <div class="overlay-footer">Click for full details</div>
     </div>
   </div>
 {/if}
