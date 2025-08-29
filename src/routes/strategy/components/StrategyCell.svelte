@@ -2,6 +2,7 @@
   import type { Recipient } from '$lib/recipient';
   import { getFilingDate, getFilingAge } from '$lib/strategy/ui';
   import { createEventDispatcher } from 'svelte';
+  import RecipientName from '$lib/components/RecipientName.svelte';
 
   // Props
   export let rowIndex: number;
@@ -17,6 +18,16 @@
   export let cellStyle: string = '';
 
   const dispatch = createEventDispatcher();
+
+  // Cell hover overlay state
+  let cellHoverInfo: {
+    x: number;
+    y: number;
+    filingDate1: string;
+    filingDate2: string;
+    filingAge1: string;
+    filingAge2: string;
+  } | null = null;
 
   // Calculate conditional CSS classes
   $: isHighlightedCell =
@@ -35,11 +46,44 @@
     hoveredCell.colIndex !== colIndex;
 
   // Handle events
-  function handleMouseOver() {
+  function handleMouseOver(event: MouseEvent) {
+    dispatch('hover', { rowIndex, colIndex });
+    
+    if (calculationResult) {
+      // Calculate filing dates for both recipients
+      const filingAge1Years = calculationResult.filingAge1Years;
+      const filingAge1Months = calculationResult.filingAge1Months;
+      const filingAge2Years = calculationResult.filingAge2Years;
+      const filingAge2Months = calculationResult.filingAge2Months;
+      
+      const filingDate1 = recipients[0].birthdate.dateAtLayAge(
+        calculationResult.filingAge1
+      );
+      const filingDate2 = recipients[1].birthdate.dateAtLayAge(
+        calculationResult.filingAge2
+      );
+      
+      cellHoverInfo = {
+        x: event.clientX,
+        y: event.clientY,
+        filingDate1: filingDate1.toString(),
+        filingDate2: filingDate2.toString(),
+        filingAge1: `${filingAge1Years}y ${filingAge1Months}m`,
+        filingAge2: `${filingAge2Years}y ${filingAge2Months}m`
+      };
+    }
+  }
+
+  function handleFocus() {
     dispatch('hover', { rowIndex, colIndex });
   }
 
   function handleMouseOut() {
+    dispatch('hoverout');
+    cellHoverInfo = null;
+  }
+
+  function handleBlur() {
     dispatch('hoverout');
   }
 
@@ -113,19 +157,44 @@
   class:selected-cell={isSelected}
   on:mouseover={handleMouseOver}
   on:mouseout={handleMouseOut}
-  on:focus={handleMouseOver}
-  on:blur={handleMouseOut}
+  on:focus={handleFocus}
+  on:blur={handleBlur}
   on:click={handleClick}
   on:keydown={handleKeydown}
   tabindex="0"
   role="gridcell"
-  title="Net present value: {calculationResult?.totalBenefit.string() || 'N/A'}"
   style={cellStyle}
 >
   <div class="filing-dates">
     {cellContent}
   </div>
 </div>
+
+<!-- Cell hover overlay -->
+{#if cellHoverInfo}
+  <div
+    class="cell-hover-overlay"
+    style:left="{cellHoverInfo.x + 10}px"
+    style:top="{cellHoverInfo.y - 10}px"
+  >
+    <div class="overlay-header">
+      Filing Strategy
+    </div>
+    <div class="overlay-content">
+      <div class="overlay-section">
+        <strong><RecipientName r={recipients[0]} />:</strong>
+        {cellHoverInfo.filingAge1} ({cellHoverInfo.filingDate1})
+      </div>
+      <div class="overlay-section">
+        <strong><RecipientName r={recipients[1]} />:</strong>
+        {cellHoverInfo.filingAge2} ({cellHoverInfo.filingDate2})
+      </div>
+      <div class="overlay-footer">
+        Click for full details
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   .strategy-cell {
@@ -183,5 +252,54 @@
     .strategy-cell {
       padding: 0.15rem;
     }
+  }
+
+  /* Cell hover overlay styles */
+  .cell-hover-overlay {
+    position: fixed;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    max-width: 280px;
+    font-size: 0.9rem;
+    pointer-events: none;
+    transform: translateY(-100%);
+  }
+
+  .overlay-header {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 7px 7px 0 0;
+    font-weight: bold;
+    color: #0056b3;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .overlay-content {
+    padding: 0.75rem;
+  }
+
+  .overlay-section {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .overlay-section:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .overlay-footer {
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+    font-style: italic;
+    color: #6c757d;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 0.5rem;
   }
 </style>

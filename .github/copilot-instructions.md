@@ -135,6 +135,12 @@ Testing strategy:
 - Calculations follow official SSA formulas and rules precisely
 - Time-based calculations prefer month precision over day precision
 - External data dependencies are centralized and documented
+- **Always use the `RecipientName` component when displaying recipient names**:
+  - Import from `$lib/components/RecipientName.svelte`
+  - Use `<RecipientName r={recipient} />` for basic display
+  - Use `<RecipientName r={recipient} apos />` when possessive form is needed
+  - This ensures consistent formatting and handles edge cases centrally
+  - Never use `recipient.name` directly in templates
 
 ## Assistant Guidelines:
 
