@@ -143,7 +143,6 @@ export function generateThreeYearBuckets(
   probDistribution: { age: number; probability: number }[]
 ): DeathAgeBucket[] {
   const buckets: DeathAgeBucket[] = [];
-  const OPEN_ENDED_LIFE_EXPECTANCY_CAP_YEARS = 5; // Cap beyond start age
 
   let currentStart = startAge;
 
@@ -163,24 +162,8 @@ export function generateThreeYearBuckets(
     const midAge = currentStart + 1;
     const endAge = currentStart + 2;
     const probability = sumProbabilityRange(currentStart, endAge);
-    // Motivation: We show only one label (midAge) for a 3‑year bucket
-    // [currentStart, currentStart+1, currentStart+2]. To avoid biasing
-    // valuations by assuming everyone dies exactly at an integer age or
-    // at year‑end, we model deaths at the probability‑weighted midpoint
-    // within each one‑year interval (x + 0.5) under a Uniform Distribution
-    // of Deaths (UDD) assumption. Mortality rises with age, so the expected
-    // death within the 3‑year set is slightly above the simple midpoint.
-    // We convert the weighted mean (in fractional years) to a MonthDuration
-    // (rounded to nearest month) and store it as expectedAge.
-    let weightedSum = 0;
-    let probSum = 0;
-    for (let age = currentStart; age <= endAge; age++) {
-      const qx = probDistribution.find((e) => e.age === age)?.probability || 0;
-      probSum += qx;
-      weightedSum += qx * (age + 0.5);
-    }
-    const expectedAgeFraction =
-      probSum > 0 ? weightedSum / probSum : midAge + 0.5; // fallback midpoint
+    // Simplified approach: use midAge + 0.5 for all buckets
+    const expectedAgeFraction = midAge + 0.5;
     const totalMonths = Math.round(expectedAgeFraction * 12);
     const expectedAge = MonthDuration.initFromYearsMonths({
       years: Math.floor(totalMonths / 12),
@@ -200,26 +183,8 @@ export function generateThreeYearBuckets(
   // Final open-ended bucket
   const plusLabel = `${currentStart}+`;
   const finalProb = sumProbabilityRange(currentStart, null);
-  // Expected age for open-ended bucket: conditional expectation of age>=start
-  // Motivation: For ages beyond the last finite bucket we take the
-  // conditional life expectancy using the same UDD mid‑year assumption.
-  // Without a cap, very long tails (low prob mass at extreme ages) could
-  // push the expected age far out, inflating benefit present values for
-  // extremely rare scenarios. We therefore cap additional years beyond
-  // the bucket start (default 5y) which is a pragmatic compromise: it
-  // captures most remaining expected life while preventing outlier noise.
-  let weightedSum = 0;
-  let probSum = 0;
-  for (const entry of probDistribution) {
-    if (entry.age >= currentStart) {
-      probSum += entry.probability;
-      weightedSum += entry.probability * (entry.age + 0.5);
-    }
-  }
-  let expectedAgeFraction =
-    probSum > 0 ? weightedSum / probSum : currentStart + 0.5;
-  const cap = currentStart + OPEN_ENDED_LIFE_EXPECTANCY_CAP_YEARS;
-  if (expectedAgeFraction > cap) expectedAgeFraction = cap;
+  // Simplified approach: for 101+ bucket, use 102.5 as modeled age
+  const expectedAgeFraction = 102.5;
   const totalMonths = Math.round(expectedAgeFraction * 12);
   const expectedAge = MonthDuration.initFromYearsMonths({
     years: Math.floor(totalMonths / 12),

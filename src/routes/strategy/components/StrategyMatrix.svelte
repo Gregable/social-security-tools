@@ -27,6 +27,17 @@
   // Matrix width tracking
   let matrixWidth: number = 0;
 
+  // Header hover overlay state
+  let headerHoverInfo: {
+    type: 'row' | 'column';
+    index: number;
+    bucket: DeathAgeBucket;
+    recipient: Recipient;
+    distribution: { age: number; probability: number }[];
+    x: number;
+    y: number;
+  } | null = null;
+
   // Fixed height constant (matches CSS)
   const MATRIX_HEIGHT = 900;
 
@@ -250,6 +261,31 @@
     onhovercell?.(null);
   }
 
+  // Handle header hover events
+  function handleHeaderHover(
+    event: MouseEvent,
+    type: 'row' | 'column',
+    index: number,
+    bucket: DeathAgeBucket,
+    recipient: Recipient,
+    distribution: { age: number; probability: number }[]
+  ) {
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    headerHoverInfo = {
+      type,
+      index,
+      bucket,
+      recipient,
+      distribution,
+      x: event.clientX,
+      y: event.clientY,
+    };
+  }
+
+  function handleHeaderHoverOut() {
+    headerHoverInfo = null;
+  }
+
   function handleCellSelect(event) {
     const { rowIndex, colIndex } = event.detail;
     const result = calculationResults.get(
@@ -321,11 +357,18 @@
           <div
             class="age-header"
             class:highlighted-column={hoveredCell && hoveredCell.colIndex === j}
-            title={bucketHeaderTitle(
-              colBucket,
-              deathProbDistribution2,
-              recipients[1]
-            )}
+            on:mouseenter={(e) =>
+              handleHeaderHover(
+                e,
+                'column',
+                j,
+                colBucket,
+                recipients[1],
+                deathProbDistribution2
+              )}
+            on:mouseleave={handleHeaderHoverOut}
+            role="columnheader"
+            tabindex="0"
           >
             {colBucket?.label || ''}
           </div>
@@ -350,11 +393,18 @@
             <div
               class="age-header"
               class:highlighted-row={hoveredCell && hoveredCell.rowIndex === i}
-              title={bucketHeaderTitle(
-                rowBucket,
-                deathProbDistribution1,
-                recipients[0]
-              )}
+              on:mouseenter={(e) =>
+                handleHeaderHover(
+                  e,
+                  'row',
+                  i,
+                  rowBucket,
+                  recipients[0],
+                  deathProbDistribution1
+                )}
+              on:mouseleave={handleHeaderHoverOut}
+              role="rowheader"
+              tabindex="0"
             >
               {rowBucket?.label || ''}
             </div>
@@ -394,6 +444,50 @@
       </div>
     </div>
   </div>
+
+  <!-- Header hover overlay -->
+  {#if headerHoverInfo}
+    <div
+      class="header-hover-overlay"
+      style:left="{headerHoverInfo.x + 10}px"
+      style:top="{headerHoverInfo.y - 10}px"
+    >
+      <div class="overlay-header">
+        <RecipientName r={headerHoverInfo.recipient} apos /> Death Age: {headerHoverInfo
+          .bucket?.label || ''}
+      </div>
+      <div class="overlay-content">
+        <div class="overlay-section">
+          <strong>Age Range:</strong>
+          {#if headerHoverInfo.bucket?.endAgeInclusive !== null}
+            {headerHoverInfo.bucket?.startAge}y
+            <span class="age-range-dash">—</span>
+            {headerHoverInfo.bucket?.endAgeInclusive}y + 11m
+          {:else}
+            {headerHoverInfo.bucket?.startAge}+
+          {/if}
+        </div>
+        <div class="overlay-section">
+          <strong>Probability:</strong>
+          {(
+            bucketProbability(
+              headerHoverInfo.bucket,
+              headerHoverInfo.distribution
+            ) * 100
+          ).toFixed(2)}%
+        </div>
+        <div class="overlay-section">
+          <strong>Modeled Age:</strong>
+          {(() => {
+            const expected = headerHoverInfo.bucket?.expectedAge;
+            const expYearsInt = expected?.years() || 0;
+            const expRemMonths = expected?.modMonths() || 0;
+            return `${expYearsInt}y${expRemMonths ? ' ' + expRemMonths + 'm' : ''}`;
+          })()}
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -531,5 +625,48 @@
     background-color: #e9ecef;
     min-width: 2rem;
     min-height: 2rem;
+  }
+
+  /* Header hover overlay styles */
+  .header-hover-overlay {
+    position: fixed;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    max-width: 320px;
+    font-size: 0.9rem;
+    pointer-events: none;
+    transform: translateY(-100%);
+  }
+
+  .overlay-header {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 7px 7px 0 0;
+    font-weight: bold;
+    color: #0056b3;
+    font-size: 0.95rem;
+  }
+
+  .overlay-content {
+    padding: 0.75rem;
+  }
+
+  .overlay-section {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .overlay-section:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .age-range-dash {
+    color: #bbb;
+    font-weight: normal;
   }
 </style>
