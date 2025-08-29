@@ -118,11 +118,19 @@
   }
 
   // Handle health multiplier changes
-  function handleHealthChange(index: number, value: number) {
-    const clamped = Math.max(0.7, Math.min(2.5, value));
+  function handleHealthChange(index: number, sliderValue: number) {
+    // Convert slider value to health multiplier (reverse the scale)
+    // Slider: 0.7 (left) to 2.5 (right) -> Health: 2.5 (worse) to 0.7 (better)
+    const healthMultiplier = 3.2 - sliderValue;
+    const clamped = Math.max(0.7, Math.min(2.5, healthMultiplier));
     recipients[index].healthMultiplier = clamped;
     recipients = [...recipients];
     onUpdate?.();
+  }
+
+  // Convert health multiplier to slider value for display
+  function healthMultiplierToSliderValue(healthMultiplier: number): number {
+    return 3.2 - healthMultiplier;
   }
 
   function getHealthCategory(multiplier: number): string {
@@ -216,16 +224,20 @@
           <RecipientName r={recipient} apos /> Health adjustment to yearly mortality
           q(x):
         </label>
-        <input
-          id="health{i}"
-          type="range"
-          min="0.7"
-          max="2.5"
-          step="0.1"
-          value={recipient.healthMultiplier}
-          on:input={(event) =>
-            handleHealthChange(i, parseFloat(event.currentTarget.value))}
-        />
+        <div class="health-slider-container">
+          <span class="health-label-left">Worse Health</span>
+          <input
+            id="health{i}"
+            type="range"
+            min="0.7"
+            max="2.5"
+            step="0.1"
+            value={healthMultiplierToSliderValue(recipient.healthMultiplier)}
+            on:input={(event) =>
+              handleHealthChange(i, parseFloat(event.currentTarget.value))}
+          />
+          <span class="health-label-right">Better Health</span>
+        </div>
         <div class="health-display">
           <span class="health-value"
             >{recipient.healthMultiplier.toFixed(1)}x</span
@@ -286,6 +298,20 @@
     border: none;
     appearance: auto;
     background: transparent;
+    flex: 1;
+  }
+
+  .health-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .health-label-left,
+  .health-label-right {
+    font-size: 0.9em;
+    color: #666;
+    min-width: fit-content;
   }
 
   .health-display {
