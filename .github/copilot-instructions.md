@@ -142,6 +142,24 @@ Testing strategy:
   - This ensures consistent formatting and handles edge cases centrally
   - Never use `recipient.name` directly in templates
 
+## Guide Writing Guidelines:
+
+- **Always use current date for new guides**: Use the `date --iso-8601` command
+  to get the current date for both `published` and `modified` fields in guide
+  metadata
+- Guides should be placed in `/src/routes/guides/{topic}/+page.svelte` following
+  SvelteKit routing conventions
+- Include proper schema.org structured data for SEO (Article, author,
+  datePublished, dateModified)
+- Cross-link to related guides where relevant (e.g., link AIME guide to
+  earnings-cap and indexing-factors guides)
+- Follow SSA.tools styling patterns with proper headings, sections, and visual
+  hierarchy
+- Include practical examples and clear explanations of complex Social Security
+  concepts
+- Update the guides index page at `/src/routes/guides/+page.svelte` to include
+  new guides
+
 ## Assistant Guidelines:
 
 - Break down tasks into smaller, manageable steps.

@@ -143,11 +143,6 @@ export default [
           component: 'always', // Svelte components can be self-closing
         },
       ],
-      // Reduce noise from minor style issues
-      'svelte/prefer-style-directive': 'warn',
-      'svelte/no-unused-svelte-ignore': 'warn',
-      'no-undef': 'warn',
-      'no-empty': 'warn',
       // Override any unused vars rules from svelte.configs.recommended
       // This MUST come after spreading svelte.configs.recommended.rules
       'no-unused-vars': 'off',

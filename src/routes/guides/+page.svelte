@@ -14,6 +14,19 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Sep 19, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/aime">Averaged Indexed Monthly Earnings (AIME)</a>
+        </h3>
+        <p class="description">
+          Understanding how Social Security calculates your Averaged Indexed
+          Monthly Earnings (AIME) and its impact on your benefits. Learn about
+          the three-step process, common misconceptions, and strategies to
+          maximize your AIME.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jun 15, 2025</span>
         <h3 class="posttitle">
           How much Social Security will I get based on my income?

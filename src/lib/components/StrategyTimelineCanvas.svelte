@@ -213,7 +213,8 @@
     bind:this={canvasEl}
     {width}
     {height}
-    style="border: 1px solid #ddd; background: white;"
+    style:border="1px solid #ddd"
+    style:background="white"
   ></canvas>
 </div>
 

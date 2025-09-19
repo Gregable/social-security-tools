@@ -3,7 +3,8 @@
   "compilerOptions": {
     "target": "ESNext",
     "types": [
-      "vitest/globals"
+      "vitest/globals",
+      "node"
     ],
     "useDefineForClassFields": true,
     "module": "ESNext",
