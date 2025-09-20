@@ -135,8 +135,9 @@
   <h2>Why AIME Matters</h2>
 
   <p>
-    Your AIME directly determines your Primary Insurance Amount (PIA) through a
-    progressive benefit formula. The Social Security Administration applies
+    Your AIME directly determines your <a href="/guides/pia"
+      >Primary Insurance Amount (PIA)</a
+    > through a progressive benefit formula. The Social Security Administration applies
     different percentage rates to different portions of your AIME:
   </p>
 
@@ -149,6 +150,12 @@
     </li>
     <li>15% of any remaining amount above the second bend point</li>
   </ul>
+
+  <p>
+    For a detailed explanation of how these bend points work and their
+    implications for your benefits, see our comprehensive
+    <a href="/guides/pia">Primary Insurance Amount (PIA) guide</a>.
+  </p>
 
   <p>
     This progressive structure means that Social Security provides higher

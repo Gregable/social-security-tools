@@ -67,7 +67,9 @@
   <p>
     The spouse of someone earning the maximum monthly benefit would also be
     eligible to earn a spousal benefit on the same record of as much as half of
-    the primary earner's benefit at age 67, aka the "primary insurance amount".
+    the primary earner's benefit at age 67, aka the <a href="/guides/pia"
+      >"primary insurance amount"</a
+    >.
   </p>
   <p>
     In the case of the primary earner earning the maximum benefit of $5,108 /

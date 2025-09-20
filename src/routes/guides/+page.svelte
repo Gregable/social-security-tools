@@ -27,6 +27,19 @@
       </li>
 
       <li>
+        <span class="postdate">Sep 19, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/pia">Primary Insurance Amount (PIA)</a>
+        </h3>
+        <p class="description">
+          Learn how Social Security calculates your Primary Insurance Amount
+          (PIA) using bendpoints, the implications of earning more money late in
+          your career, and how PIA forms the foundation of all Social Security
+          benefits.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jun 15, 2025</span>
         <h3 class="posttitle">
           How much Social Security will I get based on my income?
