@@ -55,50 +55,50 @@
   border-radius: 8px;
 }
 
-h1 {
+.guide-page h1 {
   color: #2c3e50;
   border-bottom: 3px solid #3498db;
   padding-bottom: 0.5rem;
 }
 
-h2 {
+.guide-page h2 {
   color: #34495e;
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
 
-h3 {
+.guide-page h3 {
   color: #555;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
 }
 
-a {
+.guide-page a {
   color: #3498db;
   text-decoration: none;
 }
 
-a:hover {
+.guide-page a:hover {
   text-decoration: underline;
 }
 
-ul {
+.guide-page ul {
   margin: 1rem 0;
   padding-left: 2rem;
 }
 
-li {
+.guide-page li {
   margin: 0.5rem 0;
 }
 
-img {
+.guide-page img {
   max-width: 100%;
   height: auto;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-blockquote {
+.guide-page blockquote {
   background-color: #f8f9fa;
   border-left: 4px solid #007bff;
   padding: 1rem;
