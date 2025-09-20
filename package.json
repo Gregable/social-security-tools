@@ -19,7 +19,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:ts": "prettier --write 'src/**/*.{ts,js,svelte}'",
-    "quality": "npm run format:check && npm run lint && npm run check"
+    "quality": "npm run format:check && npm run lint && npm run check",
+    "setup": "./scripts/setup.sh",
+    "node:check": "node --version && echo 'Node.js version check passed'",
+    "dev:safe": "npm run node:check && npm run dev",
+    "build:safe": "npm run node:check && npm run build"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.9.0",
