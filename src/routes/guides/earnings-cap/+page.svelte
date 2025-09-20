@@ -353,30 +353,3 @@
   </ul>
   <GuideFooter />
 </div>
-
-<style>
-  .earnings-cap-guide .css-column {
-    column-count: 4;
-    width: 90%;
-    column-rule: 1px solid lightblue;
-    margin: 2em;
-  }
-  .earnings-cap-guide .css-column span {
-    margin-right: 1.5em;
-    margin-left: 1.5em;
-    font-size: 14px;
-  }
-
-  @media (max-width: 768px) {
-    .earnings-cap-guide .css-column {
-      column-count: 1; /* Display as a single column on small screens */
-      width: 100%; /* Take full width */
-      margin: 1em 0; /* Adjust margin */
-    }
-    .earnings-cap-guide .css-column span {
-      margin-right: 0.5em; /* Adjust margins for better spacing */
-      margin-left: 0.5em;
-      font-size: 16px; /* Slightly larger font for readability */
-    }
-  }
-</style>

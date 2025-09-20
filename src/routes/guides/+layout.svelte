@@ -1,5 +1,6 @@
 <script lang="ts">
   import Header from '$lib/components/Header.svelte';
+  import './guide-styles.css';
 </script>
 
 <Header active="Guides" />
