@@ -14,6 +14,21 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Sep 30, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/government-shutdown"
+            >How Government Shutdowns Affect Social Security</a
+          >
+        </h3>
+        <p class="description">
+          Government shutdowns never stop Social Security payments, but they
+          severely disrupt services. Learn what continues, what stops, and how
+          to protect yourself during funding gaps. Understand the current
+          shutdown threat and prepare for potential service disruptions.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 19, 2025</span>
         <h3 class="posttitle">
           <a href="/guides/aime">Averaged Indexed Monthly Earnings (AIME)</a>
