@@ -15,6 +15,8 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description;
+  schema.imageAlt = 'Laptop with piggybank representing Social Security AIME calculations';
+  schema.tags = ['AIME', 'Average Indexed Monthly Earnings', 'Social Security', 'Benefits Calculation'];
 </script>
 
 <svelte:head>
@@ -23,6 +25,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">

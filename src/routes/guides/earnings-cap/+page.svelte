@@ -14,6 +14,8 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'Laptop with piggybank representing Social Security earnings limits';
+  schema.tags = ['Earnings Cap', 'Social Security', 'Maximum Earnings', 'FICA'];
 </script>
 
 <svelte:head>
@@ -22,6 +24,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page earnings-cap-guide">

@@ -19,6 +19,8 @@
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'An image of a covid virus, artists rendition';
+  schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
 </script>
 
 <svelte:head>
@@ -27,6 +29,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">

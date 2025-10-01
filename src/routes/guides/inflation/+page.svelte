@@ -18,6 +18,8 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'A grocery cart filled with various groceries';
+  schema.tags = ['Inflation', 'Social Security', 'COLA', 'Cost of Living'];
 </script>
 
 <svelte:head>
@@ -26,6 +28,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">

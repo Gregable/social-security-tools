@@ -14,6 +14,8 @@
   schema.image = HeroImage; // Added HeroImage to schema
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'A chalkboard with complex equations';
+  schema.tags = ['Wage Indexing', 'Social Security', 'AWI', 'Average Wage Index'];
 </script>
 
 <svelte:head>
@@ -22,6 +24,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">

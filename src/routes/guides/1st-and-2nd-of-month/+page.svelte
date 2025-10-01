@@ -16,6 +16,8 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'A framed poster of a birthday cake and balloons';
+  schema.tags = ['Birth Date', 'Social Security', 'First of Month', 'Benefit Timing'];
 </script>
 
 <svelte:head>
@@ -24,6 +26,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">

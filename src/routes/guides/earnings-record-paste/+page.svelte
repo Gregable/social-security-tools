@@ -20,6 +20,8 @@
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'A woman looking confused with a tangle of pipes and a robot above her head';
+  schema.tags = ['Earnings Record', 'Social Security', 'SSA.gov', 'Import Data'];
 </script>
 
 <svelte:head>
@@ -28,6 +30,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">

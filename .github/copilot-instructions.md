@@ -151,6 +151,9 @@ Testing strategy:
   SvelteKit routing conventions
 - Include proper schema.org structured data for SEO (Article, author,
   datePublished, dateModified)
+- **Add social media metadata**: Set `schema.imageAlt` (descriptive alt text) and
+  `schema.tags` (relevant Social Security hashtags), then include 
+  `{@html schema.renderSocialMeta()}` in svelte:head for rich social media cards
 - Cross-link to related guides where relevant (e.g., link AIME guide to
   earnings-cap and indexing-factors guides)
 - Follow SSA.tools styling patterns with proper headings, sections, and visual

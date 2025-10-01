@@ -17,6 +17,8 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'Laptop with piggybank representing Social Security benefits for $100k income';
+  schema.tags = ['High Income', 'Social Security', '$100000', 'Benefits Calculation'];
 </script>
 
 <svelte:head>
@@ -25,6 +27,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">

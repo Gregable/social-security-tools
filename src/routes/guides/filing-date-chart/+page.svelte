@@ -19,6 +19,8 @@
   schema.image = HeroImage;
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
+  schema.imageAlt = 'Laptop with piggybank representing Social Security filing strategies';
+  schema.tags = ['Filing Date', 'Social Security', 'Benefits Optimization', 'Retirement Age'];
 </script>
 
 <svelte:head>
@@ -27,6 +29,7 @@
     {title} | SSA.tools
   </title>
   {@html schema.render()}
+  {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page">
