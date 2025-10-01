@@ -16,8 +16,14 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description;
-  schema.imageAlt = 'Laptop with piggybank representing Social Security and life expectancy';
-  schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
+  schema.imageAlt =
+    'Laptop with piggybank representing Social Security and life expectancy';
+  schema.tags = [
+    'Life Expectancy',
+    'Social Security',
+    'Mortality',
+    'Actuarial',
+  ];
 </script>
 
 <svelte:head>

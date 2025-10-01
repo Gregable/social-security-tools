@@ -16,8 +16,14 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'Laptop with piggybank representing Social Security benefits for $40k income';
-  schema.tags = ['Middle Income', 'Social Security', '$40000', 'Benefits Calculation'];
+  schema.imageAlt =
+    'Laptop with piggybank representing Social Security benefits for $40k income';
+  schema.tags = [
+    'Middle Income',
+    'Social Security',
+    '$40000',
+    'Benefits Calculation',
+  ];
 </script>
 
 <svelte:head>

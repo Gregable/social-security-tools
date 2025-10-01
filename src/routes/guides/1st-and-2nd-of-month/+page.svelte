@@ -17,7 +17,12 @@
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
   schema.imageAlt = 'A framed poster of a birthday cake and balloons';
-  schema.tags = ['Birth Date', 'Social Security', 'First of Month', 'Benefit Timing'];
+  schema.tags = [
+    'Birth Date',
+    'Social Security',
+    'First of Month',
+    'Benefit Timing',
+  ];
 </script>
 
 <svelte:head>

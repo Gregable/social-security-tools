@@ -14,7 +14,12 @@
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
   schema.imageAlt = 'Image of earth from space';
-  schema.tags = ['International', 'Social Security', 'Totalization', 'Expat Benefits'];
+  schema.tags = [
+    'International',
+    'Social Security',
+    'Totalization',
+    'Expat Benefits',
+  ];
 </script>
 
 <svelte:head>

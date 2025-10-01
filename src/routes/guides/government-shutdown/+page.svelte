@@ -19,7 +19,8 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description;
-  schema.imageAlt = 'Lincoln Memorial with barriers during the 2013 government shutdown';
+  schema.imageAlt =
+    'Lincoln Memorial with barriers during the 2013 government shutdown';
   schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
 </script>
 
@@ -28,7 +29,7 @@
   <title>
     {title} | SSA.tools
   </title>
-  
+
   {@html schema.renderSocialMeta()}
   {@html schema.render()}
 </svelte:head>

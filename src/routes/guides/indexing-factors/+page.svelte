@@ -15,7 +15,12 @@
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
   schema.imageAlt = 'A chalkboard with complex equations';
-  schema.tags = ['Wage Indexing', 'Social Security', 'AWI', 'Average Wage Index'];
+  schema.tags = [
+    'Wage Indexing',
+    'Social Security',
+    'AWI',
+    'Average Wage Index',
+  ];
 </script>
 
 <svelte:head>

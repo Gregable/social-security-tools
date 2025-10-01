@@ -50,7 +50,7 @@ export class GuidesSchema {
 
   renderSocialMeta(): string {
     let meta = '';
-    
+
     // Open Graph / Facebook
     meta += `<meta property="og:type" content="article" />`;
     if (this.url) {
@@ -63,7 +63,9 @@ export class GuidesSchema {
       meta += `<meta property="og:description" content="${this.description}" />`;
     }
     if (this.image) {
-      const fullImageUrl = this.image.startsWith('http') ? this.image : `https://ssa.tools${this.image}`;
+      const fullImageUrl = this.image.startsWith('http')
+        ? this.image
+        : `https://ssa.tools${this.image}`;
       meta += `<meta property="og:image" content="${fullImageUrl}" />`;
       meta += `<meta property="og:image:width" content="1200" />`;
       meta += `<meta property="og:image:height" content="630" />`;
@@ -77,9 +79,9 @@ export class GuidesSchema {
     }
     meta += `<meta property="article:author" content="SSA.tools" />`;
     meta += `<meta property="article:section" content="Social Security" />`;
-    
+
     // Add tags if provided
-    this.tags.forEach(tag => {
+    this.tags.forEach((tag) => {
       meta += `<meta property="article:tag" content="${tag}" />`;
     });
 
@@ -95,7 +97,9 @@ export class GuidesSchema {
       meta += `<meta name="twitter:description" content="${this.description}" />`;
     }
     if (this.image) {
-      const fullImageUrl = this.image.startsWith('http') ? this.image : `https://ssa.tools${this.image}`;
+      const fullImageUrl = this.image.startsWith('http')
+        ? this.image
+        : `https://ssa.tools${this.image}`;
       meta += `<meta name="twitter:image" content="${fullImageUrl}" />`;
     }
     if (this.imageAlt) {

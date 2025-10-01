@@ -20,7 +20,12 @@
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
   schema.imageAlt = 'An image of a covid virus, artists rendition';
-  schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
+  schema.tags = [
+    'COVID-19',
+    'Social Security',
+    'Wage Index',
+    'Pandemic Impact',
+  ];
 </script>
 
 <svelte:head>

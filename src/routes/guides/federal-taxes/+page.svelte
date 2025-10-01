@@ -16,7 +16,12 @@
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
   schema.imageAlt = 'Tax forms laid atop some currency';
-  schema.tags = ['Social Security Taxes', 'Federal Taxes', 'Retirement Income', 'Tax Planning'];
+  schema.tags = [
+    'Social Security Taxes',
+    'Federal Taxes',
+    'Retirement Income',
+    'Tax Planning',
+  ];
 </script>
 
 <svelte:head>

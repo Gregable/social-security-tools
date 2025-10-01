@@ -14,8 +14,14 @@
   schema.image = '/laptop-piggybank.jpg'; // Added a generic hero image for the schema
   schema.datePublished = publishDate.toISOString();
   schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'Laptop with piggybank representing Social Security work credits';
-  schema.tags = ['Work Credits', 'Social Security', 'Eligibility', 'Quarters of Coverage'];
+  schema.imageAlt =
+    'Laptop with piggybank representing Social Security work credits';
+  schema.tags = [
+    'Work Credits',
+    'Social Security',
+    'Eligibility',
+    'Quarters of Coverage',
+  ];
 </script>
 
 <svelte:head>

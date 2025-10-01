@@ -14,7 +14,8 @@
   schema.datePublished = publishDate.toISOString();
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'Laptop with piggybank representing Social Security earnings limits';
+  schema.imageAlt =
+    'Laptop with piggybank representing Social Security earnings limits';
   schema.tags = ['Earnings Cap', 'Social Security', 'Maximum Earnings', 'FICA'];
 </script>
 

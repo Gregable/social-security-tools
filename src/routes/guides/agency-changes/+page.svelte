@@ -17,7 +17,12 @@
   schema.dateModified = updateDate.toISOString();
   schema.description = description; // Pass the description to the schema
   schema.imageAlt = 'A lighthouse with a small unmanned sailboat near shore';
-  schema.tags = ['SSA', 'Social Security Administration', 'Agency Changes', 'Government'];
+  schema.tags = [
+    'SSA',
+    'Social Security Administration',
+    'Agency Changes',
+    'Government',
+  ];
 </script>
 
 <svelte:head>
