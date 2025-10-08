@@ -1,9 +1,32 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { activeIntegration } from '$lib/integrations/context';
+  import { loadIntroBanner } from '$lib/integrations/config';
+  import type { ComponentType, SvelteComponent } from 'svelte';
+
   import Header from '$lib/components/Header.svelte';
   import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
   import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
   import CombinedDemoMp4 from '$lib/videos/combined-demo.mp4';
   import CombinedDemoPoster from '$lib/videos/combined-demo-poster.jpg';
+
+  let IntroBannerComponent: ComponentType<SvelteComponent> | null = null;
+
+  onMount(() => {
+    // Load integration banner if an integration is active
+    // (integration is already initialized by root layout)
+    const unsubscribe = activeIntegration.subscribe(async (integration) => {
+      if (integration) {
+        IntroBannerComponent = await loadIntroBanner(integration.id);
+      } else {
+        IntroBannerComponent = null;
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  });
 </script>
 
 <svelte:head>
@@ -34,6 +57,11 @@
 </svelte:head>
 
 <Header />
+
+{#if IntroBannerComponent && $activeIntegration}
+  <svelte:component this={IntroBannerComponent} />
+{/if}
+
 <main>
   <div class="jumbotron-grid">
     <div>

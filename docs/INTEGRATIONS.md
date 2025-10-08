@@ -25,14 +25,27 @@ The integration parameter can be combined with other hash parameters:
 https://ssa.tools/calculator#integration=opensocialsecurity.com&other=value
 ```
 
+**Navigation from Home Page**: Users can also enter the integration via the home
+page. The hash parameter is automatically preserved when navigating from the
+home page to the calculator:
+
+```text
+https://ssa.tools/#integration=opensocialsecurity.com
+```
+
+When users click "Get Started" or any calculator links from the home page, the
+integration parameter will be carried through to the calculator page.
+
 ### User Experience
 
 When an integration is active:
 
-1. **Intro Banner**: A small banner appears at the top of the calculator page
-   (after the header, before the paste flow) informing the user that the
-   integration is active and that they'll see additional information at the end
-   of their report.
+1. **Intro Banner**: A small banner appears at the top of both the home page and
+   calculator page (after the header) informing the user that the integration is
+   active and that they'll see additional information at the end of their
+   report. On the calculator page, the banner automatically disappears once the
+   user has entered their earnings data (or loaded demo data), providing a clean
+   experience during data confirmation and report viewing.
 
 2. **Report End Section**: After the user enters their data and completes the
    report, a new section appears immediately before the "More Reading" section.
@@ -110,6 +123,16 @@ npm test -- src/test/integrations.test.ts
 
 ## Implementation Details
 
+### Root Page Integration
+
+The root page (`src/routes/+page.svelte`) displays the intro banner when an
+integration is active:
+
+1. On mount, it subscribes to the active integration state
+2. It dynamically loads the IntroBanner component based on the active
+   integration
+3. The banner is conditionally rendered after the header
+
 ### Calculator Page Integration
 
 The calculator page (`src/routes/calculator/+page.svelte`) handles the
@@ -125,6 +148,31 @@ integration display:
 Integration sections automatically appear in the sidebar navigation because
 they're wrapped in `SidebarSection` components. The `Sidebar` component
 dynamically discovers all sections with the `data-sidebarsection` attribute.
+
+Integration sections are visually distinguished in the sidebar with the
+integration's favicon icon.
+
+### Hash Parameter Preservation
+
+The integration system preserves the active integration across page navigation
+within the same browser session using `sessionStorage`:
+
+1. **Initial Load**: When a user visits any page with `#integration=...` in the
+   URL, the integration ID is saved to `sessionStorage`
+2. **Root Layout**: The root layout (`src/routes/+layout.svelte`) initializes
+   the integration on every page load by checking:
+   - First priority: URL hash parameter (explicit)
+   - Second priority: `sessionStorage` (persisted from earlier navigation)
+3. **Session Persistence**: The integration remains active for the entire
+   browser session, even when navigating to pages without the hash parameter
+4. **Navigation Flow Example**:
+   - User visits `https://ssa.tools/#integration=opensocialsecurity.com`
+   - Visits `/about` → integration persists (from sessionStorage)
+   - Visits `/guides` → integration persists (from sessionStorage)
+   - Visits `/calculator` → integration is active, shows banner and report end
+
+This allows users to browse the site naturally without losing their integration
+context, while still allowing explicit URL parameters to take precedence.
 
 ### Backward Compatibility
 

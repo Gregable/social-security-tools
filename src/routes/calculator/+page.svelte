@@ -1,10 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { context } from '$lib/context';
-  import {
-    activeIntegration,
-    initializeIntegration,
-  } from '$lib/integrations/context';
+  import { activeIntegration } from '$lib/integrations/context';
   import { loadIntroBanner, loadReportEnd } from '$lib/integrations/config';
   import type { ComponentType, SvelteComponent } from 'svelte';
 
@@ -30,17 +27,21 @@
 
   let IntroBannerComponent: ComponentType<SvelteComponent> | null = null;
   let ReportEndComponent: ComponentType<SvelteComponent> | null = null;
+  let showIntroBanner: boolean = true;
 
   function pasteDone() {
     isPasteFlow = false;
     history.pushState({ id: 'top' }, '', '#results');
   }
 
-  onMount(() => {
-    // Initialize integration context on page load
-    initializeIntegration();
+  function pasteStarted() {
+    // Hide the intro banner once user has entered data
+    showIntroBanner = false;
+  }
 
+  onMount(() => {
     // Load integration components if an integration is active
+    // (integration is already initialized by root layout)
     const unsubscribe = activeIntegration.subscribe(async (integration) => {
       if (integration) {
         IntroBannerComponent = await loadIntroBanner(integration.id);
@@ -77,13 +78,13 @@
 
 <Header active="Calculator" />
 
-{#if isPasteFlow && IntroBannerComponent && $activeIntegration}
+{#if isPasteFlow && showIntroBanner && IntroBannerComponent && $activeIntegration}
   <svelte:component this={IntroBannerComponent} />
 {/if}
 
 <main>
   {#if isPasteFlow}
-    <PasteFlow ondone={pasteDone} />
+    <PasteFlow ondone={pasteDone} onStarted={pasteStarted} />
   {:else}
     <Sidebar>
       <!--

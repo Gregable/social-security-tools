@@ -31,18 +31,35 @@
         String(spouse.pia().primaryInsuranceAmount().roundToDollar().value())
       );
     } else {
-      // Single person
+      // Single person - use marital=single with placeholder for person B
       params.set('marital', 'single');
-      params.set('DOBm', String(recipient.birthdate.layBirthMonth() + 1));
-      params.set('DOBd', String(recipient.birthdate.layBirthDayOfMonth()));
-      params.set('DOBy', String(recipient.birthdate.layBirthYear()));
+
+      // Person A (recipient)
+      params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
+      params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
+      params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
       params.set(
-        'PIA',
+        'aPIA',
         String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
       );
+
+      // Person B (placeholder - required by Open Social Security)
+      params.set('bDOBm', '4');
+      params.set('bDOBd', '15');
+      params.set('bDOBy', '1960');
+      params.set('bPIA', '1000');
     }
 
     return `${baseUrl}?${params.toString()}`;
+  }
+
+  // Format PIA for display
+  function formatPia(recipient: Recipient): string {
+    return recipient
+      .pia()
+      .primaryInsuranceAmount()
+      .roundToDollar()
+      .wholeDollars();
   }
 </script>
 
@@ -56,8 +73,21 @@
       based on maximizing your total actuarial lifetime benefits.
     </p>
     <p>
-      The following link will take you back to Open Social Security,
-      pre-populated with the information you've entered here:
+      {#if spouse}
+        Your Primary Insurance Amounts (PIAs) are <strong
+          >{formatPia(recipient)}</strong
+        >
+        for {recipient.name} and <strong>{formatPia(spouse)}</strong> for {spouse.name}.
+        These values will be pre-populated in Open Social Security.
+      {:else}
+        Your Primary Insurance Amount (PIA) is <strong
+          >{formatPia(recipient)}</strong
+        >. This value will be pre-populated in Open Social Security.
+      {/if}
+    </p>
+    <p>
+      The following link will take you back to Open Social Security with this
+      information:
     </p>
     <p>
       <a href={buildOpenSocialSecurityUrl()} target="_blank" rel="noopener">

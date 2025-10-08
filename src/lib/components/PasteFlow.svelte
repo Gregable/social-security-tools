@@ -15,6 +15,8 @@
 
   // Callback prop for done event
   export let ondone: (() => void) | undefined = undefined;
+  // Callback prop for when user moves past initial paste prompt
+  export let onStarted: (() => void) | undefined = undefined;
 
   // The mode of the paste flow. This is a state machine that controls
   // which component is rendered.
@@ -127,6 +129,9 @@
       context.spouse.markSecond();
     }
 
+    // Notify that user has started (demo skips paste flow entirely)
+    onStarted?.();
+
     // Let the app know we're done.
     browser && posthog.capture('Demo Loaded');
     ondone?.();
@@ -145,6 +150,9 @@
       context.spouse.markSecond();
       context.spouse.name = spouseName;
     }
+
+    // Notify that user has started entering data (no longer showing initial prompt)
+    onStarted?.();
 
     if (detail.recipient.isPiaOnly) {
       // If the user only pasted their PIA, we skip the confirmation step.

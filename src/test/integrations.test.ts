@@ -51,14 +51,33 @@ describe('Integration Configuration', () => {
 
 describe('Integration Context', () => {
   let originalWindow: typeof globalThis.window;
+  let mockSessionStorage: { [key: string]: string };
 
   beforeEach(() => {
-    // Reset the store before each test
-    clearIntegration();
     // Save original window if it exists
     if (typeof window !== 'undefined') {
       originalWindow = window;
     }
+
+    // Reset mock sessionStorage
+    mockSessionStorage = {};
+
+    // Set up mock window with sessionStorage before clearing
+    (globalThis as any).window = {
+      location: { hash: '' },
+      sessionStorage: {
+        getItem: (key: string) => mockSessionStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockSessionStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockSessionStorage[key];
+        },
+      },
+    };
+
+    // Reset the store after mock is set up
+    clearIntegration();
   });
 
   afterEach(() => {
@@ -68,10 +87,19 @@ describe('Integration Context', () => {
     }
   });
 
-  // Mock window.location.hash
+  // Mock window.location.hash and sessionStorage
   const mockWindow = (hash: string) => {
     (globalThis as any).window = {
       location: { hash },
+      sessionStorage: {
+        getItem: (key: string) => mockSessionStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockSessionStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockSessionStorage[key];
+        },
+      },
     };
   };
 
@@ -129,6 +157,47 @@ describe('Integration Context', () => {
 
     clearIntegration();
     expect(get(activeIntegration)).toBeNull();
+  });
+
+  it('should persist integration to sessionStorage', () => {
+    mockWindow('#integration=opensocialsecurity.com');
+    initializeIntegration();
+    expect(mockSessionStorage['activeIntegrationId']).toBe(
+      'opensocialsecurity.com'
+    );
+  });
+
+  it('should restore integration from sessionStorage', () => {
+    // Set up sessionStorage with an integration
+    mockWindow('');
+    mockSessionStorage['activeIntegrationId'] = 'opensocialsecurity.com';
+
+    // Initialize without URL hash - should load from sessionStorage
+    initializeIntegration();
+    const storeValue = get(activeIntegration);
+    expect(storeValue).not.toBeNull();
+    expect(storeValue?.id).toBe('opensocialsecurity.com');
+  });
+
+  it('should prioritize URL hash over sessionStorage', () => {
+    mockWindow('#integration=opensocialsecurity.com');
+    // Put a different value in sessionStorage
+    mockSessionStorage['activeIntegrationId'] = 'other-site.com';
+
+    initializeIntegration();
+    const storeValue = get(activeIntegration);
+    expect(storeValue?.id).toBe('opensocialsecurity.com');
+  });
+
+  it('should clear sessionStorage when clearing integration', () => {
+    mockWindow('#integration=opensocialsecurity.com');
+    initializeIntegration();
+    expect(mockSessionStorage['activeIntegrationId']).toBe(
+      'opensocialsecurity.com'
+    );
+
+    clearIntegration();
+    expect(mockSessionStorage['activeIntegrationId']).toBeUndefined();
   });
 });
 

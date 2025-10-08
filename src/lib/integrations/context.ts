@@ -8,11 +8,35 @@
 import { writable } from 'svelte/store';
 import { getIntegration, type IntegrationConfig } from './config';
 
+const SESSION_STORAGE_KEY = 'activeIntegrationId';
+
 /**
  * Store for the currently active integration.
  * null if no integration is active.
  */
 export const activeIntegration = writable<IntegrationConfig | null>(null);
+
+/**
+ * Save integration ID to session storage.
+ */
+function saveIntegrationToSession(integrationId: string | null): void {
+  if (typeof window === 'undefined') return;
+  if (integrationId) {
+    window.sessionStorage.setItem(SESSION_STORAGE_KEY, integrationId);
+  } else {
+    window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
+  }
+}
+
+/**
+ * Load integration ID from session storage.
+ */
+function loadIntegrationFromSession(): IntegrationConfig | null {
+  if (typeof window === 'undefined') return null;
+  const integrationId = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+  if (!integrationId) return null;
+  return getIntegration(integrationId);
+}
 
 /**
  * Parse the URL hash to detect integration parameter.
@@ -44,17 +68,31 @@ export function parseIntegrationFromHash(): IntegrationConfig | null {
 }
 
 /**
- * Initialize the integration context by parsing the URL.
+ * Initialize the integration context by parsing the URL or session storage.
+ * Priority: URL hash > session storage
  * Should be called on page mount.
  */
 export function initializeIntegration(): void {
-  const config = parseIntegrationFromHash();
+  // First try URL hash (explicit parameter takes precedence)
+  let config = parseIntegrationFromHash();
+
+  // If not in URL, try session storage
+  if (!config) {
+    config = loadIntegrationFromSession();
+  }
+
+  // Save to session storage if found
+  if (config) {
+    saveIntegrationToSession(config.id);
+  }
+
   activeIntegration.set(config);
 }
 
 /**
- * Clear the active integration.
+ * Clear the active integration from both store and session storage.
  */
 export function clearIntegration(): void {
   activeIntegration.set(null);
+  saveIntegrationToSession(null);
 }
