@@ -28,6 +28,7 @@
   let IntroBannerComponent: ComponentType<SvelteComponent> | null = null;
   let ReportEndComponent: ComponentType<SvelteComponent> | null = null;
   let showIntroBanner: boolean = true;
+  let integrationFavicon: string = '';
 
   function pasteDone() {
     isPasteFlow = false;
@@ -46,9 +47,11 @@
       if (integration) {
         IntroBannerComponent = await loadIntroBanner(integration.id);
         ReportEndComponent = await loadReportEnd(integration.id);
+        integrationFavicon = await integration.getFavicon();
       } else {
         IntroBannerComponent = null;
         ReportEndComponent = null;
+        integrationFavicon = '';
       }
     });
 
@@ -207,7 +210,7 @@
         <SidebarSection
           label={$activeIntegration.reportEndLabel}
           integration={true}
-          integrationFaviconPath={$activeIntegration.faviconPath}
+          integrationFaviconPath={integrationFavicon}
         >
           <svelte:component
             this={ReportEndComponent}

@@ -17,8 +17,8 @@ export interface IntegrationConfig {
   displayName: string;
   /** Label for the report end section in the sidebar */
   reportEndLabel: string;
-  /** Path to the favicon for sidebar display */
-  faviconPath: string;
+  /** Function that returns the favicon URL (processed by Vite) */
+  getFavicon: () => Promise<string>;
 }
 
 /**
@@ -30,8 +30,12 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
     id: 'opensocialsecurity.com',
     displayName: 'Open Social Security',
     reportEndLabel: 'Open Social Security',
-    faviconPath:
-      '/src/lib/components/integrations/opensocialsecurity.com/favicon.ico',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/opensocialsecurity.com/favicon.ico'
+      );
+      return module.default;
+    },
   },
 };
 

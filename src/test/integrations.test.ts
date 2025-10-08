@@ -18,7 +18,7 @@ import {
 } from '$lib/integrations/context';
 
 describe('Integration Configuration', () => {
-  it('should have Open Social Security registered', () => {
+  it('should have Open Social Security registered', async () => {
     expect(INTEGRATIONS['opensocialsecurity.com']).toBeDefined();
     expect(INTEGRATIONS['opensocialsecurity.com'].id).toBe(
       'opensocialsecurity.com'
@@ -26,10 +26,15 @@ describe('Integration Configuration', () => {
     expect(INTEGRATIONS['opensocialsecurity.com'].displayName).toBe(
       'Open Social Security'
     );
-    expect(INTEGRATIONS['opensocialsecurity.com'].faviconPath).toBeDefined();
-    expect(INTEGRATIONS['opensocialsecurity.com'].faviconPath).toContain(
-      'favicon.ico'
+    expect(INTEGRATIONS['opensocialsecurity.com'].getFavicon).toBeDefined();
+    expect(typeof INTEGRATIONS['opensocialsecurity.com'].getFavicon).toBe(
+      'function'
     );
+    // Test that getFavicon returns a string
+    const faviconUrl =
+      await INTEGRATIONS['opensocialsecurity.com'].getFavicon();
+    expect(faviconUrl).toBeDefined();
+    expect(typeof faviconUrl).toBe('string');
   });
 
   it('should return integration config for valid ID', () => {
