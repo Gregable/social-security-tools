@@ -14,6 +14,22 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Oct 7, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/url-parameters"
+            >Sharing Social Security Scenarios with URL Parameters</a
+          >
+        </h3>
+        <p class="description">
+          Learn how to use URL parameters to link directly to the SSA.tools
+          calculator with preloaded scenarios. Perfect for financial advisors,
+          educators, or sharing examples with family and friends. Create
+          shareable links with specific Primary Insurance Amounts and
+          birthdates.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 30, 2025</span>
         <h3 class="posttitle">
           <a href="/guides/government-shutdown"

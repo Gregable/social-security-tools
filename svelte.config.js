@@ -17,6 +17,14 @@ export default {
     }),
     prerender: {
       handleHttpError: 'warn',
+      handleMissingId: ({ id, path }) => {
+        // Ignore hash fragments that are URL parameters (contain =)
+        if (id.includes('=')) {
+          return;
+        }
+        // Otherwise, throw the error
+        throw new Error(`Missing ID: ${id} on page ${path}`);
+      },
     },
   },
 };
