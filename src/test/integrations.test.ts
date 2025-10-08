@@ -1,0 +1,144 @@
+/**
+ * Tests for the third-party integration configuration and context.
+ */
+
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { get } from 'svelte/store';
+import {
+  INTEGRATIONS,
+  getIntegration,
+  loadIntroBanner,
+  loadReportEnd,
+} from '$lib/integrations/config';
+import {
+  activeIntegration,
+  parseIntegrationFromHash,
+  initializeIntegration,
+  clearIntegration,
+} from '$lib/integrations/context';
+
+describe('Integration Configuration', () => {
+  it('should have Open Social Security registered', () => {
+    expect(INTEGRATIONS['opensocialsecurity.com']).toBeDefined();
+    expect(INTEGRATIONS['opensocialsecurity.com'].id).toBe(
+      'opensocialsecurity.com'
+    );
+    expect(INTEGRATIONS['opensocialsecurity.com'].displayName).toBe(
+      'Open Social Security'
+    );
+    expect(INTEGRATIONS['opensocialsecurity.com'].faviconPath).toBeDefined();
+    expect(INTEGRATIONS['opensocialsecurity.com'].faviconPath).toContain(
+      'favicon.ico'
+    );
+  });
+
+  it('should return integration config for valid ID', () => {
+    const config = getIntegration('opensocialsecurity.com');
+    expect(config).not.toBeNull();
+    expect(config?.id).toBe('opensocialsecurity.com');
+  });
+
+  it('should return null for invalid integration ID', () => {
+    const config = getIntegration('invalid-site.com');
+    expect(config).toBeNull();
+  });
+
+  it('should return null for empty integration ID', () => {
+    const config = getIntegration('');
+    expect(config).toBeNull();
+  });
+});
+
+describe('Integration Context', () => {
+  let originalWindow: typeof globalThis.window;
+
+  beforeEach(() => {
+    // Reset the store before each test
+    clearIntegration();
+    // Save original window if it exists
+    if (typeof window !== 'undefined') {
+      originalWindow = window;
+    }
+  });
+
+  afterEach(() => {
+    // Restore original window if it was saved
+    if (originalWindow) {
+      (globalThis as any).window = originalWindow;
+    }
+  });
+
+  // Mock window.location.hash
+  const mockWindow = (hash: string) => {
+    (globalThis as any).window = {
+      location: { hash },
+    };
+  };
+
+  it('should parse valid integration from hash', () => {
+    mockWindow('#integration=opensocialsecurity.com');
+    const config = parseIntegrationFromHash();
+    expect(config).not.toBeNull();
+    expect(config?.id).toBe('opensocialsecurity.com');
+  });
+
+  it('should parse integration with other parameters', () => {
+    mockWindow('#integration=opensocialsecurity.com&other=value');
+    const config = parseIntegrationFromHash();
+    expect(config).not.toBeNull();
+    expect(config?.id).toBe('opensocialsecurity.com');
+  });
+
+  it('should return null for invalid integration ID', () => {
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
+    mockWindow('#integration=unknown-site.com');
+    const config = parseIntegrationFromHash();
+    expect(config).toBeNull();
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Unknown integration ID in URL')
+    );
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('should return null when no integration parameter', () => {
+    mockWindow('#results');
+    const config = parseIntegrationFromHash();
+    expect(config).toBeNull();
+  });
+
+  it('should return null when no hash', () => {
+    mockWindow('');
+    const config = parseIntegrationFromHash();
+    expect(config).toBeNull();
+  });
+
+  it('should initialize integration store from URL', () => {
+    mockWindow('#integration=opensocialsecurity.com');
+    initializeIntegration();
+    const storeValue = get(activeIntegration);
+    expect(storeValue).not.toBeNull();
+    expect(storeValue?.id).toBe('opensocialsecurity.com');
+  });
+
+  it('should clear active integration', () => {
+    mockWindow('#integration=opensocialsecurity.com');
+    initializeIntegration();
+    expect(get(activeIntegration)).not.toBeNull();
+
+    clearIntegration();
+    expect(get(activeIntegration)).toBeNull();
+  });
+});
+
+describe('Dynamic Component Loading', () => {
+  it('should have component loader functions', () => {
+    expect(loadIntroBanner).toBeDefined();
+    expect(loadReportEnd).toBeDefined();
+  });
+
+  // Note: Testing actual dynamic imports is difficult in unit tests
+  // as they require the actual component files to exist.
+  // These would be better tested in integration or e2e tests.
+});

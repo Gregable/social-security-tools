@@ -1,5 +1,12 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { context } from '$lib/context';
+  import {
+    activeIntegration,
+    initializeIntegration,
+  } from '$lib/integrations/context';
+  import { loadIntroBanner, loadReportEnd } from '$lib/integrations/config';
+  import type { ComponentType, SvelteComponent } from 'svelte';
 
   import Header from '$lib/components/Header.svelte';
   import PasteFlow from '$lib/components/PasteFlow.svelte';
@@ -21,10 +28,33 @@
 
   export let isPasteFlow: boolean = true;
 
+  let IntroBannerComponent: ComponentType<SvelteComponent> | null = null;
+  let ReportEndComponent: ComponentType<SvelteComponent> | null = null;
+
   function pasteDone() {
     isPasteFlow = false;
     history.pushState({ id: 'top' }, '', '#results');
   }
+
+  onMount(() => {
+    // Initialize integration context on page load
+    initializeIntegration();
+
+    // Load integration components if an integration is active
+    const unsubscribe = activeIntegration.subscribe(async (integration) => {
+      if (integration) {
+        IntroBannerComponent = await loadIntroBanner(integration.id);
+        ReportEndComponent = await loadReportEnd(integration.id);
+      } else {
+        IntroBannerComponent = null;
+        ReportEndComponent = null;
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  });
 </script>
 
 <svelte:head>
@@ -46,6 +76,11 @@
 </svelte:head>
 
 <Header active="Calculator" />
+
+{#if isPasteFlow && IntroBannerComponent && $activeIntegration}
+  <svelte:component this={IntroBannerComponent} />
+{/if}
+
 <main>
   {#if isPasteFlow}
     <PasteFlow ondone={pasteDone} />
@@ -162,6 +197,19 @@
         </SidebarSection>
         <SidebarSection label="Survivor Benefit">
           <SurvivorReport
+            recipient={context.recipient}
+            spouse={context.spouse}
+          />
+        </SidebarSection>
+      {/if}
+      {#if ReportEndComponent && $activeIntegration}
+        <SidebarSection
+          label={$activeIntegration.reportEndLabel}
+          integration={true}
+          integrationFaviconPath={$activeIntegration.faviconPath}
+        >
+          <svelte:component
+            this={ReportEndComponent}
             recipient={context.recipient}
             spouse={context.spouse}
           />

@@ -94,6 +94,8 @@
     heading: boolean = false;
     active: boolean = false;
     sponsor: boolean = false;
+    integration: boolean = false;
+    integrationFaviconPath: string = '';
   }
   let lastActiveSection: SidebarSection;
 
@@ -118,6 +120,9 @@
         // the viewport. Initially all false.
         active: false,
         sponsor: child.getAttribute('data-sponsor') == 'true',
+        integration: child.getAttribute('data-integration') == 'true',
+        integrationFaviconPath:
+          child.getAttribute('data-integration-favicon') || '',
       });
     }
     // eslint-disable-next-line no-self-assign
@@ -137,9 +142,17 @@
           on:keydown={scrollTo(section)}
           class:active={section.active}
           class:sponsor={section.sponsor}
+          class:integration={section.integration}
           role="presentation"
         >
           <div class="navlabel" class:indent={hasHeading && !section.heading}>
+            {#if section.integration && section.integrationFaviconPath}
+              <img
+                src={section.integrationFaviconPath}
+                alt=""
+                class="integration-icon"
+              />
+            {/if}
             {section.label}
           </div>
 
@@ -233,6 +246,13 @@
   }
   li.sponsor {
     background-color: aliceblue;
+  }
+  .integration-icon {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin-right: 0.35em;
+    display: inline-block;
   }
   li:first-child {
     border-radius: 6px 6px 0 0;

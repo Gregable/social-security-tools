@@ -1,0 +1,111 @@
+<script lang="ts">
+  import type { Recipient } from '$lib/recipient';
+
+  export let recipient: Recipient;
+  export let spouse: Recipient | null = null;
+
+  // Build the Open Social Security URL with pre-populated data
+  function buildOpenSocialSecurityUrl(): string {
+    const baseUrl = 'https://opensocialsecurity.com/';
+    const params = new URLSearchParams();
+
+    if (spouse) {
+      // Married couple
+      params.set('marital', 'married');
+
+      // Person A (recipient)
+      params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
+      params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
+      params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
+      params.set(
+        'aPIA',
+        String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
+      );
+
+      // Person B (spouse)
+      params.set('bDOBm', String(spouse.birthdate.layBirthMonth() + 1));
+      params.set('bDOBd', String(spouse.birthdate.layBirthDayOfMonth()));
+      params.set('bDOBy', String(spouse.birthdate.layBirthYear()));
+      params.set(
+        'bPIA',
+        String(spouse.pia().primaryInsuranceAmount().roundToDollar().value())
+      );
+    } else {
+      // Single person
+      params.set('marital', 'single');
+      params.set('DOBm', String(recipient.birthdate.layBirthMonth() + 1));
+      params.set('DOBd', String(recipient.birthdate.layBirthDayOfMonth()));
+      params.set('DOBy', String(recipient.birthdate.layBirthYear()));
+      params.set(
+        'PIA',
+        String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
+      );
+    }
+
+    return `${baseUrl}?${params.toString()}`;
+  }
+</script>
+
+<div class="pageBreakAvoid">
+  <h2>Open Social Security</h2>
+
+  <div class="text">
+    <p>
+      Now that you have a better understanding of your Social Security benefits,
+      you can return to Open Social Security to calculate a filing strategy
+      based on maximizing your total actuarial lifetime benefits.
+    </p>
+    <p>
+      The following link will take you back to Open Social Security,
+      pre-populated with the information you've entered here:
+    </p>
+    <p>
+      <a href={buildOpenSocialSecurityUrl()} target="_blank" rel="noopener">
+        Return to Open Social Security (with my information)
+        <svg
+          class="external-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      </a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .text {
+    margin: 0 0.5em;
+  }
+
+  .text p {
+    margin: 1em 0;
+  }
+
+  .text a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+  }
+
+  .text a:hover {
+    text-decoration: underline;
+  }
+
+  .external-icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
+</style>

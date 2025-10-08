@@ -20,6 +20,16 @@
   export let sponsor: boolean = false;
 
   /**
+   * If true, color this as an integration section.
+   */
+  export let integration: boolean = false;
+
+  /**
+   * Path to favicon icon for integration sections.
+   */
+  export let integrationFaviconPath: string = '';
+
+  /**
    * If true, this section considered to be below a sticky element, namely the
    * slider elements. This is used to add a scroll-margin-top to the section
    * so that it's not hidden behind the sticky elements when it's selected in
@@ -41,6 +51,8 @@
   data-label={label}
   data-heading={heading ? 'true' : 'false'}
   data-sponsor={sponsor ? 'true' : 'false'}
+  data-integration={integration ? 'true' : 'false'}
+  data-integration-favicon={integrationFaviconPath}
   class:underSticky
 >
   <slot></slot>
