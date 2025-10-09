@@ -117,9 +117,10 @@ warning.
 - **Intro Banner**: Informs users that they'll see their PIA information for use
   with Linopt
 - **Report End**: Displays the user's Primary Insurance Amount(s) and provides a
-  link to Linopt for retirement income optimization. Values are inflation-adjusted
-  to future dollars using Linopt's 2.5% annual inflation rate. Displays filing
-  ages rounded to nearest year, with yearly benefit amounts in thousands.
+  link to Linopt for retirement income optimization. Values are
+  inflation-adjusted to future dollars using Linopt's 2.5% annual inflation
+  rate. Displays filing ages rounded to nearest year, with yearly benefit
+  amounts in thousands.
 
 ### FIRECalc (firecalc.com)
 
