@@ -48,6 +48,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'firecalc.com': {
+    id: 'firecalc.com',
+    displayName: 'FIRECalc',
+    reportEndLabel: 'FIRECalc',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/firecalc.com/firecalc-icon.svg'
+      );
+      return module.default;
+    },
+  },
 };
 
 /**

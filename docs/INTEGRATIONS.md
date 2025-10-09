@@ -117,7 +117,19 @@ warning.
 - **Intro Banner**: Informs users that they'll see their PIA information for use
   with Linopt
 - **Report End**: Displays the user's Primary Insurance Amount(s) and provides a
-  link to Linopt for retirement income optimization
+  link to Linopt for retirement income optimization. Values are inflation-adjusted
+  to future dollars using Linopt's 2.5% annual inflation rate. Displays filing
+  ages rounded to nearest year, with yearly benefit amounts in thousands.
+
+### FIRECalc (firecalc.com)
+
+- **Intro Banner**: Informs users that they'll see their Social Security
+  calculations for use with FIRECalc
+- **Report End**: Displays annual Social Security amounts in today's dollars
+  with starting years (not ages). For couples, includes a toggle to choose
+  between personal benefit only or combined personal + spousal benefit for the
+  lower earner. No inflation adjustment is applied since FIRECalc expects
+  amounts in today's dollars.
 
 ## Testing
 

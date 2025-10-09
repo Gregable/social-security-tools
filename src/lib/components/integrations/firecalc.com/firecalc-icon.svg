@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Flame shape for FIRE (Financial Independence Retire Early) -->
+  <path d="M12 2C12 2 9 5 9 8C9 10 10 11 11 11.5C10.5 11 10 10 10 9C10 7.5 11.5 6 12 5C12.5 6 14 7.5 14 9C14 10 13.5 11 13 11.5C14 11 15 10 15 8C15 5 12 2 12 2Z" fill="#1976d2" stroke="#0d47a1" stroke-width="0.5"/>
+  <!-- Calculator/document representation -->
+  <rect x="6" y="12" width="12" height="10" rx="1" fill="#fff" stroke="#1976d2" stroke-width="1.5"/>
+  <!-- Calculator buttons/lines -->
+  <line x1="8" y1="14.5" x2="16" y2="14.5" stroke="#1976d2" stroke-width="1"/>
+  <line x1="8" y1="17" x2="10" y2="17" stroke="#1976d2" stroke-width="1"/>
+  <line x1="11.5" y1="17" x2="13.5" y2="17" stroke="#1976d2" stroke-width="1"/>
+  <line x1="15" y1="17" x2="16" y2="17" stroke="#1976d2" stroke-width="1"/>
+  <line x1="8" y1="19.5" x2="10" y2="19.5" stroke="#1976d2" stroke-width="1"/>
+  <line x1="11.5" y1="19.5" x2="13.5" y2="19.5" stroke="#1976d2" stroke-width="1"/>
+  <line x1="15" y1="19.5" x2="16" y2="19.5" stroke="#1976d2" stroke-width="1"/>
+</svg>
