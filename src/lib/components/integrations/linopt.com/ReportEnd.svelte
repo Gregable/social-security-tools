@@ -3,9 +3,13 @@
   import type { MonthDate } from '$lib/month-time';
   import { recipientFilingDate, spouseFilingDate } from '$lib/context';
   import RecipientName from '$lib/components/RecipientName.svelte';
+  import { CURRENT_YEAR } from '$lib/constants';
 
   export let recipient: Recipient;
   export let spouse: Recipient | null = null;
+
+  // Linopt assumes 2.5% annual inflation rate
+  const LINOPT_INFLATION_RATE = 0.025;
 
   // Toggle for lower earner benefit calculation (personal only vs personal + spousal)
   let includeSpousalBenefit = false;
@@ -30,7 +34,7 @@
       ? $spouseFilingDate
       : $recipientFilingDate;
 
-  // Helper function to get monthly benefit for display in option preview
+  // Helper function to get monthly benefit for display in option preview (today's dollars)
   function getMonthlyBenefit(
     recipient: Recipient,
     filingDate: MonthDate | null,
@@ -53,7 +57,20 @@
     } else {
       monthlyBenefit = recipient.benefitOnDate(filingDate, filingDate);
     }
+    // Note that .wholeDollars returns a string with $ sign and commas.
     return monthlyBenefit.roundToDollar().wholeDollars();
+  }
+
+  // Helper function to calculate years until benefit starts
+  function getYearsUntilBenefitStarts(filingDate: MonthDate | null): number {
+    if (filingDate === null) return 0;
+    const filingYear = filingDate.year();
+    return Math.max(0, filingYear - CURRENT_YEAR);
+  }
+
+  // Helper function to inflate amount from today's dollars to future dollars
+  function inflateAmount(todaysDollars: number, years: number): number {
+    return todaysDollars * Math.pow(1 + LINOPT_INFLATION_RATE, years);
   }
 
   // Helper function to get filing age for display in option preview
@@ -73,6 +90,7 @@
 
   // Format benefit for display (yearly amount in thousands, no $ sign)
   // Uses the filing date to calculate the benefit with early/delayed adjustments
+  // Adjusts for inflation to match Linopt's expectation of future dollars
   function formatYearlySS(
     recipient: Recipient,
     filingDate: MonthDate | null,
@@ -103,8 +121,16 @@
       // Use PIA at normal retirement age if no filing date selected
       monthlyBenefit = recipient.pia().primaryInsuranceAmount();
     }
-    const yearlyAmount = monthlyBenefit.times(12);
-    const dollars = yearlyAmount.roundToDollar().value();
+
+    let yearlyAmount = monthlyBenefit.times(12);
+    let dollars = yearlyAmount.roundToDollar().value();
+
+    // Inflate to future dollars for Linopt
+    if (filingDate !== null) {
+      const yearsUntilStart = getYearsUntilBenefitStarts(filingDate);
+      dollars = inflateAmount(dollars, yearsUntilStart);
+    }
+
     // Convert to thousands with 3 decimal places
     return (dollars / 1000).toFixed(3);
   }
@@ -341,6 +367,16 @@
     <div class="caveats">
       <h3>Caveats</h3>
       <ul>
+        <li>
+          <strong>Inflation Adjustment:</strong> The yearly benefit amounts
+          shown below are adjusted for inflation to match Linopt's expectations.
+          Linopt assumes you enter benefits in future dollars and then applies
+          its own 2.5% annual inflation from the starting age forward. We've
+          inflated the amounts by 2.5% annually from {CURRENT_YEAR} to the year benefits
+          begin, so Linopt's inflation adjustment will correctly model the benefit
+          growth. The amounts shown in the toggle options above are in today's dollars
+          ({CURRENT_YEAR}) for easier comparison.
+        </li>
         <li>
           The starting age is rounded to the nearest year. Linopt only accepts
           integer ages, while your actual
