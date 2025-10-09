@@ -112,6 +112,13 @@ warning.
 - **Report End**: Provides context about filing date strategies and a
   pre-populated link back to Open Social Security with the user's data
 
+### Linopt (linopt.com)
+
+- **Intro Banner**: Informs users that they'll see their PIA information for use
+  with Linopt
+- **Report End**: Displays the user's Primary Insurance Amount(s) and provides a
+  link to Linopt for retirement income optimization
+
 ## Testing
 
 Unit tests for the integration system are in `src/test/integrations.test.ts`.

@@ -37,6 +37,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'linopt.com': {
+    id: 'linopt.com',
+    displayName: 'Linopt',
+    reportEndLabel: 'Linopt',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/linopt.com/linopt-fig.png'
+      );
+      return module.default;
+    },
+  },
 };
 
 /**

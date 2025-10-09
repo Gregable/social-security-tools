@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   import type { Birthdate } from '$lib/birthday';
   import { Recipient } from '$lib/recipient';
   import { Money } from '$lib/money';
   import Slider from './Slider.svelte';
   import RecipientName from './RecipientName.svelte';
+  import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 
   import { MonthDate, MonthDuration } from '$lib/month-time';
 
@@ -18,6 +19,14 @@
   let canvasEl_: HTMLCanvasElement;
   let ctx_: CanvasRenderingContext2D;
 
+  // Determine which filing date store to use based on whether this is the first or second recipient
+  $: filingDateStore = $recipient.first
+    ? recipientFilingDate
+    : spouseFilingDate;
+  $: filingDateValue = $recipient.first
+    ? $recipientFilingDate
+    : $spouseFilingDate;
+
   // sliderMonths_ is bound to the value of the slider, in months.
   // This is set once in onMount to the user's NRA, typically 66 * 12.
   // It is not set again, even if the users's birthday/NRA changes so that
@@ -25,6 +34,38 @@
   // manually.
   let sliderMonths_: number = 62 * 12;
   $: sliderMonths_ && render();
+
+  // Track if we're currently updating from the store to prevent circular updates
+  let updatingFromStore_: boolean = false;
+
+  // Update store when slider value changes
+  // Only export after mount to ensure we start with NRA, not the default 62
+  $: {
+    if (sliderMonths_ && $recipient && mounted_ && !updatingFromStore_) {
+      filingDateStore.set(userSelectedDate());
+    }
+  }
+
+  // Sync slider position when store changes (e.g., from CombinedChart or SurvivorReport)
+  $: {
+    if (filingDateValue && $recipient && mounted_) {
+      const ageAtFiling = $recipient.birthdate.ageAtSsaDate(filingDateValue);
+      const newSliderMonths = ageAtFiling.asMonths();
+      // Only update if significantly different to avoid infinite loops
+      if (Math.abs(newSliderMonths - sliderMonths_) > 0.5) {
+        syncSliderFromStore(newSliderMonths);
+      }
+    }
+  }
+
+  async function syncSliderFromStore(newSliderMonths: number) {
+    updatingFromStore_ = true;
+    await tick(); // Ensure flag update happens before slider change
+    sliderMonths_ = newSliderMonths;
+    await tick(); // Ensure slider change completes before unsetting flag
+    updatingFromStore_ = false;
+  }
+
   // userFloor_ is the minimum age that the user can select. This may be
   // 62 years or 62 years and one month, depending on their birthdate.
   let userFloor_: number = 62 * 12;
@@ -44,9 +85,25 @@
   let blueish_ = '#337ab7';
 
   onMount(() => {
+    // Set guard flag during initialization to prevent circular updates
+    updatingFromStore_ = true;
+
     sliderMonths_ = recipient.normalRetirementAge().asMonths();
-    updateCanvas();
-    mounted_ = true;
+
+    // Set store to match initialized slider position
+    filingDateStore.set(userSelectedDate());
+
+    // Initialize asynchronously but return cleanup function synchronously
+    (async () => {
+      // Wait for one tick to ensure store updates propagate
+      await tick();
+
+      // Enable sync and render
+      updatingFromStore_ = false;
+      mounted_ = true;
+      updateCanvas();
+    })();
+
     media_query_list = window.matchMedia('print');
     media_query_list.addEventListener('change', updateCanvas);
     return () => {

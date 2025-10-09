@@ -1,0 +1,1638 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-RD62H7XMJT"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-RD62H7XMJT');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Linopt Lifetime Optimizer - Retirement Planning & Optimization Tool
+    </title>
+    <meta
+      name="description"
+      content="Linopt Lifetime Optimizer: Advanced modeling tool for retirement planning and wealth optimization. Simulate investment scenarios, maximize savings, and secure your financial future with data-driven insights."
+    />
+    <meta
+      name="keywords"
+      content="retirement optimization, wealth management, financial planning, retirement calculator, investment simulator, Lifetime Optimizer, retirement strategies"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta
+      property="og:title"
+      content="Linopt Lifetime Optimizer - Retirement Planning & Optimization Tool"
+    />
+    <meta
+      property="og:description"
+      content="Linopt Lifetime Optimizer: Advanced tool for retirement planning and wealth optimization. Simulate investment scenarios, maximize savings, and secure your financial future with data-driven insights."
+    />
+    <meta
+      property="og:image"
+      content="https://linopt.com/static/img/linoptog-1200x630.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://linopt.com/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Linopt Lifetime Optimizer - Retirement Planning & Optimization Tool"
+    />
+    <meta
+      name="twitter:description"
+      content="Linopt Lifetime Optimizer: Advanced tool for retirement planning and wealth optimization. Simulate investment scenarios, maximize savings, and secure your financial future with data-driven insights."
+    />
+    <meta
+      name="twitter:image"
+      content="https://linopt.com/static/img/linoptog-1200x630.jpg"
+    />
+    <link rel="canonical" href="https://linopt.com/" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://linopt.com/static/img/linopt-fig.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/css/bootstrap.min.css"
+      integrity="sha512-fw7f+TcMjTb7bpbLJZlP8g2Y4XcCyFZW8uy8HsRZsH/SwbMw0plKHFHr99DN3l04VsYNwvzicUX/6qurvIxbxw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css"
+      integrity="sha512-t7Few9xlddEmgd3oKZQahkNI4dS6l80+eGEzFQiqtyVYdvcSG2D3Iub77R20BdotfRPA9caaRkg1tyaJiPmO0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.14.0/dist/chartjs-chart-sankey.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/js/bootstrap.bundle.min.js"
+      integrity="sha512-Tc0i+vRogmX4NN7tuLbQfBxa8JkfUSAxSFVzmU31nVdHyiHElPPy2cWfFacmCJKw0VqovrzKhdd2TSTMdAxp2g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+      integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oxanium:wght@200..800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.22.2/sweetalert2.min.css"
+      integrity="sha512-bkb9OVJFbnXaSi8PvT9arbq1WSE9QCDkLse1RqPlhnRqmH16CgmL9HAd0W99NYfVIp66gZb4k+L1jOr+JuT8Og=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.22.2/sweetalert2.all.min.js"
+      integrity="sha512-rBcqrtFFt2PxFGp3ffb/lECz3pYr2DoF1FWmnMLy6qVdAOnaQg2C4wK84m64K36aK0qxkImFrlb/AKgOoeTvSg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link rel="stylesheet" href="/static/css/style.css?v=1.0" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.5.18/vue.global.prod.min.js"
+      integrity="sha512-UyWj9VA5pQrLGoqDUNeT9ciMYGkWexsNHnMQksL9eeiRQyHzD9nIHAj9JzUrbaJ8XRukAkZkQS9EKCnx/Dc8Lw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script>
+      (function () {
+        var savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+      })();
+    </script>
+    <script src="/static/js/theme.js?v=1.74"></script>
+    <script src="/static/js/app.js?v=1.74" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm fixed-top bg-body-tertiary">
+      <div
+        class="container-fluid d-flex justify-content-between align-items-center"
+      >
+        <a class="navbar-brand" href="/">
+          <img
+            id="logo-fig"
+            src="/static/img/linopt-fig.png"
+            width="36"
+            height="36"
+          />
+          <span class="d-none d-sm-inline ps-2">LINOPT</span>
+        </a>
+        <div class="d-flex align-items-center gap-3">
+          <button
+            id="shareBtn"
+            class="btn btn-outline-primary btn-sm"
+            title="Share my plan"
+          >
+            <i class="bi bi-share-fill"></i> Share
+          </button>
+
+          <div class="theme-switcher">
+            <i class="bi bi-moon-fill" title="Dark mode"></i>
+            <i class="bi bi-sun-fill" title="Light mode"></i>
+          </div>
+          <button
+            class="navbar-toggler ms-2"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="/contact">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/donate">Donate</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container mt-4 mb-5" id="app">
+      <header class="text-center mb-4">
+        <h1>Lifetime Optimizer</h1>
+      </header>
+
+      <form
+        ref="retForm"
+        class="needs-validation"
+        novalidate
+        @submit.prevent="calculatePlan"
+      >
+        <ul
+          class="nav nav-tabs mb-3 flex-nowrap"
+          id="inputTab"
+          role="tablist"
+          style="overflow-x: auto"
+        >
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="basic-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#basic"
+              type="button"
+              role="tab"
+              aria-controls="basic"
+              aria-selected="true"
+            >
+              Basic
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="income-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#income"
+              type="button"
+              role="tab"
+              aria-controls="income"
+              aria-selected="false"
+            >
+              Income
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="accounts-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#accounts"
+              type="button"
+              role="tab"
+              aria-controls="accounts"
+              aria-selected="false"
+            >
+              Accounts
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="config-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#config"
+              type="button"
+              role="tab"
+              aria-controls="config"
+              aria-selected="false"
+            >
+              Misc.
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="goal-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#goal"
+              type="button"
+              role="tab"
+              aria-controls="goal"
+              aria-selected="false"
+            >
+              Goals
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="results-tab"
+              data-bs-target="#results"
+              type="button"
+              role="tab"
+              aria-controls="results"
+              aria-selected="false"
+              @click="showResults"
+            >
+              Results
+              <i
+                class="bi bi-arrow-repeat ms-1"
+                id="results-icon"
+                style="font-weight: bold"
+              ></i>
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="inputTabContent">
+          <div
+            class="tab-pane fade show active"
+            id="basic"
+            role="tabpanel"
+            aria-labelledby="basic-tab"
+          >
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Personal Details</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="hasSpouse"
+                        v-model="form.hasSpouse"
+                      />
+                      <label class="form-check-label" for="hasSpouse"
+                        >Married</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="current_age" class="form-label">Age</label>
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      class="form-control"
+                      id="current_age"
+                      v-model.number="form.current_age"
+                      min="18"
+                      max="110"
+                      step="1"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid age (18-110).
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label for="current_age_spouse" class="form-label"
+                      >Age - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      class="form-control"
+                      id="current_age_spouse"
+                      v-model.number="form.current_age_spouse"
+                      min="18"
+                      max="110"
+                      step="1"
+                      :required="form.hasSpouse"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid spouse age (18-110).
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="retirement_age" class="form-label"
+                      >Retirement Age</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      class="form-control"
+                      id="retirement_age"
+                      v-model.number="form.retirement_age"
+                      min="18"
+                      max="110"
+                      step="1"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid retirement age (18-110).
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label for="retirement_age_spouse" class="form-label"
+                      >Retirement Age - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      class="form-control"
+                      id="retirement_age_spouse"
+                      v-model.number="form.retirement_age_spouse"
+                      min="18"
+                      max="110"
+                      step="1"
+                      :required="form.hasSpouse"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid spouse retirement age (18-110).
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="ending_age" class="form-label"
+                      >Ending Age</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      class="form-control"
+                      id="ending_age"
+                      v-model.number="form.ending_age"
+                      min="18"
+                      max="110"
+                      step="1"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid end age (18-110).
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm mt-2 next-btn"
+              @click="nextTab('income')"
+            >
+              Next
+            </button>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="income"
+            role="tabpanel"
+            aria-labelledby="income-tab"
+          >
+            <p class="text-info-emphasis fst-italic">
+              Enter amounts in thousands of dollars (e.g., for $10,500, enter
+              10.5)
+            </p>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Expenses</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label for="annual_expenses_thousands" class="form-label"
+                      >Yearly Expenses</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="annual_expenses_thousands"
+                      required
+                      v-model.number="form.annual_expenses_thousands"
+                      min="1"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Earned Income</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6 col-12">
+                    <label for="annual_earned_thousands" class="form-label"
+                      >Yearly Earned Income</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="annual_earned_thousands"
+                      v-model.number="form.annual_earned_thousands"
+                      min="0"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label
+                      for="annual_earned_thousands_spouse"
+                      class="form-label"
+                      >Yearly Earned Income - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="annual_earned_thousands_spouse"
+                      v-model.number="form.annual_earned_thousands_spouse"
+                      min="0"
+                      step="any"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Social Security Income</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6 col-12">
+                    <label for="ss_annual_thousands" class="form-label"
+                      >Yearly Social Security</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="ss_annual_thousands"
+                      v-model.number="form.ss_annual_thousands"
+                      min="0"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label for="ss_annual_thousands_spouse" class="form-label"
+                      >Yearly Social Security - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="ss_annual_thousands_spouse"
+                      v-model.number="form.ss_annual_thousands_spouse"
+                      min="0"
+                      step="any"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="age_start_ss" class="form-label"
+                      >Age to Start Social Security</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      class="form-control"
+                      id="age_start_ss"
+                      v-model.number="form.age_start_ss"
+                      min="62"
+                      max="70"
+                      step="1"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid age (62-70).
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label for="age_start_ss_spouse" class="form-label"
+                      >Age to Start Social Security - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      class="form-control"
+                      id="age_start_ss_spouse"
+                      v-model.number="form.age_start_ss_spouse"
+                      min="62"
+                      max="70"
+                      step="1"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid age (62-70).
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Pension Income</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4 col-12">
+                    <label for="pension_annual_thousands" class="form-label"
+                      >Yearly Pension</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="pension_annual_thousands"
+                      v-model.number="form.pension_annual_thousands"
+                      min="0"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">Invalid.</div>
+                  </div>
+                  <div class="col-md-2 col-12">
+                    <label for="pension_annual_cola" class="form-label"
+                      >COLA %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="pension_annual_cola"
+                      v-model.number="form.pension_annual_cola"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-10%</div>
+                  </div>
+                  <div
+                    class="col-md-4 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label
+                      for="pension_annual_thousands_spouse"
+                      class="form-label"
+                      >Pension - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="pension_annual_thousands_spouse"
+                      v-model.number="form.pension_annual_thousands_spouse"
+                      min="0"
+                      step="any"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">Invalid.</div>
+                  </div>
+                  <div
+                    class="col-md-2 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label for="pension_annual_cola_spouse" class="form-label"
+                      >COLA %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="pension_annual_cola_spouse"
+                      v-model.number="form.pension_annual_cola_spouse"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-10%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm mt-2 next-btn"
+              @click="nextTab('accounts')"
+            >
+              Next
+            </button>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="accounts"
+            role="tabpanel"
+            aria-labelledby="accounts-tab"
+          >
+            <p class="text-info-emphasis fst-italic">
+              Enter amounts in thousands of dollars (e.g., for $10,500, enter
+              10.5)
+            </p>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Savings Account</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4 col-12">
+                    <label for="initial_savings_thousands" class="form-label"
+                      >Savings Balance</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control regular-savings-input"
+                      id="initial_savings_thousands"
+                      v-model.number="form.initial_savings_thousands"
+                      min="0"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div class="col-md-2 col-12">
+                    <label for="savings_interest_percent" class="form-label"
+                      >APY %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="savings_interest_percent"
+                      v-model.number="form.savings_interest_percent"
+                      min="0"
+                      max="20"
+                      step="0.1"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-20%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Brokerage Account</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4 col-12">
+                    <label for="initial_brokerage_thousands" class="form-label"
+                      >Brokerage Value</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control brokerage-input"
+                      id="initial_brokerage_thousands"
+                      v-model.number="form.initial_brokerage_thousands"
+                      min="0"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div class="col-md-2 col-12">
+                    <label for="brokerage_return_percent" class="form-label"
+                      >Return %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="brokerage_return_percent"
+                      v-model.number="form.brokerage_return_percent"
+                      min="0"
+                      max="50"
+                      step="0.1"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-50%</div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="lt_cg_percent" class="form-label"
+                      >Long Term Capital Gains Tax %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="lt_cg_percent"
+                      v-model.number="form.lt_cg_percent"
+                      min="0"
+                      max="50"
+                      step="0.1"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-50%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">
+                Traditional Tax-Deferred IRA/401(k) Accounts
+              </div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4 col-12">
+                    <label for="initial_trad_thousands" class="form-label"
+                      >Tax-Deferred IRA/401(k)</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control traditional-input"
+                      id="initial_trad_thousands"
+                      v-model.number="form.initial_trad_thousands"
+                      min="0"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div class="col-md-2 col-12">
+                    <label for="roth_return_percent" class="form-label"
+                      >Return %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="roth_return_percent"
+                      v-model.number="form.roth_return_percent"
+                      min="0"
+                      max="50"
+                      step="0.1"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-50%</div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label
+                      for="initial_trad_thousands_spouse"
+                      class="form-label"
+                      >Tax-Deferred IRA/401(k) - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control traditional-spouse-input"
+                      id="initial_trad_thousands_spouse"
+                      v-model.number="form.initial_trad_thousands_spouse"
+                      min="0"
+                      step="any"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Roth IRA Accounts</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6 col-12">
+                    <label for="initial_roth_thousands" class="form-label"
+                      >Roth IRA/401(k)</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control roth-input"
+                      id="initial_roth_thousands"
+                      v-model.number="form.initial_roth_thousands"
+                      min="0"
+                      step="any"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label
+                      for="initial_roth_thousands_spouse"
+                      class="form-label"
+                      >Roth IRA/401(k) - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control roth-spouse-input"
+                      id="initial_roth_thousands_spouse"
+                      v-model.number="form.initial_roth_thousands_spouse"
+                      min="0"
+                      step="any"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="max_roth_conv_thousands" class="form-label"
+                      >Yearly Max. Roth Conversion</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control roth-input"
+                      id="max_roth_conv_thousands"
+                      v-model.number="form.max_roth_conv_thousands"
+                      min="0"
+                      step="any"
+                      placeholder="unlimited"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label
+                      for="max_roth_conv_thousands_spouse"
+                      class="form-label"
+                      >Yearly Max. Roth Conversion - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control roth-spouse-input"
+                      id="max_roth_conv_thousands_spouse"
+                      v-model.number="form.max_roth_conv_thousands_spouse"
+                      min="0"
+                      step="any"
+                      placeholder="unlimited"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Contribution Limits</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6 col-12">
+                    <label for="max_trad_contrib_thousands" class="form-label"
+                      >Yearly Max to Traditional Tax-Deferred IRA/401(k)</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control traditional-input"
+                      id="max_trad_contrib_thousands"
+                      v-model.number="form.max_trad_contrib_thousands"
+                      min="0"
+                      max="100"
+                      step="any"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label
+                      for="max_trad_contrib_thousands_spouse"
+                      class="form-label"
+                      >Yearly Max to Traditional Tax-Deferred IRA/401(k) -
+                      Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control traditional-spouse-input"
+                      id="max_trad_contrib_thousands_spouse"
+                      v-model.number="form.max_trad_contrib_thousands_spouse"
+                      min="0"
+                      max="100"
+                      step="any"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="max_roth_contrib_thousands" class="form-label"
+                      >Yearly Max to Roth</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control roth-input"
+                      id="max_roth_contrib_thousands"
+                      v-model.number="form.max_roth_contrib_thousands"
+                      min="0"
+                      max="100"
+                      step="any"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div
+                    class="col-md-6 col-12"
+                    :class="{ 'spouse-field': true, disabled: !form.hasSpouse }"
+                  >
+                    <label
+                      for="max_roth_contrib_thousands_spouse"
+                      class="form-label"
+                      >Yearly Max to Roth - Spouse</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control roth-spouse-input"
+                      id="max_roth_contrib_thousands_spouse"
+                      v-model.number="form.max_roth_contrib_thousands_spouse"
+                      min="0"
+                      max="100"
+                      step="any"
+                      :disabled="!form.hasSpouse"
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm mt-2 next-btn"
+              @click="nextTab('config')"
+            >
+              Next
+            </button>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="config"
+            role="tabpanel"
+            aria-labelledby="config-tab"
+          >
+            <p class="text-info-emphasis fst-italic">
+              Enter amounts in thousands of dollars (e.g., for $10,500, enter
+              10.5)
+            </p>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Rates</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6 col-12">
+                    <label for="inflation_percent" class="form-label"
+                      >Yearly Inflation %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="inflation_percent"
+                      v-model.number="form.inflation_percent"
+                      min="0"
+                      max="20"
+                      step="0.1"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-20%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Payroll Parameters</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label for="ss_wage_base_thousands" class="form-label"
+                      >Social Security Wage Base</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="ss_wage_base_thousands"
+                      v-model.number="form.ss_wage_base_thousands"
+                      min="0"
+                      step="any"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">
+                      Please enter a valid amount.
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="payroll_tax_ss_percent" class="form-label"
+                      >Social Security Tax %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="payroll_tax_ss_percent"
+                      v-model.number="form.payroll_tax_ss_percent"
+                      min="0"
+                      max="20"
+                      step="0.01"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-20%</div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <label for="payroll_tax_medicare_percent" class="form-label"
+                      >Medicare Tax %</label
+                    >
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      class="form-control"
+                      id="payroll_tax_medicare_percent"
+                      v-model.number="form.payroll_tax_medicare_percent"
+                      min="0"
+                      max="20"
+                      step="0.01"
+                      required
+                      @blur="validateField($event.target)"
+                    />
+                    <div class="invalid-feedback">0-20%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm mt-2 next-btn"
+              @click="nextTab('goal')"
+            >
+              Next
+            </button>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="goal"
+            role="tabpanel"
+            aria-labelledby="goal-tab"
+          >
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header">Optimization Goal</div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <p class="form-label">Select Goal</p>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="goalSelect"
+                        id="goalMaxNetWorth"
+                        value="max_net_worth"
+                        v-model="form.goal"
+                        required
+                      />
+                      <label class="form-check-label" for="goalMaxNetWorth"
+                        >Maximize final net worth</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="goalSelect"
+                        id="goalMinRetirementAge"
+                        value="min_retirement_age"
+                        v-model="form.goal"
+                        required
+                      />
+                      <label class="form-check-label" for="goalMinRetirementAge"
+                        >Minimize retirement age</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="goalSelect"
+                        id="goalMaxRetirementSpend"
+                        value="max_retirement_spend"
+                        v-model="form.goal"
+                        required
+                      />
+                      <label
+                        class="form-check-label"
+                        for="goalMaxRetirementSpend"
+                        >Maximize sustainable retirement spending
+                      </label>
+                    </div>
+                    <div class="invalid-feedback">Please select a goal.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary w-100 mt-2"
+              id="calculateBtn"
+              @click="calculatePlan"
+            >
+              Calculate Plan
+            </button>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="results"
+            role="tabpanel"
+            aria-labelledby="results-tab"
+          >
+            <ul
+              class="nav nav-tabs mb-3 flex-nowrap"
+              id="resultsTab"
+              role="tablist"
+              style="overflow-x: auto"
+            >
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="summary-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#summary"
+                  type="button"
+                  role="tab"
+                  aria-controls="summary"
+                  aria-selected="true"
+                >
+                  Summary
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="balances-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#balances"
+                  type="button"
+                  role="tab"
+                  aria-controls="balances"
+                  aria-selected="false"
+                >
+                  Balances
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="income-tax-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#income-tax"
+                  type="button"
+                  role="tab"
+                  aria-controls="income-tax"
+                  aria-selected="false"
+                >
+                  Income & Tax
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="withdrawals-conversions-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#withdrawals-conversions"
+                  type="button"
+                  role="tab"
+                  aria-controls="withdrawals-conversions"
+                  aria-selected="false"
+                >
+                  Withdrawals & Conversions
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="cashflow-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#cashflow"
+                  type="button"
+                  role="tab"
+                  aria-controls="cashflow"
+                  aria-selected="false"
+                >
+                  Cashflow
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="custom-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#custom"
+                  type="button"
+                  role="tab"
+                  aria-controls="custom"
+                  aria-selected="false"
+                >
+                  Custom/Data
+                </button>
+              </li>
+            </ul>
+            <div class="tab-content" id="resultsTabContent">
+              <div
+                class="tab-pane fade show active"
+                id="summary"
+                role="tabpanel"
+                aria-labelledby="summary-tab"
+              >
+                <div v-html="summaryHtml"></div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="balances"
+                role="tabpanel"
+                aria-labelledby="balances-tab"
+              >
+                <h2 class="h4 mb-3">Account Balances Over Time</h2>
+                <div id="chart_balances" class="chart-container shadow-sm">
+                  <canvas id="canvas_balances"></canvas>
+                </div>
+                <h2 class="h4 mt-4 mb-3">
+                  Account Balance Composition - Normalized
+                </h2>
+                <div
+                  id="chart_net_worth_breakdown"
+                  class="chart-container shadow-sm"
+                >
+                  <canvas id="canvas_net_worth_breakdown"></canvas>
+                </div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="income-tax"
+                role="tabpanel"
+                aria-labelledby="income-tax-tab"
+              >
+                <h2 class="h4 mb-3">Annual Income</h2>
+                <div id="chart_annual_income" class="chart-container shadow-sm">
+                  <canvas id="canvas_annual_income"></canvas>
+                </div>
+                <h2 class="h4 mt-4 mb-3">Tax Insights Over Time</h2>
+                <div id="chart_tax_insights" class="chart-container shadow-sm">
+                  <canvas id="canvas_tax_insights"></canvas>
+                </div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="withdrawals-conversions"
+                role="tabpanel"
+                aria-labelledby="withdrawals-conversions-tab"
+              >
+                <h2 class="h4 mb-3">Annual Withdrawals</h2>
+                <div id="chart_withdrawals" class="chart-container shadow-sm">
+                  <canvas id="canvas_withdrawals"></canvas>
+                </div>
+                <h2 class="h4 mt-4 mb-3">Roth Conversions Over Time</h2>
+                <div id="chart_conversions" class="chart-container shadow-sm">
+                  <canvas id="canvas_conversions"></canvas>
+                </div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="cashflow"
+                role="tabpanel"
+                aria-labelledby="cashflow-tab"
+              >
+                <h2 class="h4 mb-3">Annual Cashflow Balance</h2>
+                <div
+                  id="chart_annual_cashflow_balance"
+                  class="chart-container shadow-sm"
+                >
+                  <canvas id="canvas_annual_cashflow_balance"></canvas>
+                </div>
+                <h2 class="h4 mt-4 mb-3">Overall Cashflow</h2>
+                <div id="chart_sankey" class="chart-container shadow-sm">
+                  <canvas id="canvas_sankey"></canvas>
+                </div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="custom"
+                role="tabpanel"
+                aria-labelledby="custom-tab"
+              >
+                <h2 class="h4 mb-3">Custom Metrics Over Time</h2>
+                <div class="mb-3">
+                  <label for="metricSelect" class="form-label"
+                    >Select Metrics for Custom Graph</label
+                  >
+                  <select
+                    multiple
+                    class="form-select"
+                    id="metricSelect"
+                    v-model="selectedMetrics"
+                    aria-describedby="metricSelectHelp"
+                    @change="drawCustomChart"
+                  >
+                    <optgroup label="Income & Expenses">
+                      <option value="earned">Earned Income</option>
+                      <option value="earned_spouse" v-show="form.hasSpouse">
+                        Earned Income Spouse
+                      </option>
+                      <option value="pension">Pension</option>
+                      <option value="pension_spouse" v-show="form.hasSpouse">
+                        Pension Spouse
+                      </option>
+                      <option value="ss">SS</option>
+                      <option value="ss_spouse" v-show="form.hasSpouse">
+                        SS Spouse
+                      </option>
+                      <option value="expenses">Expenses</option>
+                    </optgroup>
+                    <optgroup label="Withdrawals">
+                      <option value="savings_withdrawal">
+                        Savings Withdrawal
+                      </option>
+                      <option value="roth_withdrawal">Roth Withdrawal</option>
+                      <option
+                        value="roth_withdrawal_spouse"
+                        v-show="form.hasSpouse"
+                      >
+                        Roth Withdrawal Spouse
+                      </option>
+                      <option value="brokerage_withdrawal">
+                        Brokerage Withdrawal
+                      </option>
+                      <option value="trad_withdrawal">Trad Withdrawal</option>
+                      <option
+                        value="trad_withdrawal_spouse"
+                        v-show="form.hasSpouse"
+                      >
+                        Trad Withdrawal Spouse
+                      </option>
+                    </optgroup>
+                    <optgroup label="Conversions">
+                      <option value="roth_conversion">Roth Conversion</option>
+                      <option
+                        value="roth_conversion_spouse"
+                        v-show="form.hasSpouse"
+                      >
+                        Roth Conversion Spouse
+                      </option>
+                    </optgroup>
+                    <optgroup label="Taxes">
+                      <option value="income_tax">Income Tax</option>
+                      <option value="tax_bracket_rate">Tax Bracket Rate</option>
+                      <option value="cg_tax">CG Tax</option>
+                      <option value="payroll_tax">Payroll Tax</option>
+                    </optgroup>
+                    <optgroup label="Gains">
+                      <option value="savings_interest">Savings Interest</option>
+                      <option value="roth_gains">Roth Gains</option>
+                      <option value="roth_gains_spouse" v-show="form.hasSpouse">
+                        Roth Gains Spouse
+                      </option>
+                      <option value="brokerage_gains">Brokerage Gains</option>
+                      <option value="trad_gains">Trad Gains</option>
+                      <option value="trad_gains_spouse" v-show="form.hasSpouse">
+                        Trad Gains Spouse
+                      </option>
+                    </optgroup>
+                    <optgroup label="Savings/Brokerage">
+                      <option value="brokerage_deposit">
+                        Brokerage Deposit
+                      </option>
+                      <option value="add_to_savings">Savings Deposit</option>
+                    </optgroup>
+                    <optgroup label="Balances">
+                      <option value="savings_balance">Savings Balance</option>
+                      <option value="roth_balance">Roth Balance</option>
+                      <option
+                        value="roth_balance_spouse"
+                        v-show="form.hasSpouse"
+                      >
+                        Roth Balance Spouse
+                      </option>
+                      <option value="brokerage_balance">
+                        Brokerage Balance
+                      </option>
+                      <option value="trad_balance">Trad Balance</option>
+                      <option
+                        value="trad_balance_spouse"
+                        v-show="form.hasSpouse"
+                      >
+                        Trad Balance Spouse
+                      </option>
+                      <option value="net_worth">Net Worth</option>
+                    </optgroup>
+                    <optgroup label="RMDs">
+                      <option value="rmd">RMD</option>
+                      <option value="rmd_spouse" v-show="form.hasSpouse">
+                        RMD Spouse
+                      </option>
+                    </optgroup>
+                    <optgroup label="Contributions">
+                      <option value="trad_contrib">Trad Contrib</option>
+                      <option value="roth_contrib">Roth Contrib</option>
+                      <option
+                        value="trad_contrib_spouse"
+                        v-show="form.hasSpouse"
+                      >
+                        Trad Contrib Spouse
+                      </option>
+                      <option
+                        value="roth_contrib_spouse"
+                        v-show="form.hasSpouse"
+                      >
+                        Roth Contrib Spouse
+                      </option>
+                    </optgroup>
+                  </select>
+                  <small id="metricSelectHelp" class="form-text text-muted"
+                    >Hold Ctrl/Cmd to select multiple metrics.</small
+                  >
+                </div>
+                <div id="chart" class="chart-container shadow-sm">
+                  <canvas id="canvas_custom"></canvas>
+                </div>
+                <h2 class="h4 mt-4 mb-3">Data Table</h2>
+                <div
+                  class="table-responsive"
+                  v-if="dataTable.length && columns.length"
+                >
+                  <table
+                    class="table table-striped table-bordered table-sm table-hover datatable"
+                  >
+                    <thead class="table-light">
+                      <tr>
+                        <th
+                          v-for="column in columns"
+                          :key="column.data"
+                          :class="{ 'text-start': column.data === 'age', 'text-end': column.data !== 'age' }"
+                          v-text="column.title"
+                          scope="col"
+                        ></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(row, index) in dataTable" :key="index">
+                        <td
+                          v-for="column in columns"
+                          :key="column.data"
+                          :class="{ 'text-start': column.data === 'age', 'text-end': column.data !== 'age' }"
+                          v-text="column.data === 'age'
+                        ? row[column.data]
+                        : percentMetrics.includes(column.data)
+                            ? formatPercent(row[column.data])
+                            : formatMoney(row[column.data])"
+                        ></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div v-else class="text-muted text-center mt-3">
+                  No data available. Please calculate a plan first.
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    @click="downloadCSV"
+                  >
+                    <i class="bi bi-download me-2"></i>Download as CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="container mt-2 mb-2">
+      <footer class="text-center py-3 my-3 border-top">
+        <div>&copy; 2025 LINOPT Lifetime Optimizer. All Rights Reserved.</div>
+      </footer>
+    </div>
+  </body>
+</html>

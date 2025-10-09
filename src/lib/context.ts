@@ -1,7 +1,9 @@
 /**
  * Global context for the application.
  */
+import { writable, derived } from 'svelte/store';
 import type { Recipient } from './recipient';
+import type { MonthDate } from './month-time';
 
 class Context {
   recipient: Recipient | null = null;
@@ -18,3 +20,32 @@ class Context {
 }
 
 export const context = new Context();
+
+// Filing dates as Svelte stores for proper reactivity
+export const recipientFilingDate = writable<MonthDate | null>(null);
+export const spouseFilingDate = writable<MonthDate | null>(null);
+
+// Derived store for higher earner's filing date
+export const higherEarnerFilingDate = derived(
+  [recipientFilingDate, spouseFilingDate],
+  ([$recipientDate, $spouseDate]) => {
+    if (!context.recipient || !context.spouse) return null;
+
+    if (context.recipient.higherEarningsThan(context.spouse)) {
+      return $recipientDate;
+    } else {
+      return $spouseDate;
+    }
+  }
+);
+
+// Helper function to set higher earner filing date
+export function setHigherEarnerFilingDate(date: MonthDate | null) {
+  if (!context.recipient || !context.spouse) return;
+
+  if (context.recipient.higherEarningsThan(context.spouse)) {
+    recipientFilingDate.set(date);
+  } else {
+    spouseFilingDate.set(date);
+  }
+}

@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   import { Recipient } from '$lib/recipient';
   import { Money } from '$lib/money';
   import Slider from './Slider.svelte';
   import RecipientName from './RecipientName.svelte';
   import { activeIntegration } from '$lib/integrations/context';
+  import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 
   import { MonthDate, MonthDuration } from '$lib/month-time';
 
@@ -79,22 +80,93 @@
 
   let blueish_ = '#337ab7';
 
-  $: onMount(() => {
-    mounted_ = true;
+  $: onMount(async () => {
     if (!canvasEl_) return;
 
     ctx_ = canvasEl_.getContext('2d');
     ctx_.font = 'bold 14px Helvetica';
 
+    // Set guard flags during initialization to prevent circular updates
+    updatingFromStoreA_ = true;
+    updatingFromStoreB_ = true;
+
     ctxA_.sliderMonths = $recipient.normalRetirementAge().asMonths();
     ctxB_.sliderMonths = $spouse.normalRetirementAge().asMonths();
 
+    // Now set stores to match initialized slider positions
+    recipientFilingDate.set(userSelectedDate(ctxA_));
+    spouseFilingDate.set(userSelectedDate(ctxB_));
+
+    // Wait for one tick to ensure store updates propagate
+    await tick();
+
+    // Enable sync and render
+    updatingFromStoreA_ = false;
+    updatingFromStoreB_ = false;
+    mounted_ = true;
     render();
   });
 
   let mouseToggle_: boolean = true;
   let lastMouseX_: number = -1;
   let lastMouseDate_: MonthDate = new MonthDate(0);
+
+  // Track if we're currently updating from stores to prevent circular updates
+  let updatingFromStoreA_: boolean = false;
+  let updatingFromStoreB_: boolean = false;
+
+  // Update stores when slider values change
+  // Only export after mount to ensure we start with NRA, not the default 62*12
+  $: {
+    if (ctxA_.sliderMonths && $recipient && mounted_ && !updatingFromStoreA_) {
+      recipientFilingDate.set(userSelectedDate(ctxA_));
+    }
+  }
+  $: {
+    if (ctxB_.sliderMonths && $spouse && mounted_ && !updatingFromStoreB_) {
+      spouseFilingDate.set(userSelectedDate(ctxB_));
+    }
+  }
+
+  // Sync slider positions when stores change (e.g., from individual charts or SurvivorReport)
+  $: {
+    if ($recipientFilingDate && $recipient && mounted_) {
+      const ageAtFiling =
+        $recipient.birthdate.ageAtSsaDate($recipientFilingDate);
+      const newSliderMonths = ageAtFiling.asMonths();
+      // Only update if significantly different to avoid infinite loops
+      if (Math.abs(newSliderMonths - ctxA_.sliderMonths) > 0.5) {
+        syncSliderAFromStore(newSliderMonths);
+      }
+    }
+  }
+  $: {
+    if ($spouseFilingDate && $spouse && mounted_) {
+      const ageAtFiling = $spouse.birthdate.ageAtSsaDate($spouseFilingDate);
+      const newSliderMonths = ageAtFiling.asMonths();
+      // Only update if significantly different to avoid infinite loops
+      if (Math.abs(newSliderMonths - ctxB_.sliderMonths) > 0.5) {
+        syncSliderBFromStore(newSliderMonths);
+      }
+    }
+  }
+
+  async function syncSliderAFromStore(newSliderMonths: number) {
+    updatingFromStoreA_ = true;
+    await tick(); // Ensure flag update happens before slider change
+    ctxA_.sliderMonths = newSliderMonths;
+    await tick(); // Ensure slider change completes before unsetting flag
+    updatingFromStoreA_ = false;
+  }
+
+  async function syncSliderBFromStore(newSliderMonths: number) {
+    updatingFromStoreB_ = true;
+    await tick(); // Ensure flag update happens before slider change
+    ctxB_.sliderMonths = newSliderMonths;
+    await tick(); // Ensure slider change completes before unsetting flag
+    updatingFromStoreB_ = false;
+  }
+
   function onClick(event: MouseEvent) {
     if (!canvasEl_) return;
     if (mouseToggle_) {
@@ -873,6 +945,13 @@
     updateSlider(ctxB_);
     minCapSlider(ctxA_, ctxB_);
     minCapSlider(ctxB_, ctxA_);
+
+    // Trigger Svelte reactivity by re-assigning the context objects
+    // This ensures the Slider components see the updated ticks
+    // eslint-disable-next-line no-self-assign
+    ctxA_ = ctxA_;
+    // eslint-disable-next-line no-self-assign
+    ctxB_ = ctxB_;
 
     ctx_.save();
     ctx_.clearRect(0, 0, canvasEl_.width, canvasEl_.height);

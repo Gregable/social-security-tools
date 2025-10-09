@@ -1,10 +1,14 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import Expando from './Expando.svelte';
   import { Recipient } from '$lib/recipient';
   import RName from './RecipientName.svelte';
   import { MonthDate, MonthDuration } from '$lib/month-time';
   import Slider from './Slider.svelte';
+  import {
+    higherEarnerFilingDate,
+    setHigherEarnerFilingDate,
+  } from '$lib/context';
 
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
@@ -44,6 +48,49 @@
   let afterDeathSliderMonths_: number = 68 * 12;
   let survivorSliderMonths_: number = 60 * 12;
   let survivorActualFilingDate: MonthDate = new MonthDate(3000 * 12);
+  let mounted_: boolean = false;
+
+  // Track if we're currently updating from the store to prevent circular updates
+  let updatingFromStore_: boolean = false;
+
+  // Update store when beforeDeath slider changes
+  // Only export after mount to ensure we start with NRA
+  $: {
+    if (
+      beforeDeathSliderMonths_ &&
+      higherEarner &&
+      mounted_ &&
+      !updatingFromStore_
+    ) {
+      setHigherEarnerFilingDate(
+        higherEarner.birthdate.dateAtSsaAge(
+          new MonthDuration(beforeDeathSliderMonths_)
+        )
+      );
+    }
+  }
+
+  // Sync slider position when store changes (e.g., from individual or combined charts)
+  $: {
+    if ($higherEarnerFilingDate && higherEarner && mounted_) {
+      const ageAtFiling = higherEarner.birthdate.ageAtSsaDate(
+        $higherEarnerFilingDate
+      );
+      const newSliderMonths = ageAtFiling.asMonths();
+      // Only update if significantly different to avoid infinite loops
+      if (Math.abs(newSliderMonths - beforeDeathSliderMonths_) > 0.5) {
+        syncSliderFromStore(newSliderMonths);
+      }
+    }
+  }
+
+  async function syncSliderFromStore(newSliderMonths: number) {
+    updatingFromStore_ = true;
+    await tick(); // Ensure flag update happens before slider change
+    beforeDeathSliderMonths_ = newSliderMonths;
+    await tick(); // Ensure slider change completes before unsetting flag
+    updatingFromStore_ = false;
+  }
 
   /**
    * Translation function for slider labels to map months to ages.
@@ -118,7 +165,7 @@
     return ticks;
   }
 
-  onMount(() => {
+  onMount(async () => {
     beforeDeathTicks_ = generateTicks(
       MonthDuration.initFromYearsMonths({
         years: 62,
@@ -155,6 +202,25 @@
       false,
       true
     );
+    // Initialize slider to higher earner's NRA
+    // Set guard flag during initialization to prevent circular updates
+    updatingFromStore_ = true;
+
+    beforeDeathSliderMonths_ = higherEarner.normalRetirementAge().asMonths();
+
+    // Set store to match initialized slider position
+    setHigherEarnerFilingDate(
+      higherEarner.birthdate.dateAtSsaAge(
+        new MonthDuration(beforeDeathSliderMonths_)
+      )
+    );
+
+    // Wait for one tick to ensure store updates propagate
+    await tick();
+
+    // Enable sync
+    updatingFromStore_ = false;
+    mounted_ = true;
   });
 
   function minCapSlider() {
