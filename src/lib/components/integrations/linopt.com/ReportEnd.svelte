@@ -2,14 +2,108 @@
   import type { Recipient } from '$lib/recipient';
   import type { MonthDate } from '$lib/month-time';
   import { recipientFilingDate, spouseFilingDate } from '$lib/context';
+  import RecipientName from '$lib/components/RecipientName.svelte';
 
   export let recipient: Recipient;
   export let spouse: Recipient | null = null;
 
-  // Format PIA for display (yearly amount in thousands, no $ sign)
-  function formatYearlySS(recipient: Recipient): string {
-    const monthlyPia = recipient.pia().primaryInsuranceAmount();
-    const yearlyAmount = monthlyPia.times(12);
+  // Toggle for lower earner benefit calculation (personal only vs personal + spousal)
+  let includeSpousalBenefit = false;
+
+  // Determine the higher earner and their filing date
+  $: higherEarner =
+    spouse !== null && recipient.higherEarningsThan(spouse)
+      ? recipient
+      : spouse;
+  $: higherEarnerFilingDate =
+    spouse !== null && recipient.higherEarningsThan(spouse)
+      ? $recipientFilingDate
+      : $spouseFilingDate;
+
+  // Determine the lower earner
+  $: lowerEarner =
+    spouse !== null && recipient.higherEarningsThan(spouse)
+      ? spouse
+      : recipient;
+  $: lowerEarnerFilingDate =
+    spouse !== null && recipient.higherEarningsThan(spouse)
+      ? $spouseFilingDate
+      : $recipientFilingDate;
+
+  // Helper function to get monthly benefit for display in option preview
+  function getMonthlyBenefit(
+    recipient: Recipient,
+    filingDate: MonthDate | null,
+    includeSpousal: boolean
+  ): string {
+    if (filingDate === null || lowerEarner === null) return '$0';
+
+    let monthlyBenefit;
+    if (
+      includeSpousal &&
+      higherEarner !== null &&
+      higherEarnerFilingDate !== null
+    ) {
+      monthlyBenefit = recipient.allBenefitsOnDate(
+        higherEarner,
+        higherEarnerFilingDate,
+        filingDate,
+        filingDate
+      );
+    } else {
+      monthlyBenefit = recipient.benefitOnDate(filingDate, filingDate);
+    }
+    return monthlyBenefit.roundToDollar().wholeDollars();
+  }
+
+  // Helper function to get filing age for display in option preview
+  function getFilingAgeForPreview(
+    recipient: Recipient,
+    filingDate: MonthDate | null
+  ): string {
+    if (filingDate === null) return '';
+    const ageAtFiling = recipient.birthdate.ageAtSsaDate(filingDate);
+    const years = Math.floor(ageAtFiling.asMonths() / 12);
+    const months = ageAtFiling.asMonths() % 12;
+    if (months === 0) {
+      return `${years}`;
+    }
+    return `${years} and ${months} month${months > 1 ? 's' : ''}`;
+  }
+
+  // Format benefit for display (yearly amount in thousands, no $ sign)
+  // Uses the filing date to calculate the benefit with early/delayed adjustments
+  function formatYearlySS(
+    recipient: Recipient,
+    filingDate: MonthDate | null,
+    isLowerEarner: boolean
+  ): string {
+    let monthlyBenefit;
+    if (filingDate !== null) {
+      // For lower earner, optionally include spousal benefit
+      if (
+        isLowerEarner &&
+        includeSpousalBenefit &&
+        spouse !== null &&
+        higherEarner !== null &&
+        higherEarnerFilingDate !== null
+      ) {
+        // Calculate personal + spousal benefit
+        monthlyBenefit = recipient.allBenefitsOnDate(
+          higherEarner,
+          higherEarnerFilingDate,
+          filingDate,
+          filingDate
+        );
+      } else {
+        // Calculate personal benefit only
+        monthlyBenefit = recipient.benefitOnDate(filingDate, filingDate);
+      }
+    } else {
+      // Use PIA at normal retirement age if no filing date selected
+      monthlyBenefit = recipient.pia().primaryInsuranceAmount();
+    }
+    const yearlyAmount = monthlyBenefit.times(12);
     const dollars = yearlyAmount.roundToDollar().value();
     // Convert to thousands with 3 decimal places
     return (dollars / 1000).toFixed(3);
@@ -50,17 +144,104 @@
     <p>
       Now that you have calculated your Social Security benefits, you can use
       this information with Linopt to optimize your retirement income strategy.
-      Below are your calculated values to enter into Linopt's "Social Security
-      Income" section:
     </p>
 
     {#if usingSelectedDates}
       <p class="info-note">
         <strong>Note:</strong> The values below are based on the filing
-        {spouse ? 'dates' : 'date'} you selected in the
-        {spouse ? 'Combined Spousal Benefits' : 'Filing Date'} chart.
+        {spouse ? 'dates' : 'date'} you selected above.
       </p>
     {/if}
+
+    {#if spouse !== null}
+      <div class="spousal-toggle-section">
+        <h3>
+          Benefit Calculation for <RecipientName r={lowerEarner} />
+        </h3>
+        <p>
+          Choose how to calculate <RecipientName r={lowerEarner} apos /> benefit,
+          since only Linout only accepts a single filing date per person.
+        </p>
+        <div class="toggle-options">
+          <label class="toggle-option">
+            <input
+              type="radio"
+              name="benefit-type"
+              value={false}
+              bind:group={includeSpousalBenefit}
+            />
+            <div class="option-content">
+              <strong>Personal Benefit Only</strong>
+              <p class="option-description">
+                Use <RecipientName r={lowerEarner} apos /> filing date with their
+                personal benefit only.
+              </p>
+              {#if lowerEarnerFilingDate !== null}
+                <p class="option-preview">
+                  <span class="preview-text">
+                    <strong
+                      >{getMonthlyBenefit(
+                        lowerEarner,
+                        lowerEarnerFilingDate,
+                        false
+                      )} / month</strong
+                    >
+                    at age
+                    <strong
+                      >{getFilingAgeForPreview(
+                        lowerEarner,
+                        lowerEarnerFilingDate
+                      )}</strong
+                    >
+                  </span>
+                </p>
+              {/if}
+            </div>
+          </label>
+          <label class="toggle-option">
+            <input
+              type="radio"
+              name="benefit-type"
+              value={true}
+              bind:group={includeSpousalBenefit}
+            />
+            <div class="option-content">
+              <strong>Combined Personal + Spousal Benefit</strong>
+              <p class="option-description">
+                Use the <RecipientName r={higherEarner} apos /> filing date with
+                <RecipientName r={lowerEarner} apos /> combined benefit (personal
+                + spousal).
+              </p>
+              {#if higherEarnerFilingDate !== null}
+                <p class="option-preview">
+                  <span class="preview-text">
+                    <strong
+                      >{getMonthlyBenefit(
+                        lowerEarner,
+                        higherEarnerFilingDate,
+                        true
+                      )} / month</strong
+                    >
+                    at age
+                    <strong
+                      >{getFilingAgeForPreview(
+                        lowerEarner,
+                        higherEarnerFilingDate
+                      )}</strong
+                    >
+                  </span>
+                </p>
+              {/if}
+            </div>
+          </label>
+        </div>
+      </div>
+    {/if}
+
+    <p>
+      Below are your calculated values to enter into Linopt's "Social Security
+      Income" section:
+    </p>
 
     <div class="linopt-card">
       <div class="card-header">Social Security Income</div>
@@ -69,14 +250,30 @@
           <div class="col-md-6">
             <div class="form-label">Yearly Social Security</div>
             <div class="form-control readonly-field">
-              {formatYearlySS(recipient)}
+              {formatYearlySS(
+                recipient,
+                includeSpousalBenefit &&
+                  spouse !== null &&
+                  !recipient.higherEarningsThan(spouse)
+                  ? higherEarnerFilingDate
+                  : $recipientFilingDate,
+                spouse !== null && !recipient.higherEarningsThan(spouse)
+              )}
             </div>
           </div>
           {#if spouse}
             <div class="col-md-6">
               <div class="form-label">Yearly Social Security - Spouse</div>
               <div class="form-control readonly-field">
-                {formatYearlySS(spouse)}
+                {formatYearlySS(
+                  spouse,
+                  includeSpousalBenefit &&
+                    spouse !== null &&
+                    recipient.higherEarningsThan(spouse)
+                    ? higherEarnerFilingDate
+                    : $spouseFilingDate,
+                  spouse !== null && recipient.higherEarningsThan(spouse)
+                )}
               </div>
             </div>
           {:else}
@@ -90,7 +287,14 @@
           <div class="col-md-6">
             <div class="form-label">Age to Start Social Security</div>
             <div class="form-control readonly-field">
-              {getFilingAge(recipient, $recipientFilingDate)}
+              {getFilingAge(
+                recipient,
+                includeSpousalBenefit &&
+                  spouse !== null &&
+                  !recipient.higherEarningsThan(spouse)
+                  ? higherEarnerFilingDate
+                  : $recipientFilingDate
+              )}
             </div>
           </div>
           {#if spouse}
@@ -99,7 +303,14 @@
                 Age to Start Social Security - Spouse
               </div>
               <div class="form-control readonly-field">
-                {getFilingAge(spouse, $spouseFilingDate)}
+                {getFilingAge(
+                  spouse,
+                  includeSpousalBenefit &&
+                    spouse !== null &&
+                    recipient.higherEarningsThan(spouse)
+                    ? higherEarnerFilingDate
+                    : $spouseFilingDate
+                )}
               </div>
             </div>
           {:else}
@@ -135,6 +346,23 @@
           integer ages, while your actual
           {usingSelectedDates ? 'filing age' : 'Normal Retirement Age'} may include
           additional months.
+        </li>
+        <li>
+          {#if usingSelectedDates}
+            The benefit amounts include early filing reductions or delayed
+            retirement credits based on your selected filing
+            {spouse ? 'dates' : 'date'}.
+            {#if spouse && includeSpousalBenefit}
+              The lower earner's amount includes both personal and spousal
+              benefits.
+            {:else if spouse}
+              Spousal benefits are not included unless you select the "Combined
+              Personal + Spousal Benefit" option above.
+            {/if}
+          {:else}
+            The benefit amounts shown are your Primary Insurance Amount at
+            Normal Retirement Age and do not include spousal benefits.
+          {/if}
         </li>
         {#if !usingSelectedDates}
           <li>
@@ -203,6 +431,95 @@
     margin: 1em 0;
     border-radius: 4px;
     font-size: 0.95em;
+  }
+
+  /* Spousal toggle section */
+  .spousal-toggle-section {
+    background: #f5f5f5;
+    border: 1px solid var(--card-border, #dee2e6);
+    border-radius: 8px;
+    padding: 1.5em;
+    margin: 1.5em 0;
+  }
+
+  .spousal-toggle-section h3 {
+    margin: 0 0 0.5em 0;
+    font-size: 1.1em;
+    color: #1976d2;
+  }
+
+  .spousal-toggle-section > p {
+    margin: 0.5em 0 1em 0;
+    font-size: 0.95em;
+  }
+
+  .toggle-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+
+  .toggle-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75em;
+    padding: 1em;
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .toggle-option:hover {
+    border-color: #1976d2;
+    background: #f8fbff;
+  }
+
+  .toggle-option input[type='radio'] {
+    margin-top: 0.25em;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .toggle-option input[type='radio']:checked {
+    accent-color: #1976d2;
+  }
+
+  .option-content {
+    flex: 1;
+  }
+
+  .option-content strong {
+    margin-bottom: 0.25em;
+    color: #212529;
+  }
+
+  .option-description {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.4;
+  }
+
+  .option-preview {
+    margin: 0.75em 0 0 0;
+    padding: 0.5em 0.75em;
+    background: #e8f4f8;
+    border-left: 3px solid #1976d2;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #1976d2;
+    overflow-x: auto;
+  }
+
+  .preview-text {
+    white-space: nowrap;
+  }
+
+  .option-preview strong {
+    color: #0d47a1;
+    font-weight: 600;
   }
 
   /* Linopt card styling */
@@ -335,6 +652,43 @@
       --readonly-bg: #3a3a3a;
       --readonly-color: #b0b0b0;
       --disabled-color: #888;
+    }
+
+    .spousal-toggle-section {
+      background: #2b2b2b;
+      border-color: #444;
+    }
+
+    .spousal-toggle-section h3 {
+      color: #64b5f6;
+    }
+
+    .toggle-option {
+      background: #1e1e1e;
+      border-color: #444;
+    }
+
+    .toggle-option:hover {
+      border-color: #64b5f6;
+      background: #2a3f5f;
+    }
+
+    .option-content strong {
+      color: #e0e0e0;
+    }
+
+    .option-description {
+      color: #b0b0b0;
+    }
+
+    .option-preview {
+      background: #1e3a5f;
+      border-left-color: #64b5f6;
+      color: #90caf9;
+    }
+
+    .option-preview strong {
+      color: #bbdefb;
     }
 
     .caveats {
