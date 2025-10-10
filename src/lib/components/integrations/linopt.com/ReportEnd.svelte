@@ -8,8 +8,9 @@
   export let recipient: Recipient;
   export let spouse: Recipient | null = null;
 
-  // Linopt assumes 2.5% annual inflation rate
-  const LINOPT_INFLATION_RATE = 0.025;
+  // User-configurable inflation rate (Linopt's default is 2.5%)
+  let inflationRatePercent = 2.5;
+  $: inflationRate = inflationRatePercent / 100;
 
   // Toggle for lower earner benefit calculation (personal only vs personal + spousal)
   let includeSpousalBenefit = false;
@@ -70,7 +71,7 @@
 
   // Helper function to inflate amount from today's dollars to future dollars
   function inflateAmount(todaysDollars: number, years: number): number {
-    return todaysDollars * Math.pow(1 + LINOPT_INFLATION_RATE, years);
+    return todaysDollars * Math.pow(1 + inflationRate, years);
   }
 
   // Helper function to get filing age for display in option preview
@@ -94,7 +95,8 @@
   function formatYearlySS(
     recipient: Recipient,
     filingDate: MonthDate | null,
-    isLowerEarner: boolean
+    isLowerEarner: boolean,
+    _inflationRate?: number // Dependency parameter to trigger reactivity
   ): string {
     let monthlyBenefit;
     if (filingDate !== null) {
@@ -161,6 +163,32 @@
   $: usingSelectedDates =
     $recipientFilingDate !== null ||
     (spouse !== null && $spouseFilingDate !== null);
+
+  // Reactive values for yearly SS amounts (recalculate when inflation rate changes)
+  $: recipientYearlySS = formatYearlySS(
+    recipient,
+    includeSpousalBenefit &&
+      spouse !== null &&
+      !recipient.higherEarningsThan(spouse)
+      ? higherEarnerFilingDate
+      : $recipientFilingDate,
+    spouse !== null && !recipient.higherEarningsThan(spouse),
+    inflationRate // Add explicit dependency
+  );
+
+  $: spouseYearlySS =
+    spouse !== null
+      ? formatYearlySS(
+          spouse,
+          includeSpousalBenefit &&
+            spouse !== null &&
+            recipient.higherEarningsThan(spouse)
+            ? higherEarnerFilingDate
+            : $spouseFilingDate,
+          spouse !== null && recipient.higherEarningsThan(spouse),
+          inflationRate // Add explicit dependency
+        )
+      : '0.000';
 </script>
 
 <div class="pageBreakAvoid">
@@ -264,6 +292,25 @@
       </div>
     {/if}
 
+    <div class="inflation-input-section">
+      <div class="inflation-input-row">
+        <label for="inflation-rate"
+          >Annual Inflation Rate (for converting to future dollars):</label
+        >
+        <div class="input-with-suffix">
+          <input
+            id="inflation-rate"
+            type="number"
+            bind:value={inflationRatePercent}
+            min="0"
+            max="10"
+            step="0.1"
+          />
+          <span class="suffix">%</span>
+        </div>
+      </div>
+    </div>
+
     <p>
       Below are your calculated values to enter into Linopt's "Social Security
       Income" section:
@@ -276,30 +323,14 @@
           <div class="col-md-6">
             <div class="form-label">Yearly Social Security</div>
             <div class="form-control readonly-field">
-              {formatYearlySS(
-                recipient,
-                includeSpousalBenefit &&
-                  spouse !== null &&
-                  !recipient.higherEarningsThan(spouse)
-                  ? higherEarnerFilingDate
-                  : $recipientFilingDate,
-                spouse !== null && !recipient.higherEarningsThan(spouse)
-              )}
+              {recipientYearlySS}
             </div>
           </div>
           {#if spouse}
             <div class="col-md-6">
               <div class="form-label">Yearly Social Security - Spouse</div>
               <div class="form-control readonly-field">
-                {formatYearlySS(
-                  spouse,
-                  includeSpousalBenefit &&
-                    spouse !== null &&
-                    recipient.higherEarningsThan(spouse)
-                    ? higherEarnerFilingDate
-                    : $spouseFilingDate,
-                  spouse !== null && recipient.higherEarningsThan(spouse)
-                )}
+                {spouseYearlySS}
               </div>
             </div>
           {:else}
@@ -388,14 +419,11 @@
       <h3>Caveats</h3>
       <ul>
         <li>
-          <strong>Inflation Adjustment:</strong> The yearly benefit amounts
-          shown below are adjusted for inflation to match Linopt's expectations.
-          Linopt assumes you enter benefits in future dollars and then applies
-          its own 2.5% annual inflation from the starting age forward. We've
-          inflated the amounts by 2.5% annually from {CURRENT_YEAR} to the year benefits
-          begin, so Linopt's inflation adjustment will correctly model the benefit
-          growth. The amounts shown in the toggle options above are in today's dollars
-          ({CURRENT_YEAR}) for easier comparison.
+          <strong>Inflation Adjustment:</strong> The yearly benefit amounts are
+          inflated by {inflationRatePercent}% annually from {CURRENT_YEAR} to the
+          year benefits begin, converting them to future dollars as Linopt expects.
+          The amounts shown in the toggle options above are in today's dollars ({CURRENT_YEAR})
+          for easier comparison.
         </li>
         <li>
           The starting age is rounded to the nearest year. Linopt only accepts
@@ -558,6 +586,58 @@
     font-weight: 600;
   }
 
+  /* Inflation input section */
+  .inflation-input-section {
+    background: #f5f5f5;
+    border: 1px solid var(--card-border, #dee2e6);
+    border-radius: 6px;
+    padding: 0.75em 1em;
+    margin: 1em 0;
+  }
+
+  .inflation-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+    flex-wrap: wrap;
+  }
+
+  .inflation-input-row label {
+    font-size: 0.9em;
+    color: #555;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .input-with-suffix {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .input-with-suffix input[type='number'] {
+    width: 5em;
+    padding: 0.4em 1.75em 0.4em 0.6em;
+    font-size: 0.95rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background: white;
+  }
+
+  .input-with-suffix input[type='number']:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 0.15rem rgba(25, 118, 210, 0.25);
+  }
+
+  .input-with-suffix .suffix {
+    position: absolute;
+    right: 0.6em;
+    color: #666;
+    font-size: 0.9em;
+    pointer-events: none;
+  }
+
   /* Linopt card styling */
   .linopt-card {
     background: var(--card-bg, #fff);
@@ -697,6 +777,30 @@
 
     .spousal-toggle-section h3 {
       color: #64b5f6;
+    }
+
+    .inflation-input-section {
+      background: #2b2b2b;
+      border-color: #444;
+    }
+
+    .inflation-input-row label {
+      color: #b0b0b0;
+    }
+
+    .input-with-suffix input[type='number'] {
+      background: #1e1e1e;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+
+    .input-with-suffix input[type='number']:focus {
+      border-color: #64b5f6;
+      box-shadow: 0 0 0 0.15rem rgba(100, 181, 246, 0.25);
+    }
+
+    .input-with-suffix .suffix {
+      color: #b0b0b0;
     }
 
     .toggle-option {
