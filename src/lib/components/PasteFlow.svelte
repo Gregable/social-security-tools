@@ -4,6 +4,7 @@
   import { Birthdate } from '$lib/birthday';
   import { Recipient } from '$lib/recipient';
   import { Money } from '$lib/money';
+  import { UrlParams } from '$lib/url-params';
   import AgeRequest from './AgeRequest.svelte';
   import DemoData from './DemoData.svelte';
   import PasteConfirm from './PasteConfirm.svelte';
@@ -56,50 +57,60 @@
     spouseName = 'Spouse';
     context.recipient = null;
     context.spouse = null;
-    if (window.location.hash.startsWith('#pia1')) {
+
+    // Check for URL parameters using UrlParams class
+    const urlParams = new UrlParams();
+    if (urlParams.hasValidRecipientParams()) {
       handleHashPaste();
     }
   });
 
-  function parseRecipient(piaStr, dobStr, nameStr): Recipient | null {
+  function parseRecipient(
+    pia: number | null,
+    dob: string | null,
+    name: string | null
+  ): Recipient | null {
     const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
-    let recipient1: Recipient | null = null;
-    if (piaStr && dobStr) {
-      const pia1 = parseInt(piaStr, 10);
-      if (isNaN(pia1)) return;
+    let recipient: Recipient | null = null;
 
-      let m = dobStr.match(dobRegex);
-      if (!m) return;
+    if (pia !== null && dob) {
+      let m = dob.match(dobRegex);
+      if (!m) return null;
+
       const year = parseInt(m[1], 10);
       const month = parseInt(m[2], 10) - 1;
       const day = parseInt(m[3], 10);
-      if (isNaN(year) || isNaN(month) || isNaN(day)) return;
+      if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
 
-      recipient1 = new Recipient();
-      recipient1.setPia(Money.from(pia1));
-      recipient1.birthdate = Birthdate.FromYMD(year, month, day);
-      recipient1.name = nameStr || 'Self';
+      recipient = new Recipient();
+      recipient.setPia(Money.from(pia));
+      recipient.birthdate = Birthdate.FromYMD(year, month, day);
+      recipient.name = name || 'Self';
     }
-    return recipient1;
+    return recipient;
   }
 
   function handleHashPaste() {
-    const fullHash = window.location.hash;
-    // Parse the hash string into parameters:
-    // #pia1=3000&dob1=1965-09-21&name1=Alex&
-    //  pia2=500&dob2=1962-09-28&name2=Chris
-    const hash = fullHash.substring(1);
-    const params = new URLSearchParams(hash);
+    const urlParams = new UrlParams();
 
-    const pia1str: string | null = params.get('pia1');
-    const pia2str: string | null = params.get('pia2');
-    const dob1str: string | null = params.get('dob1');
-    const dob2str: string | null = params.get('dob2');
-    const name1str: string | null = params.get('name1');
-    const name2str: string | null = params.get('name2');
+    // Get recipient parameters
+    const recipientParams = urlParams.getRecipientParams();
+    let recipient1 = parseRecipient(
+      recipientParams.pia,
+      recipientParams.dob,
+      recipientParams.name
+    );
 
-    let recipient1 = parseRecipient(pia1str, dob1str, name1str);
-    let recipient2 = parseRecipient(pia2str, dob2str, name2str);
+    // Get spouse parameters if present
+    let recipient2: Recipient | null = null;
+    if (urlParams.hasValidSpouseParams()) {
+      const spouseParams = urlParams.getSpouseParams();
+      recipient2 = parseRecipient(
+        spouseParams.pia,
+        spouseParams.dob,
+        spouseParams.name
+      );
+    }
 
     if (recipient1) {
       context.recipient = recipient1;

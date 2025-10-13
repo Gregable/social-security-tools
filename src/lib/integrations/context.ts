@@ -7,6 +7,7 @@
 
 import { writable } from 'svelte/store';
 import { getIntegration, type IntegrationConfig } from './config';
+import { UrlParams } from '$lib/url-params';
 
 const SESSION_STORAGE_KEY = 'activeIntegrationId';
 
@@ -46,12 +47,8 @@ function loadIntegrationFromSession(): IntegrationConfig | null {
 export function parseIntegrationFromHash(): IntegrationConfig | null {
   if (typeof window === 'undefined') return null;
 
-  const hash = window.location.hash;
-  if (!hash) return null;
-
-  // Remove the leading '#' and parse as URLSearchParams
-  const params = new URLSearchParams(hash.substring(1));
-  const integrationId = params.get('integration');
+  const urlParams = new UrlParams();
+  const integrationId = urlParams.getIntegration();
 
   if (!integrationId) return null;
 

@@ -206,6 +206,94 @@ describe('Integration Context', () => {
   });
 });
 
+describe('Combined URL Parameters', () => {
+  let mockSessionStorage: { [key: string]: string };
+
+  beforeEach(() => {
+    mockSessionStorage = {};
+    (globalThis as any).window = {
+      location: { hash: '' },
+      sessionStorage: {
+        getItem: (key: string) => mockSessionStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockSessionStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockSessionStorage[key];
+        },
+      },
+    };
+    clearIntegration();
+  });
+
+  it('should parse integration with recipient PIA/DOB parameters', () => {
+    const mockWindow = (hash: string) => {
+      (globalThis as any).window = {
+        location: { hash },
+        sessionStorage: {
+          getItem: (key: string) => mockSessionStorage[key] || null,
+          setItem: (key: string, value: string) => {
+            mockSessionStorage[key] = value;
+          },
+          removeItem: (key: string) => {
+            delete mockSessionStorage[key];
+          },
+        },
+      };
+    };
+
+    mockWindow('#integration=opensocialsecurity.com&pia1=3000&dob1=1965-09-21');
+    const config = parseIntegrationFromHash();
+    expect(config?.id).toBe('opensocialsecurity.com');
+  });
+
+  it('should parse integration with recipient and spouse parameters', () => {
+    const mockWindow = (hash: string) => {
+      (globalThis as any).window = {
+        location: { hash },
+        sessionStorage: {
+          getItem: (key: string) => mockSessionStorage[key] || null,
+          setItem: (key: string, value: string) => {
+            mockSessionStorage[key] = value;
+          },
+          removeItem: (key: string) => {
+            delete mockSessionStorage[key];
+          },
+        },
+      };
+    };
+
+    mockWindow(
+      '#integration=linopt.com&pia1=3000&dob1=1965-09-21&pia2=2500&dob2=1962-03-10'
+    );
+    const config = parseIntegrationFromHash();
+    expect(config?.id).toBe('linopt.com');
+  });
+
+  it('should parse integration regardless of parameter order', () => {
+    const mockWindow = (hash: string) => {
+      (globalThis as any).window = {
+        location: { hash },
+        sessionStorage: {
+          getItem: (key: string) => mockSessionStorage[key] || null,
+          setItem: (key: string, value: string) => {
+            mockSessionStorage[key] = value;
+          },
+          removeItem: (key: string) => {
+            delete mockSessionStorage[key];
+          },
+        },
+      };
+    };
+
+    mockWindow(
+      '#pia1=3000&dob1=1965-09-21&integration=firecalc.com&name1=Alex'
+    );
+    const config = parseIntegrationFromHash();
+    expect(config?.id).toBe('firecalc.com');
+  });
+});
+
 describe('Dynamic Component Loading', () => {
   it('should have component loader functions', () => {
     expect(loadIntroBanner).toBeDefined();
