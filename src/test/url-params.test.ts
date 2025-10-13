@@ -324,4 +324,283 @@ describe('UrlParams', () => {
       expect(params.getRecipientName()).toBe('Alex');
     });
   });
+
+  describe('Earnings Parameters', () => {
+    describe('Recipient Earnings', () => {
+      it('should parse simple earnings history', () => {
+        const params = new UrlParams(
+          '#earnings1=2020:50000,2021:55000,2022:60000'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings).not.toBeNull();
+        expect(earnings?.length).toBe(3);
+        expect(earnings?.[0]).toEqual({ year: 2020, amount: 50000 });
+        expect(earnings?.[1]).toEqual({ year: 2021, amount: 55000 });
+        expect(earnings?.[2]).toEqual({ year: 2022, amount: 60000 });
+      });
+
+      it('should return null for missing earnings1', () => {
+        const params = new UrlParams('#dob1=1995-03-15');
+        expect(params.getRecipientEarnings()).toBeNull();
+      });
+
+      it('should parse single year earnings', () => {
+        const params = new UrlParams('#earnings1=2022:60000');
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(1);
+        expect(earnings?.[0]).toEqual({ year: 2022, amount: 60000 });
+      });
+
+      it('should parse longer earnings history', () => {
+        const params = new UrlParams(
+          '#earnings1=2000:35000,2001:38000,2002:42000,2003:45000,2004:48000,2005:52000,2006:55000,2007:58000,2008:60000,2009:62000'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(10);
+        expect(earnings?.[0]).toEqual({ year: 2000, amount: 35000 });
+        expect(earnings?.[9]).toEqual({ year: 2009, amount: 62000 });
+      });
+
+      it('should handle zero earnings', () => {
+        const params = new UrlParams('#earnings1=2020:0,2021:55000');
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(2);
+        expect(earnings?.[0]).toEqual({ year: 2020, amount: 0 });
+      });
+
+      it('should skip negative earnings', () => {
+        const params = new UrlParams('#earnings1=2020:-5000,2021:55000');
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(1);
+        expect(earnings?.[0]).toEqual({ year: 2021, amount: 55000 });
+      });
+
+      it('should skip invalid year values', () => {
+        const params = new UrlParams(
+          '#earnings1=1950:5000,2020:50000,2101:100000'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(1);
+        expect(earnings?.[0]).toEqual({ year: 2020, amount: 50000 });
+      });
+
+      it('should skip malformed pairs', () => {
+        const params = new UrlParams(
+          '#earnings1=2020:50000,invalid,2021:55000,2022'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(2);
+        expect(earnings?.[0]).toEqual({ year: 2020, amount: 50000 });
+        expect(earnings?.[1]).toEqual({ year: 2021, amount: 55000 });
+      });
+
+      it('should skip pairs with non-numeric values', () => {
+        const params = new UrlParams('#earnings1=2020:abc,2021:55000,xyz:100');
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(1);
+        expect(earnings?.[0]).toEqual({ year: 2021, amount: 55000 });
+      });
+
+      it('should handle whitespace in earnings', () => {
+        const params = new UrlParams(
+          '#earnings1=2020:50000, 2021:55000 , 2022:60000'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(3);
+        expect(earnings?.[1]).toEqual({ year: 2021, amount: 55000 });
+      });
+
+      it('should handle empty earnings parameter', () => {
+        const params = new UrlParams('#earnings1=');
+        expect(params.getRecipientEarnings()).toBeNull();
+      });
+
+      it('should return null for all-invalid earnings', () => {
+        const params = new UrlParams('#earnings1=invalid:data,bad:format');
+        expect(params.getRecipientEarnings()).toBeNull();
+      });
+
+      it('should validate recipient has earnings and DOB', () => {
+        const valid = new UrlParams('#earnings1=2020:50000&dob1=1995-03-15');
+        expect(valid.hasValidRecipientEarnings()).toBe(true);
+
+        const missingDob = new UrlParams('#earnings1=2020:50000');
+        expect(missingDob.hasValidRecipientEarnings()).toBe(false);
+
+        const missingEarnings = new UrlParams('#dob1=1995-03-15');
+        expect(missingEarnings.hasValidRecipientEarnings()).toBe(false);
+
+        const empty = new UrlParams('');
+        expect(empty.hasValidRecipientEarnings()).toBe(false);
+      });
+    });
+
+    describe('Spouse Earnings', () => {
+      it('should parse spouse earnings history', () => {
+        const params = new UrlParams(
+          '#earnings2=2020:40000,2021:42000,2022:45000'
+        );
+        const earnings = params.getSpouseEarnings();
+        expect(earnings).not.toBeNull();
+        expect(earnings?.length).toBe(3);
+        expect(earnings?.[0]).toEqual({ year: 2020, amount: 40000 });
+        expect(earnings?.[1]).toEqual({ year: 2021, amount: 42000 });
+        expect(earnings?.[2]).toEqual({ year: 2022, amount: 45000 });
+      });
+
+      it('should return null for missing earnings2', () => {
+        const params = new UrlParams('#dob2=1992-08-20');
+        expect(params.getSpouseEarnings()).toBeNull();
+      });
+
+      it('should validate spouse has earnings and DOB', () => {
+        const valid = new UrlParams('#earnings2=2020:40000&dob2=1992-08-20');
+        expect(valid.hasValidSpouseEarnings()).toBe(true);
+
+        const missingDob = new UrlParams('#earnings2=2020:40000');
+        expect(missingDob.hasValidSpouseEarnings()).toBe(false);
+
+        const missingEarnings = new UrlParams('#dob2=1992-08-20');
+        expect(missingEarnings.hasValidSpouseEarnings()).toBe(false);
+      });
+    });
+
+    describe('Combined Earnings Scenarios', () => {
+      it('should parse both recipient and spouse earnings', () => {
+        const params = new UrlParams(
+          '#earnings1=2020:80000,2021:85000&dob1=1960-01-15&name1=Alex&earnings2=2020:40000,2021:42000&dob2=1962-03-10&name2=Chris'
+        );
+
+        const recipientEarnings = params.getRecipientEarnings();
+        expect(recipientEarnings?.length).toBe(2);
+        expect(recipientEarnings?.[0]).toEqual({ year: 2020, amount: 80000 });
+
+        const spouseEarnings = params.getSpouseEarnings();
+        expect(spouseEarnings?.length).toBe(2);
+        expect(spouseEarnings?.[0]).toEqual({ year: 2020, amount: 40000 });
+
+        expect(params.hasValidRecipientEarnings()).toBe(true);
+        expect(params.hasValidSpouseEarnings()).toBe(true);
+      });
+
+      it('should handle recipient earnings with spouse PIA', () => {
+        const params = new UrlParams(
+          '#earnings1=2020:80000,2021:85000&dob1=1960-01-15&pia2=0&dob2=1962-03-10'
+        );
+        expect(params.hasValidRecipientEarnings()).toBe(true);
+        expect(params.hasValidSpouseParams()).toBe(true);
+      });
+
+      it('should handle recipient PIA with spouse earnings', () => {
+        const params = new UrlParams(
+          '#pia1=3000&dob1=1960-01-15&earnings2=2020:40000,2021:42000&dob2=1962-03-10'
+        );
+        expect(params.hasValidRecipientParams()).toBe(true);
+        expect(params.hasValidSpouseEarnings()).toBe(true);
+      });
+
+      it('should parse earnings with integration parameter', () => {
+        const params = new UrlParams(
+          '#integration=opensocialsecurity.com&earnings1=2020:50000,2021:55000&dob1=1995-03-15'
+        );
+        expect(params.getIntegration()).toBe('opensocialsecurity.com');
+        expect(params.hasValidRecipientEarnings()).toBe(true);
+      });
+
+      it('should handle earnings parameters in any order', () => {
+        const params = new UrlParams(
+          '#dob1=1995-03-15&name1=Jordan&earnings1=2020:50000,2021:55000,2022:60000'
+        );
+        expect(params.getRecipientName()).toBe('Jordan');
+        expect(params.hasValidRecipientEarnings()).toBe(true);
+      });
+    });
+
+    describe('Earnings Edge Cases', () => {
+      it('should handle very large earnings values', () => {
+        const params = new UrlParams('#earnings1=2020:999999,2021:1000000');
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(2);
+        expect(earnings?.[1]).toEqual({ year: 2021, amount: 1000000 });
+      });
+
+      it('should handle historical years', () => {
+        const params = new UrlParams(
+          '#earnings1=1951:1000,1980:15000,2000:50000'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(3);
+        expect(earnings?.[0]).toEqual({ year: 1951, amount: 1000 });
+      });
+
+      it('should handle future years within limit', () => {
+        const params = new UrlParams('#earnings1=2025:100000,2030:120000');
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(2);
+        expect(earnings?.[1]).toEqual({ year: 2030, amount: 120000 });
+      });
+
+      it('should handle duplicate years (keeps all)', () => {
+        const params = new UrlParams(
+          '#earnings1=2020:50000,2020:60000,2021:55000'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(3);
+        // Both 2020 entries should be present
+        expect(earnings?.filter((e) => e.year === 2020).length).toBe(2);
+      });
+
+      it('should handle earnings with empty pairs', () => {
+        const params = new UrlParams('#earnings1=2020:50000,,2021:55000,');
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(2);
+      });
+
+      it('should handle long earnings history (35+ years)', () => {
+        const yearPairs = Array.from(
+          { length: 40 },
+          (_, i) => `${1985 + i}:${30000 + i * 1000}`
+        ).join(',');
+        const params = new UrlParams(`#earnings1=${yearPairs}`);
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(40);
+        expect(earnings?.[0]).toEqual({ year: 1985, amount: 30000 });
+        expect(earnings?.[39]).toEqual({ year: 2024, amount: 69000 });
+      });
+    });
+
+    describe('Real-World Earnings Examples', () => {
+      it('should parse typical career progression', () => {
+        const params = new UrlParams(
+          '#earnings1=2010:40000,2011:42000,2012:45000,2013:48000,2014:52000,2015:55000,2016:58000,2017:62000,2018:65000,2019:70000,2020:75000&dob1=1985-06-15&name1=Jordan'
+        );
+        expect(params.hasValidRecipientEarnings()).toBe(true);
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(11);
+        expect(params.getRecipientName()).toBe('Jordan');
+      });
+
+      it('should parse career with gaps (zero earnings)', () => {
+        const params = new UrlParams(
+          '#earnings1=2015:50000,2016:55000,2017:0,2018:0,2019:60000,2020:65000&dob1=1980-03-20'
+        );
+        const earnings = params.getRecipientEarnings();
+        expect(earnings?.length).toBe(6);
+        expect(earnings?.filter((e) => e.amount === 0).length).toBe(2);
+      });
+
+      it('should parse couple with different earning histories', () => {
+        const params = new UrlParams(
+          '#earnings1=2015:80000,2016:85000,2017:90000,2018:95000,2019:100000,2020:105000&dob1=1975-11-10&name1=Pat&earnings2=2018:30000,2019:35000,2020:40000&dob2=1978-04-25&name2=Sam'
+        );
+        expect(params.hasValidRecipientEarnings()).toBe(true);
+        expect(params.hasValidSpouseEarnings()).toBe(true);
+
+        const recipientEarnings = params.getRecipientEarnings();
+        const spouseEarnings = params.getSpouseEarnings();
+        expect(recipientEarnings?.length).toBe(6);
+        expect(spouseEarnings?.length).toBe(3);
+      });
+    });
+  });
 });

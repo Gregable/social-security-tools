@@ -79,7 +79,20 @@
 
   <h2>Available Parameters</h2>
 
-  <h3>For a Single Person</h3>
+  <p>
+    There are two ways to specify recipient data: using PIA (Primary Insurance
+    Amount) or using a detailed earnings history. The earnings history approach
+    provides more functionality but requires longer URLs.
+  </p>
+
+  <h3>Option 1: PIA-Based Parameters (Simple)</h3>
+
+  <p>
+    This approach is simpler and results in shorter URLs, but the calculator
+    cannot show how future earnings affect your benefits.
+  </p>
+
+  <h4>For a Single Person</h4>
 
   <ul>
     <li>
@@ -93,7 +106,7 @@
     </li>
   </ul>
 
-  <h3>For a Couple</h3>
+  <h4>For a Couple</h4>
 
   <p>To include a spouse, add the corresponding parameters with "2" suffix:</p>
 
@@ -107,9 +120,64 @@
     <li><code>name2</code> - Spouse's name for display (optional)</li>
   </ul>
 
+  <h3>Option 2: Earnings History Parameters (Advanced)</h3>
+
+  <p>
+    This approach allows the calculator to show the full benefits report
+    including AIME calculations, indexed earnings, and how future earnings
+    affect your PIA. URLs will be longer but provide complete functionality.
+  </p>
+
+  <h4>Format</h4>
+
+  <p>
+    Earnings are specified as comma-separated year:amount pairs. For example:
+    <code>earnings1=2020:50000,2021:55000,2022:60000</code>
+  </p>
+
+  <h4>For a Single Person</h4>
+
+  <ul>
+    <li>
+      <code>earnings1</code> - Earnings history as year:amount pairs (required)
+    </li>
+    <li>
+      <code>dob1</code> - Date of birth in YYYY-MM-DD format (required)
+    </li>
+    <li>
+      <code>name1</code> - Person's name for display (optional, defaults to "Self")
+    </li>
+  </ul>
+
+  <h4>For a Couple</h4>
+
+  <ul>
+    <li>
+      <code>earnings2</code> - Spouse's earnings history as year:amount pairs
+    </li>
+    <li>
+      <code>dob2</code> - Spouse's date of birth in YYYY-MM-DD format
+    </li>
+    <li><code>name2</code> - Spouse's name for display (optional)</li>
+  </ul>
+
+  <h4>Earnings Format Rules</h4>
+
+  <ul>
+    <li>Format: <code>year:amount,year:amount,...</code></li>
+    <li>Years: 4-digit integers (1951-2100)</li>
+    <li>Amounts: Dollar amounts without $ or commas</li>
+    <li>Separate pairs with commas</li>
+    <li>You can include as many years as needed</li>
+    <li>Years do not need to be consecutive (gaps are allowed)</li>
+    <li>Use 0 for years with no earnings</li>
+  </ul>
+
   <h2>Example URLs</h2>
 
-  <h3>Single Person Example</h3>
+  <h3>PIA-Based Examples</h3>
+
+  <h4>Single Person Example</h4>
 
   <p>
     A single person named Alex with a PIA of $3,000, born September 21, 1965:
@@ -128,7 +196,7 @@
     >
   </p>
 
-  <h3>Couple Example</h3>
+  <h4>Couple Example</h4>
 
   <p>
     Alex (PIA $1,000) and Chris (PIA $0, eligible for spousal benefits only):
@@ -141,6 +209,78 @@
   <p>
     <a
       href="/calculator#pia1=1000&dob1=1965-09-21&name1=Alex&pia2=0&dob2=1965-09-28&name2=Chris"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-sveltekit-reload>Try this example →</a
+    >
+  </p>
+
+  <h3>Earnings History Examples</h3>
+
+  <h4>Single Person with Recent Earnings</h4>
+
+  <p>Jordan, born March 15, 1995, with three years of earnings history:</p>
+
+  <pre><code
+      >https://ssa.tools/calculator#earnings1=2020:50000,2021:55000,2022:60000&dob1=1995-03-15&name1=Jordan</code
+    ></pre>
+
+  <p>
+    <a
+      href="/calculator#earnings1=2020:50000,2021:55000,2022:60000&dob1=1995-03-15&name1=Jordan"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-sveltekit-reload>Try this example →</a
+    >
+  </p>
+
+  <h4>Person with Longer Career History</h4>
+
+  <p>Pat, born June 20, 1980, with 10 years of steady career progression:</p>
+
+  <pre><code
+      >https://ssa.tools/calculator#earnings1=2000:35000,2001:38000,2002:42000,2003:45000,2004:48000,2005:52000,2006:55000,2007:58000,2008:60000,2009:62000&dob1=1980-06-20&name1=Pat</code
+    ></pre>
+
+  <p>
+    <a
+      href="/calculator#earnings1=2000:35000,2001:38000,2002:42000,2003:45000,2004:48000,2005:52000,2006:55000,2007:58000,2008:60000,2009:62000&dob1=1980-06-20&name1=Pat"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-sveltekit-reload>Try this example →</a
+    >
+  </p>
+
+  <h4>Couple with Both Earnings Histories</h4>
+
+  <p>
+    Alex and Chris, both with earnings histories showing different career paths:
+  </p>
+
+  <pre><code
+      >https://ssa.tools/calculator#earnings1=2020:80000,2021:85000&dob1=1960-01-15&name1=Alex&earnings2=2020:40000,2021:42000&dob2=1962-03-10&name2=Chris</code
+    ></pre>
+
+  <p>
+    <a
+      href="/calculator#earnings1=2020:80000,2021:85000&dob1=1960-01-15&name1=Alex&earnings2=2020:40000,2021:42000&dob2=1962-03-10&name2=Chris"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-sveltekit-reload>Try this example →</a
+    >
+  </p>
+
+  <h4>Career with Gaps (Zero Earnings Years)</h4>
+
+  <p>Sam with a career break showing zero earnings for 2017-2018:</p>
+
+  <pre><code
+      >https://ssa.tools/calculator#earnings1=2015:50000,2016:55000,2017:0,2018:0,2019:60000,2020:65000&dob1=1980-03-20&name1=Sam</code
+    ></pre>
+
+  <p>
+    <a
+      href="/calculator#earnings1=2015:50000,2016:55000,2017:0,2018:0,2019:60000,2020:65000&dob1=1980-03-20&name1=Sam"
       target="_blank"
       rel="noopener noreferrer"
       data-sveltekit-reload>Try this example →</a
@@ -164,36 +304,23 @@
       href="/calculator#pia1=2500&dob1=1960-06-15&name1=Pat&pia2=0&dob2=1962-03-10&name2=Sam"
       target="_blank"
       rel="noopener noreferrer"
-      data-sveltekit-reload>Try this spousal benefits example →</a
+      data-sveltekit-reload>Try this PIA-based example →</a
     >
   </p>
 
-  <h2>How to Find Your PIA</h2>
+  <p><strong>Using earnings history (more detailed):</strong></p>
+
+  <pre><code
+      >https://ssa.tools/calculator#earnings1=2010:60000,2011:62000,2012:65000,2013:68000,2014:70000,2015:73000,2016:75000,2017:78000,2018:80000,2019:82000,2020:85000&dob1=1960-06-15&name1=Pat&pia2=0&dob2=1962-03-10&name2=Sam</code
+    ></pre>
 
   <p>
-    To use URL parameters effectively, you need to know your Primary Insurance
-    Amount (PIA). Here's how to find it:
-  </p>
-
-  <ol>
-    <li>
-      <strong>Use the full calculator first:</strong> Paste your earnings record
-      from ssa.gov and enter your birthdate using the standard SSA.tools interface
-    </li>
-    <li>
-      <strong>Note your PIA:</strong> The calculator will display your Primary Insurance
-      Amount in the report
-    </li>
-    <li>
-      <strong>Create your URL:</strong> Use that PIA value along with your birthdate
-      to construct a shareable URL
-    </li>
-  </ol>
-
-  <p>
-    Learn more about how PIA is calculated in our comprehensive <a
-      href="/guides/pia">Primary Insurance Amount (PIA) guide</a
-    >.
+    <a
+      href="/calculator#earnings1=2010:60000,2011:62000,2012:65000,2013:68000,2014:70000,2015:73000,2016:75000,2017:78000,2018:80000,2019:82000,2020:85000&dob1=1960-06-15&name1=Pat&pia2=0&dob2=1962-03-10&name2=Sam"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-sveltekit-reload>Try this earnings-based example →</a
+    >
   </p>
 
   <h2>Privacy Considerations</h2>
@@ -206,8 +333,8 @@
   <ul>
     <li>URLs are visible in browser history.</li>
     <li>
-      Shared links expose the PIA and birthdate information to anyone who views
-      them.
+      Shared links expose the information (PIA/earnings and birthdate) to anyone
+      who views them.
     </li>
     <li>
       Use generic examples (not real personal data) when sharing publicly or in
@@ -293,11 +420,6 @@
   }
 
   .guide-page ul {
-    margin: 1rem 0;
-    padding-left: 2rem;
-  }
-
-  .guide-page ol {
     margin: 1rem 0;
     padding-left: 2rem;
   }

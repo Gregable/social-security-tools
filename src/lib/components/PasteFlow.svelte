@@ -4,7 +4,9 @@
   import { Birthdate } from '$lib/birthday';
   import { Recipient } from '$lib/recipient';
   import { Money } from '$lib/money';
+  import { EarningRecord } from '$lib/earning-record';
   import { UrlParams } from '$lib/url-params';
+  import type { EarningsEntry } from '$lib/url-params';
   import AgeRequest from './AgeRequest.svelte';
   import DemoData from './DemoData.svelte';
   import PasteConfirm from './PasteConfirm.svelte';
@@ -60,50 +62,123 @@
 
     // Check for URL parameters using UrlParams class
     const urlParams = new UrlParams();
-    if (urlParams.hasValidRecipientParams()) {
+    if (
+      urlParams.hasValidRecipientParams() ||
+      urlParams.hasValidRecipientEarnings()
+    ) {
       handleHashPaste();
     }
   });
 
+  /**
+   * Parse a date string in YYYY-MM-DD format.
+   * Returns null if invalid.
+   */
+  function parseDob(dob: string | null): Birthdate | null {
+    if (!dob) return null;
+
+    const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
+    let m = dob.match(dobRegex);
+    if (!m) return null;
+
+    const year = parseInt(m[1], 10);
+    const month = parseInt(m[2], 10) - 1; // Month is 0-indexed
+    const day = parseInt(m[3], 10);
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+
+    return Birthdate.FromYMD(year, month, day);
+  }
+
+  /**
+   * Convert earnings entries to EarningRecord array.
+   * Sorts by year in ascending order.
+   */
+  function earningsEntriesToRecords(entries: EarningsEntry[]): EarningRecord[] {
+    const records = entries.map(
+      (entry) =>
+        new EarningRecord({
+          year: entry.year,
+          taxedEarnings: Money.from(entry.amount),
+          taxedMedicareEarnings: Money.from(entry.amount),
+        })
+    );
+
+    // Sort by year (ascending) as done in parsePaste
+    records.sort((a, b) => a.year - b.year);
+
+    return records;
+  }
+
+  /**
+   * Parse a recipient from PIA-based URL parameters.
+   */
   function parseRecipient(
     pia: number | null,
     dob: string | null,
     name: string | null
   ): Recipient | null {
-    const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
-    let recipient: Recipient | null = null;
+    if (pia === null || !dob) return null;
 
-    if (pia !== null && dob) {
-      let m = dob.match(dobRegex);
-      if (!m) return null;
+    const birthdate = parseDob(dob);
+    if (!birthdate) return null;
 
-      const year = parseInt(m[1], 10);
-      const month = parseInt(m[2], 10) - 1;
-      const day = parseInt(m[3], 10);
-      if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+    const recipient = new Recipient();
+    recipient.setPia(Money.from(pia));
+    recipient.birthdate = birthdate;
+    recipient.name = name || 'Self';
 
-      recipient = new Recipient();
-      recipient.setPia(Money.from(pia));
-      recipient.birthdate = Birthdate.FromYMD(year, month, day);
-      recipient.name = name || 'Self';
-    }
+    return recipient;
+  }
+
+  /**
+   * Parse a recipient from earnings-based URL parameters.
+   */
+  function parseRecipientFromEarnings(
+    earnings: EarningsEntry[] | null,
+    dob: string | null,
+    name: string | null
+  ): Recipient | null {
+    if (!earnings || earnings.length === 0 || !dob) return null;
+
+    const birthdate = parseDob(dob);
+    if (!birthdate) return null;
+
+    const recipient = new Recipient();
+    recipient.earningsRecords = earningsEntriesToRecords(earnings);
+    recipient.birthdate = birthdate;
+    recipient.name = name || 'Self';
+
     return recipient;
   }
 
   function handleHashPaste() {
     const urlParams = new UrlParams();
 
-    // Get recipient parameters
-    const recipientParams = urlParams.getRecipientParams();
-    let recipient1 = parseRecipient(
-      recipientParams.pia,
-      recipientParams.dob,
-      recipientParams.name
-    );
+    // Check for earnings-based parameters first (more detailed than PIA)
+    let recipient1: Recipient | null = null;
+    if (urlParams.hasValidRecipientEarnings()) {
+      const earnings = urlParams.getRecipientEarnings();
+      const dob = urlParams.getRecipientDob();
+      const name = urlParams.getRecipientName();
+      recipient1 = parseRecipientFromEarnings(earnings, dob, name);
+    } else if (urlParams.hasValidRecipientParams()) {
+      // Fall back to PIA-based parameters
+      const recipientParams = urlParams.getRecipientParams();
+      recipient1 = parseRecipient(
+        recipientParams.pia,
+        recipientParams.dob,
+        recipientParams.name
+      );
+    }
 
-    // Get spouse parameters if present
+    // Check for spouse parameters
     let recipient2: Recipient | null = null;
-    if (urlParams.hasValidSpouseParams()) {
+    if (urlParams.hasValidSpouseEarnings()) {
+      const earnings = urlParams.getSpouseEarnings();
+      const dob = urlParams.getSpouseDob();
+      const name = urlParams.getSpouseName();
+      recipient2 = parseRecipientFromEarnings(earnings, dob, name);
+    } else if (urlParams.hasValidSpouseParams()) {
       const spouseParams = urlParams.getSpouseParams();
       recipient2 = parseRecipient(
         spouseParams.pia,
