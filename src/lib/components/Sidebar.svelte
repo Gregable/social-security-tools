@@ -1,6 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { context } from '$lib/context';
+  import { activeIntegration } from '$lib/integrations/context';
+
+  // Optional prop to trigger rescan when integration components are loaded
+  export let integrationComponentsLoaded: boolean = false;
 
   function scrollTo(section: SidebarSection) {
     return () => {
@@ -102,25 +106,36 @@
   let hasHeading: boolean = false;
   let sidebarSections: Array<SidebarSection> = [];
 
-  onMount(() => {
+  function scanSections() {
     // Read the SidebarSection components from the slot and use them to
     // populate the sidebar.
+    sidebarSections = [];
+    hasHeading = false;
+
     let children = mainColumn.querySelectorAll('[data-sidebarsection]');
     for (let i = 0; i < children.length; i++) {
       let child = children[i];
       let isHeading = child.getAttribute('data-heading') == 'true';
+      let isIntegration = child.getAttribute('data-integration') == 'true';
+      let label = child.getAttribute('data-label');
+
+      // Reassign ID to ensure sequential ordering
+      // This is critical because observeCallback relies on ID order matching array index
+      const newId = `sidebarsection-${i}`;
+      child.id = newId;
+
       // If we have no headings, then nothing should be indented. If we have
       // at least one heading, non-heading items should be indented.
       if (isHeading) hasHeading = true;
       sidebarSections.push({
-        label: child.getAttribute('data-label'),
-        id: child.id,
+        label: label,
+        id: newId,
         heading: isHeading,
         // active highlights a section if it's visible at the top of
         // the viewport. Initially all false.
         active: false,
         sponsor: child.getAttribute('data-sponsor') == 'true',
-        integration: child.getAttribute('data-integration') == 'true',
+        integration: isIntegration,
         integrationFaviconPath:
           child.getAttribute('data-integration-favicon') || '',
       });
@@ -128,7 +143,20 @@
     // eslint-disable-next-line no-self-assign
     sidebarSections = sidebarSections;
     createObserver();
+  }
+
+  onMount(() => {
+    scanSections();
   });
+
+  // Rescan sections when activeIntegration changes OR when integration components are loaded
+  // This ensures integration sections appear in the sidebar after they're dynamically added
+  $: if (($activeIntegration || integrationComponentsLoaded) && mainColumn) {
+    // Use tick() to wait for DOM updates before rescanning
+    tick().then(() => {
+      scanSections();
+    });
+  }
 </script>
 
 <svelte:window on:popstate={popState} />

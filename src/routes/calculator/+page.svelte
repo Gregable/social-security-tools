@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { context } from '$lib/context';
-  import { activeIntegration } from '$lib/integrations/context';
+  import {
+    activeIntegration,
+    initializeIntegration,
+  } from '$lib/integrations/context';
   import { loadIntroBanner, loadReportEnd } from '$lib/integrations/config';
   import type { ComponentType, SvelteComponent } from 'svelte';
 
@@ -29,10 +32,24 @@
   let ReportEndComponent: ComponentType<SvelteComponent> | null = null;
   let showIntroBanner: boolean = true;
   let integrationFavicon: string = '';
+  let integrationComponentsLoaded: boolean = false;
+
+  // Initialize integration early to ensure it's set before PasteFlow runs
+  // This is critical because PasteFlow's onMount may change the hash
+  onMount(() => {
+    initializeIntegration();
+  });
 
   function pasteDone() {
     isPasteFlow = false;
-    history.pushState({ id: 'top' }, '', '#results');
+
+    // Don't change the URL hash - preserve integration parameters
+    // Previously we pushed #results here, but that would remove integration
+    // parameters from the URL before they could be properly initialized
+
+    // Re-initialize integration to ensure it's preserved after any hash changes
+    // This handles cases where the hash might have been modified
+    initializeIntegration();
   }
 
   function pasteStarted() {
@@ -40,25 +57,49 @@
     showIntroBanner = false;
   }
 
-  onMount(() => {
-    // Load integration components if an integration is active
-    // (integration is already initialized by root layout)
-    const unsubscribe = activeIntegration.subscribe(async (integration) => {
-      if (integration) {
-        IntroBannerComponent = await loadIntroBanner(integration.id);
-        ReportEndComponent = await loadReportEnd(integration.id);
-        integrationFavicon = await integration.getFavicon();
-      } else {
-        IntroBannerComponent = null;
-        ReportEndComponent = null;
-        integrationFavicon = '';
-      }
-    });
+  // Reactively load integration components when activeIntegration changes
+  // This ensures components are loaded regardless of timing with PasteFlow
+  $: if ($activeIntegration) {
+    loadIntegrationComponents($activeIntegration);
+  } else {
+    // Clear components when no integration is active
+    IntroBannerComponent = null;
+    ReportEndComponent = null;
+    integrationFavicon = '';
+    integrationComponentsLoaded = false;
+  }
 
-    return () => {
-      unsubscribe();
-    };
-  });
+  async function loadIntegrationComponents(
+    integration: typeof $activeIntegration
+  ) {
+    if (!integration) return;
+
+    // Reset loaded state while loading
+    integrationComponentsLoaded = false;
+
+    try {
+      // Load all components in parallel for better performance
+      const [introBanner, reportEnd, favicon] = await Promise.all([
+        loadIntroBanner(integration.id),
+        loadReportEnd(integration.id),
+        integration.getFavicon(),
+      ]);
+
+      // Only update if the integration hasn't changed during loading
+      if ($activeIntegration?.id === integration.id) {
+        IntroBannerComponent = introBanner;
+        ReportEndComponent = reportEnd;
+        integrationFavicon = favicon;
+        integrationComponentsLoaded = true;
+      }
+    } catch (error) {
+      console.error(
+        `Failed to load integration components for ${integration.id}:`,
+        error
+      );
+      integrationComponentsLoaded = false;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -81,7 +122,7 @@
 
 <Header active="Calculator" />
 
-{#if isPasteFlow && showIntroBanner && IntroBannerComponent && $activeIntegration}
+{#if isPasteFlow && showIntroBanner && IntroBannerComponent && $activeIntegration && integrationComponentsLoaded}
   <svelte:component this={IntroBannerComponent} />
 {/if}
 
@@ -89,7 +130,7 @@
   {#if isPasteFlow}
     <PasteFlow ondone={pasteDone} onStarted={pasteStarted} />
   {:else}
-    <Sidebar>
+    <Sidebar {integrationComponentsLoaded}>
       <!--
         This div ends up as the parent element for the position:sticky sliders
         inside the EarningsReport component. It closes at the end of this user's
@@ -206,7 +247,7 @@
           />
         </SidebarSection>
       {/if}
-      {#if ReportEndComponent && $activeIntegration}
+      {#if ReportEndComponent && $activeIntegration && integrationComponentsLoaded}
         <SidebarSection
           label={$activeIntegration.reportEndLabel}
           integration={true}
