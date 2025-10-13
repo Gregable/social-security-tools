@@ -25,6 +25,20 @@ The integration parameter can be combined with other hash parameters:
 https://ssa.tools/calculator#integration=opensocialsecurity.com&other=value
 ```
 
+**Combining with Data Parameters**: As of the unified URL parameter system,
+integration parameters can be seamlessly combined with recipient data parameters
+(pia1, dob1, name1, etc.) to pre-populate the calculator:
+
+```text
+https://ssa.tools/calculator#integration=opensocialsecurity.com&pia1=3000&dob1=1965-09-21&name1=Alex
+```
+
+This allows third-party sites to both display their integration content AND skip
+the data entry step, providing a fully streamlined experience. The parameters
+can appear in any order. See the
+[URL Parameters Guide](https://ssa.tools/guides/url-parameters) for details on
+data parameters.
+
 **Navigation from Home Page**: Users can also enter the integration via the home
 page. The hash parameter is automatically preserved when navigating from the
 home page to the calculator:
