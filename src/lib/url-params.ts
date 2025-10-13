@@ -22,6 +22,14 @@ export interface RecipientParams {
 }
 
 /**
+ * Parsed earnings record entry from URL parameters.
+ */
+export interface EarningsEntry {
+  year: number;
+  amount: number;
+}
+
+/**
  * UrlParams provides a type-safe interface for accessing URL hash parameters.
  *
  * Example usage:
@@ -174,6 +182,81 @@ export class UrlParams {
    */
   hasAnyParams(): boolean {
     return Array.from(this.params.keys()).length > 0;
+  }
+
+  /**
+   * Parse earnings history from a comma-separated format.
+   * Format: year:amount,year:amount,...
+   * Example: 2020:50000,2021:55000,2022:60000
+   *
+   * @param paramValue - The raw parameter value
+   * @returns Array of earnings entries, or null if parameter not present or invalid
+   */
+  private parseEarnings(paramValue: string | null): EarningsEntry[] | null {
+    if (!paramValue) return null;
+
+    const entries: EarningsEntry[] = [];
+    const pairs = paramValue.split(',');
+
+    for (const pair of pairs) {
+      const trimmed = pair.trim();
+      if (!trimmed) continue;
+
+      const parts = trimmed.split(':');
+      if (parts.length !== 2) continue;
+
+      const year = parseInt(parts[0], 10);
+      const amount = parseInt(parts[1], 10);
+
+      // Validate year and amount
+      if (isNaN(year) || isNaN(amount)) continue;
+      if (year < 1951 || year > 2100) continue; // Reasonable year range
+      if (amount < 0) continue;
+
+      entries.push({ year, amount });
+    }
+
+    return entries.length > 0 ? entries : null;
+  }
+
+  /**
+   * Get recipient (person 1) earnings history from URL parameters.
+   * Returns null if not present or invalid.
+   *
+   * Format: earnings1=year:amount,year:amount,...
+   * Example: #earnings1=2020:50000,2021:55000,2022:60000
+   */
+  getRecipientEarnings(): EarningsEntry[] | null {
+    return this.parseEarnings(this.params.get('earnings1'));
+  }
+
+  /**
+   * Get spouse (person 2) earnings history from URL parameters.
+   * Returns null if not present or invalid.
+   *
+   * Format: earnings2=year:amount,year:amount,...
+   * Example: #earnings2=2020:40000,2021:42000,2022:45000
+   */
+  getSpouseEarnings(): EarningsEntry[] | null {
+    return this.parseEarnings(this.params.get('earnings2'));
+  }
+
+  /**
+   * Check if recipient has valid earnings history.
+   * Both earnings data and DOB are required for earnings-based calculation.
+   */
+  hasValidRecipientEarnings(): boolean {
+    return (
+      this.getRecipientEarnings() !== null && this.getRecipientDob() !== null
+    );
+  }
+
+  /**
+   * Check if spouse has valid earnings history.
+   * Both earnings data and DOB are required for earnings-based calculation.
+   */
+  hasValidSpouseEarnings(): boolean {
+    return this.getSpouseEarnings() !== null && this.getSpouseDob() !== null;
   }
 
   /**
