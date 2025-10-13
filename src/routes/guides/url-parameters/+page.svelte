@@ -424,11 +424,6 @@
     padding-left: 2rem;
   }
 
-  .guide-page ol {
-    margin: 1rem 0;
-    padding-left: 2rem;
-  }
-
   .guide-page li {
     margin: 0.5rem 0;
   }
