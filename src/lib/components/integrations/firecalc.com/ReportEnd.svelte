@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { Recipient } from '$lib/recipient';
   import type { MonthDate } from '$lib/month-time';
-  import { recipientFilingDate, spouseFilingDate } from '$lib/context';
-  import RecipientName from '$lib/components/RecipientName.svelte';
+  import { recipientFilingDate } from '$lib/context';
+  import { Money } from '$lib/money';
   import { CURRENT_YEAR } from '$lib/constants';
+  import { IntegrationContext } from '../integration-context';
+  import SpousalBenefitToggle from '../SpousalBenefitToggle.svelte';
 
   export let recipient: Recipient;
   export let spouse: Recipient | null = null;
@@ -11,128 +13,47 @@
   // Toggle for lower earner benefit calculation (personal only vs personal + spousal)
   let includeSpousalBenefit = false;
 
-  // Determine the higher earner and their filing date
-  $: higherEarner =
-    spouse !== null && recipient.higherEarningsThan(spouse)
-      ? recipient
-      : spouse;
-  $: higherEarnerFilingDate =
-    spouse !== null && recipient.higherEarningsThan(spouse)
-      ? $recipientFilingDate
-      : $spouseFilingDate;
+  // Context for determining higher/lower earners and their filing dates
+  $: context = new IntegrationContext(recipient, spouse);
 
-  // Determine the lower earner
-  $: lowerEarner =
-    spouse !== null && recipient.higherEarningsThan(spouse)
-      ? spouse
-      : recipient;
-  $: lowerEarnerFilingDate =
-    spouse !== null && recipient.higherEarningsThan(spouse)
-      ? $spouseFilingDate
-      : $recipientFilingDate;
+  // Calculated values from SpousalBenefitToggle (annual benefits in today's dollars)
+  // These are bound from the toggle component when spouse is present
+  let recipientBenefitCalculationDate: MonthDate;
+  let spouseBenefitCalculationDate: MonthDate;
+  let recipientAnnualBenefit: Money;
+  let spouseAnnualBenefit: Money;
 
-  // Helper function to get monthly benefit for display in option preview (today's dollars)
-  function getMonthlyBenefit(
-    recipient: Recipient,
-    filingDate: MonthDate | null,
-    includeSpousal: boolean
-  ): string {
-    if (filingDate === null || lowerEarner === null) return '$0';
-
-    let monthlyBenefit;
-    if (
-      includeSpousal &&
-      higherEarner !== null &&
-      higherEarnerFilingDate !== null
-    ) {
-      monthlyBenefit = recipient.allBenefitsOnDate(
-        higherEarner,
-        higherEarnerFilingDate,
-        filingDate,
-        filingDate
-      );
-    } else {
-      monthlyBenefit = recipient.benefitOnDate(filingDate, filingDate);
-    }
-    // Note that .wholeDollars returns a string with $ sign and commas.
-    return monthlyBenefit.roundToDollar().wholeDollars();
+  // For single-person case, calculate values directly
+  $: if (spouse === null) {
+    recipientBenefitCalculationDate = $recipientFilingDate!;
+    recipientAnnualBenefit = recipient
+      .benefitOnDate(
+        recipientBenefitCalculationDate,
+        recipientBenefitCalculationDate
+      )
+      .times(12);
   }
 
-  // Helper function to calculate starting year for benefit
-  function getStartingYear(filingDate: MonthDate | null): number {
-    if (filingDate === null) return CURRENT_YEAR;
-    return filingDate.year();
+  // Format annual benefit for FIRECalc (today's dollars, whole dollars)
+  function formatForFIRECalc(annualBenefit: Money): string {
+    return annualBenefit.roundToDollar().value().toFixed(0);
   }
 
-  // Helper function to get filing age for display in option preview
-  function getFilingAgeForPreview(
-    recipient: Recipient,
-    filingDate: MonthDate | null
-  ): string {
-    if (filingDate === null) return '';
-    const ageAtFiling = recipient.birthdate.ageAtSsaDate(filingDate);
-    const years = Math.floor(ageAtFiling.asMonths() / 12);
-    const months = ageAtFiling.asMonths() % 12;
-    if (months === 0) {
-      return `${years}`;
-    }
-    return `${years} and ${months} month${months > 1 ? 's' : ''}`;
-  }
+  // Reactive formatted values and starting years
+  $: recipientStartingYear = recipientBenefitCalculationDate
+    ? recipientBenefitCalculationDate.year()
+    : CURRENT_YEAR;
+  $: recipientAnnualSS = recipientAnnualBenefit
+    ? formatForFIRECalc(recipientAnnualBenefit)
+    : '0';
 
-  // Format benefit for display (annual amount in today's dollars)
-  // Uses the filing date to calculate the benefit with early/delayed adjustments
-  // FIRECalc expects amounts in today's dollars (no inflation adjustment)
-  function formatAnnualSS(
-    recipient: Recipient,
-    filingDate: MonthDate | null,
-    isLowerEarner: boolean
-  ): string {
-    let monthlyBenefit;
-    if (filingDate !== null) {
-      // For lower earner, optionally include spousal benefit
-      if (
-        isLowerEarner &&
-        includeSpousalBenefit &&
-        spouse !== null &&
-        higherEarner !== null &&
-        higherEarnerFilingDate !== null
-      ) {
-        // Calculate personal + spousal benefit
-        monthlyBenefit = recipient.allBenefitsOnDate(
-          higherEarner,
-          higherEarnerFilingDate,
-          filingDate,
-          filingDate
-        );
-      } else {
-        // Calculate personal benefit only
-        monthlyBenefit = recipient.benefitOnDate(filingDate, filingDate);
-      }
-    } else {
-      // Use PIA at normal retirement age if no filing date selected
-      monthlyBenefit = recipient.pia().primaryInsuranceAmount();
-    }
-
-    let yearlyAmount = monthlyBenefit.times(12);
-    // FIRECalc expects amounts in today's dollars - no inflation adjustment
-    let dollars = yearlyAmount.roundToDollar().value();
-
-    return dollars.toFixed(0);
-  }
-
-  // Copy value to clipboard
-  function copyToClipboard(value: string) {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(value).then(
-        () => {
-          // Success feedback could be added here
-        },
-        (err) => {
-          console.error('Failed to copy:', err);
-        }
-      );
-    }
-  }
+  $: spouseStartingYear = spouse
+    ? (spouseBenefitCalculationDate?.year() ?? CURRENT_YEAR)
+    : CURRENT_YEAR;
+  $: spouseAnnualSS =
+    spouse && spouseAnnualBenefit
+      ? formatForFIRECalc(spouseAnnualBenefit)
+      : '0';
 </script>
 
 <div class="pageBreakAvoid">
@@ -150,88 +71,15 @@
     </p>
 
     {#if spouse !== null}
-      <div class="spousal-toggle-section">
-        <h3>
-          Benefit Calculation for <RecipientName r={lowerEarner} />
-        </h3>
-        <p>
-          Choose how to calculate <RecipientName r={lowerEarner} apos /> benefit,
-          since FIRECalc only accepts a single starting year per person.
-        </p>
-        <div class="toggle-options">
-          <label class="toggle-option">
-            <input
-              type="radio"
-              name="benefit-type"
-              value={false}
-              bind:group={includeSpousalBenefit}
-            />
-            <div class="option-content">
-              <strong>Personal Benefit Only</strong>
-              <p class="option-description">
-                Use <RecipientName r={lowerEarner} apos /> filing date with their
-                personal benefit only.
-              </p>
-              {#if lowerEarnerFilingDate !== null}
-                <p class="option-preview">
-                  <span class="preview-text">
-                    <strong
-                      >{getMonthlyBenefit(
-                        lowerEarner,
-                        lowerEarnerFilingDate,
-                        false
-                      )} / month</strong
-                    >
-                    at age
-                    <strong
-                      >{getFilingAgeForPreview(
-                        lowerEarner,
-                        lowerEarnerFilingDate
-                      )}</strong
-                    >
-                  </span>
-                </p>
-              {/if}
-            </div>
-          </label>
-          <label class="toggle-option">
-            <input
-              type="radio"
-              name="benefit-type"
-              value={true}
-              bind:group={includeSpousalBenefit}
-            />
-            <div class="option-content">
-              <strong>Combined Personal + Spousal Benefit</strong>
-              <p class="option-description">
-                Use the <RecipientName r={higherEarner} apos /> filing date with
-                <RecipientName r={lowerEarner} apos /> combined benefit (personal
-                + spousal).
-              </p>
-              {#if higherEarnerFilingDate !== null}
-                <p class="option-preview">
-                  <span class="preview-text">
-                    <strong
-                      >{getMonthlyBenefit(
-                        lowerEarner,
-                        higherEarnerFilingDate,
-                        true
-                      )} / month</strong
-                    >
-                    at age
-                    <strong
-                      >{getFilingAgeForPreview(
-                        lowerEarner,
-                        higherEarnerFilingDate
-                      )}</strong
-                    >
-                  </span>
-                </p>
-              {/if}
-            </div>
-          </label>
-        </div>
-      </div>
+      <SpousalBenefitToggle
+        {context}
+        bind:includeSpousalBenefit
+        bind:recipientBenefitCalculationDate
+        bind:spouseBenefitCalculationDate
+        bind:recipientAnnualBenefit
+        bind:spouseAnnualBenefit
+        toolName="FIRECalc"
+      />
     {/if}
 
     <p>
@@ -274,35 +122,13 @@
                 </p>
               </td>
               <td class="input-cell">
-                <input
-                  type="text"
-                  readonly
-                  value={formatAnnualSS(
-                    recipient,
-                    includeSpousalBenefit &&
-                      spouse !== null &&
-                      !recipient.higherEarningsThan(spouse)
-                      ? higherEarnerFilingDate
-                      : $recipientFilingDate,
-                    spouse !== null && !recipient.higherEarningsThan(spouse)
-                  )}
-                />
+                <input type="text" readonly value={recipientAnnualSS} />
                 <button
                   class="copy-btn"
                   title="Copy to clipboard"
                   aria-label="Copy your Social Security amount to clipboard"
                   on:click={() =>
-                    copyToClipboard(
-                      formatAnnualSS(
-                        recipient,
-                        includeSpousalBenefit &&
-                          spouse !== null &&
-                          !recipient.higherEarningsThan(spouse)
-                          ? higherEarnerFilingDate
-                          : $recipientFilingDate,
-                        spouse !== null && !recipient.higherEarningsThan(spouse)
-                      )
-                    )}
+                    IntegrationContext.copyToClipboard(recipientAnnualSS)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -326,27 +152,15 @@
                   type="text"
                   readonly
                   class="year-input"
-                  value={getStartingYear(
-                    includeSpousalBenefit &&
-                      spouse !== null &&
-                      !recipient.higherEarningsThan(spouse)
-                      ? higherEarnerFilingDate
-                      : $recipientFilingDate
-                  )}
+                  value={recipientStartingYear}
                 />
                 <button
                   class="copy-btn"
                   title="Copy to clipboard"
                   aria-label="Copy starting year to clipboard"
                   on:click={() =>
-                    copyToClipboard(
-                      getStartingYear(
-                        includeSpousalBenefit &&
-                          spouse !== null &&
-                          !recipient.higherEarningsThan(spouse)
-                          ? higherEarnerFilingDate
-                          : $recipientFilingDate
-                      ).toString()
+                    IntegrationContext.copyToClipboard(
+                      recipientStartingYear.toString()
                     )}
                 >
                   <svg
@@ -376,39 +190,14 @@
                 </p>
               </td>
               <td class="input-cell">
-                <input
-                  type="text"
-                  readonly
-                  value={spouse
-                    ? formatAnnualSS(
-                        spouse,
-                        includeSpousalBenefit &&
-                          spouse !== null &&
-                          recipient.higherEarningsThan(spouse)
-                          ? higherEarnerFilingDate
-                          : $spouseFilingDate,
-                        spouse !== null && recipient.higherEarningsThan(spouse)
-                      )
-                    : '0'}
-                />
+                <input type="text" readonly value={spouseAnnualSS} />
                 {#if spouse}
                   <button
                     class="copy-btn"
                     title="Copy to clipboard"
                     aria-label="Copy spouse's Social Security amount to clipboard"
                     on:click={() =>
-                      copyToClipboard(
-                        formatAnnualSS(
-                          spouse,
-                          includeSpousalBenefit &&
-                            spouse !== null &&
-                            recipient.higherEarningsThan(spouse)
-                            ? higherEarnerFilingDate
-                            : $spouseFilingDate,
-                          spouse !== null &&
-                            recipient.higherEarningsThan(spouse)
-                        )
-                      )}
+                      IntegrationContext.copyToClipboard(spouseAnnualSS)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -433,15 +222,7 @@
                   type="text"
                   readonly
                   class="year-input"
-                  value={spouse
-                    ? getStartingYear(
-                        includeSpousalBenefit &&
-                          spouse !== null &&
-                          recipient.higherEarningsThan(spouse)
-                          ? higherEarnerFilingDate
-                          : $spouseFilingDate
-                      )
-                    : CURRENT_YEAR}
+                  value={spouseStartingYear}
                 />
                 {#if spouse}
                   <button
@@ -449,14 +230,8 @@
                     title="Copy to clipboard"
                     aria-label="Copy spouse's starting year to clipboard"
                     on:click={() =>
-                      copyToClipboard(
-                        getStartingYear(
-                          includeSpousalBenefit &&
-                            spouse !== null &&
-                            recipient.higherEarningsThan(spouse)
-                            ? higherEarnerFilingDate
-                            : $spouseFilingDate
-                        ).toString()
+                      IntegrationContext.copyToClipboard(
+                        spouseStartingYear.toString()
                       )}
                   >
                     <svg
@@ -560,95 +335,6 @@
     margin: 1em 0;
     border-radius: 4px;
     font-size: 0.95em;
-  }
-
-  /* Spousal toggle section */
-  .spousal-toggle-section {
-    background: #f5f5f5;
-    border: 1px solid var(--card-border, #dee2e6);
-    border-radius: 8px;
-    padding: 1.5em;
-    margin: 1.5em 0;
-  }
-
-  .spousal-toggle-section h3 {
-    margin: 0 0 0.5em 0;
-    font-size: 1.1em;
-    color: #1976d2;
-  }
-
-  .spousal-toggle-section > p {
-    margin: 0.5em 0 1em 0;
-    font-size: 0.95em;
-  }
-
-  .toggle-options {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-  }
-
-  .toggle-option {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75em;
-    padding: 1em;
-    background: white;
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .toggle-option:hover {
-    border-color: #1976d2;
-    background: #f8fbff;
-  }
-
-  .toggle-option input[type='radio'] {
-    margin-top: 0.25em;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  .toggle-option input[type='radio']:checked {
-    accent-color: #1976d2;
-  }
-
-  .option-content {
-    flex: 1;
-  }
-
-  .option-content strong {
-    margin-bottom: 0.25em;
-    color: #212529;
-  }
-
-  .option-description {
-    margin: 0;
-    font-size: 0.9em;
-    color: #666;
-    line-height: 1.4;
-  }
-
-  .option-preview {
-    margin: 0.75em 0 0 0;
-    padding: 0.5em 0.75em;
-    background: #e8f4f8;
-    border-left: 3px solid #1976d2;
-    border-radius: 4px;
-    font-size: 0.9em;
-    color: #1976d2;
-    overflow-x: auto;
-  }
-
-  .preview-text {
-    white-space: nowrap;
-  }
-
-  .option-preview strong {
-    color: #0d47a1;
-    font-weight: 600;
   }
 
   /* FIRECalc mirror container - lightbox style */
@@ -901,43 +587,6 @@
       --copy-btn-color: white;
       --copy-btn-border: #1565c0;
       --copy-btn-hover-bg: #1565c0;
-    }
-
-    .spousal-toggle-section {
-      background: #2b2b2b;
-      border-color: #444;
-    }
-
-    .spousal-toggle-section h3 {
-      color: #64b5f6;
-    }
-
-    .toggle-option {
-      background: #1e1e1e;
-      border-color: #444;
-    }
-
-    .toggle-option:hover {
-      border-color: #64b5f6;
-      background: #2a3f5f;
-    }
-
-    .option-content strong {
-      color: #e0e0e0;
-    }
-
-    .option-description {
-      color: #b0b0b0;
-    }
-
-    .option-preview {
-      background: #1e3a5f;
-      border-left-color: #64b5f6;
-      color: #90caf9;
-    }
-
-    .option-preview strong {
-      color: #bbdefb;
     }
 
     .caveats {

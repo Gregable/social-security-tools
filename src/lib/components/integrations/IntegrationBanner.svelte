@@ -8,7 +8,7 @@
   <div class="banner-content">
     <img src={logo} alt={logoAlt} class="logo" />
     <span>
-      <slot />
+      <slot></slot>
     </span>
   </div>
 </div>
