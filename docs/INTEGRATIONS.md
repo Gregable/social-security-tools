@@ -146,6 +146,12 @@ warning.
   lower earner. No inflation adjustment is applied since FIRECalc expects
   amounts in today's dollars.
 
+### Fin Pods AI (finpodsai.com)
+
+- **Intro Banner**: Informs users that they're using the calculator via Fin Pods
+  AI
+- **Report End**: None (this integration only displays an intro banner)
+
 ## Testing
 
 Unit tests for the integration system are in `src/test/integrations.test.ts`.

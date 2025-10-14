@@ -59,6 +59,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'finpodsai.com': {
+    id: 'finpodsai.com',
+    displayName: 'Fin Pods AI',
+    reportEndLabel: '',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/finpodsai.com/favicon.ico'
+      );
+      return module.default;
+    },
+  },
 };
 
 /**
@@ -91,6 +102,7 @@ export async function loadIntroBanner(
 
 /**
  * Dynamically import the ReportEnd component for a given integration.
+ * Returns null if the component doesn't exist (some integrations may only have IntroBanner).
  */
 export async function loadReportEnd(
   integrationId: string
@@ -100,11 +112,9 @@ export async function loadReportEnd(
       `$lib/components/integrations/${integrationId}/ReportEnd.svelte`
     );
     return module.default;
-  } catch (e) {
-    console.error(
-      `Failed to load ReportEnd for integration: ${integrationId}`,
-      e
-    );
+  } catch (_e) {
+    // Silently return null if the ReportEnd component doesn't exist
+    // Some integrations may only have an IntroBanner component
     return null;
   }
 }
