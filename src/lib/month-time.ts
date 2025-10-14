@@ -274,6 +274,16 @@ export class MonthDuration {
   }
 
   /**
+   * Returns the age in years, rounded to the nearest whole year.
+   * Ages with 6 or more months round up, otherwise round down.
+   */
+  roundedYears(): number {
+    const years = this.years();
+    const months = this.modMonths();
+    return months >= 6 ? years + 1 : years;
+  }
+
+  /**
    * Returns true if this duration is greater than the other.
    */
   greaterThan(other: MonthDuration): boolean {

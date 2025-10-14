@@ -135,6 +135,15 @@ describe('MonthDuration', () => {
     let md = MonthDuration.initFromYearsMonths({ years: 12, months: 11 });
     expect(md.modMonths()).toBe(11);
   });
+  it('rounds to nearest year', () => {
+    // Round down (less than 6 months)
+    expect(new MonthDuration(65 * 12 + 5).roundedYears()).toBe(65);
+    // Round up (6 or more months)
+    expect(new MonthDuration(65 * 12 + 6).roundedYears()).toBe(66);
+    expect(new MonthDuration(65 * 12 + 11).roundedYears()).toBe(66);
+    // Exact years
+    expect(new MonthDuration(65 * 12).roundedYears()).toBe(65);
+  });
   it('correctly comparse to other MonthDurations', () => {
     let md = new MonthDuration(9);
     expect(md.greaterThan(new MonthDuration(8))).toBe(true);
