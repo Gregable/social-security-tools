@@ -2,53 +2,53 @@ name: CI Quality Checks
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
     name: Code Quality Gate
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.x'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run Biome Format & Lint Check
-      run: |
-        echo "🎨 Checking code formatting and linting with Biome..."
-        npm run format:check
-        
-    - name: Run Svelte Check
-      run: |
-        echo "🔧 Running Svelte type checking..."
-        npm run check
-        
-    - name: Run Full Test Suite
-      run: |
-        echo "🧪 Running full test suite..."
-        npm test
-        
-    - name: Build Check
-      run: |
-        echo "🏗️ Verifying production build..."
-        npm run build
-        
-    - name: Quality Gate Summary
-      if: success()
-      run: |
-        echo "✅ All quality checks passed!"
-        echo "✅ Biome (format & lint): PASSED"
-        echo "✅ Svelte type checking: PASSED"
-        echo "✅ Full test suite: PASSED"
-        echo "✅ Production build: PASSED"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Biome Format & Lint Check
+        run: |
+          echo "🎨 Checking code formatting and linting with Biome..."
+          npm run format:check
+
+      - name: Run Svelte Check
+        run: |
+          echo "🔧 Running Svelte type checking..."
+          npm run check
+
+      - name: Run Full Test Suite
+        run: |
+          echo "🧪 Running full test suite..."
+          npm test
+
+      - name: Build Check
+        run: |
+          echo "🏗️ Verifying production build..."
+          npm run build
+
+      - name: Quality Gate Summary
+        if: success()
+        run: |
+          echo "✅ All quality checks passed!"
+          echo "✅ Biome (format & lint): PASSED"
+          echo "✅ Svelte type checking: PASSED"
+          echo "✅ Full test suite: PASSED"
+          echo "✅ Production build: PASSED"

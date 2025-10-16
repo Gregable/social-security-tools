@@ -1,0 +1,44 @@
+name: Biome Quality Gate
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  biome-quality-gate:
+    runs-on: ubuntu-latest
+    name: Biome Zero-Tolerance Check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Biome Quality Gate
+        run: |
+          echo "🔍 Running Biome quality gate..."
+          echo "Zero-tolerance policy: no Biome errors or warnings allowed"
+          echo ""
+
+          if npm run lint --silent; then
+            echo "✅ Perfect! No Biome issues found."
+            echo "✅ Biome quality gate passed!"
+          else
+            echo "❌ Biome found issues that must be fixed:"
+            echo ""
+            npm run lint
+            echo ""
+            echo "💡 Since we maintain zero-tolerance policy, all issues must be resolved."
+            echo "Please fix all Biome errors and warnings before merging."
+            exit 1
+          fi
