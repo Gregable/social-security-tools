@@ -112,22 +112,21 @@ describe('Biome Regression Prevention', () => {
         });
 
         // Check for unused variables/imports (Biome's noUnusedVariables/noUnusedImports)
-        const unusedMatches = (output.match(/noUnusedVariables|noUnusedImports/g) || [])
-          .length;
+        const unusedMatches = (
+          output.match(/noUnusedVariables|noUnusedImports/g) || []
+        ).length;
         expect(unusedMatches).toBe(0);
       } catch (error: any) {
         if (error.status === 1) {
           const output = error.stdout || '';
 
           // Check if the failure is due to unused variables
-          const unusedMatches = (output.match(/noUnusedVariables|noUnusedImports/g) || [])
-            .length;
+          const unusedMatches = (
+            output.match(/noUnusedVariables|noUnusedImports/g) || []
+          ).length;
 
           if (unusedMatches > 0) {
-            console.error(
-              'Found unused variable/import violations:',
-              output
-            );
+            console.error('Found unused variable/import violations:', output);
             throw new Error(
               `Found ${unusedMatches} unused variable/import violations. These must be fixed.`
             );
