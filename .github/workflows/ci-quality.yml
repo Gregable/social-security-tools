@@ -24,16 +24,10 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Run Prettier Format Check
+    - name: Run Biome Format & Lint Check
       run: |
-        echo "🎨 Checking code formatting..."
+        echo "🎨 Checking code formatting and linting with Biome..."
         npm run format:check
-        
-    - name: Run ESLint (Zero Tolerance)
-      run: |
-        echo "🔍 Running ESLint quality gate..."
-        echo "Zero-tolerance policy: no ESLint errors or warnings allowed"
-        npm run lint
         
     - name: Run Svelte Check
       run: |
@@ -54,8 +48,7 @@ jobs:
       if: success()
       run: |
         echo "✅ All quality checks passed!"
-        echo "✅ Code formatting: PASSED"
-        echo "✅ ESLint (zero tolerance): PASSED" 
+        echo "✅ Biome (format & lint): PASSED"
         echo "✅ Svelte type checking: PASSED"
         echo "✅ Full test suite: PASSED"
         echo "✅ Production build: PASSED"

@@ -1,4 +1,4 @@
-name: ESLint Quality Gate
+name: Biome Quality Gate
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  eslint-quality-gate:
+  biome-quality-gate:
     runs-on: ubuntu-latest
-    name: ESLint Zero-Tolerance Check
+    name: Biome Zero-Tolerance Check
     
     steps:
     - name: Checkout code
@@ -24,21 +24,21 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Run ESLint Quality Gate
+    - name: Run Biome Quality Gate
       run: |
-        echo "🔍 Running ESLint quality gate..."
-        echo "Zero-tolerance policy: no ESLint errors or warnings allowed"
+        echo "🔍 Running Biome quality gate..."
+        echo "Zero-tolerance policy: no Biome errors or warnings allowed"
         echo ""
         
         if npm run lint --silent; then
-          echo "✅ Perfect! No ESLint issues found."
-          echo "✅ ESLint quality gate passed!"
+          echo "✅ Perfect! No Biome issues found."
+          echo "✅ Biome quality gate passed!"
         else
-          echo "❌ ESLint found issues that must be fixed:"
+          echo "❌ Biome found issues that must be fixed:"
           echo ""
           npm run lint
           echo ""
           echo "💡 Since we maintain zero-tolerance policy, all issues must be resolved."
-          echo "Please fix all ESLint errors and warnings before merging."
+          echo "Please fix all Biome errors and warnings before merging."
           exit 1
         fi
