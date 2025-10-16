@@ -53,7 +53,7 @@ export function calculateAgeRangePercentages(
   let sumOfRoundedPercentages = 0;
 
   for (let i = 0; i < segmentProbabilities.length; i++) {
-    let percentage = segmentProbabilities[i] / effectiveTotalProb;
+    const percentage = segmentProbabilities[i] / effectiveTotalProb;
     let roundedPercentageValue: number;
 
     if (i === segmentProbabilities.length - 1) {

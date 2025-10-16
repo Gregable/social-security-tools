@@ -1,6 +1,6 @@
-import { Recipient } from '$lib/recipient';
-import { MonthDate, MonthDuration } from '$lib/month-time';
-import { BenefitType, BenefitPeriod } from './benefit-period.js';
+import { type MonthDate, MonthDuration } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
+import { BenefitPeriod, BenefitType } from './benefit-period.js';
 
 const MONTHS_IN_YEAR = 12;
 
@@ -83,7 +83,7 @@ export function PersonalBenefitPeriods(
     monthsRemainingInFilingYear > 0 &&
     numMonthsAfterInitialYear > 0
   ) {
-    let period = new BenefitPeriod();
+    const period = new BenefitPeriod();
     period.startDate = filingDate;
     period.endDate = filingDate.addDuration(
       new MonthDuration(
@@ -97,7 +97,7 @@ export function PersonalBenefitPeriods(
   } else {
     // Don't insert an empty period:
     if (monthsRemainingInFilingYear > 0) {
-      let initialPeriod = new BenefitPeriod();
+      const initialPeriod = new BenefitPeriod();
       initialPeriod.startDate = filingDate;
       // Subtract 1 so that we get inclusive periods:
       initialPeriod.endDate = filingDate.addDuration(
@@ -110,7 +110,7 @@ export function PersonalBenefitPeriods(
     }
 
     if (numMonthsAfterInitialYear > 0) {
-      let finalPeriod = new BenefitPeriod();
+      const finalPeriod = new BenefitPeriod();
       finalPeriod.amount = secondAmount;
       finalPeriod.startDate = filingDate.addDuration(
         new MonthDuration(monthsRemainingInFilingYear)

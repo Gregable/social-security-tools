@@ -13,56 +13,56 @@
 -->
 
 <script lang="ts">
-  import { parsePaste } from '$lib/ssa-parse';
-  import { Recipient } from '$lib/recipient';
-  import Expando from '$lib/components/Expando.svelte';
-  import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
-  import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
-  import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
-  import { Money } from '$lib/money';
+import Expando from '$lib/components/Expando.svelte';
+import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
+import { Money } from '$lib/money';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
+import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
 
-  // Callback prop for paste event
-  export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
-    undefined;
+// Callback prop for paste event
+export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
+  undefined;
 
-  let pasteContents: string = '';
-  let pasteError: boolean = false;
+let pasteContents: string = '';
+let pasteError: boolean = false;
 
-  function parsePasteContents(contents: string) {
-    if (contents == '') {
-      pasteError = false;
-      return;
-    }
-    const records = parsePaste(contents);
-    if (records.length > 0) {
-      let recipient: Recipient = new Recipient();
-      recipient.earningsRecords = records;
-
-      onpaste?.({
-        recipient: recipient,
-      });
-    } else {
-      pasteError = true;
-    }
+function parsePasteContents(contents: string) {
+  if (contents === '') {
+    pasteError = false;
+    return;
   }
-  $: parsePasteContents(pasteContents);
-
-  let piaInput: number | null = null;
-  let piaDisabled: boolean = true;
-  function piaEntry() {
-    if (piaInput === null) return;
-
+  const records = parsePaste(contents);
+  if (records.length > 0) {
     let recipient: Recipient = new Recipient();
-    recipient.setPia(Money.from(piaInput));
+    recipient.earningsRecords = records;
 
     onpaste?.({
       recipient: recipient,
     });
+  } else {
+    pasteError = true;
   }
-  $: piaDisabled = (() => {
-    if (piaInput === null) return true;
-    return piaInput < 0;
-  })();
+}
+$: parsePasteContents(pasteContents);
+
+let piaInput: number | null = null;
+let piaDisabled: boolean = true;
+function piaEntry() {
+  if (piaInput === null) return;
+
+  let recipient: Recipient = new Recipient();
+  recipient.setPia(Money.from(piaInput));
+
+  onpaste?.({
+    recipient: recipient,
+  });
+}
+$: piaDisabled = (() => {
+  if (piaInput === null) return true;
+  return piaInput < 0;
+})();
 </script>
 
 <div class="pastePrompt">

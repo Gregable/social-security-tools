@@ -1,162 +1,165 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
-  import { context } from '$lib/context';
-  import { activeIntegration } from '$lib/integrations/context';
+import { onMount, tick } from 'svelte';
+import { context } from '$lib/context';
+import { activeIntegration } from '$lib/integrations/context';
 
-  // Optional prop to trigger rescan when integration components are loaded
-  export let integrationComponentsLoaded: boolean = false;
+// Optional prop to trigger rescan when integration components are loaded
+export let integrationComponentsLoaded: boolean = false;
 
-  function scrollTo(section: SidebarSection) {
-    return () => {
-      const element = document.getElementById(section.id);
+function scrollTo(section: SidebarSection) {
+  return () => {
+    const element = document.getElementById(section.id);
+    if (element) {
+      history.pushState(
+        { id: section.id },
+        '',
+        `#${section.label.replaceAll(' ', '')}`
+      );
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+}
+
+function popState(event: PopStateEvent) {
+  if (event.state?.id) {
+    if (event.state.id === 'top') {
+      mainColumn.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      const element = document.getElementById(event.state.id);
       if (element) {
-        history.pushState(
-          { id: section.id },
-          '',
-          '#' + section.label.replaceAll(' ', '')
-        );
         element.scrollIntoView({ behavior: 'smooth' });
       }
-    };
+    }
   }
+}
 
-  function popState(event: PopStateEvent) {
-    if (event.state && event.state.id) {
-      if (event.state.id == 'top') {
-        mainColumn.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        const element = document.getElementById(event.state.id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
+let mainColumn: HTMLDivElement;
+
+let visibleSections: Array<number> = [];
+
+function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
+  entries.forEach((entry) => {
+    let id: number = parseInt(
+      entry.target.getAttribute('id').split('-')[1],
+      10
+    );
+    // If we use entry.isIntersecting, the element may still be partly
+    // intersecting the scroll box, but hidden below a sticky element where
+    // it's not visible. So we use the boundingClientRect to check if it's
+    // bottom point is below the sticky element's height (110px), iff there
+    // is a sticky element.
+
+    let isIntersecting = context.isStuck()
+      ? entry.boundingClientRect.bottom > 110
+      : entry.isIntersecting;
+
+    if (isIntersecting) {
+      // Push to front or back, as appropriate, if not already present.
+      if (visibleSections.length === 0) {
+        visibleSections.push(id);
+      } else if (visibleSections[0] > id) {
+        visibleSections.unshift(id);
+      } else if (visibleSections[visibleSections.length - 1] < id) {
+        visibleSections.push(id);
       }
+    } else {
+      visibleSections = visibleSections.filter((x) => x !== id);
     }
-  }
-
-  let mainColumn: HTMLDivElement;
-
-  let visibleSections: Array<number> = [];
-
-  function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
-    entries.forEach((entry) => {
-      let id: number = parseInt(entry.target.getAttribute('id').split('-')[1]);
-      // If we use entry.isIntersecting, the element may still be partly
-      // intersecting the scroll box, but hidden below a sticky element where
-      // it's not visible. So we use the boundingClientRect to check if it's
-      // bottom point is below the sticky element's height (110px), iff there
-      // is a sticky element.
-
-      let isIntersecting = context.isStuck()
-        ? entry.boundingClientRect.bottom > 110
-        : entry.isIntersecting;
-
-      if (isIntersecting) {
-        // Push to front or back, as appropriate, if not already present.
-        if (visibleSections.length == 0) {
-          visibleSections.push(id);
-        } else if (visibleSections[0] > id) {
-          visibleSections.unshift(id);
-        } else if (visibleSections[visibleSections.length - 1] < id) {
-          visibleSections.push(id);
-        }
-      } else {
-        visibleSections = visibleSections.filter((x) => x != id);
-      }
-    });
-
-    if (lastActiveSection) {
-      lastActiveSection.active = false;
-    }
-    if (visibleSections.length > 0) {
-      lastActiveSection = sidebarSections[visibleSections[0]];
-      lastActiveSection.active = true;
-    }
-    // eslint-disable-next-line no-self-assign
-    sidebarSections = sidebarSections;
-  }
-
-  let observer: IntersectionObserver | null = null;
-
-  function createObserver(_isStuck: boolean = false) {
-    if (!mainColumn) return;
-    if (observer) observer.disconnect();
-    observer = new IntersectionObserver(observeCallback, {
-      root: document,
-      rootMargin: '0px',
-      // Every 5%:
-      threshold: [...Array(20).keys()].map((i) => i / 20),
-    });
-    let children = mainColumn.querySelectorAll('[data-sidebarsection]');
-    for (let i = 0; i < children.length; i++) {
-      observer.observe(children[i]);
-    }
-  }
-
-  class SidebarSection {
-    label: string | null = '';
-    id: string = '';
-    heading: boolean = false;
-    active: boolean = false;
-    sponsor: boolean = false;
-    integration: boolean = false;
-    integrationFaviconPath: string = '';
-  }
-  let lastActiveSection: SidebarSection;
-
-  let hasHeading: boolean = false;
-  let sidebarSections: Array<SidebarSection> = [];
-
-  function scanSections() {
-    // Read the SidebarSection components from the slot and use them to
-    // populate the sidebar.
-    sidebarSections = [];
-    hasHeading = false;
-
-    let children = mainColumn.querySelectorAll('[data-sidebarsection]');
-    for (let i = 0; i < children.length; i++) {
-      let child = children[i];
-      let isHeading = child.getAttribute('data-heading') == 'true';
-      let isIntegration = child.getAttribute('data-integration') == 'true';
-      let label = child.getAttribute('data-label');
-
-      // Reassign ID to ensure sequential ordering
-      // This is critical because observeCallback relies on ID order matching array index
-      const newId = `sidebarsection-${i}`;
-      child.id = newId;
-
-      // If we have no headings, then nothing should be indented. If we have
-      // at least one heading, non-heading items should be indented.
-      if (isHeading) hasHeading = true;
-      sidebarSections.push({
-        label: label,
-        id: newId,
-        heading: isHeading,
-        // active highlights a section if it's visible at the top of
-        // the viewport. Initially all false.
-        active: false,
-        sponsor: child.getAttribute('data-sponsor') == 'true',
-        integration: isIntegration,
-        integrationFaviconPath:
-          child.getAttribute('data-integration-favicon') || '',
-      });
-    }
-    // eslint-disable-next-line no-self-assign
-    sidebarSections = sidebarSections;
-    createObserver();
-  }
-
-  onMount(() => {
-    scanSections();
   });
 
-  // Rescan sections when activeIntegration changes OR when integration components are loaded
-  // This ensures integration sections appear in the sidebar after they're dynamically added
-  $: if (($activeIntegration || integrationComponentsLoaded) && mainColumn) {
-    // Use tick() to wait for DOM updates before rescanning
-    tick().then(() => {
-      scanSections();
+  if (lastActiveSection) {
+    lastActiveSection.active = false;
+  }
+  if (visibleSections.length > 0) {
+    lastActiveSection = sidebarSections[visibleSections[0]];
+    lastActiveSection.active = true;
+  }
+  // eslint-disable-next-line no-self-assign
+  sidebarSections = sidebarSections;
+}
+
+let observer: IntersectionObserver | null = null;
+
+function createObserver(_isStuck: boolean = false) {
+  if (!mainColumn) return;
+  if (observer) observer.disconnect();
+  observer = new IntersectionObserver(observeCallback, {
+    root: document,
+    rootMargin: '0px',
+    // Every 5%:
+    threshold: [...Array(20).keys()].map((i) => i / 20),
+  });
+  let children = mainColumn.querySelectorAll('[data-sidebarsection]');
+  for (let i = 0; i < children.length; i++) {
+    observer.observe(children[i]);
+  }
+}
+
+class SidebarSection {
+  label: string | null = '';
+  id: string = '';
+  heading: boolean = false;
+  active: boolean = false;
+  sponsor: boolean = false;
+  integration: boolean = false;
+  integrationFaviconPath: string = '';
+}
+let lastActiveSection: SidebarSection;
+
+let hasHeading: boolean = false;
+let sidebarSections: Array<SidebarSection> = [];
+
+function scanSections() {
+  // Read the SidebarSection components from the slot and use them to
+  // populate the sidebar.
+  sidebarSections = [];
+  hasHeading = false;
+
+  let children = mainColumn.querySelectorAll('[data-sidebarsection]');
+  for (let i = 0; i < children.length; i++) {
+    let child = children[i];
+    let isHeading = child.getAttribute('data-heading') === 'true';
+    let isIntegration = child.getAttribute('data-integration') === 'true';
+    let label = child.getAttribute('data-label');
+
+    // Reassign ID to ensure sequential ordering
+    // This is critical because observeCallback relies on ID order matching array index
+    const newId = `sidebarsection-${i}`;
+    child.id = newId;
+
+    // If we have no headings, then nothing should be indented. If we have
+    // at least one heading, non-heading items should be indented.
+    if (isHeading) hasHeading = true;
+    sidebarSections.push({
+      label: label,
+      id: newId,
+      heading: isHeading,
+      // active highlights a section if it's visible at the top of
+      // the viewport. Initially all false.
+      active: false,
+      sponsor: child.getAttribute('data-sponsor') === 'true',
+      integration: isIntegration,
+      integrationFaviconPath:
+        child.getAttribute('data-integration-favicon') || '',
     });
   }
+  // eslint-disable-next-line no-self-assign
+  sidebarSections = sidebarSections;
+  createObserver();
+}
+
+onMount(() => {
+  scanSections();
+});
+
+// Rescan sections when activeIntegration changes OR when integration components are loaded
+// This ensures integration sections appear in the sidebar after they're dynamically added
+$: if (($activeIntegration || integrationComponentsLoaded) && mainColumn) {
+  // Use tick() to wait for DOM updates before rescanning
+  tick().then(() => {
+    scanSections();
+  });
+}
 </script>
 
 <svelte:window on:popstate={popState} />

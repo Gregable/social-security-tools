@@ -1,67 +1,61 @@
 <script lang="ts">
-  import { Money } from '$lib/money';
+import HorizCurlyImg from '$lib/images/horiz-curly.png';
+import { Money } from '$lib/money';
+import { Recipient } from '$lib/recipient';
+import Expando from './Expando.svelte';
+import RName from './RecipientName.svelte';
 
-  import { Recipient } from '$lib/recipient';
-  import Expando from './Expando.svelte';
-  import RName from './RecipientName.svelte';
+export let recipient: Recipient = new Recipient();
+export let spouse: Recipient = new Recipient();
+const r: Recipient = recipient;
+const s: Recipient = spouse;
 
-  import HorizCurlyImg from '$lib/images/horiz-curly.png';
+let higherEarner: Recipient;
+let lowerEarner: Recipient;
+$: higherEarner = $recipient.higherEarningsThan($spouse) ? $recipient : $spouse;
+$: lowerEarner = $recipient.higherEarningsThan($spouse) ? $spouse : $recipient;
 
-  export let recipient: Recipient = new Recipient();
-  export let spouse: Recipient = new Recipient();
-  const r: Recipient = recipient;
-  const s: Recipient = spouse;
-
-  let higherEarner: Recipient;
-  let lowerEarner: Recipient;
-  $: higherEarner = $recipient.higherEarningsThan($spouse)
-    ? $recipient
-    : $spouse;
-  $: lowerEarner = $recipient.higherEarningsThan($spouse)
-    ? $spouse
-    : $recipient;
-
-  function spousalBenefitCalc(higher: Recipient, lower: Recipient): Money {
-    let maxSpousal = higher.pia().primaryInsuranceAmount().div(2);
-    let spousal = maxSpousal.sub(lower.pia().primaryInsuranceAmount());
-    if (spousal.value() > 0) {
-      return spousal;
-    } else {
-      return Money.from(0);
-    }
+function spousalBenefitCalc(higher: Recipient, lower: Recipient): Money {
+  let maxSpousal = higher.pia().primaryInsuranceAmount().div(2);
+  let spousal = maxSpousal.sub(lower.pia().primaryInsuranceAmount());
+  if (spousal.value() > 0) {
+    return spousal;
+  } else {
+    return Money.from(0);
   }
-  let spousalBenefit: Money = Money.from(0);
-  $: spousalBenefit = spousalBenefitCalc(higherEarner, lowerEarner);
+}
+let spousalBenefit: Money = Money.from(0);
+$: spousalBenefit = spousalBenefitCalc(higherEarner, lowerEarner);
 
-  /**
-   * Returns the personal benefit as a percentage of personal + spousal
-   * benefits. Used for the spousal benefit percentage diagram.
-   */
-  function spousalBenefitFractionCalc(
-    higher: Recipient,
-    lower: Recipient
-  ): number {
-    let maxSpousal: Money = higher.pia().primaryInsuranceAmount().div(2);
-    if (maxSpousal.value() == 0) {
-      return 0;
-    }
-    let myPia: Money = lower.pia().primaryInsuranceAmount();
-    var actualFraction = myPia.div$(maxSpousal) * 100.0;
-    // If the actual number is > 0, return at least 1%.
-    if (actualFraction > 0 || myPia.value() == 0) {
-      return actualFraction;
-    }
-    return 1;
+/**
+ * Returns the personal benefit as a percentage of personal + spousal
+ * benefits. Used for the spousal benefit percentage diagram.
+ */
+function spousalBenefitFractionCalc(
+  higher: Recipient,
+  lower: Recipient
+): number {
+  let maxSpousal: Money = higher.pia().primaryInsuranceAmount().div(2);
+  if (maxSpousal.value() === 0) {
+    return 0;
   }
-  let spousalBenefitFraction: number = 0;
-  $: spousalBenefitFraction = spousalBenefitFractionCalc(
-    higherEarner,
-    lowerEarner
-  );
+  let myPia: Money = lower.pia().primaryInsuranceAmount();
+  var actualFraction = myPia.div$(maxSpousal) * 100.0;
+  // If the actual number is > 0, return at least 1%.
+  if (actualFraction > 0 || myPia.value() === 0) {
+    return actualFraction;
+  }
+  return 1;
+}
+let spousalBenefitFraction: number = 0;
+$: spousalBenefitFraction = spousalBenefitFractionCalc(
+  higherEarner,
+  lowerEarner
+);
 
-  // TODO: We may want to consider zero'ing out PIA in this section if
-  // the user isn't eligible for benefits, even if they have a record.
-  // Unclear what the best approach for this is.
+// TODO: We may want to consider zero'ing out PIA in this section if
+// the user isn't eligible for benefits, even if they have a record.
+// Unclear what the best approach for this is.
 </script>
 
 <div>

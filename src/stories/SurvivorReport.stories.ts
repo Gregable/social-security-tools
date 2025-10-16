@@ -1,12 +1,10 @@
 import type { Meta } from '@storybook/svelte';
-import SurvivorReport from '../lib/components/SurvivorReport.svelte';
-
-import { Recipient } from '$lib/recipient';
-import { parsePaste } from '$lib/ssa-parse';
 import { Birthdate } from '$lib/birthday';
-
 import demo from '$lib/pastes/averagepaste.txt?raw';
 import demo_spouse_low from '$lib/pastes/averagepaste-spouse.txt?raw';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import SurvivorReport from '../lib/components/SurvivorReport.svelte';
 
 const meta: Meta<SurvivorReport> = {
   component: SurvivorReport,
@@ -23,13 +21,13 @@ const Template = ({ ...args }) => ({
   props: args,
 });
 
-let recipient = new Recipient();
+const recipient = new Recipient();
 recipient.name = 'Alex';
 recipient.markFirst();
 recipient.earningsRecords = parsePaste(demo);
 recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
 
-let spouse = new Recipient();
+const spouse = new Recipient();
 spouse.name = 'Chris';
 spouse.markSecond();
 spouse.earningsRecords = parsePaste(demo_spouse_low);
@@ -42,13 +40,13 @@ Default.args = {
   spouse: spouse,
 };
 
-let recipient2 = new Recipient();
+const recipient2 = new Recipient();
 recipient2.name = 'Alex';
 recipient2.markFirst();
 recipient2.earningsRecords = parsePaste(demo);
 recipient2.birthdate = Birthdate.FromYMD(1942, 6, 1);
 
-let spouse2 = new Recipient();
+const spouse2 = new Recipient();
 spouse2.name = 'Chris';
 spouse2.markSecond();
 spouse2.earningsRecords = parsePaste(demo_spouse_low);

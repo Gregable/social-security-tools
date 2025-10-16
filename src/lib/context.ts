@@ -1,9 +1,9 @@
 /**
  * Global context for the application.
  */
-import { writable, derived } from 'svelte/store';
-import type { Recipient } from './recipient';
+import { derived, writable } from 'svelte/store';
 import type { MonthDate } from './month-time';
+import type { Recipient } from './recipient';
 
 class Context {
   recipient: Recipient | null = null;

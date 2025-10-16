@@ -1,14 +1,13 @@
-import { Recipient } from '$lib/recipient';
-import { MonthDate } from '$lib/month-time';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-
+import { MonthDate } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
+import type { BenefitPeriod } from '$lib/strategy/calculations/benefit-period';
 import {
   PersonalBenefitPeriods,
   sumBenefitPeriods,
 } from '$lib/strategy/calculations/recipient-personal-benefits';
-import { BenefitPeriod } from '$lib/strategy/calculations/benefit-period';
 
 describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   let recipient: Recipient;
@@ -47,7 +46,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   it('calculates benefits correctly across year boundaries', () => {
     // Mock benefitOnDate to return different values in different years
     vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
-      (filingDate, atDate) => {
+      (_filingDate, atDate) => {
         if (atDate.year() === 2022) {
           return Money.from(1000);
         } else {
@@ -186,7 +185,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('calculates benefits correctly for multi-year periods', () => {
     // Mock with COLA increases over multiple years
-    let yearlyBenefits = {
+    const yearlyBenefits = {
       2022: 1000,
       2023: 1030,
       2024: 1061,
@@ -194,7 +193,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
     };
 
     vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
-      (filingDate, atDate) => {
+      (_filingDate, atDate) => {
         // Get benefit amount based on year of atDate
         const year = atDate.year();
         const amount = yearlyBenefits[year] || 1000;

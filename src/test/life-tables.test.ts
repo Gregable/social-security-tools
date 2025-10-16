@@ -1,11 +1,11 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  getLifeTableData,
-  getDeathProbabilityDistribution,
+  DataNotFoundError,
   getCurrentAge,
+  getDeathProbabilityDistribution,
+  getLifeTableData,
   isLifeTableDataAvailable,
   LifeTableError,
-  DataNotFoundError,
 } from '$lib/life-tables';
 
 // Helper to build a minimal recipient-like object without importing Recipient (avoids potential circular deps in unit tests)

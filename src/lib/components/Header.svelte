@@ -1,13 +1,13 @@
 <script lang="ts">
-  export let active = 'none';
+export let active = 'none';
 
-  let navOptions = [
-    { name: 'Calculator', link: 'calculator', active: false },
-    { name: 'Guides', link: 'guides', active: false },
-    { name: 'About', link: 'about', active: false },
-    { name: 'Contact', link: 'contact', active: false },
-  ];
-  $: active && navOptions.forEach((o) => (o.active = o.name === active));
+let navOptions = [
+  { name: 'Calculator', link: 'calculator', active: false },
+  { name: 'Guides', link: 'guides', active: false },
+  { name: 'About', link: 'about', active: false },
+  { name: 'Contact', link: 'contact', active: false },
+];
+$: active && navOptions.forEach((o) => (o.active = o.name === active));
 </script>
 
 <div class="header">

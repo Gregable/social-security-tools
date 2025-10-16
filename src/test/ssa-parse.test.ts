@@ -1,5 +1,5 @@
-import { dollarStringToMoney, parsePaste } from '$lib/ssa-parse';
 import { describe, expect, it } from 'vitest';
+import { dollarStringToMoney, parsePaste } from '$lib/ssa-parse';
 
 describe('dollarStringToMoney', () => {
   it('Parses Number', () => {
@@ -30,14 +30,14 @@ function parsePasteExpect(parsed) {
 
 describe('parsePaste', () => {
   it('Parses Simple Space Delimited Data', () => {
-    let pasteData = '2018 $100,000\n2017 $90,000\n2016 $80,000';
+    const pasteData = '2018 $100,000\n2017 $90,000\n2016 $80,000';
     parsePasteExpect(parsePaste(pasteData));
   });
 
   it('Parses unknown 3-column format', () => {
     // If the fist two columns are year and earnings, we might be able to
     // parse it ignoring the other columns.
-    let pasteData =
+    const pasteData =
       '2018 $100,000 garbage\n2017 $90,000 garbage\n2016 $80,000 garbage';
     parsePasteExpect(parsePaste(pasteData));
   });
@@ -45,7 +45,7 @@ describe('parsePaste', () => {
   it('Parses unknown 4-column format', () => {
     // If the fist two columns are year and earnings, we might be able to
     // parse it ignoring the other columns.
-    let pasteData =
+    const pasteData =
       '2018 $100,000 garbage garbage\n' +
       '2017 $90,000 garbage garbage\n' +
       '2016 $80,000 garbage garbage';
@@ -53,7 +53,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses data from ssa.gov pdf statement', () => {
-    let pasteData =
+    const pasteData =
       'Work Year\n' +
       'Earnings Taxed for Social Security\n' +
       'Earnings Taxed for Medicare (began 1966)\n' +
@@ -62,7 +62,7 @@ describe('parsePaste', () => {
       '1991-2000 $200,000 $200,000\n' +
       '2001-2005 $300,000 $300,000\n' +
       '2006 $40,000 $40,000';
-    let parsed = parsePaste(pasteData);
+    const parsed = parsePaste(pasteData);
     expect(parsed.length).toBe(41);
     let j = 0;
     for (let i = 1966; i <= 1980; i++) {
@@ -90,7 +90,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.tools own formatted table', () => {
-    let pasteData =
+    const pasteData =
       'Year\tAge\tTaxed Earnings\t\tMultiplier\tIndexed Earnings\t\t\n' +
       '2016\t21\t$80,000\tx\t1.01\t=\t$80,900\tTop 35 Value\n' +
       '2017\t22\t$90,000\tx\t1.00\t=\t$90,000\t\n' +
@@ -99,7 +99,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Chrome, Linux, Full Page)', () => {
-    let pasteData =
+    const pasteData =
       'KSkip to Content\n' +
       'my Social Security\n' +
       'Uncle Sam Sign Out\n' +
@@ -145,7 +145,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Chrome, Linux, Full Table)', () => {
-    let pasteData =
+    const pasteData =
       'Work Year\n' +
       'Taxed Social Security Earnings\n' +
       'Taxed Medicare Earnings\n' +
@@ -156,7 +156,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Chrome, Linux, Table Rows)', () => {
-    let pasteData =
+    const pasteData =
       '2018\t$100,000\t$100,000\n' +
       '2017\t$90,000\t$90,000\n' +
       '2016\t$80,000\t$80,000\n';
@@ -164,7 +164,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Firefox, Linux, Full Page)', () => {
-    let pasteData =
+    const pasteData =
       '\n' +
       'K\n' +
       'Skip to Content\n' +
@@ -211,7 +211,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Firefox, Linux, Full Table)', () => {
-    let pasteData =
+    const pasteData =
       'Work Year\n\t\n' +
       'Taxed Social Security Earnings\n\t\n' +
       'Taxed Medicare Earnings\n' +
@@ -222,7 +222,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Firefox, Linux, Table Rows)', () => {
-    let pasteData =
+    const pasteData =
       '2018 \t$100,000 \t$100,000\n' +
       '2017 \t$90,000 \t$90,000\n' +
       '2016 \t$80,000 \t$80,000\n';
@@ -232,7 +232,7 @@ describe('parsePaste', () => {
   it('Parses ssa.gov format with trailing whitespace', () => {
     // User report here indicates that trailing whitespace breaks parsing:
     // http://www.early-retirement.org/forums/f28/fire-effect-on-ss-benefits-96343-3.html#post2196019
-    let pasteData =
+    const pasteData =
       'Work Year \n' +
       'Taxed Social Security Earnings \n' +
       'Taxed Medicare Earnings \n' +
@@ -243,7 +243,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Edge, Windows, Full Page)', () => {
-    let pasteData =
+    const pasteData =
       'K\n' +
       'Skip to Content\n' +
       'my Social Security\n' +
@@ -296,7 +296,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Edge, Windows, Full Table)', () => {
-    let pasteData =
+    const pasteData =
       'Work Year \n' +
       'Taxed Social Security Earnings \n' +
       'Taxed Medicare Earnings \n' +
@@ -313,7 +313,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format (Edge, Windows, Table Rows)', () => {
-    let pasteData =
+    const pasteData =
       '2018 \n' +
       '$100,000 \n' +
       '$100,000 \n' +
@@ -327,7 +327,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format with not yet recorded year', () => {
-    let pasteData =
+    const pasteData =
       'Work Year\n' +
       'Taxed Social Security Earnings\n' +
       'Taxed Medicare Earnings\n' +
@@ -349,7 +349,7 @@ describe('parsePaste', () => {
   });
 
   it('Parses ssa.gov format before medicare', () => {
-    let pasteData =
+    const pasteData =
       '1966\t$2,966\t$2,966\n' +
       '1965\t$2,965\tMedicare Began in 1966\n' +
       '1964\t$2,964\n' +

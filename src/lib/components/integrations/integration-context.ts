@@ -4,10 +4,10 @@
  * and their filing dates based on recipient and spouse data.
  */
 
-import type { Recipient } from '$lib/recipient';
-import type { MonthDate } from '$lib/month-time';
-import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 import { get } from 'svelte/store';
+import { recipientFilingDate, spouseFilingDate } from '$lib/context';
+import type { MonthDate } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
 
 /**
  * Context class for integration components that need to work with
@@ -122,7 +122,7 @@ export class IntegrationContext {
   getLowerEarnerPersonalBenefit(filingDate: MonthDate | null): string {
     const lowerEarner = this.lowerEarner();
 
-    const monthlyBenefit = lowerEarner!.benefitOnDate(filingDate!, filingDate!);
+    const monthlyBenefit = lowerEarner?.benefitOnDate(filingDate!, filingDate!);
     return monthlyBenefit.roundToDollar().wholeDollars();
   }
 
@@ -139,7 +139,7 @@ export class IntegrationContext {
     const higherEarner = this.higherEarner();
     const higherEarnerFilingDate = this.higherEarnerFilingDate();
 
-    const monthlyBenefit = lowerEarner!.allBenefitsOnDate(
+    const monthlyBenefit = lowerEarner?.allBenefitsOnDate(
       higherEarner!,
       higherEarnerFilingDate!,
       filingDate!,

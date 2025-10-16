@@ -9,7 +9,7 @@ export class GuidesSchema {
   public tags: string[] = []; // Article tags for Open Graph
 
   render(): string {
-    let schema = {
+    const schema = {
       '@context': 'https://schema.org',
       '@type': 'NewsArticle',
       mainEntityOfPage: {

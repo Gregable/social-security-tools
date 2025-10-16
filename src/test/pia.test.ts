@@ -1,14 +1,14 @@
+import { describe, expect, it } from 'vitest';
 import { Birthdate } from '$lib/birthday';
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
-import { describe, expect, it } from 'vitest';
 
 import * as constants from '../lib/constants';
 
 describe('Recipient', () => {
   it('calculates bendpoints', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
     r.birthdate = Birthdate.FromYMD(1957, 0, 2);
@@ -18,24 +18,24 @@ describe('Recipient', () => {
   });
 
   it('calculates pia by bracket', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
 
     expect(r.pia().primaryInsuranceAmountByBracket(0).value()).toEqual(690.3);
     expect(r.pia().primaryInsuranceAmountByBracket(1).value()).toEqual(843.2);
     expect(r.pia().primaryInsuranceAmountByBracket(2).value()).toEqual(0);
-    let sum: number = 690.3 + 843.2 + 0;
+    const sum: number = 690.3 + 843.2 + 0;
     expect(r.pia().primaryInsuranceAmountUnadjusted().value()).toEqual(sum);
   });
 
   it('calculates cola adjustments', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
 
     // There should be one adjustment per year from 2012 to MAX_COLA_YEAR.
-    let adjustments = r.pia().colaAdjustments();
+    const adjustments = r.pia().colaAdjustments();
     expect(adjustments.length).toEqual(constants.MAX_COLA_YEAR - 2011);
 
     // Verify the first adjustment.
@@ -55,7 +55,7 @@ describe('Recipient', () => {
   });
 
   it('calculates pia from AIME', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1950, 6, 1);
     r.earningsRecords = parsePaste(demo0);
 

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
   COLA,
   EARNINGS_PER_CREDIT,
@@ -7,7 +8,6 @@ import {
   TAX_RATES,
   WAGE_INDICES,
 } from '$lib/constants';
-import { describe, expect, it } from 'vitest';
 
 describe('constants.ts', () => {
   // The first year for earnings_per_credit is 1978.

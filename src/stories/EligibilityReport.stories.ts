@@ -1,24 +1,22 @@
 import type { Meta } from '@storybook/svelte';
-import EligibilityReport from '../lib/components/EligibilityReport.svelte';
-
-import { Recipient } from '$lib/recipient';
-import { parsePaste } from '$lib/ssa-parse';
 import { Birthdate } from '$lib/birthday';
-import { Money } from '$lib/money';
 import { EarningRecord } from '$lib/earning-record';
-
+import { Money } from '$lib/money';
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 import demo1 from '$lib/pastes/millionpaste.txt?raw';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import EligibilityReport from '../lib/components/EligibilityReport.svelte';
 
 // Sufficient earnigns for eligibility
-let recipient0 = new Recipient();
+const recipient0 = new Recipient();
 recipient0.earningsRecords = parsePaste(demo0);
 recipient0.birthdate = Birthdate.FromYMD(1950, 6, 1);
 recipient0.name = 'Alex';
 recipient0.markFirst();
 
 // Insuficient earnings for eligibility
-let recipient1 = new Recipient();
+const recipient1 = new Recipient();
 recipient1.earningsRecords = parsePaste(demo1);
 recipient1.birthdate = Birthdate.FromYMD(1950, 6, 1);
 const futureEarnings1 = [
@@ -38,7 +36,7 @@ recipient1.name = 'Alex';
 recipient1.markFirst();
 
 // Sufficient earnings for eligibility with future earnings
-let recipient2 = new Recipient();
+const recipient2 = new Recipient();
 recipient2.earningsRecords = parsePaste(demo1);
 recipient2.birthdate = Birthdate.FromYMD(1950, 6, 1);
 const futureEarnings2 = [

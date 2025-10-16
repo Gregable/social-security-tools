@@ -1,354 +1,353 @@
 <script lang="ts">
-  import { afterUpdate, onMount, tick } from 'svelte';
+import { afterUpdate, onMount, tick } from 'svelte';
 
-  let sliderEl: HTMLDivElement;
-  let handleEl: HTMLSpanElement;
-  let handleLabelEl: HTMLSpanElement;
-  let mounted: boolean = false;
-  let initialCalculationDone: boolean = false;
+let sliderEl: HTMLDivElement;
+let handleEl: HTMLSpanElement;
+let handleLabelEl: HTMLSpanElement;
+let mounted: boolean = false;
+let initialCalculationDone: boolean = false;
 
-  export let value: number = 0;
+export let value: number = 0;
 
-  /**
-   * Minimum value shown on the slider.
-   */
-  export let floor: number = 0;
+/**
+ * Minimum value shown on the slider.
+ */
+export let floor: number = 0;
 
-  /**
-   * Maximum value shown on the slider.
-   */
-  export let ceiling: number = 10;
+/**
+ * Maximum value shown on the slider.
+ */
+export let ceiling: number = 10;
 
-  export let userFloor: number = floor;
-  export let userCeiling: number = ceiling;
+export let userFloor: number = floor;
+export let userCeiling: number = ceiling;
 
-  /**
-   * Increment between slider values.
-   */
-  export let step: number = 1;
+/**
+ * Increment between slider values.
+ */
+export let step: number = 1;
 
-  /**
-   * Color of the ticks to the left of the slider handle.
-   */
-  export let tickLeftColor: string = '#0db9f0';
-  /**
-   * Color of the ticks to the right of the slider handle.
-   */
-  export let tickRightColor: string = '#d8e0f3';
-  /**
-   * Color of the bar to the left of the slider handle.
-   */
-  export let barLeftColor: string = '#0db9f0';
-  /**
-   * Color of the bar to the right of the slider handle.
-   */
-  export let barRightColor: string = '#d8e0f3';
-  /**
-   * Color of the slider handle.
-   */
-  export let handleColor: string = '#0db9f0';
-  /**
-   * Color of the slider handle inner dot when selected.
-   */
-  export let handleSelectedColor: string = '#451aff';
-  /**
-   * Text color of the tick labels, as well as the slider handle label.
-   */
-  export let tickLabelColor: string = '#000';
-  /**
-   * Text color of the tick legends.
-   */
-  export let tickLegendColor: string = '#000';
+/**
+ * Color of the ticks to the left of the slider handle.
+ */
+export let tickLeftColor: string = '#0db9f0';
+/**
+ * Color of the ticks to the right of the slider handle.
+ */
+export let tickRightColor: string = '#d8e0f3';
+/**
+ * Color of the bar to the left of the slider handle.
+ */
+export let barLeftColor: string = '#0db9f0';
+/**
+ * Color of the bar to the right of the slider handle.
+ */
+export let barRightColor: string = '#d8e0f3';
+/**
+ * Color of the slider handle.
+ */
+export let handleColor: string = '#0db9f0';
+/**
+ * Color of the slider handle inner dot when selected.
+ */
+export let handleSelectedColor: string = '#451aff';
+/**
+ * Text color of the tick labels, as well as the slider handle label.
+ */
+export let tickLabelColor: string = '#000';
+/**
+ * Text color of the tick legends.
+ */
+export let tickLegendColor: string = '#000';
 
-  /**
-   * Shows the ticks along the slider bar.
-   * If ticksArray is unset, ticks will be shown at the step interval.
-   */
-  export let showTicks: boolean = false;
+/**
+ * Shows the ticks along the slider bar.
+ * If ticksArray is unset, ticks will be shown at the step interval.
+ */
+export let showTicks: boolean = false;
 
-  /**
-   * Selection of specific tick locations, labels, and legends. Overrides
-   * the default ticks at the step interval and translate function.
-   *
-   * Usage:
-   *   Values in the array should be either of form:
-   *     {value: 1}
-   *   or:
-   *     {value: 1, label: "One", legend: "Foo", color: "#f00"}
-   *
-   *   Only value is required.
-   *
-   * If the array is empty, ticks will be shown at the step interval.
-   */
-  export let ticksArray: Array<{
-    value: number;
-    label?: string;
-    legend?: string;
-    color?: string;
-  }> = [];
+/**
+ * Selection of specific tick locations, labels, and legends. Overrides
+ * the default ticks at the step interval and translate function.
+ *
+ * Usage:
+ *   Values in the array should be either of form:
+ *     {value: 1}
+ *   or:
+ *     {value: 1, label: "One", legend: "Foo", color: "#f00"}
+ *
+ *   Only value is required.
+ *
+ * If the array is empty, ticks will be shown at the step interval.
+ */
+export let ticksArray: Array<{
+  value: number;
+  label?: string;
+  legend?: string;
+  color?: string;
+}> = [];
 
-  /**
-   * Custom translate function. Use this if you want to translate the values
-   * displayed in the slider bar. `label` is a string that can take the
-   * following values:
-   * - `'value'`: The current value label
-   * - `'ceiling'`: The high label
-   * - `'floor'`: The low label
-   */
-  export let translate: (value: number, _label: string) => string = (
-    value,
-    _label
-  ) => value.toLocaleString();
+/**
+ * Custom translate function. Use this if you want to translate the values
+ * displayed in the slider bar. `label` is a string that can take the
+ * following values:
+ * - `'value'`: The current value label
+ * - `'ceiling'`: The high label
+ * - `'floor'`: The low label
+ */
+export let translate: (value: number, _label: string) => string = (
+  value,
+  _label
+) => value.toLocaleString();
 
-  export let onchange: ((event: { value: number }) => void) | undefined =
-    undefined;
+export let onchange: ((event: { value: number }) => void) | undefined =
+  undefined;
 
-  // Reactive statement to call the callback when value changes
-  $: onchange?.({ value });
+// Reactive statement to call the callback when value changes
+$: onchange?.({ value });
 
-  // By binding to window.innerWidth, we can update the width when the
-  // window is resized and update the slider position visibly.
-  function getWidth(_windowWidth: number, el: HTMLDivElement): number {
-    if (el != undefined) {
-      return el.getBoundingClientRect().width;
-    } else {
-      return 1;
-    }
+// By binding to window.innerWidth, we can update the width when the
+// window is resized and update the slider position visibly.
+function getWidth(_windowWidth: number, el: HTMLDivElement): number {
+  if (el !== undefined) {
+    return el.getBoundingClientRect().width;
+  } else {
+    return 1;
   }
-  let innerWidth: number = window.innerWidth;
-  let width: number = 0;
-  $: width =
-    mounted && initialCalculationDone && sliderEl
-      ? getWidth(innerWidth, sliderEl)
-      : 0;
+}
+let innerWidth: number = window.innerWidth;
+let width: number = 0;
+$: width =
+  mounted && initialCalculationDone && sliderEl
+    ? getWidth(innerWidth, sliderEl)
+    : 0;
 
-  // Similarly, we want to bind to print events so we resize correctly for those
-  // too:
-  let media_query_list: MediaQueryList;
-  function onPrintMediaChange() {
-    if (mounted && sliderEl) {
-      width = getWidth(innerWidth, sliderEl);
-    }
+// Similarly, we want to bind to print events so we resize correctly for those
+// too:
+let media_query_list: MediaQueryList;
+function onPrintMediaChange() {
+  if (mounted && sliderEl) {
+    width = getWidth(innerWidth, sliderEl);
   }
-  function removeMediaQueryListener() {
-    if (media_query_list) {
-      media_query_list.removeEventListener('change', onPrintMediaChange);
-    }
+}
+function removeMediaQueryListener() {
+  if (media_query_list) {
+    media_query_list.removeEventListener('change', onPrintMediaChange);
   }
-  onMount(() => {
-    const initAsync = async () => {
-      mounted = true;
-      // Wait for the DOM to be fully updated before calculating dimensions
-      await tick();
+}
+onMount(() => {
+  const initAsync = async () => {
+    mounted = true;
+    // Wait for the DOM to be fully updated before calculating dimensions
+    await tick();
 
-      // Additional timeout to ensure everything is fully rendered
-      setTimeout(() => {
-        if (sliderEl) {
-          const newWidth = getWidth(innerWidth, sliderEl);
-          if (newWidth > 0) {
-            width = newWidth;
-            initialCalculationDone = true;
-          }
+    // Additional timeout to ensure everything is fully rendered
+    setTimeout(() => {
+      if (sliderEl) {
+        const newWidth = getWidth(innerWidth, sliderEl);
+        if (newWidth > 0) {
+          width = newWidth;
+          initialCalculationDone = true;
         }
-      }, 0);
+      }
+    }, 0);
 
-      media_query_list = window.matchMedia('print');
-      media_query_list.addEventListener('change', onPrintMediaChange);
-    };
+    media_query_list = window.matchMedia('print');
+    media_query_list.addEventListener('change', onPrintMediaChange);
+  };
 
-    initAsync();
+  initAsync();
 
-    return () => {
-      removeMediaQueryListener();
-    };
-  });
+  return () => {
+    removeMediaQueryListener();
+  };
+});
 
-  // If we're dragging the slider, it's selected. However, it can also be
-  // selected by tabbing to it. It also remains selected after dragging until
-  // the user clicks elsewhere.
-  let dragging: boolean = false;
-  let selected: boolean = false;
-  function onFocus(_event: FocusEvent) {
-    selected = true;
-  }
-  function onBlur(_event: FocusEvent) {
-    selected = false;
-  }
+// If we're dragging the slider, it's selected. However, it can also be
+// selected by tabbing to it. It also remains selected after dragging until
+// the user clicks elsewhere.
+let dragging: boolean = false;
+let selected: boolean = false;
+function onFocus(_event: FocusEvent) {
+  selected = true;
+}
+function onBlur(_event: FocusEvent) {
+  selected = false;
+}
 
-  function onStart(event: PointerEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    dragging = true;
-    handleEl.focus();
+function onStart(event: PointerEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+  dragging = true;
+  handleEl.focus();
+  dragTo(event.clientX);
+}
+function onMove(event: PointerEvent) {
+  if (dragging) {
     dragTo(event.clientX);
   }
-  function onMove(event: PointerEvent) {
-    if (dragging) {
-      dragTo(event.clientX);
-    }
-  }
-  function onEnd(_event: PointerEvent) {
-    dragging = false;
-  }
-  function onKeyDown(event: KeyboardEvent) {
-    if (!selected) return;
+}
+function onEnd(_event: PointerEvent) {
+  dragging = false;
+}
+function onKeyDown(event: KeyboardEvent) {
+  if (!selected) return;
 
-    let val = value;
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
-      val = Math.max(userFloor, val - step);
-    } else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-      val = Math.min(userCeiling, val + step);
-    } else if (event.key === 'PageDown') {
-      val = Math.max(userFloor, val - step * 5);
-    } else if (event.key === 'PageUp') {
-      val = Math.min(userCeiling, val + step * 5);
-    } else if (event.key === 'Home') {
-      val = userFloor;
-    } else if (event.key === 'End') {
-      val = userCeiling;
-    } else {
-      return;
-    }
-
-    // Only prevent default if we actually changed the value. Otherwise, we
-    // want to allow the default behavior of whatever key we didn't interpret.
-    // For example, this could be <tab> which we want to allow to remove focus.
-    event.preventDefault();
-    event.stopPropagation();
-
-    // Ensure that we snap to the nearest "step" increment unless we are at
-    // the bounds:
-    if (val > userFloor && val < userCeiling) {
-      val = Math.round(val / step) * step;
-    }
-    // Ensure that we don't go out of bounds.
-    val = Math.max(userFloor, Math.min(userCeiling, val));
-
-    value = val;
+  let val = value;
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+    val = Math.max(userFloor, val - step);
+  } else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+    val = Math.min(userCeiling, val + step);
+  } else if (event.key === 'PageDown') {
+    val = Math.max(userFloor, val - step * 5);
+  } else if (event.key === 'PageUp') {
+    val = Math.min(userCeiling, val + step * 5);
+  } else if (event.key === 'Home') {
+    val = userFloor;
+  } else if (event.key === 'End') {
+    val = userCeiling;
+  } else {
+    return;
   }
 
-  /**
-   * Set the value of the slider from the x coordinate of the event.
-   * The value is rounded to the nearest step.
-   * @param eventX The x coordinate of the event.
-   */
-  function dragTo(eventX: number) {
-    if (!mounted || !initialCalculationDone || !sliderEl || width <= 0) return;
-    const percent = (eventX - sliderEl.getBoundingClientRect().left) / width;
-    let val = floor + percent * (ceiling - floor);
+  // Only prevent default if we actually changed the value. Otherwise, we
+  // want to allow the default behavior of whatever key we didn't interpret.
+  // For example, this could be <tab> which we want to allow to remove focus.
+  event.preventDefault();
+  event.stopPropagation();
+
+  // Ensure that we snap to the nearest "step" increment unless we are at
+  // the bounds:
+  if (val > userFloor && val < userCeiling) {
     val = Math.round(val / step) * step;
-    val = Math.max(userFloor, Math.min(userCeiling, val));
-    value = val;
   }
+  // Ensure that we don't go out of bounds.
+  val = Math.max(userFloor, Math.min(userCeiling, val));
 
-  /**
-   * Compute the pixel position of an element matching a given value,
-   * considering the current width of the slider.
-   * @param value The logical value to move the slider to.
-   * @param floor The minimum value of the slider.
-   * @param ceiling The maximum value of the slider.
-   * @param width The width of the slider element.
-   * @returns The position of the slider in pixels.
-   */
-  function valueToPosition(
-    value: number,
-    floor: number,
-    ceiling: number,
-    width: number
-  ): number {
-    const percent = (value - floor) / (ceiling - floor);
-    return Math.floor(percent * width);
-  }
-  let sliderPosition: string = '0px';
-  $: sliderPosition =
-    mounted && initialCalculationDone && width > 0
-      ? valueToPosition(value, floor, ceiling, width) + 'px'
-      : '0px';
+  value = val;
+}
 
-  // When the label for the handle changes, it's width may change as well.
-  // We need to update it's position to be centered over the handle.
-  let handleLabel: string = '';
-  $: handleLabel = translate(value, 'value');
+/**
+ * Set the value of the slider from the x coordinate of the event.
+ * The value is rounded to the nearest step.
+ * @param eventX The x coordinate of the event.
+ */
+function dragTo(eventX: number) {
+  if (!mounted || !initialCalculationDone || !sliderEl || width <= 0) return;
+  const percent = (eventX - sliderEl.getBoundingClientRect().left) / width;
+  let val = floor + percent * (ceiling - floor);
+  val = Math.round(val / step) * step;
+  val = Math.max(userFloor, Math.min(userCeiling, val));
+  value = val;
+}
 
-  /**
-   * Update the position of the handle label based on the current value and
-   * element width. Called in afterUpdate to ensure that the label has been
-   * rendered before we try to measure it.
-   */
-  function updateHandleLabel(widthIn = width) {
-    if (!mounted || !initialCalculationDone || !handleLabelEl || widthIn <= 0)
-      return;
-    const rect = handleLabelEl.getBoundingClientRect();
-    const percent = (value - floor) / (ceiling - floor);
-    handleLabelEl.style.left =
-      Math.floor(percent * widthIn) - rect.width / 2 + 'px';
-  }
-  afterUpdate(() => {
-    updateHandleLabel();
-    // Force recalculation of width and ticks after DOM updates
-    if (mounted && sliderEl && !initialCalculationDone) {
-      const newWidth = getWidth(innerWidth, sliderEl);
-      if (newWidth > 0) {
-        width = newWidth;
-        initialCalculationDone = true;
-      }
+/**
+ * Compute the pixel position of an element matching a given value,
+ * considering the current width of the slider.
+ * @param value The logical value to move the slider to.
+ * @param floor The minimum value of the slider.
+ * @param ceiling The maximum value of the slider.
+ * @param width The width of the slider element.
+ * @returns The position of the slider in pixels.
+ */
+function valueToPosition(
+  value: number,
+  floor: number,
+  ceiling: number,
+  width: number
+): number {
+  const percent = (value - floor) / (ceiling - floor);
+  return Math.floor(percent * width);
+}
+let sliderPosition: string = '0px';
+$: sliderPosition =
+  mounted && initialCalculationDone && width > 0
+    ? `${valueToPosition(value, floor, ceiling, width)}px`
+    : '0px';
+
+// When the label for the handle changes, it's width may change as well.
+// We need to update it's position to be centered over the handle.
+let handleLabel: string = '';
+$: handleLabel = translate(value, 'value');
+
+/**
+ * Update the position of the handle label based on the current value and
+ * element width. Called in afterUpdate to ensure that the label has been
+ * rendered before we try to measure it.
+ */
+function updateHandleLabel(widthIn = width) {
+  if (!mounted || !initialCalculationDone || !handleLabelEl || widthIn <= 0)
+    return;
+  const rect = handleLabelEl.getBoundingClientRect();
+  const percent = (value - floor) / (ceiling - floor);
+  handleLabelEl.style.left = `${Math.floor(percent * widthIn) - rect.width / 2}px`;
+}
+afterUpdate(() => {
+  updateHandleLabel();
+  // Force recalculation of width and ticks after DOM updates
+  if (mounted && sliderEl && !initialCalculationDone) {
+    const newWidth = getWidth(innerWidth, sliderEl);
+    if (newWidth > 0) {
+      width = newWidth;
+      initialCalculationDone = true;
     }
-  });
-
-  $: mounted && initialCalculationDone && width > 0 && updateHandleLabel(width);
-
-  /**
-   * Update the list of ticks based on the current input values.
-   *
-   * If `showTicks` is false, the list is empty. If `ticksArray` is non-empty,
-   * it is used as the list of ticks. Otherwise, the list is generated from
-   * `floor`, `ceiling`, and `step` with labels generated by `translate`.
-   */
-  function updateTicks(
-    width: number,
-    floor: number,
-    ceil: number,
-    step: number,
-    showTicks: boolean,
-    ticksArray: Array<{ value: number; label?: string; legend?: string }>
-  ): Array<{ value: number; label?: string; legend?: string; x?: number }> {
-    if (!showTicks) return [];
-    let ticks: Array<{
-      value: number;
-      label?: string;
-      legend?: string;
-      x?: number;
-    }> = [];
-    if (ticksArray.length > 0) {
-      ticks = ticksArray;
-      ticks.forEach((element) => {
-        element.x = valueToPosition(element.value, floor, ceiling, width);
-      });
-      ticks = ticks.filter(
-        (element) => element.value >= floor && element.value <= ceiling
-      );
-    } else {
-      for (let i = floor; i <= ceil; i += step) {
-        ticks.push({
-          value: i,
-          label: translate(i, 'tick'),
-          x: valueToPosition(i, floor, ceiling, width),
-        });
-      }
-    }
-    return ticks;
   }
+});
+
+$: mounted && initialCalculationDone && width > 0 && updateHandleLabel(width);
+
+/**
+ * Update the list of ticks based on the current input values.
+ *
+ * If `showTicks` is false, the list is empty. If `ticksArray` is non-empty,
+ * it is used as the list of ticks. Otherwise, the list is generated from
+ * `floor`, `ceiling`, and `step` with labels generated by `translate`.
+ */
+function updateTicks(
+  width: number,
+  floor: number,
+  ceil: number,
+  step: number,
+  showTicks: boolean,
+  ticksArray: Array<{ value: number; label?: string; legend?: string }>
+): Array<{ value: number; label?: string; legend?: string; x?: number }> {
+  if (!showTicks) return [];
   let ticks: Array<{
     value: number;
     label?: string;
     legend?: string;
-    color?: string;
     x?: number;
   }> = [];
-  $: ticks =
-    mounted && initialCalculationDone && width > 0
-      ? updateTicks(width, floor, ceiling, step, showTicks, ticksArray)
-      : [];
+  if (ticksArray.length > 0) {
+    ticks = ticksArray;
+    ticks.forEach((element) => {
+      element.x = valueToPosition(element.value, floor, ceiling, width);
+    });
+    ticks = ticks.filter(
+      (element) => element.value >= floor && element.value <= ceiling
+    );
+  } else {
+    for (let i = floor; i <= ceil; i += step) {
+      ticks.push({
+        value: i,
+        label: translate(i, 'tick'),
+        x: valueToPosition(i, floor, ceiling, width),
+      });
+    }
+  }
+  return ticks;
+}
+let ticks: Array<{
+  value: number;
+  label?: string;
+  legend?: string;
+  color?: string;
+  x?: number;
+}> = [];
+$: ticks =
+  mounted && initialCalculationDone && width > 0
+    ? updateTicks(width, floor, ceiling, step, showTicks, ticksArray)
+    : [];
 </script>
 
 <svelte:window bind:innerWidth />

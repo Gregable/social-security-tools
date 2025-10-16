@@ -1,29 +1,30 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  const HeroImage = '/thoughtful_person.png'; // Using a specific image for all guides
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
 
-  const title = 'How much Social Security will I get if I make $25,000 / year?';
-  const description =
-    'Understand how your Social Security benefits are calculated if you consistently earn $25,000 per year.';
-  const publishDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
-  const updateDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
+const HeroImage = '/thoughtful_person.png'; // Using a specific image for all guides
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/25k-income';
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt =
-    'Laptop with piggybank representing Social Security benefits for $25k income';
-  schema.tags = [
-    'Low Income',
-    'Social Security',
-    '$25000',
-    'Benefits Calculation',
-  ];
+const title = 'How much Social Security will I get if I make $25,000 / year?';
+const description =
+  'Understand how your Social Security benefits are calculated if you consistently earn $25,000 per year.';
+const publishDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
+const updateDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
+
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/25k-income';
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt =
+  'Laptop with piggybank representing Social Security benefits for $25k income';
+schema.tags = [
+  'Low Income',
+  'Social Security',
+  '$25000',
+  'Benefits Calculation',
+];
 </script>
 
 <svelte:head>

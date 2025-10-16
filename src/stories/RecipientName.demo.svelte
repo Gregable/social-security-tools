@@ -1,14 +1,14 @@
 <script lang="ts">
-  /**
-   * As far as I can tell, there is no good way to implement demo slots
-   * in Storybook. This is a hack to get around that, by creating a new
-   * component that is only used in the demo.
-   */
-  import RecipientName from '$lib/components/RecipientName.svelte';
-  import { Recipient } from '$lib/recipient';
+/**
+ * As far as I can tell, there is no good way to implement demo slots
+ * in Storybook. This is a hack to get around that, by creating a new
+ * component that is only used in the demo.
+ */
+import RecipientName from '$lib/components/RecipientName.svelte';
+import { Recipient } from '$lib/recipient';
 
-  export let r: Recipient = new Recipient();
-  export let noColor: boolean = false;
+export let r: Recipient = new Recipient();
+export let noColor: boolean = false;
 </script>
 
 <div>

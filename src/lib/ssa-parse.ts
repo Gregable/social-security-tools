@@ -10,11 +10,11 @@ export function dollarStringToMoney(dollarString: string): Money {
   // Similar idea here, for the year 1965, the SSA site will display
   // 'Medicare Began in 1966' if the data is unavailable. Record this as
   // a 0 sentinel.
-  if (dollarString == 'MedicareBeganIn1966') return Money.from(0);
-  if (dollarString == '') return Money.from(0);
+  if (dollarString === 'MedicareBeganIn1966') return Money.from(0);
+  if (dollarString === '') return Money.from(0);
   const numberString = dollarString.replace(/[$,]/g, '');
   const value = parseInt(numberString, 10);
-  if (isNaN(value)) return Money.from(0);
+  if (Number.isNaN(value)) return Money.from(0);
   if (value < 0) return Money.from(0);
   return Money.from(value);
 }
@@ -24,18 +24,18 @@ export function dollarStringToMoney(dollarString: string): Money {
  * See: https://github.com/Gregable/social-security-tools/issues/214
  */
 function isPdfPaste(lines: string[]): boolean {
-  const lineMatch = new RegExp('[12][0-9]{3}-[12][0-9]{3}', 'g');
+  const lineMatch = /[12][0-9]{3}-[12][0-9]{3}/g;
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
     // Looking for a line like "1991 - 2000":
-    if (columns.length == 3 && lineMatch.test(columns[0])) {
+    if (columns.length === 3 && lineMatch.test(columns[0])) {
       const years: Array<string> = columns[0].split('-');
-      let startYear = parseInt(years[0], 10);
-      let endYear = parseInt(years[1], 10);
+      const startYear = parseInt(years[0], 10);
+      const endYear = parseInt(years[1], 10);
       if (
-        !isNaN(startYear) &&
-        !isNaN(endYear) &&
+        !Number.isNaN(startYear) &&
+        !Number.isNaN(endYear) &&
         startYear >= 1966 &&
         endYear >= 1966 &&
         startYear <= constants.CURRENT_YEAR &&
@@ -53,46 +53,46 @@ function isPdfPaste(lines: string[]): boolean {
  * See: https://github.com/Gregable/social-security-tools/issues/214
  */
 function parseSsaPdfTable(lines: string[]): Array<EarningRecord> {
-  const lineMatch = new RegExp('[12][0-9]{3}-[12][0-9]{3}');
-  let earningsRecords: Array<EarningRecord> = [];
+  const lineMatch = /[12][0-9]{3}-[12][0-9]{3}/;
+  const earningsRecords: Array<EarningRecord> = [];
   let i = 0;
   for (; i < lines.length; ++i) {
-    let line: string = lines[i];
-    let columns: Array<string> = line.split(' ');
+    const line: string = lines[i];
+    const columns: Array<string> = line.split(' ');
 
-    if (columns.length == 3 && lineMatch.test(columns[0])) {
+    if (columns.length === 3 && lineMatch.test(columns[0])) {
       break;
     }
   }
 
   for (; i < lines.length; ++i) {
-    let line: string = lines[i];
-    let columns: Array<string> = line.split(' ');
-    if (columns.length != 3 || !lineMatch.test(columns[0])) break;
+    const line: string = lines[i];
+    const columns: Array<string> = line.split(' ');
+    if (columns.length !== 3 || !lineMatch.test(columns[0])) break;
 
     // Col 1: '1991-2000'
     const years: Array<string> = columns[0].split('-');
-    let startYear = parseInt(years[0], 10);
-    let endYear = parseInt(years[1], 10);
+    const startYear = parseInt(years[0], 10);
+    const endYear = parseInt(years[1], 10);
     if (
-      isNaN(startYear) ||
-      isNaN(endYear) ||
+      Number.isNaN(startYear) ||
+      Number.isNaN(endYear) ||
       startYear < 1966 ||
       endYear < 1966 ||
       startYear > constants.CURRENT_YEAR ||
       endYear > constants.CURRENT_YEAR
     )
       return earningsRecords;
-    let numYears = endYear - startYear + 1;
+    const numYears = endYear - startYear + 1;
 
     // Col 2: $5,000
-    let taxedEarnings = dollarStringToMoney(columns[1]).div(numYears);
+    const taxedEarnings = dollarStringToMoney(columns[1]).div(numYears);
 
     // Line 3: $5,000
-    let taxedMedicareEarnings = dollarStringToMoney(columns[2]).div(numYears);
+    const taxedMedicareEarnings = dollarStringToMoney(columns[2]).div(numYears);
 
     for (let j = startYear; j <= endYear; ++j) {
-      let record = new EarningRecord({
+      const record = new EarningRecord({
         year: j,
         taxedEarnings: taxedEarnings,
         taxedMedicareEarnings: taxedMedicareEarnings,
@@ -102,21 +102,22 @@ function parseSsaPdfTable(lines: string[]): Array<EarningRecord> {
   }
 
   for (; i < lines.length; ++i) {
-    let line: string = lines[i];
-    let columns: Array<string> = line.split(' ');
-    if (columns.length != 3) break;
+    const line: string = lines[i];
+    const columns: Array<string> = line.split(' ');
+    if (columns.length !== 3) break;
 
     // Col 1: "2006"
-    let year = parseInt(columns[0], 10);
-    if (isNaN(year) || year < 1966 || year > constants.CURRENT_YEAR) break;
+    const year = parseInt(columns[0], 10);
+    if (Number.isNaN(year) || year < 1966 || year > constants.CURRENT_YEAR)
+      break;
 
     // Co. 2: $5,000
-    let taxedEarnings = dollarStringToMoney(columns[1]);
+    const taxedEarnings = dollarStringToMoney(columns[1]);
 
     // Col 3: $5,000
-    let taxedMedicareEarnings = dollarStringToMoney(columns[2]);
+    const taxedMedicareEarnings = dollarStringToMoney(columns[2]);
 
-    let record = new EarningRecord({
+    const record = new EarningRecord({
       year: year,
       taxedEarnings: taxedEarnings,
       taxedMedicareEarnings: taxedMedicareEarnings,
@@ -131,12 +132,12 @@ function parseSsaPdfTable(lines: string[]): Array<EarningRecord> {
  * Parses the table format used by the SSA.gov website.
  */
 function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
-  let earningsRecords: Array<EarningRecord> = [];
+  const earningsRecords: Array<EarningRecord> = [];
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
-    if (columns[1] == 'NotYetRecorded') {
-      let record = new EarningRecord({
+    if (columns[1] === 'NotYetRecorded') {
+      const record = new EarningRecord({
         year: parseInt(columns[0], 10),
         taxedEarnings: Money.from(0),
         taxedMedicareEarnings: Money.from(0),
@@ -144,7 +145,7 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
       record.incomplete = true;
       earningsRecords.push(record);
     } else {
-      let record = new EarningRecord({
+      const record = new EarningRecord({
         year: parseInt(columns[0], 10),
         taxedEarnings: dollarStringToMoney(columns[1]),
         taxedMedicareEarnings:
@@ -160,7 +161,7 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
  * Parses a user formatted table of earnings records.
  */
 function parseFormattedTable(lines: string[]): Array<EarningRecord> {
-  let earningsRecords: Array<EarningRecord> = [];
+  const earningsRecords: Array<EarningRecord> = [];
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
@@ -178,12 +179,12 @@ function parseFormattedTable(lines: string[]): Array<EarningRecord> {
  * Parses a copy / paste from this site's table.
  */
 function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
-  let earningsRecords: Array<EarningRecord> = [];
+  const earningsRecords: Array<EarningRecord> = [];
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
-    if (columns[1] == 'NotYetRecorded') {
-      let record = new EarningRecord({
+    if (columns[1] === 'NotYetRecorded') {
+      const record = new EarningRecord({
         year: parseInt(columns[0], 10),
         taxedEarnings: Money.from(0),
         taxedMedicareEarnings: Money.from(0),
@@ -207,8 +208,8 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
  */
 function isYearString(maybeYearStr: string): boolean {
   // If not an int, it's not a year.
-  let maybeYear: number = parseInt(maybeYearStr, 10);
-  if (isNaN(maybeYear)) return false;
+  const maybeYear: number = parseInt(maybeYearStr, 10);
+  if (Number.isNaN(maybeYear)) return false;
   // parseInt will ignore trailing garbage, so "1A" will be parsed as "1".
   // We don't want this as it could lead us to extract lines that aren't
   // valid.
@@ -251,18 +252,16 @@ export function parsePaste(paste: string): Array<EarningRecord> {
   );
 
   // Split based on newlines.
-  let lines: string[] = replacedStr.split('\n');
+  const lines: string[] = replacedStr.split('\n');
 
   if (isPdfPaste(lines)) {
-    let out = parseSsaPdfTable(lines);
-    out.sort(function (a, b) {
-      return a.year - b.year;
-    });
+    const out = parseSsaPdfTable(lines);
+    out.sort((a, b) => a.year - b.year);
     return out;
   }
 
   // All valid lines will start with a year indicator.
-  let earningsLines: string[] = [];
+  const earningsLines: string[] = [];
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i].trim();
     const columns: string[] = line.split(' ');
@@ -281,7 +280,7 @@ export function parsePaste(paste: string): Array<EarningRecord> {
       for (let j = 1; j < 3; ++j) {
         const colValue: string = lines[i + j].trim();
         if (colValue === 'NotYetRecorded' || colValue[0] === '$') {
-          constructedLine += ' ' + colValue;
+          constructedLine += ` ${colValue}`;
         } else {
           legitThreeLineValue = false;
         }
@@ -338,10 +337,7 @@ export function parsePaste(paste: string): Array<EarningRecord> {
   // sense for display, but is not what code usually expects, so we sort
   // output so that it's in chronological order. This also lets us handle
   // errors in user formatted years or whatnot.
-  if (out.length > 1)
-    out.sort(function (a, b) {
-      return a.year - b.year;
-    });
+  if (out.length > 1) out.sort((a, b) => a.year - b.year);
 
   return out;
 }

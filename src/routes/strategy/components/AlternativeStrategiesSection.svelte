@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import type { StrategyResult } from '$lib/strategy/ui';
-  import AlternativeStrategiesGrid from './AlternativeStrategiesGrid.svelte';
+import type { Recipient } from '$lib/recipient';
+import type { StrategyResult } from '$lib/strategy/ui';
+import AlternativeStrategiesGrid from './AlternativeStrategiesGrid.svelte';
 
-  // Props
-  export let recipients: [Recipient, Recipient];
-  export let result: StrategyResult | null = null;
-  export let discountRate: number;
-  export let displayAsAges: boolean = false;
+// Props
+export let recipients: [Recipient, Recipient];
+export let result: StrategyResult | null = null;
+export let discountRate: number;
+export let displayAsAges: boolean = false;
 </script>
 
 {#if result}

@@ -1,6 +1,6 @@
-import type { DeathAgeBucket } from './grid-sizing.js';
-import type { MonthDuration } from '$lib/month-time';
 import type { Money } from '$lib/money';
+import type { MonthDuration } from '$lib/month-time';
+import type { DeathAgeBucket } from './grid-sizing.js';
 
 export interface StrategyResult {
   deathAge1: string;
@@ -25,7 +25,7 @@ export enum CalculationStatus {
 }
 
 // Number of different starting age pairs (per scenario multiplier reference)
-const CALCULATIONS_PER_SCENARIO = Math.pow((70 - 62) * 12 - 1, 2);
+const CALCULATIONS_PER_SCENARIO = ((70 - 62) * 12 - 1) ** 2;
 
 /**
  * Immutable-ish wrapper around a 2D grid of strategy results providing

@@ -17,31 +17,31 @@
 -->
 
 <script lang="ts">
-  // Callback prop for response event
-  export let onresponse:
-    | ((detail: { spouse: boolean; name: string; spousename?: string }) => void)
-    | undefined = undefined;
+// Callback prop for response event
+export let onresponse:
+  | ((detail: { spouse: boolean; name: string; spousename?: string }) => void)
+  | undefined = undefined;
 
-  let initial: boolean = true;
-  let selfname: string = 'Self';
-  let spousename: string = 'Spouse';
+let initial: boolean = true;
+let selfname: string = 'Self';
+let spousename: string = 'Spouse';
 
-  function nospouse() {
-    onresponse?.({
-      spouse: false,
-      name: selfname,
-    });
-  }
-  function spouse() {
-    initial = false;
-  }
-  function confirmSpouse() {
-    onresponse?.({
-      spouse: true,
-      name: selfname,
-      spousename: spousename,
-    });
-  }
+function nospouse() {
+  onresponse?.({
+    spouse: false,
+    name: selfname,
+  });
+}
+function spouse() {
+  initial = false;
+}
+function confirmSpouse() {
+  onresponse?.({
+    spouse: true,
+    name: selfname,
+    spousename: spousename,
+  });
+}
 </script>
 
 <div class="spouseQuestion">

@@ -192,7 +192,7 @@ export class MonthDate {
    * Returns a human readable string version of the date
    */
   toString() {
-    return this.monthName() + ' ' + this.year();
+    return `${this.monthName()} ${this.year()}`;
   }
 }
 
@@ -238,7 +238,7 @@ export class MonthDuration {
     // Negative durations are OK, but shouldn't have both positive and negative.
     console.assert(
       Math.sign(yearsMonths.years) * Math.sign(yearsMonths.months) >= 0,
-      yearsMonths.years + ' ' + yearsMonths.months
+      `${yearsMonths.years} ${yearsMonths.months}`
     );
     return new MonthDuration(yearsMonths.years * 12 + yearsMonths.months);
   }

@@ -1,279 +1,275 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
-  import Expando from './Expando.svelte';
-  import { Recipient } from '$lib/recipient';
-  import RName from './RecipientName.svelte';
-  import { MonthDate, MonthDuration } from '$lib/month-time';
-  import Slider from './Slider.svelte';
-  import {
-    higherEarnerFilingDate,
-    setHigherEarnerFilingDate,
-  } from '$lib/context';
+import { onMount, tick } from 'svelte';
+import {
+  higherEarnerFilingDate,
+  setHigherEarnerFilingDate,
+} from '$lib/context';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
+import Expando from './Expando.svelte';
+import RName from './RecipientName.svelte';
+import Slider from './Slider.svelte';
 
-  export let recipient: Recipient = new Recipient();
-  export let spouse: Recipient = new Recipient();
+export let recipient: Recipient = new Recipient();
+export let spouse: Recipient = new Recipient();
 
-  let higherEarner: Recipient;
-  let lowerEarner: Recipient;
-  $: higherEarner = $recipient.higherEarningsThan($spouse)
-    ? $recipient
-    : $spouse;
-  $: lowerEarner = $recipient.higherEarningsThan($spouse)
-    ? $spouse
-    : $recipient;
+let higherEarner: Recipient;
+let lowerEarner: Recipient;
+$: higherEarner = $recipient.higherEarningsThan($spouse) ? $recipient : $spouse;
+$: lowerEarner = $recipient.higherEarningsThan($spouse) ? $spouse : $recipient;
 
-  // If the deceased higher earner filed before this age, the survivor benefit
-  // would become the larget 82.5% of the higher earner's PIA. After this age,
-  // the survivor benefit would be the amount the higher earner was receiving.
-  let breakEvenAge: MonthDuration;
-  $: breakEvenAge = $higherEarner
-    .normalRetirementAge()
-    .subtract(new MonthDuration(31));
-  let breakEvenDate: MonthDate;
-  $: breakEvenDate = $higherEarner.birthdate.dateAtLayAge(breakEvenAge);
+// If the deceased higher earner filed before this age, the survivor benefit
+// would become the larget 82.5% of the higher earner's PIA. After this age,
+// the survivor benefit would be the amount the higher earner was receiving.
+let breakEvenAge: MonthDuration;
+$: breakEvenAge = $higherEarner
+  .normalRetirementAge()
+  .subtract(new MonthDuration(31));
+let breakEvenDate: MonthDate;
+$: breakEvenDate = $higherEarner.birthdate.dateAtLayAge(breakEvenAge);
 
-  let adjustedNormalRetirementAge: boolean;
-  $: adjustedNormalRetirementAge =
-    $lowerEarner.survivorNormalRetirementAge().asMonths() !=
-    $lowerEarner.normalRetirementAge().asMonths();
+let adjustedNormalRetirementAge: boolean;
+$: adjustedNormalRetirementAge =
+  $lowerEarner.survivorNormalRetirementAge().asMonths() !==
+  $lowerEarner.normalRetirementAge().asMonths();
 
-  let fileVsDeath: string = 'fileBeforeDeath';
+let fileVsDeath: string = 'fileBeforeDeath';
 
-  // sliderMonths_ is bound to the value of the slider, in months.
-  // This is set once in onMount to the user's NRA, typically 67 * 12.
-  // It is not set again, even if the users's birthday / NRA changes so that
-  // we don't override the user's selection should they have changed it
-  // manually.
-  let beforeDeathSliderMonths_: number = 67 * 12;
-  let afterDeathSliderMonths_: number = 68 * 12;
-  let survivorSliderMonths_: number = 60 * 12;
-  let survivorActualFilingDate: MonthDate = new MonthDate(3000 * 12);
-  let mounted_: boolean = false;
+// sliderMonths_ is bound to the value of the slider, in months.
+// This is set once in onMount to the user's NRA, typically 67 * 12.
+// It is not set again, even if the users's birthday / NRA changes so that
+// we don't override the user's selection should they have changed it
+// manually.
+let beforeDeathSliderMonths_: number = 67 * 12;
+let afterDeathSliderMonths_: number = 68 * 12;
+let survivorSliderMonths_: number = 60 * 12;
+let survivorActualFilingDate: MonthDate = new MonthDate(3000 * 12);
+let mounted_: boolean = false;
 
-  // Track if we're currently updating from the store to prevent circular updates
-  let updatingFromStore_: boolean = false;
+// Track if we're currently updating from the store to prevent circular updates
+let updatingFromStore_: boolean = false;
 
-  // Update store when beforeDeath slider changes
-  // Only export after mount to ensure we start with NRA
-  $: {
-    if (
-      beforeDeathSliderMonths_ &&
-      higherEarner &&
-      mounted_ &&
-      !updatingFromStore_
-    ) {
-      setHigherEarnerFilingDate(
-        higherEarner.birthdate.dateAtSsaAge(
-          new MonthDuration(beforeDeathSliderMonths_)
-        )
-      );
-    }
-  }
-
-  // Sync slider position when store changes (e.g., from individual or combined charts)
-  $: {
-    if ($higherEarnerFilingDate && higherEarner && mounted_) {
-      const ageAtFiling = higherEarner.birthdate.ageAtSsaDate(
-        $higherEarnerFilingDate
-      );
-      const newSliderMonths = ageAtFiling.asMonths();
-      // Only update if significantly different to avoid infinite loops
-      if (Math.abs(newSliderMonths - beforeDeathSliderMonths_) > 0.5) {
-        syncSliderFromStore(newSliderMonths);
-      }
-    }
-  }
-
-  async function syncSliderFromStore(newSliderMonths: number) {
-    updatingFromStore_ = true;
-    await tick(); // Ensure flag update happens before slider change
-    beforeDeathSliderMonths_ = newSliderMonths;
-    await tick(); // Ensure slider change completes before unsetting flag
-    updatingFromStore_ = false;
-  }
-
-  /**
-   * Translation function for slider labels to map months to ages.
-   */
-  function translateSliderLabel(
-    extendRangeLow: number | null,
-    extendRangeHigh: number | null
+// Update store when beforeDeath slider changes
+// Only export after mount to ensure we start with NRA
+$: {
+  if (
+    beforeDeathSliderMonths_ &&
+    higherEarner &&
+    mounted_ &&
+    !updatingFromStore_
   ) {
-    return (value: number, label: string): string => {
-      const age = new MonthDuration(value);
-      if (label === 'value' || label === 'tick-value') {
-        let out = age.years() + ' ' + age.modMonths() + ' mo';
-        if (age.modMonths() === 0) {
-          // Special case for no months.
-          out = age.years().toString(10);
-        }
-        if (extendRangeHigh != null && value == extendRangeHigh) {
-          out = '>= ' + out;
-        }
-        if (extendRangeLow != null && value == extendRangeLow) {
-          out = '<= ' + out;
-        }
-        return out;
-      }
-      return '';
-    };
-  }
-
-  let beforeDeathTicks_: Array<{
-    value: number;
-    label?: string;
-    legend?: string;
-    color?: string;
-  }> = [];
-  let afterDeathTicks_: Array<{
-    value: number;
-    label?: string;
-    legend?: string;
-    color?: string;
-  }> = [];
-  let survivorTicks_: Array<{
-    value: number;
-    label?: string;
-    legend?: string;
-    color?: string;
-  }> = [];
-  function generateTicks(
-    startAge: MonthDuration,
-    endAge: MonthDuration,
-    extendRangeLow: boolean,
-    extendRangeHigh: boolean
-  ) {
-    let ticks = [];
-    let extendLow = null;
-    if (extendRangeLow) extendLow = startAge.asMonths();
-    let extendHigh = null;
-    if (extendRangeHigh) extendHigh = endAge.asMonths();
-
-    for (
-      let age = MonthDuration.copyFrom(startAge);
-      age.lessThanOrEqual(endAge);
-      age = age.add(MonthDuration.initFromYearsMonths({ years: 1, months: 0 }))
-    ) {
-      ticks.push({
-        value: age.asMonths(),
-        label: translateSliderLabel(extendLow, extendHigh)(
-          age.asMonths(),
-          'tick-value'
-        ),
-      });
-    }
-    return ticks;
-  }
-
-  onMount(async () => {
-    beforeDeathTicks_ = generateTicks(
-      MonthDuration.initFromYearsMonths({
-        years: 62,
-        months: 0,
-      }),
-      MonthDuration.initFromYearsMonths({
-        years: 70,
-        months: 0,
-      }),
-      false,
-      false
-    );
-    afterDeathTicks_ = generateTicks(
-      MonthDuration.initFromYearsMonths({
-        years: 62,
-        months: 0,
-      }),
-      MonthDuration.initFromYearsMonths({
-        years: 70,
-        months: 0,
-      }),
-      true,
-      true
-    );
-    survivorTicks_ = generateTicks(
-      MonthDuration.initFromYearsMonths({
-        years: 60,
-        months: 0,
-      }),
-      MonthDuration.initFromYearsMonths({
-        years: 67,
-        months: 0,
-      }),
-      false,
-      true
-    );
-    // Initialize slider to higher earner's NRA
-    // Set guard flag during initialization to prevent circular updates
-    updatingFromStore_ = true;
-
-    beforeDeathSliderMonths_ = higherEarner.normalRetirementAge().asMonths();
-
-    // Set store to match initialized slider position
     setHigherEarnerFilingDate(
       higherEarner.birthdate.dateAtSsaAge(
         new MonthDuration(beforeDeathSliderMonths_)
       )
     );
+  }
+}
 
-    // Wait for one tick to ensure store updates propagate
-    await tick();
-
-    // Enable sync
-    updatingFromStore_ = false;
-    mounted_ = true;
-  });
-
-  function minCapSlider() {
-    // beforeDeath is the slider for the higher earner estimating the age they
-    // filed for primary benefits *before* they died.
-    // afterDeath is the slider for the higher earner estimating the age they
-    // filed for primary benefits *after* they died.
-    // Only one of these sliders is shown at a time, depending on fileVsDeath
-
-    let earnerMonths = 0;
-    if (fileVsDeath == 'fileBeforeDeath') {
-      earnerMonths = beforeDeathSliderMonths_;
-    } else if (fileVsDeath == 'fileAfterDeath') {
-      earnerMonths = afterDeathSliderMonths_;
-    } else {
-      throw new Error('fileVsDeath toggle unexpected value: ' + fileVsDeath);
+// Sync slider position when store changes (e.g., from individual or combined charts)
+$: {
+  if ($higherEarnerFilingDate && higherEarner && mounted_) {
+    const ageAtFiling = higherEarner.birthdate.ageAtSsaDate(
+      $higherEarnerFilingDate
+    );
+    const newSliderMonths = ageAtFiling.asMonths();
+    // Only update if significantly different to avoid infinite loops
+    if (Math.abs(newSliderMonths - beforeDeathSliderMonths_) > 0.5) {
+      syncSliderFromStore(newSliderMonths);
     }
+  }
+}
 
-    let startMonth: MonthDuration = new MonthDuration(survivorSliderMonths_);
+async function syncSliderFromStore(newSliderMonths: number) {
+  updatingFromStore_ = true;
+  await tick(); // Ensure flag update happens before slider change
+  beforeDeathSliderMonths_ = newSliderMonths;
+  await tick(); // Ensure slider change completes before unsetting flag
+  updatingFromStore_ = false;
+}
 
-    // There's an issue if the survivor tries to file for survivor benefits
-    // before the higher earner dies. In this case, we increase the survivor's
-    // slider value.
-    if (
-      lowerEarner.birthdate
-        .dateAtSsaAge(new MonthDuration(survivorSliderMonths_))
-        .lessThanOrEqual(
-          higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
-        )
-    ) {
-      startMonth = lowerEarner.birthdate
-        .ageAtSsaDate(
-          higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
-        )
-        .add(new MonthDuration(1));
+/**
+ * Translation function for slider labels to map months to ages.
+ */
+function translateSliderLabel(
+  extendRangeLow: number | null,
+  extendRangeHigh: number | null
+) {
+  return (value: number, label: string): string => {
+    const age = new MonthDuration(value);
+    if (label === 'value' || label === 'tick-value') {
+      let out = `${age.years()} ${age.modMonths()} mo`;
+      if (age.modMonths() === 0) {
+        // Special case for no months.
+        out = age.years().toString(10);
+      }
+      if (extendRangeHigh != null && value === extendRangeHigh) {
+        out = `>= ${out}`;
+      }
+      if (extendRangeLow != null && value === extendRangeLow) {
+        out = `<= ${out}`;
+      }
+      return out;
     }
+    return '';
+  };
+}
 
-    // Compute the actual filing date for survivor benefits:
-    survivorActualFilingDate = lowerEarner.birthdate.dateAtSsaAge(startMonth);
+let beforeDeathTicks_: Array<{
+  value: number;
+  label?: string;
+  legend?: string;
+  color?: string;
+}> = [];
+let afterDeathTicks_: Array<{
+  value: number;
+  label?: string;
+  legend?: string;
+  color?: string;
+}> = [];
+let survivorTicks_: Array<{
+  value: number;
+  label?: string;
+  legend?: string;
+  color?: string;
+}> = [];
+function generateTicks(
+  startAge: MonthDuration,
+  endAge: MonthDuration,
+  extendRangeLow: boolean,
+  extendRangeHigh: boolean
+) {
+  let ticks = [];
+  let extendLow = null;
+  if (extendRangeLow) extendLow = startAge.asMonths();
+  let extendHigh = null;
+  if (extendRangeHigh) extendHigh = endAge.asMonths();
 
-    // But the slider shouldn't be greater than the normal retirement age:
-    if (startMonth.greaterThan(lowerEarner.survivorNormalRetirementAge()))
-      startMonth = lowerEarner.survivorNormalRetirementAge();
+  for (
+    let age = MonthDuration.copyFrom(startAge);
+    age.lessThanOrEqual(endAge);
+    age = age.add(MonthDuration.initFromYearsMonths({ years: 1, months: 0 }))
+  ) {
+    ticks.push({
+      value: age.asMonths(),
+      label: translateSliderLabel(extendLow, extendHigh)(
+        age.asMonths(),
+        'tick-value'
+      ),
+    });
+  }
+  return ticks;
+}
 
-    // Update the slider:
-    survivorSliderMonths_ = startMonth.asMonths();
+onMount(async () => {
+  beforeDeathTicks_ = generateTicks(
+    MonthDuration.initFromYearsMonths({
+      years: 62,
+      months: 0,
+    }),
+    MonthDuration.initFromYearsMonths({
+      years: 70,
+      months: 0,
+    }),
+    false,
+    false
+  );
+  afterDeathTicks_ = generateTicks(
+    MonthDuration.initFromYearsMonths({
+      years: 62,
+      months: 0,
+    }),
+    MonthDuration.initFromYearsMonths({
+      years: 70,
+      months: 0,
+    }),
+    true,
+    true
+  );
+  survivorTicks_ = generateTicks(
+    MonthDuration.initFromYearsMonths({
+      years: 60,
+      months: 0,
+    }),
+    MonthDuration.initFromYearsMonths({
+      years: 67,
+      months: 0,
+    }),
+    false,
+    true
+  );
+  // Initialize slider to higher earner's NRA
+  // Set guard flag during initialization to prevent circular updates
+  updatingFromStore_ = true;
+
+  beforeDeathSliderMonths_ = higherEarner.normalRetirementAge().asMonths();
+
+  // Set store to match initialized slider position
+  setHigherEarnerFilingDate(
+    higherEarner.birthdate.dateAtSsaAge(
+      new MonthDuration(beforeDeathSliderMonths_)
+    )
+  );
+
+  // Wait for one tick to ensure store updates propagate
+  await tick();
+
+  // Enable sync
+  updatingFromStore_ = false;
+  mounted_ = true;
+});
+
+function minCapSlider() {
+  // beforeDeath is the slider for the higher earner estimating the age they
+  // filed for primary benefits *before* they died.
+  // afterDeath is the slider for the higher earner estimating the age they
+  // filed for primary benefits *after* they died.
+  // Only one of these sliders is shown at a time, depending on fileVsDeath
+
+  let earnerMonths = 0;
+  if (fileVsDeath === 'fileBeforeDeath') {
+    earnerMonths = beforeDeathSliderMonths_;
+  } else if (fileVsDeath === 'fileAfterDeath') {
+    earnerMonths = afterDeathSliderMonths_;
+  } else {
+    throw new Error(`fileVsDeath toggle unexpected value: ${fileVsDeath}`);
   }
 
-  $: fileVsDeath &&
-    beforeDeathSliderMonths_ &&
-    afterDeathSliderMonths_ &&
-    survivorSliderMonths_ &&
-    minCapSlider();
+  let startMonth: MonthDuration = new MonthDuration(survivorSliderMonths_);
+
+  // There's an issue if the survivor tries to file for survivor benefits
+  // before the higher earner dies. In this case, we increase the survivor's
+  // slider value.
+  if (
+    lowerEarner.birthdate
+      .dateAtSsaAge(new MonthDuration(survivorSliderMonths_))
+      .lessThanOrEqual(
+        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
+      )
+  ) {
+    startMonth = lowerEarner.birthdate
+      .ageAtSsaDate(
+        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
+      )
+      .add(new MonthDuration(1));
+  }
+
+  // Compute the actual filing date for survivor benefits:
+  survivorActualFilingDate = lowerEarner.birthdate.dateAtSsaAge(startMonth);
+
+  // But the slider shouldn't be greater than the normal retirement age:
+  if (startMonth.greaterThan(lowerEarner.survivorNormalRetirementAge()))
+    startMonth = lowerEarner.survivorNormalRetirementAge();
+
+  // Update the slider:
+  survivorSliderMonths_ = startMonth.asMonths();
+}
+
+$: fileVsDeath &&
+  beforeDeathSliderMonths_ &&
+  afterDeathSliderMonths_ &&
+  survivorSliderMonths_ &&
+  minCapSlider();
 </script>
 
 <div class="pageBreakAvoid">

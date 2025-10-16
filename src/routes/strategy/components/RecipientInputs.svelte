@@ -1,166 +1,166 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import { Money } from '$lib/money';
-  import RecipientName from '$lib/components/RecipientName.svelte';
-  import BirthdateInput from '$lib/components/BirthdateInput.svelte';
-  import { Birthdate } from '$lib/birthday';
-  import { onMount } from 'svelte';
+import { onMount } from 'svelte';
+import { Birthdate } from '$lib/birthday';
+import BirthdateInput from '$lib/components/BirthdateInput.svelte';
+import RecipientName from '$lib/components/RecipientName.svelte';
+import { Money } from '$lib/money';
+import type { Recipient } from '$lib/recipient';
 
-  // Props
-  export let recipients: [Recipient, Recipient];
-  export let piaValues: [number, number];
-  export let birthdateInputs: [string, string];
+// Props
+export let recipients: [Recipient, Recipient];
+export let piaValues: [number, number];
+export let birthdateInputs: [string, string];
 
-  // Callback for when form values change
-  export let onUpdate: (() => void) | undefined = undefined;
+// Callback for when form values change
+export let onUpdate: (() => void) | undefined = undefined;
 
-  // Validation state callback
-  export let onValidityChange: ((isValid: boolean) => void) | undefined =
-    undefined;
+// Validation state callback
+export let onValidityChange: ((isValid: boolean) => void) | undefined =
+  undefined;
 
-  // Convert string dates to Birthdate objects for the BirthdateInput component
-  let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
-  export let birthdateValidity: boolean[] = [false, false];
+// Convert string dates to Birthdate objects for the BirthdateInput component
+let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
+export let birthdateValidity: boolean[] = [false, false];
 
-  // PIA validation state
-  let piaValidity: boolean[] = [true, true];
-  let piaErrors: string[] = ['', ''];
+// PIA validation state
+let piaValidity: boolean[] = [true, true];
+let piaErrors: string[] = ['', ''];
 
-  // Overall validity
-  $: isValid =
-    birthdateValidity[0] &&
-    birthdateValidity[1] &&
-    piaValidity[0] &&
-    piaValidity[1];
+// Overall validity
+$: isValid =
+  birthdateValidity[0] &&
+  birthdateValidity[1] &&
+  piaValidity[0] &&
+  piaValidity[1];
 
-  // Notify parent of validity changes
-  $: onValidityChange?.(isValid);
+// Notify parent of validity changes
+$: onValidityChange?.(isValid);
 
-  // Initialize birthdates from birthdateInputs on mount
-  onMount(() => {
-    birthdateInputs.forEach((dateStr, index) => {
-      if (dateStr) {
-        const date = new Date(dateStr);
-        if (!isNaN(date.getTime())) {
-          birthdates[index] = Birthdate.FromYMD(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate()
-          );
-        }
+// Initialize birthdates from birthdateInputs on mount
+onMount(() => {
+  birthdateInputs.forEach((dateStr, index) => {
+    if (dateStr) {
+      const date = new Date(dateStr);
+      if (!Number.isNaN(date.getTime())) {
+        birthdates[index] = Birthdate.FromYMD(
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate()
+        );
       }
-    });
+    }
   });
+});
 
-  // Update birthdateInputs when birthdates change from BirthdateInput component
-  function handleBirthdateChange(index: number, newBirthdate: Birthdate) {
-    if (newBirthdate) {
-      const newDateStr = formatDateForInput(newBirthdate);
-      birthdateInputs[index] = newDateStr;
-      birthdateInputs = [...birthdateInputs];
+// Update birthdateInputs when birthdates change from BirthdateInput component
+function handleBirthdateChange(index: number, newBirthdate: Birthdate) {
+  if (newBirthdate) {
+    const newDateStr = formatDateForInput(newBirthdate);
+    birthdateInputs[index] = newDateStr;
+    birthdateInputs = [...birthdateInputs];
 
-      // Update the recipient's birthdate directly
-      recipients[index].birthdate = newBirthdate;
-      recipients = [...recipients];
+    // Update the recipient's birthdate directly
+    recipients[index].birthdate = newBirthdate;
+    recipients = [...recipients];
 
-      onUpdate?.();
+    onUpdate?.();
+  }
+}
+
+// Handle PIA value changes
+function handlePiaChange(index: number, value: number) {
+  // Validate PIA
+  validatePia(index, value);
+  piaValues[index] = value;
+  piaValues = [...piaValues];
+
+  // Update the recipient's PIA directly
+  recipients[index].setPia(Money.from(value));
+  recipients = [...recipients];
+
+  onUpdate?.();
+}
+
+// Validate PIA value
+function validatePia(index: number, value: number) {
+  if (value < 0) {
+    piaValidity[index] = false;
+    piaErrors[index] = 'PIA must be a non-negative number';
+  } else if (value > 10000) {
+    piaValidity[index] = false;
+    piaErrors[index] =
+      'PIA seems unusually high (max typical value is around $4,000)';
+  } else {
+    piaValidity[index] = true;
+    piaErrors[index] = '';
+  }
+  // Force reactivity
+  piaValidity = [...piaValidity];
+  piaErrors = [...piaErrors];
+}
+
+// Handle name changes
+function handleNameChange(index: number, event: Event) {
+  const target = event.target as EventTarget & { value: string };
+  const name = target.value;
+  recipients[index].name = name;
+  recipients = [...recipients];
+  onUpdate?.();
+}
+
+// Handle gender changes
+function handleGenderChange(index: number, event: Event) {
+  const target = event.target as EventTarget & { value: string };
+  const gender = target.value;
+  recipients[index].gender = gender as 'male' | 'female' | 'blended';
+  recipients = [...recipients];
+  onUpdate?.();
+}
+
+// Handle health multiplier changes
+function handleHealthChange(index: number, sliderValue: number) {
+  // Convert slider value to health multiplier (reverse the scale)
+  // Slider: 0.7 (left) to 2.5 (right) -> Health: 2.5 (worse) to 0.7 (better)
+  const healthMultiplier = 3.2 - sliderValue;
+  const clamped = Math.max(0.7, Math.min(2.5, healthMultiplier));
+  recipients[index].healthMultiplier = clamped;
+  recipients = [...recipients];
+  onUpdate?.();
+}
+
+// Convert health multiplier to slider value for display
+function healthMultiplierToSliderValue(healthMultiplier: number): number {
+  return 3.2 - healthMultiplier;
+}
+
+function getHealthCategory(multiplier: number): string {
+  // Map to closest anchor label
+  const anchors: { value: number; label: string }[] = [
+    { value: 0.7, label: 'Exceptional Health' },
+    { value: 0.8, label: 'Excellent Health' },
+    { value: 0.9, label: 'Good Health' },
+    { value: 1.0, label: 'Average Health' },
+    { value: 1.3, label: 'Fair Health' },
+    { value: 1.7, label: 'Poor Health' },
+    { value: 2.5, label: 'Very Poor Health' },
+  ];
+  let best = anchors[0];
+  for (const a of anchors) {
+    if (Math.abs(a.value - multiplier) < Math.abs(best.value - multiplier)) {
+      best = a;
     }
   }
+  return best.label;
+}
 
-  // Handle PIA value changes
-  function handlePiaChange(index: number, value: number) {
-    // Validate PIA
-    validatePia(index, value);
-    piaValues[index] = value;
-    piaValues = [...piaValues];
-
-    // Update the recipient's PIA directly
-    recipients[index].setPia(Money.from(value));
-    recipients = [...recipients];
-
-    onUpdate?.();
-  }
-
-  // Validate PIA value
-  function validatePia(index: number, value: number) {
-    if (value < 0) {
-      piaValidity[index] = false;
-      piaErrors[index] = 'PIA must be a non-negative number';
-    } else if (value > 10000) {
-      piaValidity[index] = false;
-      piaErrors[index] =
-        'PIA seems unusually high (max typical value is around $4,000)';
-    } else {
-      piaValidity[index] = true;
-      piaErrors[index] = '';
-    }
-    // Force reactivity
-    piaValidity = [...piaValidity];
-    piaErrors = [...piaErrors];
-  }
-
-  // Handle name changes
-  function handleNameChange(index: number, event: Event) {
-    const target = event.target as EventTarget & { value: string };
-    const name = target.value;
-    recipients[index].name = name;
-    recipients = [...recipients];
-    onUpdate?.();
-  }
-
-  // Handle gender changes
-  function handleGenderChange(index: number, event: Event) {
-    const target = event.target as EventTarget & { value: string };
-    const gender = target.value;
-    recipients[index].gender = gender as 'male' | 'female' | 'blended';
-    recipients = [...recipients];
-    onUpdate?.();
-  }
-
-  // Handle health multiplier changes
-  function handleHealthChange(index: number, sliderValue: number) {
-    // Convert slider value to health multiplier (reverse the scale)
-    // Slider: 0.7 (left) to 2.5 (right) -> Health: 2.5 (worse) to 0.7 (better)
-    const healthMultiplier = 3.2 - sliderValue;
-    const clamped = Math.max(0.7, Math.min(2.5, healthMultiplier));
-    recipients[index].healthMultiplier = clamped;
-    recipients = [...recipients];
-    onUpdate?.();
-  }
-
-  // Convert health multiplier to slider value for display
-  function healthMultiplierToSliderValue(healthMultiplier: number): number {
-    return 3.2 - healthMultiplier;
-  }
-
-  function getHealthCategory(multiplier: number): string {
-    // Map to closest anchor label
-    const anchors: { value: number; label: string }[] = [
-      { value: 0.7, label: 'Exceptional Health' },
-      { value: 0.8, label: 'Excellent Health' },
-      { value: 0.9, label: 'Good Health' },
-      { value: 1.0, label: 'Average Health' },
-      { value: 1.3, label: 'Fair Health' },
-      { value: 1.7, label: 'Poor Health' },
-      { value: 2.5, label: 'Very Poor Health' },
-    ];
-    let best = anchors[0];
-    for (const a of anchors) {
-      if (Math.abs(a.value - multiplier) < Math.abs(best.value - multiplier)) {
-        best = a;
-      }
-    }
-    return best.label;
-  }
-
-  // Format Birthdate object to YYYY-MM-DD string for input
-  function formatDateForInput(birthdate: Birthdate | null): string {
-    if (!birthdate) return '';
-    const year = birthdate.layBirthYear();
-    const month = (birthdate.layBirthMonth() + 1).toString().padStart(2, '0');
-    const day = birthdate.layBirthDayOfMonth().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+// Format Birthdate object to YYYY-MM-DD string for input
+function formatDateForInput(birthdate: Birthdate | null): string {
+  if (!birthdate) return '';
+  const year = birthdate.layBirthYear();
+  const month = (birthdate.layBirthMonth() + 1).toString().padStart(2, '0');
+  const day = birthdate.layBirthDayOfMonth().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 </script>
 
 <div class="input-grid">

@@ -82,8 +82,8 @@ export class PrimaryInsuranceAmount {
    * @throws {Error} If invalid bracket or if recipient is PIA-only
    */
   primaryInsuranceAmountByBracket(bracket: number): Money {
-    if (bracket != 0 && bracket != 1 && bracket != 2) {
-      throw new Error('Invalid bracket: ' + bracket);
+    if (bracket !== 0 && bracket !== 1 && bracket !== 2) {
+      throw new Error(`Invalid bracket: ${bracket}`);
     }
     if (this.recipient_.isPiaOnly) {
       throw new Error('Cannot calculate PIA brackets for PIA-only recipient');
@@ -93,20 +93,20 @@ export class PrimaryInsuranceAmount {
       return Money.from(0);
     }
 
-    let aime = this.recipient_.monthlyIndexedEarnings().roundToDollar();
-    let firstBend = this.firstBendPoint();
-    let secondBend = this.secondBendPoint();
+    const aime = this.recipient_.monthlyIndexedEarnings().roundToDollar();
+    const firstBend = this.firstBendPoint();
+    const secondBend = this.secondBendPoint();
 
-    if (bracket == 0) {
+    if (bracket === 0) {
       return Money.min(aime, firstBend).times(
         constants.BEFORE_BENDPOINT1_MULTIPLIER
       );
-    } else if (bracket == 1) {
+    } else if (bracket === 1) {
       return Money.max(
         Money.from(0),
         Money.min(aime, secondBend).sub(firstBend)
       ).times(constants.BEFORE_BENDPOINT2_MULTIPLIER);
-    } else if (bracket == 2) {
+    } else if (bracket === 2) {
       return Money.max(Money.from(0), aime.sub(secondBend)).times(
         constants.AFTER_BENDPOINT2_MULTIPLIER
       );
@@ -177,8 +177,8 @@ export class PrimaryInsuranceAmount {
 
     let pia = Money.from(0);
 
-    let firstBend = this.firstBendPoint();
-    let secondBend = this.secondBendPoint();
+    const firstBend = this.firstBendPoint();
+    const secondBend = this.secondBendPoint();
 
     // First compute the unadjusted PIA from all 3 brackets.
     pia = pia.plus(
@@ -238,7 +238,7 @@ export class PrimaryInsuranceAmount {
   colaAdjustments(): Array<ColaAdjustment> {
     let adjusted = this.primaryInsuranceAmountUnadjusted();
 
-    let adjustments: Array<ColaAdjustment> = [];
+    const adjustments: Array<ColaAdjustment> = [];
     for (
       let year = this.recipient_.birthdate.yearTurningSsaAge(62);
       year <= constants.CURRENT_YEAR;
@@ -249,7 +249,7 @@ export class PrimaryInsuranceAmount {
         // Primary Insurance amounts are rounded down to the nearest dime.
         newadjusted = newadjusted.floorToDime();
 
-        let adjustment = new ColaAdjustment();
+        const adjustment = new ColaAdjustment();
         adjustment.year = year;
         adjustment.cola = constants.COLA[year];
         adjustment.start = adjusted;

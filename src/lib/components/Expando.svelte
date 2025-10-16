@@ -1,76 +1,76 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+import { onMount } from 'svelte';
 
-  /**
-   * If true, the expando will be expanded when the page loads.
-   *
-   * Modifications to this variable will not be reflected in the
-   * expando's state after it has been rendered.
-   */
-  export let initiallyExpanded: boolean = false;
+/**
+ * If true, the expando will be expanded when the page loads.
+ *
+ * Modifications to this variable will not be reflected in the
+ * expando's state after it has been rendered.
+ */
+export let initiallyExpanded: boolean = false;
 
-  /**
-   * The text to display on the expando's tab when it is collapsed.
-   */
-  export let collapsedText = 'Expand';
+/**
+ * The text to display on the expando's tab when it is collapsed.
+ */
+export let collapsedText = 'Expand';
 
-  /**
-   * The text to display on the expando's tab when it is expanded.
-   */
-  export let expandedText = 'Collapse';
+/**
+ * The text to display on the expando's tab when it is expanded.
+ */
+export let expandedText = 'Collapse';
 
-  export let collapsed_background_color: string = '#eee';
-  export let collapsed_hover_color: string = '#f5f5f5';
-  export let collapsed_tab_color: string = '#ddd';
-  export let collapsed_border_color: string = '#888';
-  export let expanded_tab_color: string = '#a6a6f5';
-  export let expanded_border_color: string = '#c6c6f5';
-  export let expanded_background_color: string = '#e9e9ff';
+export let collapsed_background_color: string = '#eee';
+export let collapsed_hover_color: string = '#f5f5f5';
+export let collapsed_tab_color: string = '#ddd';
+export let collapsed_border_color: string = '#888';
+export let expanded_tab_color: string = '#a6a6f5';
+export let expanded_border_color: string = '#c6c6f5';
+export let expanded_background_color: string = '#e9e9ff';
 
-  // Print events can change the height of the expando's contents, while toggled
-  // We need to trigger a remeasure of the height so that the expando doesn't
-  // chop off the contents.
-  let media_query_list: MediaQueryList;
+// Print events can change the height of the expando's contents, while toggled
+// We need to trigger a remeasure of the height so that the expando doesn't
+// chop off the contents.
+let media_query_list: MediaQueryList;
 
-  // Determine if the expando is expanded or collapsed initially from outside
-  // state, but once rendered, the expando should manage it's own state.
-  let expanded = false;
+// Determine if the expando is expanded or collapsed initially from outside
+// state, but once rendered, the expando should manage it's own state.
+let expanded = false;
 
-  onMount(() => {
-    expanded = initiallyExpanded;
-    media_query_list = window.matchMedia('print');
-    media_query_list.addEventListener('change', onPrintMediaChange);
+onMount(() => {
+  expanded = initiallyExpanded;
+  media_query_list = window.matchMedia('print');
+  media_query_list.addEventListener('change', onPrintMediaChange);
 
-    if (initiallyExpanded) {
-      contentsEl.style.maxHeight = contentsEl.scrollHeight + 'px';
-    }
-
-    return () => {
-      removeMediaQueryListener();
-    };
-  });
-
-  function onPrintMediaChange() {
-    if (expanded) {
-      contentsEl.style.maxHeight = contentsEl.scrollHeight + 'px';
-    }
+  if (initiallyExpanded) {
+    contentsEl.style.maxHeight = `${contentsEl.scrollHeight}px`;
   }
 
-  function removeMediaQueryListener() {
-    if (media_query_list) {
-      media_query_list.removeEventListener('change', onPrintMediaChange);
-    }
-  }
+  return () => {
+    removeMediaQueryListener();
+  };
+});
 
-  let contentsEl: HTMLDivElement;
-  function toggle() {
-    expanded = !expanded;
-    if (expanded) {
-      contentsEl.style.maxHeight = contentsEl.scrollHeight + 'px';
-    } else {
-      contentsEl.style.maxHeight = null;
-    }
+function onPrintMediaChange() {
+  if (expanded) {
+    contentsEl.style.maxHeight = `${contentsEl.scrollHeight}px`;
   }
+}
+
+function removeMediaQueryListener() {
+  if (media_query_list) {
+    media_query_list.removeEventListener('change', onPrintMediaChange);
+  }
+}
+
+let contentsEl: HTMLDivElement;
+function toggle() {
+  expanded = !expanded;
+  if (expanded) {
+    contentsEl.style.maxHeight = `${contentsEl.scrollHeight}px`;
+  } else {
+    contentsEl.style.maxHeight = null;
+  }
+}
 </script>
 
 <section

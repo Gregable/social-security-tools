@@ -1,31 +1,26 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
 
-  import HeroImage from './covid-19.jpg';
-  import CovidAimeImage from './covid-aime.jpg';
-  import CovidEarningsImage from './covid-earnings.jpg';
-  import CovidPiaImage from './covid-pia.jpg';
-  import CovidPia2Image from './covid-pia-2.jpg';
+import HeroImage from './covid-19.jpg';
+import CovidAimeImage from './covid-aime.jpg';
+import CovidEarningsImage from './covid-earnings.jpg';
+import CovidPiaImage from './covid-pia.jpg';
+import CovidPia2Image from './covid-pia-2.jpg';
 
-  const title = 'Effect of Covid-19 on Social Security Benefits';
-  const description =
-    'Will a weak economy in 2020 result in a benefits decrease for those born in 1960?';
-  const publishDate = new Date('2020-12-01T00:00:00+00:00');
+const title = 'Effect of Covid-19 on Social Security Benefits';
+const description =
+  'Will a weak economy in 2020 result in a benefits decrease for those born in 1960?';
+const publishDate = new Date('2020-12-01T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/covid-awi-drop'; // Corrected URL
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'An image of a covid virus, artists rendition';
-  schema.tags = [
-    'COVID-19',
-    'Social Security',
-    'Wage Index',
-    'Pandemic Impact',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/covid-awi-drop'; // Corrected URL
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt = 'An image of a covid virus, artists rendition';
+schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
 </script>
 
 <svelte:head>

@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-  // Generate a number unique to each instance to use.
-  let uniqid: number = 0;
+// Generate a number unique to each instance to use.
+let uniqid: number = 0;
 </script>
 
 <script lang="ts">

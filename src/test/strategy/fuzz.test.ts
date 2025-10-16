@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { Birthdate } from '$lib/birthday';
+import { EarningRecord } from '$lib/earning-record';
+import { Money } from '$lib/money';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import type { PrimaryInsuranceAmount } from '$lib/pia';
+import { Recipient } from '$lib/recipient';
 import {
   optimalStrategy,
   optimalStrategyOptimized,
 } from '$lib/strategy/calculations/strategy-calc';
-import { Recipient } from '$lib/recipient';
-import { MonthDate, MonthDuration } from '$lib/month-time';
-import { Money } from '$lib/money';
-import { PrimaryInsuranceAmount } from '$lib/pia';
-import { EarningRecord } from '$lib/earning-record';
-import { Birthdate } from '$lib/birthday';
 
 // Helper function to generate a random number within a range
 function getRandomNumber(min: number, max: number): number {

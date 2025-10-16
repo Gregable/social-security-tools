@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { EarningRecord } from '$lib/earning-record';
+import type { EarningRecord } from '$lib/earning-record';
 
-  export let earningsRecords: Array<EarningRecord> = [];
+export let earningsRecords: Array<EarningRecord> = [];
 </script>
 
 <div>

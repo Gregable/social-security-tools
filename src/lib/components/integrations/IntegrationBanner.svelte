@@ -1,7 +1,7 @@
 <script lang="ts">
-  // Shared banner component for integration intro messages
-  export let logo: string;
-  export let logoAlt: string;
+// Shared banner component for integration intro messages
+export let logo: string;
+export let logoAlt: string;
 </script>
 
 <div class="intro-banner">

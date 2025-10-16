@@ -1,9 +1,8 @@
-import type { Meta } from '@storybook/svelte';
 import { action } from '@storybook/addon-actions';
-
-import PasteConfirm from '../lib/components/PasteConfirm.svelte';
+import type { Meta } from '@storybook/svelte';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
+import PasteConfirm from '../lib/components/PasteConfirm.svelte';
 
 const meta: Meta<PasteConfirm> = {
   component: PasteConfirm,

@@ -1,28 +1,28 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import StrategyMatrix from './StrategyMatrix.svelte';
-  import type { CalculationResults } from '$lib/strategy/ui';
-  import { CalculationStatus } from '$lib/strategy/ui';
+import type { Recipient } from '$lib/recipient';
+import type { CalculationResults } from '$lib/strategy/ui';
+import { CalculationStatus } from '$lib/strategy/ui';
+import StrategyMatrix from './StrategyMatrix.svelte';
 
-  // Props
-  export let recipients: [Recipient, Recipient];
-  export let displayAsAges: boolean;
+// Props
+export let recipients: [Recipient, Recipient];
+export let displayAsAges: boolean;
 
-  // Callback props for events
-  export let onselectcell: ((detail: any) => void) | undefined = undefined;
-  export let calculationResults: CalculationResults;
-  export let deathProbDistribution1: { age: number; probability: number }[];
-  export let deathProbDistribution2: { age: number; probability: number }[];
+// Callback props for events
+export let onselectcell: ((detail: any) => void) | undefined = undefined;
+export let calculationResults: CalculationResults;
+export let deathProbDistribution1: { age: number; probability: number }[];
+export let deathProbDistribution2: { age: number; probability: number }[];
 
-  // Shared state for matrix hovering
-  let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
+// Shared state for matrix hovering
+let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
 
-  // Handle hover cell events from child components
-  function handleHoverCell(
-    detail: { rowIndex: number; colIndex: number } | null
-  ) {
-    hoveredCell = detail; // detail will be null or { rowIndex, colIndex }
-  }
+// Handle hover cell events from child components
+function handleHoverCell(
+  detail: { rowIndex: number; colIndex: number } | null
+) {
+  hoveredCell = detail; // detail will be null or { rowIndex, colIndex }
+}
 </script>
 
 <div class="result-box">

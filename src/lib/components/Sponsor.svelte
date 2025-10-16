@@ -1,39 +1,39 @@
 <script lang="ts">
-  import ProjectionLabImage from '$lib/images/projection-lab.png';
-  import { onMount } from 'svelte';
-  import { Recipient } from '$lib/recipient';
+import { onMount } from 'svelte';
+import ProjectionLabImage from '$lib/images/projection-lab.png';
+import { Recipient } from '$lib/recipient';
 
-  export let recipient: Recipient = new Recipient();
+export let recipient: Recipient = new Recipient();
 
-  let sponsorElement: HTMLElement;
-  let isVisible = false;
+let sponsorElement: HTMLElement;
+let isVisible = false;
 
-  onMount(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            isVisible = true;
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.2, // Trigger when 20% of the element is visible
-        rootMargin: '50px', // Start animation slightly before element is fully in view
-      }
-    );
-
-    if (sponsorElement) {
-      observer.observe(sponsorElement);
+onMount(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          isVisible = true;
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.2, // Trigger when 20% of the element is visible
+      rootMargin: '50px', // Start animation slightly before element is fully in view
     }
+  );
 
-    return () => {
-      if (sponsorElement) {
-        observer.unobserve(sponsorElement);
-      }
-    };
-  });
+  if (sponsorElement) {
+    observer.observe(sponsorElement);
+  }
+
+  return () => {
+    if (sponsorElement) {
+      observer.unobserve(sponsorElement);
+    }
+  };
+});
 </script>
 
 <a

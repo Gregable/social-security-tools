@@ -1,18 +1,18 @@
 <script lang="ts">
-  import IndexedEarningsTable from './IndexedEarningsTable.svelte';
-  import RecipientName from './RecipientName.svelte';
-  import { Recipient } from '$lib/recipient';
-  import Expando from './Expando.svelte';
+import { Recipient } from '$lib/recipient';
+import Expando from './Expando.svelte';
+import IndexedEarningsTable from './IndexedEarningsTable.svelte';
+import RecipientName from './RecipientName.svelte';
 
-  export let recipient: Recipient = new Recipient();
+export let recipient: Recipient = new Recipient();
 
-  function records(recipient: Recipient): number {
-    return (
-      recipient.earningsRecords.length + recipient.futureEarningsRecords.length
-    );
-  }
-  let totalRecords: number = 0;
-  $: totalRecords = records($recipient);
+function records(recipient: Recipient): number {
+  return (
+    recipient.earningsRecords.length + recipient.futureEarningsRecords.length
+  );
+}
+let totalRecords: number = 0;
+$: totalRecords = records($recipient);
 </script>
 
 <div class="main">

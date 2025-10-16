@@ -1,8 +1,8 @@
-import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Money } from '$lib/money';
-import { Recipient } from '$lib/recipient';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
+import { BenefitPeriod, BenefitType } from './benefit-period.js';
 import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
-import { BenefitType, BenefitPeriod } from './benefit-period.js';
 
 /**
  * Calculates the total lifetime benefit in cents for a given Social Security
@@ -31,7 +31,7 @@ export function strategySumPeriods(
   finalDates: [MonthDate, MonthDate],
   strats: [MonthDuration, MonthDuration]
 ): BenefitPeriod[] {
-  let periods: BenefitPeriod[] = new Array();
+  const periods: BenefitPeriod[] = [];
 
   // Declare variables to hold recipient information, final dates, filing
   // strategies (ages), and calculated filing dates.
@@ -46,7 +46,7 @@ export function strategySumPeriods(
 
   // Calculate the MonthDate version of the filing strategy ages by offsetting
   // the strategy ages from each recipient's birthdate.
-  let stratDates: [MonthDate, MonthDate] = [null, null];
+  const stratDates: [MonthDate, MonthDate] = [null, null];
   for (let i = 0; i < 2; i++) {
     stratDates[i] = recipients[i].birthdate.dateAtSsaAge(strats[i]);
   }
@@ -74,7 +74,7 @@ export function strategySumPeriods(
   // If the dependent has 0 PIA, then they can't file earlier than the earner.
   // Move the dependent's filing date up to the earner's:
   if (
-    dependent.pia().primaryInsuranceAmount().cents() == 0 &&
+    dependent.pia().primaryInsuranceAmount().cents() === 0 &&
     dependentStratDate.lessThan(earnerStratDate)
   ) {
     dependentStrat = earnerStrat;
@@ -142,7 +142,7 @@ export function strategySumPeriods(
 
   // Dependent's Survivor Benefit:
   if (isSurvivorBenefitApplicable) {
-    let survivorPeriod = new BenefitPeriod();
+    const survivorPeriod = new BenefitPeriod();
     survivorPeriod.amount = survivorBenefit;
     survivorPeriod.startDate = survivorStartDate;
     survivorPeriod.endDate = dependentFinalDate;
@@ -153,7 +153,7 @@ export function strategySumPeriods(
 
   // Dependent's Spousal Benefit:
   if (dependent.eligibleForSpousalBenefit(earner)) {
-    let spousalPeriod = new BenefitPeriod();
+    const spousalPeriod = new BenefitPeriod();
     // The start date for spousal benefits is the later of the two filing dates.
     spousalPeriod.startDate = MonthDate.max(
       earnerStratDate,
@@ -193,7 +193,7 @@ function calculateMonthlyDiscountRate(annualDiscountRate: number): number {
   if (annualDiscountRate === 0) {
     return 0;
   } else {
-    return Math.pow(1 + annualDiscountRate, 1 / 12) - 1;
+    return (1 + annualDiscountRate) ** (1 / 12) - 1;
   }
 }
 
@@ -231,12 +231,10 @@ function calculatePeriodNPV(
   } else {
     // Direct calculation for non-memoized case
     pvFactor =
-      (1 - Math.pow(1 + monthlyDiscountRate, -numberOfPayments)) /
+      (1 - (1 + monthlyDiscountRate) ** -numberOfPayments) /
       monthlyDiscountRate;
-    discountFactorToCurrentDate = Math.pow(
-      1 + monthlyDiscountRate,
-      -monthsToFirstPayment
-    );
+    discountFactorToCurrentDate =
+      (1 + monthlyDiscountRate) ** -monthsToFirstPayment;
   }
 
   return monthlyPaymentCents * pvFactor * discountFactorToCurrentDate;
@@ -374,8 +372,7 @@ function getMemoizedPVFactor(
   }
 
   const pvFactor =
-    (1 - Math.pow(1 + monthlyDiscountRate, -numberOfPayments)) /
-    monthlyDiscountRate;
+    (1 - (1 + monthlyDiscountRate) ** -numberOfPayments) / monthlyDiscountRate;
 
   cache.set(numberOfPayments, pvFactor);
   return pvFactor;
@@ -394,10 +391,7 @@ function getMemoizedDiscountFactor(
     return cache.get(monthsToFirstPayment)!;
   }
 
-  const discountFactor = Math.pow(
-    1 + monthlyDiscountRate,
-    -monthsToFirstPayment
-  );
+  const discountFactor = (1 + monthlyDiscountRate) ** -monthsToFirstPayment;
 
   cache.set(monthsToFirstPayment, discountFactor);
   return discountFactor;
@@ -454,7 +448,7 @@ function createOptimizationContext(
   }
 
   const dependentHasZeroPia =
-    dependent.pia().primaryInsuranceAmount().cents() == 0;
+    dependent.pia().primaryInsuranceAmount().cents() === 0;
   const isSpousalBenefitEligible = dependent.eligibleForSpousalBenefit(earner);
 
   return {
@@ -488,7 +482,7 @@ function strategySumCentsOptimized(
   const dependentStrat = strats[context.dependentIndex];
 
   // Calculate filing dates
-  let earnerStratDate = context.earner.birthdate.dateAtSsaAge(earnerStrat);
+  const earnerStratDate = context.earner.birthdate.dateAtSsaAge(earnerStrat);
   let dependentStratDate =
     context.dependent.birthdate.dateAtSsaAge(dependentStrat);
 
@@ -559,7 +553,7 @@ function strategySumPeriodsOptimized(
   earnerStratDate: MonthDate,
   dependentStratDate: MonthDate
 ): BenefitPeriod[] {
-  let periods: BenefitPeriod[] = new Array();
+  const periods: BenefitPeriod[] = [];
 
   // Determine the start date for survivor benefits. This is the later of:
   // 1. The month after the earner's death date.
@@ -624,7 +618,7 @@ function strategySumPeriodsOptimized(
 
   // Dependent's Survivor Benefit:
   if (isSurvivorBenefitApplicable) {
-    let survivorPeriod = new BenefitPeriod();
+    const survivorPeriod = new BenefitPeriod();
     survivorPeriod.amount = survivorBenefit;
     survivorPeriod.startDate = survivorStartDate;
     survivorPeriod.endDate = context.dependentFinalDate;
@@ -634,7 +628,7 @@ function strategySumPeriodsOptimized(
 
   // Dependent's Spousal Benefit:
   if (context.isSpousalBenefitEligible) {
-    let spousalPeriod = new BenefitPeriod();
+    const spousalPeriod = new BenefitPeriod();
     // The start date for spousal benefits is the later of the two filing dates.
     spousalPeriod.startDate = MonthDate.max(
       earnerStratDate,

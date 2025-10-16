@@ -1,27 +1,28 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  import HeroImage from './hero.jpg';
-  // Hero image: Lincoln Memorial During Government Shutdown 2013
-  // Source: https://commons.wikimedia.org/wiki/File:Lincoln_Memorial_During_Government_Shutdown_2013.jpg
-  // Licensed under Creative Commons
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import HeroImage from './hero.jpg';
 
-  const title = 'How Government Shutdowns Affect Social Security';
-  const description =
-    'Government shutdowns never stop Social Security payments, but they severely disrupt services. Learn what continues, what stops, and how to protect yourself during funding gaps.';
-  const publishDate = new Date(2025, 8, 30); // September 30, 2025 (month is 0-indexed)
-  const updateDate = new Date(2025, 8, 30); // September 30, 2025 (month is 0-indexed)
+// Hero image: Lincoln Memorial During Government Shutdown 2013
+// Source: https://commons.wikimedia.org/wiki/File:Lincoln_Memorial_During_Government_Shutdown_2013.jpg
+// Licensed under Creative Commons
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/government-shutdown';
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description;
-  schema.imageAlt =
-    'Lincoln Memorial with barriers during the 2013 government shutdown';
-  schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
+const title = 'How Government Shutdowns Affect Social Security';
+const description =
+  'Government shutdowns never stop Social Security payments, but they severely disrupt services. Learn what continues, what stops, and how to protect yourself during funding gaps.';
+const publishDate = new Date(2025, 8, 30); // September 30, 2025 (month is 0-indexed)
+const updateDate = new Date(2025, 8, 30); // September 30, 2025 (month is 0-indexed)
+
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/government-shutdown';
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description;
+schema.imageAlt =
+  'Lincoln Memorial with barriers during the 2013 government shutdown';
+schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
 </script>
 
 <svelte:head>

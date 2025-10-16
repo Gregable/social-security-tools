@@ -1,66 +1,66 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
+import type { Recipient } from '$lib/recipient';
 
-  export let recipient: Recipient;
-  export let spouse: Recipient | null = null;
+export let recipient: Recipient;
+export let spouse: Recipient | null = null;
 
-  // Build the Open Social Security URL with pre-populated data
-  function buildOpenSocialSecurityUrl(): string {
-    const baseUrl = 'https://opensocialsecurity.com/';
-    const params = new URLSearchParams();
+// Build the Open Social Security URL with pre-populated data
+function buildOpenSocialSecurityUrl(): string {
+  const baseUrl = 'https://opensocialsecurity.com/';
+  const params = new URLSearchParams();
 
-    if (spouse) {
-      // Married couple
-      params.set('marital', 'married');
+  if (spouse) {
+    // Married couple
+    params.set('marital', 'married');
 
-      // Person A (recipient)
-      params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
-      params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
-      params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
-      params.set(
-        'aPIA',
-        String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
-      );
+    // Person A (recipient)
+    params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
+    params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
+    params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
+    params.set(
+      'aPIA',
+      String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
+    );
 
-      // Person B (spouse)
-      params.set('bDOBm', String(spouse.birthdate.layBirthMonth() + 1));
-      params.set('bDOBd', String(spouse.birthdate.layBirthDayOfMonth()));
-      params.set('bDOBy', String(spouse.birthdate.layBirthYear()));
-      params.set(
-        'bPIA',
-        String(spouse.pia().primaryInsuranceAmount().roundToDollar().value())
-      );
-    } else {
-      // Single person - use marital=single with placeholder for person B
-      params.set('marital', 'single');
+    // Person B (spouse)
+    params.set('bDOBm', String(spouse.birthdate.layBirthMonth() + 1));
+    params.set('bDOBd', String(spouse.birthdate.layBirthDayOfMonth()));
+    params.set('bDOBy', String(spouse.birthdate.layBirthYear()));
+    params.set(
+      'bPIA',
+      String(spouse.pia().primaryInsuranceAmount().roundToDollar().value())
+    );
+  } else {
+    // Single person - use marital=single with placeholder for person B
+    params.set('marital', 'single');
 
-      // Person A (recipient)
-      params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
-      params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
-      params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
-      params.set(
-        'aPIA',
-        String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
-      );
+    // Person A (recipient)
+    params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
+    params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
+    params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
+    params.set(
+      'aPIA',
+      String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
+    );
 
-      // Person B (placeholder - required by Open Social Security)
-      params.set('bDOBm', '4');
-      params.set('bDOBd', '15');
-      params.set('bDOBy', '1960');
-      params.set('bPIA', '1000');
-    }
-
-    return `${baseUrl}?${params.toString()}`;
+    // Person B (placeholder - required by Open Social Security)
+    params.set('bDOBm', '4');
+    params.set('bDOBd', '15');
+    params.set('bDOBy', '1960');
+    params.set('bPIA', '1000');
   }
 
-  // Format PIA for display
-  function formatPia(recipient: Recipient): string {
-    return recipient
-      .pia()
-      .primaryInsuranceAmount()
-      .roundToDollar()
-      .wholeDollars();
-  }
+  return `${baseUrl}?${params.toString()}`;
+}
+
+// Format PIA for display
+function formatPia(recipient: Recipient): string {
+  return recipient
+    .pia()
+    .primaryInsuranceAmount()
+    .roundToDollar()
+    .wholeDollars();
+}
 </script>
 
 <div class="pageBreakAvoid">

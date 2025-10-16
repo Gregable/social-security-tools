@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, vitest } from 'vitest';
-import { IntegrationContext } from '$lib/components/integrations/integration-context';
-import { Recipient } from '$lib/recipient';
-import { MonthDate } from '$lib/month-time';
+import { beforeEach, describe, expect, it, vitest } from 'vitest';
 import { Birthdate } from '$lib/birthday';
-import { Money } from '$lib/money';
+import { IntegrationContext } from '$lib/components/integrations/integration-context';
 import { recipientFilingDate, spouseFilingDate } from '$lib/context';
+import { Money } from '$lib/money';
+import { MonthDate } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
 
 describe('IntegrationContext', () => {
   // Create test recipients with different earnings

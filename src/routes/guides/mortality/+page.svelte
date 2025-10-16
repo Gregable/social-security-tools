@@ -1,29 +1,24 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  import lifeTable from './life-table.png'; // imported so bundler serves asset
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import lifeTable from './life-table.png'; // imported so bundler serves asset
 
-  const title = 'Mortality Tables and Health Adjustments';
-  const description =
-    'How SSA cohort life tables are used, how q(x) death probabilities are derived, gender blending, and how the health multiplier adjusts mortality.';
-  const publishDate = new Date('2025-08-08T00:00:00+00:00');
-  const updateDate = publishDate; // Update when content changes
+const title = 'Mortality Tables and Health Adjustments';
+const description =
+  'How SSA cohort life tables are used, how q(x) death probabilities are derived, gender blending, and how the health multiplier adjusts mortality.';
+const publishDate = new Date('2025-08-08T00:00:00+00:00');
+const updateDate = publishDate; // Update when content changes
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/mortality';
-  schema.title = title;
-  schema.image = lifeTable; // use bundled image path
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description;
-  schema.imageAlt =
-    'Laptop with piggybank representing Social Security and life expectancy';
-  schema.tags = [
-    'Life Expectancy',
-    'Social Security',
-    'Mortality',
-    'Actuarial',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/mortality';
+schema.title = title;
+schema.image = lifeTable; // use bundled image path
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description;
+schema.imageAlt =
+  'Laptop with piggybank representing Social Security and life expectancy';
+schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
 </script>
 
 <svelte:head>

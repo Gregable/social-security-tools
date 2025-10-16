@@ -1,5 +1,5 @@
-import type { Meta } from '@storybook/svelte';
 import { action } from '@storybook/addon-actions';
+import type { Meta } from '@storybook/svelte';
 
 import Slider from '../lib/components/Slider.svelte';
 
@@ -68,7 +68,7 @@ Translate.args = {
   ceiling: 10,
   step: 1,
   showTicks: true,
-  translate: (value: number, _label: string) => value + '°C',
+  translate: (value: number, _label: string) => `${value}°C`,
 };
 
 export const CustomTicks = Template.bind({});

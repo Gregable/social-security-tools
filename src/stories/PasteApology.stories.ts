@@ -1,5 +1,5 @@
-import type { Meta } from '@storybook/svelte';
 import { action } from '@storybook/addon-actions';
+import type { Meta } from '@storybook/svelte';
 
 import PasteApology from '../lib/components/PasteApology.svelte';
 

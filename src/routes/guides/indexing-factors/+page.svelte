@@ -1,26 +1,21 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  import HeroImage from './hero.png';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import HeroImage from './hero.png';
 
-  const title = 'Social Security Indexing Factors';
-  const description =
-    "Why use the current year's indexing factors for someone younger than 62?";
-  const publishDate = new Date('2020-12-28T00:00:00+00:00');
+const title = 'Social Security Indexing Factors';
+const description =
+  "Why use the current year's indexing factors for someone younger than 62?";
+const publishDate = new Date('2020-12-28T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/indexing-factors';
-  schema.title = title;
-  schema.image = HeroImage; // Added HeroImage to schema
-  schema.datePublished = publishDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'A chalkboard with complex equations';
-  schema.tags = [
-    'Wage Indexing',
-    'Social Security',
-    'AWI',
-    'Average Wage Index',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/indexing-factors';
+schema.title = title;
+schema.image = HeroImage; // Added HeroImage to schema
+schema.datePublished = publishDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt = 'A chalkboard with complex equations';
+schema.tags = ['Wage Indexing', 'Social Security', 'AWI', 'Average Wage Index'];
 </script>
 
 <svelte:head>

@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
 
-  const title = 'Will Social Security run out?';
-  const description =
-    "And what happens if it does? Learn more about the Social Security Trust Fund, how it's slowly running out, and how what happens next could affect your benefits.";
-  const publishDate = new Date('2023-08-11T00:00:00+00:00');
+const title = 'Will Social Security run out?';
+const description =
+  "And what happens if it does? Learn more about the Social Security Trust Fund, how it's slowly running out, and how what happens next could affect your benefits.";
+const publishDate = new Date('2023-08-11T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/will-social-security-run-out';
-  schema.title = title;
-  schema.image = '/laptop-piggybank.jpg'; // Added a generic hero image for the schema
-  schema.datePublished = publishDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt =
-    'Laptop with piggybank representing Social Security program solvency';
-  schema.tags = [
-    'Social Security Solvency',
-    'Trust Fund',
-    'Program Future',
-    'Retirement Security',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/will-social-security-run-out';
+schema.title = title;
+schema.image = '/laptop-piggybank.jpg'; // Added a generic hero image for the schema
+schema.datePublished = publishDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt =
+  'Laptop with piggybank representing Social Security program solvency';
+schema.tags = [
+  'Social Security Solvency',
+  'Trust Fund',
+  'Program Future',
+  'Retirement Security',
+];
 </script>
 
 <svelte:head>

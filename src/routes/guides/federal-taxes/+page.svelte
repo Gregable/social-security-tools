@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
 
-  import HeroImage from './taxes.jpg';
+import HeroImage from './taxes.jpg';
 
-  const title = 'Federal Taxation of Social Security Benefits';
-  const description =
-    'A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI.';
-  const publishDate = new Date('2022-12-04T00:00:00+00:00');
+const title = 'Federal Taxation of Social Security Benefits';
+const description =
+  'A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI.';
+const publishDate = new Date('2022-12-04T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/federal-taxes';
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'Tax forms laid atop some currency';
-  schema.tags = [
-    'Social Security Taxes',
-    'Federal Taxes',
-    'Retirement Income',
-    'Tax Planning',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/federal-taxes';
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt = 'Tax forms laid atop some currency';
+schema.tags = [
+  'Social Security Taxes',
+  'Federal Taxes',
+  'Retirement Income',
+  'Tax Planning',
+];
 </script>
 
 <svelte:head>

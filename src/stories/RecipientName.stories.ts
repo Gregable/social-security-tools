@@ -1,8 +1,6 @@
 import type { Meta } from '@storybook/svelte';
-
-import RecipientName from './RecipientName.demo.svelte';
-
 import { Recipient } from '$lib/recipient';
+import RecipientName from './RecipientName.demo.svelte';
 
 const meta: Meta<RecipientName> = {
   component: RecipientName,
@@ -21,13 +19,13 @@ const Template = ({ ...args }) => ({
 });
 
 // Single user, no name:
-let single = new Recipient();
+const single = new Recipient();
 
-let alex = new Recipient();
+const alex = new Recipient();
 alex.name = 'Alex';
 alex.markFirst();
 
-let chris = new Recipient();
+const chris = new Recipient();
 chris.name = 'Chris';
 chris.markSecond();
 
@@ -46,7 +44,7 @@ Second.args = {
   r: chris,
 };
 
-let longName = new Recipient();
+const longName = new Recipient();
 longName.name = 'Very long name';
 longName.markFirst();
 

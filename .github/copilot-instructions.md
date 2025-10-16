@@ -36,8 +36,7 @@ embraces interactivity and dynamic data exploration.
 - **Testing**: Vitest for unit tests
 - **Component Development**: Storybook for component documentation and testing
 - **Package Manager**: npm
-- **Linting**: ESLint with TypeScript support
-- **Formatting**: Prettier
+- **Linting & Formatting**: Biome
 
 ## Code Architecture:
 
@@ -95,7 +94,7 @@ Key calculation classes:
 - Use descriptive variable and function names.
 - Use proper JSDoc comments for functions and classes.
 - Write unit tests for components and libraries, run them before committing.
-- Use ESLint and Prettier for code formatting. Run `npm run quality` before
+- Use Biome for code formatting and linting. Run `npm run quality` before
   committing.
 - Prefer 80 character lines when possible.
 - Follow SvelteKit conventions for file-based routing and component structure.
@@ -113,10 +112,10 @@ Available npm scripts:
 - `npm run coverage` - Generate test coverage report
 - `npm run storybook` - Start Storybook for component development
 - `npm run build-storybook` - Build Storybook for deployment
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
+- `npm run lint` - Run Biome linting
+- `npm run lint:fix` - Fix Biome issues automatically
+- `npm run format` - Format code with Biome
+- `npm run format:check` - Check code formatting and linting
 - `npm run quality` - Run full quality check (format, lint, type check)
 - `npm run check` - TypeScript type checking
 

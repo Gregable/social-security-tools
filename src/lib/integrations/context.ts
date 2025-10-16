@@ -6,8 +6,8 @@
  */
 
 import { writable } from 'svelte/store';
-import { getIntegration, type IntegrationConfig } from './config';
 import { UrlParams } from '$lib/url-params';
+import { getIntegration, type IntegrationConfig } from './config';
 
 const SESSION_STORAGE_KEY = 'activeIntegrationId';
 

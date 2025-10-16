@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
-import { describe, expect, it } from 'vitest';
 
 import * as constants from '../lib/constants';
 
@@ -49,7 +49,7 @@ describe('EarningRecord', () => {
   it(`calculates indexed earnings after indexingYear`, () => {
     // indexingYear is before the year of the record, so the index factor
     // is 1.0.
-    let indexedRecord = testRecord(2010);
+    const indexedRecord = testRecord(2010);
     indexedRecord.indexingYear = 2000;
     expect(indexedRecord.indexFactor()).toEqual(1.0);
     expect(indexedRecord.indexedEarnings().value()).toEqual(100 * 1000);
@@ -60,21 +60,21 @@ describe('EarningRecord', () => {
     // if this is the correct behavior. I think the correct behavior is
     // probably undefined, but I don't want to crash for example.
     expect(constants.MIN_WAGE_INDEX_YEAR).toEqual(1951);
-    let indexedRecord = testRecord(constants.MIN_WAGE_INDEX_YEAR - 1);
+    const indexedRecord = testRecord(constants.MIN_WAGE_INDEX_YEAR - 1);
     indexedRecord.indexingYear = 1990;
     expect(indexedRecord.indexFactor()).toEqual(0.0);
     expect(indexedRecord.indexedEarnings().value()).toEqual(0);
   });
 
   it(`calculates indexed earnings for wages in the future`, () => {
-    let indexedRecord = testRecord(constants.MAX_YEAR + 5);
+    const indexedRecord = testRecord(constants.MAX_YEAR + 5);
     indexedRecord.indexingYear = constants.MAX_YEAR + 10;
     expect(indexedRecord.indexFactor()).toEqual(1.0);
     expect(indexedRecord.indexedEarnings().value()).toEqual(100 * 1000);
   });
 
   it(`calculates indexed earnings`, () => {
-    let indexedRecord = testRecord(2010);
+    const indexedRecord = testRecord(2010);
     indexedRecord.indexingYear = 2020;
 
     const expectedIndexFactor = constants.WAGE_INDICES[2020].div$(
@@ -82,13 +82,13 @@ describe('EarningRecord', () => {
     );
     expect(indexedRecord.indexFactor()).toEqual(expectedIndexFactor);
 
-    let expectedIndexedEarnings: Money =
+    const expectedIndexedEarnings: Money =
       indexedRecord.taxedEarnings.times(expectedIndexFactor);
     expect(indexedRecord.indexedEarnings()).toEqual(expectedIndexedEarnings);
   });
 
   it(`calculates capped earnings`, () => {
-    let indexedRecord = testRecord(
+    const indexedRecord = testRecord(
       constants.MAX_YEAR + 5,
       constants.MAXIMUM_EARNINGS[2010].times(2)
     );

@@ -1,10 +1,10 @@
 import type { Meta } from '@storybook/svelte';
-import FutureEarningsSliders from '../lib/components/FutureEarningsSliders.svelte';
-import { Recipient } from '$lib/recipient';
-import * as constants from '$lib/constants';
 import { Birthdate } from '$lib/birthday';
+import * as constants from '$lib/constants';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
+import { Recipient } from '$lib/recipient';
+import FutureEarningsSliders from '../lib/components/FutureEarningsSliders.svelte';
 
 const meta: Meta<FutureEarningsSliders> = {
   component: FutureEarningsSliders,
@@ -16,7 +16,7 @@ const meta: Meta<FutureEarningsSliders> = {
 };
 export default meta;
 
-let recipient = new Recipient();
+const recipient = new Recipient();
 recipient.name = 'Alex';
 recipient.markFirst();
 recipient.birthdate = Birthdate.FromYMD(constants.CURRENT_YEAR - 47, 3, 4);

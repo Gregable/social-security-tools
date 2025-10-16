@@ -1,9 +1,9 @@
+import { describe, expect, it } from 'vitest';
 import { Birthdate } from '$lib/birthday';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
-import { describe, expect, it } from 'vitest';
 
 import * as constants from '../lib/constants';
 
@@ -21,32 +21,32 @@ function testRecord(year: number, earnings: Money = Money.from(10 * 1000)) {
 
 describe('Recipient', () => {
   it('initializes without input', () => {
-    let _r = new Recipient();
+    const _r = new Recipient();
   });
 
   it('sets and gets earning records', () => {
-    let r = new Recipient();
-    let er = testRecord(2010);
+    const r = new Recipient();
+    const er = testRecord(2010);
     r.earningsRecords = [er];
     expect(r.earningsRecords).toEqual([er]);
   });
 
   it('sets and gets future earning records', () => {
-    let r = new Recipient();
-    let er = testRecord(2010);
+    const r = new Recipient();
+    const er = testRecord(2010);
     r.futureEarningsRecords = [er];
     expect(r.futureEarningsRecords).toEqual([er]);
   });
 
   it('sets and gets birth date', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     const b = Birthdate.FromYMD(1970, 1, 1);
     r.birthdate = b;
     expect(r.birthdate).toEqual(b);
   });
 
   it('simulates future earning years with no earnings', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.simulateFutureEarningsYears(10, Money.from(100 * 1000));
     expect(r.futureEarningsRecords.length).toEqual(10);
 
@@ -64,7 +64,7 @@ describe('Recipient', () => {
   });
 
   it('simulates future earning years with past earnings', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
       testRecord(constants.CURRENT_YEAR - 1),
@@ -77,7 +77,7 @@ describe('Recipient', () => {
   });
 
   it('simulates future earning years with past and current earnings', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
       testRecord(constants.CURRENT_YEAR - 1),
@@ -91,7 +91,7 @@ describe('Recipient', () => {
   });
 
   it('simulates future earning years with incomplete earnings', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
       testRecord(constants.CURRENT_YEAR - 1, /*earnings*/ Money.from(-1)),
@@ -106,7 +106,7 @@ describe('Recipient', () => {
   });
 
   it('simulates future earning years with earnings in the future', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.earningsRecords = [
       testRecord(constants.CURRENT_YEAR - 2),
       testRecord(constants.CURRENT_YEAR - 1),
@@ -122,7 +122,7 @@ describe('Recipient', () => {
   });
 
   it('calculates normal retirement', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday. 1957 should be 66 and 6 months.
     r.birthdate = Birthdate.FromYMD(1957, 0, 2);
@@ -136,7 +136,7 @@ describe('Recipient', () => {
   });
 
   it('calculates survivor normal retirement', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday. 1957 should be 66 and 2 months.
     r.birthdate = Birthdate.FromYMD(1957, 0, 2);
@@ -150,7 +150,7 @@ describe('Recipient', () => {
   });
 
   it('calculates indexing year', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Use Jan 2 rather than Jan 1 to avoid issues with "attaining an age" the
     // day before the birthday.
     r.birthdate = Birthdate.FromYMD(1957, 0, 2);
@@ -159,7 +159,7 @@ describe('Recipient', () => {
   });
 
   it('calculates total credits from only earned credits', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Earned exactly 1, 2, and 3 credits in 2007, 2008, and 2009, respectively:
     r.earningsRecords = [
       testRecord(2007, constants.EARNINGS_PER_CREDIT[2007].times(1)),
@@ -176,7 +176,7 @@ describe('Recipient', () => {
   });
 
   it('calculates total credits from only future credits', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.futureEarningsRecords = [
       testRecord(
         constants.MAX_YEAR + 1,
@@ -200,7 +200,7 @@ describe('Recipient', () => {
   });
 
   it('updates earnings records on record write', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1990, 0, 2);
 
     // Records are written initially out of order:
@@ -224,7 +224,7 @@ describe('Recipient', () => {
   });
 
   it('updates future earnings records on record write', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1990, 0, 2);
 
     // Records are written initially out of order:
@@ -250,14 +250,14 @@ describe('Recipient', () => {
   });
 
   it('shortens name', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.name = 'Gregory';
     expect(r.shortName(5)).toEqual('Greg…');
     expect(r.shortName(7)).toEqual('Gregory');
   });
 
   it('captures first, second, only', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     expect(r.first).toEqual(true);
     expect(r.only).toEqual(true);
 
@@ -265,7 +265,7 @@ describe('Recipient', () => {
     expect(r.first).toEqual(true);
     expect(r.only).toEqual(false);
 
-    let r2 = new Recipient();
+    const r2 = new Recipient();
     r2.markSecond();
     expect(r2.first).toEqual(false);
     expect(r2.only).toEqual(false);
@@ -276,7 +276,7 @@ describe('Recipient', () => {
    * records starting in 1965. Each year has earnings equal to $10,000.
    */
   function top35RecipientSetup() {
-    let r = new Recipient();
+    const r = new Recipient();
 
     // Pick a start year such that the indexing year is in the past (2020).
     // This way the test won't break when the wage indices are updated for
@@ -297,7 +297,7 @@ describe('Recipient', () => {
   }
 
   it('computes top35 earnings years from historical data', () => {
-    let r = top35RecipientSetup();
+    const r = top35RecipientSetup();
 
     // The top 35 years should be the earliest 35 years, since those have the
     // highest indexing multiple, with ties are broken to earlier years.
@@ -320,7 +320,7 @@ describe('Recipient', () => {
   });
 
   it('computes top35 earnings years from historical and future data', () => {
-    let r = top35RecipientSetup();
+    const r = top35RecipientSetup();
 
     // Add 3 years of future earnings records with enough earnings to
     // ensure that they are top 35 years.
@@ -356,7 +356,7 @@ describe('Recipient', () => {
   });
 
   it('determines hasEarningsBefore1978', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Empty records:
     expect(r.hasEarningsBefore1978()).toBe(false);
 
@@ -370,7 +370,7 @@ describe('Recipient', () => {
   });
 
   it('correctly calculates benefits based on filing ages', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
@@ -419,7 +419,7 @@ describe('Recipient', () => {
   });
 
   it('correctly calculates benefits based on filing and current dates', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
     r.setPia(Money.from(1000.0));
@@ -493,12 +493,12 @@ describe('Recipient', () => {
   });
 
   it('correctly calculates spousal benefits based on filing and current dates', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     // Over time, the PIA will increase due to COLAs, but we want the tests
     // to be stable, so we set the PIA to a fixed value for testing.
     r.setPia(Money.from(1000.0));
 
-    let s = new Recipient();
+    const s = new Recipient();
     // Force a spousal PIA large enough to generate a $500 spousal benefit.
     s.setPia(Money.from(3000.0));
 
@@ -607,10 +607,10 @@ describe('Recipient', () => {
   });
 
   it('calculates spousal benefits for a specific example', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.setPia(Money.from(1000.0));
 
-    let s = new Recipient();
+    const s = new Recipient();
     s.setPia(Money.from(200.0));
 
     r.birthdate = Birthdate.FromYMD(1962, 0, 2);
@@ -631,10 +631,10 @@ describe('Recipient', () => {
   });
 
   it('calculates spousal benefits for another specific example', () => {
-    let r = new Recipient();
+    const r = new Recipient();
     r.setPia(Money.from(2120.0));
 
-    let s = new Recipient();
+    const s = new Recipient();
     s.setPia(Money.from(507.6));
 
     r.birthdate = Birthdate.FromYMD(1950, 6, 2);
@@ -658,11 +658,11 @@ describe('Recipient', () => {
     // Two recipients, one with a PIA of $1000, and the other with a PIA of
     // $3000. The first recipient is the survivor, and the second recipient is
     // the deceased.
-    let recipient = new Recipient();
+    const recipient = new Recipient();
     recipient.setPia(Money.from(1000.0));
     recipient.birthdate = Birthdate.FromYMD(1960, 0, 5);
 
-    let deceased = new Recipient();
+    const deceased = new Recipient();
     deceased.setPia(Money.from(3000.0));
     deceased.birthdate = Birthdate.FromYMD(1960, 0, 5);
 

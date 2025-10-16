@@ -79,7 +79,7 @@ export class UrlParams {
     const value = this.params.get('pia1');
     if (!value) return null;
     const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? null : parsed;
+    return Number.isNaN(parsed) ? null : parsed;
   }
 
   /**
@@ -113,7 +113,7 @@ export class UrlParams {
     const value = this.params.get('pia2');
     if (!value) return null;
     const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? null : parsed;
+    return Number.isNaN(parsed) ? null : parsed;
   }
 
   /**
@@ -209,7 +209,7 @@ export class UrlParams {
       const amount = parseInt(parts[1], 10);
 
       // Validate year and amount
-      if (isNaN(year) || isNaN(amount)) continue;
+      if (Number.isNaN(year) || Number.isNaN(amount)) continue;
       if (year < 1951 || year > 2100) continue; // Reasonable year range
       if (amount < 0) continue;
 

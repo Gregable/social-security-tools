@@ -14,30 +14,30 @@
 -->
 
 <script lang="ts">
-  import type { EarningRecord } from '$lib/earning-record';
+import type { EarningRecord } from '$lib/earning-record';
 
-  // Callback props for events
-  export let onconfirm: (() => void) | undefined = undefined;
-  export let ondecline: (() => void) | undefined = undefined;
+// Callback props for events
+export let onconfirm: (() => void) | undefined = undefined;
+export let ondecline: (() => void) | undefined = undefined;
 
-  export let earningsRecords: EarningRecord[] = [];
-  // Display the records in the same order as the SSA website: reverse
-  // chronological.
-  $: ssaSortedEarningsRecords = earningsRecords.sort((a, b) => b.year - a.year);
+export let earningsRecords: EarningRecord[] = [];
+// Display the records in the same order as the SSA website: reverse
+// chronological.
+$: ssaSortedEarningsRecords = earningsRecords.sort((a, b) => b.year - a.year);
 
-  function earningsRecordsIncludeMedicare() {
-    for (let i = 0; i < earningsRecords.length; ++i) {
-      if (earningsRecords[i].taxedMedicareEarnings.value() > 0) return true;
-    }
-    return false;
+function earningsRecordsIncludeMedicare() {
+  for (let i = 0; i < earningsRecords.length; ++i) {
+    if (earningsRecords[i].taxedMedicareEarnings.value() > 0) return true;
   }
+  return false;
+}
 
-  function confirm() {
-    onconfirm?.();
-  }
-  function decline() {
-    ondecline?.();
-  }
+function confirm() {
+  onconfirm?.();
+}
+function decline() {
+  ondecline?.();
+}
 </script>
 
 <div>

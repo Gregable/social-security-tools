@@ -2,19 +2,19 @@
  * Tests for the third-party integration configuration and context.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { get } from 'svelte/store';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  INTEGRATIONS,
   getIntegration,
+  INTEGRATIONS,
   loadIntroBanner,
   loadReportEnd,
 } from '$lib/integrations/config';
 import {
   activeIntegration,
-  parseIntegrationFromHash,
-  initializeIntegration,
   clearIntegration,
+  initializeIntegration,
+  parseIntegrationFromHash,
 } from '$lib/integrations/context';
 
 describe('Integration Configuration', () => {
@@ -167,7 +167,7 @@ describe('Integration Context', () => {
   it('should persist integration to sessionStorage', () => {
     mockWindow('#integration=opensocialsecurity.com');
     initializeIntegration();
-    expect(mockSessionStorage['activeIntegrationId']).toBe(
+    expect(mockSessionStorage.activeIntegrationId).toBe(
       'opensocialsecurity.com'
     );
   });
@@ -175,7 +175,7 @@ describe('Integration Context', () => {
   it('should restore integration from sessionStorage', () => {
     // Set up sessionStorage with an integration
     mockWindow('');
-    mockSessionStorage['activeIntegrationId'] = 'opensocialsecurity.com';
+    mockSessionStorage.activeIntegrationId = 'opensocialsecurity.com';
 
     // Initialize without URL hash - should load from sessionStorage
     initializeIntegration();
@@ -187,7 +187,7 @@ describe('Integration Context', () => {
   it('should prioritize URL hash over sessionStorage', () => {
     mockWindow('#integration=opensocialsecurity.com');
     // Put a different value in sessionStorage
-    mockSessionStorage['activeIntegrationId'] = 'other-site.com';
+    mockSessionStorage.activeIntegrationId = 'other-site.com';
 
     initializeIntegration();
     const storeValue = get(activeIntegration);
@@ -197,12 +197,12 @@ describe('Integration Context', () => {
   it('should clear sessionStorage when clearing integration', () => {
     mockWindow('#integration=opensocialsecurity.com');
     initializeIntegration();
-    expect(mockSessionStorage['activeIntegrationId']).toBe(
+    expect(mockSessionStorage.activeIntegrationId).toBe(
       'opensocialsecurity.com'
     );
 
     clearIntegration();
-    expect(mockSessionStorage['activeIntegrationId']).toBeUndefined();
+    expect(mockSessionStorage.activeIntegrationId).toBeUndefined();
   });
 });
 

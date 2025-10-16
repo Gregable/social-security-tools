@@ -2,7 +2,7 @@
  * Tests for the centralized URL parameter manager.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { UrlParams } from '$lib/url-params';
 
 describe('UrlParams', () => {

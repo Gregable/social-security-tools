@@ -1,7 +1,7 @@
 <script lang="ts">
-  // Intro banner shown when the Open Social Security integration is active
-  import IntegrationBanner from '../IntegrationBanner.svelte';
-  import logo from './favicon.ico';
+// Intro banner shown when the Open Social Security integration is active
+import IntegrationBanner from '../IntegrationBanner.svelte';
+import logo from './favicon.ico';
 </script>
 
 <IntegrationBanner {logo} logoAlt="Open Social Security">

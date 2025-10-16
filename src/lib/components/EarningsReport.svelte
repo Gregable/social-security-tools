@@ -1,18 +1,18 @@
 <script lang="ts">
-  import EarningsTable from './EarningsTable.svelte';
-  import FutureEarningsSliders from './FutureEarningsSliders.svelte';
-  import { Recipient } from '$lib/recipient';
-  import Expando from './Expando.svelte';
+import { Recipient } from '$lib/recipient';
+import EarningsTable from './EarningsTable.svelte';
+import Expando from './Expando.svelte';
+import FutureEarningsSliders from './FutureEarningsSliders.svelte';
 
-  export let recipient: Recipient = new Recipient();
+export let recipient: Recipient = new Recipient();
 
-  function records(recipient: Recipient): number {
-    return (
-      recipient.earningsRecords.length + recipient.futureEarningsRecords.length
-    );
-  }
-  let totalRecords: number = 0;
-  $: totalRecords = records($recipient);
+function records(recipient: Recipient): number {
+  return (
+    recipient.earningsRecords.length + recipient.futureEarningsRecords.length
+  );
+}
+let totalRecords: number = 0;
+$: totalRecords = records($recipient);
 </script>
 
 <div class="main pageBreakAvoid">

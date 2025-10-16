@@ -1,19 +1,19 @@
 <script lang="ts">
-  import * as constants from '$lib/constants';
-  import { Recipient } from '$lib/recipient';
-  import BendpointChart from './BendpointChart.svelte';
-  import Expando from './Expando.svelte';
-  import RName from './RecipientName.svelte';
+import * as constants from '$lib/constants';
+import { Recipient } from '$lib/recipient';
+import BendpointChart from './BendpointChart.svelte';
+import Expando from './Expando.svelte';
+import RName from './RecipientName.svelte';
 
-  export let recipient: Recipient = new Recipient();
-  const r: Recipient = recipient;
+export let recipient: Recipient = new Recipient();
+const r: Recipient = recipient;
 
-  function oneSignificantDigit(n: number) {
-    return n.toLocaleString(undefined, {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    });
-  }
+function oneSignificantDigit(n: number) {
+  return n.toLocaleString(undefined, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+}
 </script>
 
 <div>

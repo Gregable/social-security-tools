@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { MonthDate, MonthDuration } from '$lib/month-time';
-import { Money } from '$lib/money';
-import { Recipient } from '$lib/recipient';
 import { Birthdate } from '$lib/birthday';
+import { Money } from '$lib/money';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
 import {
   optimalStrategy,
   strategySumTotalPeriods,
@@ -29,15 +29,15 @@ function calculateStrategySum({
   }),
   discountRate = 0,
 }) {
-  let recipient1 = new Recipient();
+  const recipient1 = new Recipient();
   recipient1.birthdate = birthdate1;
   recipient1.setPia(pia1);
 
-  let recipient2 = new Recipient();
+  const recipient2 = new Recipient();
   recipient2.birthdate = birthdate2;
   recipient2.setPia(pia2);
 
-  let finalDates: [MonthDate, MonthDate] = [
+  const finalDates: [MonthDate, MonthDate] = [
     recipient1.birthdate.dateAtLayAge(
       MonthDuration.initFromYearsMonths({ years: finalAge1, months: 0 })
     ),
@@ -53,7 +53,7 @@ function calculateStrategySum({
     );
   }
 
-  let strategies: [MonthDuration, MonthDuration] = [
+  const strategies: [MonthDuration, MonthDuration] = [
     MonthDuration.initFromYearsMonths({ years: strategy1Year, months: 0 }),
     MonthDuration.initFromYearsMonths({ years: strategy2Year, months: 0 }),
   ];
@@ -61,7 +61,7 @@ function calculateStrategySum({
   if (strategy1Year === 62) {
     strategies[0] = strategies[0].add(new MonthDuration(1));
   }
-  if (strategy2Year == 62) {
+  if (strategy2Year === 62) {
     strategies[1] = strategies[1].add(new MonthDuration(1));
   }
 
@@ -204,7 +204,7 @@ describe('strategySumCents', () => {
     'calculates correct values for strategySumCents for %j',
     (testcase) => {
       expect(calculateStrategySum(testcase)).toBe(
-        testcase['expectedTotalBenefit']
+        testcase.expectedTotalBenefit
       );
     }
   );
@@ -344,15 +344,15 @@ function calculateOptimalStrategy({
   currentDate,
   discountRate,
 }) {
-  let recipient1 = new Recipient();
+  const recipient1 = new Recipient();
   recipient1.birthdate = birthdate1;
   recipient1.setPia(pia1);
 
-  let recipient2 = new Recipient();
+  const recipient2 = new Recipient();
   recipient2.birthdate = birthdate2;
   recipient2.setPia(pia2);
 
-  let finalDates: [MonthDate, MonthDate] = [
+  const finalDates: [MonthDate, MonthDate] = [
     recipient1.birthdate.dateAtLayAge(
       MonthDuration.initFromYearsMonths({ years: finalAge1, months: 0 })
     ),

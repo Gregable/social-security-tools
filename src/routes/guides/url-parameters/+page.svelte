@@ -1,30 +1,30 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  import chainLinkImage from './chain-link.jpg'; // imported so bundler serves asset
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import chainLinkImage from './chain-link.jpg'; // imported so bundler serves asset
 
-  const title = 'Sharing Social Security Scenarios with URL Parameters';
-  const description =
-    'Learn how to use URL parameters to link directly to the SSA.tools calculator with preloaded scenarios. Perfect for financial advisors, educators, or sharing examples with family and friends.';
-  const publishDate = new Date('2025-10-07T00:00:00+00:00');
-  const updateDate = new Date('2025-10-07T00:00:00+00:00');
+const title = 'Sharing Social Security Scenarios with URL Parameters';
+const description =
+  'Learn how to use URL parameters to link directly to the SSA.tools calculator with preloaded scenarios. Perfect for financial advisors, educators, or sharing examples with family and friends.';
+const publishDate = new Date('2025-10-07T00:00:00+00:00');
+const updateDate = new Date('2025-10-07T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/url-parameters';
-  schema.title = title;
-  schema.image = chainLinkImage; // use bundled image path
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description;
-  schema.imageAlt =
-    'Sharing Social Security calculator scenarios using URL parameters';
-  schema.tags = [
-    'URL Parameters',
-    'Calculator',
-    'Social Security',
-    'Link Sharing',
-    'Financial Planning',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/url-parameters';
+schema.title = title;
+schema.image = chainLinkImage; // use bundled image path
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description;
+schema.imageAlt =
+  'Sharing Social Security calculator scenarios using URL parameters';
+schema.tags = [
+  'URL Parameters',
+  'Calculator',
+  'Social Security',
+  'Link Sharing',
+  'Financial Planning',
+];
 </script>
 
 <svelte:head>

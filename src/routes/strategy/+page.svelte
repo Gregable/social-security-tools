@@ -1,246 +1,243 @@
 <script lang="ts">
-  import { Recipient } from '$lib/recipient';
-  import { Money } from '$lib/money';
-  import { MonthDate } from '$lib/month-time';
-  import {
-    parseBirthdate as parseBirthdateUtil,
-    generateThreeYearBuckets,
-    type DeathAgeBucket,
-  } from '$lib/strategy/ui';
-  import { getDeathProbabilityDistribution } from '$lib/life-tables';
-  import { optimalStrategyOptimized } from '$lib/strategy/calculations/strategy-calc';
+import { writable } from 'svelte/store';
+import { getDeathProbabilityDistribution } from '$lib/life-tables';
+import { Money } from '$lib/money';
+import { MonthDate } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
+import { optimalStrategyOptimized } from '$lib/strategy/calculations/strategy-calc';
+import {
+  CalculationResults,
+  CalculationStatus,
+  type DeathAgeBucket,
+  generateThreeYearBuckets,
+  parseBirthdate as parseBirthdateUtil,
+} from '$lib/strategy/ui';
+import AlternativeStrategiesSection from './components/AlternativeStrategiesSection.svelte';
+import CalculationControls from './components/CalculationControls.svelte';
+import DiscountRateInput from './components/DiscountRateInput.svelte';
+// Import components
+import RecipientInputs from './components/RecipientInputs.svelte';
+import StrategyDetails from './components/StrategyDetails.svelte';
+import StrategyMatrixDisplay from './components/StrategyMatrixDisplay.svelte';
 
-  // Import components
-  import RecipientInputs from './components/RecipientInputs.svelte';
-  import DiscountRateInput from './components/DiscountRateInput.svelte';
-  import CalculationControls from './components/CalculationControls.svelte';
-  import StrategyMatrixDisplay from './components/StrategyMatrixDisplay.svelte';
-  import StrategyDetails from './components/StrategyDetails.svelte';
-  import AlternativeStrategiesSection from './components/AlternativeStrategiesSection.svelte';
-  import { CalculationResults, CalculationStatus } from '$lib/strategy/ui';
-  import { writable } from 'svelte/store';
+// Constants
+const DEFAULT_BIRTHDATE = '1965-03-15';
+const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
+const DEFAULT_NAMES: [string, string] = ['Alex', 'Chris'];
+const MIN_FILING_AGE = 62;
+// Wrap results in a store so internal mutations (status/selection) can trigger UI updates
+const calculationResultsStore = writable<CalculationResults>(
+  new CalculationResults()
+);
+let calculationResults: CalculationResults;
+calculationResultsStore.subscribe((v) => (calculationResults = v));
 
-  // Constants
-  const DEFAULT_BIRTHDATE = '1965-03-15';
-  const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
-  const DEFAULT_NAMES: [string, string] = ['Alex', 'Chris'];
-  const MIN_FILING_AGE = 62;
-  // Wrap results in a store so internal mutations (status/selection) can trigger UI updates
-  const calculationResultsStore = writable<CalculationResults>(
-    new CalculationResults()
-  );
-  let calculationResults: CalculationResults;
-  calculationResultsStore.subscribe((v) => (calculationResults = v));
+// New three-year bucket lists
+let deathAgeBuckets1: DeathAgeBucket[] = [];
+let deathAgeBuckets2: DeathAgeBucket[] = [];
+let deathProbDistribution1: { age: number; probability: number }[] = [];
+let deathProbDistribution2: { age: number; probability: number }[] = [];
+// Elapsed time now accessed directly inside StrategyMatrixDisplay
+let displayAsAges: boolean = false;
 
-  // New three-year bucket lists
-  let deathAgeBuckets1: DeathAgeBucket[] = [];
-  let deathAgeBuckets2: DeathAgeBucket[] = [];
-  let deathProbDistribution1: { age: number; probability: number }[] = [];
-  let deathProbDistribution2: { age: number; probability: number }[] = [];
-  // Elapsed time now accessed directly inside StrategyMatrixDisplay
-  let displayAsAges: boolean = false;
+// Form inputs
+let birthdateInputs: [string, string] = [DEFAULT_BIRTHDATE, DEFAULT_BIRTHDATE];
+let piaValues: [number, number] = [...DEFAULT_PIA_VALUES];
+let discountRatePercent: number = 2.5;
 
-  // Form inputs
-  let birthdateInputs: [string, string] = [
-    DEFAULT_BIRTHDATE,
-    DEFAULT_BIRTHDATE,
-  ];
-  let piaValues: [number, number] = [...DEFAULT_PIA_VALUES];
-  let discountRatePercent: number = 2.5;
+// Validation state
+let recipientInputsValid = false;
+let discountRateValid = true;
 
-  // Validation state
-  let recipientInputsValid = false;
-  let discountRateValid = true;
+// Overall form validity
+$: formIsValid = recipientInputsValid && discountRateValid;
 
-  // Overall form validity
-  $: formIsValid = recipientInputsValid && discountRateValid;
+// Reactive statement to convert percentage to decimal
+$: discountRate = discountRatePercent / 100;
 
-  // Reactive statement to convert percentage to decimal
-  $: discountRate = discountRatePercent / 100;
+// Recipients setup
+let recipients: [Recipient, Recipient] = initializeRecipients();
 
-  // Recipients setup
-  let recipients: [Recipient, Recipient] = initializeRecipients();
+// Function to handle recipient data changes
+function handleRecipientUpdate() {
+  try {
+    // Force reactivity by reassigning the recipients array
+    recipients = [...recipients];
 
-  // Function to handle recipient data changes
-  function handleRecipientUpdate() {
-    try {
-      // Force reactivity by reassigning the recipients array
-      recipients = [...recipients];
-
-      // Update death probability distributions if recipients' gender changed
-      updateDeathProbabilityDistributions();
-    } catch (error) {
-      console.warn('Error updating form data:', error);
-    }
+    // Update death probability distributions if recipients' gender changed
+    updateDeathProbabilityDistributions();
+  } catch (error) {
+    console.warn('Error updating form data:', error);
   }
+}
 
-  /**
-   * Update death probability distributions when gender or health mult changes.
-   * This is a lightweight operation compared to the full matrix calculation.
-   */
-  async function updateDeathProbabilityDistributions() {
-    try {
-      // Get current year for the probability distribution calculation
-      const currentYear = new Date().getFullYear();
+/**
+ * Update death probability distributions when gender or health mult changes.
+ * This is a lightweight operation compared to the full matrix calculation.
+ */
+async function updateDeathProbabilityDistributions() {
+  try {
+    // Get current year for the probability distribution calculation
+    const currentYear = new Date().getFullYear();
 
-      // Fetch death probability distribution for both recipients
-      const deathProb1Promise: Promise<{ age: number; probability: number }[]> =
-        getDeathProbabilityDistribution(recipients[0], currentYear);
-      const deathProb2Promise: Promise<{ age: number; probability: number }[]> =
-        getDeathProbabilityDistribution(recipients[1], currentYear);
+    // Fetch death probability distribution for both recipients
+    const deathProb1Promise: Promise<{ age: number; probability: number }[]> =
+      getDeathProbabilityDistribution(recipients[0], currentYear);
+    const deathProb2Promise: Promise<{ age: number; probability: number }[]> =
+      getDeathProbabilityDistribution(recipients[1], currentYear);
 
-      // Wait for both promises to resolve
-      [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
-        deathProb1Promise,
-        deathProb2Promise,
-      ]);
+    // Wait for both promises to resolve
+    [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
+      deathProb1Promise,
+      deathProb2Promise,
+    ]);
 
-      // Force Svelte update by reassigning arrays
-      deathProbDistribution1 = [...deathProbDistribution1];
-      deathProbDistribution2 = [...deathProbDistribution2];
+    // Force Svelte update by reassigning arrays
+    deathProbDistribution1 = [...deathProbDistribution1];
+    deathProbDistribution2 = [...deathProbDistribution2];
 
-      // Calculate death age range start ages
-      const startAge1 = Math.max(
-        MIN_FILING_AGE,
-        recipients[0].birthdate.currentAge()
-      );
-      const startAge2 = Math.max(
-        MIN_FILING_AGE,
-        recipients[1].birthdate.currentAge()
-      );
-
-      deathAgeBuckets1 = generateThreeYearBuckets(
-        startAge1,
-        deathProbDistribution1
-      );
-      deathAgeBuckets2 = generateThreeYearBuckets(
-        startAge2,
-        deathProbDistribution2
-      );
-    } catch (error) {
-      console.warn('Error updating death probability distributions:', error);
-    }
-  }
-
-  // Discount rate now updated via two-way binding on DiscountRateInput.
-
-  /**
-   * Initialize recipients with default values
-   */
-  function initializeRecipients(): [Recipient, Recipient] {
-    const recipient1 = new Recipient();
-    const recipient2 = new Recipient();
-
-    recipient1.markFirst();
-    recipient2.markSecond();
-    recipient1.name = DEFAULT_NAMES[0];
-    recipient2.name = DEFAULT_NAMES[1];
-
-    // Set initial birthdates and PIA values
-    try {
-      recipient1.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
-      recipient2.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
-      recipient1.setPia(Money.from(DEFAULT_PIA_VALUES[0]));
-      recipient2.setPia(Money.from(DEFAULT_PIA_VALUES[1]));
-    } catch (error) {
-      console.warn('Error setting initial recipient data:', error);
-    }
-
-    return [recipient1, recipient2];
-  }
-
-  /**
-   * Main calculation function for optimal strategy matrix
-   */
-  async function calculateStrategyMatrix() {
-    if (calculationResults.status() === CalculationStatus.Running) return;
-    const fresh = new CalculationResults();
-    calculationResultsStore.set(fresh);
-
-    try {
-      // Update death probability distributions first (in case they're not current)
-      await updateDeathProbabilityDistributions();
-
-      // Calculate total calculations needed
-      const sized = new CalculationResults(
-        deathAgeBuckets1.length,
-        deathAgeBuckets2.length
-      );
-      sized.beginRun();
-      calculationResultsStore.set(sized);
-
-      // Get current date for optimal strategy calculation
-      const now = new Date();
-      const currentDate = MonthDate.initFromYearsMonths({
-        years: now.getFullYear(),
-        months: now.getMonth(),
-      });
-
-      // Initialize results matrix
-
-      // Calculate optimal strategy for each death age combination
-      for (let i = 0; i < deathAgeBuckets1.length; i++) {
-        for (let j = 0; j < deathAgeBuckets2.length; j++) {
-          const bucket1 = deathAgeBuckets1[i];
-          const bucket2 = deathAgeBuckets2[j];
-          // Representative (middle) ages for optimization
-          const deathAge1 = bucket1.expectedAge;
-          const deathAge2 = bucket2.expectedAge;
-
-          const finalDates: [MonthDate, MonthDate] = [
-            recipients[0].birthdate.dateAtLayAge(deathAge1),
-            recipients[1].birthdate.dateAtLayAge(deathAge2),
-          ];
-
-          // Calculate optimal strategy
-          const [optimalFilingAge1, optimalFilingAge2, netPresentValue] =
-            optimalStrategyOptimized(
-              recipients,
-              finalDates,
-              currentDate,
-              discountRate
-            );
-
-          // Store the result using the chosen strategy
-          calculationResults.set(i, j, {
-            deathAge1: bucket1.label,
-            deathAge2: bucket2.label,
-            bucket1,
-            bucket2,
-            filingAge1: optimalFilingAge1,
-            filingAge2: optimalFilingAge2,
-            totalBenefit: Money.fromCents(netPresentValue),
-            filingAge1Years: optimalFilingAge1.years(),
-            filingAge1Months: optimalFilingAge1.modMonths(),
-            filingAge2Years: optimalFilingAge2.years(),
-            filingAge2Months: optimalFilingAge2.modMonths(),
-          });
-
-          calculationResults.addScenarioProgress();
-        }
-        calculationResultsStore.set(calculationResults); // update row progress
-        await new Promise((resolve) => setTimeout(resolve, 0));
-      }
-      calculationResults.completeRun();
-      calculationResultsStore.set(calculationResults);
-    } catch (error) {
-      console.error('Calculation error:', error);
-      calculationResults.failRun(error.message || String(error));
-      calculationResultsStore.set(calculationResults);
-    } finally {
-      if (calculationResults.status() === CalculationStatus.Running) {
-        calculationResults.setStatus(CalculationStatus.Idle);
-        calculationResultsStore.set(calculationResults);
-      }
-    }
-  }
-  function handleCellSelect(detail: any) {
-    calculationResults.setSelectedByLabels(
-      String(detail.deathAge1),
-      String(detail.deathAge2)
+    // Calculate death age range start ages
+    const startAge1 = Math.max(
+      MIN_FILING_AGE,
+      recipients[0].birthdate.currentAge()
     );
-    calculationResultsStore.set(calculationResults);
+    const startAge2 = Math.max(
+      MIN_FILING_AGE,
+      recipients[1].birthdate.currentAge()
+    );
+
+    deathAgeBuckets1 = generateThreeYearBuckets(
+      startAge1,
+      deathProbDistribution1
+    );
+    deathAgeBuckets2 = generateThreeYearBuckets(
+      startAge2,
+      deathProbDistribution2
+    );
+  } catch (error) {
+    console.warn('Error updating death probability distributions:', error);
   }
+}
+
+// Discount rate now updated via two-way binding on DiscountRateInput.
+
+/**
+ * Initialize recipients with default values
+ */
+function initializeRecipients(): [Recipient, Recipient] {
+  const recipient1 = new Recipient();
+  const recipient2 = new Recipient();
+
+  recipient1.markFirst();
+  recipient2.markSecond();
+  recipient1.name = DEFAULT_NAMES[0];
+  recipient2.name = DEFAULT_NAMES[1];
+
+  // Set initial birthdates and PIA values
+  try {
+    recipient1.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
+    recipient2.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
+    recipient1.setPia(Money.from(DEFAULT_PIA_VALUES[0]));
+    recipient2.setPia(Money.from(DEFAULT_PIA_VALUES[1]));
+  } catch (error) {
+    console.warn('Error setting initial recipient data:', error);
+  }
+
+  return [recipient1, recipient2];
+}
+
+/**
+ * Main calculation function for optimal strategy matrix
+ */
+async function calculateStrategyMatrix() {
+  if (calculationResults.status() === CalculationStatus.Running) return;
+  const fresh = new CalculationResults();
+  calculationResultsStore.set(fresh);
+
+  try {
+    // Update death probability distributions first (in case they're not current)
+    await updateDeathProbabilityDistributions();
+
+    // Calculate total calculations needed
+    const sized = new CalculationResults(
+      deathAgeBuckets1.length,
+      deathAgeBuckets2.length
+    );
+    sized.beginRun();
+    calculationResultsStore.set(sized);
+
+    // Get current date for optimal strategy calculation
+    const now = new Date();
+    const currentDate = MonthDate.initFromYearsMonths({
+      years: now.getFullYear(),
+      months: now.getMonth(),
+    });
+
+    // Initialize results matrix
+
+    // Calculate optimal strategy for each death age combination
+    for (let i = 0; i < deathAgeBuckets1.length; i++) {
+      for (let j = 0; j < deathAgeBuckets2.length; j++) {
+        const bucket1 = deathAgeBuckets1[i];
+        const bucket2 = deathAgeBuckets2[j];
+        // Representative (middle) ages for optimization
+        const deathAge1 = bucket1.expectedAge;
+        const deathAge2 = bucket2.expectedAge;
+
+        const finalDates: [MonthDate, MonthDate] = [
+          recipients[0].birthdate.dateAtLayAge(deathAge1),
+          recipients[1].birthdate.dateAtLayAge(deathAge2),
+        ];
+
+        // Calculate optimal strategy
+        const [optimalFilingAge1, optimalFilingAge2, netPresentValue] =
+          optimalStrategyOptimized(
+            recipients,
+            finalDates,
+            currentDate,
+            discountRate
+          );
+
+        // Store the result using the chosen strategy
+        calculationResults.set(i, j, {
+          deathAge1: bucket1.label,
+          deathAge2: bucket2.label,
+          bucket1,
+          bucket2,
+          filingAge1: optimalFilingAge1,
+          filingAge2: optimalFilingAge2,
+          totalBenefit: Money.fromCents(netPresentValue),
+          filingAge1Years: optimalFilingAge1.years(),
+          filingAge1Months: optimalFilingAge1.modMonths(),
+          filingAge2Years: optimalFilingAge2.years(),
+          filingAge2Months: optimalFilingAge2.modMonths(),
+        });
+
+        calculationResults.addScenarioProgress();
+      }
+      calculationResultsStore.set(calculationResults); // update row progress
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    calculationResults.completeRun();
+    calculationResultsStore.set(calculationResults);
+  } catch (error) {
+    console.error('Calculation error:', error);
+    calculationResults.failRun(error.message || String(error));
+    calculationResultsStore.set(calculationResults);
+  } finally {
+    if (calculationResults.status() === CalculationStatus.Running) {
+      calculationResults.setStatus(CalculationStatus.Idle);
+      calculationResultsStore.set(calculationResults);
+    }
+  }
+}
+function handleCellSelect(detail: any) {
+  calculationResults.setSelectedByLabels(
+    String(detail.deathAge1),
+    String(detail.deathAge2)
+  );
+  calculationResultsStore.set(calculationResults);
+}
 </script>
 
 <main>

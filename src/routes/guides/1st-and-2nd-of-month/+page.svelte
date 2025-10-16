@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  import HeroImage from './hero.png';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import HeroImage from './hero.png';
 
-  const title = 'Extra rules for those born on the 1st or 2nd of the month';
-  const description =
-    'Learn more about how Social Security law is affected by the day of the month one was born in.';
-  const publishDate = new Date('2022-06-05T00:00:00+00:00');
-  const updateDate = new Date('2023-01-07T00:00:00+00:00');
+const title = 'Extra rules for those born on the 1st or 2nd of the month';
+const description =
+  'Learn more about how Social Security law is affected by the day of the month one was born in.';
+const publishDate = new Date('2022-06-05T00:00:00+00:00');
+const updateDate = new Date('2023-01-07T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/1st-and-2nd-of-month';
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'A framed poster of a birthday cake and balloons';
-  schema.tags = [
-    'Birth Date',
-    'Social Security',
-    'First of Month',
-    'Benefit Timing',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/1st-and-2nd-of-month';
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt = 'A framed poster of a birthday cake and balloons';
+schema.tags = [
+  'Birth Date',
+  'Social Security',
+  'First of Month',
+  'Benefit Timing',
+];
 </script>
 
 <svelte:head>

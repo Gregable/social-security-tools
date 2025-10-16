@@ -16,62 +16,61 @@
 -->
 
 <script lang="ts">
-  import { parsePaste } from '$lib/ssa-parse';
-  import { Recipient } from '$lib/recipient';
-  import { Birthdate } from '$lib/birthday';
+import { Birthdate } from '$lib/birthday';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
+import demo0_spouse from '$lib/pastes/averagepaste-spouse.txt?raw';
+import demo1 from '$lib/pastes/millionpaste.txt?raw';
+import demo2 from '$lib/pastes/youngpaste.txt?raw';
+import demo2_spouse from '$lib/pastes/youngpaste-spouse.txt?raw';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
 
-  import demo0 from '$lib/pastes/averagepaste.txt?raw';
-  import demo0_spouse from '$lib/pastes/averagepaste-spouse.txt?raw';
-  import demo1 from '$lib/pastes/millionpaste.txt?raw';
-  import demo2 from '$lib/pastes/youngpaste.txt?raw';
-  import demo2_spouse from '$lib/pastes/youngpaste-spouse.txt?raw';
+// Callback prop for demo event
+export let ondemo:
+  | ((detail: { recipient: Recipient; spouse: Recipient | null }) => void)
+  | undefined = undefined;
 
-  // Callback prop for demo event
-  export let ondemo:
-    | ((detail: { recipient: Recipient; spouse: Recipient | null }) => void)
-    | undefined = undefined;
+function loadDemoData(demoId: number) {
+  return () => {
+    let recipient: Recipient | null = null;
+    let spouse: Recipient | null = null;
+    // All of the demo birthdays are on the 2nd of the month. This is to
+    // make their filing date math as simple as possible. If you are born on
+    // the 2nd, then you attain an age on the 1st and are that age through
+    // the entire same month that you are born.
+    if (demoId === 0) {
+      recipient = new Recipient();
+      recipient.earningsRecords = parsePaste(demo0);
+      recipient.birthdate = Birthdate.FromYMD(1950, 6, 2);
+      recipient.name = 'Alex';
 
-  function loadDemoData(demoId: number) {
-    return () => {
-      let recipient: Recipient | null = null;
-      let spouse: Recipient | null = null;
-      // All of the demo birthdays are on the 2nd of the month. This is to
-      // make their filing date math as simple as possible. If you are born on
-      // the 2nd, then you attain an age on the 1st and are that age through
-      // the entire same month that you are born.
-      if (demoId == 0) {
-        recipient = new Recipient();
-        recipient.earningsRecords = parsePaste(demo0);
-        recipient.birthdate = Birthdate.FromYMD(1950, 6, 2);
-        recipient.name = 'Alex';
+      spouse = new Recipient();
+      spouse.earningsRecords = parsePaste(demo0_spouse);
+      spouse.birthdate = Birthdate.FromYMD(1949, 3, 2);
+      spouse.name = 'Chris';
+    } else if (demoId === 1) {
+      recipient = new Recipient();
+      recipient.earningsRecords = parsePaste(demo1);
+      recipient.birthdate = Birthdate.FromYMD(1950, 8, 2);
+    } else if (demoId === 2) {
+      recipient = new Recipient();
+      recipient.earningsRecords = parsePaste(demo2);
+      recipient.birthdate = Birthdate.FromYMD(1985, 9, 2);
+      recipient.name = 'Avery';
 
-        spouse = new Recipient();
-        spouse.earningsRecords = parsePaste(demo0_spouse);
-        spouse.birthdate = Birthdate.FromYMD(1949, 3, 2);
-        spouse.name = 'Chris';
-      } else if (demoId == 1) {
-        recipient = new Recipient();
-        recipient.earningsRecords = parsePaste(demo1);
-        recipient.birthdate = Birthdate.FromYMD(1950, 8, 2);
-      } else if (demoId == 2) {
-        recipient = new Recipient();
-        recipient.earningsRecords = parsePaste(demo2);
-        recipient.birthdate = Birthdate.FromYMD(1985, 9, 2);
-        recipient.name = 'Avery';
-
-        spouse = new Recipient();
-        spouse.earningsRecords = parsePaste(demo2_spouse);
-        spouse.birthdate = Birthdate.FromYMD(1986, 3, 2);
-        spouse.name = 'Riley';
-      } else {
-        throw new Error('Unknown demo ID: ' + demoId);
-      }
-      ondemo?.({
-        recipient: recipient,
-        spouse: spouse,
-      });
-    };
-  }
+      spouse = new Recipient();
+      spouse.earningsRecords = parsePaste(demo2_spouse);
+      spouse.birthdate = Birthdate.FromYMD(1986, 3, 2);
+      spouse.name = 'Riley';
+    } else {
+      throw new Error(`Unknown demo ID: ${demoId}`);
+    }
+    ondemo?.({
+      recipient: recipient,
+      spouse: spouse,
+    });
+  };
+}
 </script>
 
 <div class="demoPrompt">

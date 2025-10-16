@@ -1,142 +1,139 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import * as constants from '$lib/constants';
-  import Slider from './Slider.svelte';
-  import type { Recipient } from '$lib/recipient';
-  import { Money } from '$lib/money';
-  import { context } from '$lib/context';
-  import RecipientName from './RecipientName.svelte';
+import { onMount } from 'svelte';
+import * as constants from '$lib/constants';
+import { context } from '$lib/context';
+import { Money } from '$lib/money';
+import type { Recipient } from '$lib/recipient';
+import RecipientName from './RecipientName.svelte';
+import Slider from './Slider.svelte';
 
-  /**
-   * The recipient we are adding future earning years to.
-   */
-  export let recipient: Recipient;
+/**
+ * The recipient we are adding future earning years to.
+ */
+export let recipient: Recipient;
 
-  function translateFutureYears(value: number, label: string): string {
-    if (label == 'value') {
-      if (value == 35) {
-        return '35+';
-      } else {
-        return value.toString();
-      }
-    }
-    return '';
-  }
-  function translateFutureEarnings(value: number, label: string): string {
-    if (label == 'value') {
-      if (
-        value ==
-        constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR].value()
-      )
-        return '$' + value.toLocaleString() + '+';
-      else return '$' + value.toLocaleString();
-    }
-    return '';
-  }
-
-  // Computes the remaining years of earnings until the normal retirement age.
-  function remainingEarningYears(recipient: Recipient): number {
-    if (!recipient) return 0;
-    let years =
-      recipient.normalRetirementDate().year() - constants.CURRENT_YEAR + 1;
-    // The slider can go from 0 to 35 years.
-    return Math.min(35, Math.max(0, years));
-  }
-  function mostRecentEarningWage(recipient: Recipient): Money {
-    const numEarningsYears = recipient.earningsRecords.length;
-    if (numEarningsYears == 0) return Money.from(1000);
-    let earningRecord = recipient.earningsRecords[numEarningsYears - 1];
-    if (
-      earningRecord.year == constants.CURRENT_YEAR ||
-      earningRecord.year == constants.CURRENT_YEAR - 1 ||
-      earningRecord.year == constants.CURRENT_YEAR - 2
-    ) {
-      return earningRecord.taxedEarnings;
-    }
-    return Money.from(1000);
-  }
-  // ssa.gov by default shows a projection for someone who earns the same
-  // amount every year going forward as last year up until, and inluding,
-  // the year of the normal retirement age. We want the sliders to start
-  // in the same place as ssa.gov, but the user can of course move them from
-  // there.
-  let futureEarningYears: number = remainingEarningYears(recipient);
-  let futureEarningWage: number = mostRecentEarningWage(recipient)
-    .roundToDollar()
-    .value();
-
-  function update(futureEarningYears: number, futureEarningWage: Money) {
-    recipient.simulateFutureEarningsYears(
-      futureEarningYears,
-      futureEarningWage
-    );
-  }
-  $: update(futureEarningYears, Money.from(futureEarningWage));
-
-  // We want to track if one of the sliders is stuck to the top of the screen.
-  // This is used by the Sidebar to calculate which is the top active section,
-  // where we need to know if that section is hidden by the sticky sliders.
-  //
-  // The strategy is to have two intersection observers, one for the sliders
-  // and one for the slider container. The slider observer is offset by 1px so
-  // that we detect when the slider is stuck vs simply visible.
-  //
-  // We consider a slider to be stuck if it's partly intersecting the page top
-  // and it's container is visible. We track both slider stuckness seperately
-  // in the global context.
-  function updateStuckness() {
-    if (isStuck && isVisible) {
-      if (recipient.first) {
-        context.isFirstStuck = true;
-      } else {
-        context.isSecondStuck = true;
-      }
+function translateFutureYears(value: number, label: string): string {
+  if (label === 'value') {
+    if (value === 35) {
+      return '35+';
     } else {
-      if (recipient.first) {
-        context.isFirstStuck = false;
-      } else {
-        context.isSecondStuck = false;
-      }
+      return value.toString();
     }
   }
-  let slidersEl: HTMLDivElement;
-  let isStuck: boolean = false;
-  let isVisible: boolean = false;
-  const stickyObserver = new IntersectionObserver(
-    (entries, _observer) => {
-      entries.forEach((entry) => {
-        isStuck =
-          entry.intersectionRatio < 1 &&
-          entry.intersectionRatio > 0 &&
-          entry.boundingClientRect.top <= 1;
-        updateStuckness();
-      });
-    },
-    {
-      rootMargin: '-1px 0px 0px 0px',
-      threshold: [1],
+  return '';
+}
+function translateFutureEarnings(value: number, label: string): string {
+  if (label === 'value') {
+    if (
+      value ===
+      constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR].value()
+    )
+      return `$${value.toLocaleString()}+`;
+    else return `$${value.toLocaleString()}`;
+  }
+  return '';
+}
+
+// Computes the remaining years of earnings until the normal retirement age.
+function remainingEarningYears(recipient: Recipient): number {
+  if (!recipient) return 0;
+  let years =
+    recipient.normalRetirementDate().year() - constants.CURRENT_YEAR + 1;
+  // The slider can go from 0 to 35 years.
+  return Math.min(35, Math.max(0, years));
+}
+function mostRecentEarningWage(recipient: Recipient): Money {
+  const numEarningsYears = recipient.earningsRecords.length;
+  if (numEarningsYears === 0) return Money.from(1000);
+  let earningRecord = recipient.earningsRecords[numEarningsYears - 1];
+  if (
+    earningRecord.year === constants.CURRENT_YEAR ||
+    earningRecord.year === constants.CURRENT_YEAR - 1 ||
+    earningRecord.year === constants.CURRENT_YEAR - 2
+  ) {
+    return earningRecord.taxedEarnings;
+  }
+  return Money.from(1000);
+}
+// ssa.gov by default shows a projection for someone who earns the same
+// amount every year going forward as last year up until, and inluding,
+// the year of the normal retirement age. We want the sliders to start
+// in the same place as ssa.gov, but the user can of course move them from
+// there.
+let futureEarningYears: number = remainingEarningYears(recipient);
+let futureEarningWage: number = mostRecentEarningWage(recipient)
+  .roundToDollar()
+  .value();
+
+function update(futureEarningYears: number, futureEarningWage: Money) {
+  recipient.simulateFutureEarningsYears(futureEarningYears, futureEarningWage);
+}
+$: update(futureEarningYears, Money.from(futureEarningWage));
+
+// We want to track if one of the sliders is stuck to the top of the screen.
+// This is used by the Sidebar to calculate which is the top active section,
+// where we need to know if that section is hidden by the sticky sliders.
+//
+// The strategy is to have two intersection observers, one for the sliders
+// and one for the slider container. The slider observer is offset by 1px so
+// that we detect when the slider is stuck vs simply visible.
+//
+// We consider a slider to be stuck if it's partly intersecting the page top
+// and it's container is visible. We track both slider stuckness seperately
+// in the global context.
+function updateStuckness() {
+  if (isStuck && isVisible) {
+    if (recipient.first) {
+      context.isFirstStuck = true;
+    } else {
+      context.isSecondStuck = true;
     }
-  );
-  const stickyContainerObserver = new IntersectionObserver(
-    (entries, _observer) => {
-      entries.forEach((entry) => {
-        isVisible = entry.intersectionRatio > 0;
-        updateStuckness();
-      });
-    },
-    { threshold: [0] }
-  );
-  onMount(() => {
-    stickyObserver.observe(slidersEl);
-    let parent = slidersEl.parentElement;
-    while (parent) {
-      if (parent.classList.contains('stickyContainer')) {
-        stickyContainerObserver.observe(parent);
-        break;
-      }
-      parent = parent.parentElement;
+  } else {
+    if (recipient.first) {
+      context.isFirstStuck = false;
+    } else {
+      context.isSecondStuck = false;
     }
-  });
+  }
+}
+let slidersEl: HTMLDivElement;
+let isStuck: boolean = false;
+let isVisible: boolean = false;
+const stickyObserver = new IntersectionObserver(
+  (entries, _observer) => {
+    entries.forEach((entry) => {
+      isStuck =
+        entry.intersectionRatio < 1 &&
+        entry.intersectionRatio > 0 &&
+        entry.boundingClientRect.top <= 1;
+      updateStuckness();
+    });
+  },
+  {
+    rootMargin: '-1px 0px 0px 0px',
+    threshold: [1],
+  }
+);
+const stickyContainerObserver = new IntersectionObserver(
+  (entries, _observer) => {
+    entries.forEach((entry) => {
+      isVisible = entry.intersectionRatio > 0;
+      updateStuckness();
+    });
+  },
+  { threshold: [0] }
+);
+onMount(() => {
+  stickyObserver.observe(slidersEl);
+  let parent = slidersEl.parentElement;
+  while (parent) {
+    if (parent.classList.contains('stickyContainer')) {
+      stickyContainerObserver.observe(parent);
+      break;
+    }
+    parent = parent.parentElement;
+  }
+});
 </script>
 
 <div class="sliders" bind:this={slidersEl}>

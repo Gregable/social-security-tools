@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  import HeroImage from './hero.png';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import HeroImage from './hero.png';
 
-  const title = 'Navigating Social Security During Administrative Changes';
-  const description =
-    "If you've tried to access Social Security services recently, you may have encountered longer wait times, website outages, or difficulty reaching representatives.";
-  const publishDate = new Date('2025-04-30T00:00:00+00:00');
-  const updateDate = new Date('2025-04-30T00:00:00+00:00');
+const title = 'Navigating Social Security During Administrative Changes';
+const description =
+  "If you've tried to access Social Security services recently, you may have encountered longer wait times, website outages, or difficulty reaching representatives.";
+const publishDate = new Date('2025-04-30T00:00:00+00:00');
+const updateDate = new Date('2025-04-30T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/agency-changes';
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt = 'A lighthouse with a small unmanned sailboat near shore';
-  schema.tags = [
-    'SSA',
-    'Social Security Administration',
-    'Agency Changes',
-    'Government',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/agency-changes';
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt = 'A lighthouse with a small unmanned sailboat near shore';
+schema.tags = [
+  'SSA',
+  'Social Security Administration',
+  'Agency Changes',
+  'Government',
+];
 </script>
 
 <svelte:head>

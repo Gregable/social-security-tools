@@ -19,7 +19,7 @@ export class Money {
    * @param dollars The amount of money in dollars.
    */
   public static from(dollars: number): Money {
-    if (isNaN(dollars)) {
+    if (Number.isNaN(dollars)) {
       throw new Error('Money.from() called with NaN');
     }
     return new Money(Math.round(dollars * 100));
@@ -98,14 +98,14 @@ export class Money {
   }
 
   div(factor: number): Money {
-    if (factor == 0) {
+    if (factor === 0) {
       throw new Error('Money.div() called with 0');
     }
     return new Money(this.cents_ / factor);
   }
 
   div$(other: Money): number {
-    if (other.cents_ == 0) {
+    if (other.cents_ === 0) {
       throw new Error('Money.div$() called with 0');
     }
     return this.cents_ / other.cents_;
@@ -144,7 +144,7 @@ export class Money {
   }
 
   private constructor(cents: number) {
-    if (isNaN(cents)) {
+    if (Number.isNaN(cents)) {
       throw new Error('Money constructor called with NaN');
     }
     this.cents_ = cents;

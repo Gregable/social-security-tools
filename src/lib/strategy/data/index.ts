@@ -1,6 +1,6 @@
 // Data fetching functions
 export {
-  fetchLatest20YearTreasuryYield,
   fetchFredDFII20Yield,
+  fetchLatest20YearTreasuryYield,
   getRecommendedDiscountRate,
 } from './treasury-yields.js';

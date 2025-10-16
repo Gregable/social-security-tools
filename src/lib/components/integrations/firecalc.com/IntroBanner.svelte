@@ -1,7 +1,7 @@
 <script lang="ts">
-  // Intro banner shown when the FIRECalc integration is active
-  import IntegrationBanner from '../IntegrationBanner.svelte';
-  import logo from './firecalc-icon.svg';
+// Intro banner shown when the FIRECalc integration is active
+import IntegrationBanner from '../IntegrationBanner.svelte';
+import logo from './firecalc-icon.svg';
 </script>
 
 <IntegrationBanner {logo} logoAlt="FIRECalc">

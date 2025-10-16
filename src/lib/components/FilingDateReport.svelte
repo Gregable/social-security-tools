@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { Recipient } from '$lib/recipient';
-  import * as constants from '$lib/constants';
-  import { MonthDate, MonthDuration } from '$lib/month-time';
-  import FilingDateChart from './FilingDateChart.svelte';
-  import RName from './RecipientName.svelte';
-  import Expando from './Expando.svelte';
+import * as constants from '$lib/constants';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
+import Expando from './Expando.svelte';
+import FilingDateChart from './FilingDateChart.svelte';
+import RName from './RecipientName.svelte';
 
-  export let recipient: Recipient = new Recipient();
-  let r: Recipient = recipient;
+export let recipient: Recipient = new Recipient();
+let r: Recipient = recipient;
 
-  let exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
+let exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
 
-  let followingMonth = MonthDate.initFromYearsMonths({
-    years: constants.CURRENT_YEAR,
-    months: recipient.birthdate.ssaBirthMonthDate().monthIndex(),
-  }).addDuration(new MonthDuration(1));
+let followingMonth = MonthDate.initFromYearsMonths({
+  years: constants.CURRENT_YEAR,
+  months: recipient.birthdate.ssaBirthMonthDate().monthIndex(),
+}).addDuration(new MonthDuration(1));
 
-  function twoSignificantDigits(n: number) {
-    return n.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
+function twoSignificantDigits(n: number) {
+  return n.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 </script>
 
 <div>

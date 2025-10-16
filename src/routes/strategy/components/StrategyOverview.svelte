@@ -1,112 +1,112 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import type { StrategyResult } from '$lib/strategy/ui';
-  import { MonthDate, MonthDuration } from '$lib/month-time';
-  import { strategySumPeriods } from '$lib/strategy/calculations/strategy-calc';
-  import { BenefitType } from '$lib/strategy/calculations/benefit-period';
-  import RecipientName from '$lib/components/RecipientName.svelte';
+import RecipientName from '$lib/components/RecipientName.svelte';
+import { MonthDate, MonthDuration } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
+import { BenefitType } from '$lib/strategy/calculations/benefit-period';
+import { strategySumPeriods } from '$lib/strategy/calculations/strategy-calc';
+import type { StrategyResult } from '$lib/strategy/ui';
 
-  // Props
-  export let recipients: [Recipient, Recipient];
-  export let result: StrategyResult | undefined = undefined;
+// Props
+export let recipients: [Recipient, Recipient];
+export let result: StrategyResult | undefined = undefined;
 
-  // Format probability for display (as percentage with 2 decimal places)
-  function formatProbability(prob: number | null): string {
-    if (prob === null) return 'Unknown';
-    return (prob * 100).toFixed(2) + '%';
-  }
+// Format probability for display (as percentage with 2 decimal places)
+function formatProbability(prob: number | null): string {
+  if (prob === null) return 'Unknown';
+  return `${(prob * 100).toFixed(2)}%`;
+}
 
-  // Compute filing dates from filing ages
-  $: filingDate1 = result
-    ? recipients[0].birthdate.dateAtLayAge(result.filingAge1)
+// Compute filing dates from filing ages
+$: filingDate1 = result
+  ? recipients[0].birthdate.dateAtLayAge(result.filingAge1)
+  : null;
+$: filingDate2 = result
+  ? recipients[1].birthdate.dateAtLayAge(result.filingAge2)
+  : null;
+
+// Expected death ages (probability-weighted modeled midpoint) are always defined.
+$: expectedAge1 = result?.bucket1.expectedAge;
+$: expectedAge2 = result?.bucket2.expectedAge;
+$: deathDate1 =
+  result && expectedAge1
+    ? recipients[0].birthdate.dateAtLayAge(expectedAge1)
     : null;
-  $: filingDate2 = result
-    ? recipients[1].birthdate.dateAtLayAge(result.filingAge2)
-    : null;
-
-  // Expected death ages (probability-weighted modeled midpoint) are always defined.
-  $: expectedAge1 = result?.bucket1.expectedAge;
-  $: expectedAge2 = result?.bucket2.expectedAge;
-  $: deathDate1 =
-    result && expectedAge1
-      ? recipients[0].birthdate.dateAtLayAge(expectedAge1)
-      : null;
-  $: deathDate2 =
-    result && expectedAge2
-      ? recipients[1].birthdate.dateAtLayAge(expectedAge2)
-      : null;
-
-  // Calculate the benefit periods for the selected strategy
-  $: finalDates = result
-    ? ([
-        recipients[0].birthdate.dateAtLayAge(
-          new MonthDuration(result.bucket1.midAge * 12)
-        ),
-        recipients[1].birthdate.dateAtLayAge(
-          new MonthDuration(result.bucket2.midAge * 12)
-        ),
-      ] as [MonthDate, MonthDate])
+$: deathDate2 =
+  result && expectedAge2
+    ? recipients[1].birthdate.dateAtLayAge(expectedAge2)
     : null;
 
-  $: strats = result
-    ? ([result.filingAge1, result.filingAge2] as [MonthDuration, MonthDuration])
-    : null;
+// Calculate the benefit periods for the selected strategy
+$: finalDates = result
+  ? ([
+      recipients[0].birthdate.dateAtLayAge(
+        new MonthDuration(result.bucket1.midAge * 12)
+      ),
+      recipients[1].birthdate.dateAtLayAge(
+        new MonthDuration(result.bucket2.midAge * 12)
+      ),
+    ] as [MonthDate, MonthDate])
+  : null;
 
-  $: benefitPeriods =
-    result && finalDates && strats
-      ? strategySumPeriods(recipients, finalDates, strats)
-      : [];
+$: strats = result
+  ? ([result.filingAge1, result.filingAge2] as [MonthDuration, MonthDuration])
+  : null;
 
-  $: formattedPeriods = benefitPeriods.map((period) => ({
-    type: getBenefitTypeString(period.benefitType),
-    startDate: period.startDate,
-    endDate: period.endDate,
-    startFormatted: period.startDate.toString(),
-    endFormatted: period.endDate.toString(),
-    amount: period.amount.string(),
-    annualAmount: period.amount.times(12).string(),
-    recipient: period.recipientIndex,
-    benefitType: period.benefitType,
-  }));
+$: benefitPeriods =
+  result && finalDates && strats
+    ? strategySumPeriods(recipients, finalDates, strats)
+    : [];
 
-  $: recipient1Periods = formattedPeriods
-    .filter((p) => p.recipient === 0)
-    .sort((a, b) => {
-      // Sort by start date first
-      const startComparison =
-        a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
-      if (startComparison !== 0) {
-        return startComparison;
-      }
-      // If start dates are equal, sort by end date
-      return a.endDate.monthsSinceEpoch() - b.endDate.monthsSinceEpoch();
-    });
+$: formattedPeriods = benefitPeriods.map((period) => ({
+  type: getBenefitTypeString(period.benefitType),
+  startDate: period.startDate,
+  endDate: period.endDate,
+  startFormatted: period.startDate.toString(),
+  endFormatted: period.endDate.toString(),
+  amount: period.amount.string(),
+  annualAmount: period.amount.times(12).string(),
+  recipient: period.recipientIndex,
+  benefitType: period.benefitType,
+}));
 
-  $: recipient2Periods = formattedPeriods
-    .filter((p) => p.recipient === 1)
-    .sort((a, b) => {
-      // Sort by start date first
-      const startComparison =
-        a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
-      if (startComparison !== 0) {
-        return startComparison;
-      }
-      // If start dates are equal, sort by end date
-      return a.endDate.monthsSinceEpoch() - b.endDate.monthsSinceEpoch();
-    });
-
-  function getBenefitTypeString(benefitType: BenefitType): string {
-    switch (benefitType) {
-      case BenefitType.Personal:
-        return 'Personal';
-      case BenefitType.Spousal:
-        return 'Spousal';
-      case BenefitType.Survivor:
-        return 'Survivor';
-      default:
-        return 'Unknown';
+$: recipient1Periods = formattedPeriods
+  .filter((p) => p.recipient === 0)
+  .sort((a, b) => {
+    // Sort by start date first
+    const startComparison =
+      a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
+    if (startComparison !== 0) {
+      return startComparison;
     }
+    // If start dates are equal, sort by end date
+    return a.endDate.monthsSinceEpoch() - b.endDate.monthsSinceEpoch();
+  });
+
+$: recipient2Periods = formattedPeriods
+  .filter((p) => p.recipient === 1)
+  .sort((a, b) => {
+    // Sort by start date first
+    const startComparison =
+      a.startDate.monthsSinceEpoch() - b.startDate.monthsSinceEpoch();
+    if (startComparison !== 0) {
+      return startComparison;
+    }
+    // If start dates are equal, sort by end date
+    return a.endDate.monthsSinceEpoch() - b.endDate.monthsSinceEpoch();
+  });
+
+function getBenefitTypeString(benefitType: BenefitType): string {
+  switch (benefitType) {
+    case BenefitType.Personal:
+      return 'Personal';
+    case BenefitType.Spousal:
+      return 'Spousal';
+    case BenefitType.Survivor:
+      return 'Survivor';
+    default:
+      return 'Unknown';
   }
+}
 </script>
 
 {#if result}

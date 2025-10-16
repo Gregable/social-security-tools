@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
-import StrategyDetails from '../routes/strategy/components/StrategyDetails.svelte';
-import { Recipient } from '../lib/recipient';
 import { Money } from '../lib/money';
 import { MonthDuration } from '../lib/month-time';
+import { Recipient } from '../lib/recipient';
 import { parseBirthdate } from '../lib/strategy/ui';
+import StrategyDetails from '../routes/strategy/components/StrategyDetails.svelte';
 
 const meta: Meta<StrategyDetails> = {
   title: 'Strategy/StrategyDetails',

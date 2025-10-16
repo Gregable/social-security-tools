@@ -12,163 +12,159 @@
 -->
 
 <script lang="ts">
-  import { Birthdate } from '../birthday';
-  import { ALL_MONTHS_FULL } from '../constants';
+import { Birthdate } from '../birthday';
+import { ALL_MONTHS_FULL } from '../constants';
 
-  // Props
-  export let birthdate: Birthdate = null;
-  export let inputId = 'birthdate';
-  export let autoFocus = false;
-  export let isValid = false;
+// Props
+export let birthdate: Birthdate = null;
+export let inputId = 'birthdate';
+export let autoFocus = false;
+export let isValid = false;
 
-  export let onchange: ((event: { birthdate: Birthdate }) => void) | undefined =
-    undefined;
+export let onchange: ((event: { birthdate: Birthdate }) => void) | undefined =
+  undefined;
 
-  let bday_day;
-  let bday_year;
+let bday_day;
+let bday_year;
 
-  function parseNumberString(input: string): number {
-    const parsed = parseInt(input);
-    if (isNaN(parsed)) return 0;
-    return parsed;
+function parseNumberString(input: string): number {
+  const parsed = parseInt(input, 10);
+  if (Number.isNaN(parsed)) return 0;
+  return parsed;
+}
+
+function parseDateInputValue(
+  day: string,
+  month: string,
+  year: string
+): { date: Date | null; errors: string[] } {
+  const errors = [];
+  let birthdateDay = parseNumberString(day);
+  let birthdateMonth = parseNumberString(month);
+  let birthdateYear = parseNumberString(year);
+
+  // Only validate fields that have content
+  // Validate month (1-12) - only if month field has content
+  if (month && (birthdateMonth < 1 || birthdateMonth > 12)) {
+    errors.push('Month must be between 1 and 12');
   }
 
-  function parseDateInputValue(
-    day: string,
-    month: string,
-    year: string
-  ): { date: Date | null; errors: string[] } {
-    const errors = [];
-    let birthdateDay = parseNumberString(day);
-    let birthdateMonth = parseNumberString(month);
-    let birthdateYear = parseNumberString(year);
-
-    // Only validate fields that have content
-    // Validate month (1-12) - only if month field has content
-    if (month && (birthdateMonth < 1 || birthdateMonth > 12)) {
-      errors.push('Month must be between 1 and 12');
-    }
-
-    // Validate year (not in future, not more than 125 years ago) - only if year field has content
-    if (year) {
-      const currentYear = new Date().getFullYear();
-      const minYear = currentYear - 125;
-      if (birthdateYear > currentYear) {
-        errors.push('Year cannot be in the future');
-      } else if (birthdateYear < minYear) {
-        errors.push(`Year cannot be more than 125 years ago (${minYear})`);
-      }
-    }
-
-    // Validate day (basic range first) - only if day field has content
-    if (day && (birthdateDay < 1 || birthdateDay > 31)) {
-      errors.push('Day must be between 1 and 31');
-    }
-
-    // Only do advanced validation if all fields have content and basic validation passed
-    if (month && day && year && errors.length === 0) {
-      const testDate = new Date(
-        birthdateYear,
-        birthdateMonth - 1,
-        birthdateDay
-      );
-
-      // Check if the date rolled over (invalid day for month)
-      if (
-        testDate.getFullYear() !== birthdateYear ||
-        testDate.getMonth() !== birthdateMonth - 1 ||
-        testDate.getDate() !== birthdateDay
-      ) {
-        errors.push(
-          `Invalid day for ${ALL_MONTHS_FULL[birthdateMonth - 1]} ${birthdateYear}`
-        );
-      } else {
-        // Check if date is not in the future
-        if (testDate > new Date()) {
-          errors.push('Date cannot be in the future');
-        }
-
-        return {
-          date: new Date(
-            Date.UTC(birthdateYear, birthdateMonth - 1, birthdateDay)
-          ),
-          errors: [],
-        };
-      }
-    }
-
-    return { date: null, errors };
-  }
-
-  // Svelte binds the value of the input to a string, so we need to parse it
-  // and store it in a Date object.
-  let parsedDate: Date;
-  let birthdateDayStr = '';
-  let birthdateMonthStr = '';
-  let birthdateYearStr = '';
-  let validationErrors: string[] = [];
-
-  // One-way initializing of string values from birthdate prop
-  function initializeFromBirthdate() {
-    if (birthdate) {
-      birthdateMonthStr = (birthdate.layBirthMonth() + 1)
-        .toString()
-        .padStart(2, '0');
-      birthdateDayStr = birthdate
-        .layBirthDayOfMonth()
-        .toString()
-        .padStart(2, '0');
-      birthdateYearStr = birthdate.layBirthYear().toString();
+  // Validate year (not in future, not more than 125 years ago) - only if year field has content
+  if (year) {
+    const currentYear = new Date().getFullYear();
+    const minYear = currentYear - 125;
+    if (birthdateYear > currentYear) {
+      errors.push('Year cannot be in the future');
+    } else if (birthdateYear < minYear) {
+      errors.push(`Year cannot be more than 125 years ago (${minYear})`);
     }
   }
 
-  // Initialize values when component mounts
-  $: if (birthdate && !birthdateYearStr) {
-    initializeFromBirthdate();
+  // Validate day (basic range first) - only if day field has content
+  if (day && (birthdateDay < 1 || birthdateDay > 31)) {
+    errors.push('Day must be between 1 and 31');
   }
 
-  // Update parsed date and validity when inputs change
-  $: {
-    const result = parseDateInputValue(
-      birthdateDayStr,
-      birthdateMonthStr,
-      birthdateYearStr
-    );
+  // Only do advanced validation if all fields have content and basic validation passed
+  if (month && day && year && errors.length === 0) {
+    const testDate = new Date(birthdateYear, birthdateMonth - 1, birthdateDay);
 
-    parsedDate = result.date;
-    validationErrors = result.errors;
-    isValid = !!parsedDate && validationErrors.length === 0;
-  }
-
-  // Create Birthdate object and emit change event when valid
-  $: if (isValid && parsedDate) {
-    const newBirthdate = Birthdate.FromYMD(
-      parsedDate.getUTCFullYear(),
-      parsedDate.getUTCMonth(),
-      parsedDate.getUTCDate()
-    );
+    // Check if the date rolled over (invalid day for month)
     if (
-      !birthdate ||
-      birthdate.layBirthYear() !== newBirthdate.layBirthYear() ||
-      birthdate.layBirthMonth() !== newBirthdate.layBirthMonth() ||
-      birthdate.layBirthDayOfMonth() !== newBirthdate.layBirthDayOfMonth()
+      testDate.getFullYear() !== birthdateYear ||
+      testDate.getMonth() !== birthdateMonth - 1 ||
+      testDate.getDate() !== birthdateDay
     ) {
-      birthdate = newBirthdate;
-      onchange?.({ birthdate: newBirthdate });
+      errors.push(
+        `Invalid day for ${ALL_MONTHS_FULL[birthdateMonth - 1]} ${birthdateYear}`
+      );
+    } else {
+      // Check if date is not in the future
+      if (testDate > new Date()) {
+        errors.push('Date cannot be in the future');
+      }
+
+      return {
+        date: new Date(
+          Date.UTC(birthdateYear, birthdateMonth - 1, birthdateDay)
+        ),
+        errors: [],
+      };
     }
   }
 
-  function handleKeyUp(event, nextEl) {
-    if (/^[a-zA-Z0-9]$/.test(event.key) && event.target.value.length == 2) {
-      nextEl.focus();
-    }
-  }
+  return { date: null, errors };
+}
 
-  function init(el) {
-    if (autoFocus) {
-      el.focus();
-    }
+// Svelte binds the value of the input to a string, so we need to parse it
+// and store it in a Date object.
+let parsedDate: Date;
+let birthdateDayStr = '';
+let birthdateMonthStr = '';
+let birthdateYearStr = '';
+let validationErrors: string[] = [];
+
+// One-way initializing of string values from birthdate prop
+function initializeFromBirthdate() {
+  if (birthdate) {
+    birthdateMonthStr = (birthdate.layBirthMonth() + 1)
+      .toString()
+      .padStart(2, '0');
+    birthdateDayStr = birthdate
+      .layBirthDayOfMonth()
+      .toString()
+      .padStart(2, '0');
+    birthdateYearStr = birthdate.layBirthYear().toString();
   }
+}
+
+// Initialize values when component mounts
+$: if (birthdate && !birthdateYearStr) {
+  initializeFromBirthdate();
+}
+
+// Update parsed date and validity when inputs change
+$: {
+  const result = parseDateInputValue(
+    birthdateDayStr,
+    birthdateMonthStr,
+    birthdateYearStr
+  );
+
+  parsedDate = result.date;
+  validationErrors = result.errors;
+  isValid = !!parsedDate && validationErrors.length === 0;
+}
+
+// Create Birthdate object and emit change event when valid
+$: if (isValid && parsedDate) {
+  const newBirthdate = Birthdate.FromYMD(
+    parsedDate.getUTCFullYear(),
+    parsedDate.getUTCMonth(),
+    parsedDate.getUTCDate()
+  );
+  if (
+    !birthdate ||
+    birthdate.layBirthYear() !== newBirthdate.layBirthYear() ||
+    birthdate.layBirthMonth() !== newBirthdate.layBirthMonth() ||
+    birthdate.layBirthDayOfMonth() !== newBirthdate.layBirthDayOfMonth()
+  ) {
+    birthdate = newBirthdate;
+    onchange?.({ birthdate: newBirthdate });
+  }
+}
+
+function handleKeyUp(event, nextEl) {
+  if (/^[a-zA-Z0-9]$/.test(event.key) && event.target.value.length === 2) {
+    nextEl.focus();
+  }
+}
+
+function init(el) {
+  if (autoFocus) {
+    el.focus();
+  }
+}
 </script>
 
 <div class="date-input-container">

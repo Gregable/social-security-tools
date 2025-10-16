@@ -1,76 +1,76 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { getRecommendedDiscountRate } from '$lib/strategy/data';
+import { onMount } from 'svelte';
+import { getRecommendedDiscountRate } from '$lib/strategy/data';
 
-  export let discountRatePercent: number;
-  // Two-way binding now used instead of explicit change callback.
-  export let onValidityChange: ((isValid: boolean) => void) | undefined =
-    undefined;
+export let discountRatePercent: number;
+// Two-way binding now used instead of explicit change callback.
+export let onValidityChange: ((isValid: boolean) => void) | undefined =
+  undefined;
 
-  let highlightInput = false;
-  let treasuryRate: number = 2.5; // Default value
-  let isValid = true;
-  let errorMessage = '';
+let highlightInput = false;
+let treasuryRate: number = 2.5; // Default value
+let isValid = true;
+let errorMessage = '';
 
-  let presetRates = [
-    { label: `20-year Treasury rate (${treasuryRate}%)`, value: treasuryRate },
-    { label: 'US Stock 10y expected (3.5%)', value: 3.5 },
-    { label: 'US Stock historical (7%)', value: 7 },
-  ];
+let presetRates = [
+  { label: `20-year Treasury rate (${treasuryRate}%)`, value: treasuryRate },
+  { label: 'US Stock 10y expected (3.5%)', value: 3.5 },
+  { label: 'US Stock historical (7%)', value: 7 },
+];
 
-  onMount(async () => {
-    try {
-      // getRecommendedDiscountRate returns the rate as a decimal (e.g., 0.038 for 3.8%)
-      const rate = await getRecommendedDiscountRate();
+onMount(async () => {
+  try {
+    // getRecommendedDiscountRate returns the rate as a decimal (e.g., 0.038 for 3.8%)
+    const rate = await getRecommendedDiscountRate();
 
-      // Convert to percentage value by multiplying by 100
-      treasuryRate = parseFloat((rate * 100).toFixed(2));
+    // Convert to percentage value by multiplying by 100
+    treasuryRate = parseFloat((rate * 100).toFixed(2));
 
-      // Update the presetRates array with the new treasury rate
-      presetRates = [
-        {
-          label: `20-year Treasury rate (${treasuryRate}%)`,
-          value: treasuryRate,
-        },
-        { label: 'US Stock 10y expected (3.5%)', value: 3.5 },
-        { label: 'US Stock historical (7%)', value: 7 },
-      ];
+    // Update the presetRates array with the new treasury rate
+    presetRates = [
+      {
+        label: `20-year Treasury rate (${treasuryRate}%)`,
+        value: treasuryRate,
+      },
+      { label: 'US Stock 10y expected (3.5%)', value: 3.5 },
+      { label: 'US Stock historical (7%)', value: 7 },
+    ];
 
-      // Update the discountRatePercent if it's currently set to our default treasury rate (2.5%)
-      handleDiscountRateChange(treasuryRate);
-    } catch (error) {
-      console.error('Failed to fetch recommended discount rate:', error);
-      // Keep default 2.5% if fetch fails
-    }
-  });
-
-  // Handle discount rate changes
-  function handleDiscountRateChange(newValue: number) {
-    validateDiscountRate(newValue);
-    // Assign to exported prop to trigger two-way binding update in parent.
-    discountRatePercent = newValue;
+    // Update the discountRatePercent if it's currently set to our default treasury rate (2.5%)
+    handleDiscountRateChange(treasuryRate);
+  } catch (error) {
+    console.error('Failed to fetch recommended discount rate:', error);
+    // Keep default 2.5% if fetch fails
   }
+});
 
-  // Validate discount rate
-  function validateDiscountRate(value: number) {
-    if (isNaN(value)) {
-      isValid = false;
-      errorMessage = 'Please enter a valid number';
-    } else if (value < 0) {
-      isValid = false;
-      errorMessage = 'Discount rate cannot be less than 0%';
-    } else if (value > 50) {
-      isValid = false;
-      errorMessage = 'Discount rate cannot exceed 50%';
-    } else {
-      isValid = true;
-      errorMessage = '';
-    }
-    onValidityChange?.(isValid);
+// Handle discount rate changes
+function handleDiscountRateChange(newValue: number) {
+  validateDiscountRate(newValue);
+  // Assign to exported prop to trigger two-way binding update in parent.
+  discountRatePercent = newValue;
+}
+
+// Validate discount rate
+function validateDiscountRate(value: number) {
+  if (Number.isNaN(value)) {
+    isValid = false;
+    errorMessage = 'Please enter a valid number';
+  } else if (value < 0) {
+    isValid = false;
+    errorMessage = 'Discount rate cannot be less than 0%';
+  } else if (value > 50) {
+    isValid = false;
+    errorMessage = 'Discount rate cannot exceed 50%';
+  } else {
+    isValid = true;
+    errorMessage = '';
   }
+  onValidityChange?.(isValid);
+}
 
-  // Validate on mount
-  $: validateDiscountRate(discountRatePercent);
+// Validate on mount
+$: validateDiscountRate(discountRatePercent);
 </script>
 
 <div class="global-input-group">

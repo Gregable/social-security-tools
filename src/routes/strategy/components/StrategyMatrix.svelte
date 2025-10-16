@@ -1,300 +1,301 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import RecipientName from '$lib/components/RecipientName.svelte';
-  import StrategyCell from './StrategyCell.svelte';
-  import { MonthDuration } from '$lib/month-time';
-  import type { Money } from '$lib/money';
-  import type { DeathAgeBucket } from '$lib/strategy/ui';
-  import type { CalculationResults } from '$lib/strategy/ui';
-  import { createBorderRemovalFunctions } from '$lib/strategy/ui';
-  import { getMonthYearColor } from '$lib/strategy/ui';
+import RecipientName from '$lib/components/RecipientName.svelte';
+import type { Money } from '$lib/money';
+import { MonthDuration } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
+import type { CalculationResults, DeathAgeBucket } from '$lib/strategy/ui';
+import {
+  createBorderRemovalFunctions,
+  getMonthYearColor,
+} from '$lib/strategy/ui';
+import StrategyCell from './StrategyCell.svelte';
 
-  // Props
-  export let recipientIndex: number;
-  export let recipients: [Recipient, Recipient];
-  export let displayAsAges: boolean = false;
-  export let calculationResults: CalculationResults;
-  export let deathProbDistribution1: { age: number; probability: number }[];
-  export let deathProbDistribution2: { age: number; probability: number }[];
-  export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
+// Props
+export let recipientIndex: number;
+export let recipients: [Recipient, Recipient];
+export let displayAsAges: boolean = false;
+export let calculationResults: CalculationResults;
+export let deathProbDistribution1: { age: number; probability: number }[];
+export let deathProbDistribution2: { age: number; probability: number }[];
+export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
 
-  // Callback props for events
-  export let onhovercell:
-    | ((detail: { rowIndex: number; colIndex: number } | null) => void)
-    | undefined = undefined;
-  export let onselectcell: ((detail: any) => void) | undefined = undefined;
+// Callback props for events
+export let onhovercell:
+  | ((detail: { rowIndex: number; colIndex: number } | null) => void)
+  | undefined = undefined;
+export let onselectcell: ((detail: any) => void) | undefined = undefined;
 
-  // Matrix width tracking
-  let matrixWidth: number = 0;
+// Matrix width tracking
+let matrixWidth: number = 0;
 
-  // Header hover overlay state
-  let headerHoverInfo: {
-    type: 'row' | 'column';
-    index: number;
-    bucket: DeathAgeBucket;
-    recipient: Recipient;
-    distribution: { age: number; probability: number }[];
-    x: number;
-    y: number;
-  } | null = null;
+// Header hover overlay state
+let headerHoverInfo: {
+  type: 'row' | 'column';
+  index: number;
+  bucket: DeathAgeBucket;
+  recipient: Recipient;
+  distribution: { age: number; probability: number }[];
+  x: number;
+  y: number;
+} | null = null;
 
-  // Fixed height constant (matches CSS)
-  const MATRIX_HEIGHT = 900;
+// Fixed height constant (matches CSS)
+const MATRIX_HEIGHT = 900;
 
-  // Removed unused _getCellDimensions helper (probability-based sizing now handled via reactive cellDimensions)
+// Removed unused _getCellDimensions helper (probability-based sizing now handled via reactive cellDimensions)
 
-  // Create normalized value extractor that compares actual dates, not display strings
-  function createNormalizedValueExtractor(recipientIndex: number) {
-    return (calculationResult: StrategyResultCell): string => {
-      // Get the filing age and convert to a normalized date string
-      const filingAgeYears =
-        calculationResult[`filingAge${recipientIndex + 1}Years`];
-      const filingAgeMonths =
-        calculationResult[`filingAge${recipientIndex + 1}Months`];
+// Create normalized value extractor that compares actual dates, not display strings
+function createNormalizedValueExtractor(recipientIndex: number) {
+  return (calculationResult: StrategyResultCell): string => {
+    // Get the filing age and convert to a normalized date string
+    const filingAgeYears =
+      calculationResult[`filingAge${recipientIndex + 1}Years`];
+    const filingAgeMonths =
+      calculationResult[`filingAge${recipientIndex + 1}Months`];
 
-      // Create a normalized string that represents the same date regardless of display format
-      // Format: "YYYY-MM" for consistent comparison
-      const birthdate = recipients[recipientIndex].birthdate;
-      const filingAge = MonthDuration.initFromYearsMonths({
-        years: filingAgeYears,
-        months: filingAgeMonths,
-      });
-      const filingDate = birthdate.dateAtLayAge(filingAge);
+    // Create a normalized string that represents the same date regardless of display format
+    // Format: "YYYY-MM" for consistent comparison
+    const birthdate = recipients[recipientIndex].birthdate;
+    const filingAge = MonthDuration.initFromYearsMonths({
+      years: filingAgeYears,
+      months: filingAgeMonths,
+    });
+    const filingDate = birthdate.dateAtLayAge(filingAge);
 
-      return `${filingDate.year()}-${(filingDate.monthIndex() + 1).toString().padStart(2, '0')}`;
-    };
+    return `${filingDate.year()}-${(filingDate.monthIndex() + 1).toString().padStart(2, '0')}`;
+  };
+}
+
+// Extractor for recipient values using normalized date comparison
+$: borderRemovalFuncs = createBorderRemovalFunctions(
+  createNormalizedValueExtractor(recipientIndex),
+  calculationResults.to2D()
+);
+
+// We derive the actual 3-year (or final open-ended) death-age buckets from
+// the first cell in each row/column. Every cell in a row shares the same
+// bucket1; every cell in a column shares the same bucket2, so sampling once
+// is enough.
+$: rowBuckets = calculationResults.rowBuckets();
+$: colBuckets = calculationResults.colBuckets();
+
+/**
+ * Convert a list of buckets into a CSS grid-template string and parallel
+ * percentage list. We:
+ *  1. Recompute each bucket's probability mass from the current distribution
+ *  2. Normalize masses to fractions summing to 1.
+ *  3. Round intermediate fractions (4 decimals) to balance precision & UI
+ *     noise.
+ *  4. Force the final column/row to make the total exactly 100%.
+ * Returned template example: "12.34% 7.89% 79.77%".
+ */
+function buildTemplateFromBuckets(
+  buckets: DeathAgeBucket[],
+  distribution: { age: number; probability: number }[]
+): { template: string; percentages: number[] } {
+  // Compute raw probability mass per bucket (summing appropriate age span)
+  const masses = buckets.map((b) => bucketProbability(b, distribution));
+  const total = masses.reduce((s, v) => s + v, 0) || 1;
+  // Convert to percentages (fractions sum to 1) then format.
+
+  const fractions = masses.map((m) => m / total);
+  const percentages: number[] = [];
+  let sum = 0;
+  for (let i = 0; i < fractions.length; i++) {
+    if (i === fractions.length - 1) {
+      // Adjust last to force 100%
+      const remaining = 1 - sum;
+      percentages.push(remaining);
+    } else {
+      const rounded = parseFloat(fractions[i].toFixed(4));
+      percentages.push(rounded);
+      sum += rounded;
+    }
   }
-
-  // Extractor for recipient values using normalized date comparison
-  $: borderRemovalFuncs = createBorderRemovalFunctions(
-    createNormalizedValueExtractor(recipientIndex),
-    calculationResults.to2D()
-  );
-
-  // We derive the actual 3-year (or final open-ended) death-age buckets from
-  // the first cell in each row/column. Every cell in a row shares the same
-  // bucket1; every cell in a column shares the same bucket2, so sampling once
-  // is enough.
-  $: rowBuckets = calculationResults.rowBuckets();
-  $: colBuckets = calculationResults.colBuckets();
-
-  /**
-   * Convert a list of buckets into a CSS grid-template string and parallel
-   * percentage list. We:
-   *  1. Recompute each bucket's probability mass from the current distribution
-   *  2. Normalize masses to fractions summing to 1.
-   *  3. Round intermediate fractions (4 decimals) to balance precision & UI
-   *     noise.
-   *  4. Force the final column/row to make the total exactly 100%.
-   * Returned template example: "12.34% 7.89% 79.77%".
-   */
-  function buildTemplateFromBuckets(
-    buckets: DeathAgeBucket[],
-    distribution: { age: number; probability: number }[]
-  ): { template: string; percentages: number[] } {
-    // Compute raw probability mass per bucket (summing appropriate age span)
-    const masses = buckets.map((b) => bucketProbability(b, distribution));
-    const total = masses.reduce((s, v) => s + v, 0) || 1;
-    // Convert to percentages (fractions sum to 1) then format.
-
-    const fractions = masses.map((m) => m / total);
-    const percentages: number[] = [];
-    let sum = 0;
-    for (let i = 0; i < fractions.length; i++) {
-      if (i === fractions.length - 1) {
-        // Adjust last to force 100%
-        const remaining = 1 - sum;
-        percentages.push(remaining);
-      } else {
-        const rounded = parseFloat(fractions[i].toFixed(4));
-        percentages.push(rounded);
-        sum += rounded;
+  // Format into a CSS grid template. We recompute last segment to ensure
+  // exact 100% at two-decimal precision (important so cumulative rounding
+  // doesn't leave stray pixels or wrap).
+  const template = percentages
+    .map((p, i) => {
+      if (i === percentages.length - 1) {
+        // Ensure exact 100 with 2 decimals
+        const used = percentages.slice(0, -1).reduce((s, v) => s + v, 0);
+        const lastPct = 100 - parseFloat((used * 100).toFixed(2));
+        return `${lastPct.toFixed(2)}%`;
       }
-    }
-    // Format into a CSS grid template. We recompute last segment to ensure
-    // exact 100% at two-decimal precision (important so cumulative rounding
-    // doesn't leave stray pixels or wrap).
-    const template = percentages
-      .map((p, i) => {
-        if (i === percentages.length - 1) {
-          // Ensure exact 100 with 2 decimals
-          const used = percentages.slice(0, -1).reduce((s, v) => s + v, 0);
-          const lastPct = 100 - parseFloat((used * 100).toFixed(2));
-          return `${lastPct.toFixed(2)}%`;
-        }
-        return `${(p * 100).toFixed(2)}%`;
-      })
-      .join(' ');
-    return { template, percentages };
-  }
+      return `${(p * 100).toFixed(2)}%`;
+    })
+    .join(' ');
+  return { template, percentages };
+}
 
-  // Build row & column templates reactively; rowPercentages / columnPercentages
-  // align one-to-one with rowBuckets / colBuckets so downstream sizing math is
-  // straightforward.
-  $: ({ template: rowTemplate, percentages: rowPercentages } =
-    buildTemplateFromBuckets(rowBuckets, deathProbDistribution1));
-  $: ({ template: columnTemplate, percentages: columnPercentages } =
-    buildTemplateFromBuckets(colBuckets, deathProbDistribution2));
+// Build row & column templates reactively; rowPercentages / columnPercentages
+// align one-to-one with rowBuckets / colBuckets so downstream sizing math is
+// straightforward.
+$: ({ template: rowTemplate, percentages: rowPercentages } =
+  buildTemplateFromBuckets(rowBuckets, deathProbDistribution1));
+$: ({ template: columnTemplate, percentages: columnPercentages } =
+  buildTemplateFromBuckets(colBuckets, deathProbDistribution2));
 
-  function bucketProbability(
-    bucket: DeathAgeBucket,
-    distribution: { age: number; probability: number }[]
-  ): number {
-    if (!bucket) return 0;
-    const start = bucket.startAge;
-    const end = bucket.endAgeInclusive; // null means open ended
-    if (end === null) {
-      return distribution
-        .filter((d) => d.age >= start)
-        .reduce((s, d) => s + d.probability, 0);
-    }
+function bucketProbability(
+  bucket: DeathAgeBucket,
+  distribution: { age: number; probability: number }[]
+): number {
+  if (!bucket) return 0;
+  const start = bucket.startAge;
+  const end = bucket.endAgeInclusive; // null means open ended
+  if (end === null) {
     return distribution
-      .filter((d) => d.age >= start && d.age <= end)
+      .filter((d) => d.age >= start)
       .reduce((s, d) => s + d.probability, 0);
   }
+  return distribution
+    .filter((d) => d.age >= start && d.age <= end)
+    .reduce((s, d) => s + d.probability, 0);
+}
 
-  interface StrategyResultCell {
-    deathAge1: string | number;
-    deathAge2: string | number;
-    filingAge1: any;
-    filingAge2: any;
-    totalBenefit: Money;
-    filingAge1Years: number;
-    filingAge1Months: number;
-    filingAge2Years: number;
-    filingAge2Months: number;
-    bucket1: DeathAgeBucket;
-    bucket2: DeathAgeBucket;
-    error?: any;
-    [key: string]: any; // tolerate additional fields from upstream
+interface StrategyResultCell {
+  deathAge1: string | number;
+  deathAge2: string | number;
+  filingAge1: any;
+  filingAge2: any;
+  totalBenefit: Money;
+  filingAge1Years: number;
+  filingAge1Months: number;
+  filingAge2Years: number;
+  filingAge2Months: number;
+  bucket1: DeathAgeBucket;
+  bucket2: DeathAgeBucket;
+  error?: any;
+  [key: string]: any; // tolerate additional fields from upstream
+}
+
+// Create reactive cell dimensions matrix that updates when matrixWidth changes
+// Precompute pixel dimensions for each cell (used for adaptive label / date
+// formatting downstream). We multiply the container width by the column's
+// percentage and a fixed MATRIX_HEIGHT by the row's percentage to get the
+// actual rectangular size that visually encodes probability mass.
+$: cellDimensions = rowBuckets.map((_, i) =>
+  colBuckets.map((_, j) => ({
+    width: matrixWidth * (columnPercentages[j] || 0),
+    height: MATRIX_HEIGHT * (rowPercentages[i] || 0),
+  }))
+);
+
+// Calculate cell styles including background color and border removal
+function getCellStyle(i: number, j: number): string {
+  let style = '';
+
+  // Add background color based on filing date
+  const cell = calculationResults.get(i, j);
+  if (cell) {
+    const filingAge: MonthDuration = cell[`filingAge${recipientIndex + 1}`];
+    const backgroundColor = getMonthYearColor(
+      filingAge.asMonths(),
+      MonthDuration.initFromYearsMonths({
+        years: 62,
+        months: 0,
+      }).asMonths(),
+      MonthDuration.initFromYearsMonths({
+        years: 70,
+        months: 0,
+      }).asMonths()
+    );
+    style += `background-color: ${backgroundColor}; `;
   }
 
-  // Create reactive cell dimensions matrix that updates when matrixWidth changes
-  // Precompute pixel dimensions for each cell (used for adaptive label / date
-  // formatting downstream). We multiply the container width by the column's
-  // percentage and a fixed MATRIX_HEIGHT by the row's percentage to get the
-  // actual rectangular size that visually encodes probability mass.
-  $: cellDimensions = rowBuckets.map((_, i) =>
-    colBuckets.map((_, j) => ({
-      width: matrixWidth * (columnPercentages[j] || 0),
-      height: MATRIX_HEIGHT * (rowPercentages[i] || 0),
-    }))
-  );
-
-  // Calculate cell styles including background color and border removal
-  function getCellStyle(i: number, j: number): string {
-    let style = '';
-
-    // Add background color based on filing date
-    const cell = calculationResults.get(i, j);
-    if (cell) {
-      const filingAge: MonthDuration = cell[`filingAge${recipientIndex + 1}`];
-      const backgroundColor = getMonthYearColor(
-        filingAge.asMonths(),
-        MonthDuration.initFromYearsMonths({
-          years: 62,
-          months: 0,
-        }).asMonths(),
-        MonthDuration.initFromYearsMonths({
-          years: 70,
-          months: 0,
-        }).asMonths()
-      );
-      style += `background-color: ${backgroundColor}; `;
-    }
-
-    // Apply border removal logic
-    let bordersRemoved = 0;
-    if (borderRemovalFuncs.right(i, j)) {
-      style += 'border-right: none; ';
-      bordersRemoved++;
-    }
-    if (borderRemovalFuncs.bottom(i, j)) {
-      style += 'border-bottom: none; ';
-      bordersRemoved++;
-    }
-    if (borderRemovalFuncs.left(i, j)) {
-      style += 'border-left: none; ';
-      bordersRemoved++;
-    }
-    if (borderRemovalFuncs.top(i, j)) {
-      style += 'border-top: none; ';
-      bordersRemoved++;
-    }
-
-    // Add subtle visual indicator when borders are removed
-    if (bordersRemoved > 0) {
-      style += 'box-shadow: inset 0 0 2px rgba(0, 123, 255, 0.3); ';
-    }
-
-    return style;
+  // Apply border removal logic
+  let bordersRemoved = 0;
+  if (borderRemovalFuncs.right(i, j)) {
+    style += 'border-right: none; ';
+    bordersRemoved++;
+  }
+  if (borderRemovalFuncs.bottom(i, j)) {
+    style += 'border-bottom: none; ';
+    bordersRemoved++;
+  }
+  if (borderRemovalFuncs.left(i, j)) {
+    style += 'border-left: none; ';
+    bordersRemoved++;
+  }
+  if (borderRemovalFuncs.top(i, j)) {
+    style += 'border-top: none; ';
+    bordersRemoved++;
   }
 
-  // Handle events
-  function handleCellHover(event) {
-    const { rowIndex, colIndex } = event.detail;
-    onhovercell?.({ rowIndex, colIndex });
+  // Add subtle visual indicator when borders are removed
+  if (bordersRemoved > 0) {
+    style += 'box-shadow: inset 0 0 2px rgba(0, 123, 255, 0.3); ';
   }
 
-  function handleCellHoverOut() {
-    onhovercell?.(null);
-  }
+  return style;
+}
 
-  // Handle header hover events
-  function handleHeaderHover(
-    event: MouseEvent,
-    type: 'row' | 'column',
-    index: number,
-    bucket: DeathAgeBucket,
-    recipient: Recipient,
-    distribution: { age: number; probability: number }[]
-  ) {
-    headerHoverInfo = {
-      type,
-      index,
-      bucket,
-      recipient,
-      distribution,
-      x: event.clientX,
-      y: event.clientY,
-    };
-  }
+// Handle events
+function handleCellHover(event) {
+  const { rowIndex, colIndex } = event.detail;
+  onhovercell?.({ rowIndex, colIndex });
+}
 
-  function handleHeaderHoverOut() {
-    headerHoverInfo = null;
-  }
+function handleCellHoverOut() {
+  onhovercell?.(null);
+}
 
-  function handleCellSelect(event) {
-    const { rowIndex, colIndex } = event.detail;
-    const result = calculationResults.get(
-      rowIndex,
-      colIndex
-    ) as StrategyResultCell;
-    const bucket1 = rowBuckets[rowIndex];
-    const bucket2 = colBuckets[colIndex];
-    if (!result || !bucket1 || !bucket2) return;
+// Handle header hover events
+function handleHeaderHover(
+  event: MouseEvent,
+  type: 'row' | 'column',
+  index: number,
+  bucket: DeathAgeBucket,
+  recipient: Recipient,
+  distribution: { age: number; probability: number }[]
+) {
+  headerHoverInfo = {
+    type,
+    index,
+    bucket,
+    recipient,
+    distribution,
+    x: event.clientX,
+    y: event.clientY,
+  };
+}
 
-    // Set selection on the shared CalculationResults state
-    calculationResults.setSelectedCell(rowIndex, colIndex);
+function handleHeaderHoverOut() {
+  headerHoverInfo = null;
+}
 
-    const filingAge1 = result.filingAge1;
-    const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
-    const filingAge2 = result.filingAge2;
-    const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
+function handleCellSelect(event) {
+  const { rowIndex, colIndex } = event.detail;
+  const result = calculationResults.get(
+    rowIndex,
+    colIndex
+  ) as StrategyResultCell;
+  const bucket1 = rowBuckets[rowIndex];
+  const bucket2 = colBuckets[colIndex];
+  if (!result || !bucket1 || !bucket2) return;
 
-    // Emit a normalized details payload for external consumers (e.g., details panel)
-    onselectcell?.({
-      deathAge1: bucket1.label,
-      deathAge2: bucket2.label,
-      filingAge1Years: result.filingAge1Years,
-      filingAge1Months: result.filingAge1Months,
-      filingDate1,
-      filingAge2Years: result.filingAge2Years,
-      filingAge2Months: result.filingAge2Months,
-      filingDate2,
-      netPresentValue: result.totalBenefit,
-    });
-  }
+  // Set selection on the shared CalculationResults state
+  calculationResults.setSelectedCell(rowIndex, colIndex);
+
+  const filingAge1 = result.filingAge1;
+  const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
+  const filingAge2 = result.filingAge2;
+  const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
+
+  // Emit a normalized details payload for external consumers (e.g., details panel)
+  onselectcell?.({
+    deathAge1: bucket1.label,
+    deathAge2: bucket2.label,
+    filingAge1Years: result.filingAge1Years,
+    filingAge1Months: result.filingAge1Months,
+    filingDate1,
+    filingAge2Years: result.filingAge2Years,
+    filingAge2Months: result.filingAge2Months,
+    filingDate2,
+    netPresentValue: result.totalBenefit,
+  });
+}
 </script>
 
 <div class="matrix-container recipient-matrix">

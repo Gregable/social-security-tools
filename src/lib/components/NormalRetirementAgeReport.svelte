@@ -1,19 +1,19 @@
 <script lang="ts">
-  import * as constants from '$lib/constants';
-  import { Recipient } from '$lib/recipient';
-  import RName from './RecipientName.svelte';
-  import { Money } from '$lib/money';
+import * as constants from '$lib/constants';
+import { Money } from '$lib/money';
+import { Recipient } from '$lib/recipient';
+import RName from './RecipientName.svelte';
 
-  export let recipient: Recipient = new Recipient();
-  const r: Recipient = recipient;
+export let recipient: Recipient = new Recipient();
+const r: Recipient = recipient;
 
-  const exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
+const exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
 
-  /**
-   * The benefit amount at normal retirement age.
-   */
-  let benefit: Money = Money.from(0);
-  $: benefit = $recipient.pia().primaryInsuranceAmount().floorToDollar();
+/**
+ * The benefit amount at normal retirement age.
+ */
+let benefit: Money = Money.from(0);
+$: benefit = $recipient.pia().primaryInsuranceAmount().floorToDollar();
 </script>
 
 <div>

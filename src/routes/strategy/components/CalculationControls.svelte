@@ -1,20 +1,20 @@
 <script lang="ts">
-  // Props
-  import { CalculationStatus, CalculationResults } from '$lib/strategy/ui';
-  export let calculationResults: CalculationResults;
-  export let disabled: boolean = false;
+// Props
+import { CalculationResults, CalculationStatus } from '$lib/strategy/ui';
+export let calculationResults: CalculationResults;
+export let disabled: boolean = false;
 
-  // Callback prop for events
-  export let oncalculate: (() => void) | undefined = undefined;
+// Callback prop for events
+export let oncalculate: (() => void) | undefined = undefined;
 
-  // Derived variable for progress bar width
-  $: progressWidth = `${calculationResults.totalCalculations() > 0 ? (calculationResults.calculationProgress() / calculationResults.totalCalculations()) * 100 : 0}%`;
-  $: isRunning = calculationResults.status() === CalculationStatus.Running;
+// Derived variable for progress bar width
+$: progressWidth = `${calculationResults.totalCalculations() > 0 ? (calculationResults.calculationProgress() / calculationResults.totalCalculations()) * 100 : 0}%`;
+$: isRunning = calculationResults.status() === CalculationStatus.Running;
 
-  function triggerCalculation() {
-    // Call the callback function to trigger calculation in the parent component
-    oncalculate?.();
-  }
+function triggerCalculation() {
+  // Call the callback function to trigger calculation in the parent component
+  oncalculate?.();
+}
 </script>
 
 <div class="calculation-controls">

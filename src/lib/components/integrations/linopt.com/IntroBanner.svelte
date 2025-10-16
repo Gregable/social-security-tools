@@ -1,7 +1,7 @@
 <script lang="ts">
-  // Intro banner shown when the Linopt integration is active
-  import IntegrationBanner from '../IntegrationBanner.svelte';
-  import logo from './linopt-fig.png';
+// Intro banner shown when the Linopt integration is active
+import IntegrationBanner from '../IntegrationBanner.svelte';
+import logo from './linopt-fig.png';
 </script>
 
 <IntegrationBanner {logo} logoAlt="Linopt">

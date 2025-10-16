@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
+import { Birthdate } from '$lib/birthday';
 import StrategyTimelineCanvas from '$lib/components/StrategyTimelineCanvas.svelte';
-import { Recipient } from '$lib/recipient';
-import { MonthDuration } from '$lib/month-time';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
-import { Birthdate } from '$lib/birthday';
+import { MonthDuration } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
 
 // Create a simple mock StrategyResult type to avoid import issues
 interface MockStrategyResult {

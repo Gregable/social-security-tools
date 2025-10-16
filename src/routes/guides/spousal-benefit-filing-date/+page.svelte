@@ -1,34 +1,34 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
-  import HeroImage from './hero.png';
-  import EarlyFileImage from './early-file.png';
-  import LateFileImage from './late-file.png';
-  import EarlyFile100Image from './early-file-100.png';
-  import LateFile100Image from './late-file-100.png';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import EarlyFileImage from './early-file.png';
+import EarlyFile100Image from './early-file-100.png';
+import HeroImage from './hero.png';
+import LateFileImage from './late-file.png';
+import LateFile100Image from './late-file-100.png';
 
-  const title = 'Deep look at Spousal Benefits and Filing Dates';
-  const description =
-    'Spousal Benefits are sometimes commonly misunderstood to be equal to ' +
-    "half of the other spouse's benefit. This guide takes a deep dive into " +
-    'how spousal benefits are calculated and how different filing dates can ' +
-    'affect the final benefit calculation in confusing ways.';
-  const publishDate = new Date('2023-09-06T00:00:00+00:00');
+const title = 'Deep look at Spousal Benefits and Filing Dates';
+const description =
+  'Spousal Benefits are sometimes commonly misunderstood to be equal to ' +
+  "half of the other spouse's benefit. This guide takes a deep dive into " +
+  'how spousal benefits are calculated and how different filing dates can ' +
+  'affect the final benefit calculation in confusing ways.';
+const publishDate = new Date('2023-09-06T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/spousal-benefit-filing-date';
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt =
-    'Laptop with piggybank representing Social Security spousal benefits';
-  schema.tags = [
-    'Spousal Benefits',
-    'Social Security',
-    'Filing Strategy',
-    'Marriage',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/spousal-benefit-filing-date';
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt =
+  'Laptop with piggybank representing Social Security spousal benefits';
+schema.tags = [
+  'Spousal Benefits',
+  'Social Security',
+  'Filing Strategy',
+  'Marriage',
+];
 </script>
 
 <svelte:head>

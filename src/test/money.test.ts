@@ -1,5 +1,5 @@
-import { Money } from '$lib/money';
 import { expect, test } from 'vitest';
+import { Money } from '$lib/money';
 
 test('can be constructed from a float', () => {
   const money = Money.from(123.45);

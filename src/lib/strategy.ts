@@ -1,7 +1,7 @@
-import { Recipient } from '$lib/recipient';
-import { Money } from '$lib/money';
 import { Birthdate } from '$lib/birthday';
+import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
 
 export interface StrategyParams {
   pias: [number, number];
@@ -18,8 +18,8 @@ interface Context {
 }
 
 export function StrategySequence(config: StrategyParams) {
-  let out = [];
-  let context: Context = {
+  const out = [];
+  const context: Context = {
     recipients: [null, null],
     stratDates: [null, null],
     finalDates: [null, null],
@@ -90,6 +90,6 @@ export function StrategySequence(config: StrategyParams) {
       '=' +
       benefit[0].plus(benefit[1]).string()
   );
-  out.push('Total: ' + totalBenefit.string());
+  out.push(`Total: ${totalBenefit.string()}`);
   return out;
 }

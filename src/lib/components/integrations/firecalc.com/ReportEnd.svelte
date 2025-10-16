@@ -1,59 +1,57 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import type { MonthDate } from '$lib/month-time';
-  import { recipientFilingDate } from '$lib/context';
-  import { Money } from '$lib/money';
-  import { CURRENT_YEAR } from '$lib/constants';
-  import { IntegrationContext } from '../integration-context';
-  import SpousalBenefitToggle from '../SpousalBenefitToggle.svelte';
+import { CURRENT_YEAR } from '$lib/constants';
+import { recipientFilingDate } from '$lib/context';
+import { Money } from '$lib/money';
+import type { MonthDate } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
+import { IntegrationContext } from '../integration-context';
+import SpousalBenefitToggle from '../SpousalBenefitToggle.svelte';
 
-  export let recipient: Recipient;
-  export let spouse: Recipient | null = null;
+export let recipient: Recipient;
+export let spouse: Recipient | null = null;
 
-  // Toggle for lower earner benefit calculation (personal only vs personal + spousal)
-  let includeSpousalBenefit = false;
+// Toggle for lower earner benefit calculation (personal only vs personal + spousal)
+let includeSpousalBenefit = false;
 
-  // Context for determining higher/lower earners and their filing dates
-  $: context = new IntegrationContext(recipient, spouse);
+// Context for determining higher/lower earners and their filing dates
+$: context = new IntegrationContext(recipient, spouse);
 
-  // Calculated values from SpousalBenefitToggle (annual benefits in today's dollars)
-  // These are bound from the toggle component when spouse is present
-  let recipientBenefitCalculationDate: MonthDate;
-  let spouseBenefitCalculationDate: MonthDate;
-  let recipientAnnualBenefit: Money;
-  let spouseAnnualBenefit: Money;
+// Calculated values from SpousalBenefitToggle (annual benefits in today's dollars)
+// These are bound from the toggle component when spouse is present
+let recipientBenefitCalculationDate: MonthDate;
+let spouseBenefitCalculationDate: MonthDate;
+let recipientAnnualBenefit: Money;
+let spouseAnnualBenefit: Money;
 
-  // For single-person case, calculate values directly
-  $: if (spouse === null) {
-    recipientBenefitCalculationDate = $recipientFilingDate!;
-    recipientAnnualBenefit = recipient
-      .benefitOnDate(
-        recipientBenefitCalculationDate,
-        recipientBenefitCalculationDate
-      )
-      .times(12);
-  }
+// For single-person case, calculate values directly
+$: if (spouse === null) {
+  recipientBenefitCalculationDate = $recipientFilingDate!;
+  recipientAnnualBenefit = recipient
+    .benefitOnDate(
+      recipientBenefitCalculationDate,
+      recipientBenefitCalculationDate
+    )
+    .times(12);
+}
 
-  // Format annual benefit for FIRECalc (today's dollars, whole dollars)
-  function formatForFIRECalc(annualBenefit: Money): string {
-    return annualBenefit.roundToDollar().value().toFixed(0);
-  }
+// Format annual benefit for FIRECalc (today's dollars, whole dollars)
+function formatForFIRECalc(annualBenefit: Money): string {
+  return annualBenefit.roundToDollar().value().toFixed(0);
+}
 
-  // Reactive formatted values and starting years
-  $: recipientStartingYear = recipientBenefitCalculationDate
-    ? recipientBenefitCalculationDate.year()
-    : CURRENT_YEAR;
-  $: recipientAnnualSS = recipientAnnualBenefit
-    ? formatForFIRECalc(recipientAnnualBenefit)
-    : '0';
+// Reactive formatted values and starting years
+$: recipientStartingYear = recipientBenefitCalculationDate
+  ? recipientBenefitCalculationDate.year()
+  : CURRENT_YEAR;
+$: recipientAnnualSS = recipientAnnualBenefit
+  ? formatForFIRECalc(recipientAnnualBenefit)
+  : '0';
 
-  $: spouseStartingYear = spouse
-    ? (spouseBenefitCalculationDate?.year() ?? CURRENT_YEAR)
-    : CURRENT_YEAR;
-  $: spouseAnnualSS =
-    spouse && spouseAnnualBenefit
-      ? formatForFIRECalc(spouseAnnualBenefit)
-      : '0';
+$: spouseStartingYear = spouse
+  ? (spouseBenefitCalculationDate?.year() ?? CURRENT_YEAR)
+  : CURRENT_YEAR;
+$: spouseAnnualSS =
+  spouse && spouseAnnualBenefit ? formatForFIRECalc(spouseAnnualBenefit) : '0';
 </script>
 
 <div class="pageBreakAvoid">

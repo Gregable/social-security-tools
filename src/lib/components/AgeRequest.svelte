@@ -17,34 +17,33 @@
 -->
 
 <script lang="ts">
-  import { Birthdate } from '../birthday';
-  import BirthdateInput from './BirthdateInput.svelte';
+import { Birthdate } from '../birthday';
+import BirthdateInput from './BirthdateInput.svelte';
 
-  // Props
-  export let birthdate: Birthdate = null;
-  export let inputId = 'birthdate';
+// Props
+export let birthdate: Birthdate = null;
+export let inputId = 'birthdate';
 
-  // Callback prop for submit event
-  export let onsubmit:
-    | ((detail: { birthdate: Birthdate }) => void)
-    | undefined = undefined;
-  let isValid = false;
+// Callback prop for submit event
+export let onsubmit: ((detail: { birthdate: Birthdate }) => void) | undefined =
+  undefined;
+let isValid = false;
 
-  function confirm() {
-    if (birthdate) {
-      onsubmit?.({ birthdate });
-    }
+function confirm() {
+  if (birthdate) {
+    onsubmit?.({ birthdate });
   }
+}
 
-  function handleChange(detail: { birthdate: Birthdate }) {
-    birthdate = detail.birthdate;
-  }
+function handleChange(detail: { birthdate: Birthdate }) {
+  birthdate = detail.birthdate;
+}
 
-  function checkEnter(event) {
-    if (event.key == 'Enter' && isValid) {
-      confirm();
-    }
+function checkEnter(event) {
+  if (event.key === 'Enter' && isValid) {
+    confirm();
   }
+}
 </script>
 
 <svelte:window on:keydown={checkEnter} />

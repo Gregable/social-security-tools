@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 // We test selection mapping logic indirectly by emulating the mapping from
 // bucket label arrays to a selected cell's death ages.

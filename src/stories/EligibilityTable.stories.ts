@@ -1,21 +1,19 @@
 import type { Meta } from '@storybook/svelte';
+import { Birthdate } from '$lib/birthday';
 import EligibilityTable from '$lib/components/EligibilityTable.svelte';
-
 import { context } from '$lib/context';
+import { EarningRecord } from '$lib/earning-record';
+import { Money } from '$lib/money';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
-import { Money } from '$lib/money';
-import { Birthdate } from '$lib/birthday';
-import { EarningRecord } from '$lib/earning-record';
-
-import demo0 from '$lib/pastes/averagepaste.txt?raw';
 
 context.recipient = new Recipient();
 context.recipient.earningsRecords = parsePaste(demo0);
 // Add an incomplete record:
 context.recipient.earningsRecords.push(
   (() => {
-    let record = new EarningRecord({
+    const record = new EarningRecord({
       year: 2015,
       taxedEarnings: Money.from(0),
       taxedMedicareEarnings: Money.from(0),

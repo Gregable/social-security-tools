@@ -1,13 +1,11 @@
 import type { Meta } from '@storybook/svelte';
-import PiaReport from '../lib/components/PiaReport.svelte';
-
+import { Birthdate } from '$lib/birthday';
+import demo0 from '$lib/pastes/averagepaste.txt?raw';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
-import { Birthdate } from '$lib/birthday';
+import PiaReport from '../lib/components/PiaReport.svelte';
 
-import demo0 from '$lib/pastes/averagepaste.txt?raw';
-
-let recipient = new Recipient();
+const recipient = new Recipient();
 recipient.name = 'Alex';
 recipient.markFirst();
 recipient.earningsRecords = parsePaste(demo0);

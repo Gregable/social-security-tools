@@ -7,7 +7,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   const oldGuideUrl = /^\/guide\/(.*)\.html$/;
-  let matches = event.url.pathname.match(oldGuideUrl);
+  const matches = event.url.pathname.match(oldGuideUrl);
   if (matches) {
     return new Response(null, {
       status: 301,

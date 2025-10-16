@@ -1,5 +1,5 @@
-import { MonthDate } from '$lib/month-time';
-import { Money } from '$lib/money';
+import type { Money } from '$lib/money';
+import type { MonthDate } from '$lib/month-time';
 
 /**
  * Enum representing the different types of benefits.
@@ -14,8 +14,6 @@ export enum BenefitType {
  * Represents a period of benefits for a recipient.
  */
 export class BenefitPeriod {
-  constructor() {}
-
   // startDate and endDate are inclusive on both sides:
   public startDate: MonthDate;
   public endDate: MonthDate;

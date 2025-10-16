@@ -1,68 +1,68 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import type { MonthDate } from '$lib/month-time';
-  import { recipientFilingDate } from '$lib/context';
-  import { Money } from '$lib/money';
-  import { CURRENT_YEAR } from '$lib/constants';
-  import { IntegrationContext } from '../integration-context';
-  import SpousalBenefitToggle from '../SpousalBenefitToggle.svelte';
+import { CURRENT_YEAR } from '$lib/constants';
+import { recipientFilingDate } from '$lib/context';
+import { Money } from '$lib/money';
+import type { MonthDate } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
+import { IntegrationContext } from '../integration-context';
+import SpousalBenefitToggle from '../SpousalBenefitToggle.svelte';
 
-  export let recipient: Recipient;
-  export let spouse: Recipient | null = null;
+export let recipient: Recipient;
+export let spouse: Recipient | null = null;
 
-  // User-configurable inflation rate (Linopt's default is 2.5%)
-  let inflationRatePercent = 2.5;
-  $: inflationRate = inflationRatePercent / 100;
+// User-configurable inflation rate (Linopt's default is 2.5%)
+let inflationRatePercent = 2.5;
+$: inflationRate = inflationRatePercent / 100;
 
-  // Toggle for lower earner benefit calculation (personal only vs personal + spousal)
-  let includeSpousalBenefit = false;
+// Toggle for lower earner benefit calculation (personal only vs personal + spousal)
+let includeSpousalBenefit = false;
 
-  // Context for determining higher/lower earners and their filing dates
-  $: context = new IntegrationContext(recipient, spouse);
+// Context for determining higher/lower earners and their filing dates
+$: context = new IntegrationContext(recipient, spouse);
 
-  // Calculated values from SpousalBenefitToggle (annual benefits in today's dollars)
-  // These are bound from the toggle component when spouse is present
-  let recipientBenefitCalculationDate: MonthDate;
-  let spouseBenefitCalculationDate: MonthDate;
-  let recipientAnnualBenefit: Money;
-  let spouseAnnualBenefit: Money;
+// Calculated values from SpousalBenefitToggle (annual benefits in today's dollars)
+// These are bound from the toggle component when spouse is present
+let recipientBenefitCalculationDate: MonthDate;
+let spouseBenefitCalculationDate: MonthDate;
+let recipientAnnualBenefit: Money;
+let spouseAnnualBenefit: Money;
 
-  // For single-person case, calculate values directly
-  $: if (spouse === null) {
-    recipientBenefitCalculationDate = $recipientFilingDate!;
-    recipientAnnualBenefit = recipient
-      .benefitOnDate(
-        recipientBenefitCalculationDate,
-        recipientBenefitCalculationDate
-      )
-      .times(12);
-  }
+// For single-person case, calculate values directly
+$: if (spouse === null) {
+  recipientBenefitCalculationDate = $recipientFilingDate!;
+  recipientAnnualBenefit = recipient
+    .benefitOnDate(
+      recipientBenefitCalculationDate,
+      recipientBenefitCalculationDate
+    )
+    .times(12);
+}
 
-  // Format annual benefit for Linopt (with inflation adjustment, in thousands)
-  function formatForLinopt(
-    annualBenefit: Money,
-    calculationDate: MonthDate
-  ): string {
-    let dollars = annualBenefit.roundToDollar().value();
+// Format annual benefit for Linopt (with inflation adjustment, in thousands)
+function formatForLinopt(
+  annualBenefit: Money,
+  calculationDate: MonthDate
+): string {
+  let dollars = annualBenefit.roundToDollar().value();
 
-    // Inflate to future dollars for Linopt
-    const yearsUntilStart = Math.max(0, calculationDate.year() - CURRENT_YEAR);
-    dollars = dollars * Math.pow(1 + inflationRate, yearsUntilStart);
+  // Inflate to future dollars for Linopt
+  const yearsUntilStart = Math.max(0, calculationDate.year() - CURRENT_YEAR);
+  dollars = dollars * (1 + inflationRate) ** yearsUntilStart;
 
-    // Convert to thousands with 3 decimal places
-    return (dollars / 1000).toFixed(3);
-  }
+  // Convert to thousands with 3 decimal places
+  return (dollars / 1000).toFixed(3);
+}
 
-  // Reactive formatted values (recalculate when inflation rate or benefits change)
-  $: recipientYearlySS =
-    recipientAnnualBenefit && recipientBenefitCalculationDate
-      ? formatForLinopt(recipientAnnualBenefit, recipientBenefitCalculationDate)
-      : '0.000';
+// Reactive formatted values (recalculate when inflation rate or benefits change)
+$: recipientYearlySS =
+  recipientAnnualBenefit && recipientBenefitCalculationDate
+    ? formatForLinopt(recipientAnnualBenefit, recipientBenefitCalculationDate)
+    : '0.000';
 
-  $: spouseYearlySS =
-    spouse !== null && spouseAnnualBenefit && spouseBenefitCalculationDate
-      ? formatForLinopt(spouseAnnualBenefit, spouseBenefitCalculationDate)
-      : '0.000';
+$: spouseYearlySS =
+  spouse !== null && spouseAnnualBenefit && spouseBenefitCalculationDate
+    ? formatForLinopt(spouseAnnualBenefit, spouseBenefitCalculationDate)
+    : '0.000';
 </script>
 
 <div class="pageBreakAvoid">

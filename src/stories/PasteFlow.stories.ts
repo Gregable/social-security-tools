@@ -1,5 +1,5 @@
-import type { Meta } from '@storybook/svelte';
 import { action } from '@storybook/addon-actions';
+import type { Meta } from '@storybook/svelte';
 
 import PasteFlow from '../lib/components/PasteFlow.svelte';
 

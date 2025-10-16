@@ -1,6 +1,6 @@
 <script lang="ts">
-  import IntegrationBanner from '../IntegrationBanner.svelte';
-  import logo from './favicon.ico';
+import IntegrationBanner from '../IntegrationBanner.svelte';
+import logo from './favicon.ico';
 </script>
 
 <IntegrationBanner {logo} logoAlt="Fin Pods AI">

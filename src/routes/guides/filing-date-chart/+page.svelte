@@ -1,32 +1,31 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
+import DateSelectBoxImage from './date-select-box.png';
+import HeroImage from './hero.png';
+import MoneyAxisSingleImage from './money-axis-single.png';
+import MultiUserImage from './multi-user.png';
+import SliderImage from './slider.png';
 
-  import HeroImage from './hero.png';
-  import SliderImage from './slider.png';
-  import MoneyAxisSingleImage from './money-axis-single.png';
-  import DateSelectBoxImage from './date-select-box.png';
-  import MultiUserImage from './multi-user.png';
+const title = 'Navigate the Filing Date Chart';
+const description =
+  "This site's calculator shows a information dense chart of how filing dates affect your benefits. The chart can be a little confusing at first, so here's a guide to help you understand it.";
+const publishDate = new Date('2023-08-15T00:00:00+00:00');
 
-  const title = 'Navigate the Filing Date Chart';
-  const description =
-    "This site's calculator shows a information dense chart of how filing dates affect your benefits. The chart can be a little confusing at first, so here's a guide to help you understand it.";
-  const publishDate = new Date('2023-08-15T00:00:00+00:00');
-
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/filing-date-chart';
-  schema.title = title;
-  schema.image = HeroImage;
-  schema.datePublished = publishDate.toISOString();
-  schema.description = description; // Pass the description to the schema
-  schema.imageAlt =
-    'Laptop with piggybank representing Social Security filing strategies';
-  schema.tags = [
-    'Filing Date',
-    'Social Security',
-    'Benefits Optimization',
-    'Retirement Age',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/filing-date-chart';
+schema.title = title;
+schema.image = HeroImage;
+schema.datePublished = publishDate.toISOString();
+schema.description = description; // Pass the description to the schema
+schema.imageAlt =
+  'Laptop with piggybank representing Social Security filing strategies';
+schema.tags = [
+  'Filing Date',
+  'Social Security',
+  'Benefits Optimization',
+  'Retirement Age',
+];
 </script>
 
 <svelte:head>

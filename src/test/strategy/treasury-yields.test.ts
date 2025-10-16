@@ -1,17 +1,17 @@
+import process from 'node:process';
 import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
+  afterAll,
   afterEach,
   beforeAll,
-  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
 } from 'vitest';
-import process from 'process';
 import {
-  fetchLatest20YearTreasuryYield,
   fetchFredDFII20Yield,
+  fetchLatest20YearTreasuryYield,
   getRecommendedDiscountRate,
 } from '$lib/strategy/data';
 

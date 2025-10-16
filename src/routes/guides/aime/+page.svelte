@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
 
-  const title = 'Averaged Indexed Monthly Earnings (AIME)';
-  const description =
-    'Learn how AIME (Average Indexed Monthly Earnings) is calculated and why it matters for your Social Security benefits. Comprehensive guide with examples.';
-  const publishDate = new Date('2025-09-19T00:00:00+00:00');
-  const updateDate = new Date('2025-09-19T00:00:00+00:00');
+const title = 'Averaged Indexed Monthly Earnings (AIME)';
+const description =
+  'Learn how AIME (Average Indexed Monthly Earnings) is calculated and why it matters for your Social Security benefits. Comprehensive guide with examples.';
+const publishDate = new Date('2025-09-19T00:00:00+00:00');
+const updateDate = new Date('2025-09-19T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/aime';
-  schema.title = title;
-  schema.image = '/laptop-piggybank.jpg';
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description;
-  schema.imageAlt =
-    'Laptop with piggybank representing Social Security AIME calculations';
-  schema.tags = [
-    'AIME',
-    'Average Indexed Monthly Earnings',
-    'Social Security',
-    'Benefits Calculation',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/aime';
+schema.title = title;
+schema.image = '/laptop-piggybank.jpg';
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description;
+schema.imageAlt =
+  'Laptop with piggybank representing Social Security AIME calculations';
+schema.tags = [
+  'AIME',
+  'Average Indexed Monthly Earnings',
+  'Social Security',
+  'Benefits Calculation',
+];
 </script>
 
 <svelte:head>

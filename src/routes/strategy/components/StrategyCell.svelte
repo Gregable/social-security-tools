@@ -1,152 +1,152 @@
 <script lang="ts">
-  import type { Recipient } from '$lib/recipient';
-  import { getFilingDate, getFilingAge } from '$lib/strategy/ui';
-  import { createEventDispatcher } from 'svelte';
-  import RecipientName from '$lib/components/RecipientName.svelte';
+import { createEventDispatcher } from 'svelte';
+import RecipientName from '$lib/components/RecipientName.svelte';
+import type { Recipient } from '$lib/recipient';
+import { getFilingAge, getFilingDate } from '$lib/strategy/ui';
 
-  // Props
-  export let rowIndex: number;
-  export let colIndex: number;
-  export let calculationResult: any;
-  export let displayAsAges: boolean;
-  export let recipients: [Recipient, Recipient];
-  export let recipientIndex: number;
-  export let hoveredCell: { rowIndex: number; colIndex: number } | null;
-  export let isSelected: boolean = false;
-  export let cellWidth: number = 0;
-  export let cellHeight: number = 0;
-  export let cellStyle: string = '';
+// Props
+export let rowIndex: number;
+export let colIndex: number;
+export let calculationResult: any;
+export let displayAsAges: boolean;
+export let recipients: [Recipient, Recipient];
+export let recipientIndex: number;
+export let hoveredCell: { rowIndex: number; colIndex: number } | null;
+export let isSelected: boolean = false;
+export let cellWidth: number = 0;
+export let cellHeight: number = 0;
+export let cellStyle: string = '';
 
-  const dispatch = createEventDispatcher();
+const dispatch = createEventDispatcher();
 
-  // Cell hover overlay state
-  let cellHoverInfo: {
-    x: number;
-    y: number;
-    filingDate1: string;
-    filingDate2: string;
-    filingAge1: string;
-    filingAge2: string;
-  } | null = null;
+// Cell hover overlay state
+let cellHoverInfo: {
+  x: number;
+  y: number;
+  filingDate1: string;
+  filingDate2: string;
+  filingAge1: string;
+  filingAge2: string;
+} | null = null;
 
-  // Calculate conditional CSS classes
-  $: isHighlightedCell =
-    hoveredCell &&
-    hoveredCell.rowIndex === rowIndex &&
-    hoveredCell.colIndex === colIndex;
+// Calculate conditional CSS classes
+$: isHighlightedCell =
+  hoveredCell &&
+  hoveredCell.rowIndex === rowIndex &&
+  hoveredCell.colIndex === colIndex;
 
-  $: isHighlightedColumn =
-    hoveredCell &&
-    hoveredCell.colIndex === colIndex &&
-    hoveredCell.rowIndex !== rowIndex;
+$: isHighlightedColumn =
+  hoveredCell &&
+  hoveredCell.colIndex === colIndex &&
+  hoveredCell.rowIndex !== rowIndex;
 
-  $: isHighlightedRow =
-    hoveredCell &&
-    hoveredCell.rowIndex === rowIndex &&
-    hoveredCell.colIndex !== colIndex;
+$: isHighlightedRow =
+  hoveredCell &&
+  hoveredCell.rowIndex === rowIndex &&
+  hoveredCell.colIndex !== colIndex;
 
-  // Handle events
-  function handleMouseOver(event: MouseEvent) {
-    dispatch('hover', { rowIndex, colIndex });
+// Handle events
+function handleMouseOver(event: MouseEvent) {
+  dispatch('hover', { rowIndex, colIndex });
 
-    if (calculationResult) {
-      // Calculate filing dates for both recipients
-      const filingAge1Years = calculationResult.filingAge1Years;
-      const filingAge1Months = calculationResult.filingAge1Months;
-      const filingAge2Years = calculationResult.filingAge2Years;
-      const filingAge2Months = calculationResult.filingAge2Months;
+  if (calculationResult) {
+    // Calculate filing dates for both recipients
+    const filingAge1Years = calculationResult.filingAge1Years;
+    const filingAge1Months = calculationResult.filingAge1Months;
+    const filingAge2Years = calculationResult.filingAge2Years;
+    const filingAge2Months = calculationResult.filingAge2Months;
 
-      const filingDate1 = recipients[0].birthdate.dateAtLayAge(
-        calculationResult.filingAge1
-      );
-      const filingDate2 = recipients[1].birthdate.dateAtLayAge(
-        calculationResult.filingAge2
-      );
+    const filingDate1 = recipients[0].birthdate.dateAtLayAge(
+      calculationResult.filingAge1
+    );
+    const filingDate2 = recipients[1].birthdate.dateAtLayAge(
+      calculationResult.filingAge2
+    );
 
-      cellHoverInfo = {
-        x: event.clientX,
-        y: event.clientY,
-        filingDate1: filingDate1.toString(),
-        filingDate2: filingDate2.toString(),
-        filingAge1: `${filingAge1Years}y ${filingAge1Months}m`,
-        filingAge2: `${filingAge2Years}y ${filingAge2Months}m`,
-      };
-    }
+    cellHoverInfo = {
+      x: event.clientX,
+      y: event.clientY,
+      filingDate1: filingDate1.toString(),
+      filingDate2: filingDate2.toString(),
+      filingAge1: `${filingAge1Years}y ${filingAge1Months}m`,
+      filingAge2: `${filingAge2Years}y ${filingAge2Months}m`,
+    };
+  }
+}
+
+function handleFocus() {
+  dispatch('hover', { rowIndex, colIndex });
+}
+
+function handleMouseOut() {
+  dispatch('hoverout');
+  cellHoverInfo = null;
+}
+
+function handleBlur() {
+  dispatch('hoverout');
+}
+
+function handleClick() {
+  dispatch('select', { rowIndex, colIndex });
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    handleClick();
+  }
+}
+
+// Get the display content for the cell (reactive)
+$: cellContent = getCellContentReactive(
+  calculationResult,
+  displayAsAges,
+  recipients,
+  recipientIndex,
+  cellWidth,
+  cellHeight
+);
+
+function getCellContentReactive(
+  calculationResult: any,
+  displayAsAges: boolean,
+  recipients: [Recipient, Recipient],
+  recipientIndex: number,
+  cellWidth: number,
+  cellHeight: number
+): string {
+  if (!calculationResult) {
+    return 'N/A';
   }
 
-  function handleFocus() {
-    dispatch('hover', { rowIndex, colIndex });
+  const filingAgeYears =
+    calculationResult[`filingAge${recipientIndex + 1}Years`];
+  const filingAgeMonths =
+    calculationResult[`filingAge${recipientIndex + 1}Months`];
+
+  // Use a reasonable default width if cellWidth is 0 (during initialization)
+  // Default to a larger size to show full format until actual dimensions are available
+  const effectiveCellWidth = cellWidth || 100;
+
+  if (displayAsAges) {
+    return getFilingAge(
+      filingAgeYears,
+      filingAgeMonths,
+      effectiveCellWidth,
+      cellHeight
+    );
+  } else {
+    return getFilingDate(
+      recipients,
+      recipientIndex,
+      filingAgeYears,
+      filingAgeMonths,
+      effectiveCellWidth,
+      cellHeight
+    );
   }
-
-  function handleMouseOut() {
-    dispatch('hoverout');
-    cellHoverInfo = null;
-  }
-
-  function handleBlur() {
-    dispatch('hoverout');
-  }
-
-  function handleClick() {
-    dispatch('select', { rowIndex, colIndex });
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleClick();
-    }
-  }
-
-  // Get the display content for the cell (reactive)
-  $: cellContent = getCellContentReactive(
-    calculationResult,
-    displayAsAges,
-    recipients,
-    recipientIndex,
-    cellWidth,
-    cellHeight
-  );
-
-  function getCellContentReactive(
-    calculationResult: any,
-    displayAsAges: boolean,
-    recipients: [Recipient, Recipient],
-    recipientIndex: number,
-    cellWidth: number,
-    cellHeight: number
-  ): string {
-    if (!calculationResult) {
-      return 'N/A';
-    }
-
-    const filingAgeYears =
-      calculationResult[`filingAge${recipientIndex + 1}Years`];
-    const filingAgeMonths =
-      calculationResult[`filingAge${recipientIndex + 1}Months`];
-
-    // Use a reasonable default width if cellWidth is 0 (during initialization)
-    // Default to a larger size to show full format until actual dimensions are available
-    const effectiveCellWidth = cellWidth || 100;
-
-    if (displayAsAges) {
-      return getFilingAge(
-        filingAgeYears,
-        filingAgeMonths,
-        effectiveCellWidth,
-        cellHeight
-      );
-    } else {
-      return getFilingDate(
-        recipients,
-        recipientIndex,
-        filingAgeYears,
-        filingAgeMonths,
-        effectiveCellWidth,
-        cellHeight
-      );
-    }
-  }
+}
 </script>
 
 <div

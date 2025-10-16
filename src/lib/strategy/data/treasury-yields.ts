@@ -33,7 +33,7 @@ export async function fetchLatest20YearTreasuryYield(): Promise<TreasuryYieldDat
 
     let response = await fetch(url);
     let xmlText = await response.text();
-    let parser = new DOMParser();
+    const parser = new DOMParser();
     let xmlDoc = parser.parseFromString(xmlText, 'text/xml');
     let entries = xmlDoc.getElementsByTagName('entry');
 
@@ -138,7 +138,7 @@ export async function fetchFredDFII20Yield(): Promise<TreasuryYieldData> {
       const [date, rateStr] = line.split(',');
       const rate = parseFloat(rateStr);
 
-      if (!isNaN(rate) && rateStr.trim() !== '') {
+      if (!Number.isNaN(rate) && rateStr.trim() !== '') {
         // Found a valid rate
         return {
           date: date,

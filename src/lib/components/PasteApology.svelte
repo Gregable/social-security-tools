@@ -13,11 +13,11 @@
 -->
 
 <script lang="ts">
-  // Callback prop for reset event
-  export let onreset: (() => void) | undefined = undefined;
-  function reset() {
-    onreset?.();
-  }
+// Callback prop for reset event
+export let onreset: (() => void) | undefined = undefined;
+function reset() {
+  onreset?.();
+}
 </script>
 
 <div class="confirmation">

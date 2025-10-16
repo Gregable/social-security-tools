@@ -25,11 +25,6 @@ export type GenderOption = 'male' | 'female' | 'blended';
  * A Recipient object manages calculating a user's SSA and IRS data.
  */
 export class Recipient {
-  /**
-   * Creates a Recipient object.
-   */
-  constructor() {}
-
   /** Health multiplier to scale mortality q(x) values (0.7–2.5). */
   private healthMultiplier_: number = 1.0;
   get healthMultiplier(): number {
@@ -99,7 +94,7 @@ export class Recipient {
    */
   shortName(length: number): string {
     if (this.name_.length <= length) return this.name_;
-    return this.name_.substring(0, length - 1) + '…';
+    return `${this.name_.substring(0, length - 1)}…`;
   }
 
   /** True if this is the only recipient, false if there are two. */
@@ -201,7 +196,7 @@ export class Recipient {
       const lastRecord =
         this.earningsRecords_[this.earningsRecords_.length - 1];
       if (
-        lastRecord.year == constants.CURRENT_YEAR - 1 &&
+        lastRecord.year === constants.CURRENT_YEAR - 1 &&
         lastRecord.incomplete
       ) {
         // If the previous year's record is listed as incomplete, we allow the
@@ -320,9 +315,9 @@ export class Recipient {
     delayedIncreaseAnnual: number;
   } {
     // Find the retirement age bracket data for this recipient.
-    let retirementAgeBracket = undefined;
+    let retirementAgeBracket;
     for (let i = 0; i < constants.FULL_RETIREMENT_AGE.length; ++i) {
-      let ageBracket = constants.FULL_RETIREMENT_AGE[i];
+      const ageBracket = constants.FULL_RETIREMENT_AGE[i];
       if (
         this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
         this.birthdate_.ssaBirthYear() <= ageBracket.maxYear
@@ -342,9 +337,9 @@ export class Recipient {
     delayedIncreaseAnnual: number;
   } {
     // Find the retirement age bracket data for this recipient.
-    let retirementAgeBracket = undefined;
+    let retirementAgeBracket;
     for (let i = 0; i < constants.FULL_RETIREMENT_AGE_SURVIVOR.length; ++i) {
-      let ageBracket = constants.FULL_RETIREMENT_AGE_SURVIVOR[i];
+      const ageBracket = constants.FULL_RETIREMENT_AGE_SURVIVOR[i];
       if (
         this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
         this.birthdate_.ssaBirthYear() <= ageBracket.maxYear
@@ -499,7 +494,7 @@ export class Recipient {
     );
     this.top35IndexedEarnings_.sort((a, b) => {
       // Prefer higher indexed earnings, break ties by by older years.
-      if (a.indexedEarnings().value() != b.indexedEarnings().value()) {
+      if (a.indexedEarnings().value() !== b.indexedEarnings().value()) {
         return b.indexedEarnings().value() - a.indexedEarnings().value();
       } else {
         return a.year - b.year;
@@ -524,7 +519,7 @@ export class Recipient {
       throw new Error('Cannot check earnings records when PIA is set.');
     }
     // Only check the first earnings record. Future records are after 1978.
-    return this.earningsRecords_.length == 0
+    return this.earningsRecords_.length === 0
       ? false
       : this.earningsRecords_[0].year < 1978;
   }
@@ -572,7 +567,7 @@ export class Recipient {
     // Compute the number of total months between birth and full retirement age.
     if (nra.greaterThan(age)) {
       // Reduced benefits due to taking benefits early.
-      let before = nra.subtract(age);
+      const before = nra.subtract(age);
       return (
         -1.0 *
         ((Math.min(36, before.asMonths()) * 5) / 900 +
@@ -689,8 +684,8 @@ export class Recipient {
    * @returns True if this recipient is eligible for spousal benefits.
    */
   eligibleForSpousalBenefit(spouse: Recipient): boolean {
-    let piaAmount: Money = this.pia().primaryInsuranceAmount();
-    let spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
+    const piaAmount: Money = this.pia().primaryInsuranceAmount();
+    const spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
 
     return spousePiaAmount.div(2).value() > piaAmount.value();
   }

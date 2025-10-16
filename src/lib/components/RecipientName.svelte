@@ -17,43 +17,43 @@
 -->
 
 <script lang="ts">
-  import { Recipient } from '$lib/recipient';
+import { Recipient } from '$lib/recipient';
 
-  /**
-   * Shortened "recipient", to make the tag less verbose.
-   */
-  export let r: Recipient = new Recipient();
+/**
+ * Shortened "recipient", to make the tag less verbose.
+ */
+export let r: Recipient = new Recipient();
 
-  /**
-   * If set, the string will be appended to the recipeint's name.
-   * String will not be appended if the slot is used instead.
-   */
-  export let suffix: string = '';
+/**
+ * If set, the string will be appended to the recipeint's name.
+ * String will not be appended if the slot is used instead.
+ */
+export let suffix: string = '';
 
-  /**
-   * If set, no styling will be applied to the name.
-   */
-  export let noColor: boolean = false;
+/**
+ * If set, no styling will be applied to the name.
+ */
+export let noColor: boolean = false;
 
-  /**
-   * If set, the name will be shortened to the given number of characters.
-   */
-  export let shortenTo: number | null = null;
+/**
+ * If set, the name will be shortened to the given number of characters.
+ */
+export let shortenTo: number | null = null;
 
-  /**
-   * Apostrophe: shorthand for suffix="'s".
-   */
-  export let apos: boolean = false;
+/**
+ * Apostrophe: shorthand for suffix="'s".
+ */
+export let apos: boolean = false;
 
-  function finalSuffix(): string {
-    if (suffix) {
-      return suffix;
-    } else if (apos) {
-      return "'s";
-    } else {
-      return '';
-    }
+function finalSuffix(): string {
+  if (suffix) {
+    return suffix;
+  } else if (apos) {
+    return "'s";
+  } else {
+    return '';
   }
+}
 </script>
 
 <span

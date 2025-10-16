@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { GuidesSchema } from '$lib/schema-org';
-  import GuideFooter from '../guide-footer.svelte';
+import { GuidesSchema } from '$lib/schema-org';
+import GuideFooter from '../guide-footer.svelte';
 
-  const title = 'Primary Insurance Amount (PIA)';
-  const description =
-    'Learn how Social Security calculates your Primary Insurance Amount (PIA) using bendpoints, the implications of earning more money late in your career, and how PIA forms the foundation of all Social Security benefits.';
-  const publishDate = new Date('2025-09-19T00:00:00+00:00');
-  const updateDate = new Date('2025-09-19T00:00:00+00:00');
+const title = 'Primary Insurance Amount (PIA)';
+const description =
+  'Learn how Social Security calculates your Primary Insurance Amount (PIA) using bendpoints, the implications of earning more money late in your career, and how PIA forms the foundation of all Social Security benefits.';
+const publishDate = new Date('2025-09-19T00:00:00+00:00');
+const updateDate = new Date('2025-09-19T00:00:00+00:00');
 
-  let schema: GuidesSchema = new GuidesSchema();
-  schema.url = 'https://ssa.tools/guides/pia';
-  schema.title = title;
-  schema.image = '/laptop-piggybank.jpg';
-  schema.datePublished = publishDate.toISOString();
-  schema.dateModified = updateDate.toISOString();
-  schema.description = description;
-  schema.imageAlt =
-    'Laptop with piggybank representing Social Security calculations';
-  schema.tags = [
-    'Primary Insurance Amount',
-    'PIA',
-    'Social Security',
-    'Bendpoints',
-  ];
+let schema: GuidesSchema = new GuidesSchema();
+schema.url = 'https://ssa.tools/guides/pia';
+schema.title = title;
+schema.image = '/laptop-piggybank.jpg';
+schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
+schema.description = description;
+schema.imageAlt =
+  'Laptop with piggybank representing Social Security calculations';
+schema.tags = [
+  'Primary Insurance Amount',
+  'PIA',
+  'Social Security',
+  'Bendpoints',
+];
 </script>
 
 <svelte:head>

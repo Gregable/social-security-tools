@@ -1,15 +1,14 @@
 import type { Meta } from '@storybook/svelte';
-import App from '../routes/calculator/+page.svelte';
-
-import { context } from '$lib/context';
-import { Recipient } from '$lib/recipient';
-import { parsePaste } from '$lib/ssa-parse';
 import { Birthdate } from '$lib/birthday';
 
+import { context } from '$lib/context';
 import demo from '$lib/pastes/averagepaste.txt?raw';
 import demo_spouse_low from '$lib/pastes/averagepaste-spouse.txt?raw';
+import { Recipient } from '$lib/recipient';
+import { parsePaste } from '$lib/ssa-parse';
+import App from '../routes/calculator/+page.svelte';
 
-let recipient = new Recipient();
+const recipient = new Recipient();
 recipient.name = 'Alex';
 recipient.markFirst();
 recipient.earningsRecords = parsePaste(demo);
@@ -18,7 +17,7 @@ context.recipient = recipient;
 
 // This data is such that the spouse has a low enough PIA that they can claim
 // spousal benefits, but not a zero PIA.
-let spouseLowEarner = new Recipient();
+const spouseLowEarner = new Recipient();
 spouseLowEarner.name = 'Chris';
 spouseLowEarner.markSecond();
 spouseLowEarner.earningsRecords = parsePaste(demo_spouse_low);

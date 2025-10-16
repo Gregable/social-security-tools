@@ -455,7 +455,7 @@ export const SSA_EARNINGS_YEARS: number = 35;
 /**
  * The current calendar year.
  */
-export let CURRENT_YEAR: number = new Date().getFullYear();
+export const CURRENT_YEAR: number = new Date().getFullYear();
 
 /**
  * All months, in order, as 3-letter abbreviations.
