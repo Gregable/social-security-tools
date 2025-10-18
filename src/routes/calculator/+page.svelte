@@ -42,6 +42,9 @@ onMount(() => {
 function pasteDone() {
   isPasteFlow = false;
 
+  // Show the intro banner again now that the report is displayed
+  showIntroBanner = true;
+
   // Don't change the URL hash - preserve integration parameters
   // Previously we pushed #results here, but that would remove integration
   // parameters from the URL before they could be properly initialized
@@ -121,7 +124,7 @@ async function loadIntegrationComponents(
 
 <Header active="Calculator" />
 
-{#if isPasteFlow && showIntroBanner && IntroBannerComponent && $activeIntegration && integrationComponentsLoaded}
+{#if showIntroBanner && IntroBannerComponent && $activeIntegration && integrationComponentsLoaded}
   <svelte:component this={IntroBannerComponent} />
 {/if}
 

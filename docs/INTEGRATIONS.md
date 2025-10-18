@@ -57,9 +57,10 @@ When an integration is active:
 1. **Intro Banner**: A small banner appears at the top of both the home page and
    calculator page (after the header) informing the user that the integration is
    active and that they'll see additional information at the end of their
-   report. On the calculator page, the banner automatically disappears once the
-   user has entered their earnings data (or loaded demo data), providing a clean
-   experience during data confirmation and report viewing.
+   report. On the calculator page, the banner automatically hides during the
+   earnings data entry process (while the user is filling out or confirming
+   their data), then reappears when the full report is displayed, providing a
+   reminder of the integration context.
 
 2. **Report End Section**: After the user enters their data and completes the
    report, a new section appears immediately before the "More Reading" section.
