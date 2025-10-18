@@ -27,7 +27,7 @@ jobs:
       - name: Run Biome Format & Lint Check
         run: |
           echo "🎨 Checking code formatting and linting with Biome..."
-          npm run format:check
+          npm run lint
 
       - name: Run Svelte Check
         run: |
