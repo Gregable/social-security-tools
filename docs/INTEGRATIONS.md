@@ -108,10 +108,12 @@ warning.
    ```
 
 2. **Create integration components**:
+
    - `src/lib/components/integrations/newsite.com/IntroBanner.svelte`
    - `src/lib/components/integrations/newsite.com/ReportEnd.svelte`
 
 3. **Component Props**:
+
    - `IntroBanner.svelte`: No props required
    - `ReportEnd.svelte`: Receives `recipient` and `spouse` (nullable) as props
 

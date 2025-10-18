@@ -5,24 +5,17 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "prepare": "svelte-kit sync",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings --watch",
-    "lint": "biome lint .",
-    "lint:fix": "biome lint --write .",
+    "lint": "biome check .",
+    "fix": "biome check --write .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
-    "format": "biome format --write .",
-    "format:check": "biome check .",
-    "quality": "npm run format:check && npm run check",
-    "setup": "./scripts/setup.sh",
-    "node:check": "node --version && echo 'Node.js version check passed'",
-    "dev:safe": "npm run node:check && npm run dev",
-    "build:safe": "npm run node:check && npm run build"
+    "quality": "npm run lint && npm run check",
+    "setup": "./scripts/setup.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.6",

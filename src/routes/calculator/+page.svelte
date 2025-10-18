@@ -116,9 +116,9 @@ async function loadIntegrationComponents(
     function gtag() {
       dataLayer.push(arguments);
     }
-    gtag('js', new Date());
+    gtag("js", new Date());
 
-    gtag('config', 'AW-16669721864');
+    gtag("config", "AW-16669721864");
   </script>
 </svelte:head>
 
@@ -267,10 +267,10 @@ async function loadIntegrationComponents(
       </SidebarSection>
     </Sidebar>
     <script>
-      gtag('event', 'conversion', {
-        send_to: 'AW-16669721864/KvxrCIjA3skZEIiK34w-',
+      gtag("event", "conversion", {
+        send_to: "AW-16669721864/KvxrCIjA3skZEIiK34w-",
         value: 1.0,
-        currency: 'USD',
+        currency: "USD",
       });
     </script>
   {/if}
