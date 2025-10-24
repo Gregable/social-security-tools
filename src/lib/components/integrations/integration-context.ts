@@ -4,11 +4,11 @@
  * and their filing dates based on recipient and spouse data.
  */
 
-import { get } from 'svelte/store';
-import { recipientFilingDate, spouseFilingDate } from '$lib/context';
-import { Money } from '$lib/money';
-import { type MonthDate, MonthDuration } from '$lib/month-time';
-import type { Recipient } from '$lib/recipient';
+import { recipientFilingDate, spouseFilingDate } from "$lib/context";
+import { Money } from "$lib/money";
+import { type MonthDate, MonthDuration } from "$lib/month-time";
+import type { Recipient } from "$lib/recipient";
+import { get } from "svelte/store";
 
 /**
  * Context class for integration components that need to work with
@@ -229,13 +229,13 @@ export class IntegrationContext {
    * @param value The string value to copy to the clipboard
    */
   static copyToClipboard(value: string): void {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(value).then(
         () => {
           // Success feedback could be added here
         },
         (err) => {
-          console.error('Failed to copy:', err);
+          console.error("Failed to copy:", err);
         }
       );
     }

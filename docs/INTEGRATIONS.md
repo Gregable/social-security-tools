@@ -142,12 +142,12 @@ warning.
 ### FIRECalc (firecalc.com)
 
 - **Intro Banner**: Informs users that they'll see their Social Security
-   calculations for use with FIRECalc
+  calculations for use with FIRECalc
 - **Report End**: Displays annual Social Security amounts in today's dollars
-   with starting years (not ages). For couples, includes a toggle to choose
-   between personal benefit only or combined personal + spousal benefit for the
-   lower earner. No inflation adjustment is applied since FIRECalc expects
-   amounts in today's dollars.
+  with starting years (not ages). For couples, includes a toggle to choose
+  between personal benefit only or combined personal + spousal benefit for the
+  lower earner. No inflation adjustment is applied since FIRECalc expects
+  amounts in today's dollars.
 
 ### FI Calc (ficalc.app)
 

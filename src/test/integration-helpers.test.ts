@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it, vitest } from 'vitest';
-import { Birthdate } from '$lib/birthday';
-import { IntegrationContext } from '$lib/components/integrations/integration-context';
-import { recipientFilingDate, spouseFilingDate } from '$lib/context';
-import { Money } from '$lib/money';
-import { MonthDate } from '$lib/month-time';
-import { Recipient } from '$lib/recipient';
+import { Birthdate } from "$lib/birthday";
+import { IntegrationContext } from "$lib/components/integrations/integration-context";
+import { recipientFilingDate, spouseFilingDate } from "$lib/context";
+import { Money } from "$lib/money";
+import { MonthDate } from "$lib/month-time";
+import { Recipient } from "$lib/recipient";
+import { beforeEach, describe, expect, it, vitest } from "vitest";
 
-describe('IntegrationContext', () => {
+describe("IntegrationContext", () => {
   // Create test recipients with different earnings
   let higherEarningRecipient: Recipient;
   let lowerEarningRecipient: Recipient;
@@ -26,20 +26,20 @@ describe('IntegrationContext', () => {
     spouseFilingDate.set(null);
   });
 
-  describe('when no spouse', () => {
-    it('should return recipient for higherEarner', () => {
+  describe("when no spouse", () => {
+    it("should return recipient for higherEarner", () => {
       const context = new IntegrationContext(higherEarningRecipient, null);
 
       expect(context.higherEarner()).toBe(higherEarningRecipient);
     });
 
-    it('should return null for lowerEarner', () => {
+    it("should return null for lowerEarner", () => {
       const context = new IntegrationContext(higherEarningRecipient, null);
 
       expect(context.lowerEarner()).toBeNull();
     });
 
-    it('should return recipient filing date for higherEarnerFilingDate', () => {
+    it("should return recipient filing date for higherEarnerFilingDate", () => {
       const filingDate = MonthDate.initFromYearsMonths({
         years: 2027,
         months: 0,
@@ -51,27 +51,27 @@ describe('IntegrationContext', () => {
       expect(context.higherEarnerFilingDate()).toBe(filingDate);
     });
 
-    it('should return null for lowerEarnerFilingDate', () => {
+    it("should return null for lowerEarnerFilingDate", () => {
       const context = new IntegrationContext(higherEarningRecipient, null);
 
       expect(context.lowerEarnerFilingDate()).toBeNull();
     });
 
-    it('should return true for isRecipientHigherEarner', () => {
+    it("should return true for isRecipientHigherEarner", () => {
       const context = new IntegrationContext(higherEarningRecipient, null);
 
       expect(context.isRecipientHigherEarner()).toBe(true);
     });
 
-    it('should return false for isRecipientLowerEarner', () => {
+    it("should return false for isRecipientLowerEarner", () => {
       const context = new IntegrationContext(higherEarningRecipient, null);
 
       expect(context.isRecipientLowerEarner()).toBe(false);
     });
   });
 
-  describe('when recipient is higher earner', () => {
-    it('should return recipient for higherEarner', () => {
+  describe("when recipient is higher earner", () => {
+    it("should return recipient for higherEarner", () => {
       const context = new IntegrationContext(
         higherEarningRecipient,
         lowerEarningRecipient
@@ -80,7 +80,7 @@ describe('IntegrationContext', () => {
       expect(context.higherEarner()).toBe(higherEarningRecipient);
     });
 
-    it('should return spouse for lowerEarner', () => {
+    it("should return spouse for lowerEarner", () => {
       const context = new IntegrationContext(
         higherEarningRecipient,
         lowerEarningRecipient
@@ -89,7 +89,7 @@ describe('IntegrationContext', () => {
       expect(context.lowerEarner()).toBe(lowerEarningRecipient);
     });
 
-    it('should return recipient filing date for higherEarnerFilingDate', () => {
+    it("should return recipient filing date for higherEarnerFilingDate", () => {
       const filingDate = MonthDate.initFromYearsMonths({
         years: 2027,
         months: 0,
@@ -104,7 +104,7 @@ describe('IntegrationContext', () => {
       expect(context.higherEarnerFilingDate()).toBe(filingDate);
     });
 
-    it('should return spouse filing date for lowerEarnerFilingDate', () => {
+    it("should return spouse filing date for lowerEarnerFilingDate", () => {
       const filingDate = MonthDate.initFromYearsMonths({
         years: 2029,
         months: 5,
@@ -119,7 +119,7 @@ describe('IntegrationContext', () => {
       expect(context.lowerEarnerFilingDate()).toBe(filingDate);
     });
 
-    it('should return true for isRecipientHigherEarner', () => {
+    it("should return true for isRecipientHigherEarner", () => {
       const context = new IntegrationContext(
         higherEarningRecipient,
         lowerEarningRecipient
@@ -128,7 +128,7 @@ describe('IntegrationContext', () => {
       expect(context.isRecipientHigherEarner()).toBe(true);
     });
 
-    it('should return false for isRecipientLowerEarner', () => {
+    it("should return false for isRecipientLowerEarner", () => {
       const context = new IntegrationContext(
         higherEarningRecipient,
         lowerEarningRecipient
@@ -138,8 +138,8 @@ describe('IntegrationContext', () => {
     });
   });
 
-  describe('when spouse is higher earner', () => {
-    it('should return spouse for higherEarner', () => {
+  describe("when spouse is higher earner", () => {
+    it("should return spouse for higherEarner", () => {
       const context = new IntegrationContext(
         lowerEarningRecipient,
         higherEarningRecipient
@@ -148,7 +148,7 @@ describe('IntegrationContext', () => {
       expect(context.higherEarner()).toBe(higherEarningRecipient);
     });
 
-    it('should return recipient for lowerEarner', () => {
+    it("should return recipient for lowerEarner", () => {
       const context = new IntegrationContext(
         lowerEarningRecipient,
         higherEarningRecipient
@@ -157,7 +157,7 @@ describe('IntegrationContext', () => {
       expect(context.lowerEarner()).toBe(lowerEarningRecipient);
     });
 
-    it('should return spouse filing date for higherEarnerFilingDate', () => {
+    it("should return spouse filing date for higherEarnerFilingDate", () => {
       const filingDate = MonthDate.initFromYearsMonths({
         years: 2027,
         months: 0,
@@ -172,7 +172,7 @@ describe('IntegrationContext', () => {
       expect(context.higherEarnerFilingDate()).toBe(filingDate);
     });
 
-    it('should return recipient filing date for lowerEarnerFilingDate', () => {
+    it("should return recipient filing date for lowerEarnerFilingDate", () => {
       const filingDate = MonthDate.initFromYearsMonths({
         years: 2029,
         months: 5,
@@ -187,7 +187,7 @@ describe('IntegrationContext', () => {
       expect(context.lowerEarnerFilingDate()).toBe(filingDate);
     });
 
-    it('should return false for isRecipientHigherEarner', () => {
+    it("should return false for isRecipientHigherEarner", () => {
       const context = new IntegrationContext(
         lowerEarningRecipient,
         higherEarningRecipient
@@ -196,7 +196,7 @@ describe('IntegrationContext', () => {
       expect(context.isRecipientHigherEarner()).toBe(false);
     });
 
-    it('should return true for isRecipientLowerEarner', () => {
+    it("should return true for isRecipientLowerEarner", () => {
       const context = new IntegrationContext(
         lowerEarningRecipient,
         higherEarningRecipient
@@ -206,8 +206,8 @@ describe('IntegrationContext', () => {
     });
   });
 
-  describe('reactive updates to filing date stores', () => {
-    it('should update higherEarnerFilingDate when store changes', () => {
+  describe("reactive updates to filing date stores", () => {
+    it("should update higherEarnerFilingDate when store changes", () => {
       const context = new IntegrationContext(
         higherEarningRecipient,
         lowerEarningRecipient
@@ -222,7 +222,7 @@ describe('IntegrationContext', () => {
       expect(context.higherEarnerFilingDate()).toBe(newDate);
     });
 
-    it('should update lowerEarnerFilingDate when store changes', () => {
+    it("should update lowerEarnerFilingDate when store changes", () => {
       const context = new IntegrationContext(
         higherEarningRecipient,
         lowerEarningRecipient
@@ -238,26 +238,26 @@ describe('IntegrationContext', () => {
     });
   });
 
-  describe('static copyToClipboard', () => {
-    it('should call navigator.clipboard.writeText with the provided value', () => {
+  describe("static copyToClipboard", () => {
+    it("should call navigator.clipboard.writeText with the provided value", () => {
       // Mock the clipboard API
       const writeTextMock = vitest.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, 'clipboard', {
+      Object.defineProperty(navigator, "clipboard", {
         value: { writeText: writeTextMock },
         writable: true,
         configurable: true,
       });
 
-      const testValue = 'test clipboard content';
+      const testValue = "test clipboard content";
       IntegrationContext.copyToClipboard(testValue);
 
       expect(writeTextMock).toHaveBeenCalledWith(testValue);
     });
 
-    it('should handle missing clipboard API gracefully', () => {
+    it("should handle missing clipboard API gracefully", () => {
       // Remove clipboard API
       const originalClipboard = navigator.clipboard;
-      Object.defineProperty(navigator, 'clipboard', {
+      Object.defineProperty(navigator, "clipboard", {
         value: undefined,
         writable: true,
         configurable: true,
@@ -265,11 +265,11 @@ describe('IntegrationContext', () => {
 
       // Should not throw
       expect(() => {
-        IntegrationContext.copyToClipboard('test');
+        IntegrationContext.copyToClipboard("test");
       }).not.toThrow();
 
       // Restore
-      Object.defineProperty(navigator, 'clipboard', {
+      Object.defineProperty(navigator, "clipboard", {
         value: originalClipboard,
         writable: true,
         configurable: true,
@@ -277,7 +277,7 @@ describe('IntegrationContext', () => {
     });
   });
 
-  describe('benefit calculation methods', () => {
+  describe("benefit calculation methods", () => {
     beforeEach(() => {
       // Set up filing dates for tests
       const recipientDate = MonthDate.initFromYearsMonths({
@@ -292,8 +292,8 @@ describe('IntegrationContext', () => {
       spouseFilingDate.set(spouseDate);
     });
 
-    describe('getLowerEarnerPersonalBenefit', () => {
-      it('should return monthly Money for lower earner personal benefit', () => {
+    describe("getLowerEarnerPersonalBenefit", () => {
+      it("should return monthly Money for lower earner personal benefit", () => {
         const context = new IntegrationContext(
           higherEarningRecipient,
           lowerEarningRecipient
@@ -310,8 +310,8 @@ describe('IntegrationContext', () => {
       });
     });
 
-    describe('getLowerEarnerCombinedBenefit', () => {
-      it('should return monthly Money for lower earner combined benefit', () => {
+    describe("getLowerEarnerCombinedBenefit", () => {
+      it("should return monthly Money for lower earner combined benefit", () => {
         const context = new IntegrationContext(
           higherEarningRecipient,
           lowerEarningRecipient
@@ -327,7 +327,7 @@ describe('IntegrationContext', () => {
         expect(result.cents()).toBeGreaterThan(0);
       });
 
-      it('should return higher amount than personal benefit (includes spousal)', () => {
+      it("should return higher amount than personal benefit (includes spousal)", () => {
         const context = new IntegrationContext(
           higherEarningRecipient,
           lowerEarningRecipient
@@ -344,8 +344,8 @@ describe('IntegrationContext', () => {
       });
     });
 
-    describe('getHigherEarnerPersonalBenefit', () => {
-      it('should return monthly Money for higher earner personal benefit', () => {
+    describe("getHigherEarnerPersonalBenefit", () => {
+      it("should return monthly Money for higher earner personal benefit", () => {
         const context = new IntegrationContext(
           higherEarningRecipient,
           lowerEarningRecipient
