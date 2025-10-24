@@ -37,6 +37,15 @@ describe('Integration Configuration', () => {
     expect(typeof faviconUrl).toBe('string');
   });
 
+  it('should have cFIREsim registered', async () => {
+    expect(INTEGRATIONS['cfiresim.com']).toBeDefined();
+    expect(INTEGRATIONS['cfiresim.com'].id).toBe('cfiresim.com');
+    expect(INTEGRATIONS['cfiresim.com'].displayName).toBe('cFIREsim');
+    const faviconUrl = await INTEGRATIONS['cfiresim.com'].getFavicon();
+    expect(faviconUrl).toBeDefined();
+    expect(typeof faviconUrl).toBe('string');
+  });
+
   it('should return integration config for valid ID', () => {
     const config = getIntegration('opensocialsecurity.com');
     expect(config).not.toBeNull();

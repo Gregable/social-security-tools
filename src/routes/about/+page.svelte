@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Header from "$lib/components/Header.svelte";
-  import KoFiImg from "$lib/images/kofi.png";
+import Header from '$lib/components/Header.svelte';
+import KoFiImg from '$lib/images/kofi.png';
 </script>
 
 <svelte:head>
