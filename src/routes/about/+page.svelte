@@ -1,6 +1,6 @@
 <script lang="ts">
-import Header from '$lib/components/Header.svelte';
-import KoFiImg from '$lib/images/kofi.png';
+  import Header from "$lib/components/Header.svelte";
+  import KoFiImg from "$lib/images/kofi.png";
 </script>
 
 <svelte:head>
@@ -59,10 +59,7 @@ import KoFiImg from '$lib/images/kofi.png';
       It should be treated as a useful exploratory tool, but any decisions should
       be made after researching the subject yourself.
     </p>
-    <p>
-      The site was most recently updated on Oct 12, 2024 with the latest 2.5%
-      COLA adjustment.
-    </p>
+    <p>The site was most recently updated on Oct 24, 2025.</p>
     <h3>Why?</h3>
     <p>
       This site is completely free and contains no advertising. I don't collect
