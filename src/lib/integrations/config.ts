@@ -70,6 +70,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'cfiresim.com': {
+    id: 'cfiresim.com',
+    displayName: 'cFIREsim',
+    reportEndLabel: 'cFIREsim',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/cfiresim.com/cfiresim-logo.svg'
+      );
+      return module.default;
+    },
+  },
   'finpodsai.com': {
     id: 'finpodsai.com',
     displayName: 'Fin Pods AI',
