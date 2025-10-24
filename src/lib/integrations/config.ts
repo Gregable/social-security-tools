@@ -59,6 +59,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'ficalc.app': {
+    id: 'ficalc.app',
+    displayName: 'FI Calc',
+    reportEndLabel: 'FI Calc',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/ficalc.app/favicon.ico'
+      );
+      return module.default;
+    },
+  },
   'finpodsai.com': {
     id: 'finpodsai.com',
     displayName: 'Fin Pods AI',

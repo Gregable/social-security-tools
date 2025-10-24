@@ -293,7 +293,7 @@ describe('IntegrationContext', () => {
     });
 
     describe('getLowerEarnerPersonalBenefit', () => {
-      it('should return formatted personal benefit for lower earner', () => {
+      it('should return monthly Money for lower earner personal benefit', () => {
         const context = new IntegrationContext(
           higherEarningRecipient,
           lowerEarningRecipient
@@ -305,15 +305,13 @@ describe('IntegrationContext', () => {
 
         const result = context.getLowerEarnerPersonalBenefit(filingDate);
 
-        // Should return a formatted string starting with $
-        expect(result).toMatch(/^\$/);
-        // Should not be $0
-        expect(result).not.toBe('$0');
+        expect(result).toBeInstanceOf(Money);
+        expect(result.cents()).toBeGreaterThan(0);
       });
     });
 
     describe('getLowerEarnerCombinedBenefit', () => {
-      it('should return formatted combined benefit for lower earner', () => {
+      it('should return monthly Money for lower earner combined benefit', () => {
         const context = new IntegrationContext(
           higherEarningRecipient,
           lowerEarningRecipient
@@ -325,10 +323,8 @@ describe('IntegrationContext', () => {
 
         const result = context.getLowerEarnerCombinedBenefit(filingDate);
 
-        // Should return a formatted string starting with $
-        expect(result).toMatch(/^\$/);
-        // Should not be $0
-        expect(result).not.toBe('$0');
+        expect(result).toBeInstanceOf(Money);
+        expect(result.cents()).toBeGreaterThan(0);
       });
 
       it('should return higher amount than personal benefit (includes spousal)', () => {
@@ -344,12 +340,25 @@ describe('IntegrationContext', () => {
         const personal = context.getLowerEarnerPersonalBenefit(filingDate);
         const combined = context.getLowerEarnerCombinedBenefit(filingDate);
 
-        // Parse dollar amounts for comparison
-        const personalAmount = parseFloat(personal.replace(/[$,]/g, ''));
-        const combinedAmount = parseFloat(combined.replace(/[$,]/g, ''));
+        expect(combined.cents()).toBeGreaterThanOrEqual(personal.cents());
+      });
+    });
 
-        // Combined benefit should be greater than or equal to personal
-        expect(combinedAmount).toBeGreaterThanOrEqual(personalAmount);
+    describe('getHigherEarnerPersonalBenefit', () => {
+      it('should return monthly Money for higher earner personal benefit', () => {
+        const context = new IntegrationContext(
+          higherEarningRecipient,
+          lowerEarningRecipient
+        );
+        const filingDate = MonthDate.initFromYearsMonths({
+          years: 2027,
+          months: 0,
+        });
+
+        const result = context.getHigherEarnerPersonalBenefit(filingDate);
+
+        expect(result).toBeInstanceOf(Money);
+        expect(result.cents()).toBeGreaterThan(0);
       });
     });
   });

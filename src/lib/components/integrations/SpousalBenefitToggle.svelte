@@ -135,8 +135,9 @@ function getFilingAgeForPreview(
           <p class="option-preview">
             <span class="preview-text">
               <strong
-                >{context.getLowerEarnerPersonalBenefit(lowerEarnerFilingDate)}
-                / month</strong
+                >{context
+                  .getLowerEarnerPersonalBenefit(lowerEarnerFilingDate)
+                  .wholeDollars()} / month</strong
               >
               at age
               <strong
@@ -166,8 +167,9 @@ function getFilingAgeForPreview(
         <p class="option-preview">
           <span class="preview-text">
             <strong
-              >{context.getLowerEarnerCombinedBenefit(higherEarnerFilingDate!)} /
-              month</strong
+              >{context
+                .getLowerEarnerCombinedBenefit(higherEarnerFilingDate!)
+                .wholeDollars()} / month</strong
             >
             at age
             <strong
