@@ -4,10 +4,11 @@
  * and their filing dates based on recipient and spouse data.
  */
 
-import { get } from 'svelte/store';
-import { recipientFilingDate, spouseFilingDate } from '$lib/context';
-import type { MonthDate } from '$lib/month-time';
-import type { Recipient } from '$lib/recipient';
+import { recipientFilingDate, spouseFilingDate } from "$lib/context";
+import { Money } from "$lib/money";
+import { type MonthDate, MonthDuration } from "$lib/month-time";
+import type { Recipient } from "$lib/recipient";
+import { get } from "svelte/store";
 
 /**
  * Context class for integration components that need to work with
@@ -114,38 +115,112 @@ export class IntegrationContext {
 
   /**
    * Get the lower earner's personal benefit only (in today's dollars).
-   * Returns a formatted string with dollar sign and commas.
+   * Returns the rounded monthly benefit amount.
    *
    * @param filingDate The date when benefits begin
-   * @returns Formatted monthly benefit amount (e.g., "$1,234")
+   * @returns Monthly benefit as Money (rounded to whole dollars)
    */
-  getLowerEarnerPersonalBenefit(filingDate: MonthDate | null): string {
+  getLowerEarnerPersonalBenefit(filingDate: MonthDate | null): Money {
     const lowerEarner = this.lowerEarner();
+    if (lowerEarner === null || filingDate === null) {
+      return Money.zero();
+    }
 
-    const monthlyBenefit = lowerEarner?.benefitOnDate(filingDate!, filingDate!);
-    return monthlyBenefit.roundToDollar().wholeDollars();
+    const evaluationDate = filingDate.addDuration(MonthDuration.OneYear());
+    const monthlyBenefit = lowerEarner.benefitOnDate(
+      filingDate,
+      evaluationDate
+    );
+    return monthlyBenefit.roundToDollar();
   }
 
   /**
    * Get the lower earner's combined benefit (personal + spousal, in today's dollars).
-   * Returns a formatted string with dollar sign and commas.
+   * Returns the rounded monthly benefit amount.
    *
    * @param filingDate The date when benefits begin for the lower earner
-   * @returns Formatted monthly benefit amount (e.g., "$1,234")
+   * @returns Monthly benefit as Money (rounded to whole dollars)
    */
-  getLowerEarnerCombinedBenefit(filingDate: MonthDate): string {
+  getLowerEarnerCombinedBenefit(filingDate: MonthDate): Money {
     const lowerEarner = this.lowerEarner();
+    if (lowerEarner === null) {
+      return Money.zero();
+    }
 
     const higherEarner = this.higherEarner();
     const higherEarnerFilingDate = this.higherEarnerFilingDate();
+    if (higherEarnerFilingDate === null) {
+      return Money.zero();
+    }
 
-    const monthlyBenefit = lowerEarner?.allBenefitsOnDate(
-      higherEarner!,
-      higherEarnerFilingDate!,
-      filingDate!,
-      filingDate!
+    const evaluationDate = filingDate.addDuration(MonthDuration.OneYear());
+    const monthlyBenefit = lowerEarner.allBenefitsOnDate(
+      higherEarner,
+      higherEarnerFilingDate,
+      filingDate,
+      evaluationDate
     );
-    return monthlyBenefit.roundToDollar().wholeDollars();
+    return monthlyBenefit.roundToDollar();
+  }
+
+  /**
+   * Get the higher earner's personal benefit only (in today's dollars).
+   * Returns the rounded monthly benefit amount.
+   *
+   * @param filingDate The date when benefits begin
+   * @returns Monthly benefit as Money (rounded to whole dollars)
+   */
+  getHigherEarnerPersonalBenefit(filingDate: MonthDate | null): Money {
+    const higherEarner = this.higherEarner();
+    if (filingDate === null) {
+      return Money.zero();
+    }
+
+    const evaluationDate = filingDate.addDuration(MonthDuration.OneYear());
+    const monthlyBenefit = higherEarner.benefitOnDate(
+      filingDate,
+      evaluationDate
+    );
+    return monthlyBenefit.roundToDollar();
+  }
+
+  /**
+   * Returns the lower earner's spousal benefit information, including
+   * the monthly benefit (in today's dollars) and the month the spousal
+   * benefit begins. Returns null when a spousal benefit does not apply
+   * for the current filing selections.
+   */
+  getLowerEarnerSpousalBenefit(): {
+    monthlyBenefit: Money;
+    startDate: MonthDate;
+  } | null {
+    const lowerEarner = this.lowerEarner();
+    if (lowerEarner === null) return null;
+
+    const higherEarner = this.higherEarner();
+    const higherFilingDate = this.higherEarnerFilingDate();
+    const lowerFilingDate = this.lowerEarnerFilingDate();
+
+    if (higherFilingDate === null || lowerFilingDate === null) {
+      return null;
+    }
+
+    const spousalStart = higherFilingDate.greaterThan(lowerFilingDate)
+      ? higherFilingDate
+      : lowerFilingDate;
+
+    const monthlyBenefit = lowerEarner.spousalBenefitOnDateGivenStartDate(
+      higherEarner,
+      higherFilingDate,
+      lowerFilingDate,
+      spousalStart
+    );
+
+    if (monthlyBenefit.cents() <= 0) {
+      return null;
+    }
+
+    return { monthlyBenefit, startDate: spousalStart };
   }
 
   /**
@@ -154,13 +229,13 @@ export class IntegrationContext {
    * @param value The string value to copy to the clipboard
    */
   static copyToClipboard(value: string): void {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(value).then(
         () => {
           // Success feedback could be added here
         },
         (err) => {
-          console.error('Failed to copy:', err);
+          console.error("Failed to copy:", err);
         }
       );
     }

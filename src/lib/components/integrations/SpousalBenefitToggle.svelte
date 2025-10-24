@@ -1,112 +1,114 @@
 <script lang="ts">
-import RecipientName from '$lib/components/RecipientName.svelte';
-import { recipientFilingDate, spouseFilingDate } from '$lib/context';
-import { Money } from '$lib/money';
-import type { MonthDate } from '$lib/month-time';
-import type { Recipient } from '$lib/recipient';
-import type { IntegrationContext } from './integration-context';
+  import RecipientName from "$lib/components/RecipientName.svelte";
+  import { recipientFilingDate, spouseFilingDate } from "$lib/context";
+  import { Money } from "$lib/money";
+  import type { MonthDate } from "$lib/month-time";
+  import type { Recipient } from "$lib/recipient";
+  import type { IntegrationContext } from "./integration-context";
 
-/**
- * Reusable component for choosing between personal benefit only vs
- * combined personal + spousal benefit for the lower earner.
- *
- * Used by integration components (FIRECalc, Linopt) that only accept
- * a single filing date per person, requiring the user to choose
- * which benefit calculation to use for the lower earner.
- *
- * This component calculates and exposes (via binding):
- * - recipientBenefitCalculationDate: The filing date to use for recipient benefits
- * - spouseBenefitCalculationDate: The filing date to use for spouse benefits
- * - recipientAnnualBenefit: The annual benefit amount for recipient (in today's dollars)
- * - spouseAnnualBenefit: The annual benefit amount for spouse (in today's dollars)
- */
+  /**
+   * Reusable component for choosing between personal benefit only vs
+   * combined personal + spousal benefit for the lower earner.
+   *
+   * Used by integration components (FIRECalc, Linopt) that only accept
+   * a single filing date per person, requiring the user to choose
+   * which benefit calculation to use for the lower earner.
+   *
+   * This component calculates and exposes (via binding):
+   * - recipientBenefitCalculationDate: The filing date to use for recipient benefits
+   * - spouseBenefitCalculationDate: The filing date to use for spouse benefits
+   * - recipientAnnualBenefit: The annual benefit amount for recipient (in today's dollars)
+   * - spouseAnnualBenefit: The annual benefit amount for spouse (in today's dollars)
+   */
 
-export let context: IntegrationContext;
-export let includeSpousalBenefit: boolean;
-export let toolName: string;
+  export let context: IntegrationContext;
+  export let includeSpousalBenefit: boolean;
+  export let toolName: string;
 
-// Export calculated values via binding
-export let recipientBenefitCalculationDate: MonthDate;
-export let spouseBenefitCalculationDate: MonthDate;
-export let recipientAnnualBenefit: Money;
-export let spouseAnnualBenefit: Money;
+  // Export calculated values via binding
+  export let recipientBenefitCalculationDate: MonthDate;
+  export let spouseBenefitCalculationDate: MonthDate;
+  export let recipientAnnualBenefit: Money;
+  export let spouseAnnualBenefit: Money;
 
-$: recipient = context.recipient;
-$: spouse = context.spouse;
-$: higherEarner = context.higherEarner();
-$: higherEarnerFilingDate = context.higherEarnerFilingDate();
-$: lowerEarner = context.lowerEarner();
-$: lowerEarnerFilingDate = context.lowerEarnerFilingDate();
+  $: recipient = context.recipient;
+  $: spouse = context.spouse;
+  $: higherEarner = context.higherEarner();
+  $: higherEarnerFilingDate = context.higherEarnerFilingDate();
+  $: lowerEarner = context.lowerEarner();
+  $: lowerEarnerFilingDate = context.lowerEarnerFilingDate();
 
-// Calculate which filing date to use for each person
-$: recipientBenefitCalculationDate =
-  includeSpousalBenefit && context.isRecipientLowerEarner()
-    ? higherEarnerFilingDate!
-    : $recipientFilingDate!;
+  // Calculate which filing date to use for each person
+  $: recipientBenefitCalculationDate =
+    includeSpousalBenefit && context.isRecipientLowerEarner()
+      ? higherEarnerFilingDate!
+      : $recipientFilingDate!;
 
-$: spouseBenefitCalculationDate =
-  spouse !== null && includeSpousalBenefit && !context.isRecipientLowerEarner()
-    ? higherEarnerFilingDate!
-    : $spouseFilingDate!;
+  $: spouseBenefitCalculationDate =
+    spouse !== null &&
+    includeSpousalBenefit &&
+    !context.isRecipientLowerEarner()
+      ? higherEarnerFilingDate!
+      : $spouseFilingDate!;
 
-// Calculate annual benefits (in today's dollars, before any inflation adjustments)
-$: {
-  let monthlyBenefit;
-
-  if (context.isRecipientLowerEarner() && includeSpousalBenefit) {
-    // Lower earner with spousal benefit included
-    monthlyBenefit = recipient.allBenefitsOnDate(
-      higherEarner,
-      higherEarnerFilingDate!,
-      recipientBenefitCalculationDate,
-      recipientBenefitCalculationDate
-    );
-  } else {
-    // Personal benefit only
-    monthlyBenefit = recipient.benefitOnDate(
-      recipientBenefitCalculationDate,
-      recipientBenefitCalculationDate
-    );
-  }
-
-  recipientAnnualBenefit = monthlyBenefit.times(12);
-}
-
-$: {
-  if (spouse !== null) {
+  // Calculate annual benefits (in today's dollars, before any inflation adjustments)
+  $: {
     let monthlyBenefit;
 
-    if (!context.isRecipientLowerEarner() && includeSpousalBenefit) {
-      // Lower earner (spouse) with spousal benefit included
-      monthlyBenefit = spouse.allBenefitsOnDate(
+    if (context.isRecipientLowerEarner() && includeSpousalBenefit) {
+      // Lower earner with spousal benefit included
+      monthlyBenefit = recipient.allBenefitsOnDate(
         higherEarner,
         higherEarnerFilingDate!,
-        spouseBenefitCalculationDate,
-        spouseBenefitCalculationDate
+        recipientBenefitCalculationDate,
+        recipientBenefitCalculationDate
       );
     } else {
       // Personal benefit only
-      monthlyBenefit = spouse.benefitOnDate(
-        spouseBenefitCalculationDate,
-        spouseBenefitCalculationDate
+      monthlyBenefit = recipient.benefitOnDate(
+        recipientBenefitCalculationDate,
+        recipientBenefitCalculationDate
       );
     }
 
-    spouseAnnualBenefit = monthlyBenefit.times(12);
-  } else {
-    spouseAnnualBenefit = Money.zero();
+    recipientAnnualBenefit = monthlyBenefit.times(12);
   }
-}
 
-// Helper function to get filing age for display in option preview
-function getFilingAgeForPreview(
-  recipient: Recipient,
-  filingDate: MonthDate | null
-): string {
-  if (filingDate === null) return '';
-  const ageAtFiling = recipient.birthdate.ageAtSsaDate(filingDate);
-  return ageAtFiling.toAgeString();
-}
+  $: {
+    if (spouse !== null) {
+      let monthlyBenefit;
+
+      if (!context.isRecipientLowerEarner() && includeSpousalBenefit) {
+        // Lower earner (spouse) with spousal benefit included
+        monthlyBenefit = spouse.allBenefitsOnDate(
+          higherEarner,
+          higherEarnerFilingDate!,
+          spouseBenefitCalculationDate,
+          spouseBenefitCalculationDate
+        );
+      } else {
+        // Personal benefit only
+        monthlyBenefit = spouse.benefitOnDate(
+          spouseBenefitCalculationDate,
+          spouseBenefitCalculationDate
+        );
+      }
+
+      spouseAnnualBenefit = monthlyBenefit.times(12);
+    } else {
+      spouseAnnualBenefit = Money.zero();
+    }
+  }
+
+  // Helper function to get filing age for display in option preview
+  function getFilingAgeForPreview(
+    recipient: Recipient,
+    filingDate: MonthDate | null
+  ): string {
+    if (filingDate === null) return "";
+    const ageAtFiling = recipient.birthdate.ageAtSsaDate(filingDate);
+    return ageAtFiling.toAgeString();
+  }
 </script>
 
 <div class="spousal-toggle-section">
@@ -135,8 +137,9 @@ function getFilingAgeForPreview(
           <p class="option-preview">
             <span class="preview-text">
               <strong
-                >{context.getLowerEarnerPersonalBenefit(lowerEarnerFilingDate)}
-                / month</strong
+                >{context
+                  .getLowerEarnerPersonalBenefit(lowerEarnerFilingDate)
+                  .wholeDollars()} / month</strong
               >
               at age
               <strong
@@ -166,8 +169,9 @@ function getFilingAgeForPreview(
         <p class="option-preview">
           <span class="preview-text">
             <strong
-              >{context.getLowerEarnerCombinedBenefit(higherEarnerFilingDate!)} /
-              month</strong
+              >{context
+                .getLowerEarnerCombinedBenefit(higherEarnerFilingDate!)
+                .wholeDollars()} / month</strong
             >
             at age
             <strong
@@ -227,13 +231,13 @@ function getFilingAgeForPreview(
     background: #f8fbff;
   }
 
-  .toggle-option input[type='radio'] {
+  .toggle-option input[type="radio"] {
     margin-top: 0.25em;
     cursor: pointer;
     flex-shrink: 0;
   }
 
-  .toggle-option input[type='radio']:checked {
+  .toggle-option input[type="radio"]:checked {
     accent-color: #1976d2;
   }
 
