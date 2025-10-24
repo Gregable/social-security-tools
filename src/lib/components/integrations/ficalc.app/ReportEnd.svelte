@@ -1,96 +1,96 @@
 <script lang="ts">
-  import RecipientName from "$lib/components/RecipientName.svelte";
-  import { recipientFilingDate, spouseFilingDate } from "$lib/context";
-  import { Money } from "$lib/money";
-  import { MonthDate } from "$lib/month-time";
-  import type { Recipient } from "$lib/recipient";
-  import { IntegrationContext } from "../integration-context";
+import RecipientName from '$lib/components/RecipientName.svelte';
+import { recipientFilingDate, spouseFilingDate } from '$lib/context';
+import { Money } from '$lib/money';
+import { MonthDate } from '$lib/month-time';
+import type { Recipient } from '$lib/recipient';
+import { IntegrationContext } from '../integration-context';
 
-  export let recipient: Recipient;
-  export let spouse: Recipient | null = null;
+export let recipient: Recipient;
+export let spouse: Recipient | null = null;
 
-  const currentMonth = MonthDate.initFromNow();
+const currentMonth = MonthDate.initFromNow();
 
-  interface Entry {
-    person: Recipient;
-    type: "personal" | "spousal";
-    annualAmount: Money;
-    startDate: MonthDate;
+interface Entry {
+  person: Recipient;
+  type: 'personal' | 'spousal';
+  annualAmount: Money;
+  startDate: MonthDate;
+}
+
+let recipientEntry: Entry | null = null;
+let spouseEntry: Entry | null = null;
+let spousalEntry: Entry | null = null;
+let entryCount = 0;
+
+$: context = new IntegrationContext(recipient, spouse);
+$: {
+  const primaryDate = $recipientFilingDate;
+  if (!primaryDate) {
+    recipientEntry = null;
+  } else {
+    const monthlyBenefit =
+      context.higherEarner() === recipient
+        ? context.getHigherEarnerPersonalBenefit(primaryDate)
+        : context.getLowerEarnerPersonalBenefit(primaryDate);
+
+    recipientEntry = {
+      person: recipient,
+      type: 'personal',
+      annualAmount: monthlyBenefit.times(12),
+      startDate: primaryDate,
+    };
   }
+}
 
-  let recipientEntry: Entry | null = null;
-  let spouseEntry: Entry | null = null;
-  let spousalEntry: Entry | null = null;
-  let entryCount = 0;
+$: {
+  const spouseDate = $spouseFilingDate;
+  spouseEntry =
+    spouse && spouseDate
+      ? {
+          person: spouse,
+          type: 'personal',
+          annualAmount: (context.higherEarner() === spouse
+            ? context.getHigherEarnerPersonalBenefit(spouseDate)
+            : context.getLowerEarnerPersonalBenefit(spouseDate)
+          ).times(12),
+          startDate: spouseDate,
+        }
+      : null;
+}
 
-  $: context = new IntegrationContext(recipient, spouse);
-  $: {
-    const primaryDate = $recipientFilingDate;
-    if (!primaryDate) {
-      recipientEntry = null;
-    } else {
-      const monthlyBenefit =
-        context.higherEarner() === recipient
-          ? context.getHigherEarnerPersonalBenefit(primaryDate)
-          : context.getLowerEarnerPersonalBenefit(primaryDate);
+$: {
+  const lowerEarner = context.lowerEarner();
+  const spousalInfo = context.getLowerEarnerSpousalBenefit();
+  spousalEntry =
+    lowerEarner && spousalInfo
+      ? {
+          person: lowerEarner,
+          type: 'spousal',
+          annualAmount: spousalInfo.monthlyBenefit.times(12),
+          startDate: spousalInfo.startDate,
+        }
+      : null;
+}
 
-      recipientEntry = {
-        person: recipient,
-        type: "personal",
-        annualAmount: monthlyBenefit.times(12),
-        startDate: primaryDate,
-      };
-    }
-  }
+$: entryCount =
+  (recipientEntry ? 1 : 0) + (spouseEntry ? 1 : 0) + (spousalEntry ? 1 : 0);
+$: hasEntries = entryCount > 0;
 
-  $: {
-    const spouseDate = $spouseFilingDate;
-    spouseEntry =
-      spouse && spouseDate
-        ? {
-            person: spouse,
-            type: "personal",
-            annualAmount: (context.higherEarner() === spouse
-              ? context.getHigherEarnerPersonalBenefit(spouseDate)
-              : context.getLowerEarnerPersonalBenefit(spouseDate)
-            ).times(12),
-            startDate: spouseDate,
-          }
-        : null;
-  }
+function yearsIntoRetirement(startDate: MonthDate): number {
+  const diffMonths =
+    startDate.monthsSinceEpoch() - currentMonth.monthsSinceEpoch();
+  if (diffMonths <= 0) return 0;
+  return Math.round(diffMonths / 12);
+}
 
-  $: {
-    const lowerEarner = context.lowerEarner();
-    const spousalInfo = context.getLowerEarnerSpousalBenefit();
-    spousalEntry =
-      lowerEarner && spousalInfo
-        ? {
-            person: lowerEarner,
-            type: "spousal",
-            annualAmount: spousalInfo.monthlyBenefit.times(12),
-            startDate: spousalInfo.startDate,
-          }
-        : null;
-  }
+function formatAnnual(amount: Money): string {
+  return amount.roundToDollar().wholeDollars();
+}
 
-  $: entryCount =
-    (recipientEntry ? 1 : 0) + (spouseEntry ? 1 : 0) + (spousalEntry ? 1 : 0);
-  $: hasEntries = entryCount > 0;
-
-  function yearsIntoRetirement(startDate: MonthDate): number {
-    const diffMonths =
-      startDate.monthsSinceEpoch() - currentMonth.monthsSinceEpoch();
-    if (diffMonths <= 0) return 0;
-    return Math.round(diffMonths / 12);
-  }
-
-  function formatAnnual(amount: Money): string {
-    return amount.roundToDollar().wholeDollars();
-  }
-
-  function startLabel(date: MonthDate): string {
-    return `${date.monthFullName()} ${date.year()}`;
-  }
+function startLabel(date: MonthDate): string {
+  return `${date.monthFullName()} ${date.year()}`;
+}
 </script>
 
 <div class="pageBreakAvoid">
@@ -321,12 +321,6 @@
     color: #495057;
   }
 
-  .note {
-    margin: 0.75em 0 0 0;
-    font-size: 0.9em;
-    color: #495057;
-  }
-
   .visit-link a {
     display: inline-flex;
     align-items: center;
@@ -369,10 +363,6 @@
     }
 
     .field-value small {
-      color: #b0b6be;
-    }
-
-    .note {
       color: #b0b6be;
     }
 
