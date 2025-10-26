@@ -91,11 +91,86 @@ function formatAnnual(amount: Money): string {
 function startLabel(date: MonthDate): string {
   return `${date.monthFullName()} ${date.year()}`;
 }
+
+type FICalcIncome = {
+  name: string;
+  value: number;
+  inflationAdjusted: boolean;
+  delayInflation: boolean;
+  startYearNumber: number;
+  lastsForever: boolean;
+  duration: number;
+  disabled: boolean;
+};
+
+function entryToFICalcIncome(entry: Entry): FICalcIncome {
+  let name = '';
+  if (entry.type === 'personal') {
+    name = `${entry.person.name} – Personal benefit`;
+  } else {
+    name = `${entry.person.name} – Spousal benefit`;
+  }
+  return {
+    name,
+    value: entry.annualAmount.roundToDollar().value(),
+    inflationAdjusted: true,
+    delayInflation: false,
+    startYearNumber: yearsIntoRetirement(entry.startDate),
+    lastsForever: true,
+    duration: 1,
+    disabled: false,
+  };
+}
+
+$: fiCalcIncomeArray = [
+  recipientEntry && entryToFICalcIncome(recipientEntry),
+  spouseEntry && entryToFICalcIncome(spouseEntry),
+  spousalEntry && entryToFICalcIncome(spousalEntry),
+].filter(Boolean);
+
+function generateFICalcLink(incomeArray: FICalcIncome[]): string {
+  if (!incomeArray.length) return 'https://ficalc.app/';
+  const param = encodeURIComponent(JSON.stringify(incomeArray));
+  return `https://ficalc.app?additionalIncome=${param}`;
+}
+
+$: fiCalcUrl = generateFICalcLink(fiCalcIncomeArray);
 </script>
 
 <div class="pageBreakAvoid">
   <h2>FI Calc</h2>
   <div class="text">
+    <div class="visit-link" style="margin-bottom: 1.5em">
+      <a href={fiCalcUrl} target="_blank" rel="noopener">
+        <strong
+          >Click here to open FI Calc with your Social Security income
+          pre-filled</strong
+        >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      </a>
+    </div>
+    <p>
+      Simply use the link above to open FI Calc with your Social Security income
+      already filled in based on the filing dates you selected above. If you
+      prefer, you can <a
+        href="https://ficalc.app"
+        target="_blank"
+        rel="noopener"
+        >visit FI Calc without pre-filled data
+      </a> and enter the values below manually.
+    </p>
     <p>
       FI Calc lets you list multiple retirement income streams.
       {#if hasEntries}
@@ -225,24 +300,7 @@ function startLabel(date: MonthDate): string {
       </ol>
     {/if}
 
-    <p class="visit-link">
-      <a href="https://ficalc.app/" target="_blank" rel="noopener">
-        Visit FI Calc
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-          <polyline points="15 3 21 3 21 9" />
-          <line x1="10" y1="14" x2="21" y2="3" />
-        </svg>
-      </a>
-    </p>
+    <!-- FI Calc link moved to top -->
   </div>
 </div>
 
