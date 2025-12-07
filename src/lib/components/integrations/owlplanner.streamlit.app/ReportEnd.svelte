@@ -1,13 +1,13 @@
 <script lang="ts">
-  import RecipientName from "$lib/components/RecipientName.svelte";
-  import type { Recipient } from "$lib/recipient";
+import RecipientName from '$lib/components/RecipientName.svelte';
+import type { Recipient } from '$lib/recipient';
 
-  export let recipient: Recipient;
-  export let spouse: Recipient | null = null;
+export let recipient: Recipient;
+export let spouse: Recipient | null = null;
 
-  // Get PIA values for recipient and spouse
-  $: recipientPia = recipient?.pia()?.primaryInsuranceAmount();
-  $: spousePia = spouse?.pia()?.primaryInsuranceAmount();
+// Get PIA values for recipient and spouse
+$: recipientPia = recipient?.pia()?.primaryInsuranceAmount();
+$: spousePia = spouse?.pia()?.primaryInsuranceAmount();
 </script>
 
 <div class="pageBreakAvoid">
