@@ -92,6 +92,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'owlplanner.streamlit.app': {
+    id: 'owlplanner.streamlit.app',
+    displayName: 'Owl Retirement Planner',
+    reportEndLabel: 'Owl Retirement Planner',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/owlplanner.streamlit.app/owl.png'
+      );
+      return module.default;
+    },
+  },
 };
 
 /**

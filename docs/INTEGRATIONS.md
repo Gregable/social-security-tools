@@ -172,6 +172,14 @@ warning.
   AI
 - **Report End**: None (this integration only displays an intro banner)
 
+### Owl Retirement Planner (owlplanner.streamlit.app)
+
+- **Intro Banner**: Informs users that they're using the calculator via Owl
+  Retirement Planner
+- **Report End**: Displays the user's Primary Insurance Amount(s) as text values
+  and provides a link back to Owl Retirement Planner. Shows PIA for both
+  recipients in couple scenarios.
+
 ## Testing
 
 Unit tests for the integration system are in `src/test/integrations.test.ts`.

@@ -46,6 +46,23 @@ describe('Integration Configuration', () => {
     expect(typeof faviconUrl).toBe('string');
   });
 
+  it('should have Owl Retirement Planner registered', async () => {
+    expect(INTEGRATIONS['owlplanner.streamlit.app']).toBeDefined();
+    expect(INTEGRATIONS['owlplanner.streamlit.app'].id).toBe(
+      'owlplanner.streamlit.app'
+    );
+    expect(INTEGRATIONS['owlplanner.streamlit.app'].displayName).toBe(
+      'Owl Retirement Planner'
+    );
+    expect(INTEGRATIONS['owlplanner.streamlit.app'].reportEndLabel).toBe(
+      'Owl Retirement Planner'
+    );
+    const faviconUrl =
+      await INTEGRATIONS['owlplanner.streamlit.app'].getFavicon();
+    expect(faviconUrl).toBeDefined();
+    expect(typeof faviconUrl).toBe('string');
+  });
+
   it('should return integration config for valid ID', () => {
     const config = getIntegration('opensocialsecurity.com');
     expect(config).not.toBeNull();
