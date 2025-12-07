@@ -5,7 +5,7 @@
  * that can display custom content within the calculator.
  */
 
-import type { ComponentType, SvelteComponent } from 'svelte';
+import type { ComponentType, SvelteComponent } from "svelte";
 
 /**
  * Configuration for a single integration.
@@ -26,79 +26,79 @@ export interface IntegrationConfig {
  * Only integrations listed here will be activated via URL parameters.
  */
 export const INTEGRATIONS: Record<string, IntegrationConfig> = {
-  'opensocialsecurity.com': {
-    id: 'opensocialsecurity.com',
-    displayName: 'Open Social Security',
-    reportEndLabel: 'Open Social Security',
+  "opensocialsecurity.com": {
+    id: "opensocialsecurity.com",
+    displayName: "Open Social Security",
+    reportEndLabel: "Open Social Security",
     getFavicon: async () => {
       const module = await import(
-        '../components/integrations/opensocialsecurity.com/favicon.ico'
+        "../components/integrations/opensocialsecurity.com/favicon.ico"
       );
       return module.default;
     },
   },
-  'linopt.com': {
-    id: 'linopt.com',
-    displayName: 'Linopt',
-    reportEndLabel: 'Linopt',
+  "linopt.com": {
+    id: "linopt.com",
+    displayName: "Linopt",
+    reportEndLabel: "Linopt",
     getFavicon: async () => {
       const module = await import(
-        '../components/integrations/linopt.com/linopt-fig.png'
+        "../components/integrations/linopt.com/linopt-fig.png"
       );
       return module.default;
     },
   },
-  'firecalc.com': {
-    id: 'firecalc.com',
-    displayName: 'FIRECalc',
-    reportEndLabel: 'FIRECalc',
+  "firecalc.com": {
+    id: "firecalc.com",
+    displayName: "FIRECalc",
+    reportEndLabel: "FIRECalc",
     getFavicon: async () => {
       const module = await import(
-        '../components/integrations/firecalc.com/firecalc-icon.svg'
+        "../components/integrations/firecalc.com/firecalc-icon.svg"
       );
       return module.default;
     },
   },
-  'ficalc.app': {
-    id: 'ficalc.app',
-    displayName: 'FI Calc',
-    reportEndLabel: 'FI Calc',
+  "ficalc.app": {
+    id: "ficalc.app",
+    displayName: "FI Calc",
+    reportEndLabel: "FI Calc",
     getFavicon: async () => {
       const module = await import(
-        '../components/integrations/ficalc.app/favicon.ico'
+        "../components/integrations/ficalc.app/favicon.ico"
       );
       return module.default;
     },
   },
-  'cfiresim.com': {
-    id: 'cfiresim.com',
-    displayName: 'cFIREsim',
-    reportEndLabel: 'cFIREsim',
+  "cfiresim.com": {
+    id: "cfiresim.com",
+    displayName: "cFIREsim",
+    reportEndLabel: "cFIREsim",
     getFavicon: async () => {
       const module = await import(
-        '../components/integrations/cfiresim.com/cfiresim-logo.svg'
+        "../components/integrations/cfiresim.com/cfiresim-logo.svg"
       );
       return module.default;
     },
   },
-  'finpodsai.com': {
-    id: 'finpodsai.com',
-    displayName: 'Fin Pods AI',
-    reportEndLabel: '',
+  "finpodsai.com": {
+    id: "finpodsai.com",
+    displayName: "Fin Pods AI",
+    reportEndLabel: "",
     getFavicon: async () => {
       const module = await import(
-        '../components/integrations/finpodsai.com/favicon.ico'
+        "../components/integrations/finpodsai.com/favicon.ico"
       );
       return module.default;
     },
   },
-  'owlplanner.streamlit.app': {
-    id: 'owlplanner.streamlit.app',
-    displayName: 'Owl Retirement Planner',
-    reportEndLabel: 'Owl Retirement Planner',
+  "owlplanner.streamlit.app": {
+    id: "owlplanner.streamlit.app",
+    displayName: "Owl Retirement Planner",
+    reportEndLabel: "Owl Retirement Planner",
     getFavicon: async () => {
       const module = await import(
-        '../components/integrations/owlplanner.streamlit.app/owl.png'
+        "../components/integrations/owlplanner.streamlit.app/owl.png"
       );
       return module.default;
     },

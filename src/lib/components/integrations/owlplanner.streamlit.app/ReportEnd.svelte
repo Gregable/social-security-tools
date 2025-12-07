@@ -1,13 +1,13 @@
 <script lang="ts">
-import RecipientName from '$lib/components/RecipientName.svelte';
-import type { Recipient } from '$lib/recipient';
+  import RecipientName from "$lib/components/RecipientName.svelte";
+  import type { Recipient } from "$lib/recipient";
 
-export let recipient: Recipient;
-export let spouse: Recipient | null = null;
+  export let recipient: Recipient;
+  export let spouse: Recipient | null = null;
 
-// Get PIA values for recipient and spouse
-$: recipientPia = recipient?.pia()?.primaryInsuranceAmount();
-$: spousePia = spouse?.pia()?.primaryInsuranceAmount();
+  // Get PIA values for recipient and spouse
+  $: recipientPia = recipient?.pia()?.primaryInsuranceAmount();
+  $: spousePia = spouse?.pia()?.primaryInsuranceAmount();
 </script>
 
 <div class="pageBreakAvoid">
@@ -21,7 +21,7 @@ $: spousePia = spouse?.pia()?.primaryInsuranceAmount();
     </p>
 
     <div class="pia-display">
-      <h3>Primary Insurance Amount{spouse ? 's' : ''}</h3>
+      <h3>Primary Insurance Amount{spouse ? "s" : ""}</h3>
 
       <div class="pia-values">
         {#if recipientPia}
@@ -66,70 +66,70 @@ $: spousePia = spouse?.pia()?.primaryInsuranceAmount();
 </div>
 
 <style>
-.pageBreakAvoid {
-  page-break-inside: avoid;
-}
+  .pageBreakAvoid {
+    page-break-inside: avoid;
+  }
 
-.text {
-  margin: 1rem 0;
-}
+  .text {
+    margin: 1rem 0;
+  }
 
-.pia-display {
-  background-color: #f5f5f5;
-  border-left: 4px solid #007acc;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  border-radius: 4px;
-}
+  .pia-display {
+    background-color: #f5f5f5;
+    border-left: 4px solid #007acc;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 4px;
+  }
 
-.pia-display h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-  color: #333;
-}
+  .pia-display h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #333;
+  }
 
-.pia-values {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
+  .pia-values {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
 
-.pia-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.1rem;
-}
+  .pia-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+  }
 
-.pia-label {
-  font-weight: 500;
-}
+  .pia-label {
+    font-weight: 500;
+  }
 
-.pia-value {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #007acc;
-  font-family: 'Courier New', monospace;
-}
+  .pia-value {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #007acc;
+    font-family: "Courier New", monospace;
+  }
 
-.pia-note {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #666;
-  font-style: italic;
-  border-top: 1px solid #ddd;
-  padding-top: 0.75rem;
-}
+  .pia-note {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+    border-top: 1px solid #ddd;
+    padding-top: 0.75rem;
+  }
 
-a {
-  color: #007acc;
-  text-decoration: none;
-  font-weight: 500;
-}
+  a {
+    color: #007acc;
+    text-decoration: none;
+    font-weight: 500;
+  }
 
-a:hover {
-  text-decoration: underline;
-}
+  a:hover {
+    text-decoration: underline;
+  }
 </style>

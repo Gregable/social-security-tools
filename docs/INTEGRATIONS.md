@@ -160,11 +160,11 @@ warning.
 ### cFIREsim (cfiresim.com)
 
 - **Intro Banner**: Explains that SSA.tools will prep the exact Social Security
-   figures and any required spousal adjustment for cFIREsim's form
+  figures and any required spousal adjustment for cFIREsim's form
 - **Report End**: Maps each personal benefit to the two Social Security fields
-   (annual amount and start year) and, when a spousal benefit exists, walks the
-   user through creating a single recurring adjustment entry with the correct
-   label, timing, and checkbox settings
+  (annual amount and start year) and, when a spousal benefit exists, walks the
+  user through creating a single recurring adjustment entry with the correct
+  label, timing, and checkbox settings
 
 ### Fin Pods AI (finpodsai.com)
 
