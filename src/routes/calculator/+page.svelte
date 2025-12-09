@@ -1,107 +1,107 @@
 <script lang="ts">
-  import CombinedChart from "$lib/components/CombinedChart.svelte";
-  import CombinedHeading from "$lib/components/CombinedHeading.svelte";
-  import EarningsReport from "$lib/components/EarningsReport.svelte";
-  import EligibilityReport from "$lib/components/EligibilityReport.svelte";
-  import FilingDateReport from "$lib/components/FilingDateReport.svelte";
-  import Header from "$lib/components/Header.svelte";
-  import IndexedEarningsReport from "$lib/components/IndexedEarningsReport.svelte";
-  import MoreResources from "$lib/components/MoreResources.svelte";
-  import NormalRetirementAgeReport from "$lib/components/NormalRetirementAgeReport.svelte";
-  import PasteFlow from "$lib/components/PasteFlow.svelte";
-  import PiaReport from "$lib/components/PiaReport.svelte";
-  import RecipientName from "$lib/components/RecipientName.svelte";
-  import Sidebar from "$lib/components/Sidebar.svelte";
-  import SidebarSection from "$lib/components/SidebarSection.svelte";
-  import Sponsor from "$lib/components/Sponsor.svelte";
-  import SpousalReport from "$lib/components/SpousalReport.svelte";
-  import SurvivorReport from "$lib/components/SurvivorReport.svelte";
-  import { context } from "$lib/context";
-  import { loadIntroBanner, loadReportEnd } from "$lib/integrations/config";
-  import {
-    activeIntegration,
-    initializeIntegration,
-  } from "$lib/integrations/context";
-  import type { ComponentType, SvelteComponent } from "svelte";
-  import { onMount } from "svelte";
+import type { ComponentType, SvelteComponent } from 'svelte';
+import { onMount } from 'svelte';
+import CombinedChart from '$lib/components/CombinedChart.svelte';
+import CombinedHeading from '$lib/components/CombinedHeading.svelte';
+import EarningsReport from '$lib/components/EarningsReport.svelte';
+import EligibilityReport from '$lib/components/EligibilityReport.svelte';
+import FilingDateReport from '$lib/components/FilingDateReport.svelte';
+import Header from '$lib/components/Header.svelte';
+import IndexedEarningsReport from '$lib/components/IndexedEarningsReport.svelte';
+import MoreResources from '$lib/components/MoreResources.svelte';
+import NormalRetirementAgeReport from '$lib/components/NormalRetirementAgeReport.svelte';
+import PasteFlow from '$lib/components/PasteFlow.svelte';
+import PiaReport from '$lib/components/PiaReport.svelte';
+import RecipientName from '$lib/components/RecipientName.svelte';
+import Sidebar from '$lib/components/Sidebar.svelte';
+import SidebarSection from '$lib/components/SidebarSection.svelte';
+import Sponsor from '$lib/components/Sponsor.svelte';
+import SpousalReport from '$lib/components/SpousalReport.svelte';
+import SurvivorReport from '$lib/components/SurvivorReport.svelte';
+import { context } from '$lib/context';
+import { loadIntroBanner, loadReportEnd } from '$lib/integrations/config';
+import {
+  activeIntegration,
+  initializeIntegration,
+} from '$lib/integrations/context';
 
-  export let isPasteFlow: boolean = true;
+export let isPasteFlow: boolean = true;
 
-  let IntroBannerComponent: ComponentType<SvelteComponent> | null = null;
-  let ReportEndComponent: ComponentType<SvelteComponent> | null = null;
-  let showIntroBanner: boolean = true;
-  let integrationFavicon: string = "";
-  let integrationComponentsLoaded: boolean = false;
+let IntroBannerComponent: ComponentType<SvelteComponent> | null = null;
+let ReportEndComponent: ComponentType<SvelteComponent> | null = null;
+let showIntroBanner: boolean = true;
+let integrationFavicon: string = '';
+let integrationComponentsLoaded: boolean = false;
 
-  // Initialize integration early to ensure it's set before PasteFlow runs
-  // This is critical because PasteFlow's onMount may change the hash
-  onMount(() => {
-    initializeIntegration();
-  });
+// Initialize integration early to ensure it's set before PasteFlow runs
+// This is critical because PasteFlow's onMount may change the hash
+onMount(() => {
+  initializeIntegration();
+});
 
-  function pasteDone() {
-    isPasteFlow = false;
+function pasteDone() {
+  isPasteFlow = false;
 
-    // Show the intro banner again now that the report is displayed
-    showIntroBanner = true;
+  // Show the intro banner again now that the report is displayed
+  showIntroBanner = true;
 
-    // Don't change the URL hash - preserve integration parameters
-    // Previously we pushed #results here, but that would remove integration
-    // parameters from the URL before they could be properly initialized
+  // Don't change the URL hash - preserve integration parameters
+  // Previously we pushed #results here, but that would remove integration
+  // parameters from the URL before they could be properly initialized
 
-    // Re-initialize integration to ensure it's preserved after any hash changes
-    // This handles cases where the hash might have been modified
-    initializeIntegration();
-  }
+  // Re-initialize integration to ensure it's preserved after any hash changes
+  // This handles cases where the hash might have been modified
+  initializeIntegration();
+}
 
-  function pasteStarted() {
-    // Hide the intro banner once user has entered data
-    showIntroBanner = false;
-  }
+function pasteStarted() {
+  // Hide the intro banner once user has entered data
+  showIntroBanner = false;
+}
 
-  // Reactively load integration components when activeIntegration changes
-  // This ensures components are loaded regardless of timing with PasteFlow
-  $: if ($activeIntegration) {
-    loadIntegrationComponents($activeIntegration);
-  } else {
-    // Clear components when no integration is active
-    IntroBannerComponent = null;
-    ReportEndComponent = null;
-    integrationFavicon = "";
-    integrationComponentsLoaded = false;
-  }
+// Reactively load integration components when activeIntegration changes
+// This ensures components are loaded regardless of timing with PasteFlow
+$: if ($activeIntegration) {
+  loadIntegrationComponents($activeIntegration);
+} else {
+  // Clear components when no integration is active
+  IntroBannerComponent = null;
+  ReportEndComponent = null;
+  integrationFavicon = '';
+  integrationComponentsLoaded = false;
+}
 
-  async function loadIntegrationComponents(
-    integration: typeof $activeIntegration
-  ) {
-    if (!integration) return;
+async function loadIntegrationComponents(
+  integration: typeof $activeIntegration
+) {
+  if (!integration) return;
 
-    // Reset loaded state while loading
-    integrationComponentsLoaded = false;
+  // Reset loaded state while loading
+  integrationComponentsLoaded = false;
 
-    try {
-      // Load all components in parallel for better performance
-      const [introBanner, reportEnd, favicon] = await Promise.all([
-        loadIntroBanner(integration.id),
-        loadReportEnd(integration.id),
-        integration.getFavicon(),
-      ]);
+  try {
+    // Load all components in parallel for better performance
+    const [introBanner, reportEnd, favicon] = await Promise.all([
+      loadIntroBanner(integration.id),
+      loadReportEnd(integration.id),
+      integration.getFavicon(),
+    ]);
 
-      // Only update if the integration hasn't changed during loading
-      if ($activeIntegration?.id === integration.id) {
-        IntroBannerComponent = introBanner;
-        ReportEndComponent = reportEnd;
-        integrationFavicon = favicon;
-        integrationComponentsLoaded = true;
-      }
-    } catch (error) {
-      console.error(
-        `Failed to load integration components for ${integration.id}:`,
-        error
-      );
-      integrationComponentsLoaded = false;
+    // Only update if the integration hasn't changed during loading
+    if ($activeIntegration?.id === integration.id) {
+      IntroBannerComponent = introBanner;
+      ReportEndComponent = reportEnd;
+      integrationFavicon = favicon;
+      integrationComponentsLoaded = true;
     }
+  } catch (error) {
+    console.error(
+      `Failed to load integration components for ${integration.id}:`,
+      error
+    );
+    integrationComponentsLoaded = false;
   }
+}
 </script>
 
 <svelte:head>
