@@ -1,16 +1,40 @@
 <script lang="ts">
-// Shared banner component for integration intro messages
-export let logo: string;
-export let logoAlt: string;
+  // Shared banner component for integration intro messages
+  export let logo: string;
+  export let logoAlt: string;
+  // Whether the report is currently being displayed (not in paste flow)
+  export let isReportView: boolean = false;
+  // Integration name for the CTA button text (if empty, no CTA shown)
+  export let integrationName: string = "";
+
+  function scrollToIntegrationSection() {
+    // Find the integration section by its data attribute
+    const element = document.querySelector('[data-integration="true"]');
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
 </script>
 
 <div class="intro-banner">
   <div class="banner-content">
     <img src={logo} alt={logoAlt} class="logo" />
-    <span>
+    <div class="message">
       <slot></slot>
-    </span>
+    </div>
   </div>
+  {#if integrationName && isReportView}
+    <div class="cta-container">
+      <button
+        on:click={scrollToIntegrationSection}
+        class="cta-button"
+        type="button"
+        aria-label="Jump to integration section"
+      >
+        Scroll to {integrationName} Section ↓
+      </button>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -40,6 +64,43 @@ export let logoAlt: string;
     border-radius: 2px;
   }
 
+  .message {
+    flex: 1;
+  }
+
+  .cta-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.75em;
+  }
+
+  .cta-button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-button:hover {
+    background-color: #1565c0;
+  }
+
+  .cta-button:active {
+    background-color: #0d47a1;
+  }
+
+  .cta-button:focus-visible {
+    outline: 2px solid #0d47a1;
+    outline-offset: 2px;
+  }
+
   @media print {
     .intro-banner {
       display: none;
@@ -53,6 +114,9 @@ export let logoAlt: string;
     }
     .banner-content {
       font-size: 0.9em;
+    }
+    .cta-container {
+      margin-top: 0.5em;
     }
   }
 </style>

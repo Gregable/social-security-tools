@@ -62,6 +62,11 @@ When an integration is active:
    their data), then reappears when the full report is displayed, providing a
    reminder of the integration context.
 
+   When the report is displayed, the banner includes a **"See Details ↓"**
+   button that smoothly scrolls the page directly to the integration's end
+   section, providing an immediate call-to-action for users to access the
+   integration-specific content.
+
 2. **Report End Section**: After the user enters their data and completes the
    report, a new section appears immediately before the "More Reading" section.
    This section is automatically added to the sidebar navigation.
@@ -114,7 +119,9 @@ warning.
 
 3. **Component Props**:
 
-   - `IntroBanner.svelte`: No props required
+   - `IntroBanner.svelte`: No required props. Optional `showCta={true}` prop
+     to display a "See Details" button that scrolls to the integration's end
+     section (only use this if the integration has a ReportEnd component)
    - `ReportEnd.svelte`: Receives `recipient` and `spouse` (nullable) as props
 
 4. **Test**: Add the integration ID to the URL hash and verify both components
