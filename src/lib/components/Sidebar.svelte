@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onDestroy, onMount, tick } from 'svelte';
 import { get } from 'svelte/store';
-import { isFirstStuck, isSecondStuck, isStuck } from '$lib/context';
+import { isStuck } from '$lib/context';
 import { activeIntegration } from '$lib/integrations/context';
 
 // Optional prop to trigger rescan when integration components are loaded
@@ -344,5 +344,4 @@ $: if (mainColumn && observer) {
     right: 4px;
     font-size: 24px;
   }
-
 </style>
