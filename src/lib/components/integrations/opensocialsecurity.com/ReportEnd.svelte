@@ -1,46 +1,63 @@
 <script lang="ts">
+import RecipientName from '$lib/components/RecipientName.svelte';
 import type { Recipient } from '$lib/recipient';
 
 export let recipient: Recipient;
 export let spouse: Recipient | null = null;
 
+let openSocialSecurityUrl = '';
+
+// Keep integration data reactive to future earnings changes by subscribing to
+// the recipient stores.
+$: openSocialSecurityUrl = buildOpenSocialSecurityUrl(
+  $recipient,
+  $spouse ?? null
+);
+
 // Build the Open Social Security URL with pre-populated data
-function buildOpenSocialSecurityUrl(): string {
+function buildOpenSocialSecurityUrl(
+  recipientValue: Recipient,
+  spouseValue: Recipient | null
+): string {
   const baseUrl = 'https://opensocialsecurity.com/';
   const params = new URLSearchParams();
 
-  if (spouse) {
+  if (spouseValue) {
     // Married couple
     params.set('marital', 'married');
 
     // Person A (recipient)
-    params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
-    params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
-    params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
+    params.set('aDOBm', String(recipientValue.birthdate.layBirthMonth() + 1));
+    params.set('aDOBd', String(recipientValue.birthdate.layBirthDayOfMonth()));
+    params.set('aDOBy', String(recipientValue.birthdate.layBirthYear()));
     params.set(
       'aPIA',
-      String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
+      String(
+        recipientValue.pia().primaryInsuranceAmount().roundToDollar().value()
+      )
     );
 
     // Person B (spouse)
-    params.set('bDOBm', String(spouse.birthdate.layBirthMonth() + 1));
-    params.set('bDOBd', String(spouse.birthdate.layBirthDayOfMonth()));
-    params.set('bDOBy', String(spouse.birthdate.layBirthYear()));
+    params.set('bDOBm', String(spouseValue.birthdate.layBirthMonth() + 1));
+    params.set('bDOBd', String(spouseValue.birthdate.layBirthDayOfMonth()));
+    params.set('bDOBy', String(spouseValue.birthdate.layBirthYear()));
     params.set(
       'bPIA',
-      String(spouse.pia().primaryInsuranceAmount().roundToDollar().value())
+      String(spouseValue.pia().primaryInsuranceAmount().roundToDollar().value())
     );
   } else {
     // Single person - use marital=single with placeholder for person B
     params.set('marital', 'single');
 
     // Person A (recipient)
-    params.set('aDOBm', String(recipient.birthdate.layBirthMonth() + 1));
-    params.set('aDOBd', String(recipient.birthdate.layBirthDayOfMonth()));
-    params.set('aDOBy', String(recipient.birthdate.layBirthYear()));
+    params.set('aDOBm', String(recipientValue.birthdate.layBirthMonth() + 1));
+    params.set('aDOBd', String(recipientValue.birthdate.layBirthDayOfMonth()));
+    params.set('aDOBy', String(recipientValue.birthdate.layBirthYear()));
     params.set(
       'aPIA',
-      String(recipient.pia().primaryInsuranceAmount().roundToDollar().value())
+      String(
+        recipientValue.pia().primaryInsuranceAmount().roundToDollar().value()
+      )
     );
 
     // Person B (placeholder - required by Open Social Security)
@@ -54,12 +71,9 @@ function buildOpenSocialSecurityUrl(): string {
 }
 
 // Format PIA for display
-function formatPia(recipient: Recipient): string {
-  return recipient
-    .pia()
-    .primaryInsuranceAmount()
-    .roundToDollar()
-    .wholeDollars();
+function formatPia(person: Recipient | null): string {
+  if (!person) return '';
+  return person.pia().primaryInsuranceAmount().roundToDollar().wholeDollars();
 }
 </script>
 
@@ -73,15 +87,16 @@ function formatPia(recipient: Recipient): string {
       based on maximizing your total actuarial lifetime benefits.
     </p>
     <p>
-      {#if spouse}
-        Your Primary Insurance Amounts (PIAs) are <strong
-          >{formatPia(recipient)}</strong
-        >
-        for {recipient.name} and <strong>{formatPia(spouse)}</strong> for {spouse.name}.
-        These values will be pre-populated in Open Social Security.
+      {#if $spouse}
+        Your Primary Insurance Amounts (PIAs) are
+        <strong>{formatPia($recipient)}</strong> for
+        <RecipientName r={$recipient} /> and
+        <strong>{formatPia($spouse)}</strong> for
+        <RecipientName r={$spouse} />. These values will be pre-populated in
+        Open Social Security.
       {:else}
         Your Primary Insurance Amount (PIA) is <strong
-          >{formatPia(recipient)}</strong
+          >{formatPia($recipient)}</strong
         >. This value will be pre-populated in Open Social Security.
       {/if}
     </p>
@@ -90,7 +105,7 @@ function formatPia(recipient: Recipient): string {
       information:
     </p>
     <p>
-      <a href={buildOpenSocialSecurityUrl()} target="_blank" rel="noopener">
+      <a href={openSocialSecurityUrl} target="_blank" rel="noopener">
         Return to Open Social Security (with my information)
         <svg
           class="external-icon"

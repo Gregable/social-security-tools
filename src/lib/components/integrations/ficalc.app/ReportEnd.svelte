@@ -23,7 +23,7 @@ let spouseEntry: Entry | null = null;
 let spousalEntry: Entry | null = null;
 let entryCount = 0;
 
-$: context = new IntegrationContext(recipient, spouse);
+$: context = new IntegrationContext($recipient, $spouse);
 $: {
   const primaryDate = $recipientFilingDate;
   if (!primaryDate) {

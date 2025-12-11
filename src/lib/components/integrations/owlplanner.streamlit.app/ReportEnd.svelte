@@ -6,8 +6,8 @@ export let recipient: Recipient;
 export let spouse: Recipient | null = null;
 
 // Get PIA values for recipient and spouse
-$: recipientPia = recipient?.pia()?.primaryInsuranceAmount();
-$: spousePia = spouse?.pia()?.primaryInsuranceAmount();
+$: recipientPia = $recipient?.pia()?.primaryInsuranceAmount();
+$: spousePia = $spouse?.pia()?.primaryInsuranceAmount();
 </script>
 
 <div class="pageBreakAvoid">
@@ -27,7 +27,7 @@ $: spousePia = spouse?.pia()?.primaryInsuranceAmount();
         {#if recipientPia}
           <div class="pia-row">
             <span class="pia-label">
-              <RecipientName r={recipient} apos /> PIA:
+              <RecipientName r={$recipient} apos /> PIA:
             </span>
             <span class="pia-value">
               {recipientPia.wholeDollars()}
@@ -38,7 +38,7 @@ $: spousePia = spouse?.pia()?.primaryInsuranceAmount();
         {#if spouse !== null && spousePia}
           <div class="pia-row">
             <span class="pia-label">
-              <RecipientName r={spouse} apos /> PIA:
+              <RecipientName r={$spouse} apos /> PIA:
             </span>
             <span class="pia-value">
               {spousePia.wholeDollars()}

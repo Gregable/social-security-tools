@@ -33,7 +33,7 @@ let recipientEntry: PersonalEntry | null = null;
 let spouseEntry: PersonalEntry | null = null;
 let spousalAdjustment: AdjustmentEntry | null = null;
 
-$: context = new IntegrationContext(recipient, spouse);
+$: context = new IntegrationContext($recipient, $spouse);
 
 $: recipientEntry = buildPersonalEntry(
   recipient,

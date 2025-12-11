@@ -18,7 +18,7 @@ $: inflationRate = inflationRatePercent / 100;
 let includeSpousalBenefit = false;
 
 // Context for determining higher/lower earners and their filing dates
-$: context = new IntegrationContext(recipient, spouse);
+$: context = new IntegrationContext($recipient, $spouse);
 
 // Calculated values from SpousalBenefitToggle (annual benefits in today's dollars)
 // These are bound from the toggle component when spouse is present
@@ -29,8 +29,9 @@ let spouseAnnualBenefit: Money;
 
 // For single-person case, calculate values directly
 $: if (spouse === null) {
+  const recipientValue = $recipient;
   recipientBenefitCalculationDate = $recipientFilingDate!;
-  recipientAnnualBenefit = recipient
+  recipientAnnualBenefit = recipientValue
     .benefitOnDate(
       recipientBenefitCalculationDate,
       recipientBenefitCalculationDate
