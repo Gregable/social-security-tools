@@ -1,13 +1,46 @@
 <script lang="ts">
-import RecipientName from '$lib/components/RecipientName.svelte';
-import type { Recipient } from '$lib/recipient';
+  import RecipientName from "$lib/components/RecipientName.svelte";
+  import type { Recipient } from "$lib/recipient";
 
-export let recipient: Recipient;
-export let spouse: Recipient | null = null;
+  export let recipient: Recipient;
+  export let spouse: Recipient | null = null;
 
-// Get PIA values for recipient and spouse
-$: recipientPia = $recipient?.pia()?.primaryInsuranceAmount();
-$: spousePia = $spouse?.pia()?.primaryInsuranceAmount();
+  const TARGET_ORIGIN = "https://owlplanner.streamlit.app";
+  let status: "idle" | "sent" | "noOpener" | "error" = "idle";
+  let recipientPia;
+  let spousePia;
+  let recipientPiaDollars: number | null = null;
+  let userIdx = "";
+  let payload: { userIdx: string; pia: number } | null = null;
+  let fallbackUrl = `${TARGET_ORIGIN}/`;
+  let hasOpener = false;
+
+  // Get PIA values for recipient and spouse
+  $: recipientPia = $recipient?.pia()?.primaryInsuranceAmount();
+  $: spousePia = $spouse?.pia()?.primaryInsuranceAmount();
+  $: recipientPiaDollars = recipientPia.roundToDollar().value();
+  $: userIdx = ($recipient?.name ?? "") || "0";
+  $: payload =
+    recipientPiaDollars !== null ? { userIdx, pia: recipientPiaDollars } : null;
+  $: fallbackUrl = payload
+    ? `${TARGET_ORIGIN}/#from=ssa.tools&useridx=${encodeURIComponent(
+        payload.userIdx
+      )}&pia=${encodeURIComponent(payload.pia.toString())}`
+    : `${TARGET_ORIGIN}/`;
+  $: hasOpener =
+    typeof window !== "undefined" &&
+    Boolean(window.opener && !window.opener.closed);
+
+  function sendToOwl() {
+    if (!payload || !hasOpener) return;
+    try {
+      opener.postMessage({ type: "ssa:pias", payload }, TARGET_ORIGIN);
+      status = "sent";
+    } catch (err) {
+      console.error("Failed to post message to Owl Retirement Planner", err);
+      status = "error";
+    }
+  }
 </script>
 
 <div class="pageBreakAvoid">
@@ -53,15 +86,29 @@ $: spousePia = $spouse?.pia()?.primaryInsuranceAmount();
       </p>
     </div>
 
-    <p>
-      <a
-        href="https://owlplanner.streamlit.app/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Return to Owl Retirement Planner →
-      </a>
-    </p>
+    {#if payload}
+      <div class="send-card">
+        {#if hasOpener}
+          <button class="cta" type="button" on:click={sendToOwl}>
+            Send PIA to Owl Planner automatically
+          </button>
+          {#if status === "sent"}
+            <p class="status success">Sent to Owl in your previous tab.</p>
+          {:else if status === "noOpener" || status === "error"}
+            <p class="status error">
+              Something went wrong sending to Owl. Use the link below instead.
+            </p>
+          {/if}
+        {/if}
+        <p class="fallback">
+          {#if hasOpener}If the automatic send does not work,{/if} Return to Owl
+          Planner with your data prefilled:<br />
+          <a href={fallbackUrl} target="_blank" rel="noopener">
+            {fallbackUrl}
+          </a>
+        </p>
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -121,6 +168,50 @@ $: spousePia = $spouse?.pia()?.primaryInsuranceAmount();
     font-style: italic;
     border-top: 1px solid #ddd;
     padding-top: 0.75rem;
+  }
+
+  .send-card {
+    background: #f8f9ff;
+    border: 1px solid #c5d6ff;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .cta {
+    background: #1d4f91;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .cta:hover {
+    background: #163c72;
+  }
+
+  .status {
+    margin: 0.75rem 0 0;
+    font-weight: 500;
+  }
+
+  .status.success {
+    color: #1b7a30;
+  }
+
+  .status.warning {
+    color: #ad5a00;
+  }
+
+  .status.error {
+    color: #a11212;
+  }
+
+  .fallback {
+    margin: 0.5rem 0 0;
+    font-size: 0.95rem;
   }
 
   a {
