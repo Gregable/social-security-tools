@@ -17,6 +17,8 @@ export interface IntegrationConfig {
   displayName: string;
   /** Label for the report end section in the sidebar */
   reportEndLabel: string;
+  /** Maximum number of household members the integration supports */
+  maxHouseholdMembers?: number;
   /** Function that returns the favicon URL (processed by Vite) */
   getFavicon: () => Promise<string>;
 }
@@ -96,6 +98,7 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
     id: 'owlplanner.streamlit.app',
     displayName: 'Owl Retirement Planner',
     reportEndLabel: 'Owl Retirement Planner',
+    maxHouseholdMembers: 1,
     getFavicon: async () => {
       const module = await import(
         '../components/integrations/owlplanner.streamlit.app/owl.png'

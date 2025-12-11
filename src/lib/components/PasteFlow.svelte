@@ -5,6 +5,7 @@ import { browser } from '$app/environment';
 import { Birthdate } from '$lib/birthday';
 import { context } from '$lib/context';
 import { EarningRecord } from '$lib/earning-record';
+import { activeIntegration } from '$lib/integrations/context';
 import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
 import type { EarningsEntry } from '$lib/url-params';
@@ -49,6 +50,9 @@ let mode: number = Mode.INITIAL;
 // at that time isRecipient is set to false and the flow is repeated for
 // the spouse.
 let isRecipient: boolean = true;
+let allowSpouseFlow: boolean = true;
+
+$: allowSpouseFlow = ($activeIntegration?.maxHouseholdMembers ?? 2) > 1;
 
 let spouseName: string = 'Spouse';
 
@@ -278,6 +282,11 @@ function handleReset() {
 function handleAgeSubmit(detail: { birthdate: Birthdate }) {
   if (isRecipient) {
     context.recipient.birthdate = detail.birthdate;
+    if (!allowSpouseFlow) {
+      browser && posthog.capture('Pasted');
+      ondone?.();
+      return;
+    }
   } else {
     context.spouse.birthdate = detail.birthdate;
     browser && posthog.capture('Pasted with spousal');
@@ -311,7 +320,7 @@ function handleSpouseQuestion(detail: {
 </script>
 
 <div>
-  {#if !isRecipient}
+  {#if allowSpouseFlow && !isRecipient}
     <div class="text">
       <h3>
         <span class="highlight">Repeat for <b>{spouseName}</b></span>
@@ -341,7 +350,7 @@ function handleSpouseQuestion(detail: {
     <PasteApology onreset={handleReset} />
   {:else if mode === Mode.AGE_REQUEST}
     <AgeRequest onsubmit={handleAgeSubmit} />
-  {:else if mode === Mode.SPOUSE_QUESTION}
+  {:else if allowSpouseFlow && mode === Mode.SPOUSE_QUESTION}
     <SpouseQuestion onresponse={handleSpouseQuestion} />
   {/if}
 </div>

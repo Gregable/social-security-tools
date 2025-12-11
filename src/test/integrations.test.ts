@@ -57,6 +57,9 @@ describe('Integration Configuration', () => {
     expect(INTEGRATIONS['owlplanner.streamlit.app'].reportEndLabel).toBe(
       'Owl Retirement Planner'
     );
+    expect(INTEGRATIONS['owlplanner.streamlit.app'].maxHouseholdMembers).toBe(
+      1
+    );
     const faviconUrl =
       await INTEGRATIONS['owlplanner.streamlit.app'].getFavicon();
     expect(faviconUrl).toBeDefined();
