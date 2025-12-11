@@ -1,8 +1,8 @@
 <script lang="ts">
-  import IntegrationBanner from "../IntegrationBanner.svelte";
-  import logo from "./owl.png";
+import IntegrationBanner from '../IntegrationBanner.svelte';
+import logo from './owl.png';
 
-  export let isReportView: boolean = false;
+export let isReportView: boolean = false;
 </script>
 
 <IntegrationBanner

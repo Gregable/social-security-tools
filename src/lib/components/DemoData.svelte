@@ -108,7 +108,7 @@ function loadDemoData(demoId: number) {
 
 <style>
   .demoPrompt {
-    margin: 0 auto 2em auto;
+    margin: 1em auto 2em auto;
     max-width: min(660px, 80%);
   }
   button {

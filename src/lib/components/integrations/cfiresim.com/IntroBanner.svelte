@@ -1,8 +1,8 @@
 <script lang="ts">
-  import IntegrationBanner from "../IntegrationBanner.svelte";
-  import logo from "./cfiresim-logo.svg";
+import IntegrationBanner from '../IntegrationBanner.svelte';
+import logo from './cfiresim-logo.svg';
 
-  export let isReportView: boolean = false;
+export let isReportView: boolean = false;
 </script>
 
 <IntegrationBanner

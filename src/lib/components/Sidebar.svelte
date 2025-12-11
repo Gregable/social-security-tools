@@ -1,6 +1,7 @@
 <script lang="ts">
-import { onMount, tick } from 'svelte';
-import { context } from '$lib/context';
+import { onDestroy, onMount, tick } from 'svelte';
+import { get } from 'svelte/store';
+import { isFirstStuck, isSecondStuck, isStuck } from '$lib/context';
 import { activeIntegration } from '$lib/integrations/context';
 
 // Optional prop to trigger rescan when integration components are loaded
@@ -37,21 +38,24 @@ let mainColumn: HTMLDivElement;
 
 let visibleSections: Array<number> = [];
 
+let lastIsStuck: boolean = false;
+
 function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
+  // Check if stuck state has changed and recreate observer if needed
+  const currentIsStuck = $isStuck;
+  if (currentIsStuck !== lastIsStuck) {
+    lastIsStuck = currentIsStuck;
+    createObserver();
+    return;
+  }
+
   entries.forEach((entry) => {
     let id: number = parseInt(
       entry.target.getAttribute('id').split('-')[1],
       10
     );
-    // If we use entry.isIntersecting, the element may still be partly
-    // intersecting the scroll box, but hidden below a sticky element where
-    // it's not visible. So we use the boundingClientRect to check if it's
-    // bottom point is below the sticky element's height (110px), iff there
-    // is a sticky element.
 
-    let isIntersecting = context.isStuck()
-      ? entry.boundingClientRect.bottom > 110
-      : entry.isIntersecting;
+    let isIntersecting = entry.isIntersecting;
 
     if (isIntersecting) {
       // Push to front or back, as appropriate, if not already present.
@@ -79,13 +83,27 @@ function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
 }
 
 let observer: IntersectionObserver | null = null;
+let unsubscribeStuck: (() => void) | null = null;
 
-function createObserver(_isStuck: boolean = false) {
+function createObserver() {
   if (!mainColumn) return;
   if (observer) observer.disconnect();
+
+  const stuckNow = get(isStuck);
+  const integrationNow = get(activeIntegration);
+
+  // Calculate root margin to account for sticky elements
+  const topMargin = integrationNow
+    ? stuckNow
+      ? -160 // CTA (50px) + sliders (110px)
+      : -60 // CTA only
+    : stuckNow
+      ? -110 // sliders only
+      : 0; // nothing sticky
+
   observer = new IntersectionObserver(observeCallback, {
     root: document,
-    rootMargin: '0px',
+    rootMargin: `${topMargin}px 0px 0px 0px`,
     // Every 5%:
     threshold: [...Array(20).keys()].map((i) => i / 20),
   });
@@ -150,6 +168,20 @@ function scanSections() {
 
 onMount(() => {
   scanSections();
+
+  // React to stuck state changes immediately
+  unsubscribeStuck = isStuck.subscribe((value) => {
+    if (observer && mainColumn) {
+      lastIsStuck = value;
+      createObserver();
+    } else {
+      lastIsStuck = value;
+    }
+  });
+});
+
+onDestroy(() => {
+  if (unsubscribeStuck) unsubscribeStuck();
 });
 
 // Rescan sections when activeIntegration changes OR when integration components are loaded
@@ -159,6 +191,12 @@ $: if (($activeIntegration || integrationComponentsLoaded) && mainColumn) {
   tick().then(() => {
     scanSections();
   });
+}
+
+// Recreate observer when activeIntegration changes to update rootMargin
+$: if (mainColumn && observer) {
+  $activeIntegration; // Track this dependency
+  createObserver();
 }
 </script>
 
@@ -306,4 +344,5 @@ $: if (($activeIntegration || integrationComponentsLoaded) && mainColumn) {
     right: 4px;
     font-size: 24px;
   }
+
 </style>

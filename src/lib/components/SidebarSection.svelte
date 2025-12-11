@@ -4,10 +4,12 @@ let uniqid: number = 0;
 </script>
 
 <script lang="ts">
+  import { activeIntegration } from "$lib/integrations/context";
+
   /**
    * The label to show in the sidebar for this section.
    */
-  export let label: string = '';
+  export let label: string = "";
 
   /**
    * Whether this section is a heading. Headings are styled differently.
@@ -27,7 +29,7 @@ let uniqid: number = 0;
   /**
    * Path to favicon icon for integration sections.
    */
-  export let integrationFaviconPath: string = '';
+  export let integrationFaviconPath: string = "";
 
   /**
    * If true, this section considered to be below a sticky element, namely the
@@ -41,7 +43,7 @@ let uniqid: number = 0;
   // by having the sidebar pass it's own unique id down to the section.
 
   // Increment the uniqid to ensure unique ids / labels:
-  let id = 'sidebarsection-' + uniqid;
+  let id = "sidebarsection-" + uniqid;
   uniqid += 1;
 </script>
 
@@ -49,11 +51,12 @@ let uniqid: number = 0;
   {id}
   data-sidebarsection
   data-label={label}
-  data-heading={heading ? 'true' : 'false'}
-  data-sponsor={sponsor ? 'true' : 'false'}
-  data-integration={integration ? 'true' : 'false'}
+  data-heading={heading ? "true" : "false"}
+  data-sponsor={sponsor ? "true" : "false"}
+  data-integration={integration ? "true" : "false"}
   data-integration-favicon={integrationFaviconPath}
   class:underSticky
+  class:with-integration={$activeIntegration}
 >
   <slot></slot>
 </div>
@@ -69,5 +72,11 @@ let uniqid: number = 0;
   }
   .underSticky {
     scroll-margin-top: 110px;
+  }
+  .underSticky.with-integration {
+    scroll-margin-top: 160px;
+  }
+  .with-integration:not(.underSticky) {
+    scroll-margin-top: 60px;
   }
 </style>

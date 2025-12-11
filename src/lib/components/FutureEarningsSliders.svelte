@@ -1,7 +1,9 @@
 <script lang="ts">
-import { onMount } from 'svelte';
+import { onDestroy, onMount } from 'svelte';
+import { get } from 'svelte/store';
 import * as constants from '$lib/constants';
-import { context } from '$lib/context';
+import { isFirstStuck, isSecondStuck } from '$lib/context';
+import { activeIntegration } from '$lib/integrations/context';
 import { Money } from '$lib/money';
 import type { Recipient } from '$lib/recipient';
 import RecipientName from './RecipientName.svelte';
@@ -81,62 +83,61 @@ $: update(futureEarningYears, Money.from(futureEarningWage));
 // We consider a slider to be stuck if it's partly intersecting the page top
 // and it's container is visible. We track both slider stuckness seperately
 // in the global context.
+let lastReportedStuck = false;
+
 function updateStuckness() {
-  if (isStuck && isVisible) {
-    if (recipient.first) {
-      context.isFirstStuck = true;
-    } else {
-      context.isSecondStuck = true;
-    }
+  const next = isStuck;
+
+  if (next !== lastReportedStuck) {
+    lastReportedStuck = next;
+  }
+
+  if (recipient.first) {
+    isFirstStuck.set(next);
   } else {
-    if (recipient.first) {
-      context.isFirstStuck = false;
-    } else {
-      context.isSecondStuck = false;
-    }
+    isSecondStuck.set(next);
   }
 }
 let slidersEl: HTMLDivElement;
 let isStuck: boolean = false;
-let isVisible: boolean = false;
-const stickyObserver = new IntersectionObserver(
-  (entries, _observer) => {
-    entries.forEach((entry) => {
-      isStuck =
-        entry.intersectionRatio < 1 &&
-        entry.intersectionRatio > 0 &&
-        entry.boundingClientRect.top <= 1;
-      updateStuckness();
-    });
-  },
-  {
-    rootMargin: '-1px 0px 0px 0px',
-    threshold: [1],
+
+function recomputeStuck() {
+  if (!slidersEl) return;
+  const stickyTop = get(activeIntegration) ? 50 : 0;
+  const rect = slidersEl.getBoundingClientRect();
+  const next = rect.top <= stickyTop + 1 && rect.bottom >= stickyTop;
+
+  if (next !== isStuck) {
+    isStuck = next;
+    updateStuckness();
   }
-);
-const stickyContainerObserver = new IntersectionObserver(
-  (entries, _observer) => {
-    entries.forEach((entry) => {
-      isVisible = entry.intersectionRatio > 0;
-      updateStuckness();
-    });
-  },
-  { threshold: [0] }
-);
+}
+
+function handleScroll() {
+  recomputeStuck();
+}
+
+function handleResize() {
+  recomputeStuck();
+}
+
 onMount(() => {
-  stickyObserver.observe(slidersEl);
-  let parent = slidersEl.parentElement;
-  while (parent) {
-    if (parent.classList.contains('stickyContainer')) {
-      stickyContainerObserver.observe(parent);
-      break;
-    }
-    parent = parent.parentElement;
-  }
+  recomputeStuck();
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('resize', handleResize, { passive: true });
+});
+
+onDestroy(() => {
+  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('resize', handleResize);
 });
 </script>
 
-<div class="sliders" bind:this={slidersEl}>
+<div
+  class="sliders"
+  class:with-integration={$activeIntegration}
+  bind:this={slidersEl}
+>
   <div class="grid">
     <div class="item left">
       <RecipientName r={recipient} shortenTo={15} suffix=" plans"
@@ -186,6 +187,9 @@ onMount(() => {
       z-index: 5;
       background-color: #fff;
     }
+    .sliders.with-integration {
+      top: 50px;
+    }
     /**
      * Hack to create a bottom shadow on the slider when it stick's.
      * The shadow is always there, but is covered by a white
@@ -197,6 +201,9 @@ onMount(() => {
       z-index: 3;
       position: sticky;
       top: 118px;
+    }
+    .sliders.with-integration div.sticky-shadow {
+      top: 168px;
     }
     div.sticky-shadow-cover {
       height: 2px;
