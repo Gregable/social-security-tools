@@ -115,16 +115,12 @@ function initializeFromBirthdate() {
       .toString()
       .padStart(2, '0');
     birthdateYearStr = birthdate.layBirthYear().toString();
+    // Explicitly update validation state after initialization
+    updateValidation();
   }
 }
 
-// Initialize values when component mounts
-$: if (birthdate && !birthdateYearStr) {
-  initializeFromBirthdate();
-}
-
-// Update parsed date and validity when inputs change
-$: {
+function updateValidation() {
   const result = parseDateInputValue(
     birthdateDayStr,
     birthdateMonthStr,
@@ -134,6 +130,18 @@ $: {
   parsedDate = result.date;
   validationErrors = result.errors;
   isValid = !!parsedDate && validationErrors.length === 0;
+}
+
+// Initialize from provided birthdate (one-time) to prefill fields
+$: if (birthdate && !birthdateYearStr) {
+  initializeFromBirthdate();
+}
+
+// Update parsed date and validation state when inputs change
+$: {
+  // Register dependencies
+  const _ = [birthdateDayStr, birthdateMonthStr, birthdateYearStr];
+  updateValidation();
 }
 
 // Create Birthdate object and emit change event when valid

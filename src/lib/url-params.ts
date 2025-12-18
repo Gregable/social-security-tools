@@ -76,7 +76,7 @@ export class UrlParams {
    * Example: #pia1=3000
    */
   getRecipientPia(): number | null {
-    const value = this.params.get('pia1');
+    const value = this.params.get('pia1') ?? this.params.get('pia');
     if (!value) return null;
     const parsed = parseInt(value, 10);
     return Number.isNaN(parsed) ? null : parsed;
@@ -90,7 +90,7 @@ export class UrlParams {
    * Example: #dob1=1965-09-21
    */
   getRecipientDob(): string | null {
-    return this.params.get('dob1');
+    return this.params.get('dob1') ?? this.params.get('dob');
   }
 
   /**
@@ -100,7 +100,7 @@ export class UrlParams {
    * Example: #name1=Alex
    */
   getRecipientName(): string | null {
-    return this.params.get('name1');
+    return this.params.get('name1') ?? this.params.get('name');
   }
 
   /**

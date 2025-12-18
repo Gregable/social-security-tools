@@ -52,6 +52,9 @@ let mode: number = Mode.INITIAL;
 let isRecipient: boolean = true;
 let allowSpouseFlow: boolean = true;
 
+let recipientBirthdateFromHash: Birthdate | null = null;
+let spouseBirthdateFromHash: Birthdate | null = null;
+
 $: allowSpouseFlow = ($activeIntegration?.maxHouseholdMembers ?? 2) > 1;
 
 let spouseName: string = 'Spouse';
@@ -66,11 +69,13 @@ onMount(() => {
 
   // Check for URL parameters using UrlParams class
   const urlParams = new UrlParams();
+  recipientBirthdateFromHash = parseDob(urlParams.getRecipientDob());
+  spouseBirthdateFromHash = parseDob(urlParams.getSpouseDob());
   if (
     urlParams.hasValidRecipientParams() ||
     urlParams.hasValidRecipientEarnings()
   ) {
-    handleHashPaste();
+    handleHashPaste(urlParams);
   }
 });
 
@@ -156,9 +161,7 @@ function parseRecipientFromEarnings(
   return recipient;
 }
 
-function handleHashPaste() {
-  const urlParams = new UrlParams();
-
+function handleHashPaste(urlParams: UrlParams = new UrlParams()) {
   // Check for earnings-based parameters first (more detailed than PIA)
   let recipient1: Recipient | null = null;
   if (urlParams.hasValidRecipientEarnings()) {
@@ -349,7 +352,12 @@ function handleSpouseQuestion(detail: {
   {:else if mode === Mode.PASTE_APOLOGY}
     <PasteApology onreset={handleReset} />
   {:else if mode === Mode.AGE_REQUEST}
-    <AgeRequest onsubmit={handleAgeSubmit} />
+    <AgeRequest
+      birthdate={isRecipient
+        ? recipientBirthdateFromHash
+        : spouseBirthdateFromHash}
+      onsubmit={handleAgeSubmit}
+    />
   {:else if allowSpouseFlow && mode === Mode.SPOUSE_QUESTION}
     <SpouseQuestion onresponse={handleSpouseQuestion} />
   {/if}
