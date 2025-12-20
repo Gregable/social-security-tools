@@ -42,7 +42,7 @@ $: linkUrl =
         {#if recipientPia}
           <div class="pia-row">
             <span class="pia-label">
-              <RecipientName r={$recipient} apos /> PIA:
+              <RecipientName r={$recipient} alwaysShowName apos /> PIA:
             </span>
             <span class="pia-value">
               {recipientPia.wholeDollars()}
@@ -53,7 +53,7 @@ $: linkUrl =
         {#if spouse !== null && spousePia}
           <div class="pia-row">
             <span class="pia-label">
-              <RecipientName r={$spouse} apos /> PIA:
+              <RecipientName r={$spouse} alwaysShowName apos /> PIA:
             </span>
             <span class="pia-value">
               {spousePia.wholeDollars()}

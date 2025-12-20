@@ -14,7 +14,9 @@ export let alwaysShowName: boolean = false;
 
 <div>
   <p>
-    <RecipientName {r} apos shortenTo={13} {noColor} {alwaysShowName}>your</RecipientName>
+    <RecipientName {r} apos shortenTo={13} {noColor} {alwaysShowName}
+      >your</RecipientName
+    >
   </p>
 </div>
 

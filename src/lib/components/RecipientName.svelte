@@ -5,10 +5,12 @@
     A component that displays the recipients name as an inline span of text.
 
     If the recipient is the only user, the name is instead replaced with the
-    provided slot value, and is not styled, unless `alwaysShowName` is set.
+    provided slot value, and is not styled, unless `alwaysShowName` is set
+    and the recipient has a name.
 
-    If the recpient is not the only user, or `alwaysShowName` is set, the name
-    is displayed with styling to help visually identify the user.
+    If the recpient is not the only user, or `alwaysShowName` is set and the
+    recipient has a name, the name is displayed with styling to help visually
+    identify the user.
 
   @example
     <RecipientName r={recipient}/ suffix="'s">your</RecipientName>
@@ -59,10 +61,20 @@ function finalSuffix(): string {
     return '';
   }
 }
+
+/**
+ * Determines if we should show the slot content (e.g. "your") instead of the name.
+ * We show the slot if:
+ * 1. The recipient is the only user.
+ * 2. AND either:
+ *    a. We are not forced to always show the name.
+ *    b. OR the recipient has no name to show.
+ */
+$: showSlot = r.only && (!alwaysShowName || !r.name);
 </script>
 
 <span
-  >{#if r.only && !alwaysShowName}<slot></slot>{:else}<span
+  >{#if showSlot}<slot></slot>{:else}<span
       class="name"
       class:noColor
       class:first={r.first}

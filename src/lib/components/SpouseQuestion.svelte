@@ -23,8 +23,8 @@ export let onresponse:
   | undefined = undefined;
 
 let initial: boolean = true;
-let selfname: string = 'Self';
-let spousename: string = 'Spouse';
+export let selfname: string = 'Self';
+export let spousename: string = 'Spouse';
 
 function nospouse() {
   onresponse?.({

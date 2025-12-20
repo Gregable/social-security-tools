@@ -54,6 +54,8 @@ let allowSpouseFlow: boolean = true;
 
 let recipientBirthdateFromHash: Birthdate | null = null;
 let spouseBirthdateFromHash: Birthdate | null = null;
+let recipientNameFromHash: string | null = null;
+let spouseNameFromHash: string | null = null;
 
 $: allowSpouseFlow = ($activeIntegration?.maxHouseholdMembers ?? 2) > 1;
 
@@ -71,6 +73,8 @@ onMount(() => {
   const urlParams = new UrlParams();
   recipientBirthdateFromHash = parseDob(urlParams.getRecipientDob());
   spouseBirthdateFromHash = parseDob(urlParams.getSpouseDob());
+  recipientNameFromHash = urlParams.getRecipientName();
+  spouseNameFromHash = urlParams.getSpouseName();
   if (
     urlParams.hasValidRecipientParams() ||
     urlParams.hasValidRecipientEarnings()
@@ -286,6 +290,9 @@ function handleAgeSubmit(detail: { birthdate: Birthdate }) {
   if (isRecipient) {
     context.recipient.birthdate = detail.birthdate;
     if (!allowSpouseFlow) {
+      if (recipientNameFromHash) {
+        context.recipient.name = recipientNameFromHash;
+      }
       browser && posthog.capture('Pasted');
       ondone?.();
       return;
@@ -359,7 +366,11 @@ function handleSpouseQuestion(detail: {
       onsubmit={handleAgeSubmit}
     />
   {:else if allowSpouseFlow && mode === Mode.SPOUSE_QUESTION}
-    <SpouseQuestion onresponse={handleSpouseQuestion} />
+    <SpouseQuestion
+      selfname={recipientNameFromHash || 'Self'}
+      spousename={spouseNameFromHash || 'Spouse'}
+      onresponse={handleSpouseQuestion}
+    />
   {/if}
 </div>
 
