@@ -5,10 +5,10 @@
     A component that displays the recipients name as an inline span of text.
 
     If the recipient is the only user, the name is instead replaced with the
-    provided slot value, and is not styled.
+    provided slot value, and is not styled, unless `alwaysShowName` is set.
 
-    If the recpient is not the only user, the name is displayed
-    with styling to help visually identify the user.
+    If the recpient is not the only user, or `alwaysShowName` is set, the name
+    is displayed with styling to help visually identify the user.
 
   @example
     <RecipientName r={recipient}/ suffix="'s">your</RecipientName>
@@ -45,6 +45,11 @@ export let shortenTo: number | null = null;
  */
 export let apos: boolean = false;
 
+/**
+ * If set, the name will be displayed even if the recipient is the only user.
+ */
+export let alwaysShowName: boolean = false;
+
 function finalSuffix(): string {
   if (suffix) {
     return suffix;
@@ -57,7 +62,7 @@ function finalSuffix(): string {
 </script>
 
 <span
-  >{#if r.only}<slot></slot>{:else}<span
+  >{#if r.only && !alwaysShowName}<slot></slot>{:else}<span
       class="name"
       class:noColor
       class:first={r.first}

@@ -34,6 +34,12 @@ Default.args = {
   r: single,
 };
 
+export const SingleAlwaysShow = Template.bind({});
+SingleAlwaysShow.args = {
+  r: single,
+  alwaysShowName: true,
+};
+
 export const First = Template.bind({});
 First.args = {
   r: alex,

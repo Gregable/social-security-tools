@@ -9,11 +9,12 @@ import { Recipient } from '$lib/recipient';
 
 export let r: Recipient = new Recipient();
 export let noColor: boolean = false;
+export let alwaysShowName: boolean = false;
 </script>
 
 <div>
   <p>
-    <RecipientName {r} apos shortenTo={13} {noColor}>your</RecipientName>
+    <RecipientName {r} apos shortenTo={13} {noColor} {alwaysShowName}>your</RecipientName>
   </p>
 </div>
 
