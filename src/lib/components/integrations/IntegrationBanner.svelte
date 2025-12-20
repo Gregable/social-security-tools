@@ -1,23 +1,23 @@
 <script lang="ts">
-// Shared banner component for integration intro messages
-export let logo: string;
-export let logoAlt: string;
-// Whether the report is currently being displayed (not in paste flow)
-export let isReportView: boolean = false;
-// Integration name for the CTA button text (if empty, no CTA shown)
-export let integrationName: string = '';
-// Label for sticky header when no CTA is needed (e.g. Fin Pods AI)
-export let stickyLabel: string = '';
-// External link for the CTA button (opens in new tab)
-export let externalLink: string = '';
+  // Shared banner component for integration intro messages
+  export let logo: string;
+  export let logoAlt: string;
+  // Whether the report is currently being displayed (not in paste flow)
+  export let isReportView: boolean = false;
+  // Integration name for the CTA button text (if empty, no CTA shown)
+  export let integrationName: string = "";
+  // Label for sticky header when no CTA is needed (e.g. Fin Pods AI)
+  export let stickyLabel: string = "";
+  // External link for the CTA button (opens in new tab)
+  export let externalLink: string = "";
 
-function scrollToIntegrationSection() {
-  // Find the integration section by its data attribute
-  const element = document.querySelector('[data-integration="true"]');
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function scrollToIntegrationSection() {
+    // Find the integration section by its data attribute
+    const element = document.querySelector('[data-integration="true"]');
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
-}
 </script>
 
 <div class="intro-banner" class:in-report={isReportView}>
@@ -40,7 +40,7 @@ function scrollToIntegrationSection() {
         class="cta-button"
       >
         <img src={logo} alt={logoAlt} class="logo" />
-        Return to {integrationName || stickyLabel || 'Integration'} ↗
+        Return to {integrationName || stickyLabel || "Integration"} ↗
       </a>
     {:else if integrationName}
       <button
