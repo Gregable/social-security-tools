@@ -1,28 +1,28 @@
 <script lang="ts">
-import RecipientName from '$lib/components/RecipientName.svelte';
-import type { Recipient } from '$lib/recipient';
+  import RecipientName from "$lib/components/RecipientName.svelte";
+  import type { Recipient } from "$lib/recipient";
 
-export let recipient: Recipient;
-export let spouse: Recipient | null = null;
+  export let recipient: Recipient;
+  export let spouse: Recipient | null = null;
 
-const TARGET_ORIGIN = 'https://owlplanner.streamlit.app';
-let recipientPia;
-let spousePia;
-let recipientPiaDollars: number | null = null;
-let userIdx = '';
-let linkUrl = `${TARGET_ORIGIN}/`;
+  const TARGET_ORIGIN = "https://owlplanner.streamlit.app";
+  let recipientPia;
+  let spousePia;
+  let recipientPiaDollars: number | null = null;
+  let userIdx = "";
+  let linkUrl = `${TARGET_ORIGIN}/`;
 
-// Get PIA values for recipient and spouse
-$: recipientPia = $recipient?.pia()?.primaryInsuranceAmount();
-$: spousePia = $spouse?.pia()?.primaryInsuranceAmount();
-$: recipientPiaDollars = recipientPia.roundToDollar().value();
-$: userIdx = ($recipient?.name ?? '') || '0';
-$: linkUrl =
-  recipientPiaDollars !== null
-    ? `${TARGET_ORIGIN}/#from=ssa.tools&useridx=${encodeURIComponent(
-        userIdx
-      )}&pia=${encodeURIComponent(recipientPiaDollars.toString())}`
-    : `${TARGET_ORIGIN}/`;
+  // Get PIA values for recipient and spouse
+  $: recipientPia = $recipient?.pia()?.primaryInsuranceAmount();
+  $: spousePia = $spouse?.pia()?.primaryInsuranceAmount();
+  $: recipientPiaDollars = recipientPia.roundToDollar().value();
+  $: userIdx = ($recipient?.name ?? "") || "0";
+  $: linkUrl =
+    recipientPiaDollars !== null
+      ? `${TARGET_ORIGIN}/#from=ssa.tools&useridx=${encodeURIComponent(
+          userIdx
+        )}&pia=${encodeURIComponent(recipientPiaDollars.toString())}`
+      : `${TARGET_ORIGIN}/`;
 </script>
 
 <div class="pageBreakAvoid">
@@ -67,17 +67,6 @@ $: linkUrl =
         age, before any early or delayed filing adjustments.
       </p>
     </div>
-
-    {#if recipientPiaDollars !== null}
-      <div class="send-card">
-        <p class="fallback">
-          Open Owl Retirement Planner with your PIA prefilled:<br />
-          <a href={linkUrl} target="_blank" rel="noopener">
-            {linkUrl}
-          </a>
-        </p>
-      </div>
-    {/if}
   </div>
 </div>
 
