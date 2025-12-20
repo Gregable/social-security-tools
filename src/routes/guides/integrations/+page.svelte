@@ -141,9 +141,7 @@
           >
         </td>
         <td>A comprehensive retirement planning application.</td>
-        <td>
-          Displays your Primary Insurance Amount (PIA) values.
-        </td>
+        <td> Displays your Primary Insurance Amount (PIA) values. </td>
       </tr>
     </tbody>
   </table>
