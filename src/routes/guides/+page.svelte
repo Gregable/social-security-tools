@@ -14,6 +14,18 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Dec 20, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/integrations">Third-Party Integrations</a>
+        </h3>
+        <p class="description">
+          Learn about third-party tools that integrate with SSA.tools to provide
+          enhanced retirement planning capabilities. Discover how to connect
+          your Social Security data with other financial planning platforms.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Oct 7, 2025</span>
         <h3 class="posttitle">
           <a href="/guides/url-parameters"
