@@ -6,6 +6,10 @@ export let logoAlt: string;
 export let isReportView: boolean = false;
 // Integration name for the CTA button text (if empty, no CTA shown)
 export let integrationName: string = '';
+// Label for sticky header when no CTA is needed (e.g. Fin Pods AI)
+export let stickyLabel: string = '';
+// External link for the CTA button (opens in new tab)
+export let externalLink: string = '';
 
 function scrollToIntegrationSection() {
   // Find the integration section by its data attribute
@@ -26,17 +30,34 @@ function scrollToIntegrationSection() {
     </div>
   </div>
 </div>
-{#if integrationName && isReportView}
+{#if (integrationName || stickyLabel || externalLink) && isReportView}
   <div class="cta-container">
-    <button
-      on:click={scrollToIntegrationSection}
-      class="cta-button"
-      type="button"
-      aria-label="Jump to integration section"
-    >
-      <img src={logo} alt={logoAlt} class="logo" />
-      Scroll to {integrationName} Section ↓
-    </button>
+    {#if externalLink}
+      <a
+        href={externalLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cta-button"
+      >
+        <img src={logo} alt={logoAlt} class="logo" />
+        Return to {integrationName || stickyLabel || 'Integration'} ↗
+      </a>
+    {:else if integrationName}
+      <button
+        on:click={scrollToIntegrationSection}
+        class="cta-button"
+        type="button"
+        aria-label="Jump to integration section"
+      >
+        <img src={logo} alt={logoAlt} class="logo" />
+        Scroll to {integrationName} Section ↓
+      </button>
+    {:else}
+      <div class="cta-button static-badge">
+        <img src={logo} alt={logoAlt} class="logo" />
+        {stickyLabel}
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -102,6 +123,7 @@ function scrollToIntegrationSection() {
     display: flex;
     align-items: center;
     gap: 0.5em;
+    text-decoration: none;
   }
 
   .cta-button .logo {
@@ -120,6 +142,14 @@ function scrollToIntegrationSection() {
   .cta-button:focus-visible {
     outline: 2px solid #0d47a1;
     outline-offset: 2px;
+  }
+
+  .cta-button.static-badge {
+    cursor: default;
+  }
+
+  .cta-button.static-badge:hover {
+    background-color: #1976d2;
   }
 
   @media print {
