@@ -124,7 +124,7 @@ function confirmSpouse() {
     width: max-content;
     margin: 1em auto;
   }
-  input[type='text'] {
+  input[type="text"] {
     font-size: 20px;
   }
   .label {

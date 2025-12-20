@@ -367,8 +367,8 @@ function handleSpouseQuestion(detail: {
     />
   {:else if allowSpouseFlow && mode === Mode.SPOUSE_QUESTION}
     <SpouseQuestion
-      selfname={recipientNameFromHash || 'Self'}
-      spousename={spouseNameFromHash || 'Spouse'}
+      selfname={recipientNameFromHash || "Self"}
+      spousename={spouseNameFromHash || "Spouse"}
       onresponse={handleSpouseQuestion}
     />
   {/if}
