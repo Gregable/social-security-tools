@@ -128,7 +128,7 @@
           <a href="/calculator#integration=finpodsai.com">Fin Pods AI</a>
         </td>
         <td>
-          Uses artificial intelligence to assist with financial planning.
+          Uses auditable intelligence to assist with financial planning.
         </td>
         <td>
           Connects your SSA.tools data with Fin Pods AI's analysis tools.
