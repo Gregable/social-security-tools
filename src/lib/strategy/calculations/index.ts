@@ -7,8 +7,12 @@ export {
   sumBenefitPeriods,
 } from './recipient-personal-benefits.js';
 export {
-  optimalStrategy,
-  strategySumCents,
-  strategySumPeriods,
-  strategySumTotalPeriods,
+  optimalStrategyCouple,
+  optimalStrategySingle,
+  strategySumCentsCouple,
+  strategySumCentsSingle,
+  strategySumPeriodsCouple,
+  strategySumPeriodsSingle,
+  strategySumTotalPeriodsCouple,
+  strategySumTotalPeriodsSingle,
 } from './strategy-calc.js';

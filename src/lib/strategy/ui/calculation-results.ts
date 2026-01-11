@@ -4,16 +4,16 @@ import type { DeathAgeBucket } from './grid-sizing.js';
 
 export interface StrategyResult {
   deathAge1: string;
-  deathAge2: string;
+  deathAge2?: string;
   bucket1: DeathAgeBucket;
-  bucket2: DeathAgeBucket;
+  bucket2?: DeathAgeBucket;
   filingAge1: MonthDuration;
-  filingAge2: MonthDuration;
+  filingAge2?: MonthDuration;
   totalBenefit: Money;
   filingAge1Years: number;
   filingAge1Months: number;
-  filingAge2Years: number;
-  filingAge2Months: number;
+  filingAge2Years?: number;
+  filingAge2Months?: number;
   deathProb1?: number;
   deathProb2?: number;
 }

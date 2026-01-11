@@ -6,8 +6,8 @@ import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { PrimaryInsuranceAmount } from '$lib/pia';
 import { Recipient } from '$lib/recipient';
 import {
-  optimalStrategy,
-  optimalStrategyOptimized,
+  optimalStrategyCouple,
+  optimalStrategyCoupleOptimized,
 } from '$lib/strategy/calculations/strategy-calc';
 
 // Helper function to generate a random number within a range
@@ -72,7 +72,7 @@ describe('Optimal Strategy Fuzz Test', () => {
   const NUM_ITERATIONS = 100000;
   const currentDate = MonthDate.initFromYearsMonths({ years: 2025, months: 7 }); // Fixed current date
 
-  it(`should produce the same result for optimalStrategy and optimalStrategyOptimized over ${NUM_ITERATIONS} iterations`, async () => {
+  it(`should produce the same result for optimalStrategyCouple and optimalStrategyCoupleOptimized over ${NUM_ITERATIONS} iterations`, async () => {
     for (let i = 0; i < NUM_ITERATIONS; i++) {
       // Generate random recipients
       const recipient1 = createFuzzRecipient(currentDate, 50, 80, 0, 4000);
@@ -94,13 +94,13 @@ describe('Optimal Strategy Fuzz Test', () => {
       const discountRate = getRandomNumber(0.01, 0.07); // 1% to 7%
 
       // Run both optimal strategy functions
-      const resultOriginal = optimalStrategy(
+      const resultOriginal = optimalStrategyCouple(
         recipients,
         finalDates,
         currentDate,
         discountRate
       );
-      const resultOptimized = optimalStrategyOptimized(
+      const resultOptimized = optimalStrategyCoupleOptimized(
         recipients,
         finalDates,
         currentDate,

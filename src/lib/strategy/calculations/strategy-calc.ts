@@ -26,7 +26,7 @@ import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
  *                                                  MonthDuration)
  *                                                  for each recipient.
  */
-export function strategySumPeriods(
+export function strategySumPeriodsCouple(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   strats: [MonthDuration, MonthDuration]
@@ -261,14 +261,14 @@ function calculatePeriodNPV(
  *                                                  for each recipient.
  * @returns {Money} The net present value of all payments across all periods.
  */
-export function strategySumTotalPeriods(
+export function strategySumTotalPeriodsCouple(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
   monthlyDiscountRate: number,
   strats: [MonthDuration, MonthDuration]
 ): Money {
-  const periods = strategySumPeriods(recipients, finalDates, strats);
+  const periods = strategySumPeriodsCouple(recipients, finalDates, strats);
   let totalNPVCents = 0;
 
   for (const period of periods) {
@@ -675,7 +675,7 @@ function strategySumPeriodsOptimized(
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
-export function optimalStrategy(
+export function optimalStrategyCouple(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
@@ -703,7 +703,7 @@ export function optimalStrategy(
         new MonthDuration(j),
       ];
 
-      const outcome = strategySumCents(
+      const outcome = strategySumCentsCouple(
         recipients,
         finalDates,
         currentDate,
@@ -735,7 +735,7 @@ export function optimalStrategy(
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
-export function optimalStrategyOptimized(
+export function optimalStrategyCoupleOptimized(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
@@ -805,7 +805,7 @@ export function optimalStrategyOptimized(
  * Convenience function that returns the strategy sum in cents rather than as a Money object.
  * This is a wrapper around strategySumTotalPeriods that extracts the cents value.
  */
-export function strategySumCents(
+export function strategySumCentsCouple(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
@@ -814,11 +814,184 @@ export function strategySumCents(
 ): number {
   const monthlyDiscountRate = calculateMonthlyDiscountRate(discountRate);
 
-  return strategySumTotalPeriods(
+  return strategySumTotalPeriodsCouple(
     recipients,
     finalDates,
     currentDate,
     monthlyDiscountRate,
     strats
   ).cents();
+}
+
+/**
+ * Calculates the benefit periods for a single recipient given a filing strategy and final date.
+ *
+ * @param {Recipient} recipient - The recipient.
+ * @param {MonthDate} finalDate - The final date (death date).
+ * @param {MonthDuration} strat - The filing age.
+ * @returns {BenefitPeriod[]} Array of benefit periods.
+ */
+export function strategySumPeriodsSingle(
+  recipient: Recipient,
+  finalDate: MonthDate,
+  strat: MonthDuration
+): BenefitPeriod[] {
+  const periods: BenefitPeriod[] = [];
+  const filingDate = recipient.birthdate.dateAtSsaAge(strat);
+
+  PersonalBenefitPeriods(
+    recipient,
+    filingDate,
+    finalDate,
+    periods,
+    0 // recipientIndex is always 0 for single
+  );
+
+  return periods;
+}
+
+/**
+ * Calculates the net present value of all benefit periods for a single
+ * recipient.
+ *
+ * This function calls strategySumPeriodsSingle to get an array of benefit
+ * periods, and then calculates the net present value of the payments during
+ * those periods, accounting for the duration of each period and discounting
+ * future payments.
+ *
+ * @param {Recipient} recipient - The recipient for whom the strategy results
+ *                                are being calculated.
+ * @param {MonthDate} finalDate - The final date (death date) for the recipient.
+ * @param {MonthDate} currentDate - Today's date, used as the reference for NPV
+ *                                  calculation.
+ * @param {number} monthlyDiscountRate - Monthly discount rate (pre-calculated
+ *                                       from annual rate).
+ * @param {MonthDuration} strat - The filing age (as MonthDuration) for the
+ *                                recipient.
+ * @returns {Money} The net present value of all payments across all periods.
+ */
+export function strategySumTotalPeriodsSingle(
+  recipient: Recipient,
+  finalDate: MonthDate,
+  currentDate: MonthDate,
+  monthlyDiscountRate: number,
+  strat: MonthDuration
+): Money {
+  const periods = strategySumPeriodsSingle(recipient, finalDate, strat);
+  let totalNPVCents = 0;
+
+  for (const period of periods) {
+    const monthlyPaymentCents = period.amount.cents();
+
+    // Determine the effective start and end dates for payments, considering currentDate
+    // Payments are assumed to be received at the end of the month for the previous month's benefits.
+    const firstPaymentDate = period.startDate.addDuration(new MonthDuration(1));
+    const lastPaymentDate = period.endDate.addDuration(new MonthDuration(1));
+
+    // The effective start of payments for NPV calculation is the later of currentDate + 1 month or firstPaymentDate
+    const effectiveStartPaymentDate = MonthDate.max(
+      currentDate.addDuration(new MonthDuration(1)),
+      firstPaymentDate
+    );
+    const effectiveEndPaymentDate = lastPaymentDate;
+
+    // If the effective start date is after the effective end date, no payments from this period contribute to NPV.
+    if (effectiveStartPaymentDate.greaterThan(effectiveEndPaymentDate)) {
+      continue;
+    }
+
+    const numberOfPayments =
+      effectiveEndPaymentDate.monthsSinceEpoch() -
+      effectiveStartPaymentDate.monthsSinceEpoch() +
+      1;
+
+    const monthsToFirstPayment =
+      effectiveStartPaymentDate.monthsSinceEpoch() -
+      currentDate.monthsSinceEpoch();
+
+    totalNPVCents += calculatePeriodNPV(
+      monthlyPaymentCents,
+      numberOfPayments,
+      monthsToFirstPayment,
+      monthlyDiscountRate
+    );
+  }
+
+  return Money.fromCents(totalNPVCents);
+}
+
+/**
+ * Convenience function that returns the strategy sum in cents rather than as a
+ * Money object. This is a wrapper around strategySumTotalPeriodsSingle that
+ * extracts the cents value.
+ *
+ * @param {Recipient} recipient - The recipient.
+ * @param {MonthDate} finalDate - The final date (death date).
+ * @param {MonthDate} currentDate - Today's date.
+ * @param {number} discountRate - Annual discount rate.
+ * @param {MonthDuration} strat - The filing age.
+ * @returns {number} The total NPV in cents.
+ */
+export function strategySumCentsSingle(
+  recipient: Recipient,
+  finalDate: MonthDate,
+  currentDate: MonthDate,
+  discountRate: number,
+  strat: MonthDuration
+): number {
+  const monthlyDiscountRate = calculateMonthlyDiscountRate(discountRate);
+
+  return strategySumTotalPeriodsSingle(
+    recipient,
+    finalDate,
+    currentDate,
+    monthlyDiscountRate,
+    strat
+  ).cents();
+}
+
+/**
+ * Calculates the optimal filing age for a single recipient to maximize
+ * lifetime benefits (NPV).
+ *
+ * @param {Recipient} recipient - The recipient.
+ * @param {MonthDate} finalDate - The final date (death date).
+ * @param {MonthDate} currentDate - Today's date.
+ * @param {number} discountRate - Annual discount rate.
+ * @returns {[MonthDuration, number]} A tuple containing the optimal filing age and the max NPV in cents.
+ */
+export function optimalStrategySingle(
+  recipient: Recipient,
+  finalDate: MonthDate,
+  currentDate: MonthDate,
+  discountRate: number
+): [MonthDuration, number] {
+  let bestStrategy: [MonthDuration, number] = [new MonthDuration(0), -1];
+
+  const startFilingDate: number = earliestFiling(
+    recipient,
+    currentDate
+  ).asMonths();
+
+  const endFilingAge: number = Math.min(
+    70 * 12,
+    recipient.birthdate.ageAtSsaDate(finalDate).asMonths()
+  );
+
+  for (let i = startFilingDate; i <= endFilingAge; ++i) {
+    const strategy = new MonthDuration(i);
+
+    const outcome = strategySumCentsSingle(
+      recipient,
+      finalDate,
+      currentDate,
+      discountRate,
+      strategy
+    );
+    if (outcome > bestStrategy[1]) {
+      bestStrategy = [strategy, outcome];
+    }
+  }
+
+  return bestStrategy;
 }

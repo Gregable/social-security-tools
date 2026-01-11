@@ -1,407 +1,407 @@
 <script lang="ts">
-import RecipientName from '$lib/components/RecipientName.svelte';
-import { Money } from '$lib/money';
-import { MonthDurationRange } from '$lib/month-duration-range';
-import { MonthDate, MonthDuration } from '$lib/month-time';
-import type { Recipient } from '$lib/recipient';
-import { strategySumCents } from '$lib/strategy/calculations/strategy-calc';
+  import RecipientName from "$lib/components/RecipientName.svelte";
+  import { Money } from "$lib/money";
+  import { MonthDurationRange } from "$lib/month-duration-range";
+  import { MonthDate, MonthDuration } from "$lib/month-time";
+  import type { Recipient } from "$lib/recipient";
+  import { strategySumCentsCouple } from "$lib/strategy/calculations/strategy-calc";
 
-// Props
-export let recipients: [Recipient, Recipient];
-export let deathAge1: MonthDuration;
-export let deathAge2: MonthDuration;
-export let discountRate: number;
-export let optimalNPV: Money;
-export let displayAsAges: boolean = false;
+  // Props
+  export let recipients: [Recipient, Recipient];
+  export let deathAge1: MonthDuration;
+  export let deathAge2: MonthDuration;
+  export let discountRate: number;
+  export let optimalNPV: Money;
+  export let displayAsAges: boolean = false;
 
-// State
-interface AlternativeResult {
-  filingAge1: MonthDuration;
-  filingAge2: MonthDuration;
-  npv: Money;
-  percentOfOptimal: number;
-}
-
-let alternativeResults: AlternativeResult[][] = [];
-let filingAgeRange1: MonthDurationRange;
-let filingAgeRange2: MonthDurationRange;
-let isCalculating: boolean = false;
-const currentDate: MonthDate = MonthDate.initFromNow();
-
-// Hover state tracking
-let hoveredRowIndex: number = -1;
-let hoveredColIndex: number = -1;
-let hoveredResult: AlternativeResult | null = null;
-
-// Pin state tracking
-let isPinned: boolean = false;
-let pinnedRowIndex: number = -1;
-let pinnedColIndex: number = -1;
-let pinnedResult: AlternativeResult | null = null;
-
-/**
- * Creates a filing age range for a given recipient.
- *
- * This function calculates the earliest and latest possible filing ages
- * for a recipient. The earliest is typically 62+0 or 62+1 based on birth day,
- * clipped to exclude any ages in the past. The latest is the minimum of
- * age 70+0 or the recipient's death age.
- *
- * @param recipient - The recipient for whom to generate filing age ranges
- * @param deathAge - The age at which the recipient dies
- * @returns A MonthDurationRange representing possible filing ages
- */
-function createFilingAgeRange(
-  recipient: Recipient,
-  deathAge: MonthDuration
-): MonthDurationRange {
-  const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
-
-  // Get the earliest filing age for this recipient
-  const earliestFiling = recipient.birthdate.earliestFilingMonth();
-
-  // Start from the maximum of earliest filing age or current age
-  const startingAge = currentAge.greaterThan(earliestFiling)
-    ? currentAge
-    : earliestFiling;
-
-  // End at the minimum of age 70 or death age
-  const maxAge70 = MonthDuration.initFromYearsMonths({
-    years: 70,
-    months: 0,
-  });
-  const end = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
-
-  return new MonthDurationRange(startingAge, end);
-}
-
-/**
- * Creates year-based header objects that span across multiple months.
- *
- * Takes an array of MonthDuration objects and groups them by year,
- * calculating how many months each year spans. This is used to create column
- * and row headers that show only the year (e.g., "62", "63") but span across
- * all the months within that year in the grid.
- *
- * @param {MonthDuration[]} ageRange - Array of MonthDuration objects
- * @returns {Array<{year: number, colspan: number}>} Array of header objects
- * where each object contains the year to display and the number of months it
- * spans
- */
-function generateYearHeaders(
-  ageRange: MonthDuration[]
-): Array<{ year: number; colspan: number }> {
-  const yearHeaders = [];
-  let currentYear = null;
-  let monthCount = 0;
-
-  for (const duration of ageRange) {
-    const years = duration.years();
-    if (years !== currentYear) {
-      if (currentYear !== null && monthCount > 0) {
-        yearHeaders.push({
-          year: currentYear,
-          colspan: monthCount,
-        });
-      }
-      currentYear = years;
-      monthCount = 1;
-    } else {
-      monthCount++;
-    }
+  // State
+  interface AlternativeResult {
+    filingAge1: MonthDuration;
+    filingAge2: MonthDuration;
+    npv: Money;
+    percentOfOptimal: number;
   }
 
-  // Add the last year
-  if (currentYear !== null && monthCount > 0) {
-    yearHeaders.push({
-      year: currentYear,
-      colspan: monthCount,
+  let alternativeResults: AlternativeResult[][] = [];
+  let filingAgeRange1: MonthDurationRange;
+  let filingAgeRange2: MonthDurationRange;
+  let isCalculating: boolean = false;
+  const currentDate: MonthDate = MonthDate.initFromNow();
+
+  // Hover state tracking
+  let hoveredRowIndex: number = -1;
+  let hoveredColIndex: number = -1;
+  let hoveredResult: AlternativeResult | null = null;
+
+  // Pin state tracking
+  let isPinned: boolean = false;
+  let pinnedRowIndex: number = -1;
+  let pinnedColIndex: number = -1;
+  let pinnedResult: AlternativeResult | null = null;
+
+  /**
+   * Creates a filing age range for a given recipient.
+   *
+   * This function calculates the earliest and latest possible filing ages
+   * for a recipient. The earliest is typically 62+0 or 62+1 based on birth day,
+   * clipped to exclude any ages in the past. The latest is the minimum of
+   * age 70+0 or the recipient's death age.
+   *
+   * @param recipient - The recipient for whom to generate filing age ranges
+   * @param deathAge - The age at which the recipient dies
+   * @returns A MonthDurationRange representing possible filing ages
+   */
+  function createFilingAgeRange(
+    recipient: Recipient,
+    deathAge: MonthDuration
+  ): MonthDurationRange {
+    const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
+
+    // Get the earliest filing age for this recipient
+    const earliestFiling = recipient.birthdate.earliestFilingMonth();
+
+    // Start from the maximum of earliest filing age or current age
+    const startingAge = currentAge.greaterThan(earliestFiling)
+      ? currentAge
+      : earliestFiling;
+
+    // End at the minimum of age 70 or death age
+    const maxAge70 = MonthDuration.initFromYearsMonths({
+      years: 70,
+      months: 0,
     });
+    const end = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
+
+    return new MonthDurationRange(startingAge, end);
   }
 
-  return yearHeaders;
-}
+  /**
+   * Creates year-based header objects that span across multiple months.
+   *
+   * Takes an array of MonthDuration objects and groups them by year,
+   * calculating how many months each year spans. This is used to create column
+   * and row headers that show only the year (e.g., "62", "63") but span across
+   * all the months within that year in the grid.
+   *
+   * @param {MonthDuration[]} ageRange - Array of MonthDuration objects
+   * @returns {Array<{year: number, colspan: number}>} Array of header objects
+   * where each object contains the year to display and the number of months it
+   * spans
+   */
+  function generateYearHeaders(
+    ageRange: MonthDuration[]
+  ): Array<{ year: number; colspan: number }> {
+    const yearHeaders = [];
+    let currentYear = null;
+    let monthCount = 0;
 
-/**
- * Creates date-based header objects that span across multiple months within a year.
- *
- * Takes an array of MonthDuration objects and groups them by calendar year,
- * calculating how many months each year spans. This is used to create column
- * and row headers that show calendar years (e.g., "2028", "2029") instead of ages.
- *
- * @param {MonthDuration[]} ageRange - Array of MonthDuration objects
- * @param {Recipient} recipient - The recipient to calculate filing dates for
- * @returns {Array<{year: number, colspan: number}>} Array of header objects
- * where each object contains the calendar year to display and the number of months it spans
- */
-function generateDateHeaders(
-  ageRange: MonthDuration[],
-  recipient: Recipient
-): Array<{ year: number; colspan: number }> {
-  const dateHeaders = [];
-  let currentYear = null;
-  let monthCount = 0;
-
-  for (const duration of ageRange) {
-    // Convert age to actual filing date
-    const filingDate = recipient.birthdate.dateAtLayAge(duration);
-    const calendarYear = filingDate.year();
-
-    if (calendarYear !== currentYear) {
-      if (currentYear !== null && monthCount > 0) {
-        dateHeaders.push({
-          year: currentYear,
-          colspan: monthCount,
-        });
+    for (const duration of ageRange) {
+      const years = duration.years();
+      if (years !== currentYear) {
+        if (currentYear !== null && monthCount > 0) {
+          yearHeaders.push({
+            year: currentYear,
+            colspan: monthCount,
+          });
+        }
+        currentYear = years;
+        monthCount = 1;
+      } else {
+        monthCount++;
       }
-      currentYear = calendarYear;
-      monthCount = 1;
+    }
+
+    // Add the last year
+    if (currentYear !== null && monthCount > 0) {
+      yearHeaders.push({
+        year: currentYear,
+        colspan: monthCount,
+      });
+    }
+
+    return yearHeaders;
+  }
+
+  /**
+   * Creates date-based header objects that span across multiple months within a year.
+   *
+   * Takes an array of MonthDuration objects and groups them by calendar year,
+   * calculating how many months each year spans. This is used to create column
+   * and row headers that show calendar years (e.g., "2028", "2029") instead of ages.
+   *
+   * @param {MonthDuration[]} ageRange - Array of MonthDuration objects
+   * @param {Recipient} recipient - The recipient to calculate filing dates for
+   * @returns {Array<{year: number, colspan: number}>} Array of header objects
+   * where each object contains the calendar year to display and the number of months it spans
+   */
+  function generateDateHeaders(
+    ageRange: MonthDuration[],
+    recipient: Recipient
+  ): Array<{ year: number; colspan: number }> {
+    const dateHeaders = [];
+    let currentYear = null;
+    let monthCount = 0;
+
+    for (const duration of ageRange) {
+      // Convert age to actual filing date
+      const filingDate = recipient.birthdate.dateAtLayAge(duration);
+      const calendarYear = filingDate.year();
+
+      if (calendarYear !== currentYear) {
+        if (currentYear !== null && monthCount > 0) {
+          dateHeaders.push({
+            year: currentYear,
+            colspan: monthCount,
+          });
+        }
+        currentYear = calendarYear;
+        monthCount = 1;
+      } else {
+        monthCount++;
+      }
+    }
+
+    // Add the last year
+    if (currentYear !== null && monthCount > 0) {
+      dateHeaders.push({
+        year: currentYear,
+        colspan: monthCount,
+      });
+    }
+
+    return dateHeaders;
+  }
+
+  // Calculate alternative strategies when inputs change (inputs always defined)
+  $: calculateAlternativeStrategies();
+
+  /**
+   * Calculates NPV for all possible filing strategy combinations.
+   *
+   * This is the main calculation function that generates a comprehensive matrix
+   * of net present values for every possible monthly filing age combination
+   * between the two recipients. The calculation respects each recipient's
+   * earliest eligible filing age and current age constraints.
+   *
+   * The function runs asynchronously with periodic yielding to prevent UI
+   * blocking during large calculations (potentially 100x100 = 10,000
+   * combinations).
+   *
+   * Updates the component state with:
+   * - alternativeResults: 2D array of NPV results and metadata
+   * - isCalculating: Loading state flag
+   * - filingAgeRange1/filingAgeRange2: The ranges of filing ages for each
+   *     recipient
+   */
+  async function calculateAlternativeStrategies(): Promise<void> {
+    if (isCalculating) return;
+
+    isCalculating = true;
+
+    try {
+      // Generate age ranges
+      filingAgeRange1 = createFilingAgeRange(recipients[0], deathAge1);
+      filingAgeRange2 = createFilingAgeRange(recipients[1], deathAge2);
+
+      // Calculate final dates for the death ages
+      const finalDates: [MonthDate, MonthDate] = [
+        recipients[0].birthdate.dateAtLayAge(deathAge1),
+        recipients[1].birthdate.dateAtLayAge(deathAge2),
+      ];
+
+      // Initialize results matrix
+      alternativeResults = Array(filingAgeRange1.getLength())
+        .fill(null)
+        .map(() => Array(filingAgeRange2.getLength()).fill(null));
+
+      // Calculate NPV for each filing strategy combination (monthly precision)
+      for (let i = 0; i < filingAgeRange1.getLength(); i++) {
+        for (let j = 0; j < filingAgeRange2.getLength(); j++) {
+          const strategy1 = filingAgeRange1.indexToMonthDuration(i);
+          const strategy2 = filingAgeRange2.indexToMonthDuration(j);
+
+          // Calculate NPV for this strategy
+          const npvCents = strategySumCentsCouple(
+            recipients,
+            finalDates,
+            currentDate,
+            discountRate,
+            [strategy1, strategy2]
+          );
+          const npv = Money.fromCents(npvCents);
+
+          // Calculate percentage of optimal
+          const percentOfOptimal = npv.div$(optimalNPV) * 100;
+
+          alternativeResults[i][j] = {
+            filingAge1: strategy1,
+            filingAge2: strategy2,
+            npv: npv,
+            percentOfOptimal,
+          };
+        }
+
+        // Allow UI to update periodically
+        if (i % 10 === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+      }
+    } catch (error) {
+      console.error("Error calculating alternative strategies:", error);
+    } finally {
+      isCalculating = false;
+    }
+  }
+
+  // Get color for NPV value based on percentage of optimal
+  /**
+   * Determines the background color for a grid cell based on NPV performance.
+   *
+   * Uses a color scale to visually represent how close each filing strategy
+   * combination comes to the optimal NPV. Includes special handling for
+   * strategies that exactly match the optimal NPV.
+   *
+   * Color scale:
+   * - Dark green (rgb(0, 100, 0)): Exact optimal match (100%)
+   * - Green (rgb(34, 139, 34)): 95-100% of optimal
+   * - Yellow-green (rgb(154, 205, 50)): 90-95% of optimal
+   * - Gold (rgb(255, 215, 0)): 85-90% of optimal
+   * - Orange (rgb(255, 165, 0)): 80-85% of optimal
+   * - Red (rgb(220, 20, 60)): <80% of optimal
+   *
+   * @param {number} percentOfOptimal - The NPV as a percentage of the optimal NPV
+   * @param {Money} npv - The actual NPV value as a Money object
+   * @param {Money} optimalNPV - The optimal NPV value as a Money object for exact comparison
+   * @returns {string} RGB color string for use in CSS background-color
+   */
+  function getColor(
+    percentOfOptimal: number,
+    npv: Money,
+    optimalNPV: Money
+  ): string {
+    // Special color for exact 100% match (same NPV as optimal), Dark green
+    if (npv.equals(optimalNPV)) return "rgb(0, 100, 0)";
+
+    // Color scale from red (bad) to green (optimal)
+    if (percentOfOptimal >= 95) return "rgb(34, 139, 34)"; // Green
+    if (percentOfOptimal >= 90) return "rgb(154, 205, 50)"; // Yellow-green
+    if (percentOfOptimal >= 85) return "rgb(255, 215, 0)"; // Gold
+    if (percentOfOptimal >= 80) return "rgb(255, 165, 0)"; // Orange
+    return "rgb(220, 20, 60)"; // Red
+  }
+
+  /**
+   * Handles mouse enter events on data cells to update hover state.
+   */
+  function handleCellMouseEnter(
+    i: number,
+    j: number,
+    result: AlternativeResult
+  ): void {
+    if (!isPinned) {
+      hoveredRowIndex = i;
+      hoveredColIndex = j;
+      hoveredResult = result;
+    }
+  }
+
+  /**
+   * Handles mouse leave events on the grid to clear hover state.
+   */
+  function handleGridMouseLeave(): void {
+    if (!isPinned) {
+      hoveredRowIndex = -1;
+      hoveredColIndex = -1;
+      hoveredResult = null;
+    }
+  }
+
+  /**
+   * Handles keydown events on data cells for accessibility.
+   * Responds to Enter and Space keys to trigger cell click.
+   */
+  function handleCellKeydown(
+    event: KeyboardEvent,
+    i: number,
+    j: number,
+    result: AlternativeResult
+  ): void {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleCellClick(i, j, result);
+    }
+  }
+
+  /**
+   * Handles click events on data cells to toggle pin state.
+   */
+  function handleCellClick(
+    i: number,
+    j: number,
+    result: AlternativeResult
+  ): void {
+    if (isPinned) {
+      // If currently pinned, any click unpins
+      isPinned = false;
+      pinnedRowIndex = -1;
+      pinnedColIndex = -1;
+      pinnedResult = null;
+      // Set hover state to clicked cell
+      hoveredRowIndex = i;
+      hoveredColIndex = j;
+      hoveredResult = result;
     } else {
-      monthCount++;
+      // If not pinned, pin to this cell
+      isPinned = true;
+      pinnedRowIndex = i;
+      pinnedColIndex = j;
+      pinnedResult = result;
+      // Clear hover state when pinned
+      hoveredRowIndex = -1;
+      hoveredColIndex = -1;
+      hoveredResult = null;
     }
   }
 
-  // Add the last year
-  if (currentYear !== null && monthCount > 0) {
-    dateHeaders.push({
-      year: currentYear,
-      colspan: monthCount,
-    });
-  }
+  // Reactive statement to determine which cell should be highlighted and which result to show
+  $: displayedRowIndex = isPinned ? pinnedRowIndex : hoveredRowIndex;
+  $: displayedColIndex = isPinned ? pinnedColIndex : hoveredColIndex;
+  $: displayedResult = isPinned ? pinnedResult : hoveredResult;
 
-  return dateHeaders;
-}
+  /**
+   * Formats a MonthDuration as either a readable age string or filing date.
+   * Converts "62+1" format to "Age 62 and 1 month" format for ages,
+   * or to filing date format for dates based on displayAsAges toggle.
+   */
+  function formatAge(
+    duration: MonthDuration,
+    recipientIndex: number = 0
+  ): string {
+    if (displayAsAges) {
+      const years = duration.years();
+      const months = duration.modMonths();
 
-// Calculate alternative strategies when inputs change (inputs always defined)
-$: calculateAlternativeStrategies();
-
-/**
- * Calculates NPV for all possible filing strategy combinations.
- *
- * This is the main calculation function that generates a comprehensive matrix
- * of net present values for every possible monthly filing age combination
- * between the two recipients. The calculation respects each recipient's
- * earliest eligible filing age and current age constraints.
- *
- * The function runs asynchronously with periodic yielding to prevent UI
- * blocking during large calculations (potentially 100x100 = 10,000
- * combinations).
- *
- * Updates the component state with:
- * - alternativeResults: 2D array of NPV results and metadata
- * - isCalculating: Loading state flag
- * - filingAgeRange1/filingAgeRange2: The ranges of filing ages for each
- *     recipient
- */
-async function calculateAlternativeStrategies(): Promise<void> {
-  if (isCalculating) return;
-
-  isCalculating = true;
-
-  try {
-    // Generate age ranges
-    filingAgeRange1 = createFilingAgeRange(recipients[0], deathAge1);
-    filingAgeRange2 = createFilingAgeRange(recipients[1], deathAge2);
-
-    // Calculate final dates for the death ages
-    const finalDates: [MonthDate, MonthDate] = [
-      recipients[0].birthdate.dateAtLayAge(deathAge1),
-      recipients[1].birthdate.dateAtLayAge(deathAge2),
-    ];
-
-    // Initialize results matrix
-    alternativeResults = Array(filingAgeRange1.getLength())
-      .fill(null)
-      .map(() => Array(filingAgeRange2.getLength()).fill(null));
-
-    // Calculate NPV for each filing strategy combination (monthly precision)
-    for (let i = 0; i < filingAgeRange1.getLength(); i++) {
-      for (let j = 0; j < filingAgeRange2.getLength(); j++) {
-        const strategy1 = filingAgeRange1.indexToMonthDuration(i);
-        const strategy2 = filingAgeRange2.indexToMonthDuration(j);
-
-        // Calculate NPV for this strategy
-        const npvCents = strategySumCents(
-          recipients,
-          finalDates,
-          currentDate,
-          discountRate,
-          [strategy1, strategy2]
-        );
-        const npv = Money.fromCents(npvCents);
-
-        // Calculate percentage of optimal
-        const percentOfOptimal = npv.div$(optimalNPV) * 100;
-
-        alternativeResults[i][j] = {
-          filingAge1: strategy1,
-          filingAge2: strategy2,
-          npv: npv,
-          percentOfOptimal,
-        };
+      if (months === 0) {
+        return `Age ${years}`;
+      } else if (months === 1) {
+        return `Age ${years} and 1 month`;
+      } else {
+        return `Age ${years} and ${months} months`;
       }
-
-      // Allow UI to update periodically
-      if (i % 10 === 0) {
-        await new Promise((resolve) => setTimeout(resolve, 0));
-      }
-    }
-  } catch (error) {
-    console.error('Error calculating alternative strategies:', error);
-  } finally {
-    isCalculating = false;
-  }
-}
-
-// Get color for NPV value based on percentage of optimal
-/**
- * Determines the background color for a grid cell based on NPV performance.
- *
- * Uses a color scale to visually represent how close each filing strategy
- * combination comes to the optimal NPV. Includes special handling for
- * strategies that exactly match the optimal NPV.
- *
- * Color scale:
- * - Dark green (rgb(0, 100, 0)): Exact optimal match (100%)
- * - Green (rgb(34, 139, 34)): 95-100% of optimal
- * - Yellow-green (rgb(154, 205, 50)): 90-95% of optimal
- * - Gold (rgb(255, 215, 0)): 85-90% of optimal
- * - Orange (rgb(255, 165, 0)): 80-85% of optimal
- * - Red (rgb(220, 20, 60)): <80% of optimal
- *
- * @param {number} percentOfOptimal - The NPV as a percentage of the optimal NPV
- * @param {Money} npv - The actual NPV value as a Money object
- * @param {Money} optimalNPV - The optimal NPV value as a Money object for exact comparison
- * @returns {string} RGB color string for use in CSS background-color
- */
-function getColor(
-  percentOfOptimal: number,
-  npv: Money,
-  optimalNPV: Money
-): string {
-  // Special color for exact 100% match (same NPV as optimal), Dark green
-  if (npv.equals(optimalNPV)) return 'rgb(0, 100, 0)';
-
-  // Color scale from red (bad) to green (optimal)
-  if (percentOfOptimal >= 95) return 'rgb(34, 139, 34)'; // Green
-  if (percentOfOptimal >= 90) return 'rgb(154, 205, 50)'; // Yellow-green
-  if (percentOfOptimal >= 85) return 'rgb(255, 215, 0)'; // Gold
-  if (percentOfOptimal >= 80) return 'rgb(255, 165, 0)'; // Orange
-  return 'rgb(220, 20, 60)'; // Red
-}
-
-/**
- * Handles mouse enter events on data cells to update hover state.
- */
-function handleCellMouseEnter(
-  i: number,
-  j: number,
-  result: AlternativeResult
-): void {
-  if (!isPinned) {
-    hoveredRowIndex = i;
-    hoveredColIndex = j;
-    hoveredResult = result;
-  }
-}
-
-/**
- * Handles mouse leave events on the grid to clear hover state.
- */
-function handleGridMouseLeave(): void {
-  if (!isPinned) {
-    hoveredRowIndex = -1;
-    hoveredColIndex = -1;
-    hoveredResult = null;
-  }
-}
-
-/**
- * Handles keydown events on data cells for accessibility.
- * Responds to Enter and Space keys to trigger cell click.
- */
-function handleCellKeydown(
-  event: KeyboardEvent,
-  i: number,
-  j: number,
-  result: AlternativeResult
-): void {
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault();
-    handleCellClick(i, j, result);
-  }
-}
-
-/**
- * Handles click events on data cells to toggle pin state.
- */
-function handleCellClick(
-  i: number,
-  j: number,
-  result: AlternativeResult
-): void {
-  if (isPinned) {
-    // If currently pinned, any click unpins
-    isPinned = false;
-    pinnedRowIndex = -1;
-    pinnedColIndex = -1;
-    pinnedResult = null;
-    // Set hover state to clicked cell
-    hoveredRowIndex = i;
-    hoveredColIndex = j;
-    hoveredResult = result;
-  } else {
-    // If not pinned, pin to this cell
-    isPinned = true;
-    pinnedRowIndex = i;
-    pinnedColIndex = j;
-    pinnedResult = result;
-    // Clear hover state when pinned
-    hoveredRowIndex = -1;
-    hoveredColIndex = -1;
-    hoveredResult = null;
-  }
-}
-
-// Reactive statement to determine which cell should be highlighted and which result to show
-$: displayedRowIndex = isPinned ? pinnedRowIndex : hoveredRowIndex;
-$: displayedColIndex = isPinned ? pinnedColIndex : hoveredColIndex;
-$: displayedResult = isPinned ? pinnedResult : hoveredResult;
-
-/**
- * Formats a MonthDuration as either a readable age string or filing date.
- * Converts "62+1" format to "Age 62 and 1 month" format for ages,
- * or to filing date format for dates based on displayAsAges toggle.
- */
-function formatAge(
-  duration: MonthDuration,
-  recipientIndex: number = 0
-): string {
-  if (displayAsAges) {
-    const years = duration.years();
-    const months = duration.modMonths();
-
-    if (months === 0) {
-      return `Age ${years}`;
-    } else if (months === 1) {
-      return `Age ${years} and 1 month`;
     } else {
-      return `Age ${years} and ${months} months`;
+      // Display as filing date
+      const filingDate =
+        recipients[recipientIndex].birthdate.dateAtLayAge(duration);
+      return `${filingDate.monthName()} ${filingDate.year()}`;
     }
-  } else {
-    // Display as filing date
-    const filingDate =
-      recipients[recipientIndex].birthdate.dateAtLayAge(duration);
-    return `${filingDate.monthName()} ${filingDate.year()}`;
   }
-}
 </script>
 
 <div class="alternative-strategies-container">
   <p>
     This grid shows the net present value for all possible filing {displayAsAges
-      ? 'age'
-      : 'date'} combinations for the modeled death ages (<RecipientName
+      ? "age"
+      : "date"} combinations for the modeled death ages (<RecipientName
       r={recipients[0]}
     />: {deathAge1.toAgeString()}, <RecipientName r={recipients[1]} />: {deathAge2.toAgeString()}).
     Values are color-coded relative to the optimal strategy.
@@ -425,7 +425,7 @@ function formatAge(
 
     <!-- Info Panel -->
     <div class="info-panel">
-      <h4>Cell Details {isPinned ? '(Pinned - click cell to unpin)' : ''}</h4>
+      <h4>Cell Details {isPinned ? "(Pinned - click cell to unpin)" : ""}</h4>
       {#if displayedResult}
         <div class="info-content">
           <div class="info-row">
@@ -455,8 +455,8 @@ function formatAge(
         <div class="info-content">
           <p class="info-hint">
             Hover over a cell to see filing strategy details{isPinned
-              ? ''
-              : ', or click to pin'}
+              ? ""
+              : ", or click to pin"}
           </p>
         </div>
       {/if}
@@ -483,8 +483,8 @@ function formatAge(
         style:grid-row="1"
       >
         <RecipientName r={recipients[1]} apos />&nbsp;Filing {displayAsAges
-          ? 'Age'
-          : 'Date'}
+          ? "Age"
+          : "Date"}
       </div>
       <div
         class="recipient-header recipient-header-row"
@@ -493,8 +493,8 @@ function formatAge(
       >
         <span class="recipient-text"
           ><RecipientName r={recipients[0]} apos /> Filing {displayAsAges
-            ? 'Age'
-            : 'Date'}</span
+            ? "Age"
+            : "Date"}</span
         >
       </div>
 

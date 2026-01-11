@@ -4,8 +4,8 @@ import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
 import {
-  optimalStrategy,
-  strategySumTotalPeriods,
+  optimalStrategyCouple,
+  strategySumTotalPeriodsCouple,
 } from '$lib/strategy/calculations';
 
 /**
@@ -65,7 +65,7 @@ function calculateStrategySum({
     strategies[1] = strategies[1].add(new MonthDuration(1));
   }
 
-  return strategySumTotalPeriods(
+  return strategySumTotalPeriodsCouple(
     [recipient1, recipient2],
     finalDates,
     currentDate,
@@ -368,7 +368,7 @@ function calculateOptimalStrategy({
     );
   }
 
-  return optimalStrategy(
+  return optimalStrategyCouple(
     [recipient1, recipient2],
     finalDates,
     currentDate,
@@ -376,7 +376,7 @@ function calculateOptimalStrategy({
   );
 }
 
-describe('optimalStrategy', () => {
+describe('optimalStrategyCouple', () => {
   it('Survivor benefits applied for one year', () => {
     const currentDate = MonthDate.initFromYearsMonths({
       years: 2032,

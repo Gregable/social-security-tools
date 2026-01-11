@@ -1,11 +1,11 @@
 // UI utility functions
 
-export type { StrategyResult } from './calculation-results.js';
 export {
   CalculationResults,
   CalculationStatus,
-} from './calculation-results.js';
-export { getMonthYearColor } from './colors.js';
+} from "./calculation-results.js";
+export type { StrategyResult } from "./calculation-results.js";
+export { getMonthYearColor } from "./colors.js";
 export {
   calculateAgeRange,
   createBorderRemovalFunctions,
@@ -14,12 +14,14 @@ export {
   getFilingAge,
   getFilingDate,
   parseBirthdate,
-} from './formatting.js';
-export type { DeathAgeBucket } from './grid-sizing.js';
+} from "./formatting.js";
 export {
   calculateAgeRangePercentages,
   calculateGridTemplates,
   formatPercentagesToCssGridTemplate,
   generateDeathAgeRange,
+  generateMonthlyBuckets,
+  generateOneYearBuckets,
   generateThreeYearBuckets,
-} from './grid-sizing.js';
+} from "./grid-sizing.js";
+export type { DeathAgeBucket } from "./grid-sizing.js";

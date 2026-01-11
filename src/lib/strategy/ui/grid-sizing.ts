@@ -101,7 +101,7 @@ export function formatPercentagesToCssGridTemplate(
     sizeParts.push(`${formattedPercentageString}%`);
     sumOfFormattedPercentages += formattedPercentageValue;
   }
-  return sizeParts.join(' ');
+  return sizeParts.join(" ");
 }
 
 /**
@@ -117,7 +117,7 @@ export function generateDeathAgeRange(deathAgeRangeStart: number): number[] {
   return deathAgeRange;
 }
 
-import { MonthDuration } from '$lib/month-time';
+import { MonthDuration } from "$lib/month-time";
 
 export interface DeathAgeBucket {
   label: string; // Display label (e.g. '63', '66', '101+')
@@ -194,6 +194,146 @@ export function generateThreeYearBuckets(
     label: plusLabel,
     midAge: currentStart, // representative age for optimization
     startAge: currentStart,
+    endAgeInclusive: null,
+    probability: finalProb,
+    expectedAge,
+  });
+
+  return buckets;
+}
+
+/**
+ * Generate one-year buckets starting at startAge: [a] with label `a`.
+ * Continue while (age < 100). After that, create a final open-ended bucket
+ * starting at the current start age with a "+" label (e.g. '100+').
+ */
+export function generateOneYearBuckets(
+  startAge: number,
+  probDistribution: { age: number; probability: number }[]
+): DeathAgeBucket[] {
+  const buckets: DeathAgeBucket[] = [];
+
+  let currentStart = startAge;
+
+  const sumProbabilityRange = (from: number, to: number | null): number => {
+    if (to === null) {
+      return probDistribution
+        .filter((e) => e.age >= from)
+        .reduce((s, e) => s + e.probability, 0);
+    }
+    return probDistribution
+      .filter((e) => e.age >= from && e.age <= to)
+      .reduce((s, e) => s + e.probability, 0);
+  };
+
+  // Generate 1-year buckets up to 100
+  while (currentStart < 100) {
+    const probability = sumProbabilityRange(currentStart, currentStart);
+    const expectedAgeFraction = currentStart + 0.5;
+    const totalMonths = Math.round(expectedAgeFraction * 12);
+    const expectedAge = MonthDuration.initFromYearsMonths({
+      years: Math.floor(totalMonths / 12),
+      months: totalMonths % 12,
+    });
+
+    buckets.push({
+      label: String(currentStart),
+      midAge: currentStart,
+      startAge: currentStart,
+      endAgeInclusive: currentStart,
+      probability,
+      expectedAge,
+    });
+    currentStart += 1;
+  }
+
+  // Final open-ended bucket
+  const plusLabel = `${currentStart}+`;
+  const finalProb = sumProbabilityRange(currentStart, null);
+  // Use 102.5 as modeled age for consistency with 3-year buckets
+  const expectedAgeFraction = 102.5;
+  const totalMonths = Math.round(expectedAgeFraction * 12);
+  const expectedAge = MonthDuration.initFromYearsMonths({
+    years: Math.floor(totalMonths / 12),
+    months: totalMonths % 12,
+  });
+  buckets.push({
+    label: plusLabel,
+    midAge: currentStart,
+    startAge: currentStart,
+    endAgeInclusive: null,
+    probability: finalProb,
+    expectedAge,
+  });
+
+  return buckets;
+}
+
+/**
+ * Generate monthly buckets starting at startAge.
+ * Continue while (age < 100). After that, create a final open-ended bucket.
+ */
+export function generateMonthlyBuckets(
+  startAge: number,
+  probDistribution: { age: number; probability: number }[]
+): DeathAgeBucket[] {
+  const buckets: DeathAgeBucket[] = [];
+
+  let currentAgeMonths = Math.floor(startAge * 12);
+  const endAgeMonths = 100 * 12;
+
+  const sumProbabilityRange = (from: number, to: number | null): number => {
+    if (to === null) {
+      return probDistribution
+        .filter((e) => e.age >= from)
+        .reduce((s, e) => s + e.probability, 0);
+    }
+    return probDistribution
+      .filter((e) => e.age >= from && e.age <= to)
+      .reduce((s, e) => s + e.probability, 0);
+  };
+
+  while (currentAgeMonths < endAgeMonths) {
+    const year = Math.floor(currentAgeMonths / 12);
+    const month = currentAgeMonths % 12;
+
+    // Approximate probability (1/12 of the year's probability)
+    const yearProb =
+      probDistribution.find((p) => p.age === year)?.probability || 0;
+    const probability = yearProb / 12;
+
+    const expectedAge = MonthDuration.initFromYearsMonths({
+      years: year,
+      months: month,
+    });
+
+    buckets.push({
+      label: `${year}m${month}`,
+      midAge: currentAgeMonths / 12,
+      startAge: currentAgeMonths / 12,
+      endAgeInclusive: (currentAgeMonths + 1) / 12,
+      probability,
+      expectedAge,
+    });
+    currentAgeMonths++;
+  }
+
+  // Final open-ended bucket
+  const finalStartAge = currentAgeMonths / 12;
+  const plusLabel = `${Math.floor(finalStartAge)}+`;
+  const finalProb = sumProbabilityRange(Math.floor(finalStartAge), null);
+
+  const expectedAgeFraction = 102.5;
+  const totalMonths = Math.round(expectedAgeFraction * 12);
+  const expectedAge = MonthDuration.initFromYearsMonths({
+    years: Math.floor(totalMonths / 12),
+    months: totalMonths % 12,
+  });
+
+  buckets.push({
+    label: plusLabel,
+    midAge: finalStartAge,
+    startAge: finalStartAge,
     endAgeInclusive: null,
     probability: finalProb,
     expectedAge,
