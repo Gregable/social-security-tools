@@ -101,7 +101,7 @@ export function formatPercentagesToCssGridTemplate(
     sizeParts.push(`${formattedPercentageString}%`);
     sumOfFormattedPercentages += formattedPercentageValue;
   }
-  return sizeParts.join(" ");
+  return sizeParts.join(' ');
 }
 
 /**
@@ -117,7 +117,7 @@ export function generateDeathAgeRange(deathAgeRangeStart: number): number[] {
   return deathAgeRange;
 }
 
-import { MonthDuration } from "$lib/month-time";
+import { MonthDuration } from '$lib/month-time';
 
 export interface DeathAgeBucket {
   label: string; // Display label (e.g. '63', '66', '101+')
