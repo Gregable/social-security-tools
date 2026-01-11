@@ -68,19 +68,18 @@ function decline() {
         <tr>
           <td>{earningRecord.year}</td>
           <td>
-            {#if earningRecord.taxedEarnings.value() >= 0}
-              <span>{earningRecord.taxedEarnings.wholeDollars()}</span>
-            {:else}
+            {#if earningRecord.incomplete}
               <span> Not yet recorded </span>
+            {:else}
+              <span>{earningRecord.taxedEarnings.wholeDollars()}</span>
             {/if}
           </td>
           {#if earningsRecordsIncludeMedicare()}
             <td>
-              {#if earningRecord.taxedMedicareEarnings.value() >= 0}
-                <span>{earningRecord.taxedMedicareEarnings.wholeDollars()}</span
-                >
-              {:else}
+              {#if earningRecord.incomplete}
                 <span> Not yet recorded </span>
+              {:else}
+                <span>{earningRecord.taxedMedicareEarnings.wholeDollars()}</span>
               {/if}
             </td>
           {/if}
