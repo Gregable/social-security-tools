@@ -226,11 +226,16 @@ function minCapSlider() {
   // filed for primary benefits *after* they died.
   // Only one of these sliders is shown at a time, depending on fileVsDeath
 
-  let earnerMonths = 0;
+  // deathAgeMonths is the age at which the higher earner dies, used to ensure
+  // the survivor can't file for survivor benefits before the death date.
+  let deathAgeMonths = 0;
   if (fileVsDeath === 'fileBeforeDeath') {
-    earnerMonths = beforeDeathSliderMonths_;
+    // When filing before death, the death date is assumed to be age 70
+    // (matching the hardcoded value in the survivor benefit calculation below)
+    deathAgeMonths = 70 * 12;
   } else if (fileVsDeath === 'fileAfterDeath') {
-    earnerMonths = afterDeathSliderMonths_;
+    // When dying before filing, the death date is the slider value
+    deathAgeMonths = afterDeathSliderMonths_;
   } else {
     throw new Error(`fileVsDeath toggle unexpected value: ${fileVsDeath}`);
   }
@@ -244,12 +249,12 @@ function minCapSlider() {
     lowerEarner.birthdate
       .dateAtSsaAge(new MonthDuration(survivorSliderMonths_))
       .lessThanOrEqual(
-        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
+        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(deathAgeMonths))
       )
   ) {
     startMonth = lowerEarner.birthdate
       .ageAtSsaDate(
-        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(earnerMonths))
+        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(deathAgeMonths))
       )
       .add(new MonthDuration(1));
   }

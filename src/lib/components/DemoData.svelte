@@ -41,12 +41,12 @@ function loadDemoData(demoId: number) {
     if (demoId === 0) {
       recipient = new Recipient();
       recipient.earningsRecords = parsePaste(demo0);
-      recipient.birthdate = Birthdate.FromYMD(1950, 6, 2);
+      recipient.birthdate = Birthdate.FromYMD(1965, 6, 2);
       recipient.name = 'Alex';
 
       spouse = new Recipient();
       spouse.earningsRecords = parsePaste(demo0_spouse);
-      spouse.birthdate = Birthdate.FromYMD(1949, 3, 2);
+      spouse.birthdate = Birthdate.FromYMD(1966, 3, 2);
       spouse.name = 'Chris';
     } else if (demoId === 1) {
       recipient = new Recipient();
