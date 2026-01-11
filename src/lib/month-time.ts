@@ -28,28 +28,44 @@ export class MonthDate {
 
   /**
    * Initializer from a date. So {years: 2000, months: 0} would be Jan, 2000.
+   * @throws Error if years/months are not valid integers in expected ranges
    */
   static initFromYearsMonths(yearsMonths: YearsMonths): MonthDate {
-    console.assert(Number.isInteger(yearsMonths.years), yearsMonths.years);
-    console.assert(Number.isInteger(yearsMonths.months), yearsMonths.months);
-    console.assert(yearsMonths.years >= 0, yearsMonths.years);
-    console.assert(yearsMonths.months >= 0, yearsMonths.months);
-    console.assert(yearsMonths.months < 12, yearsMonths.months);
+    if (!Number.isInteger(yearsMonths.years)) {
+      throw new Error(`years must be an integer, got ${yearsMonths.years}`);
+    }
+    if (!Number.isInteger(yearsMonths.months)) {
+      throw new Error(`months must be an integer, got ${yearsMonths.months}`);
+    }
+    if (yearsMonths.years < 0) {
+      throw new Error(`years must be >= 0, got ${yearsMonths.years}`);
+    }
+    if (yearsMonths.months < 0 || yearsMonths.months >= 12) {
+      throw new Error(`months must be 0-11, got ${yearsMonths.months}`);
+    }
     return new MonthDate(yearsMonths.years * 12 + yearsMonths.months);
   }
 
   /**
    * Initializer from a date with string month. Ex: (2000, "Jan").
-   * @param monthStr - 3 character month string from ALL_MONTHS
+   * @param years - Year value (must be non-negative integer)
+   * @param monthStr - 3 character month string from ALL_MONTHS (e.g., "Jan")
+   * @throws Error if years is not a valid integer or monthStr is not recognized
    */
   static initFromYearsMonthsStr(years: number, monthStr: string): MonthDate {
-    console.assert(Number.isInteger(years), years);
-    console.assert(typeof monthStr === 'string');
-    console.assert(years >= 0, years);
+    if (!Number.isInteger(years) || years < 0) {
+      throw new Error(`years must be a non-negative integer, got ${years}`);
+    }
+    if (typeof monthStr !== 'string') {
+      throw new Error(`monthStr must be a string, got ${typeof monthStr}`);
+    }
 
     const monthIndex = constants.ALL_MONTHS.indexOf(monthStr);
-    console.assert(monthIndex >= 0, monthStr);
-    console.assert(monthIndex < 12, monthStr);
+    if (monthIndex < 0 || monthIndex >= 12) {
+      throw new Error(
+        `Invalid month string "${monthStr}". Expected one of: ${constants.ALL_MONTHS.join(', ')}`
+      );
+    }
 
     return MonthDate.initFromYearsMonths({ years: years, months: monthIndex });
   }
@@ -227,19 +243,26 @@ export class MonthDuration {
   /**
    * Initializer from a number of years and months.
    * Internally just adds the two together after multiplying years by 12.
+   * @throws Error if values are not valid integers or have inconsistent signs
    */
   static initFromYearsMonths(yearsMonths: YearsMonths): MonthDuration {
-    console.assert(Number.isInteger(yearsMonths.months), yearsMonths.months);
-    console.assert(
-      yearsMonths.months < 12 && yearsMonths.months > -12,
-      yearsMonths.months
-    );
-    console.assert(Number.isInteger(yearsMonths.years), yearsMonths.years);
+    if (!Number.isInteger(yearsMonths.months)) {
+      throw new Error(`months must be an integer, got ${yearsMonths.months}`);
+    }
+    if (yearsMonths.months <= -12 || yearsMonths.months >= 12) {
+      throw new Error(
+        `months must be between -11 and 11, got ${yearsMonths.months}`
+      );
+    }
+    if (!Number.isInteger(yearsMonths.years)) {
+      throw new Error(`years must be an integer, got ${yearsMonths.years}`);
+    }
     // Negative durations are OK, but shouldn't have both positive and negative.
-    console.assert(
-      Math.sign(yearsMonths.years) * Math.sign(yearsMonths.months) >= 0,
-      `${yearsMonths.years} ${yearsMonths.months}`
-    );
+    if (Math.sign(yearsMonths.years) * Math.sign(yearsMonths.months) < 0) {
+      throw new Error(
+        `years and months must have consistent signs, got ${yearsMonths.years}y ${yearsMonths.months}m`
+      );
+    }
     return new MonthDuration(yearsMonths.years * 12 + yearsMonths.months);
   }
 

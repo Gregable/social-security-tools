@@ -43,6 +43,15 @@ export class UrlParams {
   private params: URLSearchParams;
 
   /**
+   * Parse a string as an integer, returning null if invalid.
+   */
+  private static parseIntOrNull(value: string | null): number | null {
+    if (!value) return null;
+    const parsed = parseInt(value, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  /**
    * Create a new UrlParams instance from the current window location hash.
    * If running server-side or hash is empty, creates empty params.
    */
@@ -76,10 +85,9 @@ export class UrlParams {
    * Example: #pia1=3000
    */
   getRecipientPia(): number | null {
-    const value = this.params.get('pia1') ?? this.params.get('pia');
-    if (!value) return null;
-    const parsed = parseInt(value, 10);
-    return Number.isNaN(parsed) ? null : parsed;
+    return UrlParams.parseIntOrNull(
+      this.params.get('pia1') ?? this.params.get('pia')
+    );
   }
 
   /**
@@ -110,10 +118,7 @@ export class UrlParams {
    * Example: #pia2=2500
    */
   getSpousePia(): number | null {
-    const value = this.params.get('pia2');
-    if (!value) return null;
-    const parsed = parseInt(value, 10);
-    return Number.isNaN(parsed) ? null : parsed;
+    return UrlParams.parseIntOrNull(this.params.get('pia2'));
   }
 
   /**

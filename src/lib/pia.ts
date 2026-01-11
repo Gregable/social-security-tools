@@ -148,18 +148,8 @@ export class PrimaryInsuranceAmount {
       return this.recipient_.overridePia;
     }
 
-    let pia = this.primaryInsuranceAmountUnadjusted();
-
-    for (
-      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
-      year < constants.CURRENT_YEAR;
-      ++year
-    ) {
-      pia = pia.times(1 + constants.COLA[year] / 100.0);
-      // Primary Insurance amounts are rounded down to the nearest dime.
-      pia = pia.floorToDime();
-    }
-    return pia;
+    const pia = this.primaryInsuranceAmountUnadjusted();
+    return this.applyColaAdjustments(pia);
   }
 
   /**
@@ -199,17 +189,29 @@ export class PrimaryInsuranceAmount {
     // Round to nearest dime.
     pia = pia.floorToDime();
 
-    // Now adjust for COLA.
+    return this.applyColaAdjustments(pia);
+  }
+
+  /**
+   * Applies COLA adjustments to a PIA value from the year the recipient turns 62
+   * through the current year. Each year's adjustment is rounded down to the
+   * nearest dime per SSA rules.
+   *
+   * @param pia - The unadjusted PIA to apply COLA to
+   * @returns The COLA-adjusted PIA
+   */
+  private applyColaAdjustments(pia: Money): Money {
+    let adjusted = pia;
     for (
       let year = this.recipient_.birthdate.yearTurningSsaAge(62);
       year < constants.CURRENT_YEAR;
       ++year
     ) {
-      pia = pia.times(1 + constants.COLA[year] / 100.0);
+      adjusted = adjusted.times(1 + constants.COLA[year] / 100.0);
       // Primary Insurance amounts are rounded down to the nearest dime.
-      pia = pia.floorToDime();
+      adjusted = adjusted.floorToDime();
     }
-    return pia;
+    return adjusted;
   }
 
   /**

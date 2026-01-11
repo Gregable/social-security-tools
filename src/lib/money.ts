@@ -143,6 +143,34 @@ export class Money {
     return this.cents_ === other.cents_;
   }
 
+  /**
+   * Returns true if this Money is greater than the other.
+   */
+  greaterThan(other: Money): boolean {
+    return this.cents_ > other.cents_;
+  }
+
+  /**
+   * Returns true if this Money is greater than or equal to the other.
+   */
+  greaterThanOrEqual(other: Money): boolean {
+    return this.cents_ >= other.cents_;
+  }
+
+  /**
+   * Returns true if this Money is less than the other.
+   */
+  lessThan(other: Money): boolean {
+    return this.cents_ < other.cents_;
+  }
+
+  /**
+   * Returns true if this Money is less than or equal to the other.
+   */
+  lessThanOrEqual(other: Money): boolean {
+    return this.cents_ <= other.cents_;
+  }
+
   private constructor(cents: number) {
     if (Number.isNaN(cents)) {
       throw new Error('Money constructor called with NaN');

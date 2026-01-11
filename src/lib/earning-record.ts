@@ -82,15 +82,23 @@ export class EarningRecord {
   }
 
   /**
+   * Validates that the indexingYear has been set.
+   * @throws Error if indexingYear has not been initialized
+   */
+  private requireIndexingYear(): void {
+    if (this.indexingYear < 0) {
+      throw new Error('EarningRecord not initialized with indexingYear');
+    }
+  }
+
+  /**
    * Returns the index factor for the year of the record. If the user is
    * over 60, the index factor is 1.0. Otherwise, the index factor is the
    * ratio of the average wage index for the year of the record to the
    * average wage index for the year of the PIA calculation.
    */
   indexFactor(): number {
-    if (this.indexingYear < 0) {
-      throw new Error('EarningRecord not initialized with indexingYear');
-    }
+    this.requireIndexingYear();
 
     if (this.year >= this.indexingYear) {
       // Years after the indexing year are always indexed at 1.0.
@@ -127,9 +135,7 @@ export class EarningRecord {
    * @return indexed earnings for this record.
    */
   indexedEarnings(): Money {
-    if (this.indexingYear < 0) {
-      throw new Error('EarningRecord not initialized with indexingYear');
-    }
+    this.requireIndexingYear();
 
     const cappedEarning: Money = Money.min(
       this.earningsCap(),
