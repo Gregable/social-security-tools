@@ -104,3 +104,43 @@ test('wholeDollars handles zero correctly', () => {
   const money = Money.from(0);
   expect(money.wholeDollars()).toBe('$0');
 });
+
+test('greaterThan compares money values correctly', () => {
+  const larger = Money.from(100);
+  const smaller = Money.from(50);
+  const equal = Money.from(100);
+
+  expect(larger.greaterThan(smaller)).toBe(true);
+  expect(smaller.greaterThan(larger)).toBe(false);
+  expect(larger.greaterThan(equal)).toBe(false);
+});
+
+test('greaterThanOrEqual compares money values correctly', () => {
+  const larger = Money.from(100);
+  const smaller = Money.from(50);
+  const equal = Money.from(100);
+
+  expect(larger.greaterThanOrEqual(smaller)).toBe(true);
+  expect(smaller.greaterThanOrEqual(larger)).toBe(false);
+  expect(larger.greaterThanOrEqual(equal)).toBe(true);
+});
+
+test('lessThan compares money values correctly', () => {
+  const larger = Money.from(100);
+  const smaller = Money.from(50);
+  const equal = Money.from(50);
+
+  expect(smaller.lessThan(larger)).toBe(true);
+  expect(larger.lessThan(smaller)).toBe(false);
+  expect(smaller.lessThan(equal)).toBe(false);
+});
+
+test('lessThanOrEqual compares money values correctly', () => {
+  const larger = Money.from(100);
+  const smaller = Money.from(50);
+  const equal = Money.from(50);
+
+  expect(smaller.lessThanOrEqual(larger)).toBe(true);
+  expect(larger.lessThanOrEqual(smaller)).toBe(false);
+  expect(smaller.lessThanOrEqual(equal)).toBe(true);
+});
