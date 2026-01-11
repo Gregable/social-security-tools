@@ -1,25 +1,18 @@
 import { Birthdate } from '$lib/birthday';
 import * as constants from '$lib/constants';
 import { EarningRecord } from '$lib/earning-record';
+import type { GenderOption } from '$lib/life-tables';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { PrimaryInsuranceAmount } from '$lib/pia';
 
-export class RecipientColors {
-  constructor(dark: string, medium: string, light: string) {
-    this.dark = dark;
-    this.medium = medium;
-    this.light = light;
-  }
+export type { GenderOption };
+
+export interface RecipientColors {
   dark: string;
   medium: string;
   light: string;
 }
-
-// In this case, blended means that the user hasn't made a
-// selection in the UI. For mortality, we take the average
-// of male and female.
-export type GenderOption = 'male' | 'female' | 'blended';
 
 /**
  * A Recipient object manages calculating a user's SSA and IRS data.
@@ -307,48 +300,38 @@ export class Recipient {
       retirementAgeBracket.delayedIncreaseAnnual;
   }
 
-  private retirementAgeBracket(): {
-    minYear: number;
-    maxYear: number;
-    ageYears: number;
-    ageMonths: number;
-    delayedIncreaseAnnual: number;
-  } {
-    // Find the retirement age bracket data for this recipient.
-    let retirementAgeBracket;
-    for (let i = 0; i < constants.FULL_RETIREMENT_AGE.length; ++i) {
-      const ageBracket = constants.FULL_RETIREMENT_AGE[i];
-      if (
-        this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
-        this.birthdate_.ssaBirthYear() <= ageBracket.maxYear
-      ) {
-        retirementAgeBracket = ageBracket;
-      }
+  /**
+   * Finds the retirement age bracket for this recipient's birth year.
+   * @param brackets Array of age brackets with minYear/maxYear ranges.
+   * @returns The bracket matching this recipient's SSA birth year.
+   * @throws Error if no matching bracket is found.
+   */
+  private findAgeBracket<T extends { minYear: number; maxYear: number }>(
+    brackets: readonly T[]
+  ): T {
+    const birthYear = this.birthdate_.ssaBirthYear();
+    const bracket = brackets.find(
+      (b) => birthYear >= b.minYear && birthYear <= b.maxYear
+    );
+    if (!bracket) {
+      throw new Error(
+        `No retirement age bracket found for birth year ${birthYear}`
+      );
     }
-    console.assert(retirementAgeBracket !== undefined);
-    return retirementAgeBracket;
+    return bracket;
   }
 
-  private survivorRetirementAgeBracket(): {
-    minYear: number;
-    maxYear: number;
-    ageYears: number;
-    ageMonths: number;
-    delayedIncreaseAnnual: number;
-  } {
-    // Find the retirement age bracket data for this recipient.
-    let retirementAgeBracket;
-    for (let i = 0; i < constants.FULL_RETIREMENT_AGE_SURVIVOR.length; ++i) {
-      const ageBracket = constants.FULL_RETIREMENT_AGE_SURVIVOR[i];
-      if (
-        this.birthdate_.ssaBirthYear() >= ageBracket.minYear &&
-        this.birthdate_.ssaBirthYear() <= ageBracket.maxYear
-      ) {
-        retirementAgeBracket = ageBracket;
-      }
-    }
-    console.assert(retirementAgeBracket !== undefined);
-    return retirementAgeBracket;
+  /** Returns the normal retirement age bracket for this recipient. */
+  private retirementAgeBracket() {
+    return this.findAgeBracket(constants.FULL_RETIREMENT_AGE);
+  }
+
+  /**
+   * Returns the survivor benefit retirement age bracket for this recipient.
+   * Survivor benefits have different full retirement ages than personal benefits.
+   */
+  private survivorRetirementAgeBracket() {
+    return this.findAgeBracket(constants.FULL_RETIREMENT_AGE_SURVIVOR);
   }
 
   /*
@@ -918,9 +901,9 @@ export class Recipient {
    */
   colors(): RecipientColors {
     if (this.first) {
-      return new RecipientColors('#8d6100', '#e69f00', '#f6dfad');
+      return { dark: '#8d6100', medium: '#e69f00', light: '#f6dfad' };
     } else {
-      return new RecipientColors('#004400', '#558855', '#d9ebd9');
+      return { dark: '#004400', medium: '#558855', light: '#d9ebd9' };
     }
   }
 } // class Recipient
