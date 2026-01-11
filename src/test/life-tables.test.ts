@@ -156,7 +156,7 @@ describe('Life Tables', () => {
   describe('Utility Functions', () => {
     it('calculates current age correctly', () => {
       expect(getCurrentAge(1980, 2025)).toBe(45);
-      expect(getCurrentAge(2000)).toBe(25); // Uses current year
+      expect(getCurrentAge(2000)).toBe(new Date().getFullYear() - 2000); // Uses current year
     });
 
     it('checks data availability', async () => {
