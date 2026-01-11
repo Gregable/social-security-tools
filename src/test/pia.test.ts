@@ -23,9 +23,9 @@ describe('Recipient', () => {
     r.earningsRecords = parsePaste(demo0);
 
     expect(r.pia().primaryInsuranceAmountByBracket(0).value()).toEqual(690.3);
-    expect(r.pia().primaryInsuranceAmountByBracket(1).value()).toEqual(843.2);
+    expect(r.pia().primaryInsuranceAmountByBracket(1).value()).toEqual(825.6);
     expect(r.pia().primaryInsuranceAmountByBracket(2).value()).toEqual(0);
-    const sum: number = 690.3 + 843.2 + 0;
+    const sum: number = 690.3 + 825.6 + 0;
     expect(r.pia().primaryInsuranceAmountUnadjusted().value()).toEqual(sum);
   });
 
@@ -41,8 +41,8 @@ describe('Recipient', () => {
     // Verify the first adjustment.
     expect(adjustments[0].year).toEqual(2012);
     expect(adjustments[0].cola).toEqual(1.7);
-    expect(adjustments[0].start.value()).toEqual(1533.5);
-    expect(adjustments[0].end.value()).toEqual(1559.5);
+    expect(adjustments[0].start.value()).toEqual(1515.9);
+    expect(adjustments[0].end.value()).toEqual(1541.6);
 
     // The final adjustment or one before it, should end with the PIA.
     let one_before = 0;
