@@ -23,6 +23,7 @@ import BirthdateInput from './BirthdateInput.svelte';
 // Props
 export let birthdate: Birthdate = null;
 export let inputId = 'birthdate';
+export let name: string = '';
 
 // Callback prop for submit event
 export let onsubmit: ((detail: { birthdate: Birthdate }) => void) | undefined =
@@ -51,10 +52,10 @@ function checkEnter(event) {
 <div class="confirmation">
   <fieldset>
     <legend>
-      <h3>Step 2 of 2: When were you born?</h3>
+      <h3>Step 2 of 2: When {name ? `was ${name}` : 'were you'} born?</h3>
       <p>
-        Birthdate is used to calculate when you can collect Social Security
-        benefits, as well as to determine the amount of your benefit.
+        Birthdate is used to calculate when {name || 'you'} can collect Social Security
+        benefits, as well as to determine the amount of {name ? 'their' : 'your'} benefit.
       </p>
     </legend>
     <div class="hint">For example, 09 22 1975</div>

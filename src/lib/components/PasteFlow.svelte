@@ -341,7 +341,7 @@ function handleSpouseQuestion(detail: {
     {#if isRecipient}
       <DemoData ondemo={handleDemo} />
     {/if}
-    <PastePrompt onpaste={handlePaste} />
+    <PastePrompt onpaste={handlePaste} isSpouse={!isRecipient} />
   {:else if mode === Mode.PASTE_CONFIRMATION}
     {#if isRecipient}
       <PasteConfirm
@@ -363,6 +363,7 @@ function handleSpouseQuestion(detail: {
       birthdate={isRecipient
         ? recipientBirthdateFromHash
         : spouseBirthdateFromHash}
+      name={isRecipient ? '' : spouseName}
       onsubmit={handleAgeSubmit}
     />
   {:else if allowSpouseFlow && mode === Mode.SPOUSE_QUESTION}

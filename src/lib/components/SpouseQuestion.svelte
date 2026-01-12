@@ -50,6 +50,11 @@ function confirmSpouse() {
     {#if initial}
       <div>
         <p>This site can calculate the Social Security spousal benefit.</p>
+        <p>
+          Even if your spouse has little or no work history, they may still be
+          eligible for spousal benefits based on your earnings record.
+        </p>
+        <p>You don't need your spouse's ssa.gov login to get started.</p>
         <p>Would you like to also enter data for a spouse?</p>
 
         <button on:click={nospouse}>
