@@ -274,6 +274,8 @@ $: fileVsDeath &&
   beforeDeathSliderMonths_ &&
   afterDeathSliderMonths_ &&
   survivorSliderMonths_ &&
+  higherEarner &&
+  lowerEarner &&
   minCapSlider();
 </script>
 
