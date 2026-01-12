@@ -19,22 +19,28 @@ export let includeSpousalBenefit: boolean = false;
 export let recipientFilingDateValue: MonthDate;
 export let spouseFilingDateValue: MonthDate;
 
-// Set up stores on mount
-onMount(() => {
+// Track if stores are ready to avoid rendering with stale values
+let ready = false;
+
+// Initialize stores synchronously before rendering
+function initializeStores() {
   if (recipientFilingDateValue) {
     recipientFilingDate.set(recipientFilingDateValue);
   }
   if (spouseFilingDateValue) {
     spouseFilingDate.set(spouseFilingDateValue);
   }
+  ready = true;
+}
+
+// Initialize on mount
+onMount(() => {
+  initializeStores();
 });
 
-// Also react to prop changes
-$: if (recipientFilingDateValue) {
-  recipientFilingDate.set(recipientFilingDateValue);
-}
-$: if (spouseFilingDateValue) {
-  spouseFilingDate.set(spouseFilingDateValue);
+// Also initialize immediately for SSR/Storybook
+$: if (recipientFilingDateValue && spouseFilingDateValue && !ready) {
+  initializeStores();
 }
 
 $: context = new IntegrationContext(recipient, spouse);
@@ -46,28 +52,32 @@ let recipientAnnualBenefit: Money;
 let spouseAnnualBenefit: Money;
 </script>
 
-<div class="demo-container">
-  <SpousalBenefitToggle
-    {context}
-    bind:includeSpousalBenefit
-    bind:recipientBenefitCalculationDate
-    bind:spouseBenefitCalculationDate
-    bind:recipientAnnualBenefit
-    bind:spouseAnnualBenefit
-    {toolName}
-  />
+{#if ready}
+  <div class="demo-container">
+    <SpousalBenefitToggle
+      {context}
+      bind:includeSpousalBenefit
+      bind:recipientBenefitCalculationDate
+      bind:spouseBenefitCalculationDate
+      bind:recipientAnnualBenefit
+      bind:spouseAnnualBenefit
+      {toolName}
+    />
 
-  <div class="demo-output">
-    <h4>Current Selection</h4>
-    <p>Include Spousal Benefit: <strong>{includeSpousalBenefit ? 'Yes' : 'No'}</strong></p>
-    {#if recipientAnnualBenefit}
-      <p>{recipient.name} Annual Benefit: <strong>{recipientAnnualBenefit.wholeDollars()}</strong></p>
-    {/if}
-    {#if spouseAnnualBenefit && spouse}
-      <p>{spouse.name} Annual Benefit: <strong>{spouseAnnualBenefit.wholeDollars()}</strong></p>
-    {/if}
+    <div class="demo-output">
+      <h4>Current Selection</h4>
+      <p>Include Spousal Benefit: <strong>{includeSpousalBenefit ? 'Yes' : 'No'}</strong></p>
+      {#if recipientAnnualBenefit}
+        <p>{recipient.name} Annual Benefit: <strong>{recipientAnnualBenefit.wholeDollars()}</strong></p>
+      {/if}
+      {#if spouseAnnualBenefit && spouse}
+        <p>{spouse.name} Annual Benefit: <strong>{spouseAnnualBenefit.wholeDollars()}</strong></p>
+      {/if}
+    </div>
   </div>
-</div>
+{:else}
+  <div class="loading">Loading...</div>
+{/if}
 
 <style>
   .demo-container {
@@ -95,5 +105,11 @@ let spouseAnnualBenefit: Money;
 
   .demo-output strong {
     color: #1976d2;
+  }
+
+  .loading {
+    padding: 2em;
+    text-align: center;
+    color: #6c757d;
   }
 </style>
