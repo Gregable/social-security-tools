@@ -29,6 +29,26 @@ const config = {
     // To run the fuzz test manually, use:
     //   npm test src/test/strategy/fuzz.test.ts
     exclude: ['src/test/strategy/fuzz.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      include: ['src/lib/**/*.ts'],
+      exclude: [
+        'node_modules/**',
+        'src/stories/**',
+        '**/*.stories.ts',
+        '**/*.test.ts',
+        '.storybook/**',
+        'src/routes/**',
+        'src/lib/strategy/**',
+      ],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 60,
+        statements: 70,
+      },
+    },
   },
   build: {
     sourcemap: true,
