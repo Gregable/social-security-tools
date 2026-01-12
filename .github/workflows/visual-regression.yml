@@ -2,13 +2,21 @@ name: Visual Regression Tests
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main, develop]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# Cancel in-progress runs for the same PR/branch
+concurrency:
+  group: chromatic-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   chromatic:
     runs-on: ubuntu-latest
+    # Skip draft PRs to save snapshots
+    if: github.event.pull_request.draft != true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,3 +36,7 @@ jobs:
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           exitZeroOnChanges: true
+          # TurboSnap: only snapshot stories affected by changed files
+          onlyChanged: true
+          # Skip unchanged stories entirely (saves snapshots)
+          skip: ${{ github.event_name == 'push' && github.ref != 'refs/heads/main' }}
