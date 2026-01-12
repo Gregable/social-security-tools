@@ -14,8 +14,9 @@ const meta: Meta<PastePrompt> = {
 };
 export default meta;
 
-const Template = ({ ..._args }) => ({
+const Template = ({ ...args }) => ({
   Component: PastePrompt,
+  props: args,
   on: {
     paste: action('paste'),
   },
@@ -23,3 +24,8 @@ const Template = ({ ..._args }) => ({
 
 export const Default = Template.bind({});
 Default.args = {};
+
+export const SpouseMode = Template.bind({});
+SpouseMode.args = {
+  isSpouse: true,
+};

@@ -25,6 +25,9 @@ import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
 export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
   undefined;
 
+// Whether we're entering data for a spouse (shows skip option)
+export let isSpouse: boolean = false;
+
 let pasteContents: string = '';
 let pasteError: boolean = false;
 
@@ -63,6 +66,12 @@ $: piaDisabled = (() => {
   if (piaInput === null) return true;
   return piaInput < 0;
 })();
+
+function skipEarnings() {
+  let recipient: Recipient = new Recipient();
+  recipient.setPia(Money.from(0));
+  onpaste?.({ recipient: recipient });
+}
 </script>
 
 <div class="pastePrompt">
@@ -143,6 +152,19 @@ $: piaDisabled = (() => {
       </div>
     </div>
   </div>
+
+  {#if isSpouse}
+    <div class="skipEarnings">
+      <p>
+        If your spouse has no earnings history, or you just want to get a quick
+        estimate for now, you can skip this step and assume no earnings. You can
+        always come back later to enter more accurate data.
+      </p>
+      <button class="skipButton" on:click={skipEarnings}>
+        Skip - Assume No Earnings
+      </button>
+    </div>
+  {/if}
 
   <div class="subheading">Alternative Options</div>
   <Expando
@@ -333,6 +355,28 @@ $: piaDisabled = (() => {
     font-weight: bold;
     font-size: 22px;
     vertical-align: middle;
+  }
+
+  .skipEarnings {
+    max-width: 480px;
+    margin: 0 auto 30px auto;
+    padding: 15px 20px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .skipEarnings p {
+    margin: 0 0 12px 0;
+    color: #555;
+    font-size: 14px;
+  }
+  .skipButton {
+    background: #6b8e9f;
+    padding: 8px 20px;
+  }
+  .skipButton:hover {
+    background: #4a6d7e;
   }
 
   /** Desktop **/
