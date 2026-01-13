@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/svelte';
 import { Money } from '../lib/money';
 import { MonthDuration } from '../lib/month-time';
 import { Recipient } from '../lib/recipient';
+import type { DeathAgeBucket } from '../lib/strategy/ui';
 import { parseBirthdate } from '../lib/strategy/ui';
 import { CalculationResults } from '../lib/strategy/ui/calculation-results';
-import type { DeathAgeBucket } from '../lib/strategy/ui';
 import StrategyPlotSingle from '../routes/strategy/components/StrategyPlotSingle.svelte';
 
 const meta: Meta<StrategyPlotSingle> = {
@@ -19,9 +19,16 @@ const meta: Meta<StrategyPlotSingle> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function createRecipient(birthYear: number, birthMonth: number, birthDay: number, piaAmount: number): Recipient {
+function createRecipient(
+  birthYear: number,
+  birthMonth: number,
+  birthDay: number,
+  piaAmount: number
+): Recipient {
   const recipient = new Recipient();
-  recipient.birthdate = parseBirthdate(`${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`);
+  recipient.birthdate = parseBirthdate(
+    `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`
+  );
   recipient.setPia(Money.from(piaAmount));
   recipient.name = 'Alex';
   recipient.markFirst();
@@ -150,7 +157,9 @@ function createSharpTransitionResults(): CalculationResults {
 /**
  * Creates a simple death probability distribution for testing.
  */
-function createDeathProbDistribution(currentAge: number = 62): { age: number; probability: number }[] {
+function createDeathProbDistribution(
+  currentAge: number = 62
+): { age: number; probability: number }[] {
   const distribution: { age: number; probability: number }[] = [];
   let remaining = 1.0;
 

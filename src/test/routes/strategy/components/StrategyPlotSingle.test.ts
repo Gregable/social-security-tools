@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { Money } from '$lib/money';
 import { MonthDuration } from '$lib/month-time';
-import { CalculationResults } from '$lib/strategy/ui/calculation-results';
 import type { DeathAgeBucket } from '$lib/strategy/ui';
+import { CalculationResults } from '$lib/strategy/ui/calculation-results';
 
 /**
  * Tests for StrategyPlotSingle component logic.
