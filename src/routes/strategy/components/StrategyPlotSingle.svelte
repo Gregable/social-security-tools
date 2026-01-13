@@ -344,17 +344,6 @@
       });
       ctx.stroke();
 
-      ctx.fillStyle = "#005ea5";
-      // Only draw points if we don't have too many, otherwise it looks cluttered
-      if (strategyPoints.length < 50) {
-        strategyPoints.forEach((d) => {
-          const x = xScale(d.deathAge);
-          const y = yScale(d.filingAgeMonths);
-          ctx.beginPath();
-          ctx.arc(x, y, 4, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
     }
     ctx.restore();
 

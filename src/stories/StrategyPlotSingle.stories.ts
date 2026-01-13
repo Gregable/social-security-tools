@@ -47,30 +47,36 @@ function createBucket(startAge: number, label?: string): DeathAgeBucket {
 }
 
 /**
- * Creates mock calculation results with a typical filing age curve.
+ * Creates mock calculation results with a typical filing age curve using monthly buckets.
  * Filing age starts at minimum (62) for early death ages, then increases
  * gradually to 70 for later death ages.
  */
 function createTypicalCalculationResults(): CalculationResults {
-  const results = new CalculationResults(39, 1); // Ages 62-100
+  // Use monthly buckets from age 62 to 100 (456 months of data)
+  const startAge = 62;
+  const endAge = 100;
+  const numRows = (endAge - startAge) * 12;
+  const results = new CalculationResults(numRows, 1);
 
-  for (let i = 0; i < 39; i++) {
-    const deathAge = 62 + i;
+  for (let i = 0; i < numRows; i++) {
+    const deathAgeMonths = startAge * 12 + i;
+    const deathAge = deathAgeMonths / 12;
+
     // Filing age increases from 62 to 70 based on death age
-    // Below ~75: file at 62, gradually increasing, above ~85: file at 70
+    // Below ~75: file at 62, gradually increasing, above ~88: file at 70
     let filingAgeMonths: number;
     if (deathAge <= 75) {
       filingAgeMonths = 62 * 12; // File at 62
-    } else if (deathAge >= 85) {
+    } else if (deathAge >= 88) {
       filingAgeMonths = 70 * 12; // File at 70
     } else {
-      // Linear interpolation between 75 and 85
-      const ratio = (deathAge - 75) / 10;
+      // Linear interpolation between 75 and 88
+      const ratio = (deathAge - 75) / 13;
       filingAgeMonths = Math.round(62 * 12 + ratio * (70 - 62) * 12);
     }
 
     results.set(i, 0, {
-      deathAge1: deathAge.toString(),
+      deathAge1: deathAge.toFixed(2),
       bucket1: createBucket(deathAge),
       filingAge1: new MonthDuration(filingAgeMonths),
       totalBenefit: Money.from(500000 + deathAge * 1000),
@@ -87,14 +93,18 @@ function createTypicalCalculationResults(): CalculationResults {
  * (e.g., high discount rate scenario).
  */
 function createFlatEarlyFilingResults(): CalculationResults {
-  const results = new CalculationResults(39, 1);
+  const startAge = 62;
+  const endAge = 100;
+  const numRows = (endAge - startAge) * 12;
+  const results = new CalculationResults(numRows, 1);
 
-  for (let i = 0; i < 39; i++) {
-    const deathAge = 62 + i;
+  for (let i = 0; i < numRows; i++) {
+    const deathAgeMonths = startAge * 12 + i;
+    const deathAge = deathAgeMonths / 12;
     const filingAgeMonths = 62 * 12; // Always file at 62
 
     results.set(i, 0, {
-      deathAge1: deathAge.toString(),
+      deathAge1: deathAge.toFixed(2),
       bucket1: createBucket(deathAge),
       filingAge1: new MonthDuration(filingAgeMonths),
       totalBenefit: Money.from(400000 + deathAge * 500),
@@ -111,14 +121,18 @@ function createFlatEarlyFilingResults(): CalculationResults {
  * (e.g., very low discount rate, long life expectancy).
  */
 function createFlatLateFilingResults(): CalculationResults {
-  const results = new CalculationResults(39, 1);
+  const startAge = 62;
+  const endAge = 100;
+  const numRows = (endAge - startAge) * 12;
+  const results = new CalculationResults(numRows, 1);
 
-  for (let i = 0; i < 39; i++) {
-    const deathAge = 62 + i;
+  for (let i = 0; i < numRows; i++) {
+    const deathAgeMonths = startAge * 12 + i;
+    const deathAge = deathAgeMonths / 12;
     const filingAgeMonths = 70 * 12; // Always file at 70
 
     results.set(i, 0, {
-      deathAge1: deathAge.toString(),
+      deathAge1: deathAge.toFixed(2),
       bucket1: createBucket(deathAge),
       filingAge1: new MonthDuration(filingAgeMonths),
       totalBenefit: Money.from(600000 + deathAge * 1500),
@@ -134,15 +148,19 @@ function createFlatLateFilingResults(): CalculationResults {
  * Creates calculation results with a sharp transition in filing age.
  */
 function createSharpTransitionResults(): CalculationResults {
-  const results = new CalculationResults(39, 1);
+  const startAge = 62;
+  const endAge = 100;
+  const numRows = (endAge - startAge) * 12;
+  const results = new CalculationResults(numRows, 1);
 
-  for (let i = 0; i < 39; i++) {
-    const deathAge = 62 + i;
+  for (let i = 0; i < numRows; i++) {
+    const deathAgeMonths = startAge * 12 + i;
+    const deathAge = deathAgeMonths / 12;
     // Sharp transition at age 80
     const filingAgeMonths = deathAge < 80 ? 62 * 12 : 70 * 12;
 
     results.set(i, 0, {
-      deathAge1: deathAge.toString(),
+      deathAge1: deathAge.toFixed(2),
       bucket1: createBucket(deathAge),
       filingAge1: new MonthDuration(filingAgeMonths),
       totalBenefit: Money.from(500000),
@@ -155,20 +173,26 @@ function createSharpTransitionResults(): CalculationResults {
 }
 
 /**
- * Creates a simple death probability distribution for testing.
+ * Creates a realistic death probability distribution.
  */
 function createDeathProbDistribution(
   currentAge: number = 62
 ): { age: number; probability: number }[] {
   const distribution: { age: number; probability: number }[] = [];
-  let remaining = 1.0;
 
+  // Use a Gompertz-like mortality curve (exponentially increasing with age)
   for (let age = currentAge; age <= 120; age++) {
-    // Simple increasing probability with age
-    const prob = Math.min(remaining, 0.01 + (age - currentAge) * 0.002);
-    distribution.push({ age, probability: prob });
-    remaining -= prob;
-    if (remaining <= 0) break;
+    // Approximate mortality probability that increases with age
+    const baseRate = 0.001;
+    const doublingTime = 8; // mortality doubles every ~8 years
+    const prob = baseRate * 2 ** ((age - currentAge) / doublingTime);
+    distribution.push({ age, probability: Math.min(prob, 1) });
+  }
+
+  // Normalize so probabilities sum to 1
+  const total = distribution.reduce((sum, d) => sum + d.probability, 0);
+  for (const d of distribution) {
+    d.probability /= total;
   }
 
   return distribution;
@@ -218,16 +242,6 @@ export const SharpTransition: Story = {
     recipient: createRecipient(1962, 3, 15, 2500),
     calculationResults: createSharpTransitionResults(),
     deathProbDistribution: createDeathProbDistribution(),
-    displayAsAges: true,
-  },
-};
-
-export const NoMortalityData: Story = {
-  name: 'Without Mortality Curve',
-  args: {
-    recipient: createRecipient(1962, 3, 15, 2500),
-    calculationResults: createTypicalCalculationResults(),
-    deathProbDistribution: [],
     displayAsAges: true,
   },
 };
