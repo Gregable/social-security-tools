@@ -200,7 +200,7 @@ function createDeathProbDistribution(
 
 export const Default: Story = {
   args: {
-    recipient: createRecipient(1962, 3, 15, 2500),
+    recipient: createRecipient(1962, 3, 1, 2500),
     calculationResults: createTypicalCalculationResults(),
     deathProbDistribution: createDeathProbDistribution(),
     displayAsAges: true,
@@ -209,7 +209,7 @@ export const Default: Story = {
 
 export const DisplayAsDates: Story = {
   args: {
-    recipient: createRecipient(1962, 3, 15, 2500),
+    recipient: createRecipient(1962, 3, 1, 2500),
     calculationResults: createTypicalCalculationResults(),
     deathProbDistribution: createDeathProbDistribution(),
     displayAsAges: false,
@@ -219,7 +219,7 @@ export const DisplayAsDates: Story = {
 export const FlatEarlyFiling: Story = {
   name: 'Flat Line - Early Filing (High Interest Rate)',
   args: {
-    recipient: createRecipient(1962, 3, 15, 2500),
+    recipient: createRecipient(1962, 3, 1, 2500),
     calculationResults: createFlatEarlyFilingResults(),
     deathProbDistribution: createDeathProbDistribution(),
     displayAsAges: true,
@@ -229,7 +229,7 @@ export const FlatEarlyFiling: Story = {
 export const FlatLateFiling: Story = {
   name: 'Flat Line - Late Filing (Low Interest Rate)',
   args: {
-    recipient: createRecipient(1962, 3, 15, 2500),
+    recipient: createRecipient(1962, 3, 1, 2500),
     calculationResults: createFlatLateFilingResults(),
     deathProbDistribution: createDeathProbDistribution(),
     displayAsAges: true,
@@ -239,7 +239,7 @@ export const FlatLateFiling: Story = {
 export const SharpTransition: Story = {
   name: 'Sharp Filing Age Transition',
   args: {
-    recipient: createRecipient(1962, 3, 15, 2500),
+    recipient: createRecipient(1962, 3, 1, 2500),
     calculationResults: createSharpTransitionResults(),
     deathProbDistribution: createDeathProbDistribution(),
     displayAsAges: true,

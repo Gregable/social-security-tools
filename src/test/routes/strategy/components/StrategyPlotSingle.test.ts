@@ -49,7 +49,7 @@ function createCalculationResults(
 function calculateXAxisRange(
   results: CalculationResults,
   earliestFilingAge: number,
-  xAxisPadding: number = 2
+  xAxisPadding: number = 5
 ): { min: number; max: number } {
   const rowBuckets = results.rowBuckets();
   const bucketMin = rowBuckets[0]?.startAge ?? 62;
@@ -150,9 +150,9 @@ describe('StrategyPlotSingle', () => {
 
       // Last death age with minimum filing age is 75
       // First death age with maximum filing age is 85
-      // With padding of 2: min = 73, max = 87
-      expect(range.min).toBe(73);
-      expect(range.max).toBe(87);
+      // With padding of 5: min = 70, max = 90
+      expect(range.min).toBe(70);
+      expect(range.max).toBe(90);
     });
 
     it('should respect bucket boundaries when applying padding', () => {
@@ -169,7 +169,7 @@ describe('StrategyPlotSingle', () => {
 
       // Last death age with min filing (62) is 63
       // First death age with max filing (70) is 65
-      // With padding of 2: min = max(62, 63-2) = 62, max = min(66, 65+2) = 66
+      // With padding of 5: min = max(62, 63-5) = 62, max = min(66, 65+5) = 66
       expect(range.min).toBe(62); // Clamped to bucket min
       expect(range.max).toBe(66); // Clamped to bucket max
     });
@@ -186,9 +186,9 @@ describe('StrategyPlotSingle', () => {
 
       // Last death age with min filing (62) is 79
       // First death age with max filing (70) is 80
-      // With padding of 2: min = 77, max = 82
-      expect(range.min).toBe(77);
-      expect(range.max).toBe(82);
+      // With padding of 5: min = 74, max = 85
+      expect(range.min).toBe(74);
+      expect(range.max).toBe(85);
     });
   });
 

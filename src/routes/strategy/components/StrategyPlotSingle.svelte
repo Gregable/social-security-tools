@@ -38,7 +38,7 @@
   $: rowBuckets = calculationResults.rowBuckets();
 
   // X-axis padding in years on each side of the interesting range
-  const xAxisPadding = 2;
+  const xAxisPadding = 5;
 
   /**
    * The data points to plot. Each point represents a death age bucket and the
