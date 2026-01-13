@@ -28,13 +28,17 @@
   const width = 800;
   const height = 400;
   const padding = { top: 20, right: 60, bottom: 50, left: 100 };
-  $: minFilingAge = recipient.birthdate.earliestFilingMonth().asMonths();
-  const maxFilingAge = 70 * 12;
+  // Actual earliest filing age (for filtering invalid results)
+  $: earliestFilingAge = recipient.birthdate.earliestFilingMonth().asMonths();
+  // Y-axis display range with padding above and below
+  const minFilingAge = 61 * 12 + 11; // 61 years 11 months
+  const maxFilingAge = 70 * 12 + 1; // 70 years 1 month
 
   // Reactive Data
   $: rowBuckets = calculationResults.rowBuckets();
-  $: minDeathAge = rowBuckets[0].startAge;
-  $: maxDeathAge = rowBuckets[rowBuckets.length - 1].startAge;
+
+  // X-axis padding in years on each side of the interesting range
+  const xAxisPadding = 2;
 
   /**
    * The data points to plot. Each point represents a death age bucket and the
@@ -45,7 +49,7 @@
       const result = calculationResults.get(i, 0);
       if (!result) return null;
       // Filter out invalid results where no filing strategy was found (e.g. death before earliest filing age)
-      if (result.filingAge1.asMonths() < minFilingAge) return null;
+      if (result.filingAge1.asMonths() < earliestFilingAge) return null;
       return {
         deathAge: result.bucket1.startAge,
         filingAgeMonths: result.filingAge1.asMonths(),
@@ -53,6 +57,53 @@
       };
     })
     .filter((d): d is NonNullable<typeof d> => d !== null);
+
+  // Compute x-axis range based on where filing age varies
+  $: xAxisRange = (() => {
+    const bucketMin = rowBuckets[0].startAge;
+    const bucketMax = rowBuckets[rowBuckets.length - 1].startAge;
+
+    if (strategyPoints.length === 0) {
+      return { min: bucketMin, max: bucketMax };
+    }
+
+    // Find the minimum and maximum filing ages in the data
+    const filingAges = strategyPoints.map((p) => p.filingAgeMonths);
+    const minFiling = Math.min(...filingAges);
+    const maxFiling = Math.max(...filingAges);
+
+    // If filing age is constant (flat line), show full range
+    if (minFiling === maxFiling) {
+      return { min: bucketMin, max: bucketMax };
+    }
+
+    // Find the last death age where filing age is at minimum
+    // (filing age typically stays at minimum for early death ages, then increases)
+    let minFilingDeathAge = strategyPoints[0].deathAge;
+    for (const p of strategyPoints) {
+      if (p.filingAgeMonths === minFiling) {
+        minFilingDeathAge = p.deathAge;
+      }
+    }
+
+    // Find the first death age where filing age reaches maximum
+    let maxFilingDeathAge = strategyPoints[strategyPoints.length - 1].deathAge;
+    for (const p of strategyPoints) {
+      if (p.filingAgeMonths === maxFiling) {
+        maxFilingDeathAge = p.deathAge;
+        break;
+      }
+    }
+
+    // Add padding and clamp to valid bucket range
+    return {
+      min: Math.max(bucketMin, minFilingDeathAge - xAxisPadding),
+      max: Math.min(bucketMax, maxFilingDeathAge + xAxisPadding),
+    };
+  })();
+
+  $: minDeathAge = xAxisRange.min;
+  $: maxDeathAge = xAxisRange.max;
 
   $: mortalityPoints = (() => {
     if (deathProbDistribution.length === 0) return [];
@@ -166,7 +217,7 @@
       ctx.lineTo(width - padding.right, y);
       ctx.stroke();
 
-      ctx.fillStyle = "#666";
+      ctx.fillStyle = "#005ea5";
       ctx.textAlign = "right";
       ctx.fillText(
         displayAsAges ? formatAge(tick) : formatDate(tick),
@@ -227,7 +278,7 @@
     ctx.lineTo(width - padding.right, height - padding.bottom);
     ctx.stroke();
 
-    ctx.fillStyle = "#666";
+    ctx.fillStyle = "#dc3545";
     ctx.textAlign = "left";
     rightYTicks.forEach((tick) => {
       const y = yScaleRight(tick);
@@ -313,22 +364,74 @@
       const sx = xScale(selectedPoint.deathAge);
       const sy = yScale(selectedPoint.filingAgeMonths);
 
+      // Interpolate cumulative probability for selected point
+      let selectedProb: number | null = null;
+      const floorAge = Math.floor(selectedPoint.deathAge);
+      const ceilAge = Math.ceil(selectedPoint.deathAge);
+
+      const p1 = mortalityPoints.find((d) => d.age === floorAge);
+      const p2 = mortalityPoints.find((d) => d.age === ceilAge);
+
+      if (p1 && p2) {
+        if (p1.age === p2.age) {
+          selectedProb = p1.cumulativeProb;
+        } else {
+          const ratio = (selectedPoint.deathAge - p1.age) / (p2.age - p1.age);
+          selectedProb =
+            p1.cumulativeProb + ratio * (p2.cumulativeProb - p1.cumulativeProb);
+        }
+      } else if (p1) {
+        selectedProb = p1.cumulativeProb;
+      } else if (p2) {
+        selectedProb = p2.cumulativeProb;
+      }
+
+      let topY = sy;
+      let probY = 0;
+      if (selectedProb !== null) {
+        probY = yScaleRight(selectedProb);
+        topY = Math.min(sy, probY);
+      }
+
       // Draw persistent crosshairs for selected point
       ctx.strokeStyle = "#d4a000";
       ctx.lineWidth = 2;
       ctx.setLineDash([]);
 
-      // Vertical line
+      // Vertical line from highest point down to x-axis
       ctx.beginPath();
-      ctx.moveTo(sx, padding.top);
+      ctx.moveTo(sx, topY);
       ctx.lineTo(sx, height - padding.bottom);
       ctx.stroke();
 
-      // Horizontal line
+      // Horizontal line for filing age (left axis to point)
       ctx.beginPath();
       ctx.moveTo(padding.left, sy);
-      ctx.lineTo(width - padding.right, sy);
+      ctx.lineTo(sx, sy);
       ctx.stroke();
+
+      // Horizontal line for cumulative probability (point to right axis)
+      if (selectedProb !== null && selectedPoint.deathAge <= 100) {
+        ctx.beginPath();
+        ctx.moveTo(sx, probY);
+        ctx.lineTo(width - padding.right, probY);
+        ctx.stroke();
+
+        // Draw point on mortality line
+        ctx.fillStyle = "#fff8dc";
+        ctx.strokeStyle = "#d4a000";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(sx, probY, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Inner circle for mortality point
+        ctx.fillStyle = "#dc3545";
+        ctx.beginPath();
+        ctx.arc(sx, probY, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Draw selected point circle with golden glow
       ctx.fillStyle = "#fff8dc";
