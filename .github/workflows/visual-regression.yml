@@ -40,3 +40,5 @@ jobs:
           onlyChanged: true
           # Skip unchanged stories entirely (saves snapshots)
           skip: ${{ github.event_name == 'push' && github.ref != 'refs/heads/main' }}
+          # Auto-accept changes on main branch to establish baselines
+          autoAcceptChanges: ${{ github.ref == 'refs/heads/main' }}
