@@ -52,7 +52,7 @@ function checkEnter(event) {
 <div class="confirmation">
   <fieldset>
     <legend>
-      <h3>Step 2 of 2: When {name ? `was ${name}` : 'were you'} born?</h3>
+      <h3>When {name ? `was ${name}` : 'were you'} born?</h3>
       <p>
         Birthdate is used to calculate when {name || 'you'} can collect Social Security
         benefits, as well as to determine the amount of {name ? 'their' : 'your'} benefit.

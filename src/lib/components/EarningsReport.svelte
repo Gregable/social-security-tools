@@ -1,4 +1,5 @@
 <script lang="ts">
+import * as constants from '$lib/constants';
 import { Recipient } from '$lib/recipient';
 import EarningsTable from './EarningsTable.svelte';
 import Expando from './Expando.svelte';
@@ -13,6 +14,19 @@ function records(recipient: Recipient): number {
 }
 let totalRecords: number = 0;
 $: totalRecords = records($recipient);
+
+// Check if the prior year has an incomplete record (not yet recorded by SSA)
+function hasPriorYearIncomplete(recipient: Recipient): boolean {
+  const priorYear = constants.CURRENT_YEAR - 1;
+  for (const record of recipient.earningsRecords) {
+    if (record.year === priorYear && record.incomplete) {
+      return true;
+    }
+  }
+  return false;
+}
+$: priorYearIncomplete = hasPriorYearIncomplete($recipient);
+$: priorYear = constants.CURRENT_YEAR - 1;
 </script>
 
 <div class="main pageBreakAvoid">
@@ -50,6 +64,14 @@ $: totalRecords = records($recipient);
       This calculator also allows you to estimate future earnings. Every number
       and chart in this report will recalculate as you adjust these sliders:
     </p>
+
+    {#if priorYearIncomplete}
+      <p class="noprint incomplete-notice">
+        <strong>Note:</strong> Your {priorYear} earnings have not yet been recorded
+        by SSA. The first year of the future earnings estimate below will apply to
+        {priorYear}, allowing you to include an estimate for that year.
+      </p>
+    {/if}
   </div>
 
   <FutureEarningsSliders recipient={$recipient} />
@@ -83,5 +105,12 @@ $: totalRecords = records($recipient);
     font-weight: 700;
     letter-spacing: 0.04rem;
     color: #443378;
+  }
+  .incomplete-notice {
+    background-color: #e7f3fe;
+    border-left: 4px solid #2196f3;
+    padding: 12px 16px;
+    margin: 1em 0;
+    border-radius: 0 4px 4px 0;
   }
 </style>

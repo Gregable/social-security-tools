@@ -42,7 +42,7 @@ function decline() {
 
 <div>
   <div class="confirmation">
-    <h3>Step 1 of 2: Confirm Earnings Record</h3>
+    <h3>Confirm Earnings Record</h3>
     <p>Is this the same table you copied from ssa.gov?</p>
 
     <button on:click={confirm} class="success">
