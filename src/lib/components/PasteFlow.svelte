@@ -10,12 +10,14 @@ import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
 import type { EarningsEntry } from '$lib/url-params';
 import { UrlParams } from '$lib/url-params';
+import * as constants from '$lib/constants';
 import AgeRequest from './AgeRequest.svelte';
 import DemoData from './DemoData.svelte';
 import PasteApology from './PasteApology.svelte';
 import PasteConfirm from './PasteConfirm.svelte';
 import PastePrompt from './PastePrompt.svelte';
 import SpouseQuestion from './SpouseQuestion.svelte';
+import ZeroEarningsConfirm from './ZeroEarningsConfirm.svelte';
 
 // Callback prop for done event
 export let ondone: (() => void) | undefined = undefined;
@@ -35,12 +37,15 @@ const Mode = {
   // If the user selects "no" to the paste, we display a "Sorry" view with a
   // button to call reset(). This is <PasteApology>.
   PASTE_APOLOGY: 2,
+  // If the prior year has $0 earnings, we ask the user to confirm if it's
+  // accurate or not yet recorded. This is <ZeroEarningsConfirm>.
+  ZERO_EARNINGS_CONFIRM: 3,
   // If the user selects "yes", we then prompt them to enter their age. This
   // is <AgeRequest>.
-  AGE_REQUEST: 3,
+  AGE_REQUEST: 4,
   // After entering an age, we prompt the user to enter their spouse's
   // data if they so choose.
-  SPOUSE_QUESTION: 4,
+  SPOUSE_QUESTION: 5,
 } as const;
 let mode: number = Mode.INITIAL;
 
@@ -60,6 +65,27 @@ let spouseNameFromHash: string | null = null;
 $: allowSpouseFlow = ($activeIntegration?.maxHouseholdMembers ?? 2) > 1;
 
 let spouseName: string = 'Spouse';
+
+// Track the year with ambiguous $0 earnings that needs confirmation
+let zeroEarningsYear: number | null = null;
+
+/**
+ * Find the first earnings record with $0 for the prior year that isn't already
+ * marked as incomplete. Returns the year if found, null otherwise.
+ */
+function findAmbiguousZeroYear(records: EarningRecord[]): number | null {
+  const priorYear = constants.CURRENT_YEAR - 1;
+  for (const record of records) {
+    if (
+      record.year === priorYear &&
+      record.taxedEarnings.value() === 0 &&
+      !record.incomplete
+    ) {
+      return record.year;
+    }
+  }
+  return null;
+}
 
 onMount(() => {
   // Reset everything, especially the context.
@@ -261,10 +287,20 @@ function handlePaste(detail: { recipient: Recipient }) {
 }
 
 /**
- * Handle the user confirming their earnings record. We next prompt for age.
+ * Handle the user confirming their earnings record. Check for ambiguous $0
+ * earnings, otherwise prompt for age.
  */
 function handleConfirm() {
-  mode = Mode.AGE_REQUEST;
+  const records = isRecipient
+    ? context.recipient.earningsRecords
+    : context.spouse.earningsRecords;
+
+  zeroEarningsYear = findAmbiguousZeroYear(records);
+  if (zeroEarningsYear !== null) {
+    mode = Mode.ZERO_EARNINGS_CONFIRM;
+  } else {
+    mode = Mode.AGE_REQUEST;
+  }
 }
 
 /**
@@ -273,6 +309,30 @@ function handleConfirm() {
  */
 function handleDecline() {
   mode = Mode.PASTE_APOLOGY;
+}
+
+/**
+ * Handle the user confirming whether their $0 earnings are accurate or not
+ * yet recorded. If incomplete, mark the record as such.
+ */
+function handleZeroEarningsConfirm(incomplete: boolean) {
+  if (incomplete && zeroEarningsYear !== null) {
+    const records = isRecipient
+      ? context.recipient.earningsRecords
+      : context.spouse.earningsRecords;
+
+    // Find and mark the record as incomplete
+    for (const record of records) {
+      if (record.year === zeroEarningsYear) {
+        record.incomplete = true;
+        break;
+      }
+    }
+  }
+
+  // Reset and proceed to age request
+  zeroEarningsYear = null;
+  mode = Mode.AGE_REQUEST;
 }
 
 /**
@@ -358,6 +418,11 @@ function handleSpouseQuestion(detail: {
     {/if}
   {:else if mode === Mode.PASTE_APOLOGY}
     <PasteApology onreset={handleReset} />
+  {:else if mode === Mode.ZERO_EARNINGS_CONFIRM && zeroEarningsYear !== null}
+    <ZeroEarningsConfirm
+      year={zeroEarningsYear}
+      onconfirm={handleZeroEarningsConfirm}
+    />
   {:else if mode === Mode.AGE_REQUEST}
     <AgeRequest
       birthdate={isRecipient
