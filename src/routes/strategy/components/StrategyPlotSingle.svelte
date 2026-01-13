@@ -14,10 +14,15 @@
   /** Whether to display the filing date as an age (true) or a calendar date
    * (false). */
   export let displayAsAges: boolean;
+  /** Callback when a point is selected (clicked). */
+  export let onselectpoint:
+    | ((detail: { rowIndex: number }) => void)
+    | undefined = undefined;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D | null = null;
   let hoveredPoint: any = null;
+  let selectedRowIndex: number | null = null;
 
   // Dimensions
   const width = 800;
@@ -302,6 +307,45 @@
     }
     ctx.restore();
 
+    // Draw selected point (if any) with distinct "pinned" styling
+    if (selectedRowIndex !== null && strategyPoints[selectedRowIndex]) {
+      const selectedPoint = strategyPoints[selectedRowIndex];
+      const sx = xScale(selectedPoint.deathAge);
+      const sy = yScale(selectedPoint.filingAgeMonths);
+
+      // Draw persistent crosshairs for selected point
+      ctx.strokeStyle = "#d4a000";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([]);
+
+      // Vertical line
+      ctx.beginPath();
+      ctx.moveTo(sx, padding.top);
+      ctx.lineTo(sx, height - padding.bottom);
+      ctx.stroke();
+
+      // Horizontal line
+      ctx.beginPath();
+      ctx.moveTo(padding.left, sy);
+      ctx.lineTo(width - padding.right, sy);
+      ctx.stroke();
+
+      // Draw selected point circle with golden glow
+      ctx.fillStyle = "#fff8dc";
+      ctx.strokeStyle = "#d4a000";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Inner circle
+      ctx.fillStyle = "#005ea5";
+      ctx.beginPath();
+      ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     if (hoveredPoint) {
       const x = xScale(hoveredPoint.deathAge);
       const y = yScale(hoveredPoint.filingAgeMonths);
@@ -463,6 +507,35 @@
     requestAnimationFrame(draw);
   }
 
+  function handleClick(e: MouseEvent) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (width / rect.width);
+    const age = invertXScale(x);
+
+    if (strategyPoints.length > 0) {
+      // Find closest point
+      let closestIndex = 0;
+      let closestDist = Infinity;
+      strategyPoints.forEach((p, i) => {
+        const dist = Math.abs(p.deathAge - age);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIndex = i;
+        }
+      });
+
+      // Toggle selection: if clicking on already selected, deselect
+      if (selectedRowIndex === closestIndex) {
+        selectedRowIndex = null;
+        onselectpoint?.(null);
+      } else {
+        selectedRowIndex = closestIndex;
+        onselectpoint?.({ rowIndex: closestIndex });
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
   onMount(() => {
     ctx = canvas.getContext("2d");
     draw();
@@ -496,7 +569,8 @@
       bind:this={canvas}
       on:mousemove={handleMouseMove}
       on:mouseleave={handleMouseLeave}
-      style="width: 100%; height: auto;"
+      on:click={handleClick}
+      style="width: 100%; height: auto; cursor: crosshair;"
     ></canvas>
   </div>
 </div>

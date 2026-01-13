@@ -109,38 +109,28 @@
       </thead>
       <tbody>
         <tr>
-          <td class="row-label">Filing Age</td>
-          <td>{result.filingAge1Years}y {result.filingAge1Months}m</td>
-          <td>{result.filingAge2Years}y {result.filingAge2Months}m</td>
+          <td class="row-label">Filing</td>
+          <td>{filingDate1.toString()} ({result.filingAge1Years}y {result.filingAge1Months}m)</td>
+          <td>{filingDate2.toString()} ({result.filingAge2Years}y {result.filingAge2Months}m)</td>
         </tr>
         <tr>
-          <td class="row-label">Filing Date</td>
-          <td>{filingDate1.toString()}</td>
-          <td>{filingDate2.toString()}</td>
-        </tr>
-        <tr>
-          <td class="row-label">Death Age</td>
+          <td class="row-label">Death</td>
           <td>
-            {expectedAge1.toAgeString()}
+            {deathDate1.monthName()} {deathDate1.year()} ({expectedAge1.toAgeString()})
             {#if result.deathProb1 !== undefined}
               <span class="probability"
-                >({formatProbability(result.deathProb1 ?? null)})</span
+                >{formatProbability(result.deathProb1 ?? null)}</span
               >
             {/if}
           </td>
           <td>
-            {expectedAge2.toAgeString()}
+            {deathDate2.monthName()} {deathDate2.year()} ({expectedAge2.toAgeString()})
             {#if result.deathProb2 !== undefined}
               <span class="probability"
-                >({formatProbability(result.deathProb2 ?? null)})</span
+                >{formatProbability(result.deathProb2 ?? null)}</span
               >
             {/if}
           </td>
-        </tr>
-        <tr>
-          <td class="row-label">Death Date</td>
-          <td>{deathDate1.monthName()} {deathDate1.year()}</td>
-          <td>{deathDate2.monthName()} {deathDate2.year()}</td>
         </tr>
       </tbody>
     </table>
