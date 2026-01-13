@@ -142,19 +142,12 @@
     margin: 0;
   }
   .benefits-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75em;
     margin-bottom: 0.6em;
     line-height: 1.4;
     color: #4a5568;
   }
   .benefits-list li:last-child {
     margin-bottom: 0;
-  }
-  .benefits-list .icon {
-    flex-shrink: 0;
-    font-size: 1.1em;
   }
   .question {
     font-weight: 500;
