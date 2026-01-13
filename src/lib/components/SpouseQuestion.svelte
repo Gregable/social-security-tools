@@ -17,45 +17,62 @@
 -->
 
 <script lang="ts">
-// Callback prop for response event
-export let onresponse:
-  | ((detail: { spouse: boolean; name: string; spousename?: string }) => void)
-  | undefined = undefined;
+  // Callback prop for response event
+  export let onresponse:
+    | ((detail: { spouse: boolean; name: string; spousename?: string }) => void)
+    | undefined = undefined;
 
-let initial: boolean = true;
-export let selfname: string = 'Self';
-export let spousename: string = 'Spouse';
+  let initial: boolean = true;
+  export let selfname: string = "Self";
+  export let spousename: string = "Spouse";
 
-function nospouse() {
-  onresponse?.({
-    spouse: false,
-    name: selfname,
-  });
-}
-function spouse() {
-  initial = false;
-}
-function confirmSpouse() {
-  onresponse?.({
-    spouse: true,
-    name: selfname,
-    spousename: spousename,
-  });
-}
+  function nospouse() {
+    onresponse?.({
+      spouse: false,
+      name: selfname,
+    });
+  }
+  function spouse() {
+    initial = false;
+  }
+  function confirmSpouse() {
+    onresponse?.({
+      spouse: true,
+      name: selfname,
+      spousename: spousename,
+    });
+  }
 </script>
 
 <div class="spouseQuestion">
   <div class="text">
-    <h3>Optional: Enter data for spouse</h3>
+    <h3>Optional: Enter data for your spouse</h3>
     {#if initial}
       <div>
-        <p>This site can calculate the Social Security spousal benefit.</p>
-        <p>
-          Even if your spouse has little or no work history, they may still be
-          eligible for spousal benefits based on your earnings record.
+        <div class="info-card">
+          <p class="intro">
+            This site can calculate Social Security spousal benefits.
+          </p>
+          <ul class="benefits-list">
+            <li>
+              <span>
+                Even if your spouse has little or no work history, they may
+                still be eligible for spousal benefits based on your earnings
+                record.
+              </span>
+            </li>
+            <li>
+              <span>
+                You can get partial information in this report even without your
+                spouse's ssa.gov login.
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <p class="question">
+          Would you like to also enter data for your spouse?
         </p>
-        <p>You don't need your spouse's ssa.gov login to get started.</p>
-        <p>Would you like to also enter data for a spouse?</p>
 
         <button on:click={nospouse}>
           <ico>🧑</ico> No, Continue
@@ -103,6 +120,39 @@ function confirmSpouse() {
     font-size: 18px;
     max-width: 600px;
     margin: 1em auto;
+  }
+  .info-card {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e8f4f8 100%);
+    border: 1px solid #cde4f0;
+    border-radius: 12px;
+    padding: 1.25em 1.5em;
+    margin: 1em 0 1.5em 0;
+    text-align: left;
+  }
+  .info-card .intro {
+    font-size: 1.1em;
+    color: #2c5282;
+    margin: 0 0 0.75em 0;
+    font-weight: 500;
+    text-align: center;
+  }
+  .benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .benefits-list li {
+    margin-bottom: 0.6em;
+    line-height: 1.4;
+    color: #4a5568;
+  }
+  .benefits-list li:last-child {
+    margin-bottom: 0;
+  }
+  .question {
+    font-weight: 500;
+    color: #2d3748;
+    margin: 1.25em 0;
   }
   button {
     border: 0 none;
