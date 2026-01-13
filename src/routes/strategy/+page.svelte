@@ -21,7 +21,9 @@
   import DiscountRateInput from "./components/DiscountRateInput.svelte";
   // Import components
   import RecipientInputs from "./components/RecipientInputs.svelte";
+  import AlternativeStrategiesRow from "./components/AlternativeStrategiesRow.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
+  import StrategyDetailsSingle from "./components/StrategyDetailsSingle.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyPlotSingle from "./components/StrategyPlotSingle.svelte";
 
@@ -276,6 +278,15 @@
     );
     calculationResultsStore.set(calculationResults);
   }
+
+  function handleSinglePointSelect(detail: { rowIndex: number } | null) {
+    if (detail === null) {
+      calculationResults.clearSelectedCell();
+    } else {
+      calculationResults.setSelectedCell(detail.rowIndex, 0);
+    }
+    calculationResultsStore.set(calculationResults);
+  }
 </script>
 
 <main>
@@ -341,6 +352,7 @@
           {calculationResults}
           deathProbDistribution={deathProbDistribution1}
           bind:displayAsAges
+          onselectpoint={handleSinglePointSelect}
         />
       {:else}
         <StrategyMatrixDisplay
@@ -366,6 +378,22 @@
           {recipients}
           result={calculationResults.getSelectedCellData()}
           {discountRate}
+          bind:displayAsAges
+        />
+      {/key}
+    {/if}
+    {#if calculationResults.getSelectedCellData() && isSingle}
+      {#key calculationResults.getSelectedCellData()}
+        <StrategyDetailsSingle
+          recipient={recipients[0]}
+          result={calculationResults.getSelectedCellData()}
+        />
+        <AlternativeStrategiesRow
+          recipient={recipients[0]}
+          deathAge={calculationResults.getSelectedCellData().bucket1.expectedAge}
+          {discountRate}
+          optimalNPV={calculationResults.getSelectedCellData().totalBenefit}
+          optimalFilingAge={calculationResults.getSelectedCellData().filingAge1}
           bind:displayAsAges
         />
       {/key}
