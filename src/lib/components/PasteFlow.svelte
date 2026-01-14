@@ -16,6 +16,7 @@ import DemoData from './DemoData.svelte';
 import PasteApology from './PasteApology.svelte';
 import PasteConfirm from './PasteConfirm.svelte';
 import PastePrompt from './PastePrompt.svelte';
+import ProgressIndicator from './ProgressIndicator.svelte';
 import SpouseQuestion from './SpouseQuestion.svelte';
 import ZeroEarningsConfirm from './ZeroEarningsConfirm.svelte';
 
@@ -48,6 +49,28 @@ const Mode = {
   SPOUSE_QUESTION: 5,
 } as const;
 let mode: number = Mode.INITIAL;
+
+// Compute the current step for the progress indicator (1-4)
+// Step 1: Enter Data, Step 2: Verify, Step 3: Birthdate, Step 4: Results
+$: currentStep = (() => {
+  if (mode === Mode.INITIAL) return 1;
+  if (mode === Mode.PASTE_CONFIRMATION || mode === Mode.ZERO_EARNINGS_CONFIRM) return 2;
+  if (mode === Mode.AGE_REQUEST) return 3;
+  if (mode === Mode.SPOUSE_QUESTION) return 5; // All steps complete (shows all checkmarks)
+  return 1; // Default (including PASTE_APOLOGY)
+})();
+
+// Show "results ready" message during spouse question
+$: showResultsReady = mode === Mode.SPOUSE_QUESTION;
+
+// Whether to show the progress indicator (hide during error states only)
+$: showProgress = mode !== Mode.PASTE_APOLOGY;
+
+// Show two-row mode when entering spouse data
+$: showSpouseRow = !isRecipient;
+
+// Get the recipient's name for the progress indicator
+$: recipientName = context.recipient?.name || 'Self';
 
 // The flow supports data entry for two people. The first person is always
 // "recipient", set to context.recipient. The second person is "spouse", set
@@ -439,38 +462,36 @@ function handleSpouseQuestion(detail: {
 </script>
 
 <div>
-  {#if allowSpouseFlow && !isRecipient}
-    <div class="text">
-      <h3>
-        <span class="highlight">Repeat for <b>{spouseName}</b></span>
-      </h3>
-    </div>
+  {#if showProgress}
+    <ProgressIndicator
+      {currentStep}
+      {recipientName}
+      {spouseName}
+      {showSpouseRow}
+    />
+    {#if showResultsReady}
+      <p class="results-ready">Your results are ready! Optionally add spouse data below.</p>
+    {/if}
   {/if}
   {#if mode === Mode.INITIAL}
     {#if isRecipient}
       <DemoData ondemo={handleDemo} />
     {/if}
-    <PastePrompt onpaste={handlePaste} isSpouse={!isRecipient} />
+    <PastePrompt onpaste={handlePaste} isSpouse={!isRecipient} name={isRecipient ? '' : spouseName} />
   {:else if mode === Mode.PASTE_CONFIRMATION}
-    {#if isRecipient}
-      <PasteConfirm
-        onconfirm={handleConfirm}
-        ondecline={handleDecline}
-        earningsRecords={context.recipient.earningsRecords}
-      />
-    {:else}
-      <PasteConfirm
-        onconfirm={handleConfirm}
-        ondecline={handleDecline}
-        earningsRecords={context.spouse.earningsRecords}
-      />
-    {/if}
+    <PasteConfirm
+      onconfirm={handleConfirm}
+      ondecline={handleDecline}
+      earningsRecords={isRecipient ? context.recipient.earningsRecords : context.spouse.earningsRecords}
+      name={isRecipient ? '' : spouseName}
+    />
   {:else if mode === Mode.PASTE_APOLOGY}
     <PasteApology onreset={handleReset} />
   {:else if mode === Mode.ZERO_EARNINGS_CONFIRM && zeroEarningsYear !== null}
     <ZeroEarningsConfirm
       year={zeroEarningsYear}
       onconfirm={handleZeroEarningsConfirm}
+      name={isRecipient ? '' : spouseName}
     />
   {:else if mode === Mode.AGE_REQUEST}
     <AgeRequest
@@ -490,36 +511,16 @@ function handleSpouseQuestion(detail: {
 </div>
 
 <style>
-  .text {
-    margin: auto;
-    max-width: min(660px, 80%);
-  }
-
-  .highlight {
-    border-radius: 1em 0 1em 0;
-    background-image: linear-gradient(
-      -100deg,
-      rgba(255, 224, 0, 0.2),
-      rgba(255, 224, 0, 0.7) 95%,
-      rgba(255, 224, 0, 0.1)
-    );
-  }
-
-  @media screen and (min-width: 1025px) {
-    .text {
-      font-size: 18px;
-    }
-  }
-  /** Ipad **/
-  @media screen and (min-width: 411px) and (max-width: 1024px) {
-    .text {
-      font-size: 16px;
-    }
-  }
-  /** iPhone */
-  @media screen and (max-width: 410px) {
-    .text {
-      font-size: 12px;
-    }
+  .results-ready {
+    text-align: center;
+    color: #2d6a2d;
+    font-size: 14px;
+    margin: -0.5em 0 1em 0;
+    padding: 8px 16px;
+    background: #e8f4e8;
+    border-radius: 6px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
   }
 </style>

@@ -21,6 +21,9 @@ export let onconfirm: (() => void) | undefined = undefined;
 export let ondecline: (() => void) | undefined = undefined;
 
 export let earningsRecords: EarningRecord[] = [];
+
+// Name of the person whose earnings record is being confirmed
+export let name: string = '';
 // Display the records in the same order as the SSA website: reverse
 // chronological.
 $: ssaSortedEarningsRecords = earningsRecords.sort((a, b) => b.year - a.year);
@@ -42,14 +45,14 @@ function decline() {
 
 <div>
   <div class="confirmation">
-    <h3>Confirm Earnings Record</h3>
-    <p>Is this the same table you copied from ssa.gov?</p>
+    <h3>{name ? `${name}'s Earnings Record` : 'Your Earnings Record'}</h3>
+    <p class="summary">{earningsRecords.length} years of earnings</p>
 
     <button on:click={confirm} class="success">
-      <ico>&#10003;</ico> Yes
+      <ico>&#10003;</ico> Looks correct
     </button>
-    <button on:click={decline} class="failure">
-      <ico>&#128078;</ico> No
+    <button on:click={decline} class="secondary">
+      Try again
     </button>
   </div>
 
@@ -94,6 +97,14 @@ function decline() {
     text-align: center;
     font-size: 18px;
   }
+  .confirmation h3 {
+    margin-bottom: 0.25em;
+    color: #2c5f72;
+  }
+  .summary {
+    margin: 0 0 1em 0;
+    color: #666;
+  }
   button {
     border: 0 none;
     border-radius: 36px;
@@ -107,14 +118,17 @@ function decline() {
   button.success {
     background: #4ac15a;
   }
-  button.failure {
-    background: #d9534f;
+  button.secondary {
+    background: #888;
+    font-size: 14px;
+    padding: 6px 18px;
+    min-width: 90px;
   }
   button.success:hover {
     background: #2aa13a;
   }
-  button.failure:hover {
-    background: #b9332f;
+  button.secondary:hover {
+    background: #666;
   }
   button > ico {
     font-weight: bold;

@@ -23,6 +23,9 @@ export let year: number;
 // Callback prop for confirm event - passes true if "not yet recorded", false if accurate
 export let onconfirm: ((incomplete: boolean) => void) | undefined = undefined;
 
+// Name of the person whose earnings are being confirmed
+export let name: string = '';
+
 function confirmAccurate() {
   onconfirm?.(false);
 }
@@ -36,11 +39,11 @@ function confirmIncomplete() {
   <div class="confirmation">
     <h3>Confirm {year} Earnings</h3>
     <p>
-      Your earnings record shows <strong>$0</strong> for {year}.
+      {name ? `${name}'s` : 'Your'} earnings record shows <strong>$0</strong> for {year}.
     </p>
     <p>
       At the start of each year, SSA may not have recorded the previous year's
-      earnings yet. Is this $0 accurate, or has SSA not yet recorded your {year} earnings?
+      earnings yet. Is this $0 accurate, or has SSA not yet recorded {name ? `${name}'s` : 'your'} {year} earnings?
     </p>
 
     <div class="buttons">

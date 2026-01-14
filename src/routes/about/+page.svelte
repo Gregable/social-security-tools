@@ -50,7 +50,8 @@ import KoFiImg from '$lib/images/kofi.png';
     <p>
       While unnecessary for security, this can be confirmed by loading the site
       in your browser, and then disconnecting your computer before entering any
-      additional data.
+      additional data. For more details, see the
+      <a href="/guides/privacy">Privacy & Security guide</a>.
     </p>
     <h3>Accuracy</h3>
     <p>
