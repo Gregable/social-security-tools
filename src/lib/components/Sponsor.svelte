@@ -1,5 +1,7 @@
 <script lang="ts">
+import posthog from 'posthog-js';
 import { onMount } from 'svelte';
+import { browser } from '$app/environment';
 import ProjectionLabImage from '$lib/images/projection-lab.png';
 import { Recipient } from '$lib/recipient';
 
@@ -8,12 +10,26 @@ export let recipient: Recipient = new Recipient();
 let sponsorElement: HTMLElement;
 let isVisible = false;
 
+function handleSponsorClick() {
+  if (browser) {
+    posthog.capture('Sponsor: Clicked', {
+      sponsor_name: 'ProjectionLab',
+    });
+  }
+}
+
 onMount(() => {
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           isVisible = true;
+          // Track sponsor visibility
+          if (browser) {
+            posthog.capture('Sponsor: Visible', {
+              sponsor_name: 'ProjectionLab',
+            });
+          }
           observer.unobserve(entry.target);
         }
       });
@@ -41,6 +57,7 @@ onMount(() => {
   class="spon-anchor"
   target="_blank"
   rel="noopener noreferrer"
+  on:click={handleSponsorClick}
 >
   <div class="transition-section">
     <h2>Beyond Social Security: Complete Retirement Planning</h2>

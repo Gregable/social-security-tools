@@ -5,7 +5,9 @@
  * (if any) is currently active based on URL parameters.
  */
 
+import posthog from 'posthog-js';
 import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
 import { UrlParams } from '$lib/url-params';
 import { getIntegration, type IntegrationConfig } from './config';
 
@@ -72,6 +74,7 @@ export function parseIntegrationFromHash(): IntegrationConfig | null {
 export function initializeIntegration(): void {
   // First try URL hash (explicit parameter takes precedence)
   let config = parseIntegrationFromHash();
+  const fromUrl = config !== null;
 
   // If not in URL, try session storage
   if (!config) {
@@ -81,6 +84,21 @@ export function initializeIntegration(): void {
   // Save to session storage if found
   if (config) {
     saveIntegrationToSession(config.id);
+
+    // Track integration activation (only when first detected from URL)
+    if (fromUrl && browser) {
+      const urlParams = new UrlParams();
+      const hasPreloadedData =
+        urlParams.hasValidRecipientParams() ||
+        urlParams.hasValidRecipientEarnings() ||
+        urlParams.hasValidSpouseParams() ||
+        urlParams.hasValidSpouseEarnings();
+
+      posthog.capture('Integration: Activated', {
+        integration_id: config.id,
+        has_preloaded_data: hasPreloadedData,
+      });
+    }
   }
 
   activeIntegration.set(config);

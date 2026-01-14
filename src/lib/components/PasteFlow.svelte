@@ -106,6 +106,9 @@ onMount(() => {
     urlParams.hasValidRecipientEarnings()
   ) {
     handleHashPaste(urlParams);
+  } else {
+    // Track flow started for non-hash users
+    browser && posthog.capture('Paste Flow: Started', { is_spouse_entry: false });
   }
 });
 
@@ -233,7 +236,10 @@ function handleHashPaste(urlParams: UrlParams = new UrlParams()) {
       context.spouse.markSecond();
     }
     // Let the app know we're done.
-    browser && posthog.capture('Hash Pasted');
+    browser && posthog.capture('Hash Pasted', {
+      has_spouse: recipient2 !== null,
+      has_earnings: urlParams.hasValidRecipientEarnings() || urlParams.hasValidSpouseEarnings(),
+    });
     ondone?.();
   }
 }
@@ -245,6 +251,7 @@ function handleHashPaste(urlParams: UrlParams = new UrlParams()) {
 function handleDemo(detail: {
   recipient: Recipient;
   spouse: Recipient | null;
+  demoType?: string;
 }) {
   context.recipient = detail.recipient;
   if (detail.spouse !== null) {
@@ -257,7 +264,10 @@ function handleDemo(detail: {
   onStarted?.();
 
   // Let the app know we're done.
-  browser && posthog.capture('Demo Loaded');
+  browser && posthog.capture('Demo Loaded', {
+    demo_type: detail.demoType || 'average_earner_couple',
+    has_spouse: detail.spouse !== null,
+  });
   ondone?.();
 }
 
@@ -275,6 +285,13 @@ function handlePaste(detail: { recipient: Recipient }) {
     context.spouse.name = spouseName;
   }
 
+  // Track successful parse
+  browser && posthog.capture('Paste Flow: Parse Success', {
+    is_spouse_entry: !isRecipient,
+    record_count: detail.recipient.earningsRecords.length,
+    is_pia_only: detail.recipient.isPiaOnly,
+  });
+
   // Notify that user has started entering data (no longer showing initial prompt)
   onStarted?.();
 
@@ -291,12 +308,20 @@ function handlePaste(detail: { recipient: Recipient }) {
  * earnings, otherwise prompt for age.
  */
 function handleConfirm() {
+  browser && posthog.capture('Paste Flow: Data Confirmed', {
+    is_spouse_entry: !isRecipient,
+  });
+
   const records = isRecipient
     ? context.recipient.earningsRecords
     : context.spouse.earningsRecords;
 
   zeroEarningsYear = findAmbiguousZeroYear(records);
   if (zeroEarningsYear !== null) {
+    browser && posthog.capture('Paste Flow: Zero Earnings Check', {
+      is_spouse_entry: !isRecipient,
+      year: zeroEarningsYear,
+    });
     mode = Mode.ZERO_EARNINGS_CONFIRM;
   } else {
     mode = Mode.AGE_REQUEST;
@@ -308,6 +333,9 @@ function handleConfirm() {
  * message and a button to reset.
  */
 function handleDecline() {
+  browser && posthog.capture('Paste Flow: Data Rejected', {
+    is_spouse_entry: !isRecipient,
+  });
   mode = Mode.PASTE_APOLOGY;
 }
 
@@ -347,22 +375,36 @@ function handleReset() {
  * Handle the user submitting their age. We're done!
  */
 function handleAgeSubmit(detail: { birthdate: Birthdate }) {
+  browser && posthog.capture('Paste Flow: Birthdate Entered', {
+    is_spouse_entry: !isRecipient,
+  });
+
   if (isRecipient) {
     context.recipient.birthdate = detail.birthdate;
     if (!allowSpouseFlow) {
       if (recipientNameFromHash) {
         context.recipient.name = recipientNameFromHash;
       }
-      browser && posthog.capture('Pasted');
+      browser && posthog.capture('Pasted', {
+        record_count: context.recipient.earningsRecords.length,
+        is_pia_only: context.recipient.isPiaOnly,
+      });
       ondone?.();
       return;
     }
   } else {
     context.spouse.birthdate = detail.birthdate;
-    browser && posthog.capture('Pasted with spousal');
+    browser && posthog.capture('Pasted with spousal', {
+      record_count_recipient: context.recipient.earningsRecords.length,
+      record_count_spouse: context.spouse.earningsRecords.length,
+      recipient_is_pia_only: context.recipient.isPiaOnly,
+      spouse_is_pia_only: context.spouse.isPiaOnly,
+    });
     // Let the app know we're done.
     ondone?.();
   }
+
+  browser && posthog.capture('Paste Flow: Spouse Question Shown');
   mode = Mode.SPOUSE_QUESTION;
 }
 
@@ -377,12 +419,19 @@ function handleSpouseQuestion(detail: {
 }) {
   context.recipient.name = detail.name;
   if (detail.spouse) {
+    browser && posthog.capture('Paste Flow: Couple Selected');
     // Mark the recipient as first. Spouse will be marked second later.
     isRecipient = false;
     spouseName = detail.spousename;
+    // Track flow started for spouse entry
+    browser && posthog.capture('Paste Flow: Started', { is_spouse_entry: true });
     mode = Mode.INITIAL;
   } else {
-    browser && posthog.capture('Pasted');
+    browser && posthog.capture('Paste Flow: Single Selected');
+    browser && posthog.capture('Pasted', {
+      record_count: context.recipient.earningsRecords.length,
+      is_pia_only: context.recipient.isPiaOnly,
+    });
     // Let the app know we're done.
     ondone?.();
   }
