@@ -29,7 +29,7 @@
   ],
   "rewrites": [
     {
-      "source": "/ingest/:path(.*)",
+      "source": "/api/v1/:path(.*)",
       "destination": "https://app.posthog.com/:path*"
     }
   ]
