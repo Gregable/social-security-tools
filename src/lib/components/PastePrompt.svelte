@@ -28,8 +28,17 @@ export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
 // Whether we're entering data for a spouse (shows skip option)
 export let isSpouse: boolean = false;
 
+// Name of the person we're entering data for (used in headings when isSpouse is true)
+export let name: string = '';
+
 let pasteContents: string = '';
 let pasteError: boolean = false;
+
+// Detect Mac for platform-specific keyboard shortcut
+import { browser } from '$app/environment';
+$: selectAllShortcut = browser && navigator.platform.toLowerCase().includes('mac')
+  ? 'Cmd+A'
+  : 'Ctrl+A';
 
 function parsePasteContents(contents: string) {
   if (contents === '') {
@@ -75,29 +84,26 @@ function skipEarnings() {
 </script>
 
 <div class="pastePrompt">
-  <h3>Retrieve Social Security data</h3>
-  <div class="subheading">Preferred Option</div>
-  <ol>
+  <div class="pasteCard">
+    <h3>{name ? `Use ${name}'s SSA.gov Data` : 'Use Your SSA.gov Data'}</h3>
+    <p class="subtitle">For personalized benefit estimates</p>
+    <ol class="steps">
     <li>
-      Sign in to
-      <a target="_blank" href="https://www.ssa.gov/myaccount/">ssa.gov here</a>.
-      You may need to create an account.
+      <strong>Sign in</strong> to
+      <a target="_blank" href="https://www.ssa.gov/myaccount/">ssa.gov</a>
+      <span class="muted">({name ? `${name} may need to create an account` : 'you may need to create an account'})</span>
     </li>
     <li>
-      In the section <span class="referenceText"
-        >"Eligibility and Earnings"</span
-      >, click the link
-      <span class="referenceText">"Review your full earnings record now"</span>.
-      If you cannot find it, click
+      <strong>Open {name ? `${name}'s` : 'your'} earnings record</strong> &mdash;
       <a
         href="https://secure.ssa.gov/ec2/eligibility-earnings-ui/earnings-record"
-        target="_blank">this link</a
+        target="_blank">direct link</a
       >
-      after signing in.
       <Expando
-        collapsedText="Show me what the link looks like"
+        collapsedText="or find it manually"
         expandedText="Hide"
       >
+        <p class="expandoHint">Look for <em>"Review your full earnings record now"</em> under Eligibility and Earnings</p>
         <img
           src={EarningsRecordLinkImage}
           alt="Screenshot of the link to the earnings record on ssa.gov."
@@ -108,22 +114,27 @@ function skipEarnings() {
       </Expando>
     </li>
     <li>
-      Copy the Earnings Record table.
-      <video
-        autoplay
-        playsinline
-        loop
-        muted
-        disableRemotePlayback
-        poster={CopyPasteDemoPoster}
-        title="Animation showing a user copying a social security earnings record from ssa.gov."
+      <strong>Copy the table</strong> &mdash; Select All ({selectAllShortcut}) works great
+      <Expando
+        collapsedText="See example"
+        expandedText="Hide"
       >
-        <source src={CopyPasteDemoMp4} type="video/mp4" />
-      </video>
-      Select the table by clicking and dragging or just select the entire page. Either
-      way will work.
+        <video
+          autoplay
+          playsinline
+          loop
+          muted
+          disableRemotePlayback
+          poster={CopyPasteDemoPoster}
+          title="Animation showing a user copying a social security earnings record from ssa.gov."
+        >
+          <source src={CopyPasteDemoMp4} type="video/mp4" />
+        </video>
+      </Expando>
     </li>
-    <li>Return here, paste the result into the text area below:</li>
+    <li>
+      <strong>Paste below</strong>
+    </li>
   </ol>
   {#if pasteError}
     <div class="pasteError">
@@ -138,27 +149,25 @@ function skipEarnings() {
   {/if}
   <div class="pasteArea">
     <div>
-      <textarea
-        wrap="soft"
-        placeholder={'\n\nPaste Result Here'}
-        bind:value={pasteContents}
-      ></textarea>
       <div class="privateDataNotice">
         <span class="lockIcon">&#x1f512;</span>
-        <p>
-          Your data never leaves your computer: the report is generated entirely
-          by JavaScript in your browser.
-        </p>
+        <span>100% private — your data never leaves your computer.</span>
+        <a href="/guides/privacy" class="learnMore">Learn more</a>
       </div>
+      <textarea
+        wrap="soft"
+        placeholder={'Paste your earnings record here'}
+        bind:value={pasteContents}
+      ></textarea>
     </div>
+  </div>
   </div>
 
   {#if isSpouse}
     <div class="skipEarnings">
       <p>
-        If your spouse has no earnings history, or you just want to get a quick
-        estimate for now, you can skip this step and assume no earnings. You can
-        always come back later to enter more accurate data.
+        If {name || 'this person'} has no earnings history, or you just want a quick
+        estimate for now, you can skip this step and assume no earnings.
       </p>
       <button class="skipButton" on:click={skipEarnings}>
         Skip - Assume No Earnings
@@ -166,21 +175,17 @@ function skipEarnings() {
     </div>
   {/if}
 
-  <div class="subheading">Alternative Options</div>
   <Expando
-    collapsedText="Enter Primary Insurance Amount (PIA)"
-    expandedText="Enter Primary Insurance Amount (PIA)"
+    collapsedText="Alternative data entry options"
+    expandedText="Alternative data entry options"
   >
     <div class="expandoContents">
+      <h4>Enter Primary Insurance Amount (PIA)</h4>
       <p>
-        If you already know the Primary Insurance Amount (PIA) at Normal
-        Retirement Age (aka "Full Retirement Age"), you can enter it here.
+        If you already know {name ? `${name}'s` : 'your'} PIA at Full Retirement Age, enter it here.
+        Note: Without the earnings record, the calculator cannot show future earnings effects.
       </p>
-      <p>
-        <u>Not Preferred</u>: Without your earnings record, the calculator
-        cannot help you understand the effect of earnings in the future.
-      </p>
-      <div>
+      <div class="piaEntry">
         <label for="piaInput">Primary Insurance Amount: </label>
         <div>
           $<input
@@ -195,40 +200,12 @@ function skipEarnings() {
           <ico>&#10003;</ico> Submit
         </button>
       </div>
-    </div>
-  </Expando>
-  <Expando
-    collapsedText="Enter earnings data in alternative formats"
-    expandedText="Enter earnings data in alternative formats"
-  >
-    <div class="expandoContents">
-      <p>The box above also accepts earnings in alternative formats.</p>
+
+      <h4>Alternative Paste Formats</h4>
+      <p>The paste box also accepts:</p>
       <ul>
-        <li>
-          <p>Copy / paste from a spreadsheet or text file.</p>
-          <p>
-            The records must be one row per year, with the year in the first
-            column and the earnings in the second column. For example:
-          </p>
-          <pre class="spreadsheetPasteExample">
-            2015 $5,000
-            2014 $4,000
-            2013 $3,000
-            2012 $2,000
-            2011 $1,000
-          </pre>
-        </li>
-        <li>
-          <p>
-            Copy / paste from your Social Security Statement (not preferred).
-          </p>
-          <p>
-            Your Social Security Statement groups older work years together in
-            ranges rather than listing each year individually, e.g. "2001-2005".
-            This calculator will assume you earned the average of the range for
-            each year. This is only approximate and may result in small errors.
-          </p>
-        </li>
+        <li>Spreadsheet data (year in first column, earnings in second)</li>
+        <li>Social Security Statement (less accurate due to grouped years)</li>
       </ul>
     </div>
   </Expando>
@@ -237,85 +214,190 @@ function skipEarnings() {
 <style>
   .pastePrompt {
     margin: auto;
-    max-width: min(660px, 80%);
+    max-width: min(700px, 90%);
   }
-  .referenceText {
-    font-family: 'Times New Roman', serif;
+
+  .pasteCard {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5em;
+    margin-bottom: 1.5em;
   }
+
+  .pasteCard h3 {
+    margin: 0 0 0.25em 0;
+    color: #2c5f72;
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #666;
+    margin: 0 0 1.25em 0;
+    font-size: 0.95em;
+  }
+
+  .muted {
+    color: #888;
+    font-size: 0.9em;
+  }
+
   .fit-image {
     width: 100%;
     height: auto;
   }
-  h3 {
-    margin-bottom: 0px;
+
+  .expandoHint {
+    margin: 0.5em 0;
+    font-size: 0.95em;
+    color: #555;
   }
-  .subheading {
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 6px;
-    color: rgb(80, 80, 80);
+
+  /* Styled numbered steps */
+  ol.steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: step-counter;
   }
-  ol {
-    padding-inline-start: 5%;
+
+  ol.steps li {
+    counter-increment: step-counter;
+    margin: 1.25em 0;
+    padding-left: 2.5em;
+    position: relative;
+    line-height: 1.5;
   }
-  li {
-    margin: 10px;
+
+  ol.steps li strong {
+    color: #2c5f72;
   }
+
+  ol.steps li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.75em;
+    height: 1.75em;
+    background: #4a90a4;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+
+  ol.steps a {
+    color: #4a90a4;
+    font-weight: 500;
+  }
+
+  ol.steps a:hover {
+    color: #2c5f72;
+  }
+
   .pasteArea {
     max-width: 480px;
-    margin: 0 auto 40px auto;
-    padding: 0 20px 0 20px;
+    margin: 1.5em auto 0 auto;
+    padding: 0;
     width: 100%;
     font-size: 14px;
   }
+
   .pasteError {
     max-width: 480px;
-    margin: 0 auto;
-    padding: 0 20px 0 20px;
+    margin: 0 auto 1em auto;
+    padding: 0;
     width: 100%;
     font-size: 16px;
     display: grid;
     grid-template-columns: min-content auto;
   }
+
   .warningIcon {
     font-size: 32px;
     color: #ff0000;
     padding: 0 10px 0 0;
   }
+
   textarea {
-    /* Leave room for the padding in the pasteArea div. */
     width: 100%;
     height: 100px;
     resize: none;
-    border: 1px solid #ccc;
+    border: 2px dashed #4a90a4;
+    border-radius: 8px;
     margin: 0;
+    padding: 12px;
+    font-size: 14px;
+    background: #fff;
+    box-sizing: border-box;
   }
+
+  textarea:focus {
+    outline: none;
+    border-color: #2c5f72;
+    background: #f8fafc;
+  }
+
+  textarea::placeholder {
+    text-align: center;
+    color: #888;
+    padding-top: 30px;
+  }
+
   .lockIcon {
-    font-size: 26px;
-    color: #0000ff;
-    padding: 0 10px 0 0;
+    font-size: 16px;
+    margin-right: 6px;
   }
+
   .privateDataNotice {
-    display: grid;
-    grid-template-columns: min-content auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #e8f4e8;
+    border-radius: 6px;
+    font-size: 0.85em;
+    color: #2d6a2d;
   }
+
+  .privateDataNotice .learnMore {
+    color: #2d6a2d;
+    text-decoration: underline;
+    margin-left: 4px;
+  }
+
+  .privateDataNotice .learnMore:hover {
+    color: #1d4a1d;
+  }
+
   video {
     width: 100%;
     aspect-ratio: 576 / 294;
+    border-radius: 4px;
   }
-  textarea::-webkit-input-placeholder {
-    /**
-     * Horizontally enter the placeholder text "Place Result Here".
-     */
-    text-align: center;
-    vertical-align: bottom;
-  }
+
   .expandoContents {
     margin: 1em;
   }
-  .spreadsheetPasteExample {
-    margin-left: 1.5em;
-    white-space: pre-line;
+
+  .expandoContents h4 {
+    margin: 1.5em 0 0.5em 0;
+    color: #2c5f72;
+  }
+
+  .expandoContents h4:first-child {
+    margin-top: 0;
+  }
+
+  .piaEntry {
+    margin: 0.5em 0;
   }
 
   .piaInput {
@@ -342,11 +424,13 @@ function skipEarnings() {
     min-width: 90px;
     cursor: pointer;
   }
+
   button:disabled,
   button:disabled:hover {
     background: #ccc;
     cursor: not-allowed;
   }
+
   button:hover {
     background: #2aa13a;
   }
@@ -359,22 +443,25 @@ function skipEarnings() {
 
   .skipEarnings {
     max-width: 480px;
-    margin: 0 auto 30px auto;
+    margin: 1.5em auto;
     padding: 15px 20px;
     background: #f5f5f5;
     border: 1px solid #ddd;
     border-radius: 8px;
     text-align: center;
   }
+
   .skipEarnings p {
     margin: 0 0 12px 0;
     color: #555;
     font-size: 14px;
   }
+
   .skipButton {
     background: #6b8e9f;
     padding: 8px 20px;
   }
+
   .skipButton:hover {
     background: #4a6d7e;
   }
@@ -396,7 +483,18 @@ function skipEarnings() {
   /** iPhone */
   @media screen and (max-width: 410px) {
     .pastePrompt {
-      font-size: 12px;
+      font-size: 14px;
+    }
+    .pasteCard {
+      padding: 1em;
+    }
+    ol.steps li {
+      padding-left: 2em;
+    }
+    ol.steps li::before {
+      width: 1.5em;
+      height: 1.5em;
+      font-size: 0.8em;
     }
   }
 </style>

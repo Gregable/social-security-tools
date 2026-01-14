@@ -14,6 +14,18 @@
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jan 14, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/privacy">Privacy & Security</a>
+        </h3>
+        <p class="description">
+          SSA.tools is designed with privacy as a core principle. Learn how your
+          Social Security earnings data never leaves your computer. All
+          calculations happen entirely in your browser with no server storage.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Dec 20, 2025</span>
         <h3 class="posttitle">
           <a href="/guides/integrations">Third-Party Integrations</a>
