@@ -27,8 +27,10 @@ import { parsePaste } from '$lib/ssa-parse';
 
 // Callback prop for demo event
 export let ondemo:
-  | ((detail: { recipient: Recipient; spouse: Recipient | null }) => void)
+  | ((detail: { recipient: Recipient; spouse: Recipient | null; demoType?: string }) => void)
   | undefined = undefined;
+
+const DEMO_TYPES = ['average_earner_couple', 'high_earner_single', 'young_earner_couple'] as const;
 
 function loadDemoData(demoId: number) {
   return () => {
@@ -68,6 +70,7 @@ function loadDemoData(demoId: number) {
     ondemo?.({
       recipient: recipient,
       spouse: spouse,
+      demoType: DEMO_TYPES[demoId],
     });
   };
 }

@@ -1,3 +1,19 @@
+<script lang="ts">
+import posthog from 'posthog-js';
+import { browser } from '$app/environment';
+import { page } from '$app/stores';
+
+function handleCtaClick() {
+  if (browser) {
+    const guideSlug = $page.url.pathname.replace('/guides/', '');
+    posthog.capture('Guide: CTA Clicked', {
+      guide_slug: guideSlug,
+      cta_type: 'calculate_my_benefits',
+    });
+  }
+}
+</script>
+
 <div class="footer">
   <div class="footer-content">
     <div class="footer-icon">📊</div>
@@ -21,7 +37,7 @@
       </div>
     </div>
     <div class="cta-container">
-      <a href="/calculator" class="cta-button" role="button">
+      <a href="/calculator" class="cta-button" role="button" on:click={handleCtaClick}>
         <span class="cta-text">Calculate My Benefits</span>
       </a>
       <div class="trust-indicators">
