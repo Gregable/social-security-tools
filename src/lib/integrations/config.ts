@@ -61,6 +61,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'fireproofme.com': {
+    id: 'fireproofme.com',
+    displayName: 'FIREProof',
+    reportEndLabel: 'FIREProof',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/fireproofme.com/favicon.ico'
+      );
+      return module.default;
+    },
+  },
   'ficalc.app': {
     id: 'ficalc.app',
     displayName: 'FI Calc',

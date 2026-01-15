@@ -12,6 +12,7 @@ import LinoptIntroBanner from '$lib/components/integrations/linopt.com/IntroBann
 import OpenSSIntroBanner from '$lib/components/integrations/opensocialsecurity.com/IntroBanner.svelte';
 import OwlPlannerIntroBanner from '$lib/components/integrations/owlplanner.streamlit.app/IntroBanner.svelte';
 import FinPodsIntroBanner from '$lib/components/integrations/finpodsai.com/IntroBanner.svelte';
+import FIREProofIntroBanner from '$lib/components/integrations/fireproofme.com/IntroBanner.svelte';
 
 export let isReportView: boolean = false;
 </script>
@@ -63,6 +64,11 @@ export let isReportView: boolean = false;
     <div class="banner-item">
       <h3>Fin Pods AI</h3>
       <FinPodsIntroBanner {isReportView} />
+    </div>
+
+    <div class="banner-item">
+      <h3>FIREProof</h3>
+      <FIREProofIntroBanner {isReportView} />
     </div>
   </div>
 </div>

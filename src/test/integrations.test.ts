@@ -66,6 +66,16 @@ describe('Integration Configuration', () => {
     expect(typeof faviconUrl).toBe('string');
   });
 
+  it('should have FIREProof registered', async () => {
+    expect(INTEGRATIONS['fireproofme.com']).toBeDefined();
+    expect(INTEGRATIONS['fireproofme.com'].id).toBe('fireproofme.com');
+    expect(INTEGRATIONS['fireproofme.com'].displayName).toBe('FIREProof');
+    expect(INTEGRATIONS['fireproofme.com'].reportEndLabel).toBe('FIREProof');
+    const faviconUrl = await INTEGRATIONS['fireproofme.com'].getFavicon();
+    expect(faviconUrl).toBeDefined();
+    expect(typeof faviconUrl).toBe('string');
+  });
+
   it('should return integration config for valid ID', () => {
     const config = getIntegration('opensocialsecurity.com');
     expect(config).not.toBeNull();
