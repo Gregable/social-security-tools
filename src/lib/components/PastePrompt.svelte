@@ -100,6 +100,7 @@ function skipEarnings() {
         target="_blank">direct link</a
       >
       <Expando
+        variant="inline"
         collapsedText="or find it manually"
         expandedText="Hide"
       >
@@ -116,6 +117,7 @@ function skipEarnings() {
     <li>
       <strong>Copy the table</strong> &mdash; Select All ({selectAllShortcut}) works great
       <Expando
+        variant="inline"
         collapsedText="See example"
         expandedText="Hide"
       >
@@ -176,6 +178,7 @@ function skipEarnings() {
   {/if}
 
   <Expando
+    variant="section"
     collapsedText="Alternative data entry options"
     expandedText="Alternative data entry options"
   >
