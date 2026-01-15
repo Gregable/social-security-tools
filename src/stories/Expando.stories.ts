@@ -8,6 +8,13 @@ const meta: Meta<Expando> = {
   parameters: {
     layout: 'fullscreen',
   },
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['default', 'inline', 'section'],
+      description: 'Visual style variant',
+    },
+  },
 };
 export default meta;
 
@@ -17,4 +24,22 @@ const Template = ({ ...args }) => ({
 });
 
 export const Default = Template.bind({});
-Default.args = {};
+Default.args = {
+  variant: 'default',
+  collapsedText: 'Expand for details',
+  expandedText: 'Collapse',
+};
+
+export const Inline = Template.bind({});
+Inline.args = {
+  variant: 'inline',
+  collapsedText: 'Show example',
+  expandedText: 'Hide',
+};
+
+export const Section = Template.bind({});
+Section.args = {
+  variant: 'section',
+  collapsedText: 'Alternative options',
+  expandedText: 'Alternative options',
+};

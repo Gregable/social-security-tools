@@ -5,10 +5,14 @@
  * component that is only used in the demo.
  */
 import Expando from '$lib/components/Expando.svelte';
+
+export let variant: 'default' | 'inline' | 'section' = 'default';
+export let collapsedText: string = 'Cat Ipsum';
+export let expandedText: string = 'Collapse Me';
 </script>
 
 <div>
-  <Expando collapsedText="Cat Ipsum" expandedText="Collapse Me">
+  <Expando {variant} {collapsedText} {expandedText}>
     <!-- https://ipsum-community.github.io/catipsum.com/ -->
     <p>
       Present belly, scratch hand when stroked man running from cops stops to
