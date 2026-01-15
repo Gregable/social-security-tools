@@ -108,7 +108,7 @@ const steps = [
 
 <style>
   .progress-container {
-    margin: 0 auto 1.5em auto;
+    margin: 1.5em auto;
     max-width: min(600px, 95%);
     padding: 0 10px;
   }
