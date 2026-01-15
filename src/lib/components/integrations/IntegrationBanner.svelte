@@ -65,7 +65,7 @@
   .intro-banner {
     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
     border-left: 4px solid #1976d2;
-    margin: 1em auto 0;
+    margin: 1.5em auto 0;
     padding: 0.75em 1em;
     max-width: 1080px;
     border-radius: 4px 4px 0 0;
@@ -160,7 +160,7 @@
 
   @media screen and (max-width: 600px) {
     .intro-banner {
-      margin: 0.5em;
+      margin: 1em 0.5em 0;
       padding: 0.5em 0.75em;
     }
     .banner-content {
