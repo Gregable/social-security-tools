@@ -6,7 +6,7 @@
   const description =
     "Learn about third-party tools that integrate with SSA.tools to provide enhanced retirement planning capabilities.";
   const published = "2025-12-20";
-  const modified = "2025-12-20";
+  const modified = "2026-01-14";
 
   const schema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/integrations";
@@ -142,6 +142,20 @@
         </td>
         <td>A comprehensive retirement planning application.</td>
         <td> Displays your Primary Insurance Amount (PIA) values. </td>
+      </tr>
+      <tr>
+        <td>
+          <a href="/calculator#integration=fireproofme.com">FIREProof</a>
+        </td>
+        <td>
+          A retirement planning tool that helps you model income streams and
+          expenses throughout retirement.
+        </td>
+        <td>
+          Provides your Social Security benefits as annual amounts with start
+          years, formatted for easy entry into FIREProof's income tracking
+          system.
+        </td>
       </tr>
     </tbody>
   </table>

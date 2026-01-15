@@ -187,6 +187,16 @@ warning.
   and provides a link back to Owl Retirement Planner. Shows PIA for both
   recipients in couple scenarios.
 
+### FIREProof (fireproofme.com)
+
+- **Intro Banner**: Informs users that they're using the calculator via FIREProof
+  and that they'll see how to enter their Social Security data back into FIREProof
+- **Report End**: Displays Social Security benefits as annual amounts with start
+  years, formatted for FIREProof's income tracking system. Includes copy-to-clipboard
+  buttons for each value (name, amount, start year) and guidance on FIREProof
+  settings (Recurrence: Recurring, End Year: default, Treat as post-tax: off).
+  Links to the federal taxes guide for more information on Social Security taxation.
+
 ## Testing
 
 Unit tests for the integration system are in `src/test/integrations.test.ts`.
