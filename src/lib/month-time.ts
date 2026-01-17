@@ -371,6 +371,18 @@ export class MonthDuration {
     if (m === 0) return `${y}`;
     return `${y}y ${m}m`;
   }
+
+  /**
+   * Formats this duration as "X and Y months" or just "X" if whole years.
+   * Example: 66 years and 4 months returns "66 and 4 months"
+   * Example: 67 years returns "67"
+   */
+  toYearsAndMonthsString(): string {
+    const y = this.years();
+    const m = this.modMonths();
+    if (m === 0) return `${y}`;
+    return `${y} and ${m} month${m === 1 ? '' : 's'}`;
+  }
 }
 
 /**
