@@ -24,10 +24,9 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
 </script>
 
 <svelte:head>
+  <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
-  <title>
-    {title} | SSA.tools
-  </title>
+  <link rel="canonical" href={schema.url} />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
 </svelte:head>

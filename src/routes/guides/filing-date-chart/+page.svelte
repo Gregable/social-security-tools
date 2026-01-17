@@ -29,10 +29,9 @@ schema.tags = [
 </script>
 
 <svelte:head>
+  <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
-  <title>
-    {title} | SSA.tools
-  </title>
+  <link rel="canonical" href={schema.url} />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
 </svelte:head>
@@ -203,5 +202,32 @@ schema.tags = [
     you understand it, it's a powerful tool for understanding your social
     security benefits.
   </p>
+
+  <h2>Related Guides</h2>
+
+  <ul>
+    <li>
+      <a href="/guides/pia">Primary Insurance Amount (PIA)</a> — How your benefit
+      amount at Normal Retirement Age is calculated
+    </li>
+    <li>
+      <a href="/guides/spousal-benefit-filing-date">Spousal Benefits</a> — Why
+      the combined chart shows different amounts for each spouse
+    </li>
+    <li>
+      <a href="/guides/delayed-january-bump">Delayed January Bump</a> — Why benefits
+      sometimes increase in January after filing mid-year
+    </li>
+    <li>
+      <a href="/guides/maximum">Maximum Benefit</a> — The highest values you might
+      see on your benefit chart
+    </li>
+  </ul>
+
+  <p>
+    Ready to see your own chart? Use the <a href="/calculator">SSA.tools calculator</a>
+    to generate personalized benefit projections based on your earnings record.
+  </p>
+
   <GuideFooter />
 </div>

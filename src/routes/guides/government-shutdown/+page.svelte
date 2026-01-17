@@ -26,11 +26,9 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
 </script>
 
 <svelte:head>
+  <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
-  <title>
-    {title} | SSA.tools
-  </title>
-
+  <link rel="canonical" href={schema.url} />
   {@html schema.renderSocialMeta()}
   {@html schema.render()}
 </svelte:head>

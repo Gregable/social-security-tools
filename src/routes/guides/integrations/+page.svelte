@@ -27,6 +27,7 @@
 <svelte:head>
   <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={schema.url} />
   {@html schema.renderSocialMeta()}
   {@html schema.render()}
 </svelte:head>

@@ -22,8 +22,9 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
 </script>
 
 <svelte:head>
-  <meta name="description" content={description} />
   <title>{title} | SSA.tools</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={schema.url} />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
 </svelte:head>
