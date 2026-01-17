@@ -17,6 +17,7 @@ const pages = [
   },
   { path: '/guides/aime', priority: '0.7', changefreq: 'yearly' },
   { path: '/guides/pia', priority: '0.7', changefreq: 'yearly' },
+  { path: '/guides/wep', priority: '0.7', changefreq: 'yearly' },
   { path: '/guides/25k-income', priority: '0.7', changefreq: 'yearly' },
   { path: '/guides/40k-income', priority: '0.7', changefreq: 'yearly' },
   { path: '/guides/60k-income', priority: '0.7', changefreq: 'yearly' },

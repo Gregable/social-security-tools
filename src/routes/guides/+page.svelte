@@ -27,6 +27,19 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jan 16, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/wep">Windfall Elimination Provision (WEP)</a>
+        </h3>
+        <p class="description">
+          For 42 years, the Windfall Elimination Provision reduced Social
+          Security benefits for teachers, firefighters, and other public
+          servants. Learn what WEP was, who it affected, and why it no longer
+          applies after the Social Security Fairness Act of 2025.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 14, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/privacy">Privacy & Security</a>
