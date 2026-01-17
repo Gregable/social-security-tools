@@ -16,9 +16,9 @@ import {
 
 const title = 'SSA.tools: A Social Security Calculator';
 const description =
-  'An online social security calculator that makes understanding social security retirement benefits quick and simple.';
+  'Free Social Security calculator for 2026. Estimate your retirement benefits, find your optimal filing age (62-70), and see how your AIME and PIA affect your monthly payment.';
 const url = 'https://ssa.tools';
-const imageAlt = 'Laptop displaying piggybanks representing Social Security savings';
+const imageAlt = 'Social Security retirement benefits calculator showing estimated monthly payments';
 
 const websiteSchema = new WebSiteSchema();
 websiteSchema.url = url;
@@ -100,8 +100,8 @@ onMount(() => {
           src="/laptop-piggybank.jpg"
           width="1134"
           height="712"
-          alt="Laptop displaying two piggybanks."
-          title="Laptop displaying two piggybanks."
+          alt="Social Security retirement benefits calculator showing estimated monthly payments"
+          title="Social Security benefits calculator"
         />
       </div>
     </div>
@@ -109,17 +109,17 @@ onMount(() => {
 
   <hr />
 
-  <div class="grid-container">
-    <div>
-      <h2>Quick Data Entry</h2>
-      <h1>Directly Copy & Paste Records</h1>
+  <article class="grid-container">
+    <section>
+      <h2 class="section-label">Quick Data Entry</h2>
+      <h3 class="section-title">Import Your Earnings History from SSA.gov</h3>
       <p>
-        Painless entry of your earnings records directly from the "<i>my</i> SocialSecurity"
-        section at ssa.gov. Copy and paste your entire record directly into the social
-        security calculator in a single quick step. Run entirely from your browser
+        Painless entry of your earnings records directly from your my Social Security
+        account at ssa.gov. Copy and paste your entire earnings history directly into
+        the calculator in a single quick step. Runs entirely in your browser,
         making the process secure and private.
       </p>
-    </div>
+    </section>
     <div>
       <div class="shadow">
         <video
@@ -139,15 +139,15 @@ onMount(() => {
       </div>
     </div>
 
-    <div>
-      <h2>Highly Interactive</h2>
-      <h1>Future Benefits Formula</h1>
+    <section>
+      <h2 class="section-label">Highly Interactive</h2>
+      <h3 class="section-title">Plan Your Retirement Age</h3>
       <p>
-        Working more years in the future can have an impact on your benefit. Use
-        the working years quick calculator to estimate the impact of working
-        more or fewer years on your AIME, PIA, and benefit payments.
+        Working more years can impact your benefit. Use the retirement age
+        calculator to estimate how working until your full retirement age (or
+        beyond) affects your AIME, PIA, and monthly benefit payments.
       </p>
-    </div>
+    </section>
     <div>
       <div class="shadow">
         <video
@@ -169,15 +169,15 @@ onMount(() => {
       </div>
     </div>
 
-    <div>
-      <h2>Visual Charts</h2>
-      <h1>PIA Calculation</h1>
+    <section>
+      <h2 class="section-label">Visual Charts</h2>
+      <h3 class="section-title">Estimate Your Benefits</h3>
       <p>
-        Visually calculate how your Average Indexed Monthly Earnings (AIME)
-        affects your Primary Insurance Amount (PIA). Use the calculator to see
-        how you compare to the two Social Security breakpoints.
+        Visualize how your Average Indexed Monthly Earnings (AIME) affects your
+        Primary Insurance Amount (PIA). The calculator shows how your earnings
+        fit into the Social Security bendpoints that determine your benefit.
       </p>
-    </div>
+    </section>
     <div>
       <div class="shadow">
         <video
@@ -198,17 +198,17 @@ onMount(() => {
       </div>
     </div>
 
-    <div>
-      <h2>Graphical Excellence</h2>
-      <h1>Filing Start Date Analysis</h1>
+    <section>
+      <h2 class="section-label">When to Claim</h2>
+      <h3 class="section-title">Find Your Optimal Filing Age</h3>
       <p>
-        Intuitive interactive visual charts let you see the impact of the choice
-        of filing dates on your benefits. See your detailed payment schedule,
-        each month, specifically tailored to your own inputs. Unique unified
-        view of filing dates and the effect on both you and your spouse's
+        Should you claim at 62, wait until 70, or somewhere in between?
+        Interactive charts show how early retirement reduces benefits and how
+        delayed retirement credits can help maximize your Social Security. See
+        the impact on both your benefits and your spouse's spousal and survivor
         benefits.
       </p>
-    </div>
+    </section>
     <div>
       <div class="shadow">
         <video
@@ -227,16 +227,17 @@ onMount(() => {
         </video>
       </div>
     </div>
-  </div>
+  </article>
 
-  <div id="footer">
+  <footer id="footer">
     <div id="footer-container">
-      <h2>What next</h2>
-      <h1>Want to try the social security calculator now?</h1>
+      <h2 class="section-label">What next</h2>
+      <h3 class="section-title">Ready to estimate your Social Security benefits?</h3>
       <p>
-        Great, <a href="/calculator">get started here</a>.
+        Great, <a href="/calculator">get started here</a>. Updated for 2026
+        with the latest bend points and COLA (cost-of-living adjustment).
       </p>
-      <h1>Later?</h1>
+      <h3 class="section-title">Save for later?</h3>
       <p>Here are some easy ways to remember:</p>
       <ol>
         <li>Leave this tab open. Get back to it later.</li>
@@ -249,7 +250,7 @@ onMount(() => {
         </li>
       </ol>
     </div>
-  </div>
+  </footer>
 </main>
 
 <style>
@@ -346,7 +347,8 @@ onMount(() => {
   }
 
   h1,
-  h2 {
+  h2,
+  h3 {
     font-family: inherit;
     line-height: 1.1;
   }
@@ -357,11 +359,19 @@ onMount(() => {
     font-weight: 700;
   }
 
-  h2 {
+  .section-label {
     color: #a8a8a8;
     letter-spacing: 0.2rem;
     text-transform: uppercase;
     padding: 0px;
+    font-size: inherit;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    color: #060606;
+    margin-bottom: 2.8rem;
+    font-weight: 700;
   }
 
   p {
@@ -412,8 +422,12 @@ onMount(() => {
     margin: 0px auto;
   }
 
-  #footer h1 {
+  #footer .section-title {
     color: #ddd;
+  }
+
+  #footer .section-label {
+    color: #888;
   }
 
   #footer p,
@@ -431,7 +445,7 @@ onMount(() => {
     }
 
     /* every other row, move text to the right col */
-    .grid-container > div:nth-child(4n + 1) {
+    .grid-container > section:nth-child(4n + 1) {
       grid-column: 2;
     }
 
@@ -441,10 +455,10 @@ onMount(() => {
 
     .jumbotron-grid h1 {
       font-size: 5.5vw;
-      line-height: 8vw;
+      line-height: 6.5vw;
     }
 
-    h1,
+    .section-title,
     p {
       font-size: 1.8vw;
     }
@@ -461,7 +475,7 @@ onMount(() => {
       margin-bottom: 2rem;
     }
 
-    h2 {
+    .section-label {
       font-size: 1.2vw;
     }
   }
@@ -481,7 +495,7 @@ onMount(() => {
 
     .jumbotron-grid h1 {
       font-size: 11vw;
-      line-height: 16vw;
+      line-height: 13vw;
       margin: 0.2rem 0 1rem;
     }
 
@@ -494,7 +508,7 @@ onMount(() => {
       letter-spacing: 0.4rem;
     }
 
-    h1,
+    .section-title,
     p {
       font-size: 3.6vw;
     }
@@ -511,7 +525,7 @@ onMount(() => {
       font-size: 3.6vw;
     }
 
-    h2 {
+    .section-label {
       font-size: 2.4vw;
     }
   }
