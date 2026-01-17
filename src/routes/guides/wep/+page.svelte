@@ -46,7 +46,7 @@ schema.tags = [
     the answer for millions of teachers, firefighters, police officers, and other
     public servants was the <strong>Windfall Elimination Provision</strong> (WEP).
     This rule reduced Social Security benefits for anyone with a pension from
-    employment not covered by Social Security—a so-called "non-covered pension."
+    employment not covered by Social Security, a so-called "non-covered pension."
   </p>
 
   <p>
@@ -61,7 +61,7 @@ schema.tags = [
     repealed in January 2025, the SSA.tools calculator uses the standard Social
     Security benefit formula for all users. If you previously would have been
     subject to WEP, your benefits are now calculated the same way as everyone
-    else's—no WEP adjustment needed.
+    else's. No WEP adjustment needed.
   </div>
 
   <h2>Was WEP Repealed?</h2>
@@ -101,7 +101,7 @@ schema.tags = [
 
   <p>
     The problem arose when workers split careers between jobs covered by Social
-    Security and jobs that were <em>not</em> covered—such as state government
+    Security and jobs that were <em>not</em> covered, such as state government
     positions with separate pension systems. Years in non-covered employment
     showed as zeros in their Social Security earnings records, making them
     <em>appear</em> to be low-wage workers entitled to the generous 90% replacement
@@ -119,14 +119,14 @@ schema.tags = [
 
   <p>
     Workers with <strong>30 or more years of substantial earnings</strong> under
-    Social Security were always exempt from WEP—their benefits were never reduced.
+    Social Security were always exempt from WEP. Their benefits were never reduced.
     "Substantial earnings" meant earning above a threshold amount that increased
     each year (about $31,275 in 2024).
   </p>
 
   <p>
     Workers with 20 or fewer years of substantial covered employment faced the
-    maximum WEP reduction—which reached <strong>$587 per month in 2024</strong>.
+    maximum WEP reduction, which reached <strong>$587 per month in 2024</strong>.
     Workers with 21-29 years received graduated relief:
   </p>
 
@@ -160,15 +160,15 @@ schema.tags = [
   <p>
     WEP affected approximately <strong>2.1 million beneficiaries</strong> at its
     peak, representing about 4% of all retired-worker beneficiaries. The provision
-    targeted workers who received a non-covered pension—a pension from employment
-    where they didn't pay Social Security taxes:
+    targeted workers who received a non-covered pension (a pension from employment
+    where they didn't pay Social Security taxes):
   </p>
 
   <ul>
     <li>
       <strong>Teachers with state pensions</strong> in 15 states (including
-      California, Texas, Ohio, Massachusetts, and Illinois)—the "teacher pension
-      Social Security" problem was one of the most common WEP scenarios
+      California, Texas, Ohio, Massachusetts, and Illinois). The "teacher pension
+      Social Security" problem was one of the most common WEP scenarios.
     </li>
     <li>
       <strong>State and local government employees</strong> in 26 states with
@@ -176,13 +176,13 @@ schema.tags = [
     </li>
     <li>
       <strong>Federal employees</strong> hired before January 1, 1984, under the
-      Civil Service Retirement System (CSRS)—the CSRS pension triggered WEP for
-      these workers
+      Civil Service Retirement System (CSRS). The CSRS pension triggered WEP for
+      these workers.
     </li>
     <li><strong>Police officers and firefighters</strong> in many jurisdictions</li>
     <li>
-      <strong>Workers with foreign pensions</strong>—a foreign pension from
-      non-covered employment could also trigger WEP
+      <strong>Workers with foreign pensions</strong>. A foreign pension from
+      non-covered employment could also trigger WEP.
     </li>
     <li><strong>Some nonprofit workers</strong> in positions that opted out of Social Security</li>
   </ul>
@@ -191,7 +191,7 @@ schema.tags = [
     Contrary to common misconception, approximately <strong>72% of state and local
     public employees</strong> worked in Social Security-covered positions and were
     never affected by WEP. The provision applied only to the roughly 6.5 million
-    workers—about 28% of the public sector workforce—whose employers opted out
+    workers (about 28% of the public sector workforce) whose employers opted out
     of Social Security in favor of separate pension systems.
   </p>
 
@@ -200,8 +200,8 @@ schema.tags = [
   <p>
     Working alongside WEP was the <strong>Government Pension Offset</strong> (GPO),
     enacted even earlier in 1977. While WEP reduced a worker's <em>own</em>
-    retirement benefits, GPO targeted <em>spousal and survivor benefits</em>—reducing
-    them by <strong>two-thirds</strong> of the recipient's government pension.
+    retirement benefits, GPO targeted <em>spousal and survivor benefits</em>,
+    reducing them by <strong>two-thirds</strong> of the recipient's government pension.
   </p>
 
   <p>
@@ -251,7 +251,7 @@ schema.tags = [
   <p>
     The SSA completed implementation five months ahead of schedule. By July 2025,
     the agency had processed over <strong>3.1 million payments totaling $17
-    billion</strong> in retroactive benefits—covering the period from January 2024
+    billion</strong> in retroactive benefits, covering the period from January 2024
     (when the repeal took effect retroactively) through the implementation date.
   </p>
 
@@ -296,7 +296,7 @@ schema.tags = [
     <li>
       <strong>Perverse incentives:</strong> Workers considering second careers
       in public service faced effective tax rates exceeding 100% on their Social
-      Security contributions—they paid taxes into the system but received no
+      Security contributions. They paid taxes into the system but received no
       additional benefits due to WEP.
     </li>
     <li>
@@ -317,8 +317,8 @@ schema.tags = [
   </p>
 
   <p>
-    Advocates countered that the cost—roughly 1% of total Social Security
-    expenditures over the period—was justified to correct decades of unfairness.
+    Advocates countered that the cost (roughly 1% of total Social Security
+    expenditures over the period) was justified to correct decades of unfairness.
     They noted the provisions had already taken an estimated $60 billion from
     affected workers and their families.
   </p>
@@ -404,7 +404,7 @@ schema.tags = [
     <a href="/calculator">SSA.tools calculator</a> to estimate your monthly
     payment. Simply paste your earnings record from ssa.gov, and the calculator
     will compute your <a href="/guides/pia">Primary Insurance Amount</a> using
-    the standard formula—the same formula that now applies to everyone, including
+    the standard formula, the same formula that now applies to everyone, including
     teachers, government employees, and anyone who previously would have been
     subject to WEP.
   </p>

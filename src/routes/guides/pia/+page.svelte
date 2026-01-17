@@ -205,7 +205,7 @@ schema.tags = [
   </ul>
 
   <p>
-    This doesn't mean late-career earnings are worthless—they still increase
+    This doesn't mean late-career earnings are worthless. They still increase
     your benefits and your overall retirement income. But the Social Security
     benefit increase may be smaller than you might intuitively expect.
   </p>

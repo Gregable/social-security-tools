@@ -117,7 +117,7 @@ schema.tags = [
       Consider someone with 40 years of earnings. Their top 35 years have
       indexed earnings ranging from $45,000 to $75,000, while their bottom 5
       years have indexed earnings of $20,000 to $35,000. Only the top 35 years
-      count toward their AIME calculation—the lower 5 years are completely
+      count toward their AIME calculation. The lower 5 years are completely
       ignored.
     </p>
   </div>
@@ -241,7 +241,7 @@ schema.tags = [
   </ul>
 
   <p>
-    The calculator also shows you the "cutoff" indexed earnings amount—the
+    The calculator also shows you the "cutoff" indexed earnings amount: the
     lowest indexed earning year in your top 35. Any future year where your
     indexed earnings exceed this amount will improve your AIME.
   </p>

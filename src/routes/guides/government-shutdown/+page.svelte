@@ -55,7 +55,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
 
   <p>
     <strong>The bottom line:</strong> Government shutdowns never stop Social Security
-    benefit payments—the system has never missed a payment in its 90-year history.
+    benefit payments. The system has never missed a payment in its 90-year history.
     However, shutdowns severely disrupt the services that help Americans apply for
     benefits, resolve problems, and access basic assistance. Understanding the difference
     between payment continuity and service availability is crucial for navigating
@@ -71,9 +71,9 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
     funding bills failed to reach the required 60 votes in the Senate, and the
     shutdown will proceed at midnight Eastern Time. This would be the first
     federal shutdown in six years, despite the Republican Party controlling the
-    presidency, House, and Senate—highlighting the deep disagreements within the
-    GOP that have prevented passage of either a full-year budget or a continuing
-    resolution.
+    presidency, House, and Senate. This highlights the deep disagreements within
+    the GOP that have prevented passage of either a full-year budget or a
+    continuing resolution.
   </p>
 
   <p>
@@ -105,7 +105,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
   <ul>
     <li>
       <strong>Permanent Funding Authorization:</strong> Congress authorized Social
-      Security payments in perpetuity when it created the program—not year-by-year
+      Security payments in perpetuity when it created the program, not year-by-year
       through annual budgets.
     </li>
     <li>
@@ -126,7 +126,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
   </ul>
 
   <p>
-    Supplemental Security Income (SSI) presents a technical difference—it's
+    Supplemental Security Income (SSI) presents a technical difference: it's
     funded from general Treasury revenues rather than payroll taxes. However,
     <a href="https://www.ssa.gov/budget/">SSA's budget documents</a>
     indicate SSI can continue for up to three months during shutdowns using previously
@@ -210,7 +210,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
   <p>
     These state offices, funded by federal dollars, make the medical
     determinations that decide disability claims. SSA cannot mandate they
-    continue operations during shutdowns—it can only "encourage" continued
+    continue operations during shutdowns. It can only "encourage" continued
     service with promises of reimbursement after funding resumes. During the
     <a
       href="https://obamawhitehouse.archives.gov/sites/default/files/omb/reports/impacts-and-costs-of-october-2013-federal-government-shutdown-report.pdf"
@@ -222,7 +222,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
   <p>
     Administrative Law Judge hearings continue with limited support. While
     hearings proceed, <strong>decisions aren't written during shutdowns</strong
-    >—meaning even successful claimants face additional delays in receiving
+    >, meaning even successful claimants face additional delays in receiving
     benefits.
   </p>
 
@@ -421,8 +421,8 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
   </p>
 
   <p>
-    The current political context—with one party controlling all branches of
-    government yet unable to fund operations—combined with the SSA's
+    The current political context (one party controlling all branches of
+    government yet unable to fund operations), combined with the SSA's
     already-reduced workforce from 2025's administrative changes, threatens
     unprecedented service disruptions. While the fundamental promise of Social
     Security remains secure, the systems supporting beneficiaries face serious
