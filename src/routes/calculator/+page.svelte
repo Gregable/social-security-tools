@@ -24,6 +24,18 @@ import {
   activeIntegration,
   initializeIntegration,
 } from '$lib/integrations/context';
+import { WebApplicationSchema, renderWebsiteSocialMeta } from '$lib/schema-org';
+
+const pageTitle = 'Social Security Calculator - SSA.tools';
+const pageDescription =
+  'Free social security calculator. Copy and paste your earnings record from ssa.gov to instantly calculate your retirement benefits, PIA, and optimal filing date.';
+const pageUrl = 'https://ssa.tools/calculator';
+const pageImageAlt = 'Social Security benefits calculator tool';
+
+const webAppSchema = new WebApplicationSchema();
+webAppSchema.url = pageUrl;
+webAppSchema.name = pageTitle;
+webAppSchema.description = pageDescription;
 
 export let isPasteFlow: boolean = true;
 
@@ -105,6 +117,21 @@ async function loadIntegrationComponents(
 </script>
 
 <svelte:head>
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <link rel="canonical" href={pageUrl} />
+
+  <!-- Open Graph / Social Meta Tags -->
+  {@html renderWebsiteSocialMeta({
+    url: pageUrl,
+    title: pageTitle,
+    description: pageDescription,
+    imageAlt: pageImageAlt,
+  })}
+
+  <!-- Structured Data -->
+  {@html webAppSchema.render()}
+
   <!-- Google tag (gtag.js) -->
   <script
     async

@@ -8,6 +8,24 @@ import CombinedDemoMp4 from '$lib/videos/combined-demo.mp4';
 import CombinedDemoPoster from '$lib/videos/combined-demo-poster.jpg';
 import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
 import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
+import {
+  WebSiteSchema,
+  OrganizationSchema,
+  renderWebsiteSocialMeta,
+} from '$lib/schema-org';
+
+const title = 'SSA.tools: A Social Security Calculator';
+const description =
+  'An online social security calculator that makes understanding social security retirement benefits quick and simple.';
+const url = 'https://ssa.tools';
+const imageAlt = 'Laptop displaying piggybanks representing Social Security savings';
+
+const websiteSchema = new WebSiteSchema();
+websiteSchema.url = url;
+websiteSchema.name = 'SSA.tools';
+websiteSchema.description = description;
+
+const organizationSchema = new OrganizationSchema();
 
 let IntroBannerComponent: ComponentType<SvelteComponent> | null = null;
 
@@ -29,13 +47,17 @@ onMount(() => {
 </script>
 
 <svelte:head>
-  <title>SSA.tools: A Social Security Calculator</title>
-  <meta
-    name="description"
-    content="An online social security calculator that makes understanding social security retirement benefits quick and simple."
-  />
-  <link rel="canonical" href="https://ssa.tools" />
-  <meta property="og:url" content="https://ssa.tools" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={url} />
+
+  <!-- Open Graph / Social Meta Tags -->
+  {@html renderWebsiteSocialMeta({ url, title, description, imageAlt })}
+
+  <!-- Structured Data -->
+  {@html websiteSchema.render()}
+  {@html organizationSchema.render()}
+
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
 
   <!-- Google tag (gtag.js) -->

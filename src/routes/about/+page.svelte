@@ -1,10 +1,27 @@
 <script lang="ts">
-import Header from '$lib/components/Header.svelte';
-import KoFiImg from '$lib/images/kofi.png';
+  import Header from "$lib/components/Header.svelte";
+  import KoFiImg from "$lib/images/kofi.png";
+  import { renderWebsiteSocialMeta } from "$lib/schema-org";
+
+  const pageTitle = "About - Social Security Calculator | SSA.tools";
+  const pageDescription =
+    "Learn about SSA.tools, the free social security calculator. Built to help you understand your retirement benefits.";
+  const pageUrl = "https://ssa.tools/about";
+  const pageImageAlt = "About the Social Security Calculator";
 </script>
 
 <svelte:head>
-  <title>Social Security Calculator - About</title>
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <link rel="canonical" href={pageUrl} />
+
+  <!-- Open Graph / Social Meta Tags -->
+  {@html renderWebsiteSocialMeta({
+    url: pageUrl,
+    title: pageTitle,
+    description: pageDescription,
+    imageAlt: pageImageAlt,
+  })}
 </svelte:head>
 
 <Header active="About" />

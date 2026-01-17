@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /strategy
+
+Sitemap: https://ssa.tools/sitemap.xml
