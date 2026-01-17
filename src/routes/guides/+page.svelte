@@ -1,12 +1,25 @@
 <script lang="ts">
+import { renderWebsiteSocialMeta } from '$lib/schema-org';
+
+const pageTitle = 'Social Security Guides & Resources - SSA.tools';
+const pageDescription =
+  'Explore comprehensive guides on Social Security benefits, eligibility, taxes, and retirement planning. Find answers to common questions and understand how Social Security works.';
+const pageUrl = 'https://ssa.tools/guides';
+const pageImageAlt = 'Social Security guides and educational resources';
 </script>
 
 <svelte:head>
-  <title>Social Security Guides & Resources - SSA.tools</title>
-  <meta
-    name="description"
-    content="Explore comprehensive guides on Social Security benefits, eligibility, taxes, and retirement planning. Find answers to common questions and understand how Social Security works."
-  />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <link rel="canonical" href={pageUrl} />
+
+  <!-- Open Graph / Social Meta Tags -->
+  {@html renderWebsiteSocialMeta({
+    url: pageUrl,
+    title: pageTitle,
+    description: pageDescription,
+    imageAlt: pageImageAlt,
+  })}
 </svelte:head>
 
 <main>
