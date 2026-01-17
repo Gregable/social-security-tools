@@ -325,7 +325,7 @@ schema.tags = [
   <h2>Privacy Considerations</h2>
 
   <p>
-    URL parameters are processed entirely in the browser—no data is sent to a
+    URL parameters are processed entirely in the browser. No data is sent to a
     server. However, be mindful that:
   </p>
 

@@ -67,7 +67,7 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
   </ul>
   <p>
     Because medical and longevity improvements are expected to continue, cohort
-    tables are typically preferred for forward-looking retirement planning—they
+    tables are typically preferred for forward-looking retirement planning. They
     better reflect expected future survival than static period tables.
   </p>
 
@@ -141,7 +141,7 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
   <p>
     The resulting list of <code>&#123; age, probability &#125;</code> pairs forms
     a discrete distribution used to scale the row and column segment sizes in the
-    strategy matrix—larger segments correspond to more likely death age ranges.
+    strategy matrix. Larger segments correspond to more likely death age ranges.
   </p>
 
   <h2>Health Adjustment Slider</h2>

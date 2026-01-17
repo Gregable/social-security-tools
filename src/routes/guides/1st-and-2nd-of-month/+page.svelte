@@ -97,11 +97,12 @@ schema.tags = [
 
   <h2>Normal Retirement Age</h2>
   <p>
-    Also known as <u>Full Retirement Age</u>. This is the age at which if you
-    file to start benefits, your benefit will equal your Primary Insurance
-    Amount with no reductions from starting early or delayed credit increases
-    for delaying benefits. Normal Retirement Age varies by year of birth.
-    Currently anyone born in 1960 or later has a Normal Retirement Age of 67.
+    <a href="/guides/nra">Normal Retirement Age</a> (NRA), also known as Full
+    Retirement Age, is the age at which if you file to start benefits, your
+    benefit will equal your Primary Insurance Amount with no reductions from
+    starting early or delayed credit increases for delaying benefits. NRA
+    varies by year of birth. Currently anyone born in 1960 or later has an NRA
+    of 67.
   </p>
   <p>
     The month of your normal retirement age is the month that you attain that

@@ -27,6 +27,19 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jan 17, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/nra">Normal Retirement Age (NRA)</a>
+        </h3>
+        <p class="description">
+          Learn about Normal Retirement Age (NRA), also called Full Retirement
+          Age (FRA), how it varies by birth year from 65 to 67, and why it
+          matters for calculating your Social Security benefits. Understand how
+          filing before or after NRA affects your monthly payment.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 16, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/wep">Windfall Elimination Provision (WEP)</a>
@@ -349,9 +362,9 @@ const pageImageAlt = 'Social Security guides and educational resources';
         <p class="description">
           Inflation significantly impacts the value of your Social Security
           benefits. This guide differentiates between two key types of
-          inflation—wage increases and the Consumer Price Index—and explains how
-          each uniquely influences the calculation and purchasing power of your
-          Social Security payments.
+          inflation (wage increases and the Consumer Price Index) and explains
+          how each uniquely influences the calculation and purchasing power of
+          your Social Security payments.
         </p>
       </li>
     </ul>
