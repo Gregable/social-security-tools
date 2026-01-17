@@ -1,35 +1,135 @@
 <script lang="ts">
-import { GuidesSchema } from '$lib/schema-org';
-import GuideFooter from '../guide-footer.svelte';
+  import { Birthdate } from "$lib/birthday";
+  import BendpointChart from "$lib/components/BendpointChart.svelte";
+  import {
+    AFTER_BENDPOINT2_MULTIPLIER,
+    BEFORE_BENDPOINT1_MULTIPLIER,
+    BEFORE_BENDPOINT2_MULTIPLIER,
+    MAX_YEAR,
+    SSA_EARNINGS_YEARS,
+  } from "$lib/constants";
+  import { Money } from "$lib/money";
+  import averagePaste from "$lib/pastes/averagepaste.txt?raw";
+  import { Recipient } from "$lib/recipient";
+  import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
+  import { parsePaste } from "$lib/ssa-parse";
+  import GuideFooter from "../guide-footer.svelte";
 
-const title = 'Primary Insurance Amount (PIA)';
-const description =
-  'Learn how Social Security calculates your Primary Insurance Amount (PIA) using bendpoints, the implications of earning more money late in your career, and how PIA forms the foundation of all Social Security benefits.';
-const publishDate = new Date('2025-09-19T00:00:00+00:00');
-const updateDate = new Date('2025-09-19T00:00:00+00:00');
+  // Current year from constants
+  const currentYear = MAX_YEAR;
 
-let schema: GuidesSchema = new GuidesSchema();
-schema.url = 'https://ssa.tools/guides/pia';
-schema.title = title;
-schema.image = '/laptop-piggybank.jpg';
-schema.datePublished = publishDate.toISOString();
-schema.dateModified = updateDate.toISOString();
-schema.description = description;
-schema.imageAlt =
-  'Laptop with piggybank representing Social Security calculations';
-schema.tags = [
-  'Primary Insurance Amount',
-  'PIA',
-  'Social Security',
-  'Bendpoints',
-];
+  // Create a representative recipient turning 62 in the current year
+  // This gives us the bend points for someone first eligible in this year
+  const birthYearFor62 = currentYear - 62;
+  const representative = new Recipient();
+  representative.birthdate = Birthdate.FromYMD(birthYearFor62, 0, 2);
+
+  // Get PIA object and bend points from the Recipient
+  const pia = representative.pia();
+  const firstBendPoint = pia.firstBendPoint();
+  const secondBendPoint = pia.secondBendPoint();
+
+  // Convert multipliers to percentages for display
+  const firstBracketPercent = Math.round(BEFORE_BENDPOINT1_MULTIPLIER * 100);
+  const secondBracketPercent = Math.round(BEFORE_BENDPOINT2_MULTIPLIER * 100);
+  const thirdBracketPercent = Math.round(AFTER_BENDPOINT2_MULTIPLIER * 100);
+
+  // Example calculation with AIME of $5,000
+  const exampleAIME = Money.from(5000);
+  const exampleBracket1 = Money.min(exampleAIME, firstBendPoint).times(
+    BEFORE_BENDPOINT1_MULTIPLIER
+  );
+  const exampleBracket2Amount = Money.max(
+    Money.zero(),
+    Money.min(exampleAIME, secondBendPoint).sub(firstBendPoint)
+  );
+  const exampleBracket2 = exampleBracket2Amount.times(
+    BEFORE_BENDPOINT2_MULTIPLIER
+  );
+  const examplePIAUnrounded = exampleBracket1.plus(exampleBracket2);
+  const examplePIA = pia.piaFromAIME(exampleAIME);
+
+  // For the late-career earnings examples
+  const midBracketAIME = Money.from(6000);
+  const midBracketIncrease = Money.from(500);
+  const highBracketAIME = Money.from(8000);
+  const midBracketBenefit = midBracketIncrease.times(
+    BEFORE_BENDPOINT2_MULTIPLIER
+  );
+  const highBracketBenefit = midBracketIncrease.times(
+    AFTER_BENDPOINT2_MULTIPLIER
+  );
+
+  // AIME values for the AIME to PIA conversion table
+  const aimeTableValues = [
+    1000,
+    2000,
+    3000,
+    4000,
+    5000,
+    6000,
+    Math.round(secondBendPoint.value()),
+    8000,
+    10000,
+    12500,
+  ];
+
+  // Create a demo recipient with sample earnings for the bendpoint chart
+  const demoRecipient = new Recipient();
+  demoRecipient.earningsRecords = parsePaste(averagePaste);
+  demoRecipient.birthdate = Birthdate.FromYMD(birthYearFor62, 0, 2);
+
+  const title = "Primary Insurance Amount (PIA)";
+  const description = `Learn how Social Security calculates your Primary Insurance Amount (PIA) in ${currentYear}. Understand the bendpoint formula (${firstBendPoint.wholeDollars()} and ${secondBendPoint.wholeDollars()}), calculate your monthly benefit, and discover strategies to maximize your PIA.`;
+  const publishDate = new Date("2025-09-19T00:00:00+00:00");
+  const updateDate = new Date("2025-09-19T00:00:00+00:00");
+
+  let schema: GuidesSchema = new GuidesSchema();
+  schema.url = "https://ssa.tools/guides/pia";
+  schema.title = title;
+  schema.image = "/laptop-piggybank.jpg";
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
+  schema.description = description;
+  schema.imageAlt =
+    "Laptop with piggybank representing Social Security calculations";
+  schema.tags = [
+    "Primary Insurance Amount",
+    "PIA",
+    "Social Security",
+    "Bendpoints",
+  ];
+
+  // FAQ structured data for featured snippets
+  const faqs: FAQItem[] = [
+    {
+      question: "What is a good PIA?",
+      answer: `A "good" PIA depends on your income needs and lifestyle expectations. A PIA above $2,500 puts you in the upper tier of beneficiaries, while the maximum PIA requires earning at or above the taxable maximum for ${SSA_EARNINGS_YEARS} years. Most financial planners suggest Social Security should replace about 40% of pre-retirement income for average earners.`,
+    },
+    {
+      question: "How is PIA different from my actual benefit?",
+      answer:
+        "Your PIA is your benefit amount only if you claim at your Full Retirement Age. If you claim early (as young as 62), your benefit is permanently reduced—up to 30% less than your PIA. If you delay past FRA (up to age 70), you earn delayed retirement credits that increase your benefit by 8% per year, potentially receiving up to 124-132% of your PIA.",
+    },
+    {
+      question: "Does my PIA change after I start receiving benefits?",
+      answer:
+        "Yes, but only through Cost-of-Living Adjustments (COLA). Once you turn 62, your PIA is locked in and protected against inflation through annual COLA increases. However, if you continue working while receiving benefits, additional high-earning years could potentially increase your AIME and thus your PIA.",
+    },
+    {
+      question: `What if I don't have ${SSA_EARNINGS_YEARS} years of work history?`,
+      answer: `Social Security uses your highest ${SSA_EARNINGS_YEARS} years of indexed earnings to calculate your AIME. If you have fewer than ${SSA_EARNINGS_YEARS} years, zeros are averaged in for the missing years, which significantly lowers your AIME and PIA. Each additional year of work replaces a zero, boosting your benefit.`,
+    },
+  ];
 </script>
 
 <svelte:head>
-  <title>{title}</title>
+  <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={schema.url} />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
+  {@html renderFAQSchema(faqs)}
 </svelte:head>
 
 <div class="guide-page">
@@ -43,6 +143,29 @@ schema.tags = [
     is calculated helps you make informed decisions about your career, retirement
     timing, and overall Social Security strategy.
   </p>
+
+  <div class="key-takeaways">
+    <h3>Key Takeaways</h3>
+    <ul>
+      <li>
+        <strong>PIA = Your benefit at Full Retirement Age (FRA)</strong> - File early
+        and you get less; delay and you get more
+      </li>
+      <li>
+        <strong>Based on your highest {SSA_EARNINGS_YEARS} years</strong> - Your
+        AIME (average indexed earnings) feeds into the PIA formula
+      </li>
+      <li>
+        <strong>Progressive formula</strong> - Lower earners replace more of
+        their income ({firstBracketPercent}%) than higher earners ({thirdBracketPercent}%)
+      </li>
+      <li>
+        <strong
+          >{currentYear} bendpoints: {firstBendPoint.wholeDollars()} and {secondBendPoint.wholeDollars()}</strong
+        > - These thresholds determine your benefit calculation brackets
+      </li>
+    </ul>
+  </div>
 
   <h2>What is the Primary Insurance Amount?</h2>
 
@@ -75,11 +198,19 @@ schema.tags = [
   </p>
 
   <div class="formula-box">
-    <h3>2025 PIA Formula</h3>
+    <h3>{currentYear} PIA Formula</h3>
     <ul class="bendpoint-formula">
-      <li><strong>90%</strong> of the first $1,226 of AIME</li>
-      <li><strong>32%</strong> of AIME over $1,226 up to $7,391</li>
-      <li><strong>15%</strong> of AIME over $7,391</li>
+      <li>
+        <strong>{firstBracketPercent}%</strong> of the first {firstBendPoint.wholeDollars()}
+        of AIME
+      </li>
+      <li>
+        <strong>{secondBracketPercent}%</strong> of AIME over {firstBendPoint.wholeDollars()}
+        up to {secondBendPoint.wholeDollars()}
+      </li>
+      <li>
+        <strong>{thirdBracketPercent}%</strong> of AIME over {secondBendPoint.wholeDollars()}
+      </li>
     </ul>
   </div>
 
@@ -87,31 +218,46 @@ schema.tags = [
     These bendpoints are adjusted annually for <a href="/guides/inflation"
       >wage inflation</a
     >, ensuring they maintain their purchasing power over time. The percentages
-    (90%, 32%, 15%) have remained constant since 1979.
+    ({firstBracketPercent}%, {secondBracketPercent}%, {thirdBracketPercent}%)
+    have remained constant since 1979.
   </p>
 
   <h3>Example Calculation</h3>
 
-  <p>Let's walk through an example with an AIME of $5,000:</p>
+  <p>
+    Let's walk through an example with an AIME of {exampleAIME.wholeDollars()}:
+  </p>
 
   <div class="calculation-example">
     <table>
       <tbody>
         <tr>
-          <td><strong>First bracket:</strong> 90% of $1,226</td>
-          <td>= $1,103.40</td>
+          <td
+            ><strong>First bracket:</strong>
+            {firstBracketPercent}% of {firstBendPoint.wholeDollars()}</td
+          >
+          <td>= {exampleBracket1.string()}</td>
         </tr>
         <tr>
-          <td><strong>Second bracket:</strong> 32% of ($5,000 - $1,226)</td>
-          <td>= 32% of $3,774 = $1,207.68</td>
+          <td
+            ><strong>Second bracket:</strong>
+            {secondBracketPercent}% of ({exampleAIME.wholeDollars()} - {firstBendPoint.wholeDollars()})</td
+          >
+          <td
+            >= {secondBracketPercent}% of {exampleBracket2Amount.wholeDollars()}
+            = {exampleBracket2.string()}</td
+          >
         </tr>
         <tr>
-          <td><strong>Third bracket:</strong> 15% of ($5,000 - $7,391)</td>
+          <td
+            ><strong>Third bracket:</strong>
+            {thirdBracketPercent}% of ({exampleAIME.wholeDollars()} - {secondBendPoint.wholeDollars()})</td
+          >
           <td>= $0 (AIME doesn't reach third bracket)</td>
         </tr>
         <tr class="total-row">
           <td><strong>Total PIA:</strong></td>
-          <td><strong>$2,311.08</strong></td>
+          <td><strong>{examplePIAUnrounded.string()}</strong></td>
         </tr>
       </tbody>
     </table>
@@ -121,8 +267,53 @@ schema.tags = [
     The final step is rounding: Social Security rounds the PIA <strong
       >down</strong
     >
-    to the nearest dime, so this would become $2,311.00 per month.
+    to the nearest dime, so this would become {examplePIA.string()} per month.
   </p>
+
+  <h3>AIME to PIA Conversion Table</h3>
+
+  <p>
+    Here's how different AIME levels translate to monthly PIA amounts using {currentYear}
+    bend points ({firstBendPoint.wholeDollars()} and {secondBendPoint.wholeDollars()}):
+  </p>
+
+  <div class="aime-table">
+    <table>
+      <thead>
+        <tr>
+          <th>AIME</th>
+          <th>Estimated PIA</th>
+          <th>Replacement Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each aimeTableValues as aimeValue}
+          {@const aimeMoney = Money.from(aimeValue)}
+          {@const piaAmount = pia.piaFromAIME(aimeMoney)}
+          {@const replacementRate = Math.round(piaAmount.div$(aimeMoney) * 100)}
+          <tr>
+            <td>${aimeValue.toLocaleString()}</td>
+            <td>{piaAmount.wholeDollars()}</td>
+            <td>{replacementRate}%</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Interactive Bendpoint Chart</h3>
+
+  <p>
+    This chart visualizes how the PIA formula works. The green marker shows a
+    sample earner's position on the curve. Move your mouse over the chart to
+    explore how different AIME values translate to different PIA amounts. Notice
+    how the slope changes at each bendpoint—steeper at the left ({firstBracketPercent}%),
+    then flatter ({secondBracketPercent}%), and flattest at the right ({thirdBracketPercent}%).
+  </p>
+
+  <div class="chart-wrapper">
+    <BendpointChart recipient={demoRecipient} />
+  </div>
 
   <h2>Progressive Nature of the Formula</h2>
 
@@ -161,27 +352,37 @@ schema.tags = [
   <h3>Marginal Return on Additional Earnings</h3>
 
   <p>
-    If you're already earning above the second bendpoint ($7,391 AIME in 2025),
-    any additional earnings that increase your AIME will only increase your PIA
-    by 15 cents for every additional dollar of monthly AIME.
+    If you're already earning above the second bendpoint ({secondBendPoint.wholeDollars()}
+    AIME in {currentYear}), any additional earnings that increase your AIME will
+    only increase your PIA by {thirdBracketPercent} cents for every additional dollar
+    of monthly AIME.
   </p>
 
   <div class="insight-box">
     <h4>Example: Late-Career Bonus Impact</h4>
     <p>
       Suppose you're 64 and considering whether to accept a high-paying position
-      for your final working year. If this job would increase your AIME by $500
-      (from $6,000 to $6,500), your PIA would increase by:
+      for your final working year. If this job would increase your AIME by {midBracketIncrease.wholeDollars()}
+      (from {midBracketAIME.wholeDollars()} to {midBracketAIME
+        .plus(midBracketIncrease)
+        .wholeDollars()}), your PIA would increase by:
     </p>
     <p>
-      <strong>$500 × 32% = $160 per month</strong>
+      <strong
+        >{midBracketIncrease.wholeDollars()} × {secondBracketPercent}% = {midBracketBenefit.wholeDollars()}
+        per month</strong
+      >
     </p>
     <p>
-      However, if your AIME was already $8,000 and increased to $8,500, your PIA
+      However, if your AIME was already {highBracketAIME.wholeDollars()} and increased
+      to {highBracketAIME.plus(midBracketIncrease).wholeDollars()}, your PIA
       would only increase by:
     </p>
     <p>
-      <strong>$500 × 15% = $75 per month</strong>
+      <strong
+        >{midBracketIncrease.wholeDollars()} × {thirdBracketPercent}% = {highBracketBenefit.wholeDollars()}
+        per month</strong
+      >
     </p>
   </div>
 
@@ -238,7 +439,10 @@ schema.tags = [
     <li>
       <strong>Retirement benefits:</strong> Your PIA adjusted for filing age
     </li>
-    <li><strong>Spousal benefits:</strong> Up to 50% of your PIA</li>
+    <li>
+      <strong><a href="/guides/spousal-benefit-filing-date">Spousal benefits</a>:</strong>
+      Up to 50% of your PIA (not 50% of your actual benefit if you delay past FRA)
+    </li>
     <li><strong>Survivor benefits:</strong> Up to 100% of your PIA</li>
     <li>
       <strong>Disability benefits:</strong> Your PIA without age adjustments
@@ -247,12 +451,17 @@ schema.tags = [
 
   <h2>Maximizing Your PIA</h2>
 
-  <p>To maximize your PIA:</p>
+  <p>
+    First, ensure you have enough <a href="/guides/work-credits">work credits</a>
+    to qualify—you need 40 credits (about 10 years of work). Then focus on maximizing
+    your PIA:
+  </p>
 
   <ol>
     <li>
-      <strong>Work for 35 years:</strong> PIA is based on your highest 35 years,
-      so each year of work can potentially replace a zero-earning year
+      <strong>Work for {SSA_EARNINGS_YEARS} years:</strong> PIA is based on your
+      highest {SSA_EARNINGS_YEARS} years, so each year of work can potentially replace
+      a zero-earning year
     </li>
     <li>
       <strong>Maximize early and mid-career earnings:</strong> These often provide
@@ -288,6 +497,71 @@ schema.tags = [
     filing dates affect your actual monthly benefits, which are based on your
     PIA.
   </p>
+
+  <h2>Frequently Asked Questions</h2>
+
+  <div class="faq-section">
+    <h3>What is a good PIA?</h3>
+    <p>
+      A "good" PIA depends on your income needs and lifestyle expectations. A
+      PIA above $2,500 puts you in the upper tier of beneficiaries, while the
+      <a href="/guides/maximum">maximum PIA</a> requires earning at or above the
+      taxable maximum for {SSA_EARNINGS_YEARS} years. Most financial planners suggest
+      Social Security should replace about 40% of pre-retirement income for average
+      earners.
+    </p>
+
+    <h3>How is PIA different from my actual benefit?</h3>
+    <p>
+      Your PIA is your benefit amount <em>only if</em> you claim at your Full Retirement
+      Age. If you claim early (as young as 62), your benefit is permanently reduced—up
+      to 30% less than your PIA. If you delay past FRA (up to age 70), you earn delayed
+      retirement credits that increase your benefit by 8% per year, potentially receiving
+      up to 124-132% of your PIA.
+    </p>
+
+    <h3>Does my PIA change after I start receiving benefits?</h3>
+    <p>
+      Yes, but only through Cost-of-Living Adjustments (COLA). Once you turn 62,
+      your PIA is locked in and protected against inflation through annual COLA
+      increases. However, if you continue working while receiving benefits,
+      additional high-earning years could potentially increase your AIME and
+      thus your PIA.
+    </p>
+
+    <h3>What if I don't have {SSA_EARNINGS_YEARS} years of work history?</h3>
+    <p>
+      Social Security uses your highest {SSA_EARNINGS_YEARS} years of indexed earnings
+      to calculate your AIME. If you have fewer than {SSA_EARNINGS_YEARS} years,
+      zeros are averaged in for the missing years, which significantly lowers your
+      AIME and PIA. Each additional year of work replaces a zero, boosting your benefit.
+    </p>
+  </div>
+
+  <h2>Related Guides</h2>
+
+  <ul>
+    <li>
+      <a href="/guides/aime">AIME Guide</a> — How your earnings are indexed and
+      averaged to calculate your AIME
+    </li>
+    <li>
+      <a href="/guides/spousal-benefit-filing-date">Spousal Benefits</a> — How
+      filing dates affect spousal benefits based on your PIA
+    </li>
+    <li>
+      <a href="/guides/work-credits">Work Credits</a> — The 40 credits you need
+      to qualify for benefits before your PIA matters
+    </li>
+    <li>
+      <a href="/guides/maximum">Maximum Benefit</a> — What it takes to reach the
+      highest possible PIA
+    </li>
+    <li>
+      <a href="/guides/filing-date-chart">Filing Date Chart Guide</a> — How to
+      read the interactive chart showing benefits at different filing ages
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>
@@ -358,6 +632,42 @@ schema.tags = [
     padding-top: 12px;
   }
 
+  .aime-table {
+    background-color: #f0f8ff;
+    border: 1px solid #4a90e2;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  .aime-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .aime-table th,
+  .aime-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .aime-table th {
+    background-color: #e9ecef;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .aime-table tbody tr:hover {
+    background-color: #e8f4fd;
+  }
+
+  .chart-wrapper {
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
   .insight-box {
     background-color: #e8f5e8;
     border-left: 4px solid #28a745;
@@ -369,6 +679,43 @@ schema.tags = [
   .insight-box h4 {
     margin-top: 0;
     color: #155724;
+  }
+
+  .key-takeaways {
+    background-color: #e8f4fd;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .key-takeaways h3 {
+    margin-top: 0;
+    color: #2c5282;
+    font-size: 1.2em;
+  }
+
+  .key-takeaways ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .key-takeaways li {
+    margin: 10px 0;
+    line-height: 1.5;
+    font-size: 0.95em;
+  }
+
+  .faq-section h3 {
+    color: #2c3e50;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-size: 1.1em;
+  }
+
+  .faq-section p {
+    margin-top: 0;
+    line-height: 1.6;
   }
 
   @media (max-width: 600px) {

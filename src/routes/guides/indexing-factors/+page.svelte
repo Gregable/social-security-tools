@@ -19,10 +19,9 @@ schema.tags = ['Wage Indexing', 'Social Security', 'AWI', 'Average Wage Index'];
 </script>
 
 <svelte:head>
+  <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
-  <title>
-    {title} | SSA.tools
-  </title>
+  <link rel="canonical" href={schema.url} />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
 </svelte:head>
@@ -206,26 +205,35 @@ schema.tags = ['Wage Indexing', 'Social Security', 'AWI', 'Average Wage Index'];
     year going forward until age 62. It then applies the benefit formula using
     this year's Indexing Factors, giving you an estimate in today's dollars.
   </p>
-  <h2>More reading</h2>
+  <h2>Related Guides</h2>
+
+  <ul>
+    <li>
+      <a href="/guides/aime">AIME Guide</a> — How indexing factors are used to
+      calculate your Average Indexed Monthly Earnings
+    </li>
+    <li>
+      <a href="/guides/earnings-cap">Earnings Cap</a> — The annual limit on earnings
+      before indexing is applied
+    </li>
+    <li>
+      <a href="/guides/pia">Primary Insurance Amount (PIA)</a> — How your indexed
+      earnings become your monthly benefit
+    </li>
+    <li>
+      <a href="/guides/inflation">Inflation Guide</a> — How wage and price inflation
+      affect Social Security calculations differently
+    </li>
+    <li>
+      <a href="/guides/covid-awi-drop">COVID AWI Drop</a> — How 2020's economy
+      affected indexing factors for those born in 1960
+    </li>
+  </ul>
+
   <p>
-    There are actually multiple ways to measure inflation. Wage inflation is
-    only one of them, and it varies from price inflation. Typically wages grow a
-    little faster than prices. Price inflation also has an effect on the formula
-    for your social security benefit. To understand more, take a look at our
-    guide on <a href="./inflation"
-      >How inflation rate affects Social Security benefit calculations.</a
-    >
+    Use the <a href="/calculator">SSA.tools calculator</a> to see your indexed
+    earnings based on your actual earnings record.
   </p>
-  <p>
-    The Indexing Factors that adjust one's benefit are all determined based on
-    the AWI in the year that one turns 60 years old. In 2020, Covid-19 has had
-    an unusually large impact on the nation's Average Wages in a manner that
-    will likely negatively impact those who turn 60 that year. If you were born
-    in 1960, take a look at our guide answering the question: <a
-      href="./covid-awi-drop"
-      >Will a weak economy in 2020 result in a benefits decrease for those born
-      in 1960?</a
-    >
-  </p>
+
   <GuideFooter />
 </div>

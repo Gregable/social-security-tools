@@ -235,3 +235,31 @@ export class GuidesSchema {
     return meta;
   }
 }
+
+/**
+ * FAQ item for FAQ schema
+ */
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+/**
+ * Renders FAQ structured data (FAQPage schema)
+ * Use this on pages with Q&A content to help win featured snippets
+ */
+export function renderFAQSchema(faqs: FAQItem[]): string {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+  return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
+}

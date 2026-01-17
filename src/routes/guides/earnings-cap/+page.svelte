@@ -1,359 +1,246 @@
 <script lang="ts">
+import { MAX_CREDITS, MAXIMUM_EARNINGS, MAX_YEAR, SSA_EARNINGS_YEARS } from '$lib/constants';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 
-const title = 'Social Security Earnings Caps'; // Corrected title
-const description = 'How do Social Security annual earnings caps work?';
+const currentYear = MAX_YEAR;
+const currentYearCap = MAXIMUM_EARNINGS[currentYear];
+
+const title = 'Social Security Earnings Cap: How Much Counts Toward Benefits?';
+const description =
+  `The Social Security earnings cap limits how much of your income is taxed and counted toward benefits. In ${currentYear}, the cap is ${currentYearCap.wholeDollars()}. See the complete history of earnings caps since 1937.`;
 const publishDate = new Date('2020-11-28T00:00:00+00:00');
-const updateDate = new Date('2023-08-08T00:00:00+00:00');
+const updateDate = new Date('2024-02-26T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
-schema.url = 'https://ssa.tools/guides/earnings-cap'; // Corrected URL
-schema.title = title; // Use the title variable
-schema.image = '/laptop-piggybank.jpg'; // Add a hero image for the schema
+schema.url = 'https://ssa.tools/guides/earnings-cap';
+schema.title = title;
+schema.image = '/laptop-piggybank.jpg';
 schema.datePublished = publishDate.toISOString();
 schema.dateModified = updateDate.toISOString();
-schema.description = description; // Pass the description to the schema
+schema.description = description;
 schema.imageAlt =
   'Laptop with piggybank representing Social Security earnings limits';
-schema.tags = ['Earnings Cap', 'Social Security', 'Maximum Earnings', 'FICA'];
+schema.tags = [
+  'Earnings Cap',
+  'Social Security',
+  'Maximum Earnings',
+  'FICA',
+  'Payroll Tax',
+  String(currentYear),
+];
 </script>
 
 <svelte:head>
+  <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
-  <title>
-    {title} | SSA.tools
-  </title>
+  <link rel="canonical" href={schema.url} />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
 </svelte:head>
 
 <div class="guide-page earnings-cap-guide">
   <h1>{title}</h1>
-  <p class="postdate">
-    Published: {publishDate.toLocaleDateString()}<br />
-    Updated: {updateDate.toLocaleDateString()}
-  </p>
-  <p>
-    There is an annual limit on the amount of personal earnings that subject to
-    payroll, or Social Security tax. Above that amount, payroll taxes are no
-    longer applied to one's earnings. This same limit is applied to how much of
-    one's earnings can be applied to their benefit calculation. For 2023, this
-    limit is $160,200. Earnings above that amount are not subject to payroll
-    tax, and do not affect your social security benefit, <abbr
-      title="Primary Insurance
-        Amount">PIA</abbr
-    >, or
-    <abbr title="Average Indexed Monthly Earnings">AIME</abbr>.
-  </p>
-  <p>
-    This cap is updated every year to account for wage growth. In the following
-    table, you can see the cap for every year since 1956:
-  </p>
-  <div class="css-column">
-    <div>
-      <span>1956</span>
-      <span>$4,200</span>
-    </div>
-    <div>
-      <span>1957</span>
-      <span>$4,200</span>
-    </div>
-    <div>
-      <span>1958</span>
-      <span>$2,400</span>
-    </div>
-    <div>
-      <span>1959</span>
-      <span>$4,800</span>
-    </div>
-    <div>
-      <span>1960</span>
-      <span>$4,800</span>
-    </div>
-    <div>
-      <span>1961</span>
-      <span>$4,800</span>
-    </div>
-    <div>
-      <span>1962</span>
-      <span>$4,800</span>
-    </div>
-    <div>
-      <span>1963</span>
-      <span>$4,800</span>
-    </div>
-    <div>
-      <span>1964</span>
-      <span>$4,800</span>
-    </div>
-    <div>
-      <span>1965</span>
-      <span>$4,800</span>
-    </div>
-    <div>
-      <span>1966</span>
-      <span>$6,600</span>
-    </div>
-    <div>
-      <span>1967</span>
-      <span>$6,600</span>
-    </div>
-    <div>
-      <span>1968</span>
-      <span>$7,800</span>
-    </div>
-    <div>
-      <span>1969</span>
-      <span>$7,800</span>
-    </div>
-    <div>
-      <span>1970</span>
-      <span>$7,800</span>
-    </div>
-    <div>
-      <span>1971</span>
-      <span>$7,800</span>
-    </div>
-    <div>
-      <span>1972</span>
-      <span>$9,000</span>
-    </div>
-    <div>
-      <span>1973</span>
-      <span>$10,800</span>
-    </div>
-    <div>
-      <span>1974</span>
-      <span>$13,200</span>
-    </div>
-    <div>
-      <span>1975</span>
-      <span>$14,100</span>
-    </div>
-    <div>
-      <span>1976</span>
-      <span>$15,300</span>
-    </div>
-    <div>
-      <span>1977</span>
-      <span>$16,500</span>
-    </div>
-    <div>
-      <span>1978</span>
-      <span>$17,700</span>
-    </div>
-    <div>
-      <span>1979</span>
-      <span>$22,900</span>
-    </div>
-    <div>
-      <span>1980</span>
-      <span>$25,900</span>
-    </div>
-    <div>
-      <span>1981</span>
-      <span>$29,700</span>
-    </div>
-    <div>
-      <span>1982</span>
-      <span>$32,400</span>
-    </div>
-    <div>
-      <span>1983</span>
-      <span>$35,700</span>
-    </div>
-    <div>
-      <span>1984</span>
-      <span>$37,800</span>
-    </div>
-    <div>
-      <span>1985</span>
-      <span>$39,600</span>
-    </div>
-    <div>
-      <span>1986</span>
-      <span>$42,000</span>
-    </div>
-    <div>
-      <span>1987</span>
-      <span>$43,800</span>
-    </div>
-    <div>
-      <span>1988</span>
-      <span>$45,000</span>
-    </div>
-    <div>
-      <span>1989</span>
-      <span>$48,000</span>
-    </div>
-    <div>
-      <span>1990</span>
-      <span>$51,300</span>
-    </div>
-    <div>
-      <span>1991</span>
-      <span>$53,400</span>
-    </div>
-    <div>
-      <span>1992</span>
-      <span>$55,500</span>
-    </div>
-    <div>
-      <span>1993</span>
-      <span>$57,600</span>
-    </div>
-    <div>
-      <span>1994</span>
-      <span>$60,600</span>
-    </div>
-    <div>
-      <span>1995</span>
-      <span>$61,200</span>
-    </div>
-    <div>
-      <span>1996</span>
-      <span>$62,700</span>
-    </div>
-    <div>
-      <span>1997</span>
-      <span>$65,400</span>
-    </div>
-    <div>
-      <span>1998</span>
-      <span>$68,400</span>
-    </div>
-    <div>
-      <span>1999</span>
-      <span>$72,600</span>
-    </div>
-    <div>
-      <span>2000</span>
-      <span>$76,200</span>
-    </div>
-    <div>
-      <span>2001</span>
-      <span>$80,400</span>
-    </div>
-    <div>
-      <span>2002</span>
-      <span>$84,900</span>
-    </div>
-    <div>
-      <span>2003</span>
-      <span>$87,000</span>
-    </div>
-    <div>
-      <span>2004</span>
-      <span>$87,900</span>
-    </div>
-    <div>
-      <span>2005</span>
-      <span>$90,000</span>
-    </div>
-    <div>
-      <span>2006</span>
-      <span>$94,200</span>
-    </div>
-    <div>
-      <span>2007</span>
-      <span>$97,500</span>
-    </div>
-    <div>
-      <span>2008</span>
-      <span>$102,000</span>
-    </div>
-    <div>
-      <span>2009</span>
-      <span>$106,800</span>
-    </div>
-    <div>
-      <span>2010</span>
-      <span>$106,800</span>
-    </div>
-    <div>
-      <span>2011</span>
-      <span>$106,800</span>
-    </div>
-    <div>
-      <span>2012</span>
-      <span>$110,100</span>
-    </div>
-    <div>
-      <span>2013</span>
-      <span>$113,700</span>
-    </div>
-    <div>
-      <span>2014</span>
-      <span>$117,000</span>
-    </div>
-    <div>
-      <span>2015</span>
-      <span>$118,500</span>
-    </div>
-    <div>
-      <span>2016</span>
-      <span>$118,500</span>
-    </div>
-    <div>
-      <span>2017</span>
-      <span>$127,200</span>
-    </div>
-    <div>
-      <span>2018</span>
-      <span>$128,400</span>
-    </div>
-    <div>
-      <span>2019</span>
-      <span>$132,900</span>
-    </div>
-    <div>
-      <span>2020</span>
-      <span>$137,700</span>
-    </div>
-    <div>
-      <span>2021</span>
-      <span>$142,800</span>
-    </div>
-    <div>
-      <span>2022</span>
-      <span>$147,000</span>
-    </div>
-    <div>
-      <span>2023</span>
-      <span>$160,200</span>
-    </div>
+
+  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+
+  <div class="key-takeaways">
+    <h3>Key Facts</h3>
+    <ul>
+      <li><strong>{currentYear} earnings cap: {currentYearCap.wholeDollars()}</strong> — the maximum income subject to Social Security tax</li>
+      <li><strong>Earnings above the cap</strong> — not taxed for Social Security and don't count toward benefits</li>
+      <li><strong>Adjusted annually</strong> — the cap increases each year based on national wage growth</li>
+      <li><strong>Applies to both tax and benefits</strong> — same limit for what you pay in and what counts toward your benefit</li>
+    </ul>
   </div>
+
+  <h2>What Is the Social Security Earnings Cap?</h2>
+
   <p>
-    The cap for years 1937 - 1974 and for 1979 - 1981 was set by statute. The
-    cap for all other years is set by an automatic calculation as specified by
-    the Social Security Act.
+    There is an annual limit on the amount of personal earnings subject to
+    payroll (Social Security) tax. Above that amount, payroll taxes are no
+    longer applied to your earnings. This same limit determines how much of
+    your earnings count toward your benefit calculation.
   </p>
+
   <p>
-    The formula for a given year X takes the National Average Wage Index (AWI)
-    for year (X - 2), divides this by $22,935.42 which was the AWI in 1992, and
-    multiplies it by $60,600 which was the cap in 1994.
+    In {currentYear}, this limit is <strong>{currentYearCap.wholeDollars()}</strong>.
+    Earnings above that amount are not subject to the 6.2% Social Security payroll
+    tax and do not affect your <a href="/guides/pia"><abbr title="Primary Insurance Amount">PIA</abbr></a> or
+    <a href="/guides/aime"><abbr title="Average Indexed Monthly Earnings">AIME</abbr></a>.
   </p>
-  <p>Useful Links:</p>
+
+  <div class="example-box">
+    <h4>Example</h4>
+    <p>
+      If you earn $200,000 in {currentYear}, only {currentYearCap.wholeDollars()} is subject to
+      Social Security tax. You pay 6.2% on {currentYearCap.wholeDollars()}, and the remaining
+      ${(200000 - currentYearCap.value() / 100).toLocaleString()} is not taxed for Social Security
+      (though it is still subject to Medicare tax, which has no cap).
+    </p>
+  </div>
+
+  <h2>How Is the Cap Determined?</h2>
+
+  <p>
+    The cap is updated every year to keep pace with wage growth. The formula
+    for a given year X takes the National Average Wage Index (AWI) for year
+    (X - 2), divides it by $22,935.42 (the AWI in 1992), and multiplies by
+    $60,600 (the cap in 1994).
+  </p>
+
+  <p>
+    The cap for years 1937–1974 and 1979–1981 was set by statute. For all
+    other years, it's calculated automatically as specified by the Social
+    Security Act.
+  </p>
+
+  <h2>Earnings Cap by Year</h2>
+
+  <p>
+    The following table shows the earnings cap for every year since 1937:
+  </p>
+
+  <div class="earnings-container">
+    {#each Object.entries(MAXIMUM_EARNINGS) as [year, earnings]}
+      <div class="earnings-year" class:current-year={Number(year) === currentYear}>
+        <span class="year">{year}:</span>
+        <span class="earnings">{earnings.wholeDollars()}</span>
+      </div>
+    {/each}
+  </div>
+
+  <h2>Related Guides</h2>
+
+  <ul>
+    <li>
+      <a href="/guides/aime">AIME Guide</a> — Learn how capped earnings are averaged
+      to calculate your monthly indexed earnings
+    </li>
+    <li>
+      <a href="/guides/pia">PIA Guide</a> — See how your AIME is converted to your
+      Primary Insurance Amount using the bendpoint formula
+    </li>
+    <li>
+      <a href="/guides/maximum">Maximum Benefit</a> — Discover what it takes to reach
+      the maximum Social Security benefit by earning at the cap for {SSA_EARNINGS_YEARS} years
+    </li>
+    <li>
+      <a href="/guides/work-credits">Work Credits</a> — Understand how earnings
+      also count toward the {MAX_CREDITS} credits needed to qualify for benefits
+    </li>
+  </ul>
+
+  <p>
+    Use the <a href="/calculator">SSA.tools calculator</a> to see exactly how your
+    earnings—subject to each year's cap—affect your benefit amount.
+  </p>
+
+  <h2>Additional Resources</h2>
+
   <ul>
     <li>
       <a href="https://www.ssa.gov/oact/cola/cbb.html">
-        Contribution and Benefit Base
-      </a>
-      [ssa.gov]
+        Contribution and Benefit Base</a> [ssa.gov]
     </li>
     <li>
       <a href="https://www.ssa.gov/oact/cola/cbbdet.html">
-        Contribution and Benefit Base Determination
-      </a>
-      [ssa.gov]
+        Contribution and Benefit Base Determination</a> [ssa.gov]
     </li>
     <li>
       <a href="https://www.ssa.gov/oact/cola/AWI.html">
-        Average Wage Index since 1951
-      </a>
-      [ssa.gov]
+        Average Wage Index since 1951</a> [ssa.gov]
     </li>
   </ul>
+
   <GuideFooter />
 </div>
+
+<style>
+  .postdate {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+  }
+
+  .key-takeaways {
+    background-color: #e8f4fd;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .key-takeaways h3 {
+    margin-top: 0;
+    color: #2c5282;
+    font-size: 1.2em;
+  }
+
+  .key-takeaways ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .key-takeaways li {
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+
+  .example-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 20px 0;
+  }
+
+  .example-box h4 {
+    margin-top: 0;
+    color: #2c3e50;
+  }
+
+  .example-box p {
+    margin-bottom: 0;
+  }
+
+  .earnings-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+
+  .earnings-year {
+    display: flex;
+    gap: 0.5em;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .earnings-year.current-year {
+    background-color: #d4edda;
+    font-weight: bold;
+  }
+
+  .year {
+    color: #666;
+  }
+
+  .earnings {
+    font-weight: 500;
+  }
+
+  ul {
+    margin: 1rem 0;
+    padding-left: 2rem;
+  }
+
+  li {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+</style>
