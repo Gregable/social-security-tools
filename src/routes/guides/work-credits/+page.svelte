@@ -170,7 +170,8 @@ const faqs: FAQItem[] = [
     <strong>Important:</strong> To receive <a href="/guides/spousal-benefit-filing-date">spousal benefits</a>,
     you don't need to have earned work credits yourself. You only need to be
     married to someone who has earned enough work credits. This also applies to
-    divorced spouses who were married for at least 10 years.
+    <a href="/guides/divorced-spouse">divorced spouses</a> who were married for
+    at least 10 years.
   </p>
 
   <h2>Check Your Credits</h2>

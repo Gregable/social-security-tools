@@ -273,7 +273,8 @@ fraTable.push({
     <a href="/guides/spousal-benefit-filing-date">Spousal benefits</a> are also
     reduced if filed before your NRA. However, unlike personal benefits, spousal
     benefits do <em>not</em> increase if you delay past NRA. There are no delayed
-    credits for spousal benefits.
+    credits for spousal benefits. The same rules apply to
+    <a href="/guides/divorced-spouse">divorced spouse benefits</a>.
   </p>
 
   <h3>Survivor Benefits</h3>
@@ -350,6 +351,10 @@ fraTable.push({
     <li>
       <a href="/guides/spousal-benefit-filing-date">Spousal Benefits and Filing Dates</a>
       – How NRA affects spousal benefit calculations
+    </li>
+    <li>
+      <a href="/guides/divorced-spouse">Divorced Spouse Benefits</a> – Eligibility
+      rules for benefits based on an ex-spouse's record
     </li>
     <li>
       <a href="/guides/delayed-january-bump">Delayed January Bump</a> – How
