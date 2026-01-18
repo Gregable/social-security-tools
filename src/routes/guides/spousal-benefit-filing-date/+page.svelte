@@ -334,10 +334,10 @@
   <p>
     In the case of divorced couples where one is eligible for benefits on an
     ex-spouse's record, the filing date of the primary earner does not affect
-    the spousal benefit amount. There are <a
-      href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
-      >additional rules</a
-    > for this scenario not described here.
+    the spousal benefit amount. If you were married for at least 10 years and
+    are now divorced, see our <a href="/guides/divorced-spouse">divorced spouse
+    benefits guide</a> for the complete eligibility rules, including how to
+    claim even if your ex hasn't filed yet.
   </p>
 
   <h2>Related Guides</h2>
@@ -358,6 +358,10 @@
     <li>
       <a href="/guides/work-credits">Work Credits</a> — Spousal benefits don't
       require you to have earned any credits
+    </li>
+    <li>
+      <a href="/guides/divorced-spouse">Divorced Spouse Benefits</a> — Special
+      rules for claiming benefits from an ex-spouse after divorce
     </li>
     <li>
       <a href="/guides/filing-date-chart">Filing Date Chart Guide</a> — How to

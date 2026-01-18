@@ -550,6 +550,10 @@
       filing dates affect spousal benefits based on your PIA
     </li>
     <li>
+      <a href="/guides/divorced-spouse">Divorced Spouse Benefits</a> — How
+      ex-spouses can receive up to 50% of your PIA
+    </li>
+    <li>
       <a href="/guides/work-credits">Work Credits</a> — The 40 credits you need
       to qualify for benefits before your PIA matters
     </li>

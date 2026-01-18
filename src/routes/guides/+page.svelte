@@ -27,6 +27,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jan 18, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/divorced-spouse"
+            >Social Security Benefits for Divorced Spouses</a
+          >
+        </h3>
+        <p class="description">
+          Can you collect Social Security from your ex-spouse? Learn the divorced
+          spouse benefit rules, including the 10-year marriage requirement, how
+          much you can receive (up to 50% of your ex's benefit), and whether your
+          ex needs to know or consent.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 17, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/nra">Normal Retirement Age (NRA)</a>
