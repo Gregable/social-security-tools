@@ -647,39 +647,6 @@ function startLabel(date: MonthDate): string {
     display: block;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .info-note {
-      background: #1e3a5f;
-      color: #e0e0e0;
-    }
-
-    .settings-card {
-      background: #1f2d3d;
-      border-color: #335b94;
-    }
-
-    .settings-card h3 {
-      color: #9ac9ff;
-    }
-
-    .fireproof-card {
-      background: #23272f;
-      border-color: #3a4250;
-    }
-
-    .field-label {
-      color: #9aa0a6;
-    }
-
-    .field-value {
-      color: #d6e2ff;
-    }
-
-    .field-hint {
-      color: #b0b6be;
-    }
-  }
-
   @media (max-width: 600px) {
     .field-row {
       flex-direction: column;

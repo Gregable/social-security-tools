@@ -561,48 +561,6 @@ $: spouseAnnualSS =
     margin: 0.5em 0;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .firecalc-mirror {
-      --mirror-outer-bg: #1a1a1a;
-      --mirror-border: #64b5f6;
-    }
-
-    .mirror-header {
-      background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
-      border-bottom-color: #1976d2;
-    }
-
-    .firecalc-section {
-      --section-bg: #2b2b2b;
-      --heading-color: #e0e0e0;
-      --row-border: #444;
-      --label-color: #e0e0e0;
-      --description-color: #b0b0b0;
-      --input-border: #555;
-      --input-bg: #3a3a3a;
-      --input-color: #e0e0e0;
-      --text-color: #e0e0e0;
-      --copy-btn-bg: #1976d2;
-      --copy-btn-color: white;
-      --copy-btn-border: #1565c0;
-      --copy-btn-hover-bg: #1565c0;
-    }
-
-    .caveats {
-      background: #2b2b2b;
-      color: #e0e0e0;
-    }
-
-    .caveats h3 {
-      color: #64b5f6;
-    }
-
-    .info-note {
-      background: #1e3a5f;
-      color: #e0e0e0;
-    }
-  }
-
   @media print {
     .firecalc-mirror {
       box-shadow: none;

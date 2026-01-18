@@ -274,43 +274,4 @@ function getFilingAgeForPreview(
     color: #0d47a1;
     font-weight: 600;
   }
-
-  @media (prefers-color-scheme: dark) {
-    .spousal-toggle-section {
-      background: #2b2b2b;
-      border-color: #444;
-    }
-
-    .spousal-toggle-section h3 {
-      color: #64b5f6;
-    }
-
-    .toggle-option {
-      background: #1e1e1e;
-      border-color: #444;
-    }
-
-    .toggle-option:hover {
-      border-color: #64b5f6;
-      background: #2a3f5f;
-    }
-
-    .option-content strong {
-      color: #e0e0e0;
-    }
-
-    .option-description {
-      color: #b0b0b0;
-    }
-
-    .option-preview {
-      background: #1e3a5f;
-      border-left-color: #64b5f6;
-      color: #90caf9;
-    }
-
-    .option-preview strong {
-      color: #bbdefb;
-    }
-  }
 </style>

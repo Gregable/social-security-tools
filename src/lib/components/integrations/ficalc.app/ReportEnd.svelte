@@ -397,35 +397,4 @@ $: fiCalcUrl = generateFICalcLink(fiCalcIncomeArray);
     height: 1em;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .settings-card {
-      background: #1f2d3d;
-      border-color: #335b94;
-    }
-
-    .settings-card h3 {
-      color: #9ac9ff;
-    }
-
-    .field-grid {
-      background: #23272f;
-      border-color: #3a4250;
-    }
-
-    .field-label {
-      color: #9aa0a6;
-    }
-
-    .field-value {
-      color: #d6e2ff;
-    }
-
-    .field-value small {
-      color: #b0b6be;
-    }
-
-    .visit-link a {
-      color: #9ac9ff;
-    }
-  }
 </style>

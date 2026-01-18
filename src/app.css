@@ -1,4 +1,5 @@
 html {
+  color-scheme: light dark;
   width: 100%;
   overflow-x: hidden;
   scrollbar-gutter: stable;
@@ -9,7 +10,7 @@ body {
   width: 100%;
   /* Minimum width to match small mobile devices (iPhone 5/SE width) */
   min-width: 320px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: rgb(51, 51, 51);
   background-color: #fff;
 }
