@@ -437,60 +437,6 @@ $: spouseYearlySS =
     opacity: 0.6;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .linopt-card {
-      --card-bg: #2b2b2b;
-      --card-border: #444;
-      --card-header-gradient-start: #2d4a5e;
-      --card-header-color: #e0e0e0;
-      --label-color: #e0e0e0;
-      --input-color: #e0e0e0;
-      --input-bg: #1e1e1e;
-      --input-border: #444;
-      --readonly-bg: #3a3a3a;
-      --readonly-color: #b0b0b0;
-      --disabled-color: #888;
-    }
-
-    .inflation-input-section {
-      background: #2b2b2b;
-      border-color: #444;
-    }
-
-    .inflation-input-row label {
-      color: #b0b0b0;
-    }
-
-    .input-with-suffix input[type='number'] {
-      background: #1e1e1e;
-      border-color: #444;
-      color: #e0e0e0;
-    }
-
-    .input-with-suffix input[type='number']:focus {
-      border-color: #64b5f6;
-      box-shadow: 0 0 0 0.15rem rgba(100, 181, 246, 0.25);
-    }
-
-    .input-with-suffix .suffix {
-      color: #b0b0b0;
-    }
-
-    .caveats {
-      background: #2b2b2b;
-      color: #e0e0e0;
-    }
-
-    .caveats h3 {
-      color: #64b5f6;
-    }
-
-    .info-note {
-      background: #1e3a5f;
-      color: #e0e0e0;
-    }
-  }
-
   @media print {
     .linopt-card {
       box-shadow: none;

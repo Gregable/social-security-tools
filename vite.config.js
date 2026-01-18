@@ -1,4 +1,8 @@
 import { sveltekit } from '@sveltejs/kit/vite';
+import { loadEnv } from 'vite';
+
+// Load env vars for use in config (Vite doesn't load .env files until after config is processed)
+const env = loadEnv('development', process.cwd(), '');
 
 /** @type {import('vite').Plugin} */
 const viteHeaderPlugin = {
@@ -17,6 +21,10 @@ const viteHeaderPlugin = {
 /** @type {import('vite').UserConfig} */
 const config = {
   plugins: [viteHeaderPlugin, sveltekit()],
+  server: {
+    // Allow additional hosts via VITE_ALLOWED_HOST env var (e.g., for ngrok testing)
+    allowedHosts: env.VITE_ALLOWED_HOST ? [env.VITE_ALLOWED_HOST] : [],
+  },
   optimizeDeps: {
     // Exclude libs that appear to generate unstable pre-bundled chunk names or
     // are ESM-only / ship conditionally. This prevents Vite from trying to
