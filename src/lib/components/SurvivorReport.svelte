@@ -51,8 +51,14 @@ let mounted_: boolean = false;
 let survivorUserFloor_: number = 60 * 12;
 $: {
   if (fileVsDeath === 'fileBeforeDeath') {
-    // Death assumed at 70, so survivor can file from 60
-    survivorUserFloor_ = 60 * 12;
+    // Death assumed right after filing. Calculate survivor's age when higher earner dies.
+    if (higherEarner && lowerEarner) {
+      const deathDate = higherEarner.birthdate.dateAtSsaAge(
+        new MonthDuration(beforeDeathSliderMonths_)
+      );
+      const survivorAgeAtDeath = lowerEarner.birthdate.ageAtSsaDate(deathDate);
+      survivorUserFloor_ = Math.max(60 * 12, survivorAgeAtDeath.asMonths() + 1);
+    }
   } else if (fileVsDeath === 'fileAfterDeath') {
     if (afterDeathSliderMonths_ === 66 * 12) {
       // "<=66" means death could be earlier, so no restriction
@@ -253,9 +259,8 @@ function minCapSlider() {
   // the survivor can't file for survivor benefits before the death date.
   let deathAgeMonths = 0;
   if (fileVsDeath === 'fileBeforeDeath') {
-    // When filing before death, the death date is assumed to be age 70
-    // (matching the hardcoded value in the survivor benefit calculation below)
-    deathAgeMonths = 70 * 12;
+    // When filing before death, assume death happens right after filing
+    deathAgeMonths = beforeDeathSliderMonths_;
   } else if (fileVsDeath === 'fileAfterDeath') {
     // When dying before filing, the death date is the slider value.
     // But if slider is at floor (<=66), don't restrict survivor filing age
@@ -313,15 +318,15 @@ let survivorBenefitDisplay_: string = '--';
 $: {
   try {
     if (fileVsDeath === 'fileBeforeDeath') {
+      // Death assumed right after filing
+      const deathDate = higherEarner.birthdate.dateAtSsaAge(
+        new MonthDuration(beforeDeathSliderMonths_)
+      );
       survivorBenefitDisplay_ = lowerEarner
         .survivorBenefit(
           higherEarner,
-          higherEarner.birthdate.dateAtSsaAge(
-            new MonthDuration(beforeDeathSliderMonths_)
-          ),
-          higherEarner.birthdate.dateAtSsaAge(
-            MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-          ),
+          /* deceasedFilingDate */ deathDate,
+          /* deceasedDeathDate */ deathDate,
           survivorActualFilingDate
         )
         .wholeDollars();
@@ -597,9 +602,9 @@ $: {
                 higherEarner.birthdate.dateAtSsaAge(
                   new MonthDuration(beforeDeathSliderMonths_)
                 ),
-                /* deceasedDeathDate = 70 */
+                /* deceasedDeathDate - assume death right after filing */
                 higherEarner.birthdate.dateAtSsaAge(
-                  MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+                  new MonthDuration(beforeDeathSliderMonths_)
                 ),
                 /* survivorFilingDate = 200 */
                 lowerEarner.birthdate.dateAtSsaAge(
