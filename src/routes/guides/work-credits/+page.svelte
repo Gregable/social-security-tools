@@ -103,7 +103,8 @@ const faqs: FAQItem[] = [
   <h3>For Survivor's Benefits</h3>
   <p>
     The number of work credits required for your family to qualify for
-    survivor's benefits depends on your age at the time of death:
+    <a href="/guides/survivor-benefits">survivor's benefits</a> depends on your
+    age at the time of death:
   </p>
   <ul>
     <li>Younger individuals need fewer credits</li>

@@ -27,6 +27,20 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jan 19, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/survivor-benefits"
+            >Social Security Survivor Benefits</a
+          >
+        </h3>
+        <p class="description">
+          Learn about Social Security survivor benefits for widows, widowers,
+          and children. Understand eligibility at age 60, benefit amounts up to
+          100% of your spouse's benefit, and strategic claiming options.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 18, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/divorced-spouse"

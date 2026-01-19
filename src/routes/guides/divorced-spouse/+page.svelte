@@ -321,7 +321,7 @@ const faqs = [
   <h2>Divorced Spouse Survivor Benefits</h2>
 
   <p>
-    If your ex-spouse dies, you may be eligible for <strong>survivor benefits</strong>,
+    If your ex-spouse dies, you may be eligible for <a href="/guides/survivor-benefits">survivor benefits</a>,
     which are significantly more generous than divorced spouse retirement benefits:
   </p>
 
@@ -348,8 +348,9 @@ const faqs = [
   <div class="highlight-box">
     <strong>Strategy:</strong> If you qualify for both your own retirement benefit
     and a divorced spouse survivor benefit, you may be able to claim one first and
-    switch to the other later to maximize your lifetime benefits. Consult with the
-    Social Security Administration about your specific situation.
+    switch to the other later to maximize your lifetime benefits. See our
+    <a href="/guides/survivor-benefits">survivor benefits guide</a> for detailed
+    claiming strategies.
   </div>
 
   <h2>Divorced Spouse Benefits vs. Your Own Benefits</h2>
