@@ -234,8 +234,14 @@ function minCapSlider() {
     // (matching the hardcoded value in the survivor benefit calculation below)
     deathAgeMonths = 70 * 12;
   } else if (fileVsDeath === 'fileAfterDeath') {
-    // When dying before filing, the death date is the slider value
-    deathAgeMonths = afterDeathSliderMonths_;
+    // When dying before filing, the death date is the slider value.
+    // But if slider is at floor (<=66), don't restrict survivor filing age
+    // since "<=66" means death could have occurred earlier.
+    if (afterDeathSliderMonths_ === 66 * 12) {
+      deathAgeMonths = 0;
+    } else {
+      deathAgeMonths = afterDeathSliderMonths_;
+    }
   } else {
     throw new Error(`fileVsDeath toggle unexpected value: ${fileVsDeath}`);
   }
