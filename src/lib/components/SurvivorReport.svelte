@@ -46,6 +46,29 @@ let survivorSliderMonths_: number = 60 * 12;
 let survivorActualFilingDate: MonthDate = new MonthDate(3000 * 12);
 let mounted_: boolean = false;
 
+// Dynamic floor for survivor slider based on death date.
+// Survivor can't file until after the higher earner dies.
+let survivorUserFloor_: number = 60 * 12;
+$: {
+  if (fileVsDeath === 'fileBeforeDeath') {
+    // Death assumed at 70, so survivor can file from 60
+    survivorUserFloor_ = 60 * 12;
+  } else if (fileVsDeath === 'fileAfterDeath') {
+    if (afterDeathSliderMonths_ === 66 * 12) {
+      // "<=66" means death could be earlier, so no restriction
+      survivorUserFloor_ = 60 * 12;
+    } else if (higherEarner && lowerEarner) {
+      // Survivor must file after death. Calculate survivor's age when higher earner dies.
+      const deathDate = higherEarner.birthdate.dateAtSsaAge(
+        new MonthDuration(afterDeathSliderMonths_)
+      );
+      const survivorAgeAtDeath = lowerEarner.birthdate.ageAtSsaDate(deathDate);
+      // Add 1 month since filing must be AFTER death
+      survivorUserFloor_ = Math.max(60 * 12, survivorAgeAtDeath.asMonths() + 1);
+    }
+  }
+}
+
 // Track if we're currently updating from the store to prevent circular updates
 let updatingFromStore_: boolean = false;
 
@@ -283,6 +306,51 @@ $: fileVsDeath &&
   higherEarner &&
   lowerEarner &&
   minCapSlider();
+
+// Computed survivor benefit with error handling as a safety net.
+// This prevents the app from crashing if the slider temporarily has an invalid value.
+let survivorBenefitDisplay_: string = '--';
+$: {
+  try {
+    if (fileVsDeath === 'fileBeforeDeath') {
+      survivorBenefitDisplay_ = lowerEarner
+        .survivorBenefit(
+          higherEarner,
+          higherEarner.birthdate.dateAtSsaAge(
+            new MonthDuration(beforeDeathSliderMonths_)
+          ),
+          higherEarner.birthdate.dateAtSsaAge(
+            MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+          ),
+          survivorActualFilingDate
+        )
+        .wholeDollars();
+    } else {
+      // When death slider is at floor (<=66), use a death date 1 month before
+      // survivor filing to allow any filing age. Otherwise use the slider value.
+      let deathDate: MonthDate;
+      if (afterDeathSliderMonths_ === 66 * 12) {
+        deathDate = survivorActualFilingDate.subtractDuration(
+          new MonthDuration(1)
+        );
+      } else {
+        deathDate = higherEarner.birthdate.dateAtSsaAge(
+          new MonthDuration(afterDeathSliderMonths_)
+        );
+      }
+      survivorBenefitDisplay_ = lowerEarner
+        .survivorBenefit(
+          higherEarner,
+          /* deceasedFilingDate */ deathDate,
+          /* deceasedDeathDate */ deathDate,
+          survivorActualFilingDate
+        )
+        .wholeDollars();
+    }
+  } catch {
+    survivorBenefitDisplay_ = '--';
+  }
+}
 </script>
 
 <div class="pageBreakAvoid">
@@ -594,7 +662,7 @@ $: fileVsDeath &&
         <Slider
           bind:value={survivorSliderMonths_}
           floor={60 * 12}
-          userFloor={60 * 12}
+          userFloor={survivorUserFloor_}
           ceiling={lowerEarner.survivorNormalRetirementAge().asMonths()}
           step={1}
           translate={translateSliderLabel(
@@ -613,40 +681,7 @@ $: fileVsDeath &&
         />
       </div>
       <div class="survivor-banner">
-        Survivor Benefit Amount:
-        {#if fileVsDeath == 'fileBeforeDeath'}
-          {lowerEarner
-            .survivorBenefit(
-              higherEarner,
-              /* deceasedFilingDate */
-              higherEarner.birthdate.dateAtSsaAge(
-                new MonthDuration(beforeDeathSliderMonths_)
-              ),
-              /* deceasedDeathDate = 70 */
-              higherEarner.birthdate.dateAtSsaAge(
-                MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-              ),
-              /* survivorFilingDate */
-              survivorActualFilingDate
-            )
-            .wholeDollars()}
-        {:else}
-          {lowerEarner
-            .survivorBenefit(
-              higherEarner,
-              /* deceasedFilingDate */
-              higherEarner.birthdate.dateAtSsaAge(
-                new MonthDuration(afterDeathSliderMonths_)
-              ),
-              /* deceasedDeathDate */
-              higherEarner.birthdate.dateAtSsaAge(
-                new MonthDuration(afterDeathSliderMonths_)
-              ),
-              /* survivorFilingDate */
-              survivorActualFilingDate
-            )
-            .wholeDollars()}
-        {/if}
+        Survivor Benefit Amount: {survivorBenefitDisplay_}
       </div>
     </div>
   </div>
