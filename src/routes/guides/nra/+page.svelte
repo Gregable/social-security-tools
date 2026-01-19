@@ -279,9 +279,11 @@ fraTable.push({
 
   <h3>Survivor Benefits</h3>
   <p>
-    Survivors have a different NRA schedule (typically 2 years earlier than
-    retirement NRA for the same birth year). Survivor benefits can be filed as
-    early as age 60 (or 50 if disabled), with corresponding reductions.
+    <a href="/guides/survivor-benefits">Survivor benefits</a> have a different
+    NRA schedule (typically 2 years earlier than retirement NRA for the same
+    birth year). Survivor benefits can be filed as early as age 60 (or 50 if
+    disabled), with corresponding reductions. Unlike your own benefit, survivor
+    benefits do not increase past survivor NRA.
   </p>
 
   <h3>The Earnings Test</h3>

@@ -364,6 +364,10 @@
       rules for claiming benefits from an ex-spouse after divorce
     </li>
     <li>
+      <a href="/guides/survivor-benefits">Survivor Benefits</a> — If your spouse
+      passes away, survivor benefits can be up to 100% (vs. 50% for spousal)
+    </li>
+    <li>
       <a href="/guides/filing-date-chart">Filing Date Chart Guide</a> — How to
       read the interactive chart showing combined benefits for couples
     </li>
