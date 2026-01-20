@@ -144,6 +144,31 @@ export class EarningRecord {
     const factor: number = this.indexFactor();
     return cappedEarning.times(factor);
   }
+
+  /**
+   * Serializes this record to a plain object for storage.
+   */
+  serialize(): SerializedEarningRecord {
+    return {
+      year: this.year,
+      taxedEarningsCents: this.taxedEarnings.cents(),
+      taxedMedicareEarningsCents: this.taxedMedicareEarnings.cents(),
+      incomplete: this.incomplete,
+    };
+  }
+
+  /**
+   * Deserializes a plain object back to an EarningRecord.
+   */
+  static deserialize(data: SerializedEarningRecord): EarningRecord {
+    const record = new EarningRecord({
+      year: data.year,
+      taxedEarnings: Money.fromCents(data.taxedEarningsCents),
+      taxedMedicareEarnings: Money.fromCents(data.taxedMedicareEarningsCents),
+    });
+    record.incomplete = data.incomplete;
+    return record;
+  }
 }
 
 /**
@@ -153,4 +178,14 @@ interface EarningRecordInput {
   year: number;
   taxedEarnings: Money;
   taxedMedicareEarnings: Money;
+}
+
+/**
+ * Serialized format for session storage.
+ */
+export interface SerializedEarningRecord {
+  year: number;
+  taxedEarningsCents: number;
+  taxedMedicareEarningsCents: number;
+  incomplete: boolean;
 }

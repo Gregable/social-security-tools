@@ -239,4 +239,31 @@ export class Birthdate {
     };
     return example;
   }
+
+  /**
+   * Serializes this birthdate to a plain object for storage.
+   */
+  serialize(): SerializedBirthdate {
+    return {
+      year: this.layBirthYear(),
+      month: this.layBirthMonth(),
+      day: this.layBirthDayOfMonth(),
+    };
+  }
+
+  /**
+   * Deserializes a plain object back to a Birthdate.
+   */
+  static deserialize(data: SerializedBirthdate): Birthdate {
+    return Birthdate.FromYMD(data.year, data.month, data.day);
+  }
+}
+
+/**
+ * Serialized format for session storage.
+ */
+export interface SerializedBirthdate {
+  year: number;
+  month: number;
+  day: number;
 }

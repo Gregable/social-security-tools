@@ -131,3 +131,48 @@ describe('currentAge', () => {
     expect(bd.currentAge(asOf)).toBe(25);
   });
 });
+
+describe('Birthdate serialization', () => {
+  it('serializes to plain object', () => {
+    const bd = Birthdate.FromYMD(1965, 5, 15); // Jun 15, 1965
+
+    const serialized = bd.serialize();
+
+    expect(serialized).toEqual({
+      year: 1965,
+      month: 5,
+      day: 15,
+    });
+  });
+
+  it('deserializes back to Birthdate', () => {
+    const serialized = { year: 1965, month: 5, day: 15 };
+
+    const bd = Birthdate.deserialize(serialized);
+
+    expect(bd.layBirthYear()).toBe(1965);
+    expect(bd.layBirthMonth()).toBe(5);
+    expect(bd.layBirthDayOfMonth()).toBe(15);
+  });
+
+  it('round-trips correctly', () => {
+    const original = Birthdate.FromYMD(1980, 11, 25); // Dec 25, 1980
+
+    const roundTripped = Birthdate.deserialize(original.serialize());
+
+    expect(roundTripped.layBirthYear()).toBe(original.layBirthYear());
+    expect(roundTripped.layBirthMonth()).toBe(original.layBirthMonth());
+    expect(roundTripped.layBirthDayOfMonth()).toBe(
+      original.layBirthDayOfMonth()
+    );
+  });
+
+  it('preserves SSA date calculations after round-trip', () => {
+    const original = Birthdate.FromYMD(2000, 0, 1); // Jan 1, 2000
+
+    const roundTripped = Birthdate.deserialize(original.serialize());
+
+    expect(roundTripped.ssaBirthYear()).toBe(original.ssaBirthYear());
+    expect(roundTripped.ssaBirthMonth()).toBe(original.ssaBirthMonth());
+  });
+});
