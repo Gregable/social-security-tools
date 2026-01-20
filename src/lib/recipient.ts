@@ -1,6 +1,9 @@
-import { Birthdate } from '$lib/birthday';
+import { Birthdate, type SerializedBirthdate } from '$lib/birthday';
 import * as constants from '$lib/constants';
-import { EarningRecord } from '$lib/earning-record';
+import {
+  EarningRecord,
+  type SerializedEarningRecord,
+} from '$lib/earning-record';
 import type { GenderOption } from '$lib/life-tables';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
@@ -12,6 +15,20 @@ export interface RecipientColors {
   dark: string;
   medium: string;
   light: string;
+}
+
+/**
+ * Serialized format for session storage.
+ */
+export interface SerializedRecipient {
+  earningsRecords: SerializedEarningRecord[];
+  birthdate: SerializedBirthdate;
+  name: string;
+  isPiaOnly: boolean;
+  overridePiaCents: number | null;
+  gender: string;
+  healthMultiplier: number;
+  isFirst: boolean;
 }
 
 /**
@@ -890,5 +907,45 @@ export class Recipient {
     } else {
       return { dark: '#004400', medium: '#558855', light: '#d9ebd9' };
     }
+  }
+
+  /**
+   * Serializes this recipient to a plain object for storage.
+   */
+  serialize(): SerializedRecipient {
+    return {
+      earningsRecords: this.earningsRecords.map((er) => er.serialize()),
+      birthdate: this.birthdate.serialize(),
+      name: this.name,
+      isPiaOnly: this.isPiaOnly,
+      overridePiaCents: this.overridePia?.cents() ?? null,
+      gender: this.gender,
+      healthMultiplier: this.healthMultiplier,
+      isFirst: this.first,
+    };
+  }
+
+  /**
+   * Deserializes a plain object back to a Recipient.
+   */
+  static deserialize(data: SerializedRecipient): Recipient {
+    const r = new Recipient();
+
+    // Set birthdate first (needed for earnings record indexing)
+    r.birthdate = Birthdate.deserialize(data.birthdate);
+
+    if (data.isPiaOnly && data.overridePiaCents !== null) {
+      r.setPia(Money.fromCents(data.overridePiaCents));
+    } else {
+      r.earningsRecords = data.earningsRecords.map((er) =>
+        EarningRecord.deserialize(er)
+      );
+    }
+
+    r.name = data.name;
+    r.gender = data.gender as GenderOption;
+    r.healthMultiplier = data.healthMultiplier;
+
+    return r;
   }
 } // class Recipient

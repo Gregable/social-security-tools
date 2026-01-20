@@ -831,3 +831,139 @@ describe('Recipient', () => {
     }
   });
 });
+
+describe('Recipient serialization', () => {
+  it('serializes recipient with earnings records', () => {
+    const r = new Recipient();
+    r.birthdate = Birthdate.FromYMD(1965, 6, 15);
+    r.name = 'Test Person';
+    r.gender = 'female';
+    r.healthMultiplier = 1.2;
+    r.earningsRecords = [
+      new EarningRecord({
+        year: 2020,
+        taxedEarnings: Money.from(50000),
+        taxedMedicareEarnings: Money.from(50000),
+      }),
+    ];
+
+    const serialized = r.serialize();
+
+    expect(serialized.birthdate).toEqual({ year: 1965, month: 6, day: 15 });
+    expect(serialized.name).toBe('Test Person');
+    expect(serialized.gender).toBe('female');
+    expect(serialized.healthMultiplier).toBe(1.2);
+    expect(serialized.isPiaOnly).toBe(false);
+    expect(serialized.earningsRecords).toHaveLength(1);
+    expect(serialized.earningsRecords[0].year).toBe(2020);
+  });
+
+  it('serializes recipient with PIA only', () => {
+    const r = new Recipient();
+    r.birthdate = Birthdate.FromYMD(1970, 0, 1);
+    r.setPia(Money.from(2500));
+
+    const serialized = r.serialize();
+
+    expect(serialized.isPiaOnly).toBe(true);
+    expect(serialized.overridePiaCents).toBe(250000);
+    expect(serialized.earningsRecords).toHaveLength(0);
+  });
+
+  it('deserializes recipient with earnings records', () => {
+    const serialized = {
+      birthdate: { year: 1965, month: 6, day: 15 },
+      name: 'Test Person',
+      gender: 'female',
+      healthMultiplier: 1.2,
+      isPiaOnly: false,
+      overridePiaCents: null,
+      isFirst: true,
+      earningsRecords: [
+        {
+          year: 2020,
+          taxedEarningsCents: 5000000,
+          taxedMedicareEarningsCents: 5000000,
+          incomplete: false,
+        },
+      ],
+    };
+
+    const r = Recipient.deserialize(serialized);
+
+    expect(r.birthdate.layBirthYear()).toBe(1965);
+    expect(r.birthdate.layBirthMonth()).toBe(6);
+    expect(r.birthdate.layBirthDayOfMonth()).toBe(15);
+    expect(r.name).toBe('Test Person');
+    expect(r.gender).toBe('female');
+    expect(r.healthMultiplier).toBe(1.2);
+    expect(r.earningsRecords).toHaveLength(1);
+    expect(r.earningsRecords[0].year).toBe(2020);
+  });
+
+  it('deserializes recipient with PIA only', () => {
+    const serialized = {
+      birthdate: { year: 1970, month: 0, day: 1 },
+      name: '',
+      gender: 'blended',
+      healthMultiplier: 1.0,
+      isPiaOnly: true,
+      overridePiaCents: 250000,
+      isFirst: true,
+      earningsRecords: [],
+    };
+
+    const r = Recipient.deserialize(serialized);
+
+    expect(r.isPiaOnly).toBe(true);
+    expect(r.overridePia?.cents()).toBe(250000);
+  });
+
+  it('round-trips recipient with earnings records', () => {
+    const original = new Recipient();
+    original.birthdate = Birthdate.FromYMD(1980, 3, 20);
+    original.name = 'Round Trip';
+    original.gender = 'male';
+    original.healthMultiplier = 0.9;
+    original.earningsRecords = [
+      new EarningRecord({
+        year: 2010,
+        taxedEarnings: Money.from(45000),
+        taxedMedicareEarnings: Money.from(45000),
+      }),
+      new EarningRecord({
+        year: 2011,
+        taxedEarnings: Money.from(48000),
+        taxedMedicareEarnings: Money.from(48000),
+      }),
+    ];
+
+    const roundTripped = Recipient.deserialize(original.serialize());
+
+    expect(roundTripped.birthdate.layBirthYear()).toBe(1980);
+    expect(roundTripped.birthdate.layBirthMonth()).toBe(3);
+    expect(roundTripped.birthdate.layBirthDayOfMonth()).toBe(20);
+    expect(roundTripped.name).toBe('Round Trip');
+    expect(roundTripped.gender).toBe('male');
+    expect(roundTripped.healthMultiplier).toBe(0.9);
+    expect(roundTripped.earningsRecords).toHaveLength(2);
+    expect(roundTripped.earningsRecords[0].taxedEarnings.cents()).toBe(
+      original.earningsRecords[0].taxedEarnings.cents()
+    );
+  });
+
+  it('round-trips recipient with PIA only', () => {
+    const original = new Recipient();
+    original.birthdate = Birthdate.FromYMD(1955, 11, 31);
+    original.setPia(Money.from(3200.5));
+    original.name = 'PIA Only';
+
+    const roundTripped = Recipient.deserialize(original.serialize());
+
+    expect(roundTripped.isPiaOnly).toBe(true);
+    expect(roundTripped.overridePia?.cents()).toBe(
+      original.overridePia?.cents()
+    );
+    expect(roundTripped.name).toBe('PIA Only');
+  });
+});

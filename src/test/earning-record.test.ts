@@ -99,3 +99,59 @@ describe('EarningRecord', () => {
     );
   });
 });
+
+describe('EarningRecord serialization', () => {
+  it('serializes to plain object', () => {
+    const record = new EarningRecord({
+      year: 2020,
+      taxedEarnings: Money.from(50000),
+      taxedMedicareEarnings: Money.from(55000),
+    });
+    record.incomplete = true;
+
+    const serialized = record.serialize();
+
+    expect(serialized).toEqual({
+      year: 2020,
+      taxedEarningsCents: 5000000,
+      taxedMedicareEarningsCents: 5500000,
+      incomplete: true,
+    });
+  });
+
+  it('deserializes back to EarningRecord', () => {
+    const serialized = {
+      year: 2020,
+      taxedEarningsCents: 5000000,
+      taxedMedicareEarningsCents: 5500000,
+      incomplete: true,
+    };
+
+    const record = EarningRecord.deserialize(serialized);
+
+    expect(record.year).toBe(2020);
+    expect(record.taxedEarnings.cents()).toBe(5000000);
+    expect(record.taxedMedicareEarnings.cents()).toBe(5500000);
+    expect(record.incomplete).toBe(true);
+  });
+
+  it('round-trips correctly', () => {
+    const original = new EarningRecord({
+      year: 2015,
+      taxedEarnings: Money.from(75432.5),
+      taxedMedicareEarnings: Money.from(80000),
+    });
+    original.incomplete = false;
+
+    const roundTripped = EarningRecord.deserialize(original.serialize());
+
+    expect(roundTripped.year).toBe(original.year);
+    expect(roundTripped.taxedEarnings.cents()).toBe(
+      original.taxedEarnings.cents()
+    );
+    expect(roundTripped.taxedMedicareEarnings.cents()).toBe(
+      original.taxedMedicareEarnings.cents()
+    );
+    expect(roundTripped.incomplete).toBe(original.incomplete);
+  });
+});
