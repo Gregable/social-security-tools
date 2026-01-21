@@ -252,6 +252,11 @@ function calculateAlignment(
 
   const totalMonths = overallEndDate.subtractDate(overallStartDate).asMonths();
 
+  // Guard against division by zero (theoretically possible with identical date ranges)
+  if (totalMonths === 0) {
+    return { higherLeft: 0, higherRight: 0, survivorLeft: 0, survivorRight: 0 };
+  }
+
   // Calculate margins for each slider based on where their range falls in the overall range
   return {
     higherLeft:
