@@ -442,13 +442,23 @@ $: {
         )
         .wholeDollars();
     } else {
-      // When death slider is at floor (<=66), use a death date 1 month before
-      // survivor filing to allow any filing age. Otherwise use the slider value.
+      // When death slider is at floor (<=66), cap death date at age 66 for benefit
+      // calculation purposes. This ensures "died at or before 66" doesn't incorrectly
+      // give delayed retirement credits when the survivor files late. However, if
+      // survivor files early (before higher earner would have reached 66), use 1 month
+      // before survivor filing so the calculation remains valid.
       let deathDate: MonthDate;
       if (afterDeathSliderMonths_ === 66 * 12) {
-        deathDate = survivorActualFilingDate.subtractDuration(
+        const deathAtAge66 = higherEarner.birthdate.dateAtSsaAge(
+          new MonthDuration(66 * 12)
+        );
+        const deathBeforeSurvivorFiling = survivorActualFilingDate.subtractDuration(
           new MonthDuration(1)
         );
+        // Use earlier of: age 66 or 1 month before survivor files
+        deathDate = deathAtAge66.lessThan(deathBeforeSurvivorFiling)
+          ? deathAtAge66
+          : deathBeforeSurvivorFiling;
       } else {
         deathDate = higherEarner.birthdate.dateAtSsaAge(
           new MonthDuration(afterDeathSliderMonths_)
