@@ -85,6 +85,7 @@ export let ticksArray: Array<{
   label?: string;
   legend?: string;
   color?: string;
+  legendColor?: string;
 }> = [];
 
 /**
@@ -309,13 +310,14 @@ function updateTicks(
   ceil: number,
   step: number,
   showTicks: boolean,
-  ticksArray: Array<{ value: number; label?: string; legend?: string }>
-): Array<{ value: number; label?: string; legend?: string; x?: number }> {
+  ticksArray: Array<{ value: number; label?: string; legend?: string; legendColor?: string }>
+): Array<{ value: number; label?: string; legend?: string; legendColor?: string; x?: number }> {
   if (!showTicks) return [];
   let ticks: Array<{
     value: number;
     label?: string;
     legend?: string;
+    legendColor?: string;
     x?: number;
   }> = [];
   if (ticksArray.length > 0) {
@@ -342,6 +344,7 @@ let ticks: Array<{
   label?: string;
   legend?: string;
   color?: string;
+  legendColor?: string;
   x?: number;
 }> = [];
 $: ticks =
@@ -416,7 +419,7 @@ $: ticks =
           <span class="tickLabel">{tick.label}</span>
         {/if}
         {#if tick.legend}
-          <span class="tickLegend">{tick.legend}</span>
+          <span class="tickLegend" style:color={tick.legendColor}>{tick.legend}</span>
         {/if}
       </li>
     {/each}

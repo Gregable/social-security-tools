@@ -19,19 +19,19 @@ $: higherEarner = $recipient.higherEarningsThan($spouse) ? $recipient : $spouse;
 $: lowerEarner = $recipient.higherEarningsThan($spouse) ? $spouse : $recipient;
 
 // If the deceased higher earner filed before this age, the survivor benefit
-// would become the larget 82.5% of the higher earner's PIA. After this age,
+// would become the larger 82.5% of the higher earner's PIA. After this age,
 // the survivor benefit would be the amount the higher earner was receiving.
 let breakEvenAge: MonthDuration;
-$: breakEvenAge = $higherEarner
+$: breakEvenAge = higherEarner
   .normalRetirementAge()
   .subtract(new MonthDuration(31));
 let breakEvenDate: MonthDate;
-$: breakEvenDate = $higherEarner.birthdate.dateAtLayAge(breakEvenAge);
+$: breakEvenDate = higherEarner.birthdate.dateAtLayAge(breakEvenAge);
 
 let adjustedNormalRetirementAge: boolean;
 $: adjustedNormalRetirementAge =
-  $lowerEarner.survivorNormalRetirementAge().asMonths() !==
-  $lowerEarner.normalRetirementAge().asMonths();
+  lowerEarner.survivorNormalRetirementAge().asMonths() !==
+  lowerEarner.normalRetirementAge().asMonths();
 
 let fileVsDeath: string = 'fileBeforeDeath';
 
@@ -44,48 +44,75 @@ let beforeDeathSliderMonths_: number = 67 * 12;
 let afterDeathSliderMonths_: number = 68 * 12;
 let survivorSliderMonths_: number = 60 * 12;
 let survivorActualFilingDate: MonthDate = new MonthDate(3000 * 12);
-let mounted_: boolean = false;
+
+// Component sync state machine:
+// - 'initializing': During mount, before bidirectional sync is enabled
+// - 'syncing': Temporarily set while updating slider from store (prevents circular updates)
+// - 'ready': Normal operation, bidirectional sync enabled
+type SyncState = 'initializing' | 'syncing' | 'ready';
+let syncState_: SyncState = 'initializing';
+
+/**
+ * Gets the death age in months based on the current filing scenario.
+ * Returns 0 if death age shouldn't restrict survivor filing (e.g., "<=66" scenario).
+ */
+function getDeathAgeMonths(): number {
+  if (fileVsDeath === 'fileBeforeDeath') {
+    // When filing before death, death happens 1 month after filing
+    return beforeDeathSliderMonths_ + 1;
+  } else if (fileVsDeath === 'fileAfterDeath') {
+    // When dying before filing, the death date is the slider value.
+    // But if slider is at floor (<=66), don't restrict survivor filing age
+    // since "<=66" means death could have occurred earlier.
+    if (afterDeathSliderMonths_ === 66 * 12) {
+      return 0;
+    }
+    return afterDeathSliderMonths_;
+  }
+  return 0;
+}
+
+/**
+ * Calculates the minimum age (in months) at which the survivor can file,
+ * based on when the higher earner dies.
+ */
+function calculateSurvivorFloor(): number {
+  if (!higherEarner || !lowerEarner) return 60 * 12;
+
+  const deathAgeMonths = getDeathAgeMonths();
+  if (deathAgeMonths === 0) return 60 * 12;
+
+  const deathDate = higherEarner.birthdate.dateAtSsaAge(
+    new MonthDuration(deathAgeMonths)
+  );
+  const survivorAgeAtDeath = lowerEarner.birthdate.ageAtSsaDate(deathDate);
+  // Add 1 month since filing must be AFTER death
+  return Math.max(60 * 12, survivorAgeAtDeath.asMonths() + 1);
+}
 
 // Dynamic floor for survivor slider based on death date.
 // Survivor can't file until after the higher earner dies.
 let survivorUserFloor_: number = 60 * 12;
+// Explicitly reference dependencies so Svelte tracks them for reactivity.
+// Without this, changes to beforeDeathSliderMonths_ or afterDeathSliderMonths_
+// don't trigger recalculation because they're accessed through function calls.
 $: {
-  if (fileVsDeath === 'fileBeforeDeath') {
-    // Death assumed right after filing. Calculate survivor's age when higher earner dies.
-    if (higherEarner && lowerEarner) {
-      const deathDate = higherEarner.birthdate.dateAtSsaAge(
-        new MonthDuration(beforeDeathSliderMonths_)
-      );
-      const survivorAgeAtDeath = lowerEarner.birthdate.ageAtSsaDate(deathDate);
-      survivorUserFloor_ = Math.max(60 * 12, survivorAgeAtDeath.asMonths() + 1);
-    }
-  } else if (fileVsDeath === 'fileAfterDeath') {
-    if (afterDeathSliderMonths_ === 66 * 12) {
-      // "<=66" means death could be earlier, so no restriction
-      survivorUserFloor_ = 60 * 12;
-    } else if (higherEarner && lowerEarner) {
-      // Survivor must file after death. Calculate survivor's age when higher earner dies.
-      const deathDate = higherEarner.birthdate.dateAtSsaAge(
-        new MonthDuration(afterDeathSliderMonths_)
-      );
-      const survivorAgeAtDeath = lowerEarner.birthdate.ageAtSsaDate(deathDate);
-      // Add 1 month since filing must be AFTER death
-      survivorUserFloor_ = Math.max(60 * 12, survivorAgeAtDeath.asMonths() + 1);
-    }
-  }
+  // Touch these variables to ensure Svelte tracks them as dependencies
+  void fileVsDeath;
+  void beforeDeathSliderMonths_;
+  void afterDeathSliderMonths_;
+  void higherEarner;
+  void lowerEarner;
+  survivorUserFloor_ = calculateSurvivorFloor();
 }
 
-// Track if we're currently updating from the store to prevent circular updates
-let updatingFromStore_: boolean = false;
-
 // Update store when beforeDeath slider changes
-// Only export after mount to ensure we start with NRA
+// Only sync after initialization and when not already syncing from store
 $: {
   if (
     beforeDeathSliderMonths_ &&
     higherEarner &&
-    mounted_ &&
-    !updatingFromStore_
+    syncState_ === 'ready'
   ) {
     setHigherEarnerFilingDate(
       higherEarner.birthdate.dateAtSsaAge(
@@ -97,7 +124,7 @@ $: {
 
 // Sync slider position when store changes (e.g., from individual or combined charts)
 $: {
-  if ($higherEarnerFilingDate && higherEarner && mounted_) {
+  if ($higherEarnerFilingDate && higherEarner && syncState_ === 'ready') {
     const ageAtFiling = higherEarner.birthdate.ageAtSsaDate(
       $higherEarnerFilingDate
     );
@@ -109,12 +136,13 @@ $: {
   }
 }
 
-async function syncSliderFromStore(newSliderMonths: number) {
-  updatingFromStore_ = true;
-  await tick(); // Ensure flag update happens before slider change
+function syncSliderFromStore(newSliderMonths: number) {
+  syncState_ = 'syncing'; // Prevent circular updates
   beforeDeathSliderMonths_ = newSliderMonths;
-  await tick(); // Ensure slider change completes before unsetting flag
-  updatingFromStore_ = false;
+  // Return to ready state after Svelte's microtask queue processes reactive updates
+  setTimeout(() => {
+    syncState_ = 'ready';
+  }, 0);
 }
 
 /**
@@ -144,24 +172,136 @@ function translateSliderLabel(
   };
 }
 
-let beforeDeathTicks_: Array<{
+type TickItem = {
   value: number;
   label?: string;
   legend?: string;
   color?: string;
-}> = [];
-let afterDeathTicks_: Array<{
-  value: number;
-  label?: string;
-  legend?: string;
-  color?: string;
-}> = [];
-let survivorTicks_: Array<{
-  value: number;
-  label?: string;
-  legend?: string;
-  color?: string;
-}> = [];
+  legendColor?: string;
+};
+
+// beforeDeathTicks_ and afterDeathTicks_ use fixed ranges (62-70), initialized once
+let beforeDeathTicks_: Array<TickItem> = [];
+let afterDeathTicks_: Array<TickItem> = [];
+
+// survivorTicks_ is reactive based on lowerEarner's survivor NRA and survivorUserFloor_
+let survivorTicks_: Array<TickItem> = [];
+$: {
+  if (lowerEarner) {
+    const baseTicks = generateTicks(
+      MonthDuration.initFromYearsMonths({ years: 60, months: 0 }),
+      lowerEarner.survivorNormalRetirementAge(),
+      false,
+      true
+    );
+    // Add "FRA" legend to the survivor Full Retirement Age tick
+    const survivorFraMonths = lowerEarner.survivorNormalRetirementAge().asMonths();
+    baseTicks.push({
+      value: survivorFraMonths,
+      legend: 'FRA',
+      color: lowerEarner.colors().dark,
+      legendColor: lowerEarner.colors().dark,
+    });
+    // Add "Earliest" indicator when floor is above age 60
+    // Uses higher earner's color since the constraint comes from their death date
+    if (survivorUserFloor_ > 60 * 12) {
+      baseTicks.push({
+        value: survivorUserFloor_,
+        legend: 'Earliest',
+        color: higherEarner.colors().dark,
+        legendColor: higherEarner.colors().dark,
+      });
+    }
+    survivorTicks_ = baseTicks;
+  } else {
+    survivorTicks_ = [];
+  }
+}
+
+// Slider alignment variables - to align sliders so same calendar dates line up vertically
+// Separate values for "files before death" (62-70) and "dies before filing" (66-70) scenarios
+let reservedLeftBeforeDeath_: number = 0;
+let reservedRightBeforeDeath_: number = 0;
+let reservedLeftSurvivorBeforeDeath_: number = 0;
+let reservedRightSurvivorBeforeDeath_: number = 0;
+
+let reservedLeftAfterDeath_: number = 0;
+let reservedRightAfterDeath_: number = 0;
+let reservedLeftSurvivorAfterDeath_: number = 0;
+let reservedRightSurvivorAfterDeath_: number = 0;
+
+// Helper function to calculate alignment for a given pair of slider ranges
+function calculateAlignment(
+  higherStartAge: MonthDuration,
+  higherEndAge: MonthDuration,
+  survivorStartAge: MonthDuration,
+  survivorEndAge: MonthDuration
+): { higherLeft: number; higherRight: number; survivorLeft: number; survivorRight: number } {
+  const higherStartDate = higherEarner.birthdate.dateAtSsaAge(higherStartAge);
+  const higherEndDate = higherEarner.birthdate.dateAtSsaAge(higherEndAge);
+  const survivorStartDate = lowerEarner.birthdate.dateAtSsaAge(survivorStartAge);
+  const survivorEndDate = lowerEarner.birthdate.dateAtSsaAge(survivorEndAge);
+
+  // Find the overall date range that encompasses both sliders
+  const overallStartDate = higherStartDate.lessThan(survivorStartDate)
+    ? higherStartDate
+    : survivorStartDate;
+  const overallEndDate = higherEndDate.greaterThan(survivorEndDate)
+    ? higherEndDate
+    : survivorEndDate;
+
+  const totalMonths = overallEndDate.subtractDate(overallStartDate).asMonths();
+
+  // Guard against division by zero (theoretically possible with identical date ranges)
+  if (totalMonths === 0) {
+    return { higherLeft: 0, higherRight: 0, survivorLeft: 0, survivorRight: 0 };
+  }
+
+  // Calculate margins for each slider based on where their range falls in the overall range
+  return {
+    higherLeft:
+      (higherStartDate.subtractDate(overallStartDate).asMonths() / totalMonths) * 100,
+    higherRight:
+      (overallEndDate.subtractDate(higherEndDate).asMonths() / totalMonths) * 100,
+    survivorLeft:
+      (survivorStartDate.subtractDate(overallStartDate).asMonths() / totalMonths) * 100,
+    survivorRight:
+      (overallEndDate.subtractDate(survivorEndDate).asMonths() / totalMonths) * 100,
+  };
+}
+
+// Calculate alignment margins for both scenarios
+$: {
+  if (higherEarner && lowerEarner) {
+    const survivorStartAge = MonthDuration.initFromYearsMonths({ years: 60, months: 0 });
+    const survivorEndAge = lowerEarner.survivorNormalRetirementAge();
+
+    // "Files before death" scenario: higher earner 62-70
+    const beforeDeathAlign = calculateAlignment(
+      MonthDuration.initFromYearsMonths({ years: 62, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 70, months: 0 }),
+      survivorStartAge,
+      survivorEndAge
+    );
+    reservedLeftBeforeDeath_ = beforeDeathAlign.higherLeft;
+    reservedRightBeforeDeath_ = beforeDeathAlign.higherRight;
+    reservedLeftSurvivorBeforeDeath_ = beforeDeathAlign.survivorLeft;
+    reservedRightSurvivorBeforeDeath_ = beforeDeathAlign.survivorRight;
+
+    // "Dies before filing" scenario: higher earner 66-70
+    const afterDeathAlign = calculateAlignment(
+      MonthDuration.initFromYearsMonths({ years: 66, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 70, months: 0 }),
+      survivorStartAge,
+      survivorEndAge
+    );
+    reservedLeftAfterDeath_ = afterDeathAlign.higherLeft;
+    reservedRightAfterDeath_ = afterDeathAlign.higherRight;
+    reservedLeftSurvivorAfterDeath_ = afterDeathAlign.survivorLeft;
+    reservedRightSurvivorAfterDeath_ = afterDeathAlign.survivorRight;
+  }
+}
+
 function generateTicks(
   startAge: MonthDuration,
   endAge: MonthDuration,
@@ -205,7 +345,7 @@ onMount(async () => {
   );
   afterDeathTicks_ = generateTicks(
     MonthDuration.initFromYearsMonths({
-      years: 62,
+      years: 66,
       months: 0,
     }),
     MonthDuration.initFromYearsMonths({
@@ -215,22 +355,10 @@ onMount(async () => {
     true,
     true
   );
-  survivorTicks_ = generateTicks(
-    MonthDuration.initFromYearsMonths({
-      years: 60,
-      months: 0,
-    }),
-    MonthDuration.initFromYearsMonths({
-      years: 67,
-      months: 0,
-    }),
-    false,
-    true
-  );
-  // Initialize slider to higher earner's NRA
-  // Set guard flag during initialization to prevent circular updates
-  updatingFromStore_ = true;
+  // survivorTicks_ is now reactive (see reactive statement above)
 
+  // Initialize slider to higher earner's NRA
+  // syncState_ is 'initializing' by default, preventing reactive sync during setup
   beforeDeathSliderMonths_ = higherEarner.normalRetirementAge().asMonths();
 
   // Set store to match initialized slider position
@@ -243,54 +371,31 @@ onMount(async () => {
   // Wait for one tick to ensure store updates propagate
   await tick();
 
-  // Enable sync
-  updatingFromStore_ = false;
-  mounted_ = true;
+  // Enable bidirectional sync
+  syncState_ = 'ready';
 });
 
 function minCapSlider() {
-  // beforeDeath is the slider for the higher earner estimating the age they
-  // filed for primary benefits *before* they died.
-  // afterDeath is the slider for the higher earner estimating the age they
-  // filed for primary benefits *after* they died.
-  // Only one of these sliders is shown at a time, depending on fileVsDeath
+  // Ensures the survivor slider value respects the death date constraint
+  // and updates survivorActualFilingDate accordingly.
 
-  // deathAgeMonths is the age at which the higher earner dies, used to ensure
-  // the survivor can't file for survivor benefits before the death date.
-  let deathAgeMonths = 0;
-  if (fileVsDeath === 'fileBeforeDeath') {
-    // When filing before death, assume death happens right after filing
-    deathAgeMonths = beforeDeathSliderMonths_;
-  } else if (fileVsDeath === 'fileAfterDeath') {
-    // When dying before filing, the death date is the slider value.
-    // But if slider is at floor (<=66), don't restrict survivor filing age
-    // since "<=66" means death could have occurred earlier.
-    if (afterDeathSliderMonths_ === 66 * 12) {
-      deathAgeMonths = 0;
-    } else {
-      deathAgeMonths = afterDeathSliderMonths_;
-    }
-  } else {
-    throw new Error(`fileVsDeath toggle unexpected value: ${fileVsDeath}`);
-  }
-
+  const deathAgeMonths = getDeathAgeMonths();
   let startMonth: MonthDuration = new MonthDuration(survivorSliderMonths_);
 
-  // There's an issue if the survivor tries to file for survivor benefits
-  // before the higher earner dies. In this case, we increase the survivor's
-  // slider value.
-  if (
-    lowerEarner.birthdate
-      .dateAtSsaAge(new MonthDuration(survivorSliderMonths_))
-      .lessThanOrEqual(
-        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(deathAgeMonths))
-      )
-  ) {
-    startMonth = lowerEarner.birthdate
-      .ageAtSsaDate(
-        higherEarner.birthdate.dateAtSsaAge(new MonthDuration(deathAgeMonths))
-      )
-      .add(new MonthDuration(1));
+  // If the survivor would file before the higher earner dies, bump up to after death
+  if (deathAgeMonths > 0) {
+    const deathDate = higherEarner.birthdate.dateAtSsaAge(
+      new MonthDuration(deathAgeMonths)
+    );
+    const survivorFilingDate = lowerEarner.birthdate.dateAtSsaAge(
+      new MonthDuration(survivorSliderMonths_)
+    );
+
+    if (survivorFilingDate.lessThanOrEqual(deathDate)) {
+      startMonth = lowerEarner.birthdate
+        .ageAtSsaDate(deathDate)
+        .add(new MonthDuration(1));
+    }
   }
 
   // Compute the actual filing date for survivor benefits:
@@ -304,13 +409,16 @@ function minCapSlider() {
   survivorSliderMonths_ = startMonth.asMonths();
 }
 
-$: fileVsDeath &&
-  beforeDeathSliderMonths_ &&
-  afterDeathSliderMonths_ &&
-  survivorSliderMonths_ &&
+$: if (
+  fileVsDeath !== undefined &&
+  beforeDeathSliderMonths_ !== undefined &&
+  afterDeathSliderMonths_ !== undefined &&
+  survivorSliderMonths_ !== undefined &&
   higherEarner &&
-  lowerEarner &&
+  lowerEarner
+) {
   minCapSlider();
+}
 
 // Computed survivor benefit with error handling as a safety net.
 // This prevents the app from crashing if the slider temporarily has an invalid value.
@@ -318,14 +426,17 @@ let survivorBenefitDisplay_: string = '--';
 $: {
   try {
     if (fileVsDeath === 'fileBeforeDeath') {
-      // Death assumed right after filing
-      const deathDate = higherEarner.birthdate.dateAtSsaAge(
+      // Death assumed 1 month after filing to trigger "filed before death" logic
+      const filingDate = higherEarner.birthdate.dateAtSsaAge(
         new MonthDuration(beforeDeathSliderMonths_)
+      );
+      const deathDate = higherEarner.birthdate.dateAtSsaAge(
+        new MonthDuration(beforeDeathSliderMonths_ + 1)
       );
       survivorBenefitDisplay_ = lowerEarner
         .survivorBenefit(
           higherEarner,
-          /* deceasedFilingDate */ deathDate,
+          /* deceasedFilingDate */ filingDate,
           /* deceasedDeathDate */ deathDate,
           survivorActualFilingDate
         )
@@ -352,7 +463,8 @@ $: {
         )
         .wholeDollars();
     }
-  } catch {
+  } catch (e) {
+    console.error('Survivor benefit calculation error:', e);
     survivorBenefitDisplay_ = '--';
   }
 }
@@ -383,161 +495,114 @@ $: {
       expandedText="Show Less"
     >
       <div class="expando">
-        <p>There are a eligibility rules that must be met:</p>
-        <ol>
+        <div class="summary-box">
+          <strong>Key Takeaway:</strong> The survivor benefit depends on when
+          <RName r={higherEarner} /> files for benefits (or dies without filing) and
+          when <RName r={lowerEarner} /> claims. Filing earlier reduces the benefit;
+          waiting can maximize it.
+        </div>
+
+        <h4>Eligibility Requirements</h4>
+        <p><RName r={lowerEarner} /> must:</p>
+        <ul class="eligibility-list">
           <li>
-            <RName r={lowerEarner} /> must have been married to <RName
-              r={higherEarner}
-            /> for at least 9 months.
+            Have been married to <RName r={higherEarner} /> for at least 9 months
           </li>
           <li>
-            <RName r={lowerEarner} /> can't have remarried before age 60.
+            Not have remarried before age 60
           </li>
-          <li>
-            <RName r={higherEarner} /> must have earned enough Social Security Credits
-            at the time of death, by meeting one of:
-            <ul>
-              <li>Earned at least 40 credits.</li>
-              <li>
-                Earned at least <RName r={higherEarner} apos /> age at the time of
-                death minus 22 credits.
-              </li>
-              <li>
-                <RName r={higherEarner} /> died prior to age 28 and earned at least
-                6 credits.
-              </li>
-            </ul>
-          </li>
-        </ol>
+        </ul>
+        <p><RName r={higherEarner} /> must have earned enough Social Security credits (at least one of):</p>
+        <ul class="eligibility-list">
+          <li>40 credits</li>
+          <li>Age at death minus 22 credits</li>
+          <li>6 credits (if died before age 28)</li>
+        </ul>
+
+        <h4>Calculating the Benefit Amount</h4>
         <p>
-          The benefit calculation starts with a consideration of <RName
-            r={higherEarner}
-            apos
-          /> age at death and the age <RName r={higherEarner} /> filed for benefits
-          while alive. There are four different scenarios:
+          The benefit amount depends on two factors: whether <RName r={higherEarner} />
+          filed for benefits before death, and the timing relative to key age thresholds.
         </p>
-        <ul>
-          <li>
-            <RName r={higherEarner} /> files for benefits before the time of death
-            and ...
-          </li>
-          <ul>
-            <li>
-              <RName r={higherEarner} /> filed <b>on or after</b>
-              {breakEvenAge.years()} years, {breakEvenAge.modMonths()}
-              months (<b>{breakEvenDate.monthName()}, {breakEvenDate.year()}</b
-              >):
-              <p>
-                The survivor benefit will be based on <RName
-                  r={higherEarner}
-                  apos
-                /> personal benefit at the time of death.
-              </p>
-            </li>
-            <li>
-              <RName r={higherEarner} /> filed <b>earlier</b> than
-              {breakEvenAge.years()} years, {breakEvenAge.modMonths()}
-              months (<b>{breakEvenDate.monthName()}, {breakEvenDate.year()}</b
-              >):
-              <p>
-                The survivor benefit will be based on the minimum of 82.5% <RName
-                  r={higherEarner}
-                  apos
-                /> Primary Insurance Amount: {higherEarner
-                  .pia()
-                  .primaryInsuranceAmount()
-                  .string()} x 82.5% = {higherEarner
+
+        <table class="scenarios-table">
+          <thead>
+            <tr>
+              <th><RName r={higherEarner} /> ...</th>
+              <th>Filed Before Death</th>
+              <th>Died Before Filing</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-header">
+                <strong>Later</strong>
+              </td>
+              <td>
+                <span class="cell-condition"><RName r={higherEarner} /> filed at age {breakEvenAge.years()}y {breakEvenAge.modMonths()}m or later</span>
+                <span class="cell-result">Survivor receives <RName r={higherEarner} apos /> actual benefit amount</span>
+              </td>
+              <td>
+                <span class="cell-condition"><RName r={higherEarner} /> died at age {higherEarner.normalRetirementAge().years()}y {#if higherEarner.normalRetirementAge().modMonths() > 0}{higherEarner.normalRetirementAge().modMonths()}m {/if}(FRA) or later</span>
+                <span class="cell-result">Survivor receives what <RName r={higherEarner} /> would have gotten</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="row-header">
+                <strong>Earlier</strong>
+              </td>
+              <td>
+                <span class="cell-condition"><RName r={higherEarner} /> filed before age {breakEvenAge.years()}y {breakEvenAge.modMonths()}m</span>
+                <span class="cell-result">Survivor receives 82.5% of PIA = {higherEarner
                   .pia()
                   .primaryInsuranceAmount()
                   .times(0.825)
-                  .wholeDollars()}
-              </p>
-            </li>
-          </ul>
-          <li>
-            <RName r={higherEarner} /> died before filing for benefits and ...
-          </li>
-          <ul>
-            <li>
-              <RName r={higherEarner} /> died <b>after</b> reaching normal
-              retirement age of {$higherEarner.normalRetirementAge().years()}
-              years
-              {#if $higherEarner.normalRetirementAge().modMonths() > 0}
-                {$higherEarner.normalRetirementAge().modMonths()}, months
-              {/if}(<b
-                >{$higherEarner.normalRetirementDate().monthName()}, {$higherEarner
-                  .normalRetirementDate()
-                  .year()}</b
-              >):
-              <p>
-                The survivor benefit will be based on <RName
-                  r={higherEarner}
-                  apos
-                /> personal benefit <RName r={higherEarner} /> would have received
-                if filing at the time of death.
-              </p>
-            </li>
-            <li>
-              <RName r={higherEarner} /> died <b>on or before</b> reaching
-              normal retirement age of {$higherEarner
-                .normalRetirementAge()
-                .years()}
-              years
-              {#if $higherEarner.normalRetirementAge().modMonths() > 0}
-                {$higherEarner.normalRetirementAge().modMonths()}, months
-              {/if}(<b
-                >{$higherEarner.normalRetirementDate().monthName()}, {$higherEarner
-                  .normalRetirementDate()
-                  .year()}</b
-              >):
-              <p>
-                The survivor benefit will be based on
-                <RName r={higherEarner} apos /> Primary Insurance Amount:
-                {higherEarner.pia().primaryInsuranceAmount().wholeDollars()}
-              </p>
-            </li>
-          </ul>
-        </ul>
-        <p>
-          The survivor benefit is then subject to reductions if <RName
-            r={lowerEarner}
-          /> claims them before <RName r={lowerEarner} apos /> normal {#if adjustedNormalRetirementAge}survivor
-          {/if}retirement age{#if !adjustedNormalRetirementAge}&nbsp; of {lowerEarner
-              .survivorNormalRetirementAge()
-              .years()} years {#if lowerEarner
-              .survivorNormalRetirementAge()
-              .modMonths() > 0},
-              {lowerEarner.survivorNormalRetirementAge().modMonths()} months
-            {/if} (<b
-              >{lowerEarner.survivorNormalRetirementDate().monthName()}, {lowerEarner
-                .survivorNormalRetirementDate()
-                .year()}</b
-            >){/if}. The earliest that <RName r={lowerEarner} /> can claim is age
-          60.
+                  .wholeDollars()}</span>
+              </td>
+              <td>
+                <span class="cell-condition"><RName r={higherEarner} /> died before age {higherEarner.normalRetirementAge().years()}y {#if higherEarner.normalRetirementAge().modMonths() > 0}{higherEarner.normalRetirementAge().modMonths()}m {/if}(FRA)</span>
+                <span class="cell-result">Survivor receives 100% of PIA = {higherEarner.pia().primaryInsuranceAmount().wholeDollars()}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="pia-note">
+          PIA (Primary Insurance Amount) is <RName r={higherEarner} apos /> base benefit
+          at full retirement age: {higherEarner.pia().primaryInsuranceAmount().wholeDollars()}
         </p>
+        <p class="pia-note">
+          Why age {breakEvenAge.years()}y {breakEvenAge.modMonths()}m? If <RName r={higherEarner} />
+          files before this age, the benefit is reduced below 82.5% of PIA.
+          The survivor benefit has a floor of 82.5% of PIA, so filing earlier than
+          this doesn't further reduce the survivor benefit.
+        </p>
+
+        <h4>Early Filing Reductions for <RName r={lowerEarner} /></h4>
+        <p>
+          <RName r={lowerEarner} /> can claim survivor benefits as early as age 60,
+          but claiming before {#if adjustedNormalRetirementAge}survivor{/if} full
+          retirement age reduces the benefit:
+        </p>
+        <ul class="reduction-list">
+          <li>
+            <strong>At age 60:</strong> 28.5% reduction
+          </li>
+          <li>
+            <strong>At {#if adjustedNormalRetirementAge}survivor{/if} FRA
+            ({lowerEarner.survivorNormalRetirementAge().years()}y {#if lowerEarner.survivorNormalRetirementAge().modMonths() > 0}{lowerEarner.survivorNormalRetirementAge().modMonths()}m{/if}):</strong>
+            No reduction
+          </li>
+          <li>
+            <strong>Between 60 and {#if adjustedNormalRetirementAge}survivor{/if} FRA:</strong>
+            Proportional reduction (28.5% to 0%)
+          </li>
+        </ul>
         {#if adjustedNormalRetirementAge}
-          <p>
-            The normal survivor retirement age is slightly different than the
-            normal retirement age. <RName r={lowerEarner} apos /> normal survivor
-            retirement age is:
-            {lowerEarner.survivorNormalRetirementAge().years()} years, {lowerEarner
-              .survivorNormalRetirementAge()
-              .modMonths()} months (<b
-              >{lowerEarner.survivorNormalRetirementDate().monthName()}, {lowerEarner
-                .survivorNormalRetirementDate()
-                .year()}</b
-            >).
+          <p class="fra-note">
+            Note: The survivor full retirement age ({lowerEarner.survivorNormalRetirementAge().years()}y {lowerEarner.survivorNormalRetirementAge().modMonths()}m) is slightly
+            different from the regular retirement age.
           </p>
         {/if}
-        <p>
-          If <RName r={lowerEarner} /> claims the survivor benefit at age 60, the
-          benefit is reduced by 28.5%. If <RName r={lowerEarner} /> claims the survivor
-          benefit at <RName r={lowerEarner} apos /> normal {#if adjustedNormalRetirementAge}survivor
-          {/if}retirement age, the benefit is not reduced. Between those two
-          ages, the benefit is reduced between 28.5% and 0% proportionally to
-          the filing time between age 60 and the normal {#if adjustedNormalRetirementAge}survivor
-          {/if}retirement age.
-        </p>
       </div>
     </Expando>
 
@@ -569,121 +634,164 @@ $: {
         </fieldset>
       </div>
 
-      {#if fileVsDeath == 'fileBeforeDeath'}
-        <p>
-          2. Estimate the age that <RName r={higherEarner} /> files for benefits:
-        </p>
-        <div class="slider-box">
-          <Slider
-            bind:value={beforeDeathSliderMonths_}
-            floor={62 * 12}
-            userFloor={62 * 12}
-            ceiling={70 * 12}
-            step={1}
-            translate={translateSliderLabel(null, null)}
-            showTicks={true}
-            ticksArray={beforeDeathTicks_}
-            barLeftColor={higherEarner.colors().light}
-            barRightColor={higherEarner.colors().medium}
-            tickLeftColor={higherEarner.colors().light}
-            tickRightColor={higherEarner.colors().medium}
-            handleColor={higherEarner.colors().medium}
-            handleSelectedColor={higherEarner.colors().dark}
-            tickLegendColor={higherEarner.colors().dark}
-          />
-        </div>
-        <p class="maximum-benefit">
-          The maximum surivor benefit is
-          <b>
-            {lowerEarner
-              .survivorBenefit(
-                higherEarner,
-                /* deceasedFilingDate */
-                higherEarner.birthdate.dateAtSsaAge(
-                  new MonthDuration(beforeDeathSliderMonths_)
-                ),
-                /* deceasedDeathDate - assume death right after filing */
-                higherEarner.birthdate.dateAtSsaAge(
-                  new MonthDuration(beforeDeathSliderMonths_)
-                ),
-                /* survivorFilingDate = 200 */
-                lowerEarner.birthdate.dateAtSsaAge(
-                  MonthDuration.initFromYearsMonths({ years: 200, months: 0 })
+      <div class="sliders-container">
+        {#if fileVsDeath == 'fileBeforeDeath'}
+          <p>
+            2. Estimate the age that <RName r={higherEarner} /> files for benefits:
+          </p>
+          <div
+            class="slider-box"
+            style:--reserved-left="{reservedLeftBeforeDeath_}%"
+            style:--reserved-right="{reservedRightBeforeDeath_}%"
+          >
+            <Slider
+              bind:value={beforeDeathSliderMonths_}
+              floor={62 * 12}
+              userFloor={62 * 12}
+              ceiling={70 * 12}
+              step={1}
+              translate={translateSliderLabel(null, null)}
+              showTicks={true}
+              ticksArray={beforeDeathTicks_}
+              barLeftColor={higherEarner.colors().light}
+              barRightColor={higherEarner.colors().medium}
+              tickLeftColor={higherEarner.colors().light}
+              tickRightColor={higherEarner.colors().medium}
+              handleColor={higherEarner.colors().medium}
+              handleSelectedColor={higherEarner.colors().dark}
+              tickLegendColor={higherEarner.colors().dark}
+            />
+          </div>
+          <p class="maximum-benefit">
+            The maximum survivor benefit is
+            <b>
+              {lowerEarner
+                .survivorBenefit(
+                  higherEarner,
+                  /* deceasedFilingDate */
+                  higherEarner.birthdate.dateAtSsaAge(
+                    new MonthDuration(beforeDeathSliderMonths_)
+                  ),
+                  /* deceasedDeathDate - 1 month after filing to trigger "filed before death" logic */
+                  higherEarner.birthdate.dateAtSsaAge(
+                    new MonthDuration(beforeDeathSliderMonths_ + 1)
+                  ),
+                  /* survivorFilingDate = 200 */
+                  lowerEarner.birthdate.dateAtSsaAge(
+                    MonthDuration.initFromYearsMonths({ years: 200, months: 0 })
+                  )
                 )
-              )
-              .wholeDollars()}</b
-          >.
-        </p>
-      {:else}
-        <p>
-          2. Estimate the age that <RName r={higherEarner} /> dies:
-        </p>
-        <div class="slider-box">
-          <Slider
-            bind:value={afterDeathSliderMonths_}
-            floor={66 * 12}
-            userFloor={66 * 12}
-            ceiling={70 * 12}
-            step={1}
-            translate={translateSliderLabel(66 * 12, 70 * 12)}
-            showTicks={true}
-            ticksArray={afterDeathTicks_}
-            barLeftColor={higherEarner.colors().light}
-            barRightColor={higherEarner.colors().medium}
-            tickLeftColor={higherEarner.colors().light}
-            tickRightColor={higherEarner.colors().medium}
-            handleColor={higherEarner.colors().medium}
-            handleSelectedColor={higherEarner.colors().dark}
-            tickLegendColor={higherEarner.colors().dark}
-          />
-        </div>
-        <p class="maximum-benefit">
-          The maximum surivor benefit is
-          <b>
-            {lowerEarner
-              .survivorBenefit(
-                higherEarner,
-                /* deceasedFilingDate */
-                higherEarner.birthdate.dateAtSsaAge(
-                  new MonthDuration(afterDeathSliderMonths_)
-                ),
-                /* deceasedDeathDate */
-                higherEarner.birthdate.dateAtSsaAge(
-                  new MonthDuration(afterDeathSliderMonths_)
-                ),
-                /* survivorFilingDate = 200 */
-                lowerEarner.birthdate.dateAtSsaAge(
-                  MonthDuration.initFromYearsMonths({ years: 200, months: 0 })
+                .wholeDollars()}</b
+            >.
+          </p>
+          <p>
+            3. Estimate the age that <RName r={lowerEarner} /> files for survivor benefits:
+          </p>
+          <div
+            class="slider-box"
+            style:--reserved-left="{reservedLeftSurvivorBeforeDeath_}%"
+            style:--reserved-right="{reservedRightSurvivorBeforeDeath_}%"
+          >
+            <Slider
+              bind:value={survivorSliderMonths_}
+              floor={60 * 12}
+              userFloor={survivorUserFloor_}
+              ceiling={lowerEarner.survivorNormalRetirementAge().asMonths()}
+              step={1}
+              translate={translateSliderLabel(
+                null,
+                lowerEarner.survivorNormalRetirementAge().asMonths()
+              )}
+              showTicks={true}
+              ticksArray={survivorTicks_}
+              barLeftColor={lowerEarner.colors().light}
+              barRightColor={lowerEarner.colors().medium}
+              tickLeftColor={lowerEarner.colors().light}
+              tickRightColor={lowerEarner.colors().medium}
+              handleColor={lowerEarner.colors().medium}
+              handleSelectedColor={lowerEarner.colors().dark}
+              tickLegendColor={lowerEarner.colors().dark}
+            />
+          </div>
+        {:else}
+          <p>
+            2. Estimate the age that <RName r={higherEarner} /> dies:
+          </p>
+          <div
+            class="slider-box"
+            style:--reserved-left="{reservedLeftAfterDeath_}%"
+            style:--reserved-right="{reservedRightAfterDeath_}%"
+          >
+            <Slider
+              bind:value={afterDeathSliderMonths_}
+              floor={66 * 12}
+              userFloor={66 * 12}
+              ceiling={70 * 12}
+              step={1}
+              translate={translateSliderLabel(66 * 12, 70 * 12)}
+              showTicks={true}
+              ticksArray={afterDeathTicks_}
+              barLeftColor={higherEarner.colors().light}
+              barRightColor={higherEarner.colors().medium}
+              tickLeftColor={higherEarner.colors().light}
+              tickRightColor={higherEarner.colors().medium}
+              handleColor={higherEarner.colors().medium}
+              handleSelectedColor={higherEarner.colors().dark}
+              tickLegendColor={higherEarner.colors().dark}
+            />
+          </div>
+          <p class="maximum-benefit">
+            The maximum survivor benefit is
+            <b>
+              {lowerEarner
+                .survivorBenefit(
+                  higherEarner,
+                  /* deceasedFilingDate */
+                  higherEarner.birthdate.dateAtSsaAge(
+                    new MonthDuration(afterDeathSliderMonths_)
+                  ),
+                  /* deceasedDeathDate */
+                  higherEarner.birthdate.dateAtSsaAge(
+                    new MonthDuration(afterDeathSliderMonths_)
+                  ),
+                  /* survivorFilingDate = 200 */
+                  lowerEarner.birthdate.dateAtSsaAge(
+                    MonthDuration.initFromYearsMonths({ years: 200, months: 0 })
+                  )
                 )
-              )
-              .wholeDollars()}</b
-          >.
-        </p>
-      {/if}
-      <p>
-        3. Estimate the age that <RName r={lowerEarner} /> files for survivor benefits:
-      </p>
-      <div class="slider-box">
-        <Slider
-          bind:value={survivorSliderMonths_}
-          floor={60 * 12}
-          userFloor={survivorUserFloor_}
-          ceiling={lowerEarner.survivorNormalRetirementAge().asMonths()}
-          step={1}
-          translate={translateSliderLabel(
-            null,
-            lowerEarner.survivorNormalRetirementAge().asMonths()
-          )}
-          showTicks={true}
-          ticksArray={survivorTicks_}
-          barLeftColor={lowerEarner.colors().light}
-          barRightColor={lowerEarner.colors().medium}
-          tickLeftColor={lowerEarner.colors().light}
-          tickRightColor={lowerEarner.colors().medium}
-          handleColor={lowerEarner.colors().medium}
-          handleSelectedColor={lowerEarner.colors().dark}
-          tickLegendColor={lowerEarner.colors().dark}
-        />
+                .wholeDollars()}</b
+            >.
+          </p>
+          <p>
+            3. Estimate the age that <RName r={lowerEarner} /> files for survivor benefits:
+          </p>
+          <div
+            class="slider-box"
+            style:--reserved-left="{reservedLeftSurvivorAfterDeath_}%"
+            style:--reserved-right="{reservedRightSurvivorAfterDeath_}%"
+          >
+            <Slider
+              bind:value={survivorSliderMonths_}
+              floor={60 * 12}
+              userFloor={survivorUserFloor_}
+              ceiling={lowerEarner.survivorNormalRetirementAge().asMonths()}
+              step={1}
+              translate={translateSliderLabel(
+                null,
+                lowerEarner.survivorNormalRetirementAge().asMonths()
+              )}
+              showTicks={true}
+              ticksArray={survivorTicks_}
+              barLeftColor={lowerEarner.colors().light}
+              barRightColor={lowerEarner.colors().medium}
+              tickLeftColor={lowerEarner.colors().light}
+              tickRightColor={lowerEarner.colors().medium}
+              handleColor={lowerEarner.colors().medium}
+              handleSelectedColor={lowerEarner.colors().dark}
+              tickLegendColor={lowerEarner.colors().dark}
+            />
+          </div>
+        {/if}
       </div>
       <div class="survivor-banner">
         Survivor Benefit Amount: {survivorBenefitDisplay_}
@@ -696,21 +804,87 @@ $: {
   .text {
     margin: 0 0.5em;
   }
-  .expando > p {
-    padding: 1em 0 0 1em;
+  .expando {
+    padding: 0 1em;
+  }
+  .expando h4 {
+    margin: 1.5em 0 0.5em 0;
+    color: #333;
+    font-size: 1.1em;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.25em;
+  }
+  .expando h4:first-of-type {
+    margin-top: 1em;
+  }
+  .expando p {
+    margin: 0.75em 0;
+  }
+  .summary-box {
+    background: linear-gradient(135deg, #e8f4fd 0%, #f0e8fd 100%);
+    border-left: 4px solid #4b9dea;
+    padding: 1em;
+    margin: 1em 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .eligibility-list li {
+    margin-bottom: 0.5em;
+  }
+  .scenarios-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.95em;
+  }
+  .scenarios-table th,
+  .scenarios-table td {
+    border: 1px solid #ddd;
+    padding: 0.75em;
+    text-align: left;
+    vertical-align: top;
+  }
+  .scenarios-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+  }
+  .scenarios-table .row-header {
+    background-color: #fafafa;
+    min-width: 70px;
+  }
+  .scenarios-table td .cell-condition {
+    display: block;
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 0.5em;
+  }
+  .scenarios-table td .cell-result {
+    display: block;
+  }
+  .pia-note {
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+  }
+  .reduction-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .reduction-list li {
+    padding: 0.5em 0;
+    border-bottom: 1px solid #eee;
+  }
+  .reduction-list li:last-child {
+    border-bottom: none;
+  }
+  .fra-note {
+    font-size: 0.9em;
+    color: #666;
+    background-color: #f9f9f9;
+    padding: 0.5em 1em;
+    border-radius: 4px;
   }
   .indent {
     padding-left: 2em;
-  }
-  li p {
-    padding: 0 0 0 1em;
-    margin: 0.75em 0;
-  }
-  li {
-    margin-bottom: 0.5em;
-  }
-  li ul {
-    margin-top: 0.5em;
   }
   fieldset {
     margin: 0;
@@ -805,10 +979,15 @@ $: {
       border-top: none;
     }
   }
-  .slider-box {
-    padding-left: 2em;
-    margin: 1em;
+  .sliders-container {
     max-width: 600px;
+  }
+  .slider-box {
+    position: relative;
+    margin-left: var(--reserved-left);
+    margin-right: var(--reserved-right);
+    margin-top: 1em;
+    margin-bottom: 1em;
   }
   p.maximum-benefit {
     padding-left: 2em;
