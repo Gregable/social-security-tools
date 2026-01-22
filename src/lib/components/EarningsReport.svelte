@@ -1,11 +1,33 @@
 <script lang="ts">
 import * as constants from '$lib/constants';
+import {
+  firstFutureEarningsEditable,
+  secondFutureEarningsEditable,
+} from '$lib/context';
+import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
 import EarningsTable from './EarningsTable.svelte';
 import Expando from './Expando.svelte';
 import FutureEarningsSliders from './FutureEarningsSliders.svelte';
 
 export let recipient: Recipient = new Recipient();
+
+// Get the editable state based on which recipient this is
+$: editable = $recipient.first
+  ? $firstFutureEarningsEditable
+  : $secondFutureEarningsEditable;
+
+function handleEarningsChange(
+  event: CustomEvent<{ index: number; year: number; wage: number }>
+) {
+  const { index, wage } = event.detail;
+  // Build new records from existing, with the changed value
+  const records = $recipient.futureEarningsRecords.map((r, i) => ({
+    year: r.year,
+    wage: i === index ? Money.from(wage) : r.taxedEarnings,
+  }));
+  $recipient.setCustomFutureEarnings(records);
+}
 
 function records(recipient: Recipient): number {
   return (
@@ -75,7 +97,17 @@ $: priorYear = constants.CURRENT_YEAR - 1;
   </div>
 
   <FutureEarningsSliders recipient={$recipient} />
-  <EarningsTable earningsRecords={$recipient.futureEarningsRecords} />
+  <EarningsTable
+    earningsRecords={$recipient.futureEarningsRecords}
+    {editable}
+    on:earningsChange={handleEarningsChange}
+  />
+  {#if editable}
+    <p class="cap-note noprint">
+      Values are capped at the Social Security maximum for each year
+      (currently ${constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR].value().toLocaleString()}).
+    </p>
+  {/if}
 </div>
 
 <style>
@@ -112,5 +144,11 @@ $: priorYear = constants.CURRENT_YEAR - 1;
     padding: 12px 16px;
     margin: 1em 0;
     border-radius: 0 4px 4px 0;
+  }
+  .cap-note {
+    text-align: center;
+    font-size: 13px;
+    color: #6c757d;
+    margin: 8px 0 0 0;
   }
 </style>

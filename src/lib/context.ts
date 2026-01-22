@@ -127,6 +127,10 @@ export function hasSession(): boolean {
 export const isFirstStuck = writable<boolean>(false);
 export const isSecondStuck = writable<boolean>(false);
 
+// Track whether future earnings are being edited (custom mode) for each recipient
+export const firstFutureEarningsEditable = writable<boolean>(false);
+export const secondFutureEarningsEditable = writable<boolean>(false);
+
 // Derived store for overall stuck state
 export const isStuck = derived(
   [isFirstStuck, isSecondStuck],
