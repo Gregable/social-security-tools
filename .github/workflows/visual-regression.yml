@@ -15,8 +15,11 @@ concurrency:
 jobs:
   chromatic:
     runs-on: ubuntu-latest
-    # Skip draft PRs to save snapshots
-    if: github.event.pull_request.draft != true
+    # Skip draft PRs, Dependabot PRs, and fork PRs (no access to secrets)
+    if: |
+      github.event.pull_request.draft != true &&
+      github.actor != 'dependabot[bot]' &&
+      !github.event.pull_request.head.repo.fork
     steps:
       - uses: actions/checkout@v4
         with:
