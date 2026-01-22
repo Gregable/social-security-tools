@@ -130,30 +130,27 @@ schema.tags = [
     Workers with 21-29 years received graduated relief:
   </p>
 
-  <div class="formula-box">
-    <h3>WEP Reduction Scale (Before Repeal)</h3>
-    <table class="wep-table">
-      <thead>
-        <tr>
-          <th>Years of Substantial Earnings</th>
-          <th>First Bracket Factor</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>30 or more</td><td>90% (no reduction)</td></tr>
-        <tr><td>29</td><td>85%</td></tr>
-        <tr><td>28</td><td>80%</td></tr>
-        <tr><td>27</td><td>75%</td></tr>
-        <tr><td>26</td><td>70%</td></tr>
-        <tr><td>25</td><td>65%</td></tr>
-        <tr><td>24</td><td>60%</td></tr>
-        <tr><td>23</td><td>55%</td></tr>
-        <tr><td>22</td><td>50%</td></tr>
-        <tr><td>21</td><td>45%</td></tr>
-        <tr><td>20 or fewer</td><td>40% (maximum reduction)</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <table class="wep-table">
+    <thead>
+      <tr>
+        <th>Years of Substantial Earnings</th>
+        <th>First Bracket Factor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>30 or more</td><td>90% (no reduction)</td></tr>
+      <tr><td>29</td><td>85%</td></tr>
+      <tr><td>28</td><td>80%</td></tr>
+      <tr><td>27</td><td>75%</td></tr>
+      <tr><td>26</td><td>70%</td></tr>
+      <tr><td>25</td><td>65%</td></tr>
+      <tr><td>24</td><td>60%</td></tr>
+      <tr><td>23</td><td>55%</td></tr>
+      <tr><td>22</td><td>50%</td></tr>
+      <tr><td>21</td><td>45%</td></tr>
+      <tr><td>20 or fewer</td><td>40% (maximum reduction)</td></tr>
+    </tbody>
+  </table>
 
   <h2>Who Was Affected by WEP?</h2>
 
@@ -257,22 +254,19 @@ schema.tags = [
 
   <p>The benefit increases varied based on individual circumstances:</p>
 
-  <div class="formula-box">
-    <h3>Average Monthly Increases After Repeal</h3>
-    <table class="wep-table">
-      <thead>
-        <tr>
-          <th>Beneficiary Type</th>
-          <th>Average Monthly Increase</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>WEP-affected workers</td><td>~$360</td></tr>
-        <tr><td>GPO-affected spouses</td><td>~$700</td></tr>
-        <tr><td>GPO-affected survivors</td><td>~$1,190</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <table class="wep-table">
+    <thead>
+      <tr>
+        <th>Beneficiary Type</th>
+        <th>Average Monthly Increase</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>WEP-affected workers</td><td>~$360</td></tr>
+      <tr><td>GPO-affected spouses</td><td>~$700</td></tr>
+      <tr><td>GPO-affected survivors</td><td>~$1,190</td></tr>
+    </tbody>
+  </table>
 
   <p>
     For workers who faced the maximum WEP reduction, monthly benefits increased
@@ -413,31 +407,23 @@ schema.tags = [
 </div>
 
 <style>
-  .formula-box {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .formula-box h3 {
-    margin-top: 0;
-    color: #2c3e50;
-    text-align: center;
-  }
-
   .wep-table {
-    width: 100%;
+    width: fit-content;
+    max-width: 80%;
     border-collapse: collapse;
-    margin-top: 1rem;
+    margin: 20px auto;
   }
 
   .wep-table th,
   .wep-table td {
-    padding: 8px 12px;
+    padding: 10px 25px;
     text-align: left;
     border-bottom: 1px solid #e9ecef;
+  }
+
+  .wep-table th:first-child,
+  .wep-table td:first-child {
+    text-align: right;
   }
 
   .wep-table th {
@@ -453,8 +439,10 @@ schema.tags = [
     background-color: #f0f8ff;
     border-left: 4px solid #4a90e2;
     padding: 15px;
-    margin: 20px 0;
+    margin: 20px auto;
     border-radius: 4px;
+    width: fit-content;
+    max-width: 70%;
   }
 
   .faq h3 {
@@ -474,7 +462,7 @@ schema.tags = [
 
     .wep-table th,
     .wep-table td {
-      padding: 6px 8px;
+      padding: 8px 10px;
     }
   }
 </style>

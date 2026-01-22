@@ -180,16 +180,9 @@ const faqs = [
     The divorced spouse benefit is based on your ex-spouse's
     <a href="/guides/pia">Primary Insurance Amount (PIA)</a>, which is the benefit
     they would receive at their <a href="/guides/nra">Normal Retirement Age (NRA)</a>.
-  </p>
-
-  <div class="formula-box">
-    <h3>Divorced Spouse Benefit Formula</h3>
-    <p><strong>Maximum Benefit = 50% of Ex-Spouse's PIA</strong></p>
-  </div>
-
-  <p>
-    This maximum is what you'd receive if you claim at your own full retirement age.
-    Claiming earlier reduces your benefit:
+    The maximum divorced spouse benefit is <strong>50% of your ex-spouse's PIA</strong>,
+    which you'd receive if you claim at your own full retirement age. Claiming
+    earlier reduces your benefit:
   </p>
 
   <table class="benefit-table">
@@ -322,14 +315,10 @@ const faqs = [
 
   <p>
     If your ex-spouse dies, you may be eligible for <a href="/guides/survivor-benefits">survivor benefits</a>,
-    which are significantly more generous than divorced spouse retirement benefits:
+    which are significantly more generous than divorced spouse retirement benefits.
+    The maximum survivor benefit is <strong>100% of your ex-spouse's benefit</strong>,
+    compared to 50% while they were alive.
   </p>
-
-  <div class="formula-box">
-    <h3>Divorced Spouse Survivor Benefit</h3>
-    <p><strong>Maximum Benefit = 100% of Ex-Spouse's Benefit</strong></p>
-    <p>(compared to 50% while they were alive)</p>
-  </div>
 
   <h3>Survivor Benefit Requirements</h3>
 
@@ -496,8 +485,10 @@ const faqs = [
     background-color: #f0f8ff;
     border-left: 4px solid #4a90e2;
     padding: 15px;
-    margin: 20px 0;
+    margin: 20px auto;
     border-radius: 4px;
+    width: fit-content;
+    max-width: 70%;
   }
 
   .example-box {
@@ -514,16 +505,22 @@ const faqs = [
   }
 
   .benefit-table {
-    width: 100%;
+    width: fit-content;
+    max-width: 80%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 20px auto;
   }
 
   .benefit-table th,
   .benefit-table td {
-    padding: 10px 15px;
+    padding: 10px 25px;
     text-align: left;
     border-bottom: 1px solid #e9ecef;
+  }
+
+  .benefit-table th:first-child,
+  .benefit-table td:first-child {
+    text-align: right;
   }
 
   .benefit-table th {
@@ -540,6 +537,7 @@ const faqs = [
     color: #666;
     font-style: italic;
     margin-top: -10px;
+    text-align: center;
   }
 
   .faq h3 {
