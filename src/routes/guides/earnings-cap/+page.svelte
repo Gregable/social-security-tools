@@ -75,7 +75,7 @@ schema.tags = [
     <p>
       If you earn $200,000 in {currentYear}, only {currentYearCap.wholeDollars()} is subject to
       Social Security tax. You pay 6.2% on {currentYearCap.wholeDollars()}, and the remaining
-      ${(200000 - currentYearCap.value() / 100).toLocaleString()} is not taxed for Social Security
+      ${(200000 - currentYearCap.value()).toLocaleString()} is not taxed for Social Security
       (though it is still subject to Medicare tax, which has no cap).
     </p>
   </div>
@@ -83,10 +83,23 @@ schema.tags = [
   <h2>How Is the Cap Determined?</h2>
 
   <p>
-    The cap is updated every year to keep pace with wage growth. The formula
-    for a given year X takes the National Average Wage Index (AWI) for year
-    (X - 2), divides it by $22,935.42 (the AWI in 1992), and multiplies by
-    $60,600 (the cap in 1994).
+    The cap is updated every year to keep pace with wage growth, using the
+    National Average Wage Index (AWI):
+  </p>
+
+  <div class="formula-box">
+    <div class="formula">
+      Cap for Year X = $60,600 × <span class="fraction"><span class="numerator">AWI for Year (X − 2)</span><span class="denominator">$22,935.42</span></span>
+    </div>
+    <p class="formula-note">
+      Where $60,600 was the cap in 1994 and $22,935.42 was the AWI in 1992.
+    </p>
+  </div>
+
+  <p>
+    Why X − 2? The AWI for any given year isn't published until the following
+    fall. Since the cap for year X must be announced in the fall of year X − 1,
+    the most recent finalized AWI available is from year X − 2.
   </p>
 
   <p>
@@ -202,6 +215,44 @@ schema.tags = [
 
   .example-box p {
     margin-bottom: 0;
+  }
+
+  .formula-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .formula {
+    font-size: 1.1em;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .fraction {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0 0.2em;
+  }
+
+  .numerator {
+    border-bottom: 1px solid #333;
+    padding-bottom: 2px;
+  }
+
+  .denominator {
+    padding-top: 2px;
+  }
+
+  .formula-note {
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: #666;
   }
 
   .earnings-container {
