@@ -27,6 +27,34 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jan 21, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/indexing-factors">
+            Social Security Wage Indexing: How Your Earnings Are Adjusted
+          </a>
+        </h3>
+        <p class="description">
+          Learn how Social Security uses wage indexing to adjust your earnings
+          for inflation. Understand indexing factors, the AWI formula, and why
+          your benefit is shown in today's dollars.
+        </p>
+      </li>
+
+      <li>
+        <span class="postdate">Jan 21, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/inflation">
+            How Inflation Affects Your Social Security Benefits: AWI and COLA Explained
+          </a>
+        </h3>
+        <p class="description">
+          Discover how Social Security protects your benefits from inflation
+          through wage indexing (AWI) during your working years and Cost of
+          Living Adjustments (COLA) after retirement.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 19, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/survivor-benefits"
@@ -326,23 +354,6 @@ const pageImageAlt = 'Social Security guides and educational resources';
       </li>
 
       <li>
-        <span class="postdate">Dec 28, 2020</span>
-        <h3 class="posttitle">
-          <a href="/guides/indexing-factors">
-            Why does ssa.tools use the current year's indexing factors for
-            someone younger than 62?
-          </a>
-        </h3>
-        <p class="description">
-          The Social Security Administration uses indexing factors to adjust
-          past earnings for inflation. This guide delves into why SSA.tools uses
-          current year indexing factors for younger individuals, rather than
-          projected future factors, and the implications of this approach for
-          benefit estimates.
-        </p>
-      </li>
-
-      <li>
         <span class="postdate">Dec 1, 2020</span>
         <h3 class="posttitle">
           <a href="/guides/covid-awi-drop">
@@ -381,19 +392,6 @@ const pageImageAlt = 'Social Security guides and educational resources';
           explains the factors that determine the maximum monthly payment,
           including your earnings history and the age at which you claim
           benefits, providing insight into the upper limits of Social Security.
-        </p>
-      </li>
-      <li>
-        <span class="postdate">Nov 23, 2018</span>
-        <h3 class="posttitle">
-          <a href="/guides/inflation">Social Security and Inflation </a>
-        </h3>
-        <p class="description">
-          Inflation significantly impacts the value of your Social Security
-          benefits. This guide differentiates between two key types of
-          inflation (wage increases and the Consumer Price Index) and explains
-          how each uniquely influences the calculation and purchasing power of
-          your Social Security payments.
         </p>
       </li>
     </ul>

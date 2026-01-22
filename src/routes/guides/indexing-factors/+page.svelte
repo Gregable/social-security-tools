@@ -1,21 +1,62 @@
 <script lang="ts">
-import { GuidesSchema } from '$lib/schema-org';
+import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
+import { MAX_YEAR, MAX_WAGE_INDEX_YEAR, WAGE_INDICES } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
 import HeroImage from './hero.png';
 
-const title = 'Social Security Indexing Factors';
+const title = 'Social Security Wage Indexing: How Your Earnings Are Adjusted';
 const description =
-  "Why use the current year's indexing factors for someone younger than 62?";
+  "Learn how Social Security uses wage indexing to adjust your earnings for inflation. Understand indexing factors, the AWI formula, and why your benefit is shown in today's dollars.";
 const publishDate = new Date('2020-12-28T00:00:00+00:00');
+const updateDate = new Date('2026-01-21T00:00:00+00:00');
+
+// Calculate example indexing factor
+const exampleYear = 1990;
+const indexingYear = MAX_WAGE_INDEX_YEAR - 2; // Year someone turning 60 would use
+const exampleAWI = WAGE_INDICES[exampleYear];
+const indexingAWI = WAGE_INDICES[indexingYear];
+const exampleFactor = indexingAWI && exampleAWI ? (indexingAWI.value() / exampleAWI.value()).toFixed(2) : '2.50';
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/indexing-factors';
 schema.title = title;
-schema.image = HeroImage; // Added HeroImage to schema
+schema.image = HeroImage;
 schema.datePublished = publishDate.toISOString();
-schema.description = description; // Pass the description to the schema
-schema.imageAlt = 'A chalkboard with complex equations';
-schema.tags = ['Wage Indexing', 'Social Security', 'AWI', 'Average Wage Index'];
+schema.dateModified = updateDate.toISOString();
+schema.description = description;
+schema.imageAlt = 'A chalkboard with complex equations representing wage indexing calculations';
+schema.tags = [
+  'Wage Indexing',
+  'Social Security',
+  'AWI',
+  'Average Wage Index',
+  'Indexing Factors',
+  'Earnings Adjustment',
+  String(MAX_YEAR),
+];
+
+const faqs: FAQItem[] = [
+  {
+    question: "Why doesn't the calculator use my actual eligibility year for indexing factors?",
+    answer:
+      "The calculator uses current-year indexing factors to show your benefit in \"today's dollars.\" Using future estimated factors would show inflated dollar amounts that are harder to compare with your current expenses. This is the same approach the Social Security Administration uses in their benefit estimates.",
+  },
+  {
+    question: 'Will my indexed earnings change over time?',
+    answer:
+      "Yes. Until you turn 60, your indexed earnings will be recalculated each year using updated Average Wage Index (AWI) values. After age 60, your indexing factors are locked in and won't change.",
+  },
+  {
+    question: 'What is the Average Wage Index (AWI)?',
+    answer:
+      'The AWI is the average of all wages reported to Social Security in a given year. It measures how much average wages have grown over time and is used to adjust your historical earnings so they reflect current wage levels.',
+  },
+  {
+    question: 'Why do indexing factors stop at age 60 instead of 62?',
+    answer:
+      "The AWI for any year isn't finalized until the following fall. Since your indexing factors must be determined when you turn 62, the most recent finalized AWI available is from two years prior—when you were 60.",
+  },
+];
 </script>
 
 <svelte:head>
@@ -24,216 +65,347 @@ schema.tags = ['Wage Indexing', 'Social Security', 'AWI', 'Average Wage Index'];
   <link rel="canonical" href={schema.url} />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
+  {@html renderFAQSchema(faqs)}
 </svelte:head>
 
-<div class="guide-page">
+<div class="guide-page indexing-factors-guide">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <p class="postdate">
+    Published: {publishDate.toLocaleDateString()} · Updated: {updateDate.toLocaleDateString()}
+  </p>
 
   <figure class="hero-image">
     <img
       src={HeroImage}
       width="512"
       height="512"
-      alt="Chalkboard with unintelligble mathematics writing"
+      alt="Chalkboard with mathematical equations representing wage indexing"
     />
   </figure>
 
-  <p>
-    Yesterday, Josh Scandlen posted a <a
-      href="https://www.youtube.com/watch?v=JZXymvFm8uw&t=78s">YouTube video</a
-    >
-    discussing the <a href="/">SSA.tools Calculator</a>. One of the concerns
-    raised in the video was that for folks currently under age 62, SSA.tools
-    uses incorrect Indexing Factors. In the example, the user was born in 1970
-    and is thus 50 years old in 2020. The indexing factors for a 1970 year old
-    will be determined in 2032, at the age that the recipient turns 62.
-    SSA.tools makes all of its calculations using index factors for someone
-    turning 62 in 2021 however, which seems initially incorrect.
-  </p>
-  <h2>Short version. tl;dr:</h2>
-  <p>
-    SSA.tools uses the latest current indexing factors rather than future
-    estimated values so that all of the numbers presented in the report are in
-    "today's dollars". Another way to think of this is that the values are
-    adjusted for future inflation. If you use estimated indexing factors for
-    2032 while the current year is 2020, the report will present benefits in
-    inflated 2032 dollars amounts, which can give an extra rosy interpretation
-    of one's benefits when comparing against one's current
-    not-inflation-adjusted expenses.
-  </p>
-  <p>
-    The reports that the Social Security Administration presents operate the
-    same way, using the latest index factors rather than the future estimated
-    values.
-  </p>
-  <h2>Longer version</h2>
-  <p>
-    For the sake of illustration, let's consider a social security recipient
-    named Alex born in 1970 and the year is currently 2020. After Alex enters
-    her social security earnings record into ssa.tools, it displays a table that
-    looks like this:
-  </p>
-  <img
-    src="/indexing-factors-guide-earnings-record.jpg"
-    style:margin="auto"
-    style:display="block"
-    alt="Earnings record for a hypothetical user"
-  />
-  <p>
-    We see that in 1984, Alex earned $16,035 which is multiplied by an earnings
-    factor of <b>3.35</b> for an indexed earnings value of $16,035 x 3.35 = $53.765.
-  </p>
-  <p>
-    Alex then looks at the official <a
-      href="https://www.ssa.gov/oact/cola/awifactors.html"
-      >ssa.gov Index Factors for Earnings</a
-    > which explains that Alex's year of eligibility will be 2032 when Alex turns
-    62. Alex enters 2032 and ssa.gov displays a table that looks like this:
-  </p>
-  <img
-    src="/indexing-factors-guide-awi-factors.jpg"
-    style:margin="auto"
-    style:display="block"
-    alt="ssa.gov's index factors for 2032"
-  />
-  <p>
-    The ssa.tools calculator shows an index factor for 1984 of <b>3.35</b>
-    while ssa.gov shows <b>5.0878930</b>, clearly disagreeing. In fact every
-    index factor seems off. Every year is off by approximately the same amount
-    too: the ssa.gov numbers are all 52% higher than the ssa.tools numbers. Why?
-  </p>
-  <p>
-    On <a href="https://www.ssa.gov/oact/cola/awifactors.html"
-      >ssa.gov's Indexing Factors page</a
-    >, there is a clue to what's going on:
-  </p>
-  <img
-    src="/indexing-factors-guide-year-of-eligibility.jpg"
-    style:margin="auto"
-    style:display="block"
-    style:border="1px solid #aaa"
-    alt="Year of eligibility: Note if you select a year after 2021, we will use
-    the average wage changes that were estimated under the intermediate
-    assumptions in the latest Trustees Report."
-  />
-  <p>
-    If Alex instead enters 2021 as the year of eligibility, Alex will get the
-    exact same numbers as ssa.tools uses: 3.35 in 1984 and so on. So, which
-    number is correct?
-  </p>
-  <p>
-    We first need to understand how the indexing factors are determined. These
-    numbers are not just selected by a governing body; there is instead a simple
-    formula that determines them. The calculation will actually be made in the
-    year that Alex turns 62, which is 2032. In 2032, index factors are
-    calculated for Alex for every year up to and including the year she turned
-    60. Every year after that, the multiplier will always be 1.0. For the years
-    up until 60, the multiplier for a given year will be the Average Wage Index
-    (AWI) in the year she turned 60 divided by the AWI of the multiplier year:
-  </p>
+  <div class="key-takeaways">
+    <h3>Key Takeaways</h3>
+    <ul>
+      <li>
+        <strong>Wage indexing</strong> adjusts your past earnings to account for
+        wage growth over time
+      </li>
+      <li>
+        The <strong>Average Wage Index (AWI)</strong> determines how much each year's
+        earnings are adjusted
+      </li>
+      <li>
+        Your indexing factors are <strong>locked in at age 60</strong> and don't change
+        after that
+      </li>
+      <li>
+        Benefits are shown in <strong>"today's dollars"</strong> so you can compare
+        them to your current expenses
+      </li>
+    </ul>
+  </div>
 
-  <table style:margin="auto">
-    <tbody>
-      <tr>
-        <td rowspan="2" style:padding="6px" style:text-align="center"
-          >Multiplier (year X) =</td
-        >
-        <td
-          style:border-bottom="1px solid black"
-          style:padding="6px"
-          style:text-align="center">AWI (year 2030)</td
-        >
-      </tr>
-      <tr>
-        <td style:padding="6px" style:text-align="center">AWI (year X)</td>
-      </tr>
-    </tbody>
-  </table>
+  <h2>What Is Wage Indexing?</h2>
 
   <p>
-    The problem is that until 2032, we don't know these values. AWI stands for
-    the "Average Wage Index". It is the average of all of the wages reported by
-    everyone in the country in that year. We can't know that value until at
-    least the following year. The data is based on tax returns, so with late
-    filing and so forth, the actual number won't really be known until very late
-    in the following year, which makes it available for use in the year after
-    that (2 years later). This is why 2030 numbers are used in 2032.
+    Social Security uses wage indexing to ensure that your benefit reflects
+    changes in the general wage level over your working career. Without
+    indexing, someone who earned $20,000 in 1985 would have those earnings
+    counted the same as someone earning $20,000 today—even though $20,000 had
+    far more purchasing power in 1985.
   </p>
+
   <p>
-    The AWI numbers that ssa.gov displays for eligibility years after 2021 are
-    all just estimates based on models of what wages might be like in the
-    future. Nobody knows this for certain yet, but we can make reasonable
-    guesses. The guesses become more accurate the closer we get to that year.
+    The indexing process multiplies each year's earnings by an <strong
+      >indexing factor</strong
+    >. This factor is based on how much average wages have grown since that year.
+    The result is called your <strong>indexed earnings</strong>.
   </p>
+
+  <div class="example-box">
+    <h4>Example</h4>
+    <p>
+      If you earned $25,000 in {exampleYear} and the indexing factor for that year
+      is {exampleFactor}, your indexed earnings would be:
+    </p>
+    <p class="calculation">
+      $25,000 × {exampleFactor} = ${(25000 * parseFloat(exampleFactor)).toLocaleString()}
+    </p>
+    <p>
+      This adjusted amount is what counts toward your benefit calculation,
+      making your {exampleYear} earnings comparable to earnings today.
+    </p>
+  </div>
+
+  <h2>How the Indexing Formula Works</h2>
+
   <p>
-    This is why all of the numbers differ by 52% between the 2021 and the 2032
-    earnings factors. 52% is the estimated increase in average wage between 2019
-    and 2030. From <a
-      href="https://www.ssa.gov/oact/TR/2020/VI_G3_OASDHI_dollars.html#182913"
-      >Table VI.G6</a
-    >
-    we see that the AWI in 2019 is $53,756.28 and the <i>estimated</i> AWI in 2030
-    is $81,571.95. $81,571.95 / $53,756.28 = 152%.
+    The indexing factor for any year is calculated using a simple formula based
+    on the <a href="https://www.ssa.gov/oact/cola/awidevelop.html"
+      >Average Wage Index (AWI)</a
+    >:
   </p>
+
+  <div class="formula-box">
+    <div class="formula">
+      Indexing Factor = <span class="fraction"
+        ><span class="numerator">AWI in the year you turn 60</span><span
+          class="denominator">AWI in the earnings year</span
+        ></span
+      >
+    </div>
+    <p class="formula-note">
+      For earnings after age 60, the indexing factor is always 1.0 (no
+      adjustment).
+    </p>
+  </div>
+
   <p>
-    Why don't we use the estimates, even if they might be a little off?
-    Inflation.
+    The AWI is the average of all wages reported to Social Security in a given
+    year. As of {MAX_WAGE_INDEX_YEAR}, the AWI was {WAGE_INDICES[MAX_WAGE_INDEX_YEAR]?.wholeDollars() ?? 'not yet published'}.
   </p>
+
+  <h2>Why Benefits Are Shown in "Today's Dollars"</h2>
+
   <p>
-    The difference between the AWI in 2019 and 2030 is wage inflation. The
-    indexing factors exist to adjust for wage inflation over time. The Social
-    Security Administration expects average wages to increase by 52% between
-    2019 and 2030. Alex's costs will increase as well. If Alex were to compare
-    her 2032 monthly benefit of $3,000 against her 2020 monthly expenses of
-    $2,800, Alex may think that her benefit will entirely cover her expenses
-    with 10% left over. Instead, that $2,800 will cost much more due to
-    inflation by 2032. We don't know the exact amount, but one estimate might be
-    52% - the amount wages will inflate by then. That $2,800 would then cost
-    $2,800 x 1.52 = $4,256.
+    When you use this calculator or receive a benefit estimate from Social
+    Security, the amounts are shown in <strong>"today's dollars"</strong>. This
+    means we use the most recent available indexing factors rather than
+    estimated future values.
   </p>
+
+  <div class="highlight-box">
+    <p>
+      <strong>Why this matters:</strong> If we used estimated 2035 indexing factors
+      to calculate your benefit, the result would be in "2035 dollars"—inflated amounts
+      that are hard to compare with your current income and expenses. By using today's
+      factors, you can directly compare your estimated benefit to what you spend now.
+    </p>
+  </div>
+
   <p>
-    By showing Alex's benefit in 2020 dollars, using today's latest AWI from
-    2019, we show Alex a benefit that she can directly compare to her expenses
-    today. The benefit is approximately "inflation adjusted".
+    This is the same approach the Social Security Administration uses when they
+    send you a benefit estimate. They assume you'll continue earning at your
+    current level and apply today's indexing factors, giving you an estimate in
+    today's purchasing power.
   </p>
+
+  <h2>What Happens at Age 60?</h2>
+
   <p>
-    This is the same methodology that the Social Security Administration uses
-    when producing an estimate of your future benefit at retirement age, when
-    you get an annual report either in the mail or at ssa.gov. The estimate
-    assumes you will continue to earn the same amount as last year for every
-    year going forward until age 62. It then applies the benefit formula using
-    this year's Indexing Factors, giving you an estimate in today's dollars.
+    Your indexing factors are determined—and permanently locked in—in the year
+    you turn 62. However, the formula uses the AWI from the year you turned 60.
+    Why?
   </p>
+
+  <p>
+    The AWI for any given year isn't published until the following fall. Since
+    your benefit calculation must be finalized when you turn 62, the most recent
+    available AWI is from two years prior (when you were 60).
+  </p>
+
+  <div class="example-box">
+    <h4>Timeline Example</h4>
+    <p>If you were born in 1965:</p>
+    <ul>
+      <li><strong>2025:</strong> You turn 60 (AWI for 2025 will be used)</li>
+      <li>
+        <strong>2026:</strong> AWI for 2025 is published in the fall
+      </li>
+      <li>
+        <strong>2027:</strong> You turn 62 and your indexing factors are calculated
+        and locked in
+      </li>
+    </ul>
+  </div>
+
+  <p>
+    Earnings after age 60 receive an indexing factor of 1.0—they're counted at
+    face value with no adjustment. This means your final few years of earnings
+    aren't indexed up for wage growth.
+  </p>
+
+  <h2>Common Questions</h2>
+
+  <div class="faq-section">
+    {#each faqs as faq}
+      <h3>{faq.question}</h3>
+      <p>{faq.answer}</p>
+    {/each}
+  </div>
+
   <h2>Related Guides</h2>
 
   <ul>
     <li>
-      <a href="/guides/aime">AIME Guide</a> — How indexing factors are used to
+      <a href="/guides/aime">AIME Guide</a> — How indexed earnings are averaged to
       calculate your Average Indexed Monthly Earnings
     </li>
     <li>
       <a href="/guides/earnings-cap">Earnings Cap</a> — The annual limit on earnings
-      before indexing is applied
+      subject to Social Security tax and benefit calculations
     </li>
     <li>
-      <a href="/guides/pia">Primary Insurance Amount (PIA)</a> — How your indexed
-      earnings become your monthly benefit
+      <a href="/guides/pia">Primary Insurance Amount (PIA)</a> — How your AIME is
+      converted to your monthly benefit amount
     </li>
     <li>
-      <a href="/guides/inflation">Inflation Guide</a> — How wage and price inflation
-      affect Social Security calculations differently
-    </li>
-    <li>
-      <a href="/guides/covid-awi-drop">COVID AWI Drop</a> — How 2020's economy
-      affected indexing factors for those born in 1960
+      <a href="/guides/inflation">Inflation Guide</a> — How wage indexing and COLA
+      adjustments protect your benefit from inflation
     </li>
   </ul>
 
   <p>
-    Use the <a href="/calculator">SSA.tools calculator</a> to see your indexed
-    earnings based on your actual earnings record.
+    Use the <a href="/calculator">SSA.tools calculator</a> to see your indexed earnings
+    based on your actual earnings record.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html">
+        Index Factors for Earnings</a
+      > [ssa.gov]
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/awidevelop.html">
+        Average Wage Index Development</a
+      > [ssa.gov]
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/AWI.html">
+        National Average Wage Index</a
+      > [ssa.gov]
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>
+
+<style>
+  .postdate {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+  }
+
+  .key-takeaways {
+    background-color: #e8f5e9;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .key-takeaways h3 {
+    margin-top: 0;
+    color: #2e7d32;
+    font-size: 1.2em;
+  }
+
+  .key-takeaways ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .key-takeaways li {
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+
+  .example-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 20px 0;
+  }
+
+  .example-box h4 {
+    margin-top: 0;
+    color: #2c3e50;
+  }
+
+  .example-box .calculation {
+    font-size: 1.1em;
+    font-weight: 600;
+    text-align: center;
+    margin: 15px 0;
+  }
+
+  .example-box ul {
+    margin-bottom: 0;
+  }
+
+  .formula-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .formula {
+    font-size: 1.1em;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .fraction {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0 0.2em;
+  }
+
+  .numerator {
+    border-bottom: 1px solid #333;
+    padding-bottom: 2px;
+  }
+
+  .denominator {
+    padding-top: 2px;
+  }
+
+  .formula-note {
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: #666;
+  }
+
+  .highlight-box {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .highlight-box p {
+    margin: 0;
+  }
+
+  .faq-section h3 {
+    color: #2c3e50;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-size: 1.1em;
+  }
+
+  .faq-section p {
+    margin-top: 0;
+  }
+
+  ul {
+    margin: 1rem 0;
+    padding-left: 2rem;
+  }
+
+  li {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+</style>
