@@ -618,25 +618,6 @@
     margin-bottom: 0;
   }
 
-  .formula-box {
-    background-color: #f8f9fa;
-    border: 2px solid #6c757d;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    text-align: center;
-  }
-
-  .formula-box h3 {
-    margin-top: 0;
-    color: #495057;
-  }
-
-  .formula-box p {
-    margin-bottom: 0;
-    font-size: 1.1em;
-  }
-
   .highlight-box {
     background-color: #f0f8ff;
     border-left: 4px solid #4a90e2;
