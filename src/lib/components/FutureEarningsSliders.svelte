@@ -2,7 +2,12 @@
 import { onDestroy, onMount } from 'svelte';
 import { get } from 'svelte/store';
 import * as constants from '$lib/constants';
-import { isFirstStuck, isSecondStuck } from '$lib/context';
+import {
+  isFirstStuck,
+  isSecondStuck,
+  firstFutureEarningsEditable,
+  secondFutureEarningsEditable,
+} from '$lib/context';
 import { activeIntegration } from '$lib/integrations/context';
 import { Money } from '$lib/money';
 import type { Recipient } from '$lib/recipient';
@@ -67,10 +72,80 @@ let futureEarningWage: number = mostRecentEarningWage(recipient)
   .roundToDollar()
   .value();
 
-function update(futureEarningYears: number, futureEarningWage: Money) {
-  recipient.simulateFutureEarningsYears(futureEarningYears, futureEarningWage);
+// Read custom mode from the global store
+$: customMode = recipient.first
+  ? $firstFutureEarningsEditable
+  : $secondFutureEarningsEditable;
+
+// Get the store for this recipient to set it
+$: editableStore = recipient.first
+  ? firstFutureEarningsEditable
+  : secondFutureEarningsEditable;
+
+// Track if wage slider should be disabled (in custom mode)
+$: wageSliderDisabled = customMode;
+
+// State for inline revert confirmation
+let showRevertWarning = false;
+
+function toggleCustomMode() {
+  if (customMode) {
+    // Show inline warning instead of browser dialog
+    showRevertWarning = true;
+    return;
+  }
+  editableStore.set(true);
 }
-$: update(futureEarningYears, Money.from(futureEarningWage));
+
+function confirmRevert() {
+  showRevertWarning = false;
+  editableStore.set(false);
+}
+
+function cancelRevert() {
+  showRevertWarning = false;
+}
+
+function update(years: number, wage: Money) {
+  recipient.simulateFutureEarningsYears(years, wage);
+}
+
+// Only trigger update for flat mode when sliders change
+$: if (!customMode) {
+  update(futureEarningYears, Money.from(futureEarningWage));
+}
+
+// Handle years slider changes in custom mode
+function handleYearsChange(newYears: number) {
+  if (customMode) {
+    const records = recipient.futureEarningsRecords;
+    const currentLength = records.length;
+    if (newYears > currentLength) {
+      // Add new years using the last year's value
+      const startYear = recipient.futureEarningsStartYear();
+      const lastWage =
+        currentLength > 0
+          ? records[currentLength - 1].taxedEarnings
+          : Money.from(futureEarningWage);
+      const newRecords = records.map((r) => ({
+        year: r.year,
+        wage: r.taxedEarnings,
+      }));
+      for (let i = currentLength; i < newYears; i++) {
+        newRecords.push({ year: startYear + i, wage: lastWage });
+      }
+      recipient.setCustomFutureEarnings(newRecords);
+    } else if (newYears < currentLength) {
+      // Remove years from the end
+      const newRecords = records.slice(0, newYears).map((r) => ({
+        year: r.year,
+        wage: r.taxedEarnings,
+      }));
+      recipient.setCustomFutureEarnings(newRecords);
+    }
+  }
+  futureEarningYears = newYears;
+}
 
 // We want to track if one of the sliders is stuck to the top of the screen.
 // This is used by the Sidebar to calculate which is the top active section,
@@ -151,12 +226,21 @@ onDestroy(() => {
         ceiling={35}
         step={1}
         translate={translateFutureYears}
+        onchange={(e) => handleYearsChange(e.value)}
       />
     </div>
     <div class="item right">more years,</div>
 
-    <div class="item left">Earning approximately</div>
-    <div class="item center">
+    <div class="item left" class:disabled-label={wageSliderDisabled}>
+      {#if showRevertWarning}
+        <span class="revert-warning noprint">Discard custom edits?</span>
+      {:else if wageSliderDisabled}
+        <span class="disabled-hint">Edit years below</span>
+      {:else}
+        Earning approximately
+      {/if}
+    </div>
+    <div class="item center" class:disabled-slider={wageSliderDisabled}>
       <Slider
         bind:value={futureEarningWage}
         floor={1000}
@@ -167,11 +251,35 @@ onDestroy(() => {
         translate={translateFutureEarnings}
       />
     </div>
-    <div class="item right">per year.</div>
+    <div class="item right" class:disabled-label={wageSliderDisabled}>
+      {#if showRevertWarning}
+        <span class="revert-buttons noprint">
+          <button class="revert-btn confirm" on:click={confirmRevert}>Yes</button>
+          <button class="revert-btn cancel" on:click={cancelRevert}>No</button>
+        </span>
+      {:else}
+        {#if !wageSliderDisabled}
+          per year.
+        {/if}
+        {#if futureEarningYears > 0}
+          <label class="edit-toggle noprint">
+            <input
+              type="checkbox"
+              checked={customMode}
+              on:change={toggleCustomMode}
+              class="toggle-input"
+            />
+            <span class="toggle-switch"></span>
+            <span class="toggle-text">Edit</span>
+          </label>
+        {/if}
+      {/if}
+    </div>
   </div>
   <div class="sticky-shadow"></div>
   <div class="sticky-shadow-cover"></div>
 </div>
+
 
 <style>
   /* No need for sliders in print view */
@@ -263,5 +371,116 @@ onDestroy(() => {
     /* Need at least 16px of margin to avoid clipping the slider handles */
     margin: 0 20px;
     font-size: 14px;
+  }
+
+  /* Disabled slider styling for custom mode */
+  .disabled-slider {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .disabled-label {
+    color: #6c757d;
+  }
+
+  .disabled-hint {
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* Edit toggle styling */
+  .edit-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+  .toggle-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    background: #d0d4d8;
+    border-radius: 9px;
+    transition: background 0.2s ease;
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+  }
+  .toggle-input:checked + .toggle-switch {
+    background: #4a90d9;
+  }
+  .toggle-input:checked + .toggle-switch::after {
+    transform: translateX(14px);
+  }
+  .toggle-input:focus + .toggle-switch {
+    box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.3);
+  }
+  .toggle-text {
+    font-size: 13px;
+    color: #666;
+  }
+  .toggle-input:checked ~ .toggle-text {
+    color: #1a4d8c;
+    font-weight: 500;
+  }
+
+  /* Revert confirmation UI */
+  .revert-warning {
+    color: #495057;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 3px;
+    animation: bgFade 0.6s ease-out;
+  }
+  @keyframes bgFade {
+    0% {
+      background-color: rgba(74, 144, 217, 0.3);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  .revert-buttons {
+    display: inline-flex;
+    gap: 8px;
+  }
+  .revert-btn {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+  }
+  .revert-btn.confirm {
+    background: #4a90d9;
+    color: #fff;
+  }
+  .revert-btn.confirm:hover {
+    background: #3a7bc8;
+  }
+  .revert-btn.cancel {
+    background: #e9ecef;
+    color: #495057;
+  }
+  .revert-btn.cancel:hover {
+    background: #dee2e6;
   }
 </style>

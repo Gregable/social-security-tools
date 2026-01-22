@@ -248,6 +248,66 @@ export class Recipient {
   }
 
   /**
+   * Calculates the start year for future earnings simulation.
+   * @returns The year to start simulating future earnings from.
+   */
+  futureEarningsStartYear(): number {
+    let startYear = constants.CURRENT_YEAR;
+    if (this.earningsRecords_.length > 0) {
+      const lastRecord =
+        this.earningsRecords_[this.earningsRecords_.length - 1];
+      if (
+        lastRecord.year === constants.CURRENT_YEAR - 1 &&
+        lastRecord.incomplete
+      ) {
+        startYear = constants.CURRENT_YEAR - 1;
+      } else if (lastRecord.year >= constants.CURRENT_YEAR) {
+        startYear = lastRecord.year + 1;
+      }
+    }
+    return startYear;
+  }
+
+  /**
+   * Caps a wage to the maximum earnings for a given year.
+   * @param wage The wage to cap.
+   * @param year The year to get the cap for.
+   * @returns The capped wage.
+   */
+  private capWageForYear_(wage: Money, year: number): Money {
+    if (year <= constants.MAX_MAXIMUM_EARNINGS_YEAR) {
+      return Money.min(wage, constants.MAXIMUM_EARNINGS[year]);
+    }
+    return Money.min(
+      wage,
+      constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR]
+    );
+  }
+
+  /**
+   * Sets custom future earnings records directly.
+   * Used when user manually edits individual year values.
+   * @param records Array of {year, wage} objects.
+   */
+  setCustomFutureEarnings(records: Array<{ year: number; wage: Money }>) {
+    this.requireNotPiaOnly_();
+    this.futureEarningsRecords_ = [];
+
+    for (const record of records) {
+      const cappedWage = this.capWageForYear_(record.wage, record.year);
+      this.futureEarningsRecords_.push(
+        new EarningRecord({
+          year: record.year,
+          taxedEarnings: cappedWage,
+          taxedMedicareEarnings: cappedWage,
+        })
+      );
+    }
+
+    this.updateEarningsRecords_();
+  }
+
+  /**
    * Top constants.SSA_EARNINGS_YEARS (35) years of earning records.
    *
    * Updated in updateEarningsRecords_().
