@@ -298,30 +298,32 @@ fraTable.push({
   <h2>Common Misconceptions</h2>
 
   <div class="warning-box">
-    <h4>Misconception: "I should file at my Full Retirement Age to get my full benefit"</h4>
+    <strong>Myth: "I should file at my Full Retirement Age to get my full benefit."</strong>
     <p>
-      NRA is not the age at which you receive the most money. If you can afford
-      to wait, delaying until 70 provides a significantly higher lifetime
-      benefit if you live past your early 80s. The "full" in Full Retirement Age
-      simply means no reduction or increase. It's the neutral reference point.
+      Reality: NRA is not the age at which you receive the most money. If you
+      can afford to wait, delaying until 70 provides a significantly higher
+      lifetime benefit if you live past your early 80s. The "full" in Full
+      Retirement Age simply means no reduction or increase. It's the neutral
+      reference point.
     </p>
   </div>
 
   <div class="warning-box">
-    <h4>Misconception: "Everyone's NRA is 65"</h4>
+    <strong>Myth: "Everyone's NRA is 65."</strong>
     <p>
-      This was true for those born before 1938, but NRA has been gradually
-      increasing. For anyone born in 1960 or later, NRA is 67. Using 65 as your
-      NRA could lead to significant miscalculations in retirement planning.
+      Reality: This was true for those born before 1938, but NRA has been
+      gradually increasing. For anyone born in 1960 or later, NRA is 67. Using
+      65 as your NRA could lead to significant miscalculations in retirement
+      planning.
     </p>
   </div>
 
   <div class="warning-box">
-    <h4>Misconception: "The early filing reduction goes away at NRA"</h4>
+    <strong>Myth: "The early filing reduction goes away at NRA."</strong>
     <p>
-      If you file early, the reduction is permanent. Your benefit will never
-      increase to what it would have been had you waited until NRA (though it
-      will still receive annual COLA adjustments).
+      Reality: If you file early, the reduction is permanent. Your benefit will
+      never increase to what it would have been had you waited until NRA (though
+      it will still receive annual COLA adjustments).
     </p>
   </div>
 
@@ -369,8 +371,8 @@ fraTable.push({
 
 <style>
   .key-takeaways {
-    background-color: #e8f4fd;
-    border: 2px solid #4a90e2;
+    background-color: #e8f5e9;
+    border: 1px solid #4caf50;
     border-radius: 8px;
     padding: 20px;
     margin: 20px 0;
@@ -378,7 +380,7 @@ fraTable.push({
 
   .key-takeaways h3 {
     margin-top: 0;
-    color: #2c3e50;
+    color: #2e7d32;
   }
 
   .key-takeaways ul {
@@ -397,8 +399,10 @@ fraTable.push({
     background-color: #f0f8ff;
     border-left: 4px solid #4a90e2;
     padding: 15px;
-    margin: 20px 0;
+    margin: 20px auto;
     border-radius: 4px;
+    width: fit-content;
+    max-width: 70%;
   }
 
   .highlight-box p {
@@ -407,31 +411,36 @@ fraTable.push({
 
   .table-container {
     overflow-x: auto;
-    margin: 20px 0;
   }
 
   .fra-table {
-    width: 100%;
+    width: fit-content;
+    max-width: 80%;
     border-collapse: collapse;
+    margin: 20px auto;
     background: white;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .fra-table th,
   .fra-table td {
-    padding: 12px 16px;
+    padding: 10px 25px;
     text-align: left;
     border-bottom: 1px solid #e9ecef;
   }
 
+  .fra-table th:first-child,
+  .fra-table td:first-child {
+    text-align: right;
+  }
+
   .fra-table th {
-    background-color: #2c3e50;
-    color: white;
+    background-color: #e9ecef;
     font-weight: 600;
   }
 
   .fra-table tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: #f5f5f5;
   }
 
   .formula-box {
@@ -503,27 +512,25 @@ fraTable.push({
   }
 
   .warning-box {
-    background-color: #fff3cd;
-    border-left: 4px solid #ffc107;
+    background-color: #fffde7;
+    border-left: 4px solid #fbc02d;
     padding: 15px;
     margin: 20px 0;
     border-radius: 4px;
   }
 
-  .warning-box h4 {
-    margin-top: 0;
-    color: #856404;
-  }
-
   .warning-box p {
-    margin-bottom: 0;
+    margin: 0.5em 0 0 0;
   }
 
   @media (max-width: 600px) {
+    .fra-table {
+      font-size: 14px;
+    }
+
     .fra-table th,
     .fra-table td {
-      padding: 8px 12px;
-      font-size: 14px;
+      padding: 8px 10px;
     }
 
     .calculation-example table {
