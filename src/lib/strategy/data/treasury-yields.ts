@@ -82,6 +82,11 @@ export async function fetchLatest20YearTreasuryYield(): Promise<TreasuryYieldDat
           const currentDateStr = dateElement[0].textContent;
           const currentYieldVal = parseFloat(yieldElement[0].textContent);
 
+          // Skip entries with invalid yield values
+          if (Number.isNaN(currentYieldVal)) {
+            continue;
+          }
+
           // Compare dates to find the latest one
           if (!latestDate || currentDateStr > latestDate) {
             latestDate = currentDateStr;

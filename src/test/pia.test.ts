@@ -44,13 +44,10 @@ describe('Recipient', () => {
     expect(adjustments[0].start.value()).toEqual(1515.9);
     expect(adjustments[0].end.value()).toEqual(1541.6);
 
-    // The final adjustment or one before it, should end with the PIA.
-    let one_before = 0;
-    if (constants.MAX_COLA_YEAR === constants.CURRENT_YEAR) {
-      one_before = 1;
-    }
+    // The last applied adjustment should end with the PIA.
+    const appliedAdjustments = adjustments.filter((a) => a.applied);
     expect(
-      adjustments[adjustments.length - 1 - one_before].end.value()
+      appliedAdjustments[appliedAdjustments.length - 1].end.value()
     ).toEqual(r.pia().primaryInsuranceAmount().value());
   });
 

@@ -182,6 +182,7 @@ onMount(() => {
 
 onDestroy(() => {
   if (unsubscribeStuck) unsubscribeStuck();
+  if (observer) observer.disconnect();
 });
 
 // Rescan sections when activeIntegration changes OR when integration components are loaded

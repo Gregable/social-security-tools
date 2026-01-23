@@ -71,7 +71,21 @@ export class Birthdate {
     if (year < 1900 || year > 2200) throw new Error(`Invalid Year:${year}`);
     if (month < 0 || month > 11) throw new Error(`Invalid Month:${month}`);
     if (day < 1 || day > 31) throw new Error(`Invalid Day:${day}`);
-    return new Birthdate(new Date(Date.UTC(year, month, day)));
+
+    const date = new Date(Date.UTC(year, month, day));
+
+    // Verify the date wasn't auto-corrected by JavaScript (e.g., Feb 31 -> Mar 3)
+    if (
+      date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month ||
+      date.getUTCDate() !== day
+    ) {
+      throw new Error(
+        `Invalid date: ${year}-${month + 1}-${day} does not exist`
+      );
+    }
+
+    return new Birthdate(date);
   }
 
   /**

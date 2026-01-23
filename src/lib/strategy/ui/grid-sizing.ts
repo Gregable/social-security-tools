@@ -49,6 +49,12 @@ export function calculateAgeRangePercentages(
     0
   );
 
+  // Guard against division by zero: if total probability is 0, distribute evenly
+  if (effectiveTotalProb === 0) {
+    const evenShare = 1 / segmentProbabilities.length;
+    return segmentProbabilities.map(() => evenShare);
+  }
+
   const percentages: number[] = [];
   let sumOfRoundedPercentages = 0;
 

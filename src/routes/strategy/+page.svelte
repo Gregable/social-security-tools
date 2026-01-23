@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
@@ -37,7 +38,10 @@
     new CalculationResults()
   );
   let calculationResults: CalculationResults;
-  calculationResultsStore.subscribe((v) => (calculationResults = v));
+  const unsubscribeResults = calculationResultsStore.subscribe(
+    (v) => (calculationResults = v)
+  );
+  onDestroy(unsubscribeResults);
 
   // New three-year bucket lists
   let deathAgeBuckets1: DeathAgeBucket[] = [];

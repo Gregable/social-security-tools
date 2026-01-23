@@ -176,3 +176,72 @@ describe('Birthdate serialization', () => {
     expect(roundTripped.ssaBirthMonth()).toBe(original.ssaBirthMonth());
   });
 });
+
+describe('FromYMD validation', () => {
+  it('rejects Feb 31', () => {
+    expect(() => Birthdate.FromYMD(2000, 1, 31)).toThrow(
+      'Invalid date: 2000-2-31 does not exist'
+    );
+  });
+
+  it('rejects Feb 30', () => {
+    expect(() => Birthdate.FromYMD(2000, 1, 30)).toThrow(
+      'Invalid date: 2000-2-30 does not exist'
+    );
+  });
+
+  it('rejects Feb 29 in non-leap year', () => {
+    expect(() => Birthdate.FromYMD(2001, 1, 29)).toThrow(
+      'Invalid date: 2001-2-29 does not exist'
+    );
+  });
+
+  it('accepts Feb 29 in leap year', () => {
+    const bd = Birthdate.FromYMD(2000, 1, 29); // 2000 is a leap year
+    expect(bd.layBirthYear()).toBe(2000);
+    expect(bd.layBirthMonth()).toBe(1);
+    expect(bd.layBirthDayOfMonth()).toBe(29);
+  });
+
+  it('rejects April 31', () => {
+    expect(() => Birthdate.FromYMD(2000, 3, 31)).toThrow(
+      'Invalid date: 2000-4-31 does not exist'
+    );
+  });
+
+  it('rejects June 31', () => {
+    expect(() => Birthdate.FromYMD(2000, 5, 31)).toThrow(
+      'Invalid date: 2000-6-31 does not exist'
+    );
+  });
+
+  it('rejects September 31', () => {
+    expect(() => Birthdate.FromYMD(2000, 8, 31)).toThrow(
+      'Invalid date: 2000-9-31 does not exist'
+    );
+  });
+
+  it('rejects November 31', () => {
+    expect(() => Birthdate.FromYMD(2000, 10, 31)).toThrow(
+      'Invalid date: 2000-11-31 does not exist'
+    );
+  });
+
+  it('accepts valid 31-day months', () => {
+    // January, March, May, July, August, October, December all have 31 days
+    expect(Birthdate.FromYMD(2000, 0, 31).layBirthDayOfMonth()).toBe(31); // Jan
+    expect(Birthdate.FromYMD(2000, 2, 31).layBirthDayOfMonth()).toBe(31); // Mar
+    expect(Birthdate.FromYMD(2000, 4, 31).layBirthDayOfMonth()).toBe(31); // May
+    expect(Birthdate.FromYMD(2000, 6, 31).layBirthDayOfMonth()).toBe(31); // Jul
+    expect(Birthdate.FromYMD(2000, 7, 31).layBirthDayOfMonth()).toBe(31); // Aug
+    expect(Birthdate.FromYMD(2000, 9, 31).layBirthDayOfMonth()).toBe(31); // Oct
+    expect(Birthdate.FromYMD(2000, 11, 31).layBirthDayOfMonth()).toBe(31); // Dec
+  });
+
+  it('accepts valid 30-day months', () => {
+    expect(Birthdate.FromYMD(2000, 3, 30).layBirthDayOfMonth()).toBe(30); // Apr
+    expect(Birthdate.FromYMD(2000, 5, 30).layBirthDayOfMonth()).toBe(30); // Jun
+    expect(Birthdate.FromYMD(2000, 8, 30).layBirthDayOfMonth()).toBe(30); // Sep
+    expect(Birthdate.FromYMD(2000, 10, 30).layBirthDayOfMonth()).toBe(30); // Nov
+  });
+});

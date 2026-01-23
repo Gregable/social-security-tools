@@ -9,6 +9,12 @@ import type { Recipient } from './recipient';
  * The PIA is the basis for most Social Security benefit calculations. It
  * represents the amount a beneficiary would receive if they elected to begin
  * receiving retirement benefits at their Normal Retirement Age (NRA).
+ *
+ * COLA Timing:
+ * - The "Year Y COLA" is announced in October of year Y
+ * - It takes effect on benefits starting January of year Y+1
+ * - Therefore, in CURRENT_YEAR, all COLAs through year (CURRENT_YEAR - 1)
+ *   have been applied to benefits
  */
 export class PrimaryInsuranceAmount {
   /**
@@ -193,9 +199,18 @@ export class PrimaryInsuranceAmount {
   }
 
   /**
+   * Returns the last year whose COLA has been applied to benefits.
+   * Since a year's COLA takes effect the following January, this is
+   * CURRENT_YEAR - 1.
+   */
+  private lastAppliedColaYear(): number {
+    return constants.CURRENT_YEAR - 1;
+  }
+
+  /**
    * Applies COLA adjustments to a PIA value from the year the recipient turns 62
-   * through the current year. Each year's adjustment is rounded down to the
-   * nearest dime per SSA rules.
+   * through the last applied COLA year. Each year's adjustment is rounded down
+   * to the nearest dime per SSA rules.
    *
    * @param pia - The unadjusted PIA to apply COLA to
    * @returns The COLA-adjusted PIA
@@ -204,12 +219,14 @@ export class PrimaryInsuranceAmount {
     let adjusted = pia;
     for (
       let year = this.recipient_.birthdate.yearTurningSsaAge(62);
-      year < constants.CURRENT_YEAR;
+      year <= this.lastAppliedColaYear();
       ++year
     ) {
-      adjusted = adjusted.times(1 + constants.COLA[year] / 100.0);
-      // Primary Insurance amounts are rounded down to the nearest dime.
-      adjusted = adjusted.floorToDime();
+      if (constants.COLA[year] !== undefined) {
+        adjusted = adjusted.times(1 + constants.COLA[year] / 100.0);
+        // Primary Insurance amounts are rounded down to the nearest dime.
+        adjusted = adjusted.floorToDime();
+      }
     }
     return adjusted;
   }
@@ -229,16 +246,18 @@ export class PrimaryInsuranceAmount {
   }
 
   /**
-   * Generates a detailed breakdown of all COLA adjustments applied to the
-   * recipient's PIA.
+   * Generates a detailed breakdown of all COLA adjustments for display purposes.
    *
-   * This method calculates each year's COLA adjustment separately and returns
-   * the information in a format suitable for display to the user.
+   * Unlike applyColaAdjustments(), this includes the current year's COLA (if
+   * known) even though it hasn't been applied yet. The UI renders unapplied
+   * adjustments with "will be increased" text to indicate they're upcoming.
+   * See PiaReport.svelte.
    *
    * @returns {Array<ColaAdjustment>} Array of COLA adjustment records
    */
   colaAdjustments(): Array<ColaAdjustment> {
     let adjusted = this.primaryInsuranceAmountUnadjusted();
+    const lastApplied = this.lastAppliedColaYear();
 
     const adjustments: Array<ColaAdjustment> = [];
     for (
@@ -256,6 +275,7 @@ export class PrimaryInsuranceAmount {
         adjustment.cola = constants.COLA[year];
         adjustment.start = adjusted;
         adjustment.end = newadjusted;
+        adjustment.applied = year <= lastApplied;
         adjustments.push(adjustment);
 
         adjusted = newadjusted;
@@ -296,4 +316,10 @@ class ColaAdjustment {
    * @type {Money}
    */
   end: Money;
+  /**
+   * True if this COLA has taken effect (year <= CURRENT_YEAR - 1), false if
+   * it's upcoming (announced but not yet applied to benefits).
+   * @type {boolean}
+   */
+  applied: boolean;
 }

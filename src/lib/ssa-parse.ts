@@ -71,6 +71,9 @@ function parseSsaPdfTable(lines: string[]): Array<EarningRecord> {
     if (columns.length !== 3 || !lineMatch.test(columns[0])) break;
 
     // Col 1: '1991-2000'
+    // Note: years[1] is guaranteed to exist because lineMatch regex requires
+    // the YYYY-YYYY format. The regex test on line 71 ensures columns[0]
+    // contains a dash with valid years on both sides before we reach here.
     const years: Array<string> = columns[0].split('-');
     const startYear = parseInt(years[0], 10);
     const endYear = parseInt(years[1], 10);
@@ -136,6 +139,8 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
+    // Safe to access columns[0] and columns[1]: parsePaste() pre-filters lines
+    // to ensure they start with a valid year and have at least 2 columns.
     if (columns[1] === 'NotYetRecorded') {
       const record = new EarningRecord({
         year: parseInt(columns[0], 10),
@@ -165,6 +170,8 @@ function parseFormattedTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
+    // Safe to access columns[0] and columns[1]: parsePaste() pre-filters lines
+    // to ensure they start with a valid year and have at least 2 columns.
     var record = new EarningRecord({
       year: parseInt(columns[0], 10),
       taxedEarnings: dollarStringToMoney(columns[1]),
@@ -183,6 +190,9 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
+    // This format requires at least 3 columns (year, age, earnings).
+    // Skip malformed lines that don't match the expected format.
+    if (columns.length < 3) continue;
     if (columns[1] === 'NotYetRecorded') {
       const record = new EarningRecord({
         year: parseInt(columns[0], 10),

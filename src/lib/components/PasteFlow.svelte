@@ -112,6 +112,9 @@ function findAmbiguousZeroYear(records: EarningRecord[]): number | null {
 
 onMount(() => {
   // Reset everything, especially the context.
+  // Note: Direct context mutation is safe here because PasteFlow renders before
+  // any components that read from context. Those components only mount after
+  // ondone() is called, at which point context is fully populated.
   mode = Mode.INITIAL;
   isRecipient = true;
   spouseName = 'Spouse';
