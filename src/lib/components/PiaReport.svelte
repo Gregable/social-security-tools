@@ -170,7 +170,7 @@ function oneSignificantDigit(n: number) {
                 <ul class="cola">
                   {#each $recipient.pia().colaAdjustments() as adjustment}
                     <li>
-                      {#if adjustment.year === constants.CURRENT_YEAR}
+                      {#if !adjustment.applied}
                         <!-- Not yet applied, so special case the text: -->
                         {adjustment.year}: At the <b>end</b> of the year,
                         <b>{adjustment.start.string()}</b>
