@@ -48,7 +48,9 @@ $: {
   if (filingDateValue && $recipient && mounted_) {
     const ageAtFiling = $recipient.birthdate.ageAtSsaDate(filingDateValue);
     const newSliderMonths = ageAtFiling.asMonths();
-    // Only update if significantly different to avoid infinite loops
+    // Only update if different to avoid infinite loops. The 0.5 threshold is a
+    // floating-point safety margin; both values are integers (slider step=1,
+    // MonthDuration stores whole months), so real differences are always >= 1.
     if (Math.abs(newSliderMonths - sliderMonths_) > 0.5) {
       syncSliderFromStore(newSliderMonths);
     }

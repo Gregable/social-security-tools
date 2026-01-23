@@ -41,7 +41,10 @@ export class Recipient {
     return this.healthMultiplier_;
   }
   set healthMultiplier(multiplier: number) {
-    // Clamp within supported UI range to avoid invalid inputs
+    // Clamp within supported UI range to avoid invalid inputs.
+    // Intentionally silent on invalid input (NaN/Infinity): TypeScript enforces
+    // the number type at compile time, so invalid values indicate a bug that
+    // should be caught during development rather than at runtime.
     const clamped = Math.max(0.7, Math.min(2.5, Number(multiplier)));
     if (!Number.isFinite(clamped)) return;
     this.healthMultiplier_ = clamped;
