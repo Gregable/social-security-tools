@@ -136,6 +136,8 @@ function parseSsaGovTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
+    // Safe to access columns[0] and columns[1]: parsePaste() pre-filters lines
+    // to ensure they start with a valid year and have at least 2 columns.
     if (columns[1] === 'NotYetRecorded') {
       const record = new EarningRecord({
         year: parseInt(columns[0], 10),
@@ -165,6 +167,8 @@ function parseFormattedTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
+    // Safe to access columns[0] and columns[1]: parsePaste() pre-filters lines
+    // to ensure they start with a valid year and have at least 2 columns.
     var record = new EarningRecord({
       year: parseInt(columns[0], 10),
       taxedEarnings: dollarStringToMoney(columns[1]),
@@ -183,6 +187,9 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
+    // This format requires at least 3 columns (year, age, earnings).
+    // Skip malformed lines that don't match the expected format.
+    if (columns.length < 3) continue;
     if (columns[1] === 'NotYetRecorded') {
       const record = new EarningRecord({
         year: parseInt(columns[0], 10),
