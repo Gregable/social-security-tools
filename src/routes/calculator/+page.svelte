@@ -99,7 +99,9 @@ async function loadIntegrationComponents(
       integration.getFavicon(),
     ]);
 
-    // Only update if the integration hasn't changed during loading
+    // Race condition guard: if multiple loads are in flight (e.g., integration
+    // changed while loading), only apply results if this load's integration is
+    // still the active one. Stale loads are safely discarded.
     if ($activeIntegration?.id === integration.id) {
       IntroBannerComponent = introBanner;
       ReportEndComponent = reportEnd;

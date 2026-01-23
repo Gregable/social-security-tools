@@ -106,6 +106,10 @@ export function clearSession(): void {
   context.recipient = null;
   context.spouse = null;
   isDemo.set(false);
+  // Reset filing date stores to ensure derived stores (e.g., higherEarnerFilingDate)
+  // re-compute and detect the cleared context
+  recipientFilingDate.set(null);
+  spouseFilingDate.set(null);
 }
 
 /**
