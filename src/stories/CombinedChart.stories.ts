@@ -67,3 +67,39 @@ SpouseZeroPia.args = {
   recipient: recipient,
   spouse: spouseZeroEarner,
 };
+
+// Test case for large age gap (40 years) - Issue #63
+const olderRecipient = new Recipient();
+olderRecipient.name = 'Senior';
+olderRecipient.markFirst();
+olderRecipient.earningsRecords = parsePaste(demo);
+olderRecipient.birthdate = Birthdate.FromYMD(1950, 2, 2);
+
+const muchYoungerSpouse = new Recipient();
+muchYoungerSpouse.name = 'Junior';
+muchYoungerSpouse.markSecond();
+muchYoungerSpouse.earningsRecords = parsePaste(demo_spouse_low);
+muchYoungerSpouse.birthdate = Birthdate.FromYMD(1990, 2, 2);
+
+export const LargeAgeGap = Template.bind({});
+LargeAgeGap.args = {
+  recipient: olderRecipient,
+  spouse: muchYoungerSpouse,
+};
+// Exclude from docs page to avoid pre-existing rendering bug with different date ranges
+LargeAgeGap.tags = ['!autodocs'];
+
+// Test case for medium age gap (15 years)
+const mediumYoungerSpouse = new Recipient();
+mediumYoungerSpouse.name = 'Partner';
+mediumYoungerSpouse.markSecond();
+mediumYoungerSpouse.earningsRecords = parsePaste(demo_spouse_low);
+mediumYoungerSpouse.birthdate = Birthdate.FromYMD(1965, 2, 2);
+
+export const MediumAgeGap = Template.bind({});
+MediumAgeGap.args = {
+  recipient: olderRecipient,
+  spouse: mediumYoungerSpouse,
+};
+// Exclude from docs page to avoid pre-existing rendering bug with different date ranges
+MediumAgeGap.tags = ['!autodocs'];
