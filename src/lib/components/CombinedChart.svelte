@@ -669,11 +669,17 @@
     // If one of the users has a zero PIA, we don't allow them to file before
     // the other user:
     if (ctx0.r.pia().primaryInsuranceAmount().value() === 0) {
-      ctx0.userFloor = ctx0.r.birthdate
-        .ageAtSsaDate(
-          ctx1.r.birthdate.dateAtSsaAge(new MonthDuration(ctx1.sliderMonths))
-        )
-        .asMonths();
+      // Calculate when the spouse files, but never allow filing before age 62
+      // (the legal minimum). With large age gaps, the spouse may file before
+      // this person turns 62.
+      ctx0.userFloor = Math.max(
+        62 * 12,
+        ctx0.r.birthdate
+          .ageAtSsaDate(
+            ctx1.r.birthdate.dateAtSsaAge(new MonthDuration(ctx1.sliderMonths))
+          )
+          .asMonths()
+      );
       // Similarly min cap the actual slider value:
       if (ctx0.sliderMonths < ctx0.userFloor) {
         ctx0.sliderMonths = ctx0.userFloor;
