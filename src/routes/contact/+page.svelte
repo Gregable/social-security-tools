@@ -80,16 +80,53 @@ const pageImageAlt = 'Contact the Social Security Calculator developer';
 </main>
 
 <style>
-  a {
-    color: #337ab7;
-  }
   main {
     max-width: 1080px;
     margin: 0 auto;
+    padding: 0 1em;
+  }
+
+  main > div {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: #34495e;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  p,
+  ul {
+    font-size: 1.4em;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  li {
+    margin: 0.5rem 0;
+  }
+
+  a {
+    color: #3498db;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 
   .kofi-section {
-    margin-top: 2em; /* Add some space above the new section */
+    margin-top: 2em;
   }
 
   .kofi-section .kofi-url {
@@ -97,13 +134,22 @@ const pageImageAlt = 'Contact the Social Security Calculator developer';
   }
 
   .kofi-section .kofi-button img {
-    display: block; /* Make image a block element for margin:auto */
-    margin: auto; /* Center the image */
+    display: block;
+    margin: auto;
   }
 
   @media (max-width: 768px) {
     main {
-      padding: 0 1.5em; /* Added horizontal padding for mobile */
+      padding: 0 1.5em;
+    }
+
+    h1 {
+      font-size: 2em;
+    }
+
+    p,
+    ul {
+      font-size: 1.1em;
     }
   }
 </style>
