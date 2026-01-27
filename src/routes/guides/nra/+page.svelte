@@ -289,10 +289,11 @@ fraTable.push({
   <h3>The Earnings Test</h3>
   <p>
     If you work while receiving benefits before NRA, your benefits may be
-    temporarily reduced due to the <strong>earnings test</strong>. In 2025, if
-    you earn more than $23,400 while receiving benefits before NRA, $1 is
-    withheld for every $2 over the limit. This reduction ends once you reach
-    NRA.
+    temporarily reduced due to the <a href="/guides/earnings-test">earnings test</a>.
+    In 2026, if you earn more than $24,480 while receiving benefits before NRA,
+    $1 is withheld for every $2 over the limit. This reduction ends once you
+    reach NRA, and any withheld benefits are returned to you through higher
+    monthly payments.
   </p>
 
   <h2>Common Misconceptions</h2>
@@ -363,6 +364,10 @@ fraTable.push({
     <li>
       <a href="/guides/delayed-january-bump">Delayed January Bump</a> – How
       delayed credits are applied after NRA
+    </li>
+    <li>
+      <a href="/guides/earnings-test">Working While Receiving Benefits</a> – How
+      the earnings test affects benefits before NRA
     </li>
   </ul>
 
