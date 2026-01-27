@@ -27,6 +27,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Jan 26, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/earnings-test">
+            Working While Receiving Social Security: The Earnings Test Explained
+          </a>
+        </h3>
+        <p class="description">
+          Can you work while collecting Social Security? Learn about the
+          earnings test, 2025 and 2026 income limits, how benefits are reduced
+          if you earn too much, and why withheld benefits are returned to you
+          at full retirement age.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 21, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/indexing-factors">
