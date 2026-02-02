@@ -13,6 +13,7 @@ import { UrlParams } from '$lib/url-params';
 import * as constants from '$lib/constants';
 import AgeRequest from './AgeRequest.svelte';
 import DemoData from './DemoData.svelte';
+import MobileDesktopPrompt from './MobileDesktopPrompt.svelte';
 import PasteApology from './PasteApology.svelte';
 import PasteConfirm from './PasteConfirm.svelte';
 import PastePrompt from './PastePrompt.svelte';
@@ -479,6 +480,7 @@ function handleSpouseQuestion(detail: {
   {#if mode === Mode.INITIAL}
     {#if isRecipient}
       <DemoData ondemo={handleDemo} />
+      <MobileDesktopPrompt />
     {/if}
     <PastePrompt onpaste={handlePaste} isSpouse={!isRecipient} name={isRecipient ? '' : spouseName} />
   {:else if mode === Mode.PASTE_CONFIRMATION}
