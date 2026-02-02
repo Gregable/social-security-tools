@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Feb 2, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/senior-tax-deduction">
+            The New Senior Tax Deduction: What It Means for Social Security
+            Recipients
+          </a>
+        </h3>
+        <p class="description">
+          The One Big Beautiful Bill Act created a new $4,000-$6,000 tax
+          deduction for seniors 65+. Learn who qualifies, income phase-outs,
+          how it interacts with Social Security benefit taxation, and planning
+          strategies for 2025-2028.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 26, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/earnings-test">
@@ -176,6 +192,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
           severely disrupt services. Learn what continues, what stops, and how
           to protect yourself during funding gaps. Understand the current
           shutdown threat and prepare for potential service disruptions.
+        </p>
+      </li>
+
+      <li>
+        <span class="postdate">Aug 8, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/mortality">
+            Mortality Tables and Health Adjustments
+          </a>
+        </h3>
+        <p class="description">
+          How SSA cohort life tables are used in benefit strategy calculations,
+          how death probabilities are derived, gender blending, and how the
+          health multiplier adjusts mortality estimates for your personal
+          situation.
         </p>
       </li>
 
