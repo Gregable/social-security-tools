@@ -196,6 +196,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
       </li>
 
       <li>
+        <span class="postdate">Aug 8, 2025</span>
+        <h3 class="posttitle">
+          <a href="/guides/mortality">
+            Mortality Tables and Health Adjustments
+          </a>
+        </h3>
+        <p class="description">
+          How SSA cohort life tables are used in benefit strategy calculations,
+          how death probabilities are derived, gender blending, and how the
+          health multiplier adjusts mortality estimates for your personal
+          situation.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 19, 2025</span>
         <h3 class="posttitle">
           <a href="/guides/aime">Averaged Indexed Monthly Earnings (AIME)</a>

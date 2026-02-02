@@ -11,7 +11,7 @@ const guidesDir = resolve(__dirname, '../../routes/guides');
 
 // Guides that exist but are intentionally not listed on the index page
 // (e.g., linked only from other guides or the calculator).
-const INDEX_EXCEPTIONS: string[] = ['mortality'];
+const INDEX_EXCEPTIONS: string[] = [];
 
 function getGuideDirectories(): string[] {
   return readdirSync(guidesDir, { withFileTypes: true })
