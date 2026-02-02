@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Feb 2, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/senior-tax-deduction">
+            The New Senior Tax Deduction: What It Means for Social Security
+            Recipients
+          </a>
+        </h3>
+        <p class="description">
+          The One Big Beautiful Bill Act created a new $4,000-$6,000 tax
+          deduction for seniors 65+. Learn who qualifies, income phase-outs,
+          how it interacts with Social Security benefit taxation, and planning
+          strategies for 2025-2028.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Jan 26, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/earnings-test">
