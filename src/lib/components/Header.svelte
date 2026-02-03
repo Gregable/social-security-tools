@@ -1,5 +1,8 @@
 <script lang="ts">
+import SponsorCompact from './SponsorCompact.svelte';
+
 export let active = 'none';
+export let showSponsor = false;
 
 let navOptions = [
   { name: 'Calculator', link: 'calculator', active: false },
@@ -10,8 +13,12 @@ let navOptions = [
 $: active && navOptions.forEach((o) => (o.active = o.name === active));
 </script>
 
-<div class="header">
+<div class="header" class:with-sponsor={showSponsor}>
   <h3><a href="/">SSA.tools</a></h3>
+
+  {#if showSponsor}
+    <SponsorCompact />
+  {/if}
 
   <div class="navpills" style:--pill-count={navOptions.length.toString()}>
     {#each navOptions as option}
@@ -27,11 +34,15 @@ $: active && navOptions.forEach((o) => (o.active = o.name === active));
   /* Page Header with title and static links */
   .header {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto;
     align-items: center; /* Added for vertical alignment */
     width: 100%;
     border-bottom: 1px solid #c5c5c5;
     margin-bottom: 1.5em; /* Adjusted for better spacing */
+  }
+
+  .header.with-sponsor {
+    grid-template-columns: auto 1fr auto;
   }
 
   h3 {
