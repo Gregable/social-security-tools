@@ -151,7 +151,7 @@ async function loadIntegrationComponents(
   </script>
 </svelte:head>
 
-<Header active="Calculator" />
+<Header active="Calculator" showSponsor={!$activeIntegration} />
 
 {#if showIntroBanner && IntroBannerComponent && $activeIntegration && integrationComponentsLoaded && isPasteFlow}
   <svelte:component this={IntroBannerComponent} isReportView={false} />
