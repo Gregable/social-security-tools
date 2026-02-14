@@ -43,9 +43,10 @@ onMount(() => {
   }
 
   function onScroll() {
-    const scrollPercent =
-      window.scrollY /
-      (document.documentElement.scrollHeight - window.innerHeight);
+    const scrollable =
+      document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollable <= 0) return;
+    const scrollPercent = window.scrollY / scrollable;
     const nowVisible = scrollPercent > 0.5;
     if (nowVisible && !visible && !tracked) {
       tracked = true;

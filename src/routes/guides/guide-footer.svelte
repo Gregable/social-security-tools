@@ -152,7 +152,7 @@ onMount(() => {
 
 <style>
   .guide-footer-marker {
-    /* No visual styling - just a wrapper for intersection observer */
+    display: contents;
   }
 
   .footer {

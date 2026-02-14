@@ -187,7 +187,6 @@ onMount(() => {
 
   .calc-card p,
   .calc-card ul,
-  .calc-card ol,
   .calc-card li {
     font-size: inherit;
     line-height: normal;

@@ -66,7 +66,6 @@ export let isVisible = true;
   /* Reset elements that guide-page global styles would otherwise inflate */
   .sponsor p,
   .sponsor ul,
-  .sponsor ol,
   .sponsor li {
     font-size: inherit;
     line-height: normal;
