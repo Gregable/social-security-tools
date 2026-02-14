@@ -11,6 +11,7 @@
   import { Recipient } from "$lib/recipient";
   import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import InlineCTA from "../InlineCTA.svelte";
 
   // Current year from constants
   const currentYear = MAX_YEAR;
@@ -262,6 +263,8 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
     The result is always rounded down to the nearest dollar. For example, if
     your calculation yields $3,847.83, your AIME would be $3,847.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>Why AIME Matters</h2>
 

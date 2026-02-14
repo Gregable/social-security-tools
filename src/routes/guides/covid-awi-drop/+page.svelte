@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 import HeroImage from './covid-19.jpg';
 import CovidAimeImage from './covid-aime.jpg';
@@ -155,6 +156,8 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
     2008 multiplier is slightly lower than the 2009 multiplier (1.31 vs 1.33)
     because of the 2008 recession.
   </p>
+  <InlineCTA type="projectionlab" />
+
   <p>
     How does Covid-19 factor into this? If the AWI (year 2020) is reduced by
     9.1% for example, then <u>every</u> Indexed Earnings value is also reduced

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
 
 const title = 'Navigating Social Security During Administrative Changes';
@@ -132,6 +133,8 @@ schema.tags = [
     immigrants. This change is expected to result in 60,000-75,000 additional
     people visiting field offices weekly.
   </p>
+
+  <InlineCTA type="projectionlab" />
 
   <h3>3. Communication Changes</h3>
   <p>

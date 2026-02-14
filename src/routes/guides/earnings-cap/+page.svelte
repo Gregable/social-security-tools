@@ -2,6 +2,7 @@
 import { MAX_CREDITS, MAXIMUM_EARNINGS, MAX_YEAR, SSA_EARNINGS_YEARS } from '$lib/constants';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 const currentYear = MAX_YEAR;
 const currentYearCap = MAXIMUM_EARNINGS[currentYear];
@@ -107,6 +108,8 @@ schema.tags = [
     other years, it's calculated automatically as specified by the Social
     Security Act.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>Earnings Cap by Year</h2>
 

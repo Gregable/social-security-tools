@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Windfall Elimination Provision (WEP): What It Was and Why It No Longer Applies';
 const description =
@@ -191,6 +192,8 @@ schema.tags = [
     workers (about 28% of the public sector workforce) whose employers opted out
     of Social Security in favor of separate pension systems.
   </p>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>What's the Difference Between WEP and GPO?</h2>
 

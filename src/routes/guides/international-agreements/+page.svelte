@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
 
 const title = 'Social Security International Agreements';
@@ -62,6 +63,8 @@ schema.tags = [
       >Totalization Agreements</a
     >.
   </p>
+  <InlineCTA type="projectionlab" />
+
   <p>
     These agreements allow earned income credits to be earned overseas and still
     count towards the minimum of 40 credits required for benefits in the US.

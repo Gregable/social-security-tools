@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import lifeTable from './life-table.png'; // imported so bundler serves asset
 
 const title = 'Mortality Tables and Health Adjustments';
@@ -143,6 +144,8 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
     a discrete distribution used to scale the row and column segment sizes in the
     strategy matrix. Larger segments correspond to more likely death age ranges.
   </p>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>Health Adjustment Slider</h2>
   <p>

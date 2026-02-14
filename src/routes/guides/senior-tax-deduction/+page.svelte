@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import InlineCTA from "../InlineCTA.svelte";
   import HeroImage from "./senior-tax-deduction.jpg";
 
   const title =
@@ -219,6 +220,8 @@
       <li>Deduction: $6,000 - $1,200 = <strong>$4,800</strong></li>
     </ul>
   </div>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>How It Stacks with Existing Deductions</h2>
 

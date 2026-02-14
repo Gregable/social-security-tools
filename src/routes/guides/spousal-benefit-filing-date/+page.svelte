@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import InlineCTA from '../InlineCTA.svelte';
   import EarlyFile100Image from "./early-file-100.png";
   import EarlyFileImage from "./early-file.png";
   import HeroImage from "./hero.png";
@@ -124,6 +125,8 @@
   </p>
 
   <br class="clear" />
+
+  <InlineCTA type="calculator" />
 
   <h2>How Filing Age Affects Spousal Benefits</h2>
 

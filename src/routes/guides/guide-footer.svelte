@@ -1,55 +1,160 @@
 <script lang="ts">
 import posthog from 'posthog-js';
+import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
+import StickyMobileCTA from './StickyMobileCTA.svelte';
+
+$: guideSlug = $page.url.pathname
+  .replace('/guides/', '')
+  .replace(/\/$/, '');
+
+let footerElement: HTMLElement;
 
 function handleCtaClick() {
   if (browser) {
-    const guideSlug = $page.url.pathname.replace('/guides/', '');
     posthog.capture('Guide: CTA Clicked', {
       guide_slug: guideSlug,
       cta_type: 'calculate_my_benefits',
     });
   }
 }
+
+function handlePlClick() {
+  if (browser) {
+    posthog.capture('Guide PL Recommendation: Clicked', {
+      guide_slug: guideSlug,
+      sponsor_name: 'ProjectionLab',
+    });
+  }
+}
+
+onMount(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          if (browser) {
+            posthog.capture('Guide Footer: Visible', {
+              guide_slug: guideSlug,
+            });
+          }
+          observer.unobserve(entry.target);
+        }
+      }
+    },
+    { threshold: 0.2 }
+  );
+
+  if (footerElement) {
+    observer.observe(footerElement);
+  }
+
+  return () => {
+    if (footerElement) {
+      observer.unobserve(footerElement);
+    }
+  };
+});
+
+let plElement: HTMLElement;
+let plTracked = false;
+
+onMount(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && !plTracked) {
+          plTracked = true;
+          if (browser) {
+            posthog.capture('Guide PL Recommendation: Visible', {
+              guide_slug: guideSlug,
+              sponsor_name: 'ProjectionLab',
+            });
+          }
+          observer.unobserve(entry.target);
+        }
+      }
+    },
+    { threshold: 0.2 }
+  );
+
+  if (plElement) {
+    observer.observe(plElement);
+  }
+
+  return () => {
+    if (plElement) {
+      observer.unobserve(plElement);
+    }
+  };
+});
 </script>
 
-<div class="footer">
-  <div class="footer-content">
-    <div class="footer-icon">📊</div>
-    <h2>Ready to Calculate Your Benefits?</h2>
-    <p>
-      Get personalized insights into your Social Security retirement benefits
-      with our free calculator.
-    </p>
-    <div class="features">
-      <div class="feature">
-        <span class="feature-icon">✓</span>
-        <span>Copy & paste your earnings record</span>
+<!-- Marker for StickyMobileCTA to detect when footer is in view -->
+<div class="guide-footer-marker" bind:this={footerElement}>
+  <div class="footer">
+    <div class="footer-content">
+      <div class="footer-icon">📊</div>
+      <h2>Ready to Calculate Your Benefits?</h2>
+      <p>
+        Get personalized insights into your Social Security retirement benefits
+        with our free calculator.
+      </p>
+      <div class="features">
+        <div class="feature">
+          <span class="feature-icon">✓</span>
+          <span>Copy & paste your earnings record</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">✓</span>
+          <span>Explore "What If?" scenarios</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">✓</span>
+          <span>100% free and private</span>
+        </div>
       </div>
-      <div class="feature">
-        <span class="feature-icon">✓</span>
-        <span>Explore "What If?" scenarios</span>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">✓</span>
-        <span>100% free and private</span>
-      </div>
-    </div>
-    <div class="cta-container">
-      <a href="/calculator" class="cta-button" role="button" on:click={handleCtaClick}>
-        <span class="cta-text">Calculate My Benefits</span>
-      </a>
-      <div class="trust-indicators">
-        <span class="trust-item">🔒 Secure</span>
-        <span class="trust-item">⚡ Fast</span>
-        <span class="trust-item">💰 Free</span>
+      <div class="cta-container">
+        <a href="/calculator" class="cta-button" role="button" on:click={handleCtaClick}>
+          <span class="cta-text">Calculate My Benefits</span>
+        </a>
+        <div class="trust-indicators">
+          <span class="trust-item">🔒 Secure</span>
+          <span class="trust-item">⚡ Fast</span>
+          <span class="trust-item">💰 Free</span>
+        </div>
       </div>
     </div>
   </div>
+
+  <a
+    href="https://projectionlab.com?ref=ssa-tools"
+    class="pl-recommendation"
+    target="_blank"
+    rel="noopener noreferrer"
+    bind:this={plElement}
+    on:click={handlePlClick}
+  >
+    <div class="pl-content">
+      <div class="pl-badge">Sponsor</div>
+      <div class="pl-text">
+        Social Security is one piece of the puzzle.
+        <strong>ProjectionLab</strong> lets you model your full retirement plan.
+      </div>
+      <span class="pl-cta">Try ProjectionLab Free &rarr;</span>
+      <div class="pl-discount">Use code <strong>SSA-TOOLS</strong> for 10% off</div>
+    </div>
+  </a>
 </div>
 
+<StickyMobileCTA />
+
 <style>
+  .guide-footer-marker {
+    /* No visual styling - just a wrapper for intersection observer */
+  }
+
   .footer {
     background: linear-gradient(135deg, #f8fafe 0%, #e8f4f8 100%);
     border: 1px solid #e0e6ed;
@@ -189,6 +294,66 @@ function handleCtaClick() {
     font-weight: 500;
   }
 
+  /* ProjectionLab Recommendation */
+  .pl-recommendation {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: linear-gradient(135deg, #f0f6ff 0%, #e4effc 100%);
+    border: 1px solid #d0dff0;
+    border-radius: 10px;
+    margin: 0 auto 2em auto;
+    max-width: 600px;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .pl-recommendation:hover {
+    border-color: #337ab7;
+    box-shadow: 0 2px 8px rgba(51, 122, 183, 0.15);
+  }
+
+  .pl-content {
+    padding: 1.5em 2em;
+    text-align: center;
+  }
+
+  .pl-badge {
+    display: inline-block;
+    font-size: 0.7em;
+    color: #999;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 1px 6px;
+    margin-bottom: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .pl-text {
+    font-size: 1em;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 0.8em;
+  }
+
+  .pl-cta {
+    font-weight: 600;
+    color: #337ab7;
+    font-size: 1em;
+  }
+
+  .pl-recommendation:hover .pl-cta {
+    text-decoration: underline;
+  }
+
+  .pl-discount {
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 0.4em;
+  }
+
   /* Mobile Styles */
   @media (max-width: 768px) {
     .footer {
@@ -222,6 +387,14 @@ function handleCtaClick() {
 
     .trust-indicators {
       display: none; /* Hide on mobile to avoid stacking */
+    }
+
+    .pl-recommendation {
+      margin: 0 1em 2em 1em;
+    }
+
+    .pl-content {
+      padding: 1.2em 1.5em;
     }
   }
 

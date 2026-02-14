@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 import HeroImage from './taxes.jpg';
 
@@ -245,6 +246,8 @@ schema.tags = [
     formula produces a result that is greater than 85% of your Social Security
     Benefits, then exactly 85% of your Social Security benefits are taxable.
   </p>
+
+  <InlineCTA type="projectionlab" />
 
   <h3>Last word</h3>
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.jpg';
 
 // Hero image: Lincoln Memorial During Government Shutdown 2013
@@ -195,6 +196,8 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
       functioning for submissions, but backend processing slows dramatically
     </li>
   </ul>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>Disability Claims Face Unique Challenges</h2>
 

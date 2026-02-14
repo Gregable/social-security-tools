@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import chainLinkImage from './chain-link.jpg'; // imported so bundler serves asset
 
 const title = 'Sharing Social Security Scenarios with URL Parameters';
@@ -171,6 +172,8 @@ schema.tags = [
     <li>Years do not need to be consecutive (gaps are allowed)</li>
     <li>Use 0 for years with no earnings</li>
   </ul>
+
+  <InlineCTA type="calculator" />
 
   <h2>Example URLs</h2>
 

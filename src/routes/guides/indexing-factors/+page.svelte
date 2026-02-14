@@ -2,6 +2,7 @@
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import { MAX_YEAR, MAX_WAGE_INDEX_YEAR, WAGE_INDICES } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
 
 const title = 'Social Security Wage Indexing: How Your Earnings Are Adjusted';
@@ -164,6 +165,8 @@ const faqs: FAQItem[] = [
     The AWI is the average of all wages reported to Social Security in a given
     year. As of {MAX_WAGE_INDEX_YEAR}, the AWI was {WAGE_INDICES[MAX_WAGE_INDEX_YEAR]?.wholeDollars() ?? 'not yet published'}.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>Why Benefits Are Shown in "Today's Dollars"</h2>
 

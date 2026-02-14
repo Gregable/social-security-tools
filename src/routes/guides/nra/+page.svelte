@@ -2,6 +2,7 @@
 import { GuidesSchema } from '$lib/schema-org';
 import { FULL_RETIREMENT_AGE } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Normal Retirement Age (NRA): What It Means for Your Benefits';
 const description =
@@ -166,6 +167,8 @@ fraTable.push({
     and there are no currently scheduled changes, though future legislation
     could adjust this.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>Filing Before Normal Retirement Age</h2>
 
