@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Privacy & Security';
 const description =
@@ -72,6 +73,8 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
     (F12) and watching the Network tab while using the calculator. You'll see
     that no requests containing your earnings data are made.
   </p>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>What Data Does the Site Collect?</h2>
   <p>

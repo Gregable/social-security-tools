@@ -9,6 +9,7 @@
   import { MonthDuration } from "$lib/month-time";
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import InlineCTA from '../InlineCTA.svelte';
 
   // Current year from constants
   const currentYear = MAX_YEAR;
@@ -235,6 +236,8 @@
     The <a href="/calculator">Social Security calculator</a> will show you the benefit
     at any starting age based on your actual earnings record.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>How the Maximum Changes Each Year</h2>
 

@@ -3,7 +3,7 @@ import Header from '$lib/components/Header.svelte';
 import './guide-styles.css';
 </script>
 
-<Header active="Guides" showSponsor />
+<Header active="Guides" />
 <main>
   <slot></slot>
 </main>

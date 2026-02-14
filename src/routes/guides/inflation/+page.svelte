@@ -2,6 +2,7 @@
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import { MAX_YEAR, MAX_WAGE_INDEX_YEAR, WAGE_INDICES } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
 
 // Generate a dynamic earnings example
@@ -231,6 +232,8 @@ const faqs: FAQItem[] = [
     at face value with no indexing adjustment. For more details, see our
     <a href="/guides/indexing-factors">Wage Indexing Guide</a>.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>COLA — After You Start Collecting Benefits</h2>
 

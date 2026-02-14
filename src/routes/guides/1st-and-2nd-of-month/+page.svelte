@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
 
 const title = 'Extra rules for those born on the 1st or 2nd of the month';
@@ -129,6 +130,8 @@ schema.tags = [
       <b>May</b>, 2027.
     </li>
   </ul>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>Benefit Payment Date</h2>
   In most cases, the date of payment is also based on the day of the month you were

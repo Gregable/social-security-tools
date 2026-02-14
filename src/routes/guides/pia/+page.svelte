@@ -14,6 +14,7 @@
   import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
   import { parsePaste } from "$lib/ssa-parse";
   import GuideFooter from "../guide-footer.svelte";
+  import InlineCTA from "../InlineCTA.svelte";
 
   // Current year from constants
   const currentYear = MAX_YEAR;
@@ -314,6 +315,8 @@
   <div class="chart-wrapper">
     <BendpointChart recipient={demoRecipient} />
   </div>
+
+  <InlineCTA type="calculator" />
 
   <h2>Progressive Nature of the Formula</h2>
 

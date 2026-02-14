@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import InlineCTA from "../InlineCTA.svelte";
 
   const title =
     "Social Security Survivor Benefits: Guide for Widows, Widowers & Families";
@@ -235,6 +236,8 @@
     a reduced amount, you're protected. Your survivor benefit will be at least 82.5%
     of their PIA, even if they were receiving less than that due to early claiming.
   </div>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>Survivor Normal Retirement Age</h2>
 

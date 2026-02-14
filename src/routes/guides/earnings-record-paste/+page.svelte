@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import EarnignsRecordLinkImage from './earnings-record-link.png';
 import ErrorMessageImage from './error.png';
 import HeroImage from './hero.png';
@@ -72,6 +73,8 @@ schema.tags = ['Earnings Record', 'Social Security', 'SSA.gov', 'Import Data'];
     If you've looked through the tips in this document and still think something
     is broken, please don't hesitate to <a href="/contact">reach out</a>!
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>Common Errors</h2>
   <div class="indent">

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Will Social Security Run Out of Money?';
 const description =
@@ -99,6 +100,8 @@ const faqs: FAQItem[] = [
       >The Future Financial Status of the Social Security Program</a
     >
   </p>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>How Could Congress Fix Social Security?</h2>
   <p>

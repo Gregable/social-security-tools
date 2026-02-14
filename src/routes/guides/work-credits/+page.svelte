@@ -2,6 +2,7 @@
 import { EARNINGS_PER_CREDIT, MAX_CREDITS, MAX_YEAR } from '$lib/constants';
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 const currentYear = MAX_YEAR;
 const currentYearCredit = EARNINGS_PER_CREDIT[currentYear];
@@ -137,6 +138,8 @@ const faqs: FAQItem[] = [
     least $50 in wages. These were called "quarters of coverage" (QCs). The
     system changed to a yearly earnings-based approach starting in 1978.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h2>Earnings Required Per Credit by Year</h2>
 

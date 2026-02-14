@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Social Security Benefits for Divorced Spouses: Eligibility, Rules & How to Claim';
 const description =
@@ -231,6 +232,8 @@ const faqs = [
       approximately $840 per month (assuming a 30% reduction for early claiming).
     </p>
   </div>
+
+  <InlineCTA type="projectionlab" />
 
   <h2>Does My Ex-Spouse Know If I Claim Benefits?</h2>
 

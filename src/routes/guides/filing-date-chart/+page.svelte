@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 import DateSelectBoxImage from './date-select-box.png';
 import HeroImage from './hero.png';
 import MoneyAxisSingleImage from './money-axis-single.png';
@@ -103,6 +104,8 @@ schema.tags = [
     span from when the oldest person turns 62 to when the youngest person turns
     70.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <h3>Money</h3>
 

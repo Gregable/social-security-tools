@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import InlineCTA from "../InlineCTA.svelte";
 
   const title =
     "Working While Receiving Social Security: The Earnings Test Explained";
@@ -210,6 +211,8 @@
     entirely. You can earn any amount from working without any reduction to your
     Social Security benefits.
   </div>
+
+  <InlineCTA type="calculator" />
 
   <h2>Your Withheld Benefits Are Returned</h2>
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import InlineCTA from '../InlineCTA.svelte';
 
 import HeroImage from './delayed-bump.png';
 
@@ -80,6 +81,8 @@ schema.tags = [
     credited to the recipient. In Jan 2019, those credits kick in and the
     additional bump in benefits does as well.
   </p>
+
+  <InlineCTA type="calculator" />
 
   <p>There are a few cases where this bump does not appear:</p>
 
