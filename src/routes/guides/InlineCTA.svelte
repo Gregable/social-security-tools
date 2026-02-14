@@ -10,7 +10,7 @@ export let type: GuideCTAType;
 
 let ctaElement: HTMLElement;
 
-$: guideSlug = $page.url.pathname
+$: guideSlug = ($page?.url?.pathname ?? '')
   .replace('/guides/', '')
   .replace(/\/$/, '');
 

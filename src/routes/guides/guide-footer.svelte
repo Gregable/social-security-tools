@@ -5,7 +5,7 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import StickyMobileCTA from './StickyMobileCTA.svelte';
 
-$: guideSlug = $page.url.pathname
+$: guideSlug = ($page?.url?.pathname ?? '')
   .replace('/guides/', '')
   .replace(/\/$/, '');
 

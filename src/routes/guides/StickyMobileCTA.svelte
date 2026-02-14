@@ -10,8 +10,8 @@ let dismissed = false;
 let footerInView = false;
 let tracked = false;
 
-$: type = getGuideCTAType($page.url.pathname);
-$: guideSlug = $page.url.pathname
+$: type = getGuideCTAType($page?.url?.pathname ?? '');
+$: guideSlug = ($page?.url?.pathname ?? '')
   .replace('/guides/', '')
   .replace(/\/$/, '');
 $: show = visible && !dismissed && !footerInView;
