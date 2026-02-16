@@ -77,6 +77,7 @@ const pages = [
     priority: '0.7',
     changefreq: 'yearly',
   },
+  { path: '/guides/state-taxes', priority: '0.7', changefreq: 'yearly' },
 ];
 // Note: /strategy is excluded per robots.txt
 

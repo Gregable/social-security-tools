@@ -29,6 +29,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
       <li>
         <span class="postdate">Feb 15, 2026</span>
         <h3 class="posttitle">
+          <a href="/guides/state-taxes">
+            State Taxes on Social Security Benefits: Which States Tax Your
+            Benefits?
+          </a>
+        </h3>
+        <p class="description">
+          Most states don't tax Social Security benefits. Learn which 8 states
+          still tax benefits in 2026, exemption thresholds, recent changes, and
+          planning strategies.
+        </p>
+      </li>
+
+      <li>
+        <span class="postdate">Feb 15, 2026</span>
+        <h3 class="posttitle">
           <a href="/guides/projectionlab-review">
             ProjectionLab Review: Retirement Planning Beyond Social Security
           </a>

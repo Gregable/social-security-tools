@@ -9,13 +9,15 @@ const title = 'Federal Taxation of Social Security Benefits';
 const description =
   'A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI.';
 const publishDate = new Date('2022-12-04T00:00:00+00:00');
+const updateDate = new Date('2026-02-15T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/federal-taxes';
 schema.title = title;
 schema.image = HeroImage;
 schema.datePublished = publishDate.toISOString();
-schema.description = description; // Pass the description to the schema
+schema.dateModified = updateDate.toISOString();
+schema.description = description;
 schema.imageAlt = 'Tax forms laid atop some currency';
 schema.tags = [
   'Social Security Taxes',
@@ -60,54 +62,15 @@ schema.tags = [
   <h3>State Taxes</h3>
 
   <p>
-    Your Social Security benefits can be taxed at both the state and federal
-    levels. The laws differ between each state. This guide does not cover the
-    state tax rules, but does explain how Social Security benefits can be taxed
-    federally. If you live in one of the following 38 states, you are in luck,
-    as the state does not tax Social Security benefits at all:
+    In addition to federal taxes, your Social Security benefits may also be
+    subject to state income tax. As of 2026, only 8 states tax Social Security
+    benefits, while 42 states and Washington, D.C. do not. For a complete
+    breakdown of each state's rules, exemptions, and planning strategies, see
+    our
+    <a href="/guides/state-taxes"
+      >State Taxes on Social Security Benefits</a
+    > guide.
   </p>
-
-  <ul class="state-list">
-    <li>Alabama</li>
-    <li>Alaska</li>
-    <li>Arizona</li>
-    <li>Arkansas</li>
-    <li>California</li>
-    <li>Delaware</li>
-    <li>Florida</li>
-    <li>Georgia</li>
-    <li>Hawaii</li>
-    <li>Idaho</li>
-    <li>Illinois</li>
-    <li>Indiana</li>
-    <li>Iowa</li>
-    <li>Kentucky</li>
-    <li>Louisiana</li>
-    <li>Maine</li>
-    <li>Maryland</li>
-    <li>Massachusetts</li>
-    <li>Michigan</li>
-    <li>Mississippi</li>
-    <li>Nevada</li>
-    <li>New Hampshire</li>
-    <li>New Jersey</li>
-    <li>New York</li>
-    <li>North Carolina</li>
-    <li>North Dakota</li>
-    <li>Ohio</li>
-    <li>Oklahoma</li>
-    <li>Oregon</li>
-    <li>Pennsylvania</li>
-    <li>South Carolina</li>
-    <li>South Dakota</li>
-    <li>Tennessee</li>
-    <li>Texas</li>
-    <li>Virginia</li>
-    <li>Washington</li>
-    <li>Washington DC</li>
-    <li>Wisconsin</li>
-    <li>Wyoming</li>
-  </ul>
 
   <h3>Federal Taxes</h3>
 
