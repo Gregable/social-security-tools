@@ -68,7 +68,7 @@
 </script>
 
 <svelte:head>
-  <title>{title}</title>
+  <title>{title} | SSA.tools</title>
   <meta name="description" content={description} />
   <link rel="canonical" href="https://ssa.tools/guides/state-taxes" />
   {@html schema.render()}
@@ -141,7 +141,7 @@
       <tr>
         <td>Colorado</td>
         <td>Fully exempt at age 65+</td>
-        <td>Under 65 with limited deduction</td>
+        <td>Ages 55-64 above AGI threshold; under 55 generally ineligible</td>
       </tr>
       <tr>
         <td>Connecticut</td>
@@ -155,7 +155,7 @@
       </tr>
       <tr>
         <td>Montana</td>
-        <td>$5,500 deduction for 65+</td>
+        <td>$5,500+ deduction for 65+ (inflation-adjusted)</td>
         <td>Most filers with higher incomes</td>
       </tr>
       <tr>
@@ -184,11 +184,13 @@
   <h3>Colorado</h3>
   <p>
     Colorado offers a full exemption for retirees <strong>age 65 and older</strong>.
-    If you are under 65, you can still deduct a portion of your Social Security
-    benefits: up to $20,000 for those under age 55, and up to $24,000 for those
-    age 55-64. This makes Colorado one of the most generous taxing states,
-    since the vast majority of Social Security recipients are over 65 and pay
-    nothing.
+    For those <strong>age 55-64</strong>, benefits are also fully exempt if AGI
+    is below <strong>$75,000</strong> (single) or <strong>$95,000</strong>
+    (joint); above those thresholds, the deduction is capped at $20,000.
+    Taxpayers <strong>under age 55</strong> are generally not eligible for the
+    Social Security subtraction. This makes Colorado one of the most generous
+    taxing states, since the vast majority of Social Security recipients are
+    over 65 and pay nothing.
   </p>
 
   <h3>Connecticut</h3>
@@ -203,21 +205,22 @@
   <h3>Minnesota</h3>
   <p>
     Minnesota offers a Social Security subtraction that phases out at higher
-    incomes. For 2025, the phase-out begins at approximately
-    <strong>$84,490</strong> for single filers and
-    <strong>$108,320</strong> for joint filers. Below these thresholds, benefits
-    can be fully or partially exempt. Minnesota's subtraction is tied to the
-    federal taxable amount, so you only pay state tax on the portion already
-    taxable federally.
+    incomes. The phase-out thresholds are adjusted annually for inflation; for
+    2025, they begin at approximately <strong>$84,490</strong> for single filers
+    and <strong>$108,320</strong> for joint filers (2026 amounts have not yet
+    been published). Below these thresholds, benefits can be fully or partially
+    exempt. Minnesota's subtraction is tied to the federal taxable amount, so
+    you only pay state tax on the portion already taxable federally.
   </p>
 
   <h3>Montana</h3>
   <p>
-    Montana allows a deduction of up to <strong>$5,500</strong> for Social
-    Security and other retirement income for taxpayers age 65 and older. The
-    deduction is reduced for higher-income filers based on AGI. Montana uses
-    the federal taxable amount as the starting point, so only benefits that are
-    taxable federally are subject to state tax.
+    Montana allows a deduction of up to <strong>$5,500+</strong>
+    (inflation-adjusted annually) for Social Security and other retirement
+    income for taxpayers age 65 and older. The deduction is reduced for
+    higher-income filers based on AGI. Montana uses the federal taxable amount
+    as the starting point, so only benefits that are taxable federally are
+    subject to state tax.
   </p>
 
   <h3>New Mexico</h3>
@@ -232,8 +235,8 @@
   <h3>Rhode Island</h3>
   <p>
     Rhode Island exempts Social Security benefits for filers who have reached
-    <strong>full retirement age</strong> (as defined by Social Security) and
-    whose federal AGI is below <strong>$107,000</strong> for single filers or
+    <strong>full retirement age</strong> (typically 66 to 67, depending on birth
+    year) and whose federal AGI is below <strong>$107,000</strong> for single filers or
     <strong>$133,750</strong> for joint filers. Filers who have not reached
     full retirement age, or who exceed the income limits, may owe state tax on
     benefits.
@@ -379,7 +382,7 @@
 
   <div class="highlight-box">
     <strong>New for 2025-2028:</strong> The One Big Beautiful Bill Act created a
-    new senior tax deduction of $4,000-$6,000 for those age 65+. This can
+    new senior tax deduction of up to $6,000 for those age 65+. This can
     significantly reduce federal taxes on benefits. See our
     <a href="/guides/senior-tax-deduction">Senior Tax Deduction guide</a> for
     details.

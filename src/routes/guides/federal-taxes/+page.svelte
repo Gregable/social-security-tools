@@ -217,7 +217,7 @@ schema.tags = [
   <p>
     <strong>New for 2025-2028:</strong> The One Big Beautiful Bill Act created a
     new additional standard deduction for seniors age 65 and older, worth up to
-    $4,000 in 2025 and $6,000 in 2026-2028. While it does not change the
+    $6,000 for tax years 2025-2028. While it does not change the
     provisional income formula described above, it can significantly reduce or
     eliminate the federal tax owed on Social Security benefits for many
     retirees. See our

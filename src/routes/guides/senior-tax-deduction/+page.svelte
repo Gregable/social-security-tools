@@ -7,7 +7,7 @@
   const title =
     "The New Senior Tax Deduction: What It Means for Social Security Recipients";
   const description =
-    "The One Big Beautiful Bill Act created a new $4,000-$6,000 tax deduction for seniors 65+. Learn who qualifies, income phase-outs, how it interacts with Social Security benefit taxation, and planning strategies for 2025-2028.";
+    "The One Big Beautiful Bill Act created a new $6,000 tax deduction for seniors 65+. Learn who qualifies, income phase-outs, how it interacts with Social Security benefit taxation, and planning strategies for 2025-2028.";
   const publishDate = new Date("2026-02-02T00:00:00+00:00");
   const updateDate = new Date("2026-02-02T00:00:00+00:00");
 
@@ -38,7 +38,7 @@
     {
       question: "How much is the new senior tax deduction?",
       answer:
-        "For tax year 2025, the deduction is $4,000 per eligible individual. For tax years 2026 through 2028, it increases to $6,000 per eligible individual. A married couple filing jointly where both spouses are 65 or older can deduct up to $8,000 in 2025 and $12,000 in 2026-2028.",
+        "The deduction is $6,000 per eligible individual for tax years 2025 through 2028. A married couple filing jointly where both spouses are 65 or older can deduct up to $12,000.",
     },
     {
       question: "Who qualifies for the senior tax deduction?",
@@ -103,8 +103,8 @@
     <h3>Key Takeaways</h3>
     <ul>
       <li>
-        New deduction of <strong>$4,000 (2025)</strong> or
-        <strong>$6,000 (2026-2028)</strong> per eligible individual
+        New deduction of <strong>$6,000</strong> per eligible individual
+        (2025-2028)
       </li>
       <li>Must be <strong>age 65+</strong> with a valid SSN</li>
       <li>
@@ -152,22 +152,7 @@
     </thead>
     <tbody>
       <tr>
-        <td>2025</td>
-        <td>$4,000</td>
-        <td>$8,000</td>
-      </tr>
-      <tr>
-        <td>2026</td>
-        <td>$6,000</td>
-        <td>$12,000</td>
-      </tr>
-      <tr>
-        <td>2027</td>
-        <td>$6,000</td>
-        <td>$12,000</td>
-      </tr>
-      <tr>
-        <td>2028</td>
+        <td>2025-2028</td>
         <td>$6,000</td>
         <td>$12,000</td>
       </tr>
@@ -176,7 +161,7 @@
 
   <p>
     If only one spouse in a joint return is 65 or older, the couple receives
-    half the joint amount (e.g., $6,000 instead of $12,000 in 2026).
+    half the joint amount ($6,000 instead of $12,000).
   </p>
 
   <h2>Income Phase-Outs</h2>
