@@ -289,7 +289,7 @@
       </tr>
       <tr>
         <td>Kansas</td>
-        <td>2023 (exempt for AGI under $75K starting 2024)</td>
+        <td>2023 (fully exempt starting 2024)</td>
       </tr>
     </tbody>
   </table>
