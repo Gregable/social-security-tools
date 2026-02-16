@@ -33,6 +33,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   privacy: 'projectionlab',
   'projectionlab-review': 'calculator',
   'senior-tax-deduction': 'projectionlab',
+  'state-taxes': 'projectionlab',
   'survivor-benefits': 'projectionlab',
   '1st-and-2nd-of-month': 'projectionlab',
   wep: 'projectionlab',
