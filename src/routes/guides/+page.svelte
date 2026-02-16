@@ -27,6 +27,20 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Feb 15, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/projectionlab-review">
+            ProjectionLab Review: Retirement Planning Beyond Social Security
+          </a>
+        </h3>
+        <p class="description">
+          A review of ProjectionLab, a retirement planning tool that
+          complements Social Security calculators like SSA.tools. Covers
+          features, pricing, pros and cons, and an exclusive discount code.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Feb 2, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/senior-tax-deduction">
