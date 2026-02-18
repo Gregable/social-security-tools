@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Feb 18, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/delayed-retirement-credits">
+            Delayed Retirement Credits: How Waiting Past Full Retirement Age
+            Increases Your Benefit
+          </a>
+        </h3>
+        <p class="description">
+          Learn how Delayed Retirement Credits increase your Social Security
+          benefit by 8% per year for each year you wait past Full Retirement
+          Age, up to age 70. Includes breakeven analysis, survivor benefit
+          rules, and COLA interactions.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Feb 15, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/state-taxes">
@@ -45,7 +61,7 @@ const pageImageAlt = 'Social Security guides and educational resources';
         <span class="postdate">Feb 15, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/projectionlab-review">
-            ProjectionLab Review: Retirement Planning Beyond Social Security
+            ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security
           </a>
         </h3>
         <p class="description">
