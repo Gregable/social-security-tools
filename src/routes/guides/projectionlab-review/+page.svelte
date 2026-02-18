@@ -3,7 +3,7 @@
   import type { FAQItem } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 
-  const title = "ProjectionLab Review: Retirement Planning Beyond Social Security";
+  const title = "ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security";
   const description =
     "A review of ProjectionLab, a retirement planning tool that complements Social Security calculators like SSA.tools. Covers features, pros and cons, and an exclusive SSA-TOOLS coupon code for 10% off.";
   const published = "2026-02-15";
