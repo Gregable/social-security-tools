@@ -39,7 +39,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "storybook": "^8.6.15",
-    "svelte": "^5.18.1",
+    "svelte": "^5.53.5",
     "svelte-check": "^4.2.1",
     "terser": "^5.43.1",
     "tslib": "^2.4.1",
