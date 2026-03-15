@@ -147,12 +147,12 @@ function parseDob(dob: string | null): Birthdate | null {
   if (!dob) return null;
 
   const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
-  let m = dob.match(dobRegex);
-  if (!m) return null;
+  const match = dob.match(dobRegex);
+  if (!match) return null;
 
-  const year = parseInt(m[1], 10);
-  const month = parseInt(m[2], 10) - 1; // Month is 0-indexed
-  const day = parseInt(m[3], 10);
+  const year = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10) - 1; // Month is 0-indexed
+  const day = parseInt(match[3], 10);
   if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day))
     return null;
 

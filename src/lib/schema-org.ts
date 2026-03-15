@@ -167,11 +167,7 @@ export class GuidesSchema {
     if (this.dateModified) {
       schema.dateModified = this.dateModified;
     }
-    return (
-      `<script type="application/ld+json">` +
-      JSON.stringify(schema) +
-      `</script>`
-    );
+    return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
   }
 
   renderSocialMeta(): string {

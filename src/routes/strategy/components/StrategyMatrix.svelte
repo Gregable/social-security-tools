@@ -278,22 +278,29 @@ function handleCellSelect(event) {
   // Set selection on the shared CalculationResults state
   calculationResults.setSelectedCell(rowIndex, colIndex);
 
-  const filingAge1 = result.filingAge1;
+  const {
+    filingAge1,
+    filingAge2,
+    filingAge1Years,
+    filingAge1Months,
+    filingAge2Years,
+    filingAge2Months,
+    totalBenefit,
+  } = result;
   const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
-  const filingAge2 = result.filingAge2;
   const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
 
   // Emit a normalized details payload for external consumers (e.g., details panel)
   onselectcell?.({
     deathAge1: bucket1.label,
     deathAge2: bucket2.label,
-    filingAge1Years: result.filingAge1Years,
-    filingAge1Months: result.filingAge1Months,
+    filingAge1Years,
+    filingAge1Months,
     filingDate1,
-    filingAge2Years: result.filingAge2Years,
-    filingAge2Months: result.filingAge2Months,
+    filingAge2Years,
+    filingAge2Months,
     filingDate2,
-    netPresentValue: result.totalBenefit,
+    netPresentValue: totalBenefit,
   });
 }
 </script>
@@ -461,7 +468,7 @@ function handleCellSelect(event) {
             const expected = headerHoverInfo.bucket?.expectedAge;
             const expYearsInt = expected?.years() || 0;
             const expRemMonths = expected?.modMonths() || 0;
-            return `${expYearsInt}y${expRemMonths ? ' ' + expRemMonths + 'm' : ''}`;
+            return `${expYearsInt}y${expRemMonths ? ` ${expRemMonths}m` : ''}`;
           })()}
         </div>
       </div>

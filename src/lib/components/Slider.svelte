@@ -125,15 +125,15 @@ $: width =
 
 // Similarly, we want to bind to print events so we resize correctly for those
 // too:
-let media_query_list: MediaQueryList;
+let printMediaQuery: MediaQueryList;
 function onPrintMediaChange() {
   if (mounted && sliderEl) {
     width = getWidth(innerWidth, sliderEl);
   }
 }
 function removeMediaQueryListener() {
-  if (media_query_list) {
-    media_query_list.removeEventListener('change', onPrintMediaChange);
+  if (printMediaQuery) {
+    printMediaQuery.removeEventListener('change', onPrintMediaChange);
   }
 }
 onMount(() => {
@@ -153,8 +153,8 @@ onMount(() => {
       }
     }, 0);
 
-    media_query_list = window.matchMedia('print');
-    media_query_list.addEventListener('change', onPrintMediaChange);
+    printMediaQuery = window.matchMedia('print');
+    printMediaQuery.addEventListener('change', onPrintMediaChange);
   };
 
   initAsync();

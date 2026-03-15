@@ -308,11 +308,9 @@ function generateTicks(
   extendRangeLow: boolean,
   extendRangeHigh: boolean
 ) {
-  let ticks = [];
-  let extendLow = null;
-  if (extendRangeLow) extendLow = startAge.asMonths();
-  let extendHigh = null;
-  if (extendRangeHigh) extendHigh = endAge.asMonths();
+  const ticks = [];
+  const extendLow = extendRangeLow ? startAge.asMonths() : null;
+  const extendHigh = extendRangeHigh ? endAge.asMonths() : null;
 
   for (
     let age = MonthDuration.copyFrom(startAge);

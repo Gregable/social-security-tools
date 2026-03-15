@@ -67,7 +67,7 @@ export class MonthDate {
       );
     }
 
-    return MonthDate.initFromYearsMonths({ years: years, months: monthIndex });
+    return MonthDate.initFromYearsMonths({ years, months: monthIndex });
   }
 
   /**

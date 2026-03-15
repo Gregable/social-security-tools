@@ -14,23 +14,16 @@
   // If there is an incomplete record in the earnigns record, we should show it
   // only if there isn't a matching year in the future earnings records.
   function decideShowIncompleteRecords(recipient: Recipient): boolean {
-    let incompleteYear: number | undefined;
-    for (const record of recipient.earningsRecords) {
-      if (record.incomplete) {
-        incompleteYear = record.year;
-        break;
-      }
-    }
-    if (incompleteYear === undefined) {
+    const incompleteRecord = recipient.earningsRecords.find(
+      (record) => record.incomplete
+    );
+    if (incompleteRecord === undefined) {
       // If there is no incomplete year, it doesn't matter what the response is.
       return false;
     }
-    for (const record of recipient.futureEarningsRecords) {
-      if (record.year === incompleteYear) {
-        return false;
-      }
-    }
-    return true;
+    return !recipient.futureEarningsRecords.some(
+      (record) => record.year === incompleteRecord.year
+    );
   }
   let showIncompleteRecords: boolean = true;
   $: showIncompleteRecords = decideShowIncompleteRecords($recipient);

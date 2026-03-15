@@ -245,13 +245,12 @@ export class Birthdate {
     month: string;
     year: number;
   } {
-    var example = {
+    return {
       age: year - this.ssaBirthYear(),
       day: this.ssaBirthdate().getUTCDate(),
       month: this.ssaBirthMonthDate().monthFullName(),
       year: year,
     };
-    return example;
   }
 
   /**

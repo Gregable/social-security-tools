@@ -124,7 +124,7 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
  * Returns null if the integration ID is not in the allowed list.
  */
 export function getIntegration(id: string): IntegrationConfig | null {
-  return INTEGRATIONS[id] || null;
+  return INTEGRATIONS[id] ?? null;
 }
 
 /**

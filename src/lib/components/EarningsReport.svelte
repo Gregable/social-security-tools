@@ -40,12 +40,9 @@ $: totalRecords = records($recipient);
 // Check if the prior year has an incomplete record (not yet recorded by SSA)
 function hasPriorYearIncomplete(recipient: Recipient): boolean {
   const priorYear = constants.CURRENT_YEAR - 1;
-  for (const record of recipient.earningsRecords) {
-    if (record.year === priorYear && record.incomplete) {
-      return true;
-    }
-  }
-  return false;
+  return recipient.earningsRecords.some(
+    (record) => record.year === priorYear && record.incomplete
+  );
 }
 $: priorYearIncomplete = hasPriorYearIncomplete($recipient);
 $: priorYear = constants.CURRENT_YEAR - 1;

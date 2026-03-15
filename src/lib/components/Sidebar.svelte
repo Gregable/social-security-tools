@@ -40,7 +40,7 @@ let visibleSections: Array<number> = [];
 
 let lastIsStuck: boolean = false;
 
-function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
+function observeCallback(entries: Array<IntersectionObserverEntry>) {
   // Check if stuck state has changed and recreate observer if needed
   const currentIsStuck = $isStuck;
   if (currentIsStuck !== lastIsStuck) {
@@ -50,24 +50,22 @@ function observeCallback(entries: Array<IntersectionObserverEntry>, _) {
   }
 
   entries.forEach((entry) => {
-    let id: number = parseInt(
+    const sectionIndex: number = parseInt(
       entry.target.getAttribute('id').split('-')[1],
       10
     );
 
-    let isIntersecting = entry.isIntersecting;
-
-    if (isIntersecting) {
+    if (entry.isIntersecting) {
       // Push to front or back, as appropriate, if not already present.
       if (visibleSections.length === 0) {
-        visibleSections.push(id);
-      } else if (visibleSections[0] > id) {
-        visibleSections.unshift(id);
-      } else if (visibleSections[visibleSections.length - 1] < id) {
-        visibleSections.push(id);
+        visibleSections.push(sectionIndex);
+      } else if (visibleSections[0] > sectionIndex) {
+        visibleSections.unshift(sectionIndex);
+      } else if (visibleSections[visibleSections.length - 1] < sectionIndex) {
+        visibleSections.push(sectionIndex);
       }
     } else {
-      visibleSections = visibleSections.filter((x) => x !== id);
+      visibleSections = visibleSections.filter((x) => x !== sectionIndex);
     }
   });
 
@@ -107,7 +105,7 @@ function createObserver() {
     // Every 5%:
     threshold: [...Array(20).keys()].map((i) => i / 20),
   });
-  let children = mainColumn.querySelectorAll('[data-sidebarsection]');
+  const children = mainColumn.querySelectorAll('[data-sidebarsection]');
   for (let i = 0; i < children.length; i++) {
     observer.observe(children[i]);
   }
@@ -133,12 +131,12 @@ function scanSections() {
   sidebarSections = [];
   hasHeading = false;
 
-  let children = mainColumn.querySelectorAll('[data-sidebarsection]');
+  const children = mainColumn.querySelectorAll('[data-sidebarsection]');
   for (let i = 0; i < children.length; i++) {
-    let child = children[i];
-    let isHeading = child.getAttribute('data-heading') === 'true';
-    let isIntegration = child.getAttribute('data-integration') === 'true';
-    let label = child.getAttribute('data-label');
+    const child = children[i];
+    const isHeading = child.getAttribute('data-heading') === 'true';
+    const isIntegration = child.getAttribute('data-integration') === 'true';
+    const label = child.getAttribute('data-label');
 
     // Reassign ID to ensure sequential ordering
     // This is critical because observeCallback relies on ID order matching array index

@@ -43,7 +43,7 @@ let uniqid: number = 0;
   // by having the sidebar pass it's own unique id down to the section.
 
   // Increment the uniqid to ensure unique ids / labels:
-  let id = "sidebarsection-" + uniqid;
+  let id = `sidebarsection-${uniqid}`;
   uniqid += 1;
 </script>
 

@@ -103,8 +103,7 @@
 
   // Handle name changes
   function handleNameChange(index: number, event: Event) {
-    const target = event.target as EventTarget & { value: string };
-    const name = target.value;
+    const name = (event.target as HTMLInputElement).value;
     recipients[index].name = name;
     recipients = [...recipients];
     onUpdate?.();
@@ -112,8 +111,7 @@
 
   // Handle gender changes
   function handleGenderChange(index: number, event: Event) {
-    const target = event.target as EventTarget & { value: string };
-    const gender = target.value;
+    const gender = (event.target as HTMLSelectElement).value;
     recipients[index].gender = gender as "male" | "female" | "blended";
     recipients = [...recipients];
     onUpdate?.();

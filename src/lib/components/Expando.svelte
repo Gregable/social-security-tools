@@ -38,7 +38,7 @@ export let expanded_background_color: string = '#e9e9ff';
 // Print events can change the height of the expando's contents, while toggled
 // We need to trigger a remeasure of the height so that the expando doesn't
 // chop off the contents.
-let media_query_list: MediaQueryList;
+let printMediaQuery: MediaQueryList;
 
 // Determine if the expando is expanded or collapsed initially from outside
 // state, but once rendered, the expando should manage it's own state.
@@ -46,8 +46,8 @@ let expanded = false;
 
 onMount(() => {
   expanded = initiallyExpanded;
-  media_query_list = window.matchMedia('print');
-  media_query_list.addEventListener('change', onPrintMediaChange);
+  printMediaQuery = window.matchMedia('print');
+  printMediaQuery.addEventListener('change', onPrintMediaChange);
 
   if (initiallyExpanded) {
     contentsEl.style.maxHeight = `${contentsEl.scrollHeight}px`;
@@ -65,8 +65,8 @@ function onPrintMediaChange() {
 }
 
 function removeMediaQueryListener() {
-  if (media_query_list) {
-    media_query_list.removeEventListener('change', onPrintMediaChange);
+  if (printMediaQuery) {
+    printMediaQuery.removeEventListener('change', onPrintMediaChange);
   }
 }
 

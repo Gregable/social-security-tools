@@ -497,10 +497,10 @@ export class Recipient {
     if (this.isPiaOnly_) {
       return 40;
     }
-    let credits: number = 0;
-    for (let i = 0; i < this.earningsRecords_.length; ++i) {
-      credits += this.earningsRecords_[i].credits();
-    }
+    const credits = this.earningsRecords_.reduce(
+      (sum, record) => sum + record.credits(),
+      0
+    );
     return Math.min(40, credits);
   }
 
@@ -508,11 +508,12 @@ export class Recipient {
    * The total number of credits the recipient has earned or will earn.
    */
   totalCredits(): number {
-    let credits: number = this.earnedCredits();
-    for (let i = 0; i < this.futureEarningsRecords_.length; ++i) {
-      credits += this.futureEarningsRecords_[i].credits();
-    }
-
+    const credits =
+      this.earnedCredits() +
+      this.futureEarningsRecords_.reduce(
+        (sum, record) => sum + record.credits(),
+        0
+      );
     return Math.min(40, credits);
   }
 
@@ -890,8 +891,7 @@ export class Recipient {
 
     if (survivorFilingDate.lessThanOrEqual(deceasedDeathDate)) {
       throw new Error(
-        `Cannot file for survivor benefits before spouse died: ` +
-          `${survivorFilingDate.toString()} <= ${deceasedDeathDate.toString()}`
+        `Cannot file for survivor benefits before spouse died: ${survivorFilingDate.toString()} <= ${deceasedDeathDate.toString()}`
       );
     }
 

@@ -40,17 +40,17 @@
     }
   }
 
-  let ctxA_ = new RecipientContext();
-  $: ctxA_.r = $recipient;
-  let ctxB_ = new RecipientContext();
-  $: ctxB_.r = $spouse;
+  let recipientCtx_ = new RecipientContext();
+  $: recipientCtx_.r = $recipient;
+  let spouseCtx_ = new RecipientContext();
+  $: spouseCtx_.r = $spouse;
 
   let mounted_: boolean = false;
   $: $recipient &&
     $spouse &&
     mounted_ &&
-    ctxA_.sliderMonths &&
-    ctxB_.sliderMonths &&
+    recipientCtx_.sliderMonths &&
+    spouseCtx_.sliderMonths &&
     render();
 
   let sliderEl_: Slider;
@@ -85,22 +85,22 @@
     ctx_.font = "bold 14px Helvetica";
 
     // Set guard flags during initialization to prevent circular updates
-    updatingFromStoreA_ = true;
-    updatingFromStoreB_ = true;
+    updatingRecipientFromStore_ = true;
+    updatingSpouseFromStore_ = true;
 
-    ctxA_.sliderMonths = $recipient.normalRetirementAge().asMonths();
-    ctxB_.sliderMonths = $spouse.normalRetirementAge().asMonths();
+    recipientCtx_.sliderMonths = $recipient.normalRetirementAge().asMonths();
+    spouseCtx_.sliderMonths = $spouse.normalRetirementAge().asMonths();
 
     // Now set stores to match initialized slider positions
-    recipientFilingDate.set(userSelectedDate(ctxA_));
-    spouseFilingDate.set(userSelectedDate(ctxB_));
+    recipientFilingDate.set(userSelectedDate(recipientCtx_));
+    spouseFilingDate.set(userSelectedDate(spouseCtx_));
 
     // Wait for one tick to ensure store updates propagate
     await tick();
 
     // Enable sync and render
-    updatingFromStoreA_ = false;
-    updatingFromStoreB_ = false;
+    updatingRecipientFromStore_ = false;
+    updatingSpouseFromStore_ = false;
     mounted_ = true;
     render();
   });
@@ -110,19 +110,19 @@
   let lastMouseDate_: MonthDate = new MonthDate(0);
 
   // Track if we're currently updating from stores to prevent circular updates
-  let updatingFromStoreA_: boolean = false;
-  let updatingFromStoreB_: boolean = false;
+  let updatingRecipientFromStore_: boolean = false;
+  let updatingSpouseFromStore_: boolean = false;
 
   // Update stores when slider values change
   // Only export after mount to ensure we start with NRA, not the default 62*12
   $: {
-    if (ctxA_.sliderMonths && $recipient && mounted_ && !updatingFromStoreA_) {
-      recipientFilingDate.set(userSelectedDate(ctxA_));
+    if (recipientCtx_.sliderMonths && $recipient && mounted_ && !updatingRecipientFromStore_) {
+      recipientFilingDate.set(userSelectedDate(recipientCtx_));
     }
   }
   $: {
-    if (ctxB_.sliderMonths && $spouse && mounted_ && !updatingFromStoreB_) {
-      spouseFilingDate.set(userSelectedDate(ctxB_));
+    if (spouseCtx_.sliderMonths && $spouse && mounted_ && !updatingSpouseFromStore_) {
+      spouseFilingDate.set(userSelectedDate(spouseCtx_));
     }
   }
 
@@ -133,8 +133,8 @@
         $recipient.birthdate.ageAtSsaDate($recipientFilingDate);
       const newSliderMonths = ageAtFiling.asMonths();
       // Only update if significantly different to avoid infinite loops
-      if (Math.abs(newSliderMonths - ctxA_.sliderMonths) > 0.5) {
-        syncSliderAFromStore(newSliderMonths);
+      if (Math.abs(newSliderMonths - recipientCtx_.sliderMonths) > 0.5) {
+        syncRecipientSliderFromStore(newSliderMonths);
       }
     }
   }
@@ -143,26 +143,26 @@
       const ageAtFiling = $spouse.birthdate.ageAtSsaDate($spouseFilingDate);
       const newSliderMonths = ageAtFiling.asMonths();
       // Only update if significantly different to avoid infinite loops
-      if (Math.abs(newSliderMonths - ctxB_.sliderMonths) > 0.5) {
-        syncSliderBFromStore(newSliderMonths);
+      if (Math.abs(newSliderMonths - spouseCtx_.sliderMonths) > 0.5) {
+        syncSpouseSliderFromStore(newSliderMonths);
       }
     }
   }
 
-  async function syncSliderAFromStore(newSliderMonths: number) {
-    updatingFromStoreA_ = true;
+  async function syncRecipientSliderFromStore(newSliderMonths: number) {
+    updatingRecipientFromStore_ = true;
     await tick(); // Ensure flag update happens before slider change
-    ctxA_.sliderMonths = newSliderMonths;
+    recipientCtx_.sliderMonths = newSliderMonths;
     await tick(); // Ensure slider change completes before unsetting flag
-    updatingFromStoreA_ = false;
+    updatingRecipientFromStore_ = false;
   }
 
-  async function syncSliderBFromStore(newSliderMonths: number) {
-    updatingFromStoreB_ = true;
+  async function syncSpouseSliderFromStore(newSliderMonths: number) {
+    updatingSpouseFromStore_ = true;
     await tick(); // Ensure flag update happens before slider change
-    ctxB_.sliderMonths = newSliderMonths;
+    spouseCtx_.sliderMonths = newSliderMonths;
     await tick(); // Ensure slider change completes before unsetting flag
-    updatingFromStoreB_ = false;
+    updatingSpouseFromStore_ = false;
   }
 
   function onClick(event: MouseEvent) {
@@ -211,25 +211,25 @@
   // Pulls the filing dates automatically from the sliders. If selfFilingDate
   // is specified, uses that instead of the slider value.
   function allBenefitsOnDate(
-    ctxR: RecipientContext,
+    personCtx: RecipientContext,
     atDate: MonthDate,
     selfFilingDate: MonthDate = new MonthDate(0)
   ): Money {
     let spouseFilingDate: MonthDate;
     let spouse: Recipient;
-    if (ctxR.r.first) {
+    if (personCtx.r.first) {
       if (selfFilingDate.monthsSinceEpoch() === 0)
-        selfFilingDate = userSelectedDate(ctxA_);
-      spouseFilingDate = userSelectedDate(ctxB_);
-      spouse = ctxB_.r;
+        selfFilingDate = userSelectedDate(recipientCtx_);
+      spouseFilingDate = userSelectedDate(spouseCtx_);
+      spouse = spouseCtx_.r;
     } else {
       if (selfFilingDate.monthsSinceEpoch() === 0)
-        selfFilingDate = userSelectedDate(ctxB_);
-      spouseFilingDate = userSelectedDate(ctxA_);
-      spouse = ctxA_.r;
+        selfFilingDate = userSelectedDate(spouseCtx_);
+      spouseFilingDate = userSelectedDate(recipientCtx_);
+      spouse = recipientCtx_.r;
     }
 
-    return ctxR.r.allBenefitsOnDate(
+    return personCtx.r.allBenefitsOnDate(
       spouse,
       spouseFilingDate,
       selfFilingDate,
@@ -243,11 +243,11 @@
    */
   function maxRenderedYDollars(): Money {
     // Use each recipient's own age 70 for their benefit calculation
-    const recipientAge70 = ctxA_.r.birthdate.dateAtSsaAge(
+    const recipientAge70 = recipientCtx_.r.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
     );
-    return ctxA_.r.allBenefitsOnDate(
-      ctxB_.r,
+    return recipientCtx_.r.allBenefitsOnDate(
+      spouseCtx_.r,
       recipientAge70,
       recipientAge70,
       recipientAge70
@@ -260,11 +260,11 @@
    */
   function minRenderedYDollars(): Money {
     // Use each recipient's own age 70 for their benefit calculation
-    const spouseAge70 = ctxB_.r.birthdate.dateAtSsaAge(
+    const spouseAge70 = spouseCtx_.r.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
     );
-    return ctxB_.r.allBenefitsOnDate(
-      ctxA_.r,
+    return spouseCtx_.r.allBenefitsOnDate(
+      recipientCtx_.r,
       spouseAge70,
       spouseAge70,
       spouseAge70
@@ -376,7 +376,7 @@
   /**
    * Compute the canvas y-coordinate for a benefit dollars value
    */
-  function canvasY(ctxR: RecipientContext, benefitY: Money): number {
+  function canvasY(personCtx: RecipientContext, benefitY: Money): number {
     // chartHeight is the number of vertical pixels dedicated to showing
     // charted data about monthly benefits.
     const chartHeight = canvasEl_.height - reservedTop_ - reservedBottom_;
@@ -392,7 +392,7 @@
     // the visually lowest point in the chart correspongind to the maximum
     // benefit for the second recipient.
     let chartY: number = 0;
-    if (ctxR.r.first) {
+    if (personCtx.r.first) {
       chartY = zeroHeight + benefitY.value() * pixelsPerDollar;
     } else {
       // Subtract 1 pixel so that the two zero lines aren't drawn on top of
@@ -443,7 +443,7 @@
     ctx_.setLineDash([2, 2]);
 
     // Render the $0 line.
-    renderHorizontalLine(Money.from(0), canvasY(ctxA_, Money.from(0)));
+    renderHorizontalLine(Money.from(0), canvasY(recipientCtx_, Money.from(0)));
 
     const maxDollars = Money.max(maxRenderedYDollars(), minRenderedYDollars());
 
@@ -463,7 +463,7 @@
       i.value() < maxRenderedYDollars().value();
       i = i.plus(increment)
     ) {
-      renderHorizontalLine(i, canvasY(ctxA_, i));
+      renderHorizontalLine(i, canvasY(recipientCtx_, i));
     }
 
     for (
@@ -471,7 +471,7 @@
       i.value() < minRenderedYDollars().value();
       i = i.plus(increment)
     ) {
-      renderHorizontalLine(i, canvasY(ctxB_, i));
+      renderHorizontalLine(i, canvasY(spouseCtx_, i));
     }
 
     ctx_.restore();
@@ -612,17 +612,17 @@
     ctx_.restore();
   }
 
-  function updateSlider(ctxR: RecipientContext) {
+  function updateSlider(personCtx: RecipientContext) {
     // We don't want users to select a start date earlier than is allowed.
     // For those born on the 1st/2nd, that's 62y0m. For everyone else, it's
     // 62y1m.
-    if (ctxR.r.birthdate.layBirthDayOfMonth() <= 2) {
-      ctxR.userFloor = 62 * 12;
+    if (personCtx.r.birthdate.layBirthDayOfMonth() <= 2) {
+      personCtx.userFloor = 62 * 12;
     } else {
-      ctxR.userFloor = 62 * 12 + 1;
+      personCtx.userFloor = 62 * 12 + 1;
     }
 
-    ctxR.ticks = [];
+    personCtx.ticks = [];
 
     let startAge = MonthDuration.initFromYearsMonths({ years: 62, months: 0 });
     let endAge = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
@@ -631,21 +631,21 @@
       age.lessThanOrEqual(endAge);
       age = age.add(MonthDuration.initFromYearsMonths({ years: 1, months: 0 }))
     ) {
-      const monthsUntilNRA: number = ctxR.r
+      const monthsUntilNRA: number = personCtx.r
         .normalRetirementAge()
         .subtract(age)
         .asMonths();
       if (monthsUntilNRA === 0) {
         // This tick is the NRA, indicate it with a special legend.
-        ctxR.ticks.push({
+        personCtx.ticks.push({
           value: age.asMonths(),
           label: translateSliderLabel(age.asMonths(), "tick-value"),
           legend: "NRA",
-          color: ctxR.r.colors().dark,
+          color: personCtx.r.colors().dark,
         });
       } else {
         // Not an NRA tick, so just add it normally.
-        ctxR.ticks.push({
+        personCtx.ticks.push({
           value: age.asMonths(),
           label: translateSliderLabel(age.asMonths(), "tick-value"),
         });
@@ -653,16 +653,16 @@
 
       if (monthsUntilNRA > 0 && monthsUntilNRA < 12) {
         // The NRA is between this and the next tick: add a special tick for it.
-        ctxR.ticks.push({
-          value: ctxR.r.normalRetirementAge().asMonths(),
+        personCtx.ticks.push({
+          value: personCtx.r.normalRetirementAge().asMonths(),
           label: "",
           legend: "NRA",
-          color: ctxR.r.colors().dark,
+          color: personCtx.r.colors().dark,
         });
       }
     }
     // eslint-disable-next-line no-self-assign
-    ctxR.ticks = ctxR.ticks;
+    personCtx.ticks = personCtx.ticks;
   }
 
   function minCapSlider(ctx0: RecipientContext, ctx1: RecipientContext) {
@@ -687,9 +687,9 @@
     }
   }
 
-  function userSelectedDate(ctxR: RecipientContext) {
-    let selectedAge = new MonthDuration(ctxR.sliderMonths);
-    let selectedDate = ctxR.r.birthdate.dateAtSsaAge(selectedAge);
+  function userSelectedDate(personCtx: RecipientContext) {
+    let selectedAge = new MonthDuration(personCtx.sliderMonths);
+    let selectedDate = personCtx.r.birthdate.dateAtSsaAge(selectedAge);
     return selectedDate;
   }
 
@@ -703,22 +703,22 @@
    * @returns {Array<[number, number, Money]>} The set of boxes to render. Each
    *    box is a tuple of [x, y, benefit].
    */
-  function benefitBoxes(ctxR: RecipientContext) {
-    const selectedDate = userSelectedDate(ctxR);
+  function benefitBoxes(personCtx: RecipientContext) {
+    const selectedDate = userSelectedDate(personCtx);
 
     let boxes = [];
-    let benefit = allBenefitsOnDate(ctxR, selectedDate);
-    boxes.push([canvasX(selectedDate), canvasY(ctxR, benefit), benefit]);
+    let benefit = allBenefitsOnDate(personCtx, selectedDate);
+    boxes.push([canvasX(selectedDate), canvasY(personCtx, benefit), benefit]);
 
     for (
       let i = selectedDate;
       i.lessThanOrEqual(dateX(canvasEl_.width));
       i = i.addDuration(new MonthDuration(1))
     ) {
-      let all = allBenefitsOnDate(ctxR, i, selectedDate);
+      let all = allBenefitsOnDate(personCtx, i, selectedDate);
       if (all.value() !== benefit.value()) {
         benefit = all;
-        boxes.push([canvasX(i), canvasY(ctxR, benefit), benefit]);
+        boxes.push([canvasX(i), canvasY(personCtx, benefit), benefit]);
       }
     }
     return boxes;
@@ -730,18 +730,18 @@
    */
   function renderFilingDateBenefitBoxes(
     boxes: Array<[number, number, Money]>,
-    ctxR: RecipientContext
+    personCtx: RecipientContext
   ) {
     ctx_.save();
 
-    ctx_.strokeStyle = ctxR.r.colors().medium;
+    ctx_.strokeStyle = personCtx.r.colors().medium;
     ctx_.lineWidth = 2;
     ctx_.beginPath();
 
     // Horizontal line from full right to starting date,
     // along the bottom ($0 axis).
-    ctx_.moveTo(canvasEl_.width, canvasY(ctxR, Money.from(0)));
-    ctx_.lineTo(boxes[0][0], canvasY(ctxR, Money.from(0)));
+    ctx_.moveTo(canvasEl_.width, canvasY(personCtx, Money.from(0)));
+    ctx_.lineTo(boxes[0][0], canvasY(personCtx, Money.from(0)));
     for (let i = 0; i < boxes.length; i++) {
       let [x, y, _] = boxes[i];
       // First draw horizontally to the same date but the previous benefit.
@@ -755,20 +755,20 @@
     // Draw all of the way to the right edge of the chart.
     ctx_.lineTo(canvasEl_.width, boxes[boxes.length - 1][1]);
 
-    ctx_.fillStyle = ctxR.r.colors().light;
+    ctx_.fillStyle = personCtx.r.colors().light;
     ctx_.fill();
     ctx_.stroke();
     ctx_.restore();
 
-    renderName(boxes, ctxR);
+    renderName(boxes, personCtx);
   }
 
   // Return the box with the largest minimum dimension.
   function bestBoxForName(
     boxes: Array<[number, number, Money]>,
-    ctxR: RecipientContext
+    personCtx: RecipientContext
   ) {
-    const zeroLineY = canvasY(ctxR, Money.from(0));
+    const zeroLineY = canvasY(personCtx, Money.from(0));
 
     // Find the box that is closest to the middle of the chart.
     let bestBox = 0;
@@ -793,9 +793,9 @@
 
   function renderName(
     boxes: Array<[number, number, Money]>,
-    ctxR: RecipientContext
+    personCtx: RecipientContext
   ) {
-    const nameBox: number = bestBoxForName(boxes, ctxR);
+    const nameBox: number = bestBoxForName(boxes, personCtx);
     if (boxes.length <= nameBox) return;
 
     let xMin: number = boxes[nameBox][0];
@@ -806,7 +806,7 @@
       xMax = canvasEl_.width;
     }
 
-    let yMin: number = canvasY(ctxR, Money.from(0));
+    let yMin: number = canvasY(personCtx, Money.from(0));
     let yMax: number = boxes[nameBox][1];
     if (yMax < yMin) {
       [yMin, yMax] = [yMax, yMin];
@@ -818,17 +818,17 @@
     let centerY = yMin + regionHeight / 2;
 
     ctx_.save();
-    ctx_.fillStyle = ctxR.r.colors().dark;
-    for (let font_height = 24; font_height >= 10; font_height--) {
-      ctx_.font = `${font_height}px Helvetica`;
-      let textBox = ctx_.measureText(ctxR.r.name);
+    ctx_.fillStyle = personCtx.r.colors().dark;
+    for (let fontHeight = 24; fontHeight >= 10; fontHeight--) {
+      ctx_.font = `${fontHeight}px Helvetica`;
+      let textBox = ctx_.measureText(personCtx.r.name);
       // If there is enough space at this font size, draw the user's name,
       // else try a smaller font.
-      if (textBox.width + 20 < regionWidth && font_height + 20 < regionHeight) {
+      if (textBox.width + 20 < regionWidth && fontHeight + 20 < regionHeight) {
         ctx_.fillText(
-          ctxR.r.name,
+          personCtx.r.name,
           centerX - textBox.width / 2,
-          centerY + font_height * 0.4
+          centerY + fontHeight * 0.4
         );
         break;
       }
@@ -851,12 +851,12 @@
    */
   function renderBenefitLabels(
     boxes: Array<[number, number, Money]>,
-    ctxR: RecipientContext
+    personCtx: RecipientContext
   ) {
     ctx_.save();
-    ctx_.fillStyle = ctxR.r.colors().dark;
+    ctx_.fillStyle = personCtx.r.colors().dark;
     ctx_.font = "14px Helvetica";
-    let font_height = 12;
+    let fontHeight = 12;
 
     for (let boxIt = 0; boxIt < boxes.length; ++boxIt) {
       let [boxX, boxY, benefit] = boxes[boxIt];
@@ -870,8 +870,8 @@
       // Prefer to fix text above, rather than left.
       let text = `${benefit.wholeDollars()} / mo`;
       let textBox = ctx_.measureText(text);
-      if (textBox.width + 5 < horizSpace && font_height + 10 < vertSpace) {
-        if (ctxR.r.first) {
+      if (textBox.width + 5 < horizSpace && fontHeight + 10 < vertSpace) {
+        if (personCtx.r.first) {
           renderTextInWhiteBox(text, boxX + 5, boxY - 5);
         } else {
           renderTextInWhiteBox(text, boxX + 5, boxY + 5 + 12);
@@ -882,8 +882,8 @@
       // Again above, using shorter text.
       text = benefit.wholeDollars();
       textBox = ctx_.measureText(text);
-      if (textBox.width + 10 < horizSpace && font_height + 10 < vertSpace) {
-        if (ctxR.r.first) {
+      if (textBox.width + 10 < horizSpace && fontHeight + 10 < vertSpace) {
+        if (personCtx.r.first) {
           renderTextInWhiteBox(text, boxX + 5, boxY - 5);
         } else {
           renderTextInWhiteBox(text, boxX + 5, boxY + 5 + 12);
@@ -895,25 +895,25 @@
       let boxMinX = boxIt === 0 ? reservedLeft_ : boxes[boxIt - 1][0];
       let boxMaxY: number;
       boxMaxY =
-        boxIt === 0 ? canvasY(ctxA_, Money.from(0)) : boxes[boxIt - 1][1];
+        boxIt === 0 ? canvasY(recipientCtx_, Money.from(0)) : boxes[boxIt - 1][1];
 
       horizSpace = boxX - boxMinX;
       vertSpace = Math.abs(boxMaxY - boxY);
 
       text = `${benefit.wholeDollars()} / mo`;
       textBox = ctx_.measureText(text);
-      if (textBox.width + 15 < horizSpace && font_height + 15 < vertSpace) {
-        if (ctxR.r.first) {
+      if (textBox.width + 15 < horizSpace && fontHeight + 15 < vertSpace) {
+        if (personCtx.r.first) {
           renderTextInWhiteBox(
             text,
             boxX - 8 - textBox.width,
-            boxMaxY - (vertSpace - font_height) / 2 - font_height
+            boxMaxY - (vertSpace - fontHeight) / 2 - fontHeight
           );
         } else {
           renderTextInWhiteBox(
             text,
             boxX - 8 - textBox.width,
-            boxMaxY + (vertSpace - font_height) / 2 + font_height
+            boxMaxY + (vertSpace - fontHeight) / 2 + fontHeight
           );
         }
         continue;
@@ -922,18 +922,18 @@
       // Try again with shorter text, removing ' / mo';
       text = benefit.wholeDollars();
       textBox = ctx_.measureText(text);
-      if (textBox.width + 15 < horizSpace && font_height + 15 < vertSpace) {
-        if (ctxR.r.first) {
+      if (textBox.width + 15 < horizSpace && fontHeight + 15 < vertSpace) {
+        if (personCtx.r.first) {
           renderTextInWhiteBox(
             text,
             boxX - 8 - textBox.width,
-            boxMaxY - (vertSpace - font_height) / 2 - font_height
+            boxMaxY - (vertSpace - fontHeight) / 2 - fontHeight
           );
         } else {
           renderTextInWhiteBox(
             text,
             boxX - 8 - textBox.width,
-            boxMaxY + (vertSpace - font_height) / 2 + font_height
+            boxMaxY + (vertSpace - fontHeight) / 2 + fontHeight
           );
         }
       }
@@ -946,22 +946,22 @@
    * Render a thin line showing the trendline of the benefit matching the user
    * dragging the slider across the page.
    */
-  function renderTrendline(ctxR: RecipientContext) {
+  function renderTrendline(personCtx: RecipientContext) {
     ctx_.save();
-    ctx_.strokeStyle = ctxR.r.colors().medium;
+    ctx_.strokeStyle = personCtx.r.colors().medium;
     ctx_.lineWidth = 2;
     ctx_.globalAlpha = 0.4;
     ctx_.beginPath();
 
     for (
-      let i = ctxR.startDate();
-      i.lessThanOrEqual(ctxR.endDate());
+      let i = personCtx.startDate();
+      i.lessThanOrEqual(personCtx.endDate());
       i = i.addDuration(new MonthDuration(1))
     ) {
       let thisX = canvasX(i);
-      let yDollars = allBenefitsOnDate(ctxR, i, i);
-      let thisY = canvasY(ctxR, yDollars);
-      if (i.monthsSinceEpoch() === ctxR.startDate().monthsSinceEpoch()) {
+      let yDollars = allBenefitsOnDate(personCtx, i, i);
+      let thisY = canvasY(personCtx, yDollars);
+      if (i.monthsSinceEpoch() === personCtx.startDate().monthsSinceEpoch()) {
         ctx_.moveTo(thisX, thisY);
       } else {
         ctx_.lineTo(thisX, thisY);
@@ -974,11 +974,11 @@
   /**
    * Render the benefit of the recipient.
    */
-  function renderBenefit(ctxR: RecipientContext) {
-    let boxes = benefitBoxes(ctxR);
-    renderFilingDateBenefitBoxes(boxes, ctxR);
-    renderTrendline(ctxR);
-    renderBenefitLabels(boxes, ctxR);
+  function renderBenefit(personCtx: RecipientContext) {
+    let boxes = benefitBoxes(personCtx);
+    renderFilingDateBenefitBoxes(boxes, personCtx);
+    renderTrendline(personCtx);
+    renderBenefitLabels(boxes, personCtx);
   }
 
   /**
@@ -1146,25 +1146,25 @@
     if (!canvasEl_) return;
 
     layoutMonths();
-    updateSlider(ctxA_);
-    updateSlider(ctxB_);
-    minCapSlider(ctxA_, ctxB_);
-    minCapSlider(ctxB_, ctxA_);
+    updateSlider(recipientCtx_);
+    updateSlider(spouseCtx_);
+    minCapSlider(recipientCtx_, spouseCtx_);
+    minCapSlider(spouseCtx_, recipientCtx_);
 
     // Trigger Svelte reactivity by re-assigning the context objects
     // This ensures the Slider components see the updated ticks
     // eslint-disable-next-line no-self-assign
-    ctxA_ = ctxA_;
+    recipientCtx_ = recipientCtx_;
     // eslint-disable-next-line no-self-assign
-    ctxB_ = ctxB_;
+    spouseCtx_ = spouseCtx_;
 
     ctx_.save();
     ctx_.clearRect(0, 0, canvasEl_.width, canvasEl_.height);
 
     renderHorizontalLines();
     renderYearVerticalLines();
-    renderBenefit(ctxA_);
-    renderBenefit(ctxB_);
+    renderBenefit(recipientCtx_);
+    renderBenefit(spouseCtx_);
 
     if (lastMouseX_ > 0) {
       renderSelectedDateVerticalLine(lastMouseX_);
@@ -1252,22 +1252,22 @@
       style:--reserved-right="{reservedRightRecipient_}px"
     >
       <Slider
-        bind:value={ctxA_.sliderMonths}
+        bind:value={recipientCtx_.sliderMonths}
         bind:this={sliderEl_}
         floor={62 * 12}
-        userFloor={ctxA_.userFloor}
+        userFloor={recipientCtx_.userFloor}
         ceiling={70 * 12}
         step={1}
         translate={translateSliderLabel}
         showTicks={true}
-        ticksArray={ctxA_.ticks}
-        barLeftColor={ctxA_.r.colors().light}
-        barRightColor={ctxA_.r.colors().medium}
-        tickLeftColor={ctxA_.r.colors().light}
-        tickRightColor={ctxA_.r.colors().medium}
-        handleColor={ctxA_.r.colors().medium}
-        handleSelectedColor={ctxA_.r.colors().dark}
-        tickLegendColor={ctxA_.r.colors().dark}
+        ticksArray={recipientCtx_.ticks}
+        barLeftColor={recipientCtx_.r.colors().light}
+        barRightColor={recipientCtx_.r.colors().medium}
+        tickLeftColor={recipientCtx_.r.colors().light}
+        tickRightColor={recipientCtx_.r.colors().medium}
+        handleColor={recipientCtx_.r.colors().medium}
+        handleSelectedColor={recipientCtx_.r.colors().dark}
+        tickLegendColor={recipientCtx_.r.colors().dark}
       />
     </div>
     <p class="sliderLabel">
@@ -1292,22 +1292,22 @@
       style:--reserved-right="{reservedRightSpouse_}px"
     >
       <Slider
-        bind:value={ctxB_.sliderMonths}
+        bind:value={spouseCtx_.sliderMonths}
         bind:this={sliderEl_}
         floor={62 * 12}
-        userFloor={ctxB_.userFloor}
+        userFloor={spouseCtx_.userFloor}
         ceiling={70 * 12}
         step={1}
         translate={translateSliderLabel}
         showTicks={true}
-        ticksArray={ctxB_.ticks}
-        barLeftColor={ctxB_.r.colors().light}
-        barRightColor={ctxB_.r.colors().medium}
-        tickLeftColor={ctxB_.r.colors().light}
-        tickRightColor={ctxB_.r.colors().medium}
-        handleColor={ctxB_.r.colors().medium}
-        handleSelectedColor={ctxB_.r.colors().dark}
-        tickLegendColor={ctxB_.r.colors().dark}
+        ticksArray={spouseCtx_.ticks}
+        barLeftColor={spouseCtx_.r.colors().light}
+        barRightColor={spouseCtx_.r.colors().medium}
+        tickLeftColor={spouseCtx_.r.colors().light}
+        tickRightColor={spouseCtx_.r.colors().medium}
+        handleColor={spouseCtx_.r.colors().medium}
+        handleSelectedColor={spouseCtx_.r.colors().dark}
+        tickLegendColor={spouseCtx_.r.colors().dark}
       />
     </div>
     <canvas
@@ -1341,19 +1341,19 @@
             <tr>
               <td class="indent"></td>
               <td class="label">
-                <RecipientName r={ctxA_.r} apos shortenTo={50} /> Benefit:
+                <RecipientName r={recipientCtx_.r} apos shortenTo={50} /> Benefit:
               </td>
               <td class="value">
-                {allBenefitsOnDate(ctxA_, dateX(lastMouseX_)).wholeDollars()}
+                {allBenefitsOnDate(recipientCtx_, dateX(lastMouseX_)).wholeDollars()}
               </td>
             </tr>
             <tr>
               <td class="indent"></td>
               <td class="label">
-                <RecipientName r={ctxB_.r} apos shortenTo={50} /> Benefit:
+                <RecipientName r={spouseCtx_.r} apos shortenTo={50} /> Benefit:
               </td>
               <td class="value">
-                {allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).wholeDollars()}
+                {allBenefitsOnDate(spouseCtx_, dateX(lastMouseX_)).wholeDollars()}
               </td>
             </tr>
             <tr>
@@ -1362,10 +1362,10 @@
                 <b>Total</b> Benefit:
               </td>
               <td class="value sum"
-                >{allBenefitsOnDate(ctxA_, dateX(lastMouseX_))
+                >{allBenefitsOnDate(recipientCtx_, dateX(lastMouseX_))
                   .roundToDollar()
                   .plus(
-                    allBenefitsOnDate(ctxB_, dateX(lastMouseX_)).roundToDollar()
+                    allBenefitsOnDate(spouseCtx_, dateX(lastMouseX_)).roundToDollar()
                   )
                   .wholeDollars()}</td
               >
@@ -1399,17 +1399,17 @@
     </p>
     <p>
       <a
-        href="https://opensocialsecurity.com/?marital=married&aDOBm={ctxA_.r.birthdate.layBirthMonth() +
-          1}&aDOBd={ctxA_.r.birthdate.layBirthDayOfMonth()}&aDOBy={ctxA_.r.birthdate.layBirthYear()}&aPIA={ctxA_.r
+        href="https://opensocialsecurity.com/?marital=married&aDOBm={recipientCtx_.r.birthdate.layBirthMonth() +
+          1}&aDOBd={recipientCtx_.r.birthdate.layBirthDayOfMonth()}&aDOBy={recipientCtx_.r.birthdate.layBirthYear()}&aPIA={recipientCtx_.r
           .pia()
           .primaryInsuranceAmount()
           .roundToDollar()
-          .value()}&bPIA={ctxB_.r
+          .value()}&bPIA={spouseCtx_.r
           .pia()
           .primaryInsuranceAmount()
           .roundToDollar()
-          .value()}&bDOBm={ctxB_.r.birthdate.layBirthMonth() +
-          1}&bDOBd={ctxB_.r.birthdate.layBirthDayOfMonth()}&bDOBy={ctxB_.r.birthdate.layBirthYear()}
+          .value()}&bDOBm={spouseCtx_.r.birthdate.layBirthMonth() +
+          1}&bDOBd={spouseCtx_.r.birthdate.layBirthDayOfMonth()}&bDOBy={spouseCtx_.r.birthdate.layBirthYear()}
 "
         target="_blank">Open Social Security (populated with my information)</a
       >
