@@ -103,8 +103,8 @@ onMount(() => {
     updateCanvas();
   })();
 
-  media_query_list = window.matchMedia('print');
-  media_query_list.addEventListener('change', updateCanvas);
+  printMediaQuery = window.matchMedia('print');
+  printMediaQuery.addEventListener('change', updateCanvas);
   return () => {
     removeMediaQueryListener();
   };
@@ -132,10 +132,10 @@ let innerWidth: number = 0;
 $: innerWidth && mounted_ && updateCanvas();
 // Similarly, we want to bind to print events so we resize correctly for those
 // too:
-let media_query_list: MediaQueryList;
+let printMediaQuery: MediaQueryList;
 function removeMediaQueryListener() {
-  if (media_query_list) {
-    media_query_list.removeEventListener('change', updateCanvas);
+  if (printMediaQuery) {
+    printMediaQuery.removeEventListener('change', updateCanvas);
   }
 }
 
@@ -247,7 +247,7 @@ function canvasY(benefitY: Money): number {
 }
 
 function renderTextInWhiteBox(text: string, x: number, y: number) {
-  let textWidth = ctx_.measureText(text).width;
+  const textWidth = ctx_.measureText(text).width;
 
   // First, draw the white box.
   ctx_.save();
@@ -265,7 +265,7 @@ function renderHorizontalLine(dollarY: Money, canvasY: number) {
   ctx_.lineTo(canvasEl_.width, canvasY);
   ctx_.stroke();
 
-  let text = dollarY.wholeDollars();
+  const text = dollarY.wholeDollars();
 
   ctx_.save();
   ctx_.fillStyle = '#AAA';
@@ -318,7 +318,7 @@ function renderYearVerticalLines() {
   let startDate: MonthDate = recipient.birthdate.dateAtSsaAge(
     MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
   );
-  let endDate = recipient.birthdate.dateAtSsaAge(
+  const endDate = recipient.birthdate.dateAtSsaAge(
     MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
   );
 
@@ -347,8 +347,8 @@ function renderYearVerticalLines() {
     // Print the year vertically atop the line, with a white rectangle behind
     // the text, so that the line isn't going through the text.
     const text = `${date.year()}`;
-    let textWidth = ctx_.measureText(text).width;
-    let ypos = reservedTop_ - textWidth - 5;
+    const textWidth = ctx_.measureText(text).width;
+    const ypos = reservedTop_ - textWidth - 5;
     ctx_.save();
     ctx_.translate(canvasX(date) + 5, ypos);
     ctx_.rotate((-90 * Math.PI) / 180);
@@ -377,8 +377,8 @@ function updateSlider() {
 
   customTicks_ = [];
 
-  let startAge = MonthDuration.initFromYearsMonths({ years: 62, months: 0 });
-  let endAge = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
+  const startAge = MonthDuration.initFromYearsMonths({ years: 62, months: 0 });
+  const endAge = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
   for (
     let age = MonthDuration.copyFrom(startAge);
     age.lessThanOrEqual(endAge);
@@ -419,9 +419,8 @@ function updateSlider() {
 }
 
 function userSelectedDate() {
-  let selectedAge = new MonthDuration(sliderMonths_);
-  let selectedDate = recipient.birthdate.dateAtSsaAge(selectedAge);
-  return selectedDate;
+  const selectedAge = new MonthDuration(sliderMonths_);
+  return recipient.birthdate.dateAtSsaAge(selectedAge);
 }
 
 /**
@@ -437,9 +436,9 @@ function userSelectedDate() {
  *    box is a tuple of [x, y, benefit].
  */
 function benefitBoxes() {
-  let selectedDate = userSelectedDate();
+  const selectedDate = userSelectedDate();
 
-  let boxes = [];
+  const boxes = [];
   let benefit = recipient.benefitOnDate(selectedDate, selectedDate);
   boxes.push([canvasX(selectedDate), canvasY(benefit), benefit]);
 
@@ -507,7 +506,7 @@ function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
   ctx_.save();
   ctx_.fillStyle = recipient.colors().dark;
   ctx_.font = '14px Helvetica';
-  let font_height = 12;
+  const fontHeight = 12;
 
   for (let boxIt = 0; boxIt < boxes.length; ++boxIt) {
     let [boxX, boxY, benefit] = boxes[boxIt];
@@ -520,7 +519,7 @@ function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
     // Prefer to fix text above, rather than left.
     let text = `${benefit.wholeDollars()} / mo`;
     let textBox = ctx_.measureText(text);
-    if (textBox.width + 10 < horizSpace && font_height + 10 < vertSpace) {
+    if (textBox.width + 10 < horizSpace && fontHeight + 10 < vertSpace) {
       renderTextInWhiteBox(text, boxX + 5, boxY - 5);
       continue;
     }
@@ -528,7 +527,7 @@ function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
     // Again above, using shorter text.
     text = benefit.wholeDollars();
     textBox = ctx_.measureText(text);
-    if (textBox.width + 10 < horizSpace && font_height + 10 < vertSpace) {
+    if (textBox.width + 10 < horizSpace && fontHeight + 10 < vertSpace) {
       renderTextInWhiteBox(text, boxX + 5, boxY - 5);
       continue;
     }
@@ -541,11 +540,11 @@ function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
 
     text = `${benefit.wholeDollars()} / mo`;
     textBox = ctx_.measureText(text);
-    if (textBox.width + 15 < horizSpace && font_height + 15 < vertSpace) {
+    if (textBox.width + 15 < horizSpace && fontHeight + 15 < vertSpace) {
       renderTextInWhiteBox(
         text,
         boxX - 8 - textBox.width,
-        boxMaxY - (vertSpace - font_height) / 2 - font_height
+        boxMaxY - (vertSpace - fontHeight) / 2 - fontHeight
       );
       continue;
     }
@@ -553,11 +552,11 @@ function renderBenefitLabels(boxes: Array<[number, number, Money]>) {
     // Try again with shorter text, removing ' / mo';
     text = benefit.wholeDollars();
     textBox = ctx_.measureText(text);
-    if (textBox.width + 15 < horizSpace && font_height + 15 < vertSpace) {
+    if (textBox.width + 15 < horizSpace && fontHeight + 15 < vertSpace) {
       renderTextInWhiteBox(
         text,
         boxX - 8 - textBox.width,
-        boxMaxY - (vertSpace - font_height) / 2 - font_height
+        boxMaxY - (vertSpace - fontHeight) / 2 - fontHeight
       );
     }
     // Give up and move to next box.
@@ -606,7 +605,7 @@ function renderTrendline() {
  * Render the benefit of the recipient.
  */
 function renderBenefit() {
-  let boxes = benefitBoxes();
+  const boxes = benefitBoxes();
   renderFilingDateBenefitBoxes(boxes);
   renderTrendline();
   renderBenefitLabels(boxes);
@@ -620,12 +619,12 @@ function renderSelectedDateVerticalLine(canvasX: number) {
   if (canvasX <= 0 || canvasX >= canvasEl_.width) return;
   ctx_.save();
 
-  let date = dateX(canvasX);
-  let text = `${date.monthName()} ${date.year()}`;
-  let textWidth = ctx_.measureText(text).width;
+  const date = dateX(canvasX);
+  const text = `${date.monthName()} ${date.year()}`;
+  const textWidth = ctx_.measureText(text).width;
   // This seems to position the year to line up with the vertical year lines.
   // Why 67?  I don't know and didn't bother to figure it out.
-  let xpos = reservedTop_ + textWidth - 67;
+  const xpos = reservedTop_ + textWidth - 67;
 
   // blueish_ dashed line:
   ctx_.strokeStyle = blueish_;
@@ -692,7 +691,7 @@ function updateFilingDateString(
   birthdate: Birthdate,
   sliderMonths_: number
 ): string {
-  let filingDate = birthdate.dateAtLayAge(new MonthDuration(sliderMonths_));
+  const filingDate = birthdate.dateAtLayAge(new MonthDuration(sliderMonths_));
   return `${filingDate.monthName()} ${filingDate.year()}`;
 }
 let filingDateString_: string = '';

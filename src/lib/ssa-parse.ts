@@ -97,8 +97,8 @@ function parseSsaPdfTable(lines: string[]): Array<EarningRecord> {
     for (let j = startYear; j <= endYear; ++j) {
       const record = new EarningRecord({
         year: j,
-        taxedEarnings: taxedEarnings,
-        taxedMedicareEarnings: taxedMedicareEarnings,
+        taxedEarnings,
+        taxedMedicareEarnings,
       });
       earningsRecords.push(record);
     }
@@ -172,7 +172,7 @@ function parseFormattedTable(lines: string[]): Array<EarningRecord> {
     const columns: Array<string> = line.split(' ');
     // Safe to access columns[0] and columns[1]: parsePaste() pre-filters lines
     // to ensure they start with a valid year and have at least 2 columns.
-    var record = new EarningRecord({
+    const record = new EarningRecord({
       year: parseInt(columns[0], 10),
       taxedEarnings: dollarStringToMoney(columns[1]),
       taxedMedicareEarnings: Money.from(0),
@@ -202,7 +202,7 @@ function parseThisSiteTable(lines: string[]): Array<EarningRecord> {
       record.incomplete = true;
       earningsRecords.push(record);
     } else {
-      var record = new EarningRecord({
+      const record = new EarningRecord({
         year: parseInt(columns[0], 10),
         taxedEarnings: dollarStringToMoney(columns[2]),
         taxedMedicareEarnings: Money.from(0),

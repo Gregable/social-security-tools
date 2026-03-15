@@ -22,7 +22,7 @@
     | ((detail: { spouse: boolean; name: string; spousename?: string }) => void)
     | undefined = undefined;
 
-  let initial: boolean = true;
+  let isShowingInitialPrompt: boolean = true;
   export let selfname: string = "Self";
   export let spousename: string = "Spouse";
 
@@ -33,7 +33,7 @@
     });
   }
   function spouse() {
-    initial = false;
+    isShowingInitialPrompt = false;
   }
   function confirmSpouse() {
     onresponse?.({
@@ -47,7 +47,7 @@
 <div class="spouseQuestion">
   <div class="text">
     <h3>Optional: Enter data for your spouse</h3>
-    {#if initial}
+    {#if isShowingInitialPrompt}
       <div>
         <div class="info-card">
           <p class="intro">

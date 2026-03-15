@@ -305,7 +305,7 @@ export function generateMonthlyBuckets(
 
     // Approximate probability (1/12 of the year's probability)
     const yearProb =
-      probDistribution.find((p) => p.age === year)?.probability || 0;
+      probDistribution.find((p) => p.age === year)?.probability ?? 0;
     const probability = yearProb / 12;
 
     const expectedAge = MonthDuration.initFromYearsMonths({

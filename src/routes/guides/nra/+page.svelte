@@ -6,8 +6,7 @@ import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Normal Retirement Age (NRA): What It Means for Your Benefits';
 const description =
-  'Learn about Normal Retirement Age (NRA), also called Full Retirement Age (FRA), ' +
-  'how it varies by birth year, and why it matters for calculating your Social Security benefits.';
+  'Learn about Normal Retirement Age (NRA), also called Full Retirement Age (FRA), how it varies by birth year, and why it matters for calculating your Social Security benefits.';
 const publishDate = new Date('2026-01-17T00:00:00+00:00');
 const updateDate = new Date('2026-01-17T00:00:00+00:00');
 

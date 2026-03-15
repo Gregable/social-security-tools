@@ -95,16 +95,10 @@
       // Get current year for the probability distribution calculation
       const currentYear = new Date().getFullYear();
 
-      // Fetch death probability distribution for both recipients
-      const deathProb1Promise: Promise<{ age: number; probability: number }[]> =
-        getDeathProbabilityDistribution(recipients[0], currentYear);
-      const deathProb2Promise: Promise<{ age: number; probability: number }[]> =
-        getDeathProbabilityDistribution(recipients[1], currentYear);
-
-      // Wait for both promises to resolve
+      // Fetch death probability distributions for both recipients in parallel
       [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
-        deathProb1Promise,
-        deathProb2Promise,
+        getDeathProbabilityDistribution(recipients[0], currentYear),
+        getDeathProbabilityDistribution(recipients[1], currentYear),
       ]);
 
       // Force Svelte update by reassigning arrays

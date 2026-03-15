@@ -74,16 +74,16 @@ function calcChartWidth() {
   // A 6-digit social security payment would be about the highest we
   // would imagine someone receiving, so we reserve space on the right
   // to display such a value with a little added padding.
-  let reservedWidth = Math.ceil(ctx.measureText('$999,999').width) + 10;
-  let usableWidth = canvasEl.width - reservedWidth;
+  const reservedWidth = Math.ceil(ctx.measureText('$999,999').width) + 10;
+  const usableWidth = canvasEl.width - reservedWidth;
   return usableWidth;
 }
 
 function calcChartHeight() {
   if (!canvasEl) return 0;
   // A 12pt font is 16 pixels high. We reserve a little extra for padding.
-  let reservedHeight = 16 + 10;
-  let usableHeight = canvasEl.height - reservedHeight;
+  const reservedHeight = 16 + 10;
+  const usableHeight = canvasEl.height - reservedHeight;
   return usableHeight;
 }
 
@@ -91,8 +91,8 @@ function calcChartHeight() {
  * Compute the canvas x-coordinate for a earnings dollars value.
  */
 function canvasX(earningsX: Money): number {
-  let xValue = Math.floor(earningsX.div$(maxRenderedXDollars) * chartWidth);
-  let xClipped = Math.min(xValue, chartWidth);
+  const xValue = Math.floor(earningsX.div$(maxRenderedXDollars) * chartWidth);
+  const xClipped = Math.min(xValue, chartWidth);
   return xClipped;
 }
 
@@ -100,9 +100,9 @@ function canvasX(earningsX: Money): number {
  * Compute the canvas y-coordinate for a benefit dollars value.
  */
 function canvasY(benefitY: Money): number {
-  let yValue =
+  const yValue =
     chartHeight - Math.floor(benefitY.div$(maxRenderedYDollars) * chartHeight);
-  let yClipped = Math.min(yValue, chartHeight);
+  const yClipped = Math.min(yValue, chartHeight);
   return yClipped;
 }
 
@@ -124,16 +124,16 @@ function recomputeBounds() {
   // There are a few goals here when selecting this value:
   // 1) Show all of the breakpoints so the user can get a feel visually
   //    for how these breakpoints affect the computation.
-  let breakpoint_min = recipient.pia().secondBendPoint().times(1.25);
+  const breakpoint_min = recipient.pia().secondBendPoint().times(1.25);
   // 2) Show the user's current earnings with some space on either side
   //    so that they can explore the graph to either direction.
-  let user_min = recipient.monthlyIndexedEarnings().times(2);
+  const user_min = recipient.monthlyIndexedEarnings().times(2);
   // 3) Don't show values beyond the maximum achievable AIME.
   // https://github.com/Gregable/social-security-tools/issues/167
-  let absolute_max =
+  const absolute_max =
     constants.MAXIMUM_EARNINGS[constants.MAX_MAXIMUM_EARNINGS_YEAR].div(12);
 
-  let computed = Money.min(Money.max(breakpoint_min, user_min), absolute_max);
+  const computed = Money.min(Money.max(breakpoint_min, user_min), absolute_max);
 
   // We would prefer to keep the viewport fixed as the user changes
   // the benefit, so that it's easier to see what is going on. However
@@ -196,8 +196,8 @@ function renderBreakPoints() {
   ctx.beginPath();
   moveTo(Money.from(0), Money.from(0));
 
-  let firstBend: Money = recipient.pia().firstBendPoint();
-  let secondBend: Money = recipient.pia().secondBendPoint();
+  const firstBend: Money = recipient.pia().firstBendPoint();
+  const secondBend: Money = recipient.pia().secondBendPoint();
 
   let dollarX: Money;
   let dollarY: Money;

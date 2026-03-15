@@ -6,9 +6,9 @@ import { browser } from '$app/environment';
 const DISMISS_KEY = 'mobileDesktopPromptDismissed';
 const SITE_URL = 'https://ssa.tools/calculator';
 
-let visible = false;
+let isVisible = false;
 let canShare = false;
-let copied = false;
+let isCopied = false;
 let copiedTimer: ReturnType<typeof setTimeout> | null = null;
 
 const subject = encodeURIComponent('Try SSA.tools on your computer');
@@ -24,9 +24,9 @@ function handleEmailClick() {
 async function handleCopyLink() {
   try {
     await navigator.clipboard.writeText(SITE_URL);
-    copied = true;
+    isCopied = true;
     posthog.capture('Mobile: Desktop Reminder Clicked', { method: 'copy_link' });
-    copiedTimer = setTimeout(() => { copied = false; }, 2000);
+    copiedTimer = setTimeout(() => { isCopied = false; }, 2000);
   } catch {
     // Fallback: clipboard may not be available
   }
@@ -46,7 +46,7 @@ async function handleShare() {
 }
 
 function dismiss() {
-  visible = false;
+  isVisible = false;
   posthog.capture('Mobile: Desktop Reminder Dismissed');
   if (browser) {
     sessionStorage.setItem(DISMISS_KEY, 'true');
@@ -68,13 +68,13 @@ onMount(() => {
   const mq = window.matchMedia('(max-width: 768px)');
   if (!mq.matches) return;
 
-  visible = true;
+  isVisible = true;
   canShare = typeof navigator.share === 'function';
   posthog.capture('Mobile: Desktop Reminder Shown');
 });
 </script>
 
-{#if visible}
+{#if isVisible}
   <div class="prompt">
     <button class="dismiss" on:click={dismiss} aria-label="Dismiss">&times;</button>
     <div class="heading">Easier on a computer</div>
@@ -87,7 +87,7 @@ onMount(() => {
         Email myself
       </a>
       <button class="cta secondary" on:click={handleCopyLink}>
-        {copied ? 'Copied!' : 'Copy link'}
+        {isCopied ? 'Copied!' : 'Copy link'}
       </button>
       {#if canShare}
         <button class="cta secondary" on:click={handleShare}>

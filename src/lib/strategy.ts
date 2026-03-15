@@ -49,13 +49,7 @@ export function StrategySequence(config: StrategyParams) {
   ) {
     if (d.year() > year) {
       out.push(
-        year +
-          ' ' +
-          benefit[0].string() +
-          '+' +
-          benefit[1].string() +
-          '=' +
-          benefit[0].plus(benefit[1]).string()
+        `${year} ${benefit[0].string()}+${benefit[1].string()}=${benefit[0].plus(benefit[1]).string()}`
       );
       year = d.year();
       benefit = [Money.zero(), Money.zero()];
@@ -82,13 +76,7 @@ export function StrategySequence(config: StrategyParams) {
     }
   }
   out.push(
-    year +
-      ' ' +
-      benefit[0].string() +
-      '+' +
-      benefit[1].string() +
-      '=' +
-      benefit[0].plus(benefit[1]).string()
+    `${year} ${benefit[0].string()}+${benefit[1].string()}=${benefit[0].plus(benefit[1]).string()}`
   );
   out.push(`Total: ${totalBenefit.string()}`);
   return out;

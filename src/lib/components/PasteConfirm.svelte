@@ -28,11 +28,8 @@ export let name: string = '';
 // chronological.
 $: ssaSortedEarningsRecords = earningsRecords.sort((a, b) => b.year - a.year);
 
-function earningsRecordsIncludeMedicare() {
-  for (let i = 0; i < earningsRecords.length; ++i) {
-    if (earningsRecords[i].taxedMedicareEarnings.value() > 0) return true;
-  }
-  return false;
+function hasEarningsRecordsWithMedicare() {
+  return earningsRecords.some((r) => r.taxedMedicareEarnings.value() > 0);
 }
 
 function confirm() {
@@ -61,7 +58,7 @@ function decline() {
       <tr>
         <th>Work Year</th>
         <th>Taxed Social Security Earnings</th>
-        {#if earningsRecordsIncludeMedicare()}
+        {#if hasEarningsRecordsWithMedicare()}
           <th> Taxed Medicare Earnings </th>
         {/if}
       </tr>
@@ -77,7 +74,7 @@ function decline() {
               <span>{earningRecord.taxedEarnings.wholeDollars()}</span>
             {/if}
           </td>
-          {#if earningsRecordsIncludeMedicare()}
+          {#if hasEarningsRecordsWithMedicare()}
             <td>
               {#if earningRecord.incomplete}
                 <span> Not yet recorded </span>

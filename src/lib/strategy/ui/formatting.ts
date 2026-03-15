@@ -152,11 +152,7 @@ export function createBorderRemovalFunctions(
   return {
     right: (i: number, j: number): boolean => {
       if (j >= calculationResults[0].length - 1) return false;
-      if (
-        !calculationResults[i] ||
-        !calculationResults[i][j] ||
-        !calculationResults[i][j + 1]
-      )
+      if (!calculationResults[i]?.[j] || !calculationResults[i]?.[j + 1])
         return false;
       return (
         valueExtractor(calculationResults[i][j]) ===
@@ -166,12 +162,7 @@ export function createBorderRemovalFunctions(
 
     bottom: (i: number, j: number): boolean => {
       if (i >= calculationResults.length - 1) return false;
-      if (
-        !calculationResults[i] ||
-        !calculationResults[i + 1] ||
-        !calculationResults[i][j] ||
-        !calculationResults[i + 1][j]
-      )
+      if (!calculationResults[i]?.[j] || !calculationResults[i + 1]?.[j])
         return false;
       return (
         valueExtractor(calculationResults[i][j]) ===
@@ -181,11 +172,7 @@ export function createBorderRemovalFunctions(
 
     left: (i: number, j: number): boolean => {
       if (j <= 0) return false;
-      if (
-        !calculationResults[i] ||
-        !calculationResults[i][j] ||
-        !calculationResults[i][j - 1]
-      )
+      if (!calculationResults[i]?.[j] || !calculationResults[i]?.[j - 1])
         return false;
       return (
         valueExtractor(calculationResults[i][j]) ===
@@ -195,12 +182,7 @@ export function createBorderRemovalFunctions(
 
     top: (i: number, j: number): boolean => {
       if (i <= 0) return false;
-      if (
-        !calculationResults[i] ||
-        !calculationResults[i - 1] ||
-        !calculationResults[i][j] ||
-        !calculationResults[i - 1][j]
-      )
+      if (!calculationResults[i]?.[j] || !calculationResults[i - 1]?.[j])
         return false;
       return (
         valueExtractor(calculationResults[i][j]) ===

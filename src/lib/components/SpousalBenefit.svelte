@@ -8,7 +8,7 @@ import RName from './RecipientName.svelte';
 export let recipient: Recipient = new Recipient();
 export let spouse: Recipient = new Recipient();
 const r: Recipient = recipient;
-const s: Recipient = spouse;
+const spouseR: Recipient = spouse;
 
 let higherEarner: Recipient;
 let lowerEarner: Recipient;
@@ -40,7 +40,7 @@ function spousalBenefitFractionCalc(
     return 0;
   }
   let myPia: Money = lower.pia().primaryInsuranceAmount();
-  var actualFraction = myPia.div$(maxSpousal) * 100.0;
+  let actualFraction = myPia.div$(maxSpousal) * 100.0;
   // If the actual number is > 0, return at least 1%.
   if (actualFraction > 0 || myPia.value() === 0) {
     return actualFraction;
@@ -63,7 +63,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
   <div class="text">
     {#if $recipient.higherEarningsThan($spouse)}
       <p>
-        Because <RName {r} /> has higher earnings than <RName r={s} />, <RName
+        Because <RName {r} /> has higher earnings than <RName r={spouseR} />, <RName
           {r}
         /> is not eligible to receive a spousal benefit.
       </p>
@@ -72,27 +72,27 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
         .primaryInsuranceAmount()
         .value()}
       <p>
-        <RName {r} /> and <RName r={s} /> have the same Primary Insurance Amount.
+        <RName {r} /> and <RName r={spouseR} /> have the same Primary Insurance Amount.
         Therefore, <RName {r} /> is not eligible to receive a spousal benefit.
       </p>
     {:else if spousalBenefit.value() == 0}
       <p>
-        <RName {r} /> has lower earnings than <RName r={s} />. However <RName
+        <RName {r} /> has lower earnings than <RName r={spouseR} />. However <RName
           {r}
           apos
         /> Primary Insurance Amount is greater than half of
-        <RName r={s} apos /> Primary Insurance Amount, so there is no spousal benefit
+        <RName r={spouseR} apos /> Primary Insurance Amount, so there is no spousal benefit
         payable.
       </p>
     {:else}
       {#if $recipient.pia().primaryInsuranceAmount().value() == 0}
         <RName {r} /> is eligible to receive a <u>spousal benefit</u> on <RName
-          r={s}
+          r={spouseR}
           apos
-        /> record equal to half of <RName r={s} apos /> Primary Insurance Amount.
+        /> record equal to half of <RName r={spouseR} apos /> Primary Insurance Amount.
       {:else}
         <RName {r} /> is eligible to receive a <u>spousal benefit</u> on <RName
-          r={s}
+          r={spouseR}
           apos
         /> record. A spousal benefit is the amount at normal retirement age that
         <RName {r} /> receives in addition to <RName {r} apos />
@@ -113,14 +113,14 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
           <div class="expando">
             <p>
               <RName {r} apos /> spousal benefit at normal retirement age is calculated
-              as 50% of <RName r={s} apos /> Primary Insurance Amount minus <RName
+              as 50% of <RName r={spouseR} apos /> Primary Insurance Amount minus <RName
                 {r}
                 apos
               /> own Primary Insurance Amount.
             </p>
             <ul class="pialist">
               <li>
-                <RName r={s} apos /> Primary Insurance Amount:
+                <RName r={spouseR} apos /> Primary Insurance Amount:
                 <span class="nowrap">
                   <b>{$spouse.pia().primaryInsuranceAmount().string()}</b>
                   / month.</span
@@ -194,7 +194,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
       <h4>Filing Date</h4>
       <p>
         <RName {r} /> will begin receiving spousal benefits at the latter of either
-        the date that <RName {r} /> or <RName r={s} /> files for benefits.
+        the date that <RName {r} /> or <RName r={spouseR} /> files for benefits.
       </p>
       <Expando
         collapsedText="Expand for detail about the effect of Filing Date on Spousal Benefits"
@@ -206,7 +206,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
               <RName {r} /> can choose the filing date to begin receiving spousal
               benefits. However,
               <RName {r} /> is not eligible to begin spousal benefits until
-              <RName r={s} /> begins primary benefits. (If applicable, see
+              <RName r={spouseR} /> begins primary benefits. (If applicable, see
               <a
                 href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
                 target="_blank">divorced spouses</a
@@ -221,7 +221,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
             <ul>
               <li>
                 <RName {r} /> is not eligible to begin spousal benefits until
-                <RName r={s} /> begins primary benefits. (If applicable, see
+                <RName r={spouseR} /> begins primary benefits. (If applicable, see
                 <a
                   href="https://www.ssa.gov/benefits/retirement/planner/applying7.html#h4"
                   target="_blank">divorced spouses</a
@@ -240,7 +240,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
                   <li>
                     Once <RName {r} />
                     begins personal benefits, <RName {r} /> cannot delay spousal
-                    benefits beyond when <RName r={s} /> begins primary benefits.
+                    benefits beyond when <RName r={spouseR} /> begins primary benefits.
                   </li>
                 </ul>
               </li>
@@ -296,7 +296,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
           <p>
             Furthermore, the spousal benefit amount cannot increase the combined
             benefit for <RName {r} /> to an amount greater than half of <RName
-              r={s}
+              r={spouseR}
               apos
             /> Primary Insurance Amount. Therefore, <RName {r} apos /> delayed credits
             can potentially reduce the spousal benefit by same amount.

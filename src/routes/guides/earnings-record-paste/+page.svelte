@@ -9,10 +9,7 @@ import StatementImage from './statement.png';
 
 const title = 'Possible causes of Parsing Errors';
 const description =
-  'SSA.tools accepts a copy and pasted earnings record from ' +
-  "the Social Security Administration's website. This guide explains " +
-  'If your earnings record is not being parsed correctly, this guide ' +
-  'may help you understand why and how to fix it.';
+  "SSA.tools accepts a copy and pasted earnings record from the Social Security Administration's website. This guide explains If your earnings record is not being parsed correctly, this guide may help you understand why and how to fix it.";
 const publishDate = new Date('2023-09-12T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();

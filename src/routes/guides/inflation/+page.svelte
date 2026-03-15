@@ -25,7 +25,7 @@ let baseEarnings = 40000; // Starting salary
 for (let i = 0; i < 13; i++) {
   const year = startYear + i;
   const age = startAge + i;
-  const earnings = Math.round(baseEarnings * Math.pow(1.025, i));
+  const earnings = Math.round(baseEarnings * 1.025 ** i);
 
   // Calculate multiplier: AWI(indexingYear) / AWI(year)
   const yearAWI = WAGE_INDICES[year];
@@ -36,15 +36,15 @@ for (let i = 0; i < 13; i++) {
   earningsRows.push({
     year,
     age,
-    taxedEarnings: '$' + earnings.toLocaleString(),
+    taxedEarnings: `$${earnings.toLocaleString()}`,
     multiplier: multiplier.toFixed(2),
-    indexedEarnings: '$' + indexedEarnings.toLocaleString(),
+    indexedEarnings: `$${indexedEarnings.toLocaleString()}`,
   });
 }
 
 // Get the first and last rows for the explanation text
 const firstRow = earningsRows[0];
-const lastRow = earningsRows[earningsRows.length - 1];
+const lastRow = earningsRows.at(-1)!;
 
 const title = "How Inflation Affects Your Social Security Benefits: AWI and COLA Explained";
 const description =

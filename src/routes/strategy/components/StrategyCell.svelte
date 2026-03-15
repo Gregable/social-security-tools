@@ -51,17 +51,17 @@ function handleMouseOver(event: MouseEvent) {
 
   if (calculationResult) {
     // Calculate filing dates for both recipients
-    const filingAge1Years = calculationResult.filingAge1Years;
-    const filingAge1Months = calculationResult.filingAge1Months;
-    const filingAge2Years = calculationResult.filingAge2Years;
-    const filingAge2Months = calculationResult.filingAge2Months;
+    const {
+      filingAge1Years,
+      filingAge1Months,
+      filingAge2Years,
+      filingAge2Months,
+      filingAge1,
+      filingAge2,
+    } = calculationResult;
 
-    const filingDate1 = recipients[0].birthdate.dateAtLayAge(
-      calculationResult.filingAge1
-    );
-    const filingDate2 = recipients[1].birthdate.dateAtLayAge(
-      calculationResult.filingAge2
-    );
+    const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
+    const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
 
     cellHoverInfo = {
       x: event.clientX,

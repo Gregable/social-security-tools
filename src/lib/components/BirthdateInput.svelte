@@ -24,8 +24,8 @@ export let isValid = false;
 export let onchange: ((event: { birthdate: Birthdate }) => void) | undefined =
   undefined;
 
-let bday_day;
-let bday_year;
+let dayInputEl;
+let yearInputEl;
 
 function parseNumberString(input: string): number {
   const parsed = parseInt(input, 10);
@@ -162,13 +162,13 @@ $: if (isValid && parsedDate) {
   }
 }
 
-function handleKeyUp(event, nextEl) {
+function handleKeyUp(event, nextInputEl) {
   if (/^[a-zA-Z0-9]$/.test(event.key) && event.target.value.length === 2) {
-    nextEl.focus();
+    nextInputEl.focus();
   }
 }
 
-function init(el) {
+function autoFocusAction(el) {
   if (autoFocus) {
     el.focus();
   }
@@ -187,9 +187,9 @@ function init(el) {
       inputmode="numeric"
       placeholder="MM"
       maxlength="2"
-      on:keyup={(event) => handleKeyUp(event, bday_day)}
+      on:keyup={(event) => handleKeyUp(event, dayInputEl)}
       bind:value={birthdateMonthStr}
-      use:init
+      use:autoFocusAction
     />
   </div>
   <div class="date-input-item">
@@ -203,9 +203,9 @@ function init(el) {
       inputmode="numeric"
       placeholder="DD"
       maxlength="2"
-      on:keyup={(event) => handleKeyUp(event, bday_year)}
+      on:keyup={(event) => handleKeyUp(event, yearInputEl)}
       bind:value={birthdateDayStr}
-      bind:this={bday_day}
+      bind:this={dayInputEl}
     />
   </div>
   <div class="date-input-item">
@@ -220,7 +220,7 @@ function init(el) {
       placeholder="YYYY"
       maxlength="4"
       bind:value={birthdateYearStr}
-      bind:this={bday_year}
+      bind:this={yearInputEl}
     />
   </div>
 </div>

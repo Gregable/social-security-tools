@@ -38,8 +38,8 @@ export function saveSession(demo: boolean = false): void {
   if (!browser) return;
 
   const session: SerializedSession = {
-    recipient: context.recipient ? context.recipient.serialize() : null,
-    spouse: context.spouse ? context.spouse.serialize() : null,
+    recipient: context.recipient?.serialize() ?? null,
+    spouse: context.spouse?.serialize() ?? null,
     isDemo: demo,
     version: SESSION_VERSION,
   };

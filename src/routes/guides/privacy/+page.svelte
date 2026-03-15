@@ -5,9 +5,7 @@ import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Privacy & Security';
 const description =
-  'SSA.tools is designed with privacy as a core principle. Your Social Security ' +
-  'earnings data never leaves your computer. All calculations happen entirely ' +
-  'in your browser.';
+  'SSA.tools is designed with privacy as a core principle. Your Social Security earnings data never leaves your computer. All calculations happen entirely in your browser.';
 const publishDate = new Date('2025-01-14T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
