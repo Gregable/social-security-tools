@@ -26,7 +26,7 @@ export function dollarStringToMoney(dollarString: string): Money {
  * See: https://github.com/Gregable/social-security-tools/issues/214
  */
 function isPdfPaste(lines: string[]): boolean {
-  const lineMatch = /[12][0-9]{3}-[12][0-9]{3}/g;
+  const lineMatch = /[12][0-9]{3}-[12][0-9]{3}/;
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
