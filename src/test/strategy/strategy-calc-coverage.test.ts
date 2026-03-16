@@ -31,8 +31,8 @@ function makeRecipient(
 }
 
 /**
- * Computes the final date for a recipient at a given age,
- * adjusted to the end of that year (same logic as existing tests).
+ * Computes the final date (death date) for a recipient, set to December of
+ * the calendar year in which they reach the given lay age.
  */
 function finalDateAtAge(recipient: Recipient, ageYears: number): MonthDate {
   const raw = recipient.birthdate.dateAtLayAge(
@@ -41,7 +41,8 @@ function finalDateAtAge(recipient: Recipient, ageYears: number): MonthDate {
   return raw.addDuration(new MonthDuration(11 - raw.monthIndex()));
 }
 
-// A currentDate far in the past, so no filing ages are clipped.
+// A currentDate far in the past (year 200 AD), so no filing ages are
+// clipped by current-date constraints.
 const FAR_PAST = MonthDate.initFromYearsMonths({ years: 200, months: 0 });
 
 // ---------------------------------------------------------------------------
@@ -72,7 +73,8 @@ describe('NPV / discount rate for couples', () => {
   }
 
   it('with zero discount matches known undiscounted value', () => {
-    // $476,160 in dollars = 47,616,000 cents (validated by existing test suite).
+    // Two recipients each receive $1240/mo * 192 months (age 70 to 85,
+    // Dec 2030 to Dec 2045) = $238,080 each, $476,160 total = 47,616,000 cents.
     expect(coupleSumCents(0)).toBe(47616000);
   });
 
@@ -101,7 +103,8 @@ describe('NPV / discount rate for couples', () => {
     // Two recipients, PIA $1000 each, born Dec 15 1960, file at 70, die at 70.
     // Each gets $1240/mo for 1 month (Dec 2030). Payment arrives Jan 2031.
     // currentDate = Dec 2030. monthsToFirstPayment = 1.
-    // NPV per person = 124000 * (1+r)^(-2) where r = monthly rate.
+    // NPV uses PVFactor(N=1) * discountFactor(k=1) = 1/(1+r) * 1/(1+r) = (1+r)^(-2).
+    // So NPV per person = 124000 * (1+r)^(-2) where r = monthly rate.
     const r1 = makeRecipient(1960, 11, 15, 1000);
     const r2 = makeRecipient(1960, 11, 15, 1000);
     const finalDates: [MonthDate, MonthDate] = [
@@ -166,7 +169,7 @@ describe('NPV / discount rate for single recipient', () => {
     // PIA $1000, file at 70, die at 70, born Dec 15 1960.
     // Benefit = $1240/mo for 1 month. Payment in Jan 2031.
     // currentDate = Dec 2030. monthsToFirstPayment = 1.
-    // NPV = 124000 * (1+r)^(-2).
+    // NPV uses PVFactor(N=1) * discountFactor(k=1) = (1+r)^(-2).
     const r = makeRecipient(1960, 11, 15, 1000);
     const finalDate = finalDateAtAge(r, 70);
     const strat = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
@@ -442,6 +445,42 @@ describe('spousal top-up with two earners', () => {
     );
     expect(result).toBe(2340000);
   });
+
+  it('reduces spousal benefit for early filing (before NRA)', () => {
+    // R1: PIA $2000, R2: PIA $600. Both born Dec 15, 1960.
+    // Both file at 64y0m (36 months before NRA of 67).
+    // Both die at 68 (Dec 2028). Filing date = Dec 2024.
+    //
+    // Early reduction: 36 months before NRA → 20% reduction on personal.
+    // R1 personal: $2000 * 0.8 = $1600/mo * 49 months = 7,840,000 cents
+    // R2 personal: $600 * 0.8 = $480/mo * 49 months = 2,352,000 cents
+    //
+    // Spousal: startDate (Dec 2024) is before NRA (Dec 2027).
+    // 36 months early → spousal reduced by 25%.
+    // Base spousal = $2000/2 - $600 = $400. Reduced: $400 * 0.75 = $300/mo.
+    // R2 spousal: $300/mo * 49 months = 1,470,000 cents
+    //
+    // Total = 7,840,000 + 2,352,000 + 1,470,000 = 11,662,000 cents.
+    const r1 = makeRecipient(1960, 11, 15, 2000);
+    const r2 = makeRecipient(1960, 11, 15, 600);
+    const finalDates: [MonthDate, MonthDate] = [
+      finalDateAtAge(r1, 68),
+      finalDateAtAge(r2, 68),
+    ];
+    const strategies: [MonthDuration, MonthDuration] = [
+      MonthDuration.initFromYearsMonths({ years: 64, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 64, months: 0 }),
+    ];
+
+    const result = strategySumCentsCouple(
+      [r1, r2],
+      finalDates,
+      FAR_PAST,
+      0,
+      strategies
+    );
+    expect(result).toBe(11662000);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -566,8 +605,9 @@ describe('period structure verification', () => {
 
   it('generates two periods for mid-year post-NRA filing (year-of-election)', () => {
     // Born Jan 2, 1960. File at 68y6m (Jul 2028).
-    // Year-of-election: in filing year, only credits through Jan of that year
-    // are applied; full credits start the following January.
+    // Year-of-election: in the filing year, credits are computed only through
+    // the later of NRA or January of that year; full credits start the
+    // following January.
     const r = makeRecipient(1960, 0, 2, 1000);
     const finalDate = finalDateAtAge(r, 72);
     const strat = MonthDuration.initFromYearsMonths({ years: 68, months: 6 });
@@ -582,5 +622,105 @@ describe('period structure verification', () => {
     expect(periods[1].amount.cents()).toBeGreaterThan(
       periods[0].amount.cents()
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. Couple Edge Cases
+// ---------------------------------------------------------------------------
+describe('couple edge cases', () => {
+  it('adjusts zero-PIA dependent filing date to earner filing date', () => {
+    // R1: PIA $1000, files at 70 (Dec 2030). Dies at 71 (Dec 2031).
+    // R2: PIA $0, files at 63 (Dec 2023). Dies at 73 (Dec 2033).
+    //
+    // Since R2 has $0 PIA and files before R1, the code adjusts R2's
+    // filing to match R1's (Dec 2030). Verify by checking that no
+    // spousal period starts before the earner's filing date.
+    const r1 = makeRecipient(1960, 11, 15, 1000);
+    const r2 = makeRecipient(1960, 11, 15, 0);
+    const finalDates: [MonthDate, MonthDate] = [
+      finalDateAtAge(r1, 71),
+      finalDateAtAge(r2, 73),
+    ];
+    const strategies: [MonthDuration, MonthDuration] = [
+      MonthDuration.initFromYearsMonths({ years: 70, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 63, months: 0 }),
+    ];
+
+    const periods = strategySumPeriodsCouple([r1, r2], finalDates, strategies);
+
+    const earnerFilingDate = r1.birthdate.dateAtSsaAge(
+      MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+    );
+
+    // No period should start before the earner's filing date.
+    for (const p of periods) {
+      expect(p.startDate.greaterThanOrEqual(earnerFilingDate)).toBe(true);
+    }
+
+    // Should have survivor periods (R2 outlives R1).
+    const survivor = periods.filter(
+      (p) => p.benefitType === BenefitType.Survivor
+    );
+    expect(survivor.length).toBeGreaterThan(0);
+  });
+
+  it('starts survivor at dependent filing date when earner dies first', () => {
+    // R1: PIA $2000, files at NRA (Dec 2027). Dies at 68 (Dec 2028).
+    // R2: PIA $600, files at 70 (Dec 2030). Dies at 80 (Dec 2040).
+    //
+    // Earner dies (Dec 2028) before dependent files (Dec 2030).
+    // Survivor start = max(earnerDeath+1, dependentFiling) = Dec 2030.
+    // The dependent's filing date dominates, not the earner's death.
+    const r1 = makeRecipient(1960, 11, 15, 2000);
+    const r2 = makeRecipient(1960, 11, 15, 600);
+    const finalDates: [MonthDate, MonthDate] = [
+      finalDateAtAge(r1, 68),
+      finalDateAtAge(r2, 80),
+    ];
+    const strategies: [MonthDuration, MonthDuration] = [
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 70, months: 0 }),
+    ];
+
+    const periods = strategySumPeriodsCouple([r1, r2], finalDates, strategies);
+
+    const survivor = periods.filter(
+      (p) => p.benefitType === BenefitType.Survivor
+    );
+    expect(survivor).toHaveLength(1);
+
+    // Survivor should start at dependent's filing date (Dec 2030),
+    // not earner's death + 1 (Jan 2029).
+    const dependentFilingDate = r2.birthdate.dateAtSsaAge(
+      MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+    );
+    expect(survivor[0].startDate.monthsSinceEpoch()).toBe(
+      dependentFilingDate.monthsSinceEpoch()
+    );
+  });
+
+  it('produces no survivor periods when earner outlives dependent', () => {
+    // R1: PIA $2000, files at NRA (Dec 2027). Dies at 80 (Dec 2040).
+    // R2: PIA $600, files at NRA (Dec 2027). Dies at 68 (Dec 2028).
+    //
+    // Earner outlives dependent — no survivor benefit applies.
+    const r1 = makeRecipient(1960, 11, 15, 2000);
+    const r2 = makeRecipient(1960, 11, 15, 600);
+    const finalDates: [MonthDate, MonthDate] = [
+      finalDateAtAge(r1, 80),
+      finalDateAtAge(r2, 68),
+    ];
+    const strategies: [MonthDuration, MonthDuration] = [
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 }),
+    ];
+
+    const periods = strategySumPeriodsCouple([r1, r2], finalDates, strategies);
+
+    const survivor = periods.filter(
+      (p) => p.benefitType === BenefitType.Survivor
+    );
+    expect(survivor).toHaveLength(0);
   });
 });

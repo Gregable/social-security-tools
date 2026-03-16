@@ -623,6 +623,7 @@ function strategySumPeriodsOptimized(
     survivorPeriod.startDate = survivorStartDate;
     survivorPeriod.endDate = context.dependentFinalDate;
     survivorPeriod.recipientIndex = context.dependentIndex;
+    survivorPeriod.benefitType = BenefitType.Survivor;
     periods.push(survivorPeriod);
   }
 
