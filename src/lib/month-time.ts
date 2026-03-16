@@ -191,14 +191,14 @@ export class MonthDate {
   }
 
   /**
-   * Returns a new MonthDuration that is this one incremented by 1 month.
+   * Increments this MonthDate by 1 month in place.
    */
   increment() {
     this.monthsSinceEpoch_ += 1;
   }
 
   /**
-   * Returns a new MonthDuration that is this one decremented by 1 month.
+   * Decrements this MonthDate by 1 month in place.
    */
   decrement() {
     this.monthsSinceEpoch_ -= 1;
@@ -349,14 +349,14 @@ export class MonthDuration {
   }
 
   /**
-   * Returns a new MonthDuration that is this one incremented by 1 month.
+   * Increments this MonthDuration by 1 month in place.
    */
   increment() {
     this.months_ += 1;
   }
 
   /**
-   * Returns a new MonthDuration that is this one decremented by 1 month.
+   * Decrements this MonthDuration by 1 month in place.
    */
   decrement() {
     this.months_ -= 1;
