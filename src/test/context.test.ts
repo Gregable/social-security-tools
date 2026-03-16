@@ -139,7 +139,7 @@ describe('Context session management', () => {
           healthMultiplier: 1.0,
           isPiaOnly: false,
           overridePiaCents: null,
-          isFirst: true,
+
           earningsRecords: [
             {
               year: 2020,
@@ -173,7 +173,7 @@ describe('Context session management', () => {
           healthMultiplier: 1.0,
           isPiaOnly: false,
           overridePiaCents: null,
-          isFirst: true,
+
           earningsRecords: [],
         },
         spouse: {
@@ -183,7 +183,7 @@ describe('Context session management', () => {
           healthMultiplier: 1.0,
           isPiaOnly: false,
           overridePiaCents: null,
-          isFirst: false,
+
           earningsRecords: [],
         },
         isDemo: false,
@@ -209,7 +209,7 @@ describe('Context session management', () => {
           healthMultiplier: 1.0,
           isPiaOnly: false,
           overridePiaCents: null,
-          isFirst: true,
+
           earningsRecords: [],
         },
         spouse: null,
@@ -239,7 +239,7 @@ describe('Context session management', () => {
           healthMultiplier: 1.0,
           isPiaOnly: false,
           overridePiaCents: null,
-          isFirst: true,
+
           earningsRecords: [],
         },
         spouse: null,

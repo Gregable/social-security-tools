@@ -28,7 +28,6 @@ export interface SerializedRecipient {
   overridePiaCents: number | null;
   gender: string;
   healthMultiplier: number;
-  isFirst: boolean;
 }
 
 /**
@@ -165,6 +164,7 @@ export class Recipient {
     }
     this.isPiaOnly_ = true;
     this.overridePia_ = pia;
+    this.publish_();
   }
 
   /**
@@ -381,6 +381,8 @@ export class Recipient {
     // Recompute the delayed retirement increase based on the new birthdate.
     this.delayedRetirementIncrease_ =
       retirementAgeBracket.delayedIncreaseAnnual;
+
+    this.publish_();
   }
 
   /**
@@ -984,7 +986,6 @@ export class Recipient {
       overridePiaCents: this.overridePia?.cents() ?? null,
       gender: this.gender,
       healthMultiplier: this.healthMultiplier,
-      isFirst: this.first,
     };
   }
 
@@ -1006,7 +1007,15 @@ export class Recipient {
     }
 
     r.name = data.name;
-    r.gender = data.gender as GenderOption;
+    const validGenders: readonly string[] = ['male', 'female', 'blended'];
+    if (!validGenders.includes(data.gender)) {
+      console.warn(
+        `Invalid gender "${data.gender}" in session data, defaulting to "blended".`
+      );
+    }
+    r.gender = validGenders.includes(data.gender)
+      ? (data.gender as GenderOption)
+      : 'blended';
     r.healthMultiplier = data.healthMultiplier;
 
     return r;

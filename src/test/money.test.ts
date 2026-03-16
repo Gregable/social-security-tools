@@ -31,10 +31,32 @@ test('can be multiplied by a factor', () => {
   expect(product.value()).toEqual(246.9);
 });
 
+test('times rounds fractional cents to nearest integer', () => {
+  // 333 cents * 0.9 = 299.7 cents -> rounds to 300 cents
+  expect(Money.fromCents(333).times(0.9).cents()).toEqual(300);
+  // PIA bracket multipliers produce integer cents
+  expect(Money.from(1234).times(0.9).cents()).toEqual(111060);
+  expect(Money.from(1234).times(0.32).cents()).toEqual(39488);
+  expect(Money.from(1234).times(0.15).cents()).toEqual(18510);
+  // Survivor benefit multiplier
+  expect(Money.fromCents(100001).times(0.825).cents()).toEqual(82501);
+});
+
 test('can be divided by a factor', () => {
   const money = Money.from(123.45);
   const quotient = money.div(2);
   expect(quotient.value()).toEqual(61.73);
+});
+
+test('div rounds fractional cents to nearest integer', () => {
+  // 10000 cents / 3 = 3333.33... -> rounds to 3333 cents
+  expect(Money.from(100).div(3).cents()).toEqual(3333);
+  // AIME calculation: div(35)
+  expect(Money.fromCents(450000).div(35).cents()).toEqual(12857);
+  // Equality holds after rounding
+  const a = Money.from(100).div(3);
+  const b = Money.from(100).div(3);
+  expect(a.equals(b)).toBe(true);
 });
 
 test('can be divided by another money', () => {

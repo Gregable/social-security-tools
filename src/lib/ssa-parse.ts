@@ -13,9 +13,11 @@ export function dollarStringToMoney(dollarString: string): Money {
   if (dollarString === 'MedicareBeganIn1966') return Money.from(0);
   if (dollarString === '') return Money.from(0);
   const numberString = dollarString.replace(/[$,]/g, '');
+  if (!/^\d+(\.\d+)?$/.test(numberString)) {
+    console.warn(`Unexpected earnings value: "${dollarString}"`);
+    return Money.from(0);
+  }
   const value = parseInt(numberString, 10);
-  if (Number.isNaN(value)) return Money.from(0);
-  if (value < 0) return Money.from(0);
   return Money.from(value);
 }
 
@@ -24,7 +26,7 @@ export function dollarStringToMoney(dollarString: string): Money {
  * See: https://github.com/Gregable/social-security-tools/issues/214
  */
 function isPdfPaste(lines: string[]): boolean {
-  const lineMatch = /[12][0-9]{3}-[12][0-9]{3}/g;
+  const lineMatch = /[12][0-9]{3}-[12][0-9]{3}/;
   for (let i = 0; i < lines.length; ++i) {
     const line: string = lines[i];
     const columns: Array<string> = line.split(' ');
