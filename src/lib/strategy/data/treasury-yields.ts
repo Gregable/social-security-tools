@@ -22,32 +22,37 @@ function formatDateForTreasuryAPI(date: Date, monthOffset: number = 0): string {
 }
 
 /**
+ * Fetches and parses Treasury yield XML for a given month offset.
+ */
+async function fetchTreasuryMonth(
+  date: Date,
+  monthOffset: number
+): Promise<{ response: Response; entries: HTMLCollectionOf<Element> }> {
+  const formattedDate = formatDateForTreasuryAPI(date, monthOffset);
+  const url = `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_real_yield_curve&field_tdr_date_value_month=${formattedDate}`;
+  const response = await fetch(url);
+  const xmlText = await response.text();
+  const xmlDoc = new DOMParser().parseFromString(xmlText, 'text/xml');
+  const entries = xmlDoc.getElementsByTagName('entry');
+  return { response, entries };
+}
+
+/**
  * Fetches the latest 20-year Treasury yield from the Treasury Department API
  * @returns Promise resolving to the yield rate as a decimal (e.g., 0.025 for 2.5%)
  */
 export async function fetchLatest20YearTreasuryYield(): Promise<TreasuryYieldData> {
   try {
     const currentDate = new Date();
-    let formattedDate = formatDateForTreasuryAPI(currentDate);
-    let url = `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_real_yield_curve&field_tdr_date_value_month=${formattedDate}`;
 
-    let response = await fetch(url);
-    let xmlText = await response.text();
-    const parser = new DOMParser();
-    let xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-    let entries = xmlDoc.getElementsByTagName('entry');
-
-    // If no data for current month, try previous month
+    // Try current month first, then fall back to previous month.
+    // Early in the month, Treasury may not have published data yet.
+    let { response, entries } = await fetchTreasuryMonth(currentDate, 0);
     if (entries.length === 0) {
       console.warn(
         'No Treasury data for current month, trying previous month.'
       );
-      formattedDate = formatDateForTreasuryAPI(currentDate, -1); // Get previous month
-      url = `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_real_yield_curve&field_tdr_date_value_month=${formattedDate}`;
-      response = await fetch(url);
-      xmlText = await response.text();
-      xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-      entries = xmlDoc.getElementsByTagName('entry');
+      ({ response, entries } = await fetchTreasuryMonth(currentDate, -1));
     }
 
     if (!response.ok) {

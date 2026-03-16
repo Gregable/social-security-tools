@@ -94,14 +94,14 @@ export class Money {
   }
 
   times(factor: number): Money {
-    return new Money(this.cents_ * factor);
+    return new Money(Math.round(this.cents_ * factor));
   }
 
   div(factor: number): Money {
     if (factor === 0) {
       throw new Error('Money.div() called with 0');
     }
-    return new Money(this.cents_ / factor);
+    return new Money(Math.round(this.cents_ / factor));
   }
 
   div$(other: Money): number {
