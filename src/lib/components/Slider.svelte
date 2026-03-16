@@ -373,6 +373,7 @@ $: ticks =
   style:--tick-label-color={tickLabelColor}
   style:--tick-legend-color={tickLegendColor}
 >
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <span
     class="barWrapper noTouchAction"
     on:pointerdown={onStart}
@@ -381,6 +382,7 @@ $: ticks =
   >
     <span class="bar"></span>
   </span>
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <span
     class="barWrapper selection noTouchAction"
     on:pointerdown={onStart}

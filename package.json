@@ -33,6 +33,7 @@
     "@sveltejs/kit": "^2.53.0",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
     "@types/node": "^24.5.2",
+    "@typescript-eslint/types": "^8.57.0",
     "@vitest/coverage-v8": "^3.2.4",
     "chromatic": "^13.3.5",
     "posthog-js": "^1.77.0",
