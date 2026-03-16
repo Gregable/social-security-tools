@@ -119,7 +119,7 @@ describe('strategySumCents', () => {
       finalAge2: 92,
       strategy1Year: 63,
       strategy2Year: 70,
-      expectedTotalBenefit: 745338,
+      expectedTotalBenefit: 745243,
     },
     {
       pia1: Money.from(2500),
@@ -152,7 +152,7 @@ describe('strategySumCents', () => {
       finalAge2: 80,
       strategy1Year: 70,
       strategy2Year: 63,
-      expectedTotalBenefit: 745338,
+      expectedTotalBenefit: 745243,
     },
     {
       pia1: Money.from(0),

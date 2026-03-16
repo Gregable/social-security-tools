@@ -163,8 +163,7 @@ export function strategySumPeriodsCouple(
     // starts receiving survivor benefits or their own death date.
     spousalPeriod.endDate = MonthDate.min(
       survivorStartDate.subtractDuration(new MonthDuration(1)),
-      // Include the month of the final date:
-      dependentFinalDate.addDuration(new MonthDuration(1))
+      dependentFinalDate
     );
 
     if (spousalPeriod.endDate.greaterThanOrEqual(spousalPeriod.startDate)) {
@@ -639,8 +638,7 @@ export function strategySumPeriodsOptimized(
     // starts receiving survivor benefits or their own death date.
     spousalPeriod.endDate = MonthDate.min(
       survivorStartDate.subtractDuration(new MonthDuration(1)),
-      // Include the month of the final date:
-      context.dependentFinalDate.addDuration(new MonthDuration(1))
+      context.dependentFinalDate
     );
 
     if (spousalPeriod.endDate.greaterThanOrEqual(spousalPeriod.startDate)) {
