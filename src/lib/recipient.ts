@@ -28,7 +28,6 @@ export interface SerializedRecipient {
   overridePiaCents: number | null;
   gender: string;
   healthMultiplier: number;
-  isFirst: boolean;
 }
 
 /**
@@ -987,7 +986,6 @@ export class Recipient {
       overridePiaCents: this.overridePia?.cents() ?? null,
       gender: this.gender,
       healthMultiplier: this.healthMultiplier,
-      isFirst: this.first,
     };
   }
 

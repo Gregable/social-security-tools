@@ -878,7 +878,7 @@ describe('Recipient serialization', () => {
       healthMultiplier: 1.2,
       isPiaOnly: false,
       overridePiaCents: null,
-      isFirst: true,
+
       earningsRecords: [
         {
           year: 2020,
@@ -909,7 +909,7 @@ describe('Recipient serialization', () => {
       healthMultiplier: 1.0,
       isPiaOnly: true,
       overridePiaCents: 250000,
-      isFirst: true,
+
       earningsRecords: [],
     };
 
