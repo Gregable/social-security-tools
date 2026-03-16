@@ -5,26 +5,13 @@ import { BenefitPeriod, BenefitType } from './benefit-period.js';
 import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
 
 /**
- * Calculates the total lifetime benefit in cents for a given Social Security
- * filing strategy for a couple.
+ * Computes the benefit periods (personal, spousal, and survivor) for a
+ * couple's Social Security filing strategy.
  *
- * This function computes the sum of personal, spousal, and survivor benefits
- * for both recipients based on their selected filing ages and expected final
- * ages (death dates).
- *
- * @param {[Recipient, Recipient]} recipients - An array containing the two
- *                                              recipients for whom the strategy
- *                                              results are being calculated.
- * @param {[MonthDate, MonthDate]} finalDates - An array containing the final
- *                                              dates (death dates) for each
- *                                              recipient.
- * @param {MonthDate} currentDate - Today's date.
- * @param {number} discountRate - Rate used for present value calculation. 0
- *                                means no discount.
- * @param {[MonthDuration, MonthDuration]} strats - An array containing the
- *                                                  filing ages (as
- *                                                  MonthDuration)
- *                                                  for each recipient.
+ * @param recipients - The two recipients.
+ * @param finalDates - Final dates (death dates) for each recipient.
+ * @param strats - Filing ages (as MonthDuration) for each recipient.
+ * @returns The benefit periods with amounts, date ranges, and types.
  */
 export function strategySumPeriodsCouple(
   recipients: [Recipient, Recipient],

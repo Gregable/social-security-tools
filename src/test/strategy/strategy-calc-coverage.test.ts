@@ -796,4 +796,33 @@ describe('couple edge cases', () => {
     );
     expect(survivor).toHaveLength(0);
   });
+
+  it('spousal benefit ends on dependent death date, not one month later', () => {
+    // R1: PIA $2000, files at NRA (67). Dies at 90.
+    // R2: PIA $600, files at NRA (67). Dies at 70 (before earner).
+    //
+    // Spousal benefit should end on R2's death date (inclusive), not
+    // one month after.
+    const r1 = makeRecipient(1960, 11, 15, 2000);
+    const r2 = makeRecipient(1960, 11, 15, 600);
+    const dependentFinalDate = finalDateAtAge(r2, 70);
+    const finalDates: [MonthDate, MonthDate] = [
+      finalDateAtAge(r1, 90),
+      dependentFinalDate,
+    ];
+    const strategies: [MonthDuration, MonthDuration] = [
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 }),
+    ];
+
+    const periods = strategySumPeriodsCouple([r1, r2], finalDates, strategies);
+
+    const spousal = periods.filter(
+      (p) => p.benefitType === BenefitType.Spousal
+    );
+    expect(spousal).toHaveLength(1);
+    expect(spousal[0].endDate.monthsSinceEpoch()).toBe(
+      dependentFinalDate.monthsSinceEpoch()
+    );
+  });
 });

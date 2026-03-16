@@ -1008,6 +1008,11 @@ export class Recipient {
 
     r.name = data.name;
     const validGenders: readonly string[] = ['male', 'female', 'blended'];
+    if (!validGenders.includes(data.gender)) {
+      console.warn(
+        `Invalid gender "${data.gender}" in session data, defaulting to "blended".`
+      );
+    }
     r.gender = validGenders.includes(data.gender)
       ? (data.gender as GenderOption)
       : 'blended';
