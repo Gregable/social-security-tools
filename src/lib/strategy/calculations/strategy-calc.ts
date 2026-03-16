@@ -400,7 +400,7 @@ function getMemoizedDiscountFactor(
 /**
  * Optimized context for strategy calculations that extracts invariant computations.
  */
-interface OptimizationContext {
+export interface OptimizationContext {
   earner: Recipient;
   dependent: Recipient;
   earnerFinalDate: MonthDate;
@@ -417,7 +417,7 @@ interface OptimizationContext {
 /**
  * Creates an optimization context by pre-computing invariant values.
  */
-function createOptimizationContext(
+export function createOptimizationContext(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
@@ -548,7 +548,7 @@ function strategySumCentsOptimized(
 /**
  * Optimized version of strategySumPeriods using pre-computed context.
  */
-function strategySumPeriodsOptimized(
+export function strategySumPeriodsOptimized(
   context: OptimizationContext,
   earnerStratDate: MonthDate,
   dependentStratDate: MonthDate

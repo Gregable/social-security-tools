@@ -13,8 +13,10 @@ import {
   strategySumPeriodsSingle,
 } from '$lib/strategy/calculations';
 import {
+  createOptimizationContext,
   earliestFiling,
   optimalStrategyCoupleOptimized,
+  strategySumPeriodsOptimized,
 } from '$lib/strategy/calculations/strategy-calc';
 
 /** Creates a Recipient with PIA only (no earnings records). */
@@ -321,6 +323,77 @@ describe('optimized vs non-optimized couple strategy', () => {
     expect(s0.asMonths()).toBe(s0o.asMonths());
     expect(s1.asMonths()).toBe(s1o.asMonths());
     expect(val).toBe(valO);
+  });
+
+  it('produces structurally identical periods (types, amounts, dates)', () => {
+    // Directly compare the period arrays from both code paths to guard
+    // against future divergence (e.g., missing benefitType fields).
+    const r1 = makeRecipient(1960, 11, 15, 2000);
+    const r2 = makeRecipient(1960, 11, 15, 600);
+    const recipients: [Recipient, Recipient] = [r1, r2];
+    const finalDates: [MonthDate, MonthDate] = [
+      finalDateAtAge(r1, 75),
+      finalDateAtAge(r2, 80),
+    ];
+    const strategies: [MonthDuration, MonthDuration] = [
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 }),
+      MonthDuration.initFromYearsMonths({ years: 67, months: 0 }),
+    ];
+    const currentDate = MonthDate.initFromYearsMonths({
+      years: 2025,
+      months: 0,
+    });
+
+    // Non-optimized path
+    const nonOptPeriods = strategySumPeriodsCouple(
+      recipients,
+      finalDates,
+      strategies
+    );
+
+    // Optimized path
+    const context = createOptimizationContext(
+      recipients,
+      finalDates,
+      currentDate,
+      0
+    );
+    const earnerStratDate = context.earner.birthdate.dateAtSsaAge(
+      strategies[context.earnerIndex]
+    );
+    const dependentStratDate = context.dependent.birthdate.dateAtSsaAge(
+      strategies[context.dependentIndex]
+    );
+    const optPeriods = strategySumPeriodsOptimized(
+      context,
+      earnerStratDate,
+      dependentStratDate
+    );
+
+    expect(optPeriods).toHaveLength(nonOptPeriods.length);
+
+    // Sort both arrays by (startDate, recipientIndex, benefitType) for
+    // stable comparison.
+    const sortKey = (p: (typeof nonOptPeriods)[0]) =>
+      `${p.startDate.monthsSinceEpoch()}-${p.recipientIndex}-${p.benefitType}`;
+    const sortedNonOpt = [...nonOptPeriods].sort((a, b) =>
+      sortKey(a).localeCompare(sortKey(b))
+    );
+    const sortedOpt = [...optPeriods].sort((a, b) =>
+      sortKey(a).localeCompare(sortKey(b))
+    );
+
+    for (let i = 0; i < sortedNonOpt.length; i++) {
+      const np = sortedNonOpt[i];
+      const op = sortedOpt[i];
+      expect(op.benefitType).toBe(np.benefitType);
+      expect(op.amount.cents()).toBe(np.amount.cents());
+      expect(op.startDate.monthsSinceEpoch()).toBe(
+        np.startDate.monthsSinceEpoch()
+      );
+      expect(op.endDate.monthsSinceEpoch()).toBe(np.endDate.monthsSinceEpoch());
+      expect(op.recipientIndex).toBe(np.recipientIndex);
+    }
   });
 });
 
