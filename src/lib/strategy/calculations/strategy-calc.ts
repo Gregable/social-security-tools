@@ -311,7 +311,7 @@ export function strategySumTotalPeriodsCouple(
   return Money.fromCents(totalNPVCents);
 }
 
-function earliestFiling(
+export function earliestFiling(
   recipient: Recipient,
   currentDate: MonthDate
 ): MonthDuration {
