@@ -1007,7 +1007,10 @@ export class Recipient {
     }
 
     r.name = data.name;
-    r.gender = data.gender as GenderOption;
+    const validGenders: readonly string[] = ['male', 'female', 'blended'];
+    r.gender = validGenders.includes(data.gender)
+      ? (data.gender as GenderOption)
+      : 'blended';
     r.healthMultiplier = data.healthMultiplier;
 
     return r;
