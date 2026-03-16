@@ -165,6 +165,7 @@ export class Recipient {
     }
     this.isPiaOnly_ = true;
     this.overridePia_ = pia;
+    this.publish_();
   }
 
   /**
@@ -381,6 +382,8 @@ export class Recipient {
     // Recompute the delayed retirement increase based on the new birthdate.
     this.delayedRetirementIncrease_ =
       retirementAgeBracket.delayedIncreaseAnnual;
+
+    this.publish_();
   }
 
   /**
