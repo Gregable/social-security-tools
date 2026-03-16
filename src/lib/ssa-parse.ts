@@ -13,9 +13,11 @@ export function dollarStringToMoney(dollarString: string): Money {
   if (dollarString === 'MedicareBeganIn1966') return Money.from(0);
   if (dollarString === '') return Money.from(0);
   const numberString = dollarString.replace(/[$,]/g, '');
+  if (!/^\d+(\.\d+)?$/.test(numberString)) {
+    console.warn(`Unexpected earnings value: "${dollarString}"`);
+    return Money.from(0);
+  }
   const value = parseInt(numberString, 10);
-  if (Number.isNaN(value)) return Money.from(0);
-  if (value < 0) return Money.from(0);
   return Money.from(value);
 }
 
