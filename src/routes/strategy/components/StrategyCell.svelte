@@ -1,6 +1,7 @@
 <script lang="ts">
 import RecipientName from '$lib/components/RecipientName.svelte';
 import type { Recipient } from '$lib/recipient';
+import type { CellPosition } from '$lib/strategy/ui';
 import { getFilingAge, getFilingDate } from '$lib/strategy/ui';
 
 // Props
@@ -10,20 +11,18 @@ export let calculationResult: any;
 export let displayAsAges: boolean;
 export let recipients: [Recipient, Recipient];
 export let recipientIndex: number;
-export let hoveredCell: { rowIndex: number; colIndex: number } | null;
+export let hoveredCell: CellPosition | null;
 export let isSelected: boolean = false;
 export let cellWidth: number = 0;
 export let cellHeight: number = 0;
 export let cellStyle: string = '';
 
 // Callback props
-export let onhover:
-  | ((detail: { rowIndex: number; colIndex: number }) => void)
-  | undefined = undefined;
+export let onhover: ((position: CellPosition) => void) | undefined =
+  undefined;
 export let onhoverout: (() => void) | undefined = undefined;
-export let onselect:
-  | ((detail: { rowIndex: number; colIndex: number }) => void)
-  | undefined = undefined;
+export let onselect: ((position: CellPosition) => void) | undefined =
+  undefined;
 
 // Cell hover overlay state
 let cellHoverInfo: {

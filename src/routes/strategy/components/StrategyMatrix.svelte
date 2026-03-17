@@ -3,7 +3,12 @@ import RecipientName from '$lib/components/RecipientName.svelte';
 import type { Money } from '$lib/money';
 import { MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
-import type { CalculationResults, DeathAgeBucket } from '$lib/strategy/ui';
+import type {
+  CalculationResults,
+  CellPosition,
+  CellSelectionDetail,
+  DeathAgeBucket,
+} from '$lib/strategy/ui';
 import {
   createBorderRemovalFunctions,
   getMonthYearColor,
@@ -17,13 +22,15 @@ export let displayAsAges: boolean = false;
 export let calculationResults: CalculationResults;
 export let deathProbDistribution1: { age: number; probability: number }[];
 export let deathProbDistribution2: { age: number; probability: number }[];
-export let hoveredCell: { rowIndex: number; colIndex: number } | null = null;
+export let hoveredCell: CellPosition | null = null;
 
 // Callback props for events
 export let onhovercell:
-  | ((detail: { rowIndex: number; colIndex: number } | null) => void)
+  | ((detail: CellPosition | null) => void)
   | undefined = undefined;
-export let onselectcell: ((detail: any) => void) | undefined = undefined;
+export let onselectcell:
+  | ((detail: CellSelectionDetail) => void)
+  | undefined = undefined;
 
 // Matrix width tracking
 let matrixWidth: number = 0;
@@ -232,11 +239,8 @@ function getCellStyle(i: number, j: number): string {
 }
 
 // Handle events
-function handleCellHover(detail: {
-  rowIndex: number;
-  colIndex: number;
-}) {
-  onhovercell?.(detail);
+function handleCellHover(position: CellPosition) {
+  onhovercell?.(position);
 }
 
 function handleCellHoverOut() {
@@ -267,11 +271,8 @@ function handleHeaderHoverOut() {
   headerHoverInfo = null;
 }
 
-function handleCellSelect(detail: {
-  rowIndex: number;
-  colIndex: number;
-}) {
-  const { rowIndex, colIndex } = detail;
+function handleCellSelect(position: CellPosition) {
+  const { rowIndex, colIndex } = position;
   const result = calculationResults.get(
     rowIndex,
     colIndex

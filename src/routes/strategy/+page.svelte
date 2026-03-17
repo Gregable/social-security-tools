@@ -11,6 +11,7 @@
   import {
     CalculationResults,
     CalculationStatus,
+    type CellSelectionDetail,
     type DeathAgeBucket,
     generateMonthlyBuckets,
     generateThreeYearBuckets,
@@ -269,7 +270,7 @@
       }
     }
   }
-  function handleCellSelect(detail: any) {
+  function handleCellSelect(detail: CellSelectionDetail) {
     calculationResults.setSelectedByLabels(
       String(detail.deathAge1),
       String(detail.deathAge2)

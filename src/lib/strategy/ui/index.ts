@@ -1,6 +1,10 @@
 // UI utility functions
 
-export type { StrategyResult } from './calculation-results.js';
+export type {
+  CellPosition,
+  CellSelectionDetail,
+  StrategyResult,
+} from './calculation-results.js';
 export {
   CalculationResults,
   CalculationStatus,
