@@ -1,6 +1,23 @@
 import type { Money } from '$lib/money';
-import type { MonthDuration } from '$lib/month-time';
+import type { MonthDate, MonthDuration } from '$lib/month-time';
 import type { DeathAgeBucket } from './grid-sizing.js';
+
+export interface CellPosition {
+  rowIndex: number;
+  colIndex: number;
+}
+
+export interface CellSelectionDetail {
+  deathAge1: string;
+  deathAge2: string;
+  filingAge1Years: number;
+  filingAge1Months: number;
+  filingDate1: MonthDate;
+  filingAge2Years: number;
+  filingAge2Months: number;
+  filingDate2: MonthDate;
+  netPresentValue: Money;
+}
 
 export interface StrategyResult {
   deathAge1: string;
