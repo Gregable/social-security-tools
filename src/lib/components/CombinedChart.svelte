@@ -4,7 +4,7 @@
   import { activeIntegration } from "$lib/integrations/context";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   import RecipientName from "./RecipientName.svelte";
   import Slider from "./Slider.svelte";
   import {
@@ -35,12 +35,6 @@
   $: spouseCtx_.r = $spouse;
 
   let mounted_: boolean = false;
-  $: $recipient &&
-    $spouse &&
-    mounted_ &&
-    recipientCtx_.sliderMonths &&
-    spouseCtx_.sliderMonths &&
-    render();
 
   let sliderEl_: Slider;
   let canvasEl_: HTMLCanvasElement;
@@ -71,29 +65,19 @@
     };
   }
 
-  $: onMount(async () => {
+  $: onMount(() => {
     if (!canvasEl_) return;
 
     ctx_ = canvasEl_.getContext("2d");
     ctx_.font = "bold 14px Helvetica";
 
-    // Set guard flags during initialization to prevent circular updates
-    updatingRecipientFromStore_ = true;
-    updatingSpouseFromStore_ = true;
-
     recipientCtx_.sliderMonths = $recipient.normalRetirementAge().asMonths();
     spouseCtx_.sliderMonths = $spouse.normalRetirementAge().asMonths();
 
-    // Now set stores to match initialized slider positions
+    // Set stores to match initialized slider positions
     recipientFilingDate.set(userSelectedDate(recipientCtx_));
     spouseFilingDate.set(userSelectedDate(spouseCtx_));
 
-    // Wait for one tick to ensure store updates propagate
-    await tick();
-
-    // Enable sync and render
-    updatingRecipientFromStore_ = false;
-    updatingSpouseFromStore_ = false;
     mounted_ = true;
     render();
   });
@@ -102,57 +86,74 @@
   let lastMouseX_: number = -1;
   let lastMouseDate_: MonthDate = new MonthDate(0);
 
-  // Track if we're currently updating from stores to prevent circular updates
-  let updatingRecipientFromStore_: boolean = false;
-  let updatingSpouseFromStore_: boolean = false;
+  // Snapshot slider months into standalone primitive variables.
+  // Guarded so the self-assign in render() doesn't propagate: if the
+  // value hasn't changed, no write occurs and dependents don't re-run.
+  let recipientSliderSnapshot_: number = 0;
+  let spouseSliderSnapshot_: number = 0;
+  $: if (recipientCtx_.sliderMonths !== recipientSliderSnapshot_) {
+    recipientSliderSnapshot_ = recipientCtx_.sliderMonths;
+  }
+  $: if (spouseCtx_.sliderMonths !== spouseSliderSnapshot_) {
+    spouseSliderSnapshot_ = spouseCtx_.sliderMonths;
+  }
 
-  // Update stores when slider values change
+  // Trigger render on slider or recipient changes using primitives,
+  // NOT the context objects, to avoid a render loop from self-assign.
+  $: $recipient &&
+    $spouse &&
+    mounted_ &&
+    recipientSliderSnapshot_ &&
+    spouseSliderSnapshot_ &&
+    render();
+
+  // Update stores when slider values change.
+  // Uses snapshots (not context objects) so the self-assign in render()
+  // doesn't retrigger these. The deduplicating store in context.ts
+  // prevents cross-chart ping-pong.
   $: {
-    if (recipientCtx_.sliderMonths && $recipient && mounted_ && !updatingRecipientFromStore_) {
-      recipientFilingDate.set(userSelectedDate(recipientCtx_));
+    if (recipientSliderSnapshot_ && $recipient && mounted_) {
+      recipientFilingDate.set(
+        $recipient.birthdate.dateAtSsaAge(
+          new MonthDuration(recipientSliderSnapshot_)
+        )
+      );
     }
   }
   $: {
-    if (spouseCtx_.sliderMonths && $spouse && mounted_ && !updatingSpouseFromStore_) {
-      spouseFilingDate.set(userSelectedDate(spouseCtx_));
+    if (spouseSliderSnapshot_ && $spouse && mounted_) {
+      spouseFilingDate.set(
+        $spouse.birthdate.dateAtSsaAge(
+          new MonthDuration(spouseSliderSnapshot_)
+        )
+      );
     }
   }
 
-  // Sync slider positions when stores change
+  // Sync slider positions when stores change from an external source.
+  // Uses snapshots (not context objects) so the self-assign doesn't retrigger.
   $: {
     if ($recipientFilingDate && $recipient && mounted_) {
-      const ageAtFiling =
-        $recipient.birthdate.ageAtSsaDate($recipientFilingDate);
-      const newSliderMonths = ageAtFiling.asMonths();
-      if (Math.abs(newSliderMonths - recipientCtx_.sliderMonths) > 0.5) {
-        syncRecipientSliderFromStore(newSliderMonths);
+      const currentEpoch = $recipient.birthdate
+        .dateAtSsaAge(new MonthDuration(recipientSliderSnapshot_))
+        .monthsSinceEpoch();
+      if ($recipientFilingDate.monthsSinceEpoch() !== currentEpoch) {
+        const ageAtFiling =
+          $recipient.birthdate.ageAtSsaDate($recipientFilingDate);
+        recipientCtx_.sliderMonths = ageAtFiling.asMonths();
       }
     }
   }
   $: {
     if ($spouseFilingDate && $spouse && mounted_) {
-      const ageAtFiling = $spouse.birthdate.ageAtSsaDate($spouseFilingDate);
-      const newSliderMonths = ageAtFiling.asMonths();
-      if (Math.abs(newSliderMonths - spouseCtx_.sliderMonths) > 0.5) {
-        syncSpouseSliderFromStore(newSliderMonths);
+      const currentEpoch = $spouse.birthdate
+        .dateAtSsaAge(new MonthDuration(spouseSliderSnapshot_))
+        .monthsSinceEpoch();
+      if ($spouseFilingDate.monthsSinceEpoch() !== currentEpoch) {
+        const ageAtFiling = $spouse.birthdate.ageAtSsaDate($spouseFilingDate);
+        spouseCtx_.sliderMonths = ageAtFiling.asMonths();
       }
     }
-  }
-
-  async function syncRecipientSliderFromStore(newSliderMonths: number) {
-    updatingRecipientFromStore_ = true;
-    await tick();
-    recipientCtx_.sliderMonths = newSliderMonths;
-    await tick();
-    updatingRecipientFromStore_ = false;
-  }
-
-  async function syncSpouseSliderFromStore(newSliderMonths: number) {
-    updatingSpouseFromStore_ = true;
-    await tick();
-    spouseCtx_.sliderMonths = newSliderMonths;
-    await tick();
-    updatingSpouseFromStore_ = false;
   }
 
   function onClick(event: MouseEvent) {

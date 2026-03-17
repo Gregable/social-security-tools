@@ -175,9 +175,28 @@ export const isStuck = derived(
   ([$first, $second]) => $first || $second
 );
 
-// Filing dates as Svelte stores for proper reactivity
-export const recipientFilingDate = writable<MonthDate | null>(null);
-export const spouseFilingDate = writable<MonthDate | null>(null);
+// Filing dates as Svelte stores for proper reactivity.
+// Uses a deduplicating store that only notifies subscribers when the
+// epoch value actually changes, preventing cross-chart ping-pong where
+// multiple charts bidirectionally sync with the same store.
+function monthDateStore() {
+  const { subscribe, set: rawSet } = writable<MonthDate | null>(null);
+  let currentEpoch: number | null = null;
+
+  return {
+    subscribe,
+    set(value: MonthDate | null) {
+      const newEpoch = value?.monthsSinceEpoch() ?? null;
+      if (newEpoch !== currentEpoch) {
+        currentEpoch = newEpoch;
+        rawSet(value);
+      }
+    },
+  };
+}
+
+export const recipientFilingDate = monthDateStore();
+export const spouseFilingDate = monthDateStore();
 
 // Derived store for higher earner's filing date.
 // Depends on recipient/spouse stores so it re-evaluates when they change.
