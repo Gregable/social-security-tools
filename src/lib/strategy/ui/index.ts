@@ -1,7 +1,6 @@
 // UI utility functions
 
 export type {
-  CellPosition,
   CellSelectionDetail,
   StrategyResult,
 } from './calculation-results.js';
@@ -19,7 +18,7 @@ export {
   getFilingDate,
   parseBirthdate,
 } from './formatting.js';
-export type { DeathAgeBucket } from './grid-sizing.js';
+export type { CellPosition, DeathAgeBucket } from './grid-sizing.js';
 export {
   calculateAgeRangePercentages,
   calculateGridTemplates,

@@ -272,8 +272,8 @@
   }
   function handleCellSelect(detail: CellSelectionDetail) {
     calculationResults.setSelectedByLabels(
-      String(detail.deathAge1),
-      String(detail.deathAge2)
+      detail.deathAge1,
+      detail.deathAge2
     );
     calculationResultsStore.set(calculationResults);
   }
