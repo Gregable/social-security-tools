@@ -21,6 +21,10 @@ export class RecipientContext {
   // Tick marks for the slider, including NRA labels.
   ticks: TickItem[] = [];
 
+  constructor(recipient: Recipient) {
+    this.r = recipient;
+  }
+
   startDate(): MonthDate {
     return this.r.birthdate.dateAtSsaAge(new MonthDuration(this.userFloor));
   }
@@ -91,6 +95,7 @@ export function updateSlider(personCtx: RecipientContext): void {
       });
     }
   }
+  // Self-assign to trigger Svelte reactivity (Svelte 4 requires assignment to detect changes)
   // eslint-disable-next-line no-self-assign
   personCtx.ticks = personCtx.ticks;
 }

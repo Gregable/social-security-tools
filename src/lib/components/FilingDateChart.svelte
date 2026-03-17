@@ -4,6 +4,7 @@ import { onMount, tick } from 'svelte';
 import type { Birthdate } from '$lib/birthday';
 import { benefitOnDate } from '$lib/benefit-calculator';
 import {
+  type ChartLayout,
   type TickItem,
   translateSliderLabel,
 } from '$lib/components/chart-utils';
@@ -14,7 +15,6 @@ import { Recipient } from '$lib/recipient';
 import RecipientName from './RecipientName.svelte';
 import Slider from './Slider.svelte';
 import {
-  type FilingDateLayout,
   dateX,
   maxRenderedYDollars,
 } from './filing-date-chart-math';
@@ -99,7 +99,7 @@ let reservedRight_: number = 0;
 
 let blueish_ = '#337ab7';
 
-function layout(): FilingDateLayout {
+function layout(): ChartLayout {
   return {
     canvasWidth: canvasEl_.width,
     canvasHeight: canvasEl_.height,

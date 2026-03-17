@@ -1,4 +1,5 @@
 import { allBenefitsOnDate as allBenefitsOnDate_ } from '$lib/benefit-calculator';
+import type { ChartLayout } from '$lib/components/chart-utils';
 import type { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
@@ -6,17 +7,6 @@ import {
   type RecipientContext,
   userSelectedDate,
 } from './combined-chart-context';
-
-/**
- * Layout geometry for the combined chart canvas.
- */
-export interface CombinedChartLayout {
-  canvasWidth: number;
-  canvasHeight: number;
-  reservedLeft: number;
-  reservedTop: number;
-  reservedBottom: number;
-}
 
 // Width in pixels for the compressed gap region when there's a large age difference
 export const COMPRESSED_GAP_WIDTH = 36;
@@ -103,7 +93,7 @@ export function canvasX(
   date: MonthDate,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): number {
   const [startDate, endDate] = dateRange(recipient, spouse);
   const gap = getGapInfo(recipient, spouse);
@@ -158,7 +148,7 @@ export function dateX(
   x: number,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): MonthDate {
   const [startDate, endDate] = dateRange(recipient, spouse);
   const gap = getGapInfo(recipient, spouse);
@@ -218,7 +208,7 @@ export function canvasY(
   benefitY: Money,
   maxY: Money,
   minY: Money,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): number {
   const chartHeight =
     layout.canvasHeight - layout.reservedTop - layout.reservedBottom;
@@ -244,15 +234,15 @@ export function canvasY(
  * Returns the max benefit for the first recipient at their age 70.
  */
 export function maxRenderedYDollars(
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext
 ): Money {
-  const recipientAge70 = recipientCtx.r.birthdate.dateAtSsaAge(
+  const recipientAge70 = firstCtx.r.birthdate.dateAtSsaAge(
     MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
   );
   return allBenefitsOnDate_(
-    recipientCtx.r,
-    spouseCtx.r,
+    firstCtx.r,
+    secondCtx.r,
     recipientAge70,
     recipientAge70,
     recipientAge70
@@ -263,15 +253,15 @@ export function maxRenderedYDollars(
  * Returns the max benefit for the second recipient at their age 70.
  */
 export function minRenderedYDollars(
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext
 ): Money {
-  const spouseAge70 = spouseCtx.r.birthdate.dateAtSsaAge(
+  const spouseAge70 = secondCtx.r.birthdate.dateAtSsaAge(
     MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
   );
   return allBenefitsOnDate_(
-    spouseCtx.r,
-    recipientCtx.r,
+    secondCtx.r,
+    firstCtx.r,
     spouseAge70,
     spouseAge70,
     spouseAge70
@@ -280,12 +270,14 @@ export function minRenderedYDollars(
 
 /**
  * Returns all benefits on a given date, including spousal benefits.
- * Resolves which context is self vs spouse based on personCtx.r.first.
+ * `personCtx` is the person whose benefit we're computing (always either
+ * `firstCtx` or `secondCtx`). The function uses `personCtx.r.first` to
+ * determine which context is self vs spouse for the filing date lookup.
  */
 export function allBenefitsOnDate(
   personCtx: RecipientContext,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
   atDate: MonthDate,
   selfFilingDate: MonthDate = new MonthDate(0)
 ): Money {
@@ -293,14 +285,14 @@ export function allBenefitsOnDate(
   let spouse: Recipient;
   if (personCtx.r.first) {
     if (selfFilingDate.monthsSinceEpoch() === 0)
-      selfFilingDate = userSelectedDate(recipientCtx);
-    spouseFilingDate = userSelectedDate(spouseCtx);
-    spouse = spouseCtx.r;
+      selfFilingDate = userSelectedDate(firstCtx);
+    spouseFilingDate = userSelectedDate(secondCtx);
+    spouse = secondCtx.r;
   } else {
     if (selfFilingDate.monthsSinceEpoch() === 0)
-      selfFilingDate = userSelectedDate(spouseCtx);
-    spouseFilingDate = userSelectedDate(recipientCtx);
-    spouse = recipientCtx.r;
+      selfFilingDate = userSelectedDate(secondCtx);
+    spouseFilingDate = userSelectedDate(firstCtx);
+    spouse = firstCtx.r;
   }
 
   return allBenefitsOnDate_(

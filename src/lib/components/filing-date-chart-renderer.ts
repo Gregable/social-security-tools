@@ -1,5 +1,6 @@
 import { benefitOnDate } from '$lib/benefit-calculator';
 import {
+  type ChartLayout,
   dollarLineIncrement,
   renderHorizontalLine,
   renderTextInWhiteBox,
@@ -11,7 +12,6 @@ import {
   canvasX,
   canvasY,
   dateX,
-  type FilingDateLayout,
   maxRenderedYDollars,
 } from './filing-date-chart-math';
 
@@ -21,7 +21,7 @@ import {
 export function renderHorizontalLines(
   ctx: CanvasRenderingContext2D,
   recipient: Recipient,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): void {
   const maxY = maxRenderedYDollars(recipient);
 
@@ -57,7 +57,7 @@ export function renderHorizontalLines(
 export function renderYearVerticalLines(
   ctx: CanvasRenderingContext2D,
   recipient: Recipient,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): void {
   const maxY = maxRenderedYDollars(recipient);
   const birthdate = recipient.birthdate;
@@ -121,7 +121,7 @@ export function renderYearVerticalLines(
 export function benefitBoxes(
   recipient: Recipient,
   selectedDate: MonthDate,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): Array<[number, number, Money]> {
   const maxY = maxRenderedYDollars(recipient);
   const birthdate = recipient.birthdate;
@@ -159,7 +159,7 @@ export function renderFilingDateBenefitBoxes(
   ctx: CanvasRenderingContext2D,
   boxes: Array<[number, number, Money]>,
   recipient: Recipient,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): void {
   const maxY = maxRenderedYDollars(recipient);
 
@@ -206,7 +206,7 @@ export function renderBenefitLabels(
   ctx: CanvasRenderingContext2D,
   boxes: Array<[number, number, Money]>,
   recipient: Recipient,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): void {
   const maxY = maxRenderedYDollars(recipient);
 
@@ -281,7 +281,7 @@ export function renderTrendline(
   ctx: CanvasRenderingContext2D,
   recipient: Recipient,
   userFloor: number,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): void {
   const maxY = maxRenderedYDollars(recipient);
   const birthdate = recipient.birthdate;
@@ -323,7 +323,7 @@ export function renderBenefit(
   recipient: Recipient,
   selectedDate: MonthDate,
   userFloor: number,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): void {
   const boxes = benefitBoxes(recipient, selectedDate, layout);
   renderFilingDateBenefitBoxes(ctx, boxes, recipient, layout);
@@ -338,7 +338,7 @@ export function renderSelectedDateVerticalLine(
   ctx: CanvasRenderingContext2D,
   mouseX: number,
   recipient: Recipient,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): void {
   if (mouseX <= 0 || mouseX >= layout.canvasWidth) return;
 

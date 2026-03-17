@@ -2,6 +2,17 @@ import { Money } from '$lib/money';
 import { MonthDuration } from '$lib/month-time';
 
 /**
+ * Layout geometry shared by all canvas chart components.
+ */
+export interface ChartLayout {
+  canvasWidth: number;
+  canvasHeight: number;
+  reservedLeft: number;
+  reservedTop: number;
+  reservedBottom: number;
+}
+
+/**
  * Tick mark configuration for sliders.
  */
 export interface TickItem {

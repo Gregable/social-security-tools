@@ -1,19 +1,9 @@
 import { benefitAtAge } from '$lib/benefit-calculator';
 import type { Birthdate } from '$lib/birthday';
+import type { ChartLayout } from '$lib/components/chart-utils';
 import type { Money } from '$lib/money';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
-
-/**
- * Layout geometry for the filing date chart canvas.
- */
-export interface FilingDateLayout {
-  canvasWidth: number;
-  canvasHeight: number;
-  reservedLeft: number;
-  reservedTop: number;
-  reservedBottom: number;
-}
 
 /**
  * Returns the maximum dollars displayed on the chart (benefit at age 70).
@@ -29,7 +19,7 @@ export function maxRenderedYDollars(recipient: Recipient): Money {
 export function canvasX(
   date: MonthDate,
   birthdate: Birthdate,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): number {
   const startDate = birthdate.dateAtSsaAge(
     MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
@@ -52,7 +42,7 @@ export function canvasX(
 export function dateX(
   x: number,
   birthdate: Birthdate,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): MonthDate {
   const startDate = birthdate.dateAtSsaAge(
     MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
@@ -84,7 +74,7 @@ export function dateX(
 export function canvasY(
   benefitY: Money,
   maxY: Money,
-  layout: FilingDateLayout
+  layout: ChartLayout
 ): number {
   const chartHeight =
     layout.canvasHeight - layout.reservedTop - layout.reservedBottom;

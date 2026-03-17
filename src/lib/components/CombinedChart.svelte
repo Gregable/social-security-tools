@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { translateSliderLabel } from "$lib/components/chart-utils";
+  import { type ChartLayout, translateSliderLabel } from "$lib/components/chart-utils";
   import { recipientFilingDate, spouseFilingDate } from "$lib/context";
   import { activeIntegration } from "$lib/integrations/context";
   import { Money } from "$lib/money";
@@ -15,7 +15,6 @@
     userSelectedDate,
   } from "./combined-chart-context";
   import {
-    type CombinedChartLayout,
     allBenefitsOnDate,
     canvasX,
     dateX,
@@ -31,9 +30,9 @@
   export let recipient: Recipient = new Recipient();
   export let spouse: Recipient = new Recipient();
 
-  let recipientCtx_ = new RecipientContext();
+  let recipientCtx_ = new RecipientContext($recipient);
   $: recipientCtx_.r = $recipient;
-  let spouseCtx_ = new RecipientContext();
+  let spouseCtx_ = new RecipientContext($spouse);
   $: spouseCtx_.r = $spouse;
 
   let mounted_: boolean = false;
@@ -63,7 +62,7 @@
   let reservedRightRecipient_: number = reservedRight_;
   let reservedRightSpouse_: number = reservedRight_;
 
-  function layout(): CombinedChartLayout {
+  function layout(): ChartLayout {
     return {
       canvasWidth: canvasEl_.width,
       canvasHeight: canvasEl_.height,

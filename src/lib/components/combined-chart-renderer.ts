@@ -1,4 +1,5 @@
 import {
+  type ChartLayout,
   dollarLineIncrement,
   renderHorizontalLine,
   renderTextInWhiteBox,
@@ -10,7 +11,6 @@ import type { RecipientContext } from './combined-chart-context';
 import { userSelectedDate } from './combined-chart-context';
 import {
   allBenefitsOnDate,
-  type CombinedChartLayout,
   canvasX,
   canvasY,
   dateRange,
@@ -26,12 +26,12 @@ import {
  */
 export function renderHorizontalLines(
   ctx: CanvasRenderingContext2D,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
-  layout: CombinedChartLayout
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
+  layout: ChartLayout
 ): void {
-  const maxY = maxRenderedYDollars(recipientCtx, spouseCtx);
-  const minY = minRenderedYDollars(recipientCtx, spouseCtx);
+  const maxY = maxRenderedYDollars(firstCtx, secondCtx);
+  const minY = minRenderedYDollars(firstCtx, secondCtx);
 
   ctx.save();
   ctx.strokeStyle = '#BBB';
@@ -42,7 +42,7 @@ export function renderHorizontalLines(
   renderHorizontalLine(
     ctx,
     Money.from(0),
-    canvasY(recipientCtx, Money.from(0), maxY, minY, layout),
+    canvasY(firstCtx, Money.from(0), maxY, minY, layout),
     layout.canvasWidth
   );
 
@@ -59,7 +59,7 @@ export function renderHorizontalLines(
     renderHorizontalLine(
       ctx,
       i,
-      canvasY(recipientCtx, i, maxY, minY, layout),
+      canvasY(firstCtx, i, maxY, minY, layout),
       layout.canvasWidth
     );
   }
@@ -68,7 +68,7 @@ export function renderHorizontalLines(
     renderHorizontalLine(
       ctx,
       i,
-      canvasY(spouseCtx, i, maxY, minY, layout),
+      canvasY(secondCtx, i, maxY, minY, layout),
       layout.canvasWidth
     );
   }
@@ -84,7 +84,7 @@ function renderGapIndicator(
   gap: GapInfo,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): void {
   const gapStartX = canvasX(gap.gapStartDate, recipient, spouse, layout);
   const gapEndX = canvasX(gap.gapEndDate, recipient, spouse, layout);
@@ -123,7 +123,7 @@ export function renderYearVerticalLines(
   ctx: CanvasRenderingContext2D,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): void {
   ctx.save();
   ctx.strokeStyle = '#666';
@@ -212,23 +212,18 @@ export function renderYearVerticalLines(
  */
 export function benefitBoxes(
   personCtx: RecipientContext,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): Array<[number, number, Money]> {
-  const maxY = maxRenderedYDollars(recipientCtx, spouseCtx);
-  const minY = minRenderedYDollars(recipientCtx, spouseCtx);
+  const maxY = maxRenderedYDollars(firstCtx, secondCtx);
+  const minY = minRenderedYDollars(firstCtx, secondCtx);
   const selectedDate = userSelectedDate(personCtx);
 
   const boxes: Array<[number, number, Money]> = [];
-  let benefit = allBenefitsOnDate(
-    personCtx,
-    recipientCtx,
-    spouseCtx,
-    selectedDate
-  );
+  let benefit = allBenefitsOnDate(personCtx, firstCtx, secondCtx, selectedDate);
   boxes.push([
     canvasX(selectedDate, recipient, spouse, layout),
     canvasY(personCtx, benefit, maxY, minY, layout),
@@ -243,8 +238,8 @@ export function benefitBoxes(
   ) {
     const all = allBenefitsOnDate(
       personCtx,
-      recipientCtx,
-      spouseCtx,
+      firstCtx,
+      secondCtx,
       i,
       selectedDate
     );
@@ -295,12 +290,12 @@ function renderName(
   ctx: CanvasRenderingContext2D,
   boxes: Array<[number, number, Money]>,
   personCtx: RecipientContext,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
-  layout: CombinedChartLayout
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
+  layout: ChartLayout
 ): void {
-  const maxY = maxRenderedYDollars(recipientCtx, spouseCtx);
-  const minY = minRenderedYDollars(recipientCtx, spouseCtx);
+  const maxY = maxRenderedYDollars(firstCtx, secondCtx);
+  const minY = minRenderedYDollars(firstCtx, secondCtx);
   const zeroLineY = canvasY(personCtx, Money.from(0), maxY, minY, layout);
 
   const nameBox = bestBoxForName(boxes, zeroLineY, layout.canvasWidth);
@@ -349,12 +344,12 @@ export function renderFilingDateBenefitBoxes(
   ctx: CanvasRenderingContext2D,
   boxes: Array<[number, number, Money]>,
   personCtx: RecipientContext,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
-  layout: CombinedChartLayout
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
+  layout: ChartLayout
 ): void {
-  const maxY = maxRenderedYDollars(recipientCtx, spouseCtx);
-  const minY = minRenderedYDollars(recipientCtx, spouseCtx);
+  const maxY = maxRenderedYDollars(firstCtx, secondCtx);
+  const minY = minRenderedYDollars(firstCtx, secondCtx);
 
   ctx.save();
   ctx.strokeStyle = personCtx.r.colors().medium;
@@ -379,7 +374,7 @@ export function renderFilingDateBenefitBoxes(
   ctx.stroke();
   ctx.restore();
 
-  renderName(ctx, boxes, personCtx, recipientCtx, spouseCtx, layout);
+  renderName(ctx, boxes, personCtx, firstCtx, secondCtx, layout);
 }
 
 /**
@@ -390,12 +385,12 @@ export function renderBenefitLabels(
   ctx: CanvasRenderingContext2D,
   boxes: Array<[number, number, Money]>,
   personCtx: RecipientContext,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
-  layout: CombinedChartLayout
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
+  layout: ChartLayout
 ): void {
-  const maxY = maxRenderedYDollars(recipientCtx, spouseCtx);
-  const minY = minRenderedYDollars(recipientCtx, spouseCtx);
+  const maxY = maxRenderedYDollars(firstCtx, secondCtx);
+  const minY = minRenderedYDollars(firstCtx, secondCtx);
 
   ctx.save();
   ctx.fillStyle = personCtx.r.colors().dark;
@@ -438,7 +433,7 @@ export function renderBenefitLabels(
     const boxMinX = boxIt === 0 ? layout.reservedLeft : boxes[boxIt - 1][0];
     const boxMaxY =
       boxIt === 0
-        ? canvasY(recipientCtx, Money.from(0), maxY, minY, layout)
+        ? canvasY(firstCtx, Money.from(0), maxY, minY, layout)
         : boxes[boxIt - 1][1];
 
     horizSpace = boxX - boxMinX;
@@ -496,14 +491,14 @@ export function renderBenefitLabels(
 export function renderTrendline(
   ctx: CanvasRenderingContext2D,
   personCtx: RecipientContext,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): void {
-  const maxY = maxRenderedYDollars(recipientCtx, spouseCtx);
-  const minY = minRenderedYDollars(recipientCtx, spouseCtx);
+  const maxY = maxRenderedYDollars(firstCtx, secondCtx);
+  const minY = minRenderedYDollars(firstCtx, secondCtx);
 
   ctx.save();
   ctx.strokeStyle = personCtx.r.colors().medium;
@@ -518,13 +513,7 @@ export function renderTrendline(
     i = i.addDuration(new MonthDuration(1))
   ) {
     const thisX = canvasX(i, recipient, spouse, layout);
-    const yDollars = allBenefitsOnDate(
-      personCtx,
-      recipientCtx,
-      spouseCtx,
-      i,
-      i
-    );
+    const yDollars = allBenefitsOnDate(personCtx, firstCtx, secondCtx, i, i);
     const thisY = canvasY(personCtx, yDollars, maxY, minY, layout);
     if (i.monthsSinceEpoch() === startDate.monthsSinceEpoch()) {
       ctx.moveTo(thisX, thisY);
@@ -543,16 +532,16 @@ export function renderTrendline(
 export function renderBenefit(
   ctx: CanvasRenderingContext2D,
   personCtx: RecipientContext,
-  recipientCtx: RecipientContext,
-  spouseCtx: RecipientContext,
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): void {
   const boxes = benefitBoxes(
     personCtx,
-    recipientCtx,
-    spouseCtx,
+    firstCtx,
+    secondCtx,
     recipient,
     spouse,
     layout
@@ -561,20 +550,20 @@ export function renderBenefit(
     ctx,
     boxes,
     personCtx,
-    recipientCtx,
-    spouseCtx,
+    firstCtx,
+    secondCtx,
     layout
   );
   renderTrendline(
     ctx,
     personCtx,
-    recipientCtx,
-    spouseCtx,
+    firstCtx,
+    secondCtx,
     recipient,
     spouse,
     layout
   );
-  renderBenefitLabels(ctx, boxes, personCtx, recipientCtx, spouseCtx, layout);
+  renderBenefitLabels(ctx, boxes, personCtx, firstCtx, secondCtx, layout);
 }
 
 /**
@@ -585,7 +574,7 @@ export function renderSelectedDateVerticalLine(
   mouseX: number,
   recipient: Recipient,
   spouse: Recipient,
-  layout: CombinedChartLayout
+  layout: ChartLayout
 ): void {
   if (mouseX <= 0 || mouseX >= layout.canvasWidth) return;
   ctx.save();
