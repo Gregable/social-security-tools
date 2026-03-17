@@ -56,10 +56,12 @@ export function saveSession(demo: boolean = false): void {
 
   try {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    isDemo.set(demo);
   } catch (e) {
     console.error('Failed to save session:', e);
   }
+
+  // Always update in-memory state regardless of storage success
+  isDemo.set(demo);
 }
 
 /**
@@ -80,32 +82,42 @@ export function restoreSession(): boolean {
       return false;
     }
 
+    // Deserialize everything into locals first so stores are only
+    // updated atomically after all deserialization succeeds.
     let restoredRecipient: Recipient | null = null;
+    let restoredSpouse: Recipient | null = null;
+    let restoredRecipientFiling: MonthDate | null = null;
+    let restoredSpouseFiling: MonthDate | null = null;
 
     if (session.recipient) {
       restoredRecipient = Recipient.deserialize(session.recipient);
       if (session.spouse) {
         restoredRecipient.markFirst();
       }
-      recipient.set(restoredRecipient);
     }
 
     if (session.spouse) {
-      const restoredSpouse = Recipient.deserialize(session.spouse);
+      restoredSpouse = Recipient.deserialize(session.spouse);
       restoredSpouse.markSecond();
-      spouse.set(restoredSpouse);
     }
 
-    if (session.recipientFilingMonthsSinceEpoch !== null) {
-      recipientFilingDate.set(
-        new MonthDate(session.recipientFilingMonthsSinceEpoch)
+    if (typeof session.recipientFilingMonthsSinceEpoch === 'number') {
+      restoredRecipientFiling = new MonthDate(
+        session.recipientFilingMonthsSinceEpoch
       );
     }
 
-    if (session.spouseFilingMonthsSinceEpoch !== null) {
-      spouseFilingDate.set(new MonthDate(session.spouseFilingMonthsSinceEpoch));
+    if (typeof session.spouseFilingMonthsSinceEpoch === 'number') {
+      restoredSpouseFiling = new MonthDate(
+        session.spouseFilingMonthsSinceEpoch
+      );
     }
 
+    // All deserialization succeeded -- commit to stores
+    recipient.set(restoredRecipient);
+    spouse.set(restoredSpouse);
+    recipientFilingDate.set(restoredRecipientFiling);
+    spouseFilingDate.set(restoredSpouseFiling);
     isDemo.set(session.isDemo);
     return restoredRecipient !== null;
   } catch (e) {

@@ -45,6 +45,7 @@ import {
   recipientFilingDate,
   restoreSession,
   saveSession,
+  setHigherEarnerFilingDate,
   spouse,
   spouseFilingDate,
 } from '$lib/context';
@@ -289,6 +290,30 @@ describe('Context session management', () => {
       expect(sessionStorageMock.removeItem).toHaveBeenCalled();
     });
 
+    it('rejects v1 session data (missing filing date fields)', () => {
+      const v1SessionData = {
+        recipient: {
+          birthdate: { year: 1965, month: 0, day: 1 },
+          name: 'V1 User',
+          gender: 'blended',
+          healthMultiplier: 1.0,
+          isPiaOnly: false,
+          overridePiaCents: null,
+          earningsRecords: [],
+        },
+        spouse: null,
+        isDemo: false,
+        version: 1,
+      };
+      mockSessionStorage['ssa-tools-session'] = JSON.stringify(v1SessionData);
+
+      const result = restoreSession();
+
+      expect(result).toBe(false);
+      expect(get(recipient)).toBeNull();
+      expect(sessionStorageMock.removeItem).toHaveBeenCalled();
+    });
+
     it('handles corrupted data gracefully', () => {
       mockSessionStorage['ssa-tools-session'] = 'not valid json';
 
@@ -401,6 +426,30 @@ describe('Context session management', () => {
       );
     });
 
+    it('returns spouse filing date when spouse earns more', () => {
+      const r = new Recipient();
+      r.birthdate = Birthdate.FromYMD(1965, 0, 1);
+      r.setPia(Money.from(1000));
+      r.markFirst();
+
+      const s = new Recipient();
+      s.birthdate = Birthdate.FromYMD(1965, 0, 1);
+      s.setPia(Money.from(3000));
+      s.markSecond();
+
+      recipient.set(r);
+      spouse.set(s);
+
+      const rDate = MonthDate.initFromYearsMonths({ years: 2032, months: 0 });
+      const sDate = MonthDate.initFromYearsMonths({ years: 2033, months: 6 });
+      recipientFilingDate.set(rDate);
+      spouseFilingDate.set(sDate);
+
+      expect(get(higherEarnerFilingDate)?.monthsSinceEpoch()).toBe(
+        sDate.monthsSinceEpoch()
+      );
+    });
+
     it('re-evaluates when recipient store changes', () => {
       // Start with no recipients
       expect(get(higherEarnerFilingDate)).toBeNull();
@@ -431,6 +480,63 @@ describe('Context session management', () => {
       // Clear recipient - should go back to null
       recipient.set(null);
       expect(get(higherEarnerFilingDate)).toBeNull();
+    });
+  });
+
+  describe('setHigherEarnerFilingDate', () => {
+    it('sets recipient filing date when recipient earns more', () => {
+      const r = new Recipient();
+      r.birthdate = Birthdate.FromYMD(1965, 0, 1);
+      r.setPia(Money.from(3000));
+      r.markFirst();
+
+      const s = new Recipient();
+      s.birthdate = Birthdate.FromYMD(1965, 0, 1);
+      s.setPia(Money.from(1000));
+      s.markSecond();
+
+      recipient.set(r);
+      spouse.set(s);
+
+      const date = MonthDate.initFromYearsMonths({ years: 2032, months: 0 });
+      setHigherEarnerFilingDate(date);
+
+      expect(get(recipientFilingDate)?.monthsSinceEpoch()).toBe(
+        date.monthsSinceEpoch()
+      );
+      expect(get(spouseFilingDate)).toBeNull();
+    });
+
+    it('sets spouse filing date when spouse earns more', () => {
+      const r = new Recipient();
+      r.birthdate = Birthdate.FromYMD(1965, 0, 1);
+      r.setPia(Money.from(1000));
+      r.markFirst();
+
+      const s = new Recipient();
+      s.birthdate = Birthdate.FromYMD(1965, 0, 1);
+      s.setPia(Money.from(3000));
+      s.markSecond();
+
+      recipient.set(r);
+      spouse.set(s);
+
+      const date = MonthDate.initFromYearsMonths({ years: 2033, months: 6 });
+      setHigherEarnerFilingDate(date);
+
+      expect(get(spouseFilingDate)?.monthsSinceEpoch()).toBe(
+        date.monthsSinceEpoch()
+      );
+      expect(get(recipientFilingDate)).toBeNull();
+    });
+
+    it('is a no-op when recipient or spouse is null', () => {
+      const date = MonthDate.initFromYearsMonths({ years: 2032, months: 0 });
+
+      setHigherEarnerFilingDate(date);
+
+      expect(get(recipientFilingDate)).toBeNull();
+      expect(get(spouseFilingDate)).toBeNull();
     });
   });
 
@@ -496,27 +602,45 @@ describe('Context session management', () => {
     it('saves and restores filing dates', () => {
       const r = new Recipient();
       r.birthdate = Birthdate.FromYMD(1965, 0, 1);
+      r.markFirst();
       recipient.set(r);
 
-      const filingDate = MonthDate.initFromYearsMonths({
+      const s = new Recipient();
+      s.birthdate = Birthdate.FromYMD(1967, 0, 1);
+      s.markSecond();
+      spouse.set(s);
+
+      const rFiling = MonthDate.initFromYearsMonths({
         years: 2032,
         months: 3,
       });
-      recipientFilingDate.set(filingDate);
+      const sFiling = MonthDate.initFromYearsMonths({
+        years: 2034,
+        months: 9,
+      });
+      recipientFilingDate.set(rFiling);
+      spouseFilingDate.set(sFiling);
 
       saveSession();
 
       // Clear
       recipient.set(null);
+      spouse.set(null);
       recipientFilingDate.set(null);
+      spouseFilingDate.set(null);
 
       // Restore
       restoreSession();
 
-      const restored = get(recipientFilingDate);
-      expect(restored).not.toBeNull();
-      expect(restored!.year()).toBe(2032);
-      expect(restored!.monthIndex()).toBe(3);
+      const restoredR = get(recipientFilingDate);
+      expect(restoredR).not.toBeNull();
+      expect(restoredR!.year()).toBe(2032);
+      expect(restoredR!.monthIndex()).toBe(3);
+
+      const restoredS = get(spouseFilingDate);
+      expect(restoredS).not.toBeNull();
+      expect(restoredS!.year()).toBe(2034);
+      expect(restoredS!.monthIndex()).toBe(9);
     });
   });
 });
