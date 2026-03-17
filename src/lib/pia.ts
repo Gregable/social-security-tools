@@ -1,6 +1,19 @@
+import type { Birthdate } from './birthday';
 import * as constants from './constants';
 import { Money } from './money';
-import type { Recipient } from './recipient';
+
+/**
+ * The subset of recipient data needed for PIA calculation.
+ * Recipient implements this interface, but tests can pass a plain object.
+ */
+export interface PiaInput {
+  isPiaOnly: boolean;
+  overridePia: Money | null;
+  indexingYear(): number;
+  birthdate: Birthdate;
+  monthlyIndexedEarnings(): Money;
+  isEligible(): boolean;
+}
 
 /**
  * A PrimaryInsuranceAmount object manages calculating the user's Primary
@@ -17,15 +30,10 @@ import type { Recipient } from './recipient';
  *   have been applied to benefits
  */
 export class PrimaryInsuranceAmount {
-  /**
-   * The recipient for whom the PIA is being calculated.
-   * Contains all the personal information and earnings history needed for PIA.
-   * @private
-   */
-  private recipient_: Recipient;
+  private input_: PiaInput;
 
-  constructor(recipient: Recipient) {
-    this.recipient_ = recipient;
+  constructor(input: PiaInput) {
+    this.input_ = input;
   }
 
   /**
@@ -41,7 +49,7 @@ export class PrimaryInsuranceAmount {
     // If the indexing year is beyond the WAGE_INDICES data range, use the
     // maximum year in the data range.
     const effectiveIndexingYear = Math.min(
-      this.recipient_.indexingYear(),
+      this.input_.indexingYear(),
       constants.MAX_WAGE_INDEX_YEAR
     );
     const wage_in_1977: Money = constants.WAGE_INDICES[1977];
@@ -91,15 +99,15 @@ export class PrimaryInsuranceAmount {
     if (bracket !== 0 && bracket !== 1 && bracket !== 2) {
       throw new Error(`Invalid bracket: ${bracket}`);
     }
-    if (this.recipient_.isPiaOnly) {
+    if (this.input_.isPiaOnly) {
       throw new Error('Cannot calculate PIA brackets for PIA-only recipient');
     }
     // If the recipient is not eligible for benefits, return $0.
-    if (!this.recipient_.isEligible()) {
+    if (!this.input_.isEligible()) {
       return Money.from(0);
     }
 
-    const aime = this.recipient_.monthlyIndexedEarnings().roundToDollar();
+    const aime = this.input_.monthlyIndexedEarnings().roundToDollar();
     const firstBend = this.firstBendPoint();
     const secondBend = this.secondBendPoint();
 
@@ -129,7 +137,7 @@ export class PrimaryInsuranceAmount {
    * @throws {Error} If recipient is PIA-only
    */
   primaryInsuranceAmountUnadjusted(): Money {
-    if (this.recipient_.isPiaOnly) {
+    if (this.input_.isPiaOnly) {
       throw new Error('Cannot calculate unadjusted PIA for PIA-only recipient');
     }
     let sum = Money.from(0);
@@ -150,8 +158,8 @@ export class PrimaryInsuranceAmount {
    * @returns {Money} The final PIA amount after all applicable COLA adjustments
    */
   primaryInsuranceAmount(): Money {
-    if (this.recipient_.isPiaOnly) {
-      return this.recipient_.overridePia;
+    if (this.input_.isPiaOnly) {
+      return this.input_.overridePia;
     }
 
     const pia = this.primaryInsuranceAmountUnadjusted();
@@ -218,7 +226,7 @@ export class PrimaryInsuranceAmount {
   private applyColaAdjustments(pia: Money): Money {
     let adjusted = pia;
     for (
-      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+      let year = this.input_.birthdate.yearTurningSsaAge(62);
       year <= this.lastAppliedColaYear();
       ++year
     ) {
@@ -241,7 +249,7 @@ export class PrimaryInsuranceAmount {
    */
   shouldAdjustForCOLA(): boolean {
     return (
-      this.recipient_.birthdate.yearTurningSsaAge(62) <= constants.MAX_COLA_YEAR
+      this.input_.birthdate.yearTurningSsaAge(62) <= constants.MAX_COLA_YEAR
     );
   }
 
@@ -261,7 +269,7 @@ export class PrimaryInsuranceAmount {
 
     const adjustments: Array<ColaAdjustment> = [];
     for (
-      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+      let year = this.input_.birthdate.yearTurningSsaAge(62);
       year <= constants.CURRENT_YEAR;
       ++year
     ) {

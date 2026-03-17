@@ -1,10 +1,58 @@
 import { describe, expect, it } from 'vitest';
 import { Birthdate } from '$lib/birthday';
+import { Money } from '$lib/money';
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
+import { type PiaInput, PrimaryInsuranceAmount } from '$lib/pia';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
 
 import * as constants from '../lib/constants';
+
+describe('PrimaryInsuranceAmount with PiaInput', () => {
+  it('calculates bend points from a plain object', () => {
+    const input: PiaInput = {
+      isPiaOnly: false,
+      overridePia: null,
+      indexingYear: () => 2017,
+      birthdate: Birthdate.FromYMD(1957, 0, 2),
+      monthlyIndexedEarnings: () => Money.from(0),
+      isEligible: () => false,
+    };
+    const pia = new PrimaryInsuranceAmount(input);
+    expect(pia.firstBendPoint().value()).toEqual(926);
+    expect(pia.secondBendPoint().value()).toEqual(5583);
+  });
+
+  it('calculates PIA from a plain object with earnings', () => {
+    const input: PiaInput = {
+      isPiaOnly: false,
+      overridePia: null,
+      indexingYear: () => 2017,
+      birthdate: Birthdate.FromYMD(1957, 0, 2),
+      monthlyIndexedEarnings: () => Money.from(3000),
+      isEligible: () => true,
+    };
+    const pia = new PrimaryInsuranceAmount(input);
+    // With AIME of $3000: 90% of $926 + 32% of ($3000-$926) = $833.4 + $663.68
+    // = $1497.0 (floored to dime)
+    expect(pia.primaryInsuranceAmountByBracket(0).value()).toEqual(833.4);
+    expect(pia.primaryInsuranceAmountByBracket(1).value()).toEqual(663.68);
+    expect(pia.primaryInsuranceAmountByBracket(2).value()).toEqual(0);
+  });
+
+  it('returns override PIA for PIA-only input', () => {
+    const input: PiaInput = {
+      isPiaOnly: true,
+      overridePia: Money.from(1500),
+      indexingYear: () => 2017,
+      birthdate: Birthdate.FromYMD(1957, 0, 2),
+      monthlyIndexedEarnings: () => Money.from(0),
+      isEligible: () => true,
+    };
+    const pia = new PrimaryInsuranceAmount(input);
+    expect(pia.primaryInsuranceAmount().value()).toEqual(1500);
+  });
+});
 
 describe('Recipient', () => {
   it('calculates bendpoints', () => {

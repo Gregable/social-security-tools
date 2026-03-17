@@ -8,7 +8,7 @@ import { EarningsManager } from '$lib/earnings-manager';
 import type { GenderOption } from '$lib/life-tables';
 import { Money } from '$lib/money';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
-import { PrimaryInsuranceAmount } from '$lib/pia';
+import { type PiaInput, PrimaryInsuranceAmount } from '$lib/pia';
 import { type RecipientColors, recipientColors } from '$lib/recipient-colors';
 
 export type { GenderOption };
@@ -37,7 +37,7 @@ export interface SerializedRecipient {
  * in benefit-calculator.ts. Earnings indexing and top-35 computation live
  * in EarningsManager.
  */
-export class Recipient {
+export class Recipient implements PiaInput {
   // ---------------------------------------------------------------------------
   // Health & Gender
   // ---------------------------------------------------------------------------
