@@ -251,6 +251,8 @@ export function maxRenderedYDollars(
 
 /**
  * Returns the max benefit for the second recipient at their age 70.
+ * Named "min" because this determines the downward extent of the split
+ * chart's Y-axis (the second recipient renders below the zero line).
  */
 export function minRenderedYDollars(
   firstCtx: RecipientContext,

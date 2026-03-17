@@ -2,7 +2,6 @@
   import { type ChartLayout, translateSliderLabel } from "$lib/components/chart-utils";
   import { recipientFilingDate, spouseFilingDate } from "$lib/context";
   import { activeIntegration } from "$lib/integrations/context";
-  import { Money } from "$lib/money";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
   import { onMount, tick } from "svelte";

@@ -126,7 +126,7 @@ export function renderBreakPoints(
   // Now lets show vertical bars indicating where the breakpoints live.
   ctx.save();
 
-  // Line between 1st and 2nd breakpoints:
+  // Vertical marker at the 1st breakpoint:
   ctx.beginPath();
   ctx.lineWidth = 0.5;
   dollarX = firstBend;
@@ -149,7 +149,7 @@ export function renderBreakPoints(
   );
   ctx.stroke();
 
-  // Line between 2nd and 3rd breakpoints:
+  // Vertical marker at the 2nd breakpoint:
   ctx.beginPath();
   ctx.lineWidth = 0.5;
   dollarX = secondBend;
@@ -177,7 +177,7 @@ export function renderBreakPoints(
   const textWidth = ctx.measureText('XX%').width / 2;
   ctx.fillStyle = '#78B';
 
-  // Compute the angle at which the chart dimensions are distoring slopes.
+  // Compute the angle at which the chart dimensions are distorting slopes.
   const chartAngle =
     (chartHeight / chartWidth) *
     bounds.maxRenderedXDollars.div$(bounds.maxRenderedYDollars);
@@ -325,7 +325,7 @@ export function renderEarningsPoint(
   lineTo(ctx, bounds.maxRenderedXDollars, y, bounds, chartWidth, chartHeight);
   ctx.stroke();
 
-  // White filled circle with black edge showing the user benefit point.
+  // Solid filled circle (same color as stroke) showing the user benefit point.
   ctx.setLineDash([]); // Disable the dashed line from above.
   ctx.fillStyle = ctx.strokeStyle;
 

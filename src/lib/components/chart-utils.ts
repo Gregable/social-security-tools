@@ -80,7 +80,7 @@ export function dollarLineIncrement(maxDollars: Money): Money {
 
 /**
  * Translation function for slider labels to map months to ages.
- * Shared by CombinedChart, FilingDateChart, and SurvivorReport.
+ * Shared by CombinedChart, FilingDateChart, and combined-chart-context.
  */
 export function translateSliderLabel(value: number, label: string): string {
   const age = new MonthDuration(value);
