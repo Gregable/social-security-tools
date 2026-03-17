@@ -1,6 +1,19 @@
+import type { Birthdate } from './birthday';
 import * as constants from './constants';
 import { Money } from './money';
-import type { Recipient } from './recipient';
+
+/**
+ * The subset of recipient data needed for PIA calculation.
+ * Recipient implements this interface, but tests can pass a plain object.
+ */
+export interface PiaInput {
+  readonly isPiaOnly: boolean;
+  readonly overridePia: Money | null;
+  readonly birthdate: Birthdate;
+  indexingYear(): number;
+  monthlyIndexedEarnings(): Money;
+  isEligible(): boolean;
+}
 
 /**
  * A PrimaryInsuranceAmount object manages calculating the user's Primary
@@ -17,15 +30,10 @@ import type { Recipient } from './recipient';
  *   have been applied to benefits
  */
 export class PrimaryInsuranceAmount {
-  /**
-   * The recipient for whom the PIA is being calculated.
-   * Contains all the personal information and earnings history needed for PIA.
-   * @private
-   */
-  private recipient_: Recipient;
+  private input_: PiaInput;
 
-  constructor(recipient: Recipient) {
-    this.recipient_ = recipient;
+  constructor(input: PiaInput) {
+    this.input_ = input;
   }
 
   /**
@@ -35,13 +43,12 @@ export class PrimaryInsuranceAmount {
    * This ratio is used to adjust the bend points in the PIA formula.
    *
    * @returns {number} The wage ratio used for indexing calculations
-   * @private
    */
   private wageRatio(): number {
     // If the indexing year is beyond the WAGE_INDICES data range, use the
     // maximum year in the data range.
     const effectiveIndexingYear = Math.min(
-      this.recipient_.indexingYear(),
+      this.input_.indexingYear(),
       constants.MAX_WAGE_INDEX_YEAR
     );
     const wage_in_1977: Money = constants.WAGE_INDICES[1977];
@@ -76,7 +83,7 @@ export class PrimaryInsuranceAmount {
 
   /**
    * Calculates the PIA component for a specific bend point bracket based on
-   * the recipient's monthly indexed earnings.
+   * the provided monthly indexed earnings.
    *
    * The PIA formula has three brackets with different benefit percentages:
    * - Bracket 0: 90% of AIME up to the first bend point
@@ -85,21 +92,21 @@ export class PrimaryInsuranceAmount {
    *
    * @param {number} bracket - Which component: Must be 0, 1 or 2
    * @returns {Money} The benefit amount from the specified bracket
-   * @throws {Error} If invalid bracket or if recipient is PIA-only
+   * @throws {Error} If invalid bracket or if isPiaOnly is true
    */
   primaryInsuranceAmountByBracket(bracket: number): Money {
     if (bracket !== 0 && bracket !== 1 && bracket !== 2) {
       throw new Error(`Invalid bracket: ${bracket}`);
     }
-    if (this.recipient_.isPiaOnly) {
+    if (this.input_.isPiaOnly) {
       throw new Error('Cannot calculate PIA brackets for PIA-only recipient');
     }
-    // If the recipient is not eligible for benefits, return $0.
-    if (!this.recipient_.isEligible()) {
+    // If not eligible for benefits, return $0.
+    if (!this.input_.isEligible()) {
       return Money.from(0);
     }
 
-    const aime = this.recipient_.monthlyIndexedEarnings().roundToDollar();
+    const aime = this.input_.monthlyIndexedEarnings().roundToDollar();
     const firstBend = this.firstBendPoint();
     const secondBend = this.secondBendPoint();
 
@@ -126,16 +133,16 @@ export class PrimaryInsuranceAmount {
    * This is the initial PIA value before any COLA adjustments are applied.
    *
    * @returns {Money} The unadjusted PIA amount, rounded down to the nearest dime
-   * @throws {Error} If recipient is PIA-only
+   * @throws {Error} If isPiaOnly is true
    */
   primaryInsuranceAmountUnadjusted(): Money {
-    if (this.recipient_.isPiaOnly) {
+    if (this.input_.isPiaOnly) {
       throw new Error('Cannot calculate unadjusted PIA for PIA-only recipient');
     }
     let sum = Money.from(0);
     for (let i = 0; i < 3; ++i)
       sum = sum.plus(this.primaryInsuranceAmountByBracket(i));
-    // Primary Insurance amounts are always rounded down the the nearest dime.
+    // Primary Insurance amounts are always rounded down to the nearest dime.
     // Who decided this was an important step?
     return sum.floorToDime();
   }
@@ -145,13 +152,16 @@ export class PrimaryInsuranceAmount {
    * then adjusted for cost of living increases (COLAs).
    *
    * This is the final PIA value that would be used to determine actual benefit
-   * payments. COLAs are applied starting from the year the recipient turns 62.
+   * payments. COLAs are applied starting from the year the individual turns 62.
    *
    * @returns {Money} The final PIA amount after all applicable COLA adjustments
    */
   primaryInsuranceAmount(): Money {
-    if (this.recipient_.isPiaOnly) {
-      return this.recipient_.overridePia;
+    if (this.input_.isPiaOnly) {
+      if (this.input_.overridePia === null) {
+        throw new Error('overridePia must not be null when isPiaOnly is true');
+      }
+      return this.input_.overridePia;
     }
 
     const pia = this.primaryInsuranceAmountUnadjusted();
@@ -159,11 +169,9 @@ export class PrimaryInsuranceAmount {
   }
 
   /**
-   * Calculates the Primary Insurance Amount for this recipient as though they
-   * had an AIME of the given amount.
-   *
-   * This method is useful for simulating different earnings scenarios without
-   * changing the recipient's actual earnings record.
+   * Calculates the PIA as though the AIME were the given amount, instead of
+   * using monthlyIndexedEarnings(). Useful for simulating different earnings
+   * scenarios.
    *
    * @param {Money} aime - The AIME to use for the simulated calculation
    * @returns {Money} The PIA that would result from the specified AIME
@@ -192,7 +200,7 @@ export class PrimaryInsuranceAmount {
       )
     );
 
-    // Round to nearest dime.
+    // Round down to nearest dime.
     pia = pia.floorToDime();
 
     return this.applyColaAdjustments(pia);
@@ -208,7 +216,7 @@ export class PrimaryInsuranceAmount {
   }
 
   /**
-   * Applies COLA adjustments to a PIA value from the year the recipient turns 62
+   * Applies COLA adjustments to a PIA value from the year the individual turns 62
    * through the last applied COLA year. Each year's adjustment is rounded down
    * to the nearest dime per SSA rules.
    *
@@ -218,7 +226,7 @@ export class PrimaryInsuranceAmount {
   private applyColaAdjustments(pia: Money): Money {
     let adjusted = pia;
     for (
-      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+      let year = this.input_.birthdate.yearTurningSsaAge(62);
       year <= this.lastAppliedColaYear();
       ++year
     ) {
@@ -232,7 +240,7 @@ export class PrimaryInsuranceAmount {
   }
 
   /**
-   * Determines if the recipient is old enough (62+) to receive COLA adjustments.
+   * Determines if the individual is old enough (62+) to receive COLA adjustments.
    *
    * COLA adjustments are applied to the PIA starting from the year a person
    * turns 62, even if they don't claim benefits until later.
@@ -241,7 +249,7 @@ export class PrimaryInsuranceAmount {
    */
   shouldAdjustForCOLA(): boolean {
     return (
-      this.recipient_.birthdate.yearTurningSsaAge(62) <= constants.MAX_COLA_YEAR
+      this.input_.birthdate.yearTurningSsaAge(62) <= constants.MAX_COLA_YEAR
     );
   }
 
@@ -261,7 +269,7 @@ export class PrimaryInsuranceAmount {
 
     const adjustments: Array<ColaAdjustment> = [];
     for (
-      let year = this.recipient_.birthdate.yearTurningSsaAge(62);
+      let year = this.input_.birthdate.yearTurningSsaAge(62);
       year <= constants.CURRENT_YEAR;
       ++year
     ) {
