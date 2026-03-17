@@ -1,3 +1,4 @@
+import { benefitOnDateOptimized } from '$lib/benefit-calculator';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { BenefitPeriod, BenefitType } from './benefit-period.js';
@@ -70,8 +71,9 @@ export function PersonalBenefitPeriods(
 
   // The first amount is what the recipient would receive in the first year. It
   // might be less than the eventual amount in the case of delayed filing.
-  const firstAmount = recipient.benefitOnDateOptimized(filingDate, filingDate);
-  const secondAmount = recipient.benefitOnDateOptimized(
+  const firstAmount = benefitOnDateOptimized(recipient, filingDate, filingDate);
+  const secondAmount = benefitOnDateOptimized(
+    recipient,
     filingDate,
     janAfterFilingDate
   );

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { higherEarningsThan } from '$lib/benefit-calculator';
   import { Recipient } from '$lib/recipient';
   import SurvivorReport from '$lib/components/SurvivorReport.svelte';
 
@@ -10,8 +11,8 @@
     return `${r.name}: Born ${r.birthdate.layBirthdateString()}, PIA: ${pia.string()}`;
   }
 
-  $: higherEarner = $recipient.higherEarningsThan($spouse) ? $recipient : $spouse;
-  $: lowerEarner = $recipient.higherEarningsThan($spouse) ? $spouse : $recipient;
+  $: higherEarner = higherEarningsThan($recipient, $spouse) ? $recipient : $spouse;
+  $: lowerEarner = higherEarningsThan($recipient, $spouse) ? $spouse : $recipient;
 </script>
 
 <div class="scenario-info">

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as benefitCalc from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate } from '$lib/month-time';
@@ -20,8 +21,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   });
 
   it('calculates benefits correctly for a single year', () => {
-    // Mock benefitOnDate to return consistent values
-    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(() => {
+    // Mock benefitOnDateOptimized to return consistent values
+    vi.spyOn(benefitCalc, 'benefitOnDateOptimized').mockImplementation(() => {
       return Money.from(1000);
     });
 
@@ -44,9 +45,9 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   });
 
   it('calculates benefits correctly across year boundaries', () => {
-    // Mock benefitOnDate to return different values in different years
-    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
-      (_filingDate, atDate) => {
+    // Mock benefitOnDateOptimized to return different values in different years
+    vi.spyOn(benefitCalc, 'benefitOnDateOptimized').mockImplementation(
+      (_recipient, _filingDate, atDate) => {
         if (atDate.year() === 2022) {
           return Money.from(1000);
         } else {
@@ -74,8 +75,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('handles delayed retirement credits correctly', () => {
     // Mock to simulate delayed retirement credits being applied in January
-    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
-      (filingDate, atDate) => {
+    vi.spyOn(benefitCalc, 'benefitOnDateOptimized').mockImplementation(
+      (_recipient, filingDate, atDate) => {
         // Initial filing at age 68
         if (atDate.year() === filingDate.year() && atDate.monthIndex() <= 11) {
           return Money.from(1160); // 16% higher than PIA for delayed retirement
@@ -105,7 +106,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   });
 
   it('handles benefits when final date is in the same month as filing date', () => {
-    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(() => {
+    vi.spyOn(benefitCalc, 'benefitOnDateOptimized').mockImplementation(() => {
       return Money.from(1000);
     });
 
@@ -121,7 +122,7 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
   });
 
   it('handles final date before filing date correctly', () => {
-    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(() => {
+    vi.spyOn(benefitCalc, 'benefitOnDateOptimized').mockImplementation(() => {
       return Money.from(1000);
     });
 
@@ -143,11 +144,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
 
   it('correctly handles the January benefit bump', () => {
     // Mock to simulate actual SSA behavior with delayed retirement credits
-    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
-      (filingDate, atDate) => {
-        // Filing at age 69 in July
-        const _filingMonth = filingDate.monthIndex();
-        const _atMonth = atDate.monthIndex();
+    vi.spyOn(benefitCalc, 'benefitOnDateOptimized').mockImplementation(
+      (_recipient, filingDate, atDate) => {
         const atYear = atDate.year();
 
         // If atDate is in the same year as filing
@@ -192,8 +190,8 @@ describe('PersonalBenefitPeriods and sumBenefitPeriods', () => {
       2025: 1093,
     };
 
-    vi.spyOn(recipient, 'benefitOnDateOptimized').mockImplementation(
-      (_filingDate, atDate) => {
+    vi.spyOn(benefitCalc, 'benefitOnDateOptimized').mockImplementation(
+      (_recipient, _filingDate, atDate) => {
         // Get benefit amount based on year of atDate
         const year = atDate.year();
         const amount = yearlyBenefits[year] || 1000;

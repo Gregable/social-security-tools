@@ -2,6 +2,7 @@
 import { onMount, tick } from 'svelte';
 
 import type { Birthdate } from '$lib/birthday';
+import { benefitAtAge, benefitOnDate } from '$lib/benefit-calculator';
 import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
@@ -184,7 +185,7 @@ function onBlur(_event: FocusEvent) {
  */
 function maxRenderedYDollars(): Money {
   const maxAge = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
-  return recipient.benefitAtAge(maxAge);
+  return benefitAtAge(recipient, maxAge);
 }
 
 /**
@@ -439,7 +440,7 @@ function benefitBoxes() {
   const selectedDate = userSelectedDate();
 
   const boxes = [];
-  let benefit = recipient.benefitOnDate(selectedDate, selectedDate);
+  let benefit = benefitOnDate(recipient, selectedDate, selectedDate);
   boxes.push([canvasX(selectedDate), canvasY(benefit), benefit]);
 
   for (
@@ -447,8 +448,8 @@ function benefitBoxes() {
     i.lessThanOrEqual(dateX(canvasEl_.width));
     i = i.addDuration(new MonthDuration(1))
   ) {
-    if (recipient.benefitOnDate(selectedDate, i).value() !== benefit.value()) {
-      benefit = recipient.benefitOnDate(selectedDate, i);
+    if (benefitOnDate(recipient, selectedDate, i).value() !== benefit.value()) {
+      benefit = benefitOnDate(recipient, selectedDate, i);
       boxes.push([canvasX(i), canvasY(benefit), benefit]);
     }
   }
@@ -589,7 +590,7 @@ function renderTrendline() {
   ) {
     let thisX = canvasX(i);
     // Determine the maximum eventual benefit for a filing date of i.
-    let yDollars = recipient.benefitOnDate(i, i);
+    let yDollars = benefitOnDate(recipient, i, i);
     let thisY = canvasY(yDollars);
     if (i.monthsSinceEpoch() === startDate.monthsSinceEpoch()) {
       ctx_.moveTo(thisX, thisY);
@@ -771,8 +772,7 @@ $: filingDateString_ = updateFilingDateString(
       > benefit will be:
 
       <b>
-        {$recipient
-          .benefitOnDate(userSelectedDate(), dateX(lastMouseX_))
+        {benefitOnDate($recipient, userSelectedDate(), dateX(lastMouseX_))
           .wholeDollars()}</b
       >
     {:else}

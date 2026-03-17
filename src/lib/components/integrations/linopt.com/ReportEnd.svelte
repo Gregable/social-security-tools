@@ -1,4 +1,5 @@
 <script lang="ts">
+import { benefitOnDate } from '$lib/benefit-calculator';
 import { CURRENT_YEAR } from '$lib/constants';
 import { recipientFilingDate } from '$lib/context';
 import { Money } from '$lib/money';
@@ -31,8 +32,8 @@ let spouseAnnualBenefit: Money;
 $: if (spouse === null) {
   const recipientValue = $recipient;
   recipientBenefitCalculationDate = $recipientFilingDate!;
-  recipientAnnualBenefit = recipientValue
-    .benefitOnDate(
+  recipientAnnualBenefit = benefitOnDate(
+      recipientValue,
       recipientBenefitCalculationDate,
       recipientBenefitCalculationDate
     )

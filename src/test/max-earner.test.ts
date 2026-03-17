@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { benefitAtAge } from '$lib/benefit-calculator';
 import { MAX_YEAR, MAXIMUM_EARNINGS } from '$lib/constants';
 import { createMaxEarnerForBirthYear } from '$lib/max-earner';
 import { MonthDuration } from '$lib/month-time';
@@ -73,7 +74,7 @@ describe('createMaxEarnerForBirthYear', () => {
     const recipient = createMaxEarnerForBirthYear(birthYear);
 
     const age70 = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
-    const benefit = recipient.benefitAtAge(age70);
+    const benefit = benefitAtAge(recipient, age70);
 
     expect(benefit.value()).toBeGreaterThan(0);
     // Age 70 benefit should be greater than PIA due to delayed credits

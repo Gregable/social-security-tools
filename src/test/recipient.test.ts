@@ -1,4 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import {
+  benefitAtAge,
+  benefitOnDate,
+  spousalBenefitOnDate,
+  survivorBenefit,
+} from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
@@ -378,43 +384,38 @@ describe('Recipient', () => {
 
     // Early retirement at 62 should be 30% reduction:
     expect(
-      r
-        .benefitAtAge(
-          MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
-        )
-        .value()
+      benefitAtAge(
+        r,
+        MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
+      ).value()
     ).toEqual(700.0);
     // Early retirement at 66 should be 6.67% reduction:
     expect(
-      r
-        .benefitAtAge(
-          MonthDuration.initFromYearsMonths({ years: 66, months: 0 })
-        )
-        .value()
+      benefitAtAge(
+        r,
+        MonthDuration.initFromYearsMonths({ years: 66, months: 0 })
+      ).value()
     ).toEqual(933.0);
     // Test the normal retirement age:
     expect(
-      r
-        .benefitAtAge(
-          MonthDuration.initFromYearsMonths({ years: 67, months: 0 })
-        )
-        .value()
+      benefitAtAge(
+        r,
+        MonthDuration.initFromYearsMonths({ years: 67, months: 0 })
+      ).value()
     ).toEqual(1000.0);
     // Delayed retirement at 68 should be 8% increase:
     expect(
-      r
-        .benefitAtAge(
-          MonthDuration.initFromYearsMonths({ years: 68, months: 0 })
-        )
-        .value()
+      benefitAtAge(
+        r,
+        MonthDuration.initFromYearsMonths({ years: 68, months: 0 })
+      ).value()
     ).toEqual(1080.0);
     // Delayed retirement at 70 should be 24% increase:
     expect(
-      r
-        .benefitAtAge(
-          MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-        )
-        .value()
+      benefitAtAge(
+        r,
+        MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+      ).value()
     ).toEqual(1240.0);
   });
 
@@ -427,46 +428,42 @@ describe('Recipient', () => {
     // If they haven't filed yet, they should have zero benefit:
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     expect(
-      r
-        .benefitOnDate(
-          // File at NRA, 67:
-          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
-          // Currently at age 63:
-          MonthDate.initFromYearsMonths({ years: 2023, months: 1 })
-        )
-        .value()
+      benefitOnDate(
+        r,
+        // File at NRA, 67:
+        MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+        // Currently at age 63:
+        MonthDate.initFromYearsMonths({ years: 2023, months: 1 })
+      ).value()
     ).toEqual(0);
 
     // Early retirement at 66 should be 6.67% reduction:
     expect(
-      r
-        .benefitOnDate(
-          MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
-        )
-        .value()
+      benefitOnDate(
+        r,
+        MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
+      ).value()
     ).toEqual(933.0);
     // Reductions are applied monthly, unlike delayed retirement credits, so
     // adding 2 months should increase the benefit by 1/6 of 6.67%:
     expect(
-      r
-        .benefitOnDate(
-          MonthDate.initFromYearsMonths({ years: 2026, months: 2 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 2 })
-        )
-        .value()
+      benefitOnDate(
+        r,
+        MonthDate.initFromYearsMonths({ years: 2026, months: 2 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 2 })
+      ).value()
     ).toEqual(944.0);
 
     // Filing in the middle of the year, but on the month they turn 70,
     // should immediately be maximum delayed multiplier of 24%
     r.birthdate = Birthdate.FromYMD(1960, 6, 5);
     expect(
-      r
-        .benefitOnDate(
-          MonthDate.initFromYearsMonths({ years: 2030, months: 6 }),
-          MonthDate.initFromYearsMonths({ years: 2030, months: 6 })
-        )
-        .value()
+      benefitOnDate(
+        r,
+        MonthDate.initFromYearsMonths({ years: 2030, months: 6 }),
+        MonthDate.initFromYearsMonths({ years: 2030, months: 6 })
+      ).value()
     ).toEqual(1240.0);
 
     // Filing in the middle of the year, but on the month before they turn 70,
@@ -475,20 +472,18 @@ describe('Recipient', () => {
     // Jan 2030.
     r.birthdate = Birthdate.FromYMD(1960, 6, 5);
     expect(
-      r
-        .benefitOnDate(
-          MonthDate.initFromYearsMonths({ years: 2030, months: 5 }),
-          MonthDate.initFromYearsMonths({ years: 2030, months: 5 })
-        )
-        .value()
+      benefitOnDate(
+        r,
+        MonthDate.initFromYearsMonths({ years: 2030, months: 5 }),
+        MonthDate.initFromYearsMonths({ years: 2030, months: 5 })
+      ).value()
     ).toEqual(1200.0); // 0.67 per month for 30 months = 20%
     expect(
-      r
-        .benefitOnDate(
-          MonthDate.initFromYearsMonths({ years: 2030, months: 5 }),
-          MonthDate.initFromYearsMonths({ years: 2031, months: 0 })
-        )
-        .value()
+      benefitOnDate(
+        r,
+        MonthDate.initFromYearsMonths({ years: 2030, months: 5 }),
+        MonthDate.initFromYearsMonths({ years: 2031, months: 0 })
+      ).value()
     ).toEqual(1233.0); // 0.67 per month for 35 months = 23.33%
   });
 
@@ -507,101 +502,92 @@ describe('Recipient', () => {
     r.birthdate = Birthdate.FromYMD(1960, 0, 5);
     s.birthdate = Birthdate.FromYMD(1960, 0, 5);
     expect(
-      r
-        .spousalBenefitOnDateGivenStartDate(
-          s,
-          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
-          // File at NRA, 67:
-          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
-          // Currently at age 63:
-          MonthDate.initFromYearsMonths({ years: 2023, months: 1 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        r,
+        s,
+        MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+        // File at NRA, 67:
+        MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+        // Currently at age 63:
+        MonthDate.initFromYearsMonths({ years: 2023, months: 1 })
+      ).value()
     ).toEqual(0);
 
     // atDate before spouse files results in no benefit
     expect(
-      r
-        .spousalBenefitOnDateGivenStartDate(
-          s,
-          MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        r,
+        s,
+        MonthDate.initFromYearsMonths({ years: 2027, months: 1 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
+      ).value()
     ).toEqual(0);
 
     // Early retirement at 66 should be 8.33% reduction:
     expect(
-      r
-        .spousalBenefitOnDateGivenStartDate(
-          s,
-          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        r,
+        s,
+        MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 0 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 0 })
+      ).value()
     ).toEqual(458);
 
     // Reductions are applied monthly, unlike delayed retirement credits, so
     // adding 6 months should be only a 4.165% reduction:
     expect(
-      r
-        .spousalBenefitOnDateGivenStartDate(
-          s,
-          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 6 }),
-          MonthDate.initFromYearsMonths({ years: 2026, months: 6 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        r,
+        s,
+        MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 6 }),
+        MonthDate.initFromYearsMonths({ years: 2026, months: 6 })
+      ).value()
     ).toEqual(479);
 
     // 3 years of reductions should be 25%
     expect(
-      r
-        .spousalBenefitOnDateGivenStartDate(
-          s,
-          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
-          MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
-          MonthDate.initFromYearsMonths({ years: 2024, months: 0 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        r,
+        s,
+        MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+        MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
+        MonthDate.initFromYearsMonths({ years: 2024, months: 0 })
+      ).value()
     ).toEqual(375);
 
     // Each month past 3 years should be another 5 / 12 % reduction.
     expect(
-      r
-        .spousalBenefitOnDateGivenStartDate(
-          s,
-          MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
-          MonthDate.initFromYearsMonths({ years: 2023, months: 11 }),
-          MonthDate.initFromYearsMonths({ years: 2023, months: 11 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        r,
+        s,
+        MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+        MonthDate.initFromYearsMonths({ years: 2023, months: 11 }),
+        MonthDate.initFromYearsMonths({ years: 2023, months: 11 })
+      ).value()
     ).toEqual(372);
 
     // Delaying spousal benefit should not increase spousal benefit:
     expect(
-      r
-        .spousalBenefitOnDateGivenStartDate(
-          s,
-          // s files at age 69
-          MonthDate.initFromYearsMonths({ years: 2029, months: 0 }),
-          // r files at age 67
-          MonthDate.initFromYearsMonths({ years: 2027, months: 0 }),
-          // spousal benefit at age 69
-          MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        r,
+        s,
+        // s files at age 69
+        MonthDate.initFromYearsMonths({ years: 2029, months: 0 }),
+        // r files at age 67
+        MonthDate.initFromYearsMonths({ years: 2027, months: 0 }),
+        // spousal benefit at age 69
+        MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
+      ).value()
     ).toEqual(500.0);
 
     // However delayed retirement can decrease spousal benefit, since
     // the total benefit is capped at half of the spousal PIA.
     const age70 = MonthDate.initFromYearsMonths({ years: 2030, months: 0 });
-    expect(r.benefitOnDate(age70, age70).value()).toEqual(1240.0);
-    expect(
-      r.spousalBenefitOnDateGivenStartDate(s, age70, age70, age70).value()
-    ).toEqual(
+    expect(benefitOnDate(r, age70, age70).value()).toEqual(1240.0);
+    expect(spousalBenefitOnDate(r, s, age70, age70, age70).value()).toEqual(
       260.0 // 3000 / 2 - 1240 = 260
     );
   });
@@ -616,17 +602,16 @@ describe('Recipient', () => {
     r.birthdate = Birthdate.FromYMD(1962, 0, 2);
     s.birthdate = Birthdate.FromYMD(1962, 0, 2);
     expect(
-      s
-        .spousalBenefitOnDateGivenStartDate(
-          r,
-          // r files at age 66
-          MonthDate.initFromYearsMonths({ years: 2028, months: 0 }),
-          // s files at age 62
-          MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
-          // spousal benefit at age 67
-          MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        s,
+        r,
+        // r files at age 66
+        MonthDate.initFromYearsMonths({ years: 2028, months: 0 }),
+        // s files at age 62
+        MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
+        // spousal benefit at age 67
+        MonthDate.initFromYearsMonths({ years: 2029, months: 0 })
+      ).value()
     ).toEqual(275);
   });
 
@@ -640,17 +625,16 @@ describe('Recipient', () => {
     r.birthdate = Birthdate.FromYMD(1950, 6, 2);
     s.birthdate = Birthdate.FromYMD(1949, 3, 2);
     expect(
-      s
-        .spousalBenefitOnDateGivenStartDate(
-          r,
-          // r files at age 62
-          MonthDate.initFromYearsMonths({ years: 2016, months: 6 }),
-          // s files at age 65
-          MonthDate.initFromYearsMonths({ years: 2014, months: 3 }),
-          // spousal benefit at age 67
-          MonthDate.initFromYearsMonths({ years: 2017, months: 3 })
-        )
-        .value()
+      spousalBenefitOnDate(
+        s,
+        r,
+        // r files at age 62
+        MonthDate.initFromYearsMonths({ years: 2016, months: 6 }),
+        // s files at age 65
+        MonthDate.initFromYearsMonths({ years: 2014, months: 3 }),
+        // spousal benefit at age 67
+        MonthDate.initFromYearsMonths({ years: 2017, months: 3 })
+      ).value()
     ).toEqual(552);
   });
 
@@ -688,14 +672,13 @@ describe('Recipient', () => {
       // 60, the benefit is reduced to only 71.5% of the PIA.
       // $3,000 * 0.715 = $2,145.
       expect(
-        recipient
-          .survivorBenefit(
-            deceased,
-            deceasedDeathDate,
-            deceasedDeathDate,
-            deceasedDeathDate.addDuration(new MonthDuration(1))
-          )
-          .value()
+        survivorBenefit(
+          recipient,
+          deceased,
+          deceasedDeathDate,
+          deceasedDeathDate,
+          deceasedDeathDate.addDuration(new MonthDuration(1))
+        ).value()
       ).toEqual(2155);
     }
 
@@ -711,14 +694,13 @@ describe('Recipient', () => {
       // Since the recipient files after the surivor FRA, the benefit is not
       // reduced further.
       expect(
-        recipient
-          .survivorBenefit(
-            deceased,
-            deceasedDeathDate,
-            deceasedDeathDate,
-            deceasedDeathDate.addDuration(new MonthDuration(1))
-          )
-          .value()
+        survivorBenefit(
+          recipient,
+          deceased,
+          deceasedDeathDate,
+          deceasedDeathDate,
+          deceasedDeathDate.addDuration(new MonthDuration(1))
+        ).value()
       ).toEqual(3240);
     }
 
@@ -736,14 +718,13 @@ describe('Recipient', () => {
       // the deceased's PIA. $3,000 * 0.825 = $2,475. Since the recipient files
       // at age 67 after the survivor FRA, there is no further reduction.
       expect(
-        recipient
-          .survivorBenefit(
-            deceased,
-            deceasedFilingDate,
-            deceasedDeathDate,
-            deceasedDeathDate.addDuration(new MonthDuration(1))
-          )
-          .value()
+        survivorBenefit(
+          recipient,
+          deceased,
+          deceasedFilingDate,
+          deceasedDeathDate,
+          deceasedDeathDate.addDuration(new MonthDuration(1))
+        ).value()
       ).toEqual(2475);
     }
 
@@ -759,14 +740,13 @@ describe('Recipient', () => {
       });
       // In this situation, the base survivor benefit is the deceased's benefit, which is 108% of their PIA. $3,000 * 1.08 = $3,240.
       expect(
-        recipient
-          .survivorBenefit(
-            deceased,
-            deceasedFilingDate,
-            deceasedDeathDate,
-            deceasedDeathDate.addDuration(new MonthDuration(1))
-          )
-          .value()
+        survivorBenefit(
+          recipient,
+          deceased,
+          deceasedFilingDate,
+          deceasedDeathDate,
+          deceasedDeathDate.addDuration(new MonthDuration(1))
+        ).value()
       ).toEqual(3240);
     }
 
@@ -789,14 +769,13 @@ describe('Recipient', () => {
       // final reduction of 20.05%. $3,000 * 0.8005 = $2,401.50.
 
       expect(
-        recipient
-          .survivorBenefit(
-            deceased,
-            deceasedDeathDate,
-            deceasedDeathDate,
-            survivorFilingDate
-          )
-          .value()
+        survivorBenefit(
+          recipient,
+          deceased,
+          deceasedDeathDate,
+          deceasedDeathDate,
+          survivorFilingDate
+        ).value()
       ).toEqual(2401);
     }
 
@@ -819,14 +798,13 @@ describe('Recipient', () => {
       // final reduction of 7.125%. $3,000 * 0.92875 = $2,786.25.
 
       expect(
-        recipient
-          .survivorBenefit(
-            deceased,
-            deceasedDeathDate,
-            deceasedDeathDate,
-            survivorFilingDate
-          )
-          .value()
+        survivorBenefit(
+          recipient,
+          deceased,
+          deceasedDeathDate,
+          deceasedDeathDate,
+          survivorFilingDate
+        ).value()
       ).toEqual(2786);
     }
   });

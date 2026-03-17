@@ -5,6 +5,12 @@
  */
 
 import { get } from 'svelte/store';
+import {
+  allBenefitsOnDate,
+  benefitOnDate,
+  higherEarningsThan,
+  spousalBenefitOnDate,
+} from '$lib/benefit-calculator';
 import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 import { Money } from '$lib/money';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
@@ -46,7 +52,7 @@ export class IntegrationContext {
     if (this._spouse === null) {
       return this._recipient;
     }
-    return this._recipient.higherEarningsThan(this._spouse)
+    return higherEarningsThan(this._recipient, this._spouse)
       ? this._recipient
       : this._spouse;
   }
@@ -59,7 +65,7 @@ export class IntegrationContext {
     if (this._spouse === null) {
       return null;
     }
-    return this._recipient.higherEarningsThan(this._spouse)
+    return higherEarningsThan(this._recipient, this._spouse)
       ? this._spouse
       : this._recipient;
   }
@@ -73,7 +79,7 @@ export class IntegrationContext {
     if (this._spouse === null) {
       return get(recipientFilingDate);
     }
-    return this._recipient.higherEarningsThan(this._spouse)
+    return higherEarningsThan(this._recipient, this._spouse)
       ? get(recipientFilingDate)
       : get(spouseFilingDate);
   }
@@ -86,7 +92,7 @@ export class IntegrationContext {
     if (this._spouse === null) {
       return null;
     }
-    return this._recipient.higherEarningsThan(this._spouse)
+    return higherEarningsThan(this._recipient, this._spouse)
       ? get(spouseFilingDate)
       : get(recipientFilingDate);
   }
@@ -99,7 +105,7 @@ export class IntegrationContext {
     if (this._spouse === null) {
       return true;
     }
-    return this._recipient.higherEarningsThan(this._spouse);
+    return higherEarningsThan(this._recipient, this._spouse);
   }
 
   /**
@@ -110,7 +116,7 @@ export class IntegrationContext {
     if (this._spouse === null) {
       return false;
     }
-    return !this._recipient.higherEarningsThan(this._spouse);
+    return !higherEarningsThan(this._recipient, this._spouse);
   }
 
   /**
@@ -127,7 +133,8 @@ export class IntegrationContext {
     }
 
     const evaluationDate = filingDate.addDuration(MonthDuration.OneYear());
-    const monthlyBenefit = lowerEarner.benefitOnDate(
+    const monthlyBenefit = benefitOnDate(
+      lowerEarner,
       filingDate,
       evaluationDate
     );
@@ -154,7 +161,8 @@ export class IntegrationContext {
     }
 
     const evaluationDate = filingDate.addDuration(MonthDuration.OneYear());
-    const monthlyBenefit = lowerEarner.allBenefitsOnDate(
+    const monthlyBenefit = allBenefitsOnDate(
+      lowerEarner,
       higherEarner,
       higherEarnerFilingDate,
       filingDate,
@@ -177,7 +185,8 @@ export class IntegrationContext {
     }
 
     const evaluationDate = filingDate.addDuration(MonthDuration.OneYear());
-    const monthlyBenefit = higherEarner.benefitOnDate(
+    const monthlyBenefit = benefitOnDate(
+      higherEarner,
       filingDate,
       evaluationDate
     );
@@ -209,7 +218,8 @@ export class IntegrationContext {
       ? higherFilingDate
       : lowerFilingDate;
 
-    const monthlyBenefit = lowerEarner.spousalBenefitOnDateGivenStartDate(
+    const monthlyBenefit = spousalBenefitOnDate(
+      lowerEarner,
       higherEarner,
       higherFilingDate,
       lowerFilingDate,

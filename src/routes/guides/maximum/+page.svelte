@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { benefitAtAge } from "$lib/benefit-calculator";
   import {
     MAX_YEAR,
     MAXIMUM_EARNINGS,
@@ -55,7 +56,7 @@
     // For fractional ages like 66y 10m, we use the rounded year for birth year calculation
     const birthYear = currentYear - age.roundedYears();
     const recipient = createMaxEarnerForBirthYear(birthYear);
-    const benefit = recipient.benefitAtAge(age);
+    const benefit = benefitAtAge(recipient, age);
 
     return {
       age,
@@ -66,7 +67,7 @@
   });
 
   // Maximum benefit at age 70 (from the person turning 70 in currentYear)
-  const maxBenefitAt70 = maxEarner.benefitAtAge(age70);
+  const maxBenefitAt70 = benefitAtAge(maxEarner, age70);
 
   // Spousal benefit (50% of PIA at FRA)
   const maxSpousalBenefit = maxPIA.div(2).floorToDollar();
@@ -112,8 +113,8 @@
     const recipientFRA = atFRARecipient.normalRetirementAge();
 
     return {
-      at70: at70Recipient.benefitAtAge(age70),
-      atFRA: atFRARecipient.benefitAtAge(recipientFRA),
+      at70: benefitAtAge(at70Recipient, age70),
+      atFRA: benefitAtAge(atFRARecipient, recipientFRA),
     };
   }
 
