@@ -1,4 +1,5 @@
 <script lang="ts">
+import { higherEarningsThan } from '$lib/benefit-calculator';
 import HorizCurlyImg from '$lib/images/horiz-curly.png';
 import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
@@ -12,8 +13,8 @@ const spouseR: Recipient = spouse;
 
 let higherEarner: Recipient;
 let lowerEarner: Recipient;
-$: higherEarner = $recipient.higherEarningsThan($spouse) ? $recipient : $spouse;
-$: lowerEarner = $recipient.higherEarningsThan($spouse) ? $spouse : $recipient;
+$: higherEarner = higherEarningsThan($recipient, $spouse) ? $recipient : $spouse;
+$: lowerEarner = higherEarningsThan($recipient, $spouse) ? $spouse : $recipient;
 
 function spousalBenefitCalc(higher: Recipient, lower: Recipient): Money {
   let maxSpousal = higher.pia().primaryInsuranceAmount().div(2);
@@ -61,7 +62,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
 <div>
   <h3><RName {r} noColor /></h3>
   <div class="text">
-    {#if $recipient.higherEarningsThan($spouse)}
+    {#if higherEarningsThan($recipient, $spouse)}
       <p>
         Because <RName {r} /> has higher earnings than <RName r={spouseR} />, <RName
           {r}

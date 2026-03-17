@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { allBenefitsOnDate as allBenefitsOnDate_ } from "$lib/benefit-calculator";
   import { recipientFilingDate, spouseFilingDate } from "$lib/context";
   import { activeIntegration } from "$lib/integrations/context";
   import { Money } from "$lib/money";
@@ -229,7 +230,8 @@
       spouse = recipientCtx_.r;
     }
 
-    return personCtx.r.allBenefitsOnDate(
+    return allBenefitsOnDate_(
+      personCtx.r,
       spouse,
       spouseFilingDate,
       selfFilingDate,
@@ -246,7 +248,8 @@
     const recipientAge70 = recipientCtx_.r.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
     );
-    return recipientCtx_.r.allBenefitsOnDate(
+    return allBenefitsOnDate_(
+      recipientCtx_.r,
       spouseCtx_.r,
       recipientAge70,
       recipientAge70,
@@ -263,7 +266,8 @@
     const spouseAge70 = spouseCtx_.r.birthdate.dateAtSsaAge(
       MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
     );
-    return spouseCtx_.r.allBenefitsOnDate(
+    return allBenefitsOnDate_(
+      spouseCtx_.r,
       recipientCtx_.r,
       spouseAge70,
       spouseAge70,

@@ -1,3 +1,10 @@
+import {
+  benefitOnDate,
+  eligibleForSpousalBenefit,
+  higherEarningsThan,
+  spousalBenefitOnDate,
+  survivorBenefit,
+} from '$lib/benefit-calculator';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
@@ -42,7 +49,7 @@ export function strategySumPeriodsCouple(
   // Amount (PIA).
   let earnerIndex: number;
   let dependentIndex: number;
-  if (recipients[0].higherEarningsThan(recipients[1])) {
+  if (higherEarningsThan(recipients[0], recipients[1])) {
     earnerIndex = 0;
     dependentIndex = 1;
   } else {
@@ -78,9 +85,10 @@ export function strategySumPeriodsCouple(
 
   // Determine the dependent's survivor benefit amount:
   let isSurvivorBenefitApplicable = false;
-  let survivorBenefit: Money = Money.zero();
+  let survivorBenefitAmount: Money = Money.zero();
   if (dependentFinalDate.greaterThan(survivorStartDate)) {
-    survivorBenefit = dependent.survivorBenefit(
+    survivorBenefitAmount = survivorBenefit(
+      /*survivor*/ dependent,
       /*deceased*/ earner,
       /*deceasedFilingDate*/ earnerStratDate,
       /*deceasedDeathDate*/ earnerFinalDate,
@@ -88,12 +96,13 @@ export function strategySumPeriodsCouple(
     );
     // Note that if the survivor's personal benefit is greater than their
     // survivor benefit, they will not switch to a survivor benefit.
-    const dependentFinalPersonalBenefit = dependent.benefitOnDate(
+    const dependentFinalPersonalBenefit = benefitOnDate(
+      dependent,
       /*filingDate*/ dependentStratDate,
       // Add a year to include all late filing credits.
       /*atDate*/ dependentStratDate.addDuration(MonthDuration.OneYear())
     );
-    if (dependentFinalPersonalBenefit.cents() < survivorBenefit.cents()) {
+    if (dependentFinalPersonalBenefit.cents() < survivorBenefitAmount.cents()) {
       isSurvivorBenefitApplicable = true;
     }
   }
@@ -130,7 +139,7 @@ export function strategySumPeriodsCouple(
   // Dependent's Survivor Benefit:
   if (isSurvivorBenefitApplicable) {
     const survivorPeriod = new BenefitPeriod();
-    survivorPeriod.amount = survivorBenefit;
+    survivorPeriod.amount = survivorBenefitAmount;
     survivorPeriod.startDate = survivorStartDate;
     survivorPeriod.endDate = dependentFinalDate;
     survivorPeriod.recipientIndex = dependentIndex;
@@ -139,7 +148,7 @@ export function strategySumPeriodsCouple(
   }
 
   // Dependent's Spousal Benefit:
-  if (dependent.eligibleForSpousalBenefit(earner)) {
+  if (eligibleForSpousalBenefit(dependent, earner)) {
     const spousalPeriod = new BenefitPeriod();
     // The start date for spousal benefits is the later of the two filing dates.
     spousalPeriod.startDate = MonthDate.max(
@@ -154,7 +163,8 @@ export function strategySumPeriodsCouple(
     );
 
     if (spousalPeriod.endDate.greaterThanOrEqual(spousalPeriod.startDate)) {
-      spousalPeriod.amount = dependent.spousalBenefitOnDateGivenStartDate(
+      spousalPeriod.amount = spousalBenefitOnDate(
+        dependent,
         /*spouse=*/ earner,
         /*spouseFilingDate=*/ earnerStratDate,
         /*filingDate=*/ dependentStratDate,
@@ -417,7 +427,7 @@ export function createOptimizationContext(
   let earnerIndex: number;
   let dependentIndex: number;
 
-  if (recipients[0].higherEarningsThan(recipients[1])) {
+  if (higherEarningsThan(recipients[0], recipients[1])) {
     earner = recipients[0];
     dependent = recipients[1];
     earnerFinalDate = finalDates[0];
@@ -435,7 +445,7 @@ export function createOptimizationContext(
 
   const dependentHasZeroPia =
     dependent.pia().primaryInsuranceAmount().cents() === 0;
-  const isSpousalBenefitEligible = dependent.eligibleForSpousalBenefit(earner);
+  const isSpousalBenefitEligible = eligibleForSpousalBenefit(dependent, earner);
 
   return {
     earner,
@@ -551,9 +561,10 @@ export function strategySumPeriodsOptimized(
 
   // Determine the dependent's survivor benefit amount:
   let isSurvivorBenefitApplicable = false;
-  let survivorBenefit: Money = Money.zero();
+  let survivorBenefitAmount: Money = Money.zero();
   if (context.dependentFinalDate.greaterThan(survivorStartDate)) {
-    survivorBenefit = context.dependent.survivorBenefit(
+    survivorBenefitAmount = survivorBenefit(
+      /*survivor*/ context.dependent,
       /*deceased*/ context.earner,
       /*deceasedFilingDate*/ earnerStratDate,
       /*deceasedDeathDate*/ context.earnerFinalDate,
@@ -561,12 +572,13 @@ export function strategySumPeriodsOptimized(
     );
     // Note that if the survivor's personal benefit is greater than their
     // survivor benefit, they will not switch to a survivor benefit.
-    const dependentFinalPersonalBenefit = context.dependent.benefitOnDate(
+    const dependentFinalPersonalBenefit = benefitOnDate(
+      context.dependent,
       /*filingDate*/ dependentStratDate,
       // Add a year to include all late filing credits.
       /*atDate*/ dependentStratDate.addDuration(MonthDuration.OneYear())
     );
-    if (dependentFinalPersonalBenefit.cents() < survivorBenefit.cents()) {
+    if (dependentFinalPersonalBenefit.cents() < survivorBenefitAmount.cents()) {
       isSurvivorBenefitApplicable = true;
     }
   }
@@ -605,7 +617,7 @@ export function strategySumPeriodsOptimized(
   // Dependent's Survivor Benefit:
   if (isSurvivorBenefitApplicable) {
     const survivorPeriod = new BenefitPeriod();
-    survivorPeriod.amount = survivorBenefit;
+    survivorPeriod.amount = survivorBenefitAmount;
     survivorPeriod.startDate = survivorStartDate;
     survivorPeriod.endDate = context.dependentFinalDate;
     survivorPeriod.recipientIndex = context.dependentIndex;
@@ -629,13 +641,13 @@ export function strategySumPeriodsOptimized(
     );
 
     if (spousalPeriod.endDate.greaterThanOrEqual(spousalPeriod.startDate)) {
-      spousalPeriod.amount =
-        context.dependent.spousalBenefitOnDateGivenStartDate(
-          /*spouse=*/ context.earner,
-          /*spouseFilingDate=*/ earnerStratDate,
-          /*filingDate=*/ dependentStratDate,
-          /*atDate=*/ spousalPeriod.startDate
-        );
+      spousalPeriod.amount = spousalBenefitOnDate(
+        context.dependent,
+        /*spouse=*/ context.earner,
+        /*spouseFilingDate=*/ earnerStratDate,
+        /*filingDate=*/ dependentStratDate,
+        /*atDate=*/ spousalPeriod.startDate
+      );
       spousalPeriod.recipientIndex = context.dependentIndex;
       spousalPeriod.benefitType = BenefitType.Spousal;
       periods.push(spousalPeriod);

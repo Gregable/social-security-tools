@@ -1,5 +1,6 @@
 <script lang="ts">
 import { onMount, tick } from 'svelte';
+import { higherEarningsThan, survivorBenefit } from '$lib/benefit-calculator';
 import {
   higherEarnerFilingDate,
   setHigherEarnerFilingDate,
@@ -15,8 +16,8 @@ export let spouse: Recipient = new Recipient();
 
 let higherEarner: Recipient;
 let lowerEarner: Recipient;
-$: higherEarner = $recipient.higherEarningsThan($spouse) ? $recipient : $spouse;
-$: lowerEarner = $recipient.higherEarningsThan($spouse) ? $spouse : $recipient;
+$: higherEarner = higherEarningsThan($recipient, $spouse) ? $recipient : $spouse;
+$: lowerEarner = higherEarningsThan($recipient, $spouse) ? $spouse : $recipient;
 
 // If the deceased higher earner filed before this age, the survivor benefit
 // would become the larger 82.5% of the higher earner's PIA. After this age,
@@ -431,8 +432,8 @@ $: {
       const deathDate = higherEarner.birthdate.dateAtSsaAge(
         new MonthDuration(beforeDeathSliderMonths_ + 1)
       );
-      survivorBenefitDisplay_ = lowerEarner
-        .survivorBenefit(
+      survivorBenefitDisplay_ = survivorBenefit(
+          lowerEarner,
           higherEarner,
           /* deceasedFilingDate */ filingDate,
           /* deceasedDeathDate */ deathDate,
@@ -462,8 +463,8 @@ $: {
           new MonthDuration(afterDeathSliderMonths_)
         );
       }
-      survivorBenefitDisplay_ = lowerEarner
-        .survivorBenefit(
+      survivorBenefitDisplay_ = survivorBenefit(
+          lowerEarner,
           higherEarner,
           /* deceasedFilingDate */ deathDate,
           /* deceasedDeathDate */ deathDate,
@@ -673,8 +674,8 @@ $: {
           <p class="maximum-benefit">
             The maximum survivor benefit is
             <b>
-              {lowerEarner
-                .survivorBenefit(
+              {survivorBenefit(
+                  lowerEarner,
                   higherEarner,
                   /* deceasedFilingDate */
                   higherEarner.birthdate.dateAtSsaAge(
@@ -751,8 +752,8 @@ $: {
           <p class="maximum-benefit">
             The maximum survivor benefit is
             <b>
-              {lowerEarner
-                .survivorBenefit(
+              {survivorBenefit(
+                  lowerEarner,
                   higherEarner,
                   /* deceasedFilingDate */
                   higherEarner.birthdate.dateAtSsaAge(

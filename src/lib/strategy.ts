@@ -1,3 +1,4 @@
+import { allBenefitsOnDate } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
@@ -55,7 +56,8 @@ export function StrategySequence(config: StrategyParams) {
       benefit = [Money.zero(), Money.zero()];
     }
     if (d.lessThanOrEqual(context.finalDates[0])) {
-      const amount = context.recipients[0].allBenefitsOnDate(
+      const amount = allBenefitsOnDate(
+        context.recipients[0],
         context.recipients[1],
         context.stratDates[1],
         context.stratDates[0],
@@ -65,7 +67,8 @@ export function StrategySequence(config: StrategyParams) {
       totalBenefit = totalBenefit.plus(amount);
     }
     if (d.lessThanOrEqual(context.finalDates[1])) {
-      const amount = context.recipients[1].allBenefitsOnDate(
+      const amount = allBenefitsOnDate(
+        context.recipients[1],
         context.recipients[0],
         context.stratDates[0],
         context.stratDates[1],

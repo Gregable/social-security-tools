@@ -4,6 +4,7 @@
 
 import { derived, writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import { higherEarningsThan } from './benefit-calculator';
 import type { MonthDate } from './month-time';
 import { Recipient, type SerializedRecipient } from './recipient';
 
@@ -151,7 +152,7 @@ export const higherEarnerFilingDate = derived(
   ([$recipientDate, $spouseDate]) => {
     if (!context.recipient || !context.spouse) return null;
 
-    if (context.recipient.higherEarningsThan(context.spouse)) {
+    if (higherEarningsThan(context.recipient, context.spouse)) {
       return $recipientDate;
     } else {
       return $spouseDate;
@@ -163,7 +164,7 @@ export const higherEarnerFilingDate = derived(
 export function setHigherEarnerFilingDate(date: MonthDate | null) {
   if (!context.recipient || !context.spouse) return;
 
-  if (context.recipient.higherEarningsThan(context.spouse)) {
+  if (higherEarningsThan(context.recipient, context.spouse)) {
     recipientFilingDate.set(date);
   } else {
     spouseFilingDate.set(date);

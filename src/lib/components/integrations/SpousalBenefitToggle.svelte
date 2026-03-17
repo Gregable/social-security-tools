@@ -1,4 +1,5 @@
 <script lang="ts">
+import { allBenefitsOnDate, benefitOnDate } from '$lib/benefit-calculator';
 import RecipientName from '$lib/components/RecipientName.svelte';
 import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 import { Money } from '$lib/money';
@@ -55,7 +56,8 @@ $: {
 
   if (context.isRecipientLowerEarner() && includeSpousalBenefit) {
     // Lower earner with spousal benefit included
-    monthlyBenefit = recipient.allBenefitsOnDate(
+    monthlyBenefit = allBenefitsOnDate(
+      recipient,
       higherEarner,
       higherEarnerFilingDate!,
       recipientBenefitCalculationDate,
@@ -63,7 +65,8 @@ $: {
     );
   } else {
     // Personal benefit only
-    monthlyBenefit = recipient.benefitOnDate(
+    monthlyBenefit = benefitOnDate(
+      recipient,
       recipientBenefitCalculationDate,
       recipientBenefitCalculationDate
     );
@@ -78,7 +81,8 @@ $: {
 
     if (!context.isRecipientLowerEarner() && includeSpousalBenefit) {
       // Lower earner (spouse) with spousal benefit included
-      monthlyBenefit = spouse.allBenefitsOnDate(
+      monthlyBenefit = allBenefitsOnDate(
+        spouse,
         higherEarner,
         higherEarnerFilingDate!,
         spouseBenefitCalculationDate,
@@ -86,7 +90,8 @@ $: {
       );
     } else {
       // Personal benefit only
-      monthlyBenefit = spouse.benefitOnDate(
+      monthlyBenefit = benefitOnDate(
+        spouse,
         spouseBenefitCalculationDate,
         spouseBenefitCalculationDate
       );
