@@ -125,6 +125,11 @@ export function generateDeathAgeRange(deathAgeRangeStart: number): number[] {
 
 import { MonthDuration } from '$lib/month-time';
 
+export interface CellPosition {
+  readonly rowIndex: number;
+  readonly colIndex: number;
+}
+
 export interface DeathAgeBucket {
   label: string; // Display label (e.g. '63', '66', '101+')
   // Representative age (middle year for 3-year buckets, or start for + bucket)

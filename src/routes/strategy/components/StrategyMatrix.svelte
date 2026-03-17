@@ -284,28 +284,16 @@ function handleCellSelect(position: CellPosition) {
   // Set selection on the shared CalculationResults state
   calculationResults.setSelectedCell(rowIndex, colIndex);
 
-  const {
-    filingAge1,
-    filingAge2,
-    filingAge1Years,
-    filingAge1Months,
-    filingAge2Years,
-    filingAge2Months,
-    totalBenefit,
-  } = result;
-  const filingDate1 = recipients[0].birthdate.dateAtLayAge(filingAge1);
-  const filingDate2 = recipients[1].birthdate.dateAtLayAge(filingAge2);
+  const { filingAge1, filingAge2, totalBenefit } = result;
 
   // Emit a normalized details payload for external consumers (e.g., details panel)
   onselectcell?.({
     deathAge1: bucket1.label,
     deathAge2: bucket2.label,
-    filingAge1Years,
-    filingAge1Months,
-    filingDate1,
-    filingAge2Years,
-    filingAge2Months,
-    filingDate2,
+    filingAge1,
+    filingDate1: recipients[0].birthdate.dateAtLayAge(filingAge1),
+    filingAge2,
+    filingDate2: recipients[1].birthdate.dateAtLayAge(filingAge2),
     netPresentValue: totalBenefit,
   });
 }
