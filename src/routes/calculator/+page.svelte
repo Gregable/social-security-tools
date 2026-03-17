@@ -18,7 +18,7 @@ import SidebarSection from '$lib/components/SidebarSection.svelte';
 import Sponsor from '$lib/components/Sponsor.svelte';
 import SpousalReport from '$lib/components/SpousalReport.svelte';
 import SurvivorReport from '$lib/components/SurvivorReport.svelte';
-import { context } from '$lib/context';
+import { recipient, spouse } from '$lib/context';
 import { loadIntroBanner, loadReportEnd } from '$lib/integrations/config';
 import {
   activeIntegration,
@@ -171,95 +171,95 @@ async function loadIntegrationComponents(
         part of the report and another one is opened for the spouse's part.
       -->
       <div class="pageBreakAfter stickyContainer">
-        {#if context.spouse}
+        {#if $spouse}
           <SidebarSection
-            label={context.recipient.shortName(15)}
+            label={$recipient.shortName(15)}
             heading={true}
           >
             <h1 class="recipientName">
-              <RecipientName r={context.recipient} noColor />
+              <RecipientName r={$recipient} noColor />
             </h1>
           </SidebarSection>
         {/if}
-        {#if !context.recipient.isPiaOnly}
+        {#if !$recipient.isPiaOnly}
           <SidebarSection label="Earnings Report">
-            <EarningsReport recipient={context.recipient} />
+            <EarningsReport recipient={$recipient} />
           </SidebarSection>
           <SidebarSection label="Benefits Eligibility" underSticky>
-            <EligibilityReport recipient={context.recipient} />
+            <EligibilityReport recipient={$recipient} />
           </SidebarSection>
           <SidebarSection label="Indexed Earnings" underSticky>
-            <IndexedEarningsReport recipient={context.recipient} />
+            <IndexedEarningsReport recipient={$recipient} />
           </SidebarSection>
           <SidebarSection label="Primary Insurance Amount" underSticky>
-            <PiaReport recipient={context.recipient} />
+            <PiaReport recipient={$recipient} />
           </SidebarSection>
           {#if !$activeIntegration}
             <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
-              <Sponsor recipient={context.recipient} />
+              <Sponsor recipient={$recipient} />
             </SidebarSection>
           {/if}
           <SidebarSection label="Normal Retirement Age" underSticky>
-            <NormalRetirementAgeReport recipient={context.recipient} />
+            <NormalRetirementAgeReport recipient={$recipient} />
           </SidebarSection>
           <SidebarSection label="Filing Date" underSticky>
-            <FilingDateReport recipient={context.recipient} />
+            <FilingDateReport recipient={$recipient} />
           </SidebarSection>
         {:else}
           <SidebarSection label="Primary Insurance Amount" underSticky>
-            <PiaReport recipient={context.recipient} />
+            <PiaReport recipient={$recipient} />
           </SidebarSection>
           {#if !$activeIntegration}
             <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
-              <Sponsor recipient={context.recipient} />
+              <Sponsor recipient={$recipient} />
             </SidebarSection>
           {/if}
           <SidebarSection label="Normal Retirement Age">
-            <NormalRetirementAgeReport recipient={context.recipient} />
+            <NormalRetirementAgeReport recipient={$recipient} />
           </SidebarSection>
           <SidebarSection label="Filing Date">
-            <FilingDateReport recipient={context.recipient} />
+            <FilingDateReport recipient={$recipient} />
           </SidebarSection>
         {/if}
       </div>
-      {#if context.spouse}
+      {#if $spouse}
         <!--
           See the description of the purpose of this div above.
         -->
         <div class="pageBreakAfter stickyContainer">
-          <SidebarSection label={context.spouse.shortName(15)} heading={true}>
+          <SidebarSection label={$spouse.shortName(15)} heading={true}>
             <h1 class="recipientName">
-              <RecipientName r={context.spouse} noColor />
+              <RecipientName r={$spouse} noColor />
             </h1>
           </SidebarSection>
-          {#if !context.spouse.isPiaOnly}
+          {#if !$spouse.isPiaOnly}
             <SidebarSection label="Earnings Report">
-              <EarningsReport recipient={context.spouse} />
+              <EarningsReport recipient={$spouse} />
             </SidebarSection>
             <SidebarSection label="Benefits Eligibility" underSticky>
-              <EligibilityReport recipient={context.spouse} />
+              <EligibilityReport recipient={$spouse} />
             </SidebarSection>
             <SidebarSection label="Indexed Earnings" underSticky>
-              <IndexedEarningsReport recipient={context.spouse} />
+              <IndexedEarningsReport recipient={$spouse} />
             </SidebarSection>
             <SidebarSection label="Primary Insurance Amount" underSticky>
-              <PiaReport recipient={context.spouse} />
+              <PiaReport recipient={$spouse} />
             </SidebarSection>
             <SidebarSection label="Normal Retirement Age" underSticky>
-              <NormalRetirementAgeReport recipient={context.spouse} />
+              <NormalRetirementAgeReport recipient={$spouse} />
             </SidebarSection>
             <SidebarSection label="Filing Date" underSticky>
-              <FilingDateReport recipient={context.spouse} />
+              <FilingDateReport recipient={$spouse} />
             </SidebarSection>
           {:else}
             <SidebarSection label="Primary Insurance Amount" underSticky>
-              <PiaReport recipient={context.spouse} />
+              <PiaReport recipient={$spouse} />
             </SidebarSection>
             <SidebarSection label="Normal Retirement Age">
-              <NormalRetirementAgeReport recipient={context.spouse} />
+              <NormalRetirementAgeReport recipient={$spouse} />
             </SidebarSection>
             <SidebarSection label="Filing Date">
-              <FilingDateReport recipient={context.spouse} />
+              <FilingDateReport recipient={$spouse} />
             </SidebarSection>
           {/if}
         </div>
@@ -268,20 +268,20 @@ async function loadIntegrationComponents(
         </SidebarSection>
         <SidebarSection label="Spousal Benefits">
           <SpousalReport
-            recipient={context.recipient}
-            spouse={context.spouse}
+            recipient={$recipient}
+            spouse={$spouse}
           />
         </SidebarSection>
         <SidebarSection label="Filing Dates">
           <CombinedChart
-            recipient={context.recipient}
-            spouse={context.spouse}
+            recipient={$recipient}
+            spouse={$spouse}
           />
         </SidebarSection>
         <SidebarSection label="Survivor Benefit">
           <SurvivorReport
-            recipient={context.recipient}
-            spouse={context.spouse}
+            recipient={$recipient}
+            spouse={$spouse}
           />
         </SidebarSection>
       {/if}
@@ -293,8 +293,8 @@ async function loadIntegrationComponents(
         >
           <svelte:component
             this={ReportEndComponent}
-            recipient={context.recipient}
-            spouse={context.spouse}
+            recipient={$recipient}
+            spouse={$spouse}
           />
         </SidebarSection>
       {/if}
