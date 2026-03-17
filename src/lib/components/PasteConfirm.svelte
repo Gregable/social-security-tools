@@ -20,13 +20,13 @@ import type { EarningRecord } from '$lib/earning-record';
 export let onconfirm: (() => void) | undefined = undefined;
 export let ondecline: (() => void) | undefined = undefined;
 
-export let earningsRecords: EarningRecord[] = [];
+export let earningsRecords: ReadonlyArray<EarningRecord> = [];
 
 // Name of the person whose earnings record is being confirmed
 export let name: string = '';
 // Display the records in the same order as the SSA website: reverse
 // chronological.
-$: ssaSortedEarningsRecords = earningsRecords.sort((a, b) => b.year - a.year);
+$: ssaSortedEarningsRecords = [...earningsRecords].sort((a, b) => b.year - a.year);
 
 function hasEarningsRecordsWithMedicare() {
   return earningsRecords.some((r) => r.taxedMedicareEarnings.value() > 0);

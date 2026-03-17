@@ -200,19 +200,19 @@ export class Recipient {
 
   private earnings_: EarningsManager = new EarningsManager();
 
-  get earningsRecords(): Array<EarningRecord> {
+  get earningsRecords(): ReadonlyArray<EarningRecord> {
     return this.earnings_.earningsRecords;
   }
-  set earningsRecords(earningsRecords: Array<EarningRecord>) {
+  set earningsRecords(earningsRecords: ReadonlyArray<EarningRecord>) {
     this.requireNotPiaOnly_();
     this.earnings_.earningsRecords = earningsRecords;
     this.reindexEarnings_();
   }
 
-  get futureEarningsRecords(): Array<EarningRecord> {
+  get futureEarningsRecords(): ReadonlyArray<EarningRecord> {
     return this.earnings_.futureEarningsRecords;
   }
-  set futureEarningsRecords(futureEarningsRecords: Array<EarningRecord>) {
+  set futureEarningsRecords(futureEarningsRecords: ReadonlyArray<EarningRecord>) {
     this.requireNotPiaOnly_();
     this.earnings_.futureEarningsRecords = futureEarningsRecords;
     this.reindexEarnings_();

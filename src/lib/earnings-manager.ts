@@ -18,18 +18,18 @@ export class EarningsManager {
   private top35IndexedEarnings_: Array<EarningRecord> = [];
   private totalIndexedEarnings_: Money = Money.from(0);
 
-  get earningsRecords(): Array<EarningRecord> {
+  get earningsRecords(): ReadonlyArray<EarningRecord> {
     return this.earningsRecords_;
   }
-  set earningsRecords(records: Array<EarningRecord>) {
-    this.earningsRecords_ = records;
+  set earningsRecords(records: ReadonlyArray<EarningRecord>) {
+    this.earningsRecords_ = [...records];
   }
 
-  get futureEarningsRecords(): Array<EarningRecord> {
+  get futureEarningsRecords(): ReadonlyArray<EarningRecord> {
     return this.futureEarningsRecords_;
   }
-  set futureEarningsRecords(records: Array<EarningRecord>) {
-    this.futureEarningsRecords_ = records;
+  set futureEarningsRecords(records: ReadonlyArray<EarningRecord>) {
+    this.futureEarningsRecords_ = [...records];
   }
 
   /**

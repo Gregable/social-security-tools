@@ -175,9 +175,10 @@ describe('Recipient', () => {
     expect(r.totalCredits()).toEqual(6);
 
     // Earned enough for 20 credits in 2010, but credits are capped at 4 / year.
-    r.earningsRecords.push(
-      testRecord(2010, constants.EARNINGS_PER_CREDIT[2010].times(20))
-    );
+    r.earningsRecords = [
+      ...r.earningsRecords,
+      testRecord(2010, constants.EARNINGS_PER_CREDIT[2010].times(20)),
+    ];
     expect(r.totalCredits()).toEqual(10);
   });
 
@@ -196,12 +197,13 @@ describe('Recipient', () => {
     expect(r.totalCredits()).toEqual(3);
 
     // Earned enough for 20 credits in 2010, but credits are capped at 4 / year.
-    r.futureEarningsRecords.push(
+    r.futureEarningsRecords = [
+      ...r.futureEarningsRecords,
       testRecord(
         constants.MAX_YEAR + 3,
         constants.EARNINGS_PER_CREDIT[constants.MAX_YEAR].times(30)
-      )
-    );
+      ),
+    ];
     expect(r.totalCredits()).toEqual(7);
   });
 
@@ -292,12 +294,11 @@ describe('Recipient', () => {
     expect(r.indexingYear()).toBe(2020);
 
     // Add 40 years of earnings records, starting the year they were born:
+    const records: EarningRecord[] = [];
     for (let i = 0; i < 40; i++) {
-      r.earningsRecords.push(testRecord(startYear + i));
+      records.push(testRecord(startYear + i));
     }
-    // Force refresh after push() to trigger updateEarningsRecords_()
-    // eslint-disable-next-line no-self-assign
-    r.earningsRecords = r.earningsRecords;
+    r.earningsRecords = records;
 
     return r;
   }
@@ -330,14 +331,13 @@ describe('Recipient', () => {
 
     // Add 3 years of future earnings records with enough earnings to
     // ensure that they are top 35 years.
+    const futureRecords: EarningRecord[] = [];
     for (let i = 0; i < 3; i++) {
-      r.futureEarningsRecords.push(
+      futureRecords.push(
         testRecord(constants.CURRENT_YEAR + i, Money.from(30 * 1000))
       );
     }
-    // Force refresh after push() to trigger updateEarningsRecords_()
-    // eslint-disable-next-line no-self-assign
-    r.futureEarningsRecords = r.futureEarningsRecords;
+    r.futureEarningsRecords = futureRecords;
 
     // The earliest 32 years should form the cutoff:
     expect(r.earningsRecords[31].year).toEqual(1996);

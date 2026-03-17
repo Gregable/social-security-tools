@@ -2,7 +2,7 @@
 import { createEventDispatcher } from 'svelte';
 import type { EarningRecord } from '$lib/earning-record';
 
-export let earningsRecords: Array<EarningRecord> = [];
+export let earningsRecords: ReadonlyArray<EarningRecord> = [];
 
 /**
  * When true, earnings cells become editable inputs.

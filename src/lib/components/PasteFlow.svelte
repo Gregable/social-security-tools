@@ -97,7 +97,7 @@ let zeroEarningsYear: number | null = null;
  * Find the first earnings record with $0 for the prior year that isn't already
  * marked as incomplete. Returns the year if found, null otherwise.
  */
-function findAmbiguousZeroYear(records: EarningRecord[]): number | null {
+function findAmbiguousZeroYear(records: ReadonlyArray<EarningRecord>): number | null {
   const priorYear = constants.CURRENT_YEAR - 1;
   for (const record of records) {
     if (
