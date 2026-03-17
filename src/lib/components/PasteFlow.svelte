@@ -3,7 +3,7 @@ import posthog from 'posthog-js';
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { Birthdate } from '$lib/birthday';
-import { context } from '$lib/context';
+import { recipient, spouse } from '$lib/context';
 import { EarningRecord } from '$lib/earning-record';
 import { activeIntegration } from '$lib/integrations/context';
 import { Money } from '$lib/money';
@@ -71,11 +71,11 @@ $: showProgress = mode !== Mode.PASTE_APOLOGY;
 $: showSpouseRow = !isRecipient;
 
 // Get the recipient's name for the progress indicator
-$: recipientName = context.recipient?.name || 'Self';
+$: recipientName = $recipient?.name || 'Self';
 
 // The flow supports data entry for two people. The first person is always
-// "recipient", set to context.recipient. The second person is "spouse", set
-// to context.spouse. If the user chooses to enter data for their spouse,
+// "recipient", set via the recipient store. The second person is "spouse",
+// set via the spouse store. If the user chooses to enter data for their spouse,
 // at that time isRecipient is set to false and the flow is repeated for
 // the spouse.
 let isRecipient: boolean = true;
@@ -112,15 +112,12 @@ function findAmbiguousZeroYear(records: ReadonlyArray<EarningRecord>): number | 
 }
 
 onMount(() => {
-  // Reset everything, especially the context.
-  // Note: Direct context mutation is safe here because PasteFlow renders before
-  // any components that read from context. Those components only mount after
-  // ondone() is called, at which point context is fully populated.
+  // Reset everything, especially the stores.
   mode = Mode.INITIAL;
   isRecipient = true;
   spouseName = 'Spouse';
-  context.recipient = null;
-  context.spouse = null;
+  recipient.set(null);
+  spouse.set(null);
 
   // Check for URL parameters using UrlParams class
   const urlParams = new UrlParams();
@@ -192,12 +189,12 @@ function parseRecipient(
   const birthdate = parseDob(dob);
   if (!birthdate) return null;
 
-  const recipient = new Recipient();
-  recipient.setPia(Money.from(pia));
-  recipient.birthdate = birthdate;
-  recipient.name = name || 'Self';
+  const r = new Recipient();
+  r.setPia(Money.from(pia));
+  r.birthdate = birthdate;
+  r.name = name || 'Self';
 
-  return recipient;
+  return r;
 }
 
 /**
@@ -213,12 +210,12 @@ function parseRecipientFromEarnings(
   const birthdate = parseDob(dob);
   if (!birthdate) return null;
 
-  const recipient = new Recipient();
-  recipient.earningsRecords = earningsEntriesToRecords(earnings);
-  recipient.birthdate = birthdate;
-  recipient.name = name || 'Self';
+  const r = new Recipient();
+  r.earningsRecords = earningsEntriesToRecords(earnings);
+  r.birthdate = birthdate;
+  r.name = name || 'Self';
 
-  return recipient;
+  return r;
 }
 
 function handleHashPaste(urlParams: UrlParams = new UrlParams()) {
@@ -256,12 +253,12 @@ function handleHashPaste(urlParams: UrlParams = new UrlParams()) {
   }
 
   if (recipient1) {
-    context.recipient = recipient1;
     if (recipient2) {
-      context.recipient.markFirst();
-      context.spouse = recipient2;
-      context.spouse.markSecond();
+      recipient1.markFirst();
+      recipient2.markSecond();
+      spouse.set(recipient2);
     }
+    recipient.set(recipient1);
     // Let the app know we're done.
     browser && posthog.capture('Hash Pasted', {
       has_spouse: recipient2 !== null,
@@ -280,12 +277,12 @@ function handleDemo(detail: {
   spouse: Recipient | null;
   demoType?: string;
 }) {
-  context.recipient = detail.recipient;
   if (detail.spouse !== null) {
-    context.recipient.markFirst();
-    context.spouse = detail.spouse;
-    context.spouse.markSecond();
+    detail.recipient.markFirst();
+    detail.spouse.markSecond();
+    spouse.set(detail.spouse);
   }
+  recipient.set(detail.recipient);
 
   // Notify that user has started (demo skips paste flow entirely)
   onStarted?.();
@@ -304,12 +301,12 @@ function handleDemo(detail: {
  */
 function handlePaste(detail: { recipient: Recipient }) {
   if (isRecipient) {
-    context.recipient = detail.recipient;
+    recipient.set(detail.recipient);
   } else {
-    context.recipient.markFirst();
-    context.spouse = detail.recipient;
-    context.spouse.markSecond();
-    context.spouse.name = spouseName;
+    $recipient!.markFirst();
+    detail.recipient.markSecond();
+    detail.recipient.name = spouseName;
+    spouse.set(detail.recipient);
   }
 
   // Track successful parse
@@ -340,8 +337,8 @@ function handleConfirm() {
   });
 
   const records = isRecipient
-    ? context.recipient.earningsRecords
-    : context.spouse.earningsRecords;
+    ? $recipient!.earningsRecords
+    : $spouse!.earningsRecords;
 
   zeroEarningsYear = findAmbiguousZeroYear(records);
   if (zeroEarningsYear !== null) {
@@ -373,8 +370,8 @@ function handleDecline() {
 function handleZeroEarningsConfirm(incomplete: boolean) {
   if (incomplete && zeroEarningsYear !== null) {
     const records = isRecipient
-      ? context.recipient.earningsRecords
-      : context.spouse.earningsRecords;
+      ? $recipient!.earningsRecords
+      : $spouse!.earningsRecords;
 
     // Find and mark the record as incomplete
     for (const record of records) {
@@ -407,25 +404,25 @@ function handleAgeSubmit(detail: { birthdate: Birthdate }) {
   });
 
   if (isRecipient) {
-    context.recipient.birthdate = detail.birthdate;
+    $recipient!.birthdate = detail.birthdate;
     if (!allowSpouseFlow) {
       if (recipientNameFromHash) {
-        context.recipient.name = recipientNameFromHash;
+        $recipient!.name = recipientNameFromHash;
       }
       browser && posthog.capture('Pasted', {
-        record_count: context.recipient.earningsRecords.length,
-        is_pia_only: context.recipient.isPiaOnly,
+        record_count: $recipient!.earningsRecords.length,
+        is_pia_only: $recipient!.isPiaOnly,
       });
       ondone?.();
       return;
     }
   } else {
-    context.spouse.birthdate = detail.birthdate;
+    $spouse!.birthdate = detail.birthdate;
     browser && posthog.capture('Pasted with spousal', {
-      record_count_recipient: context.recipient.earningsRecords.length,
-      record_count_spouse: context.spouse.earningsRecords.length,
-      recipient_is_pia_only: context.recipient.isPiaOnly,
-      spouse_is_pia_only: context.spouse.isPiaOnly,
+      record_count_recipient: $recipient!.earningsRecords.length,
+      record_count_spouse: $spouse!.earningsRecords.length,
+      recipient_is_pia_only: $recipient!.isPiaOnly,
+      spouse_is_pia_only: $spouse!.isPiaOnly,
     });
     // Let the app know we're done.
     ondone?.();
@@ -444,7 +441,7 @@ function handleSpouseQuestion(detail: {
   name: string;
   spousename?: string;
 }) {
-  context.recipient.name = detail.name;
+  $recipient!.name = detail.name;
   if (detail.spouse) {
     browser && posthog.capture('Paste Flow: Couple Selected');
     // Mark the recipient as first. Spouse will be marked second later.
@@ -456,8 +453,8 @@ function handleSpouseQuestion(detail: {
   } else {
     browser && posthog.capture('Paste Flow: Single Selected');
     browser && posthog.capture('Pasted', {
-      record_count: context.recipient.earningsRecords.length,
-      is_pia_only: context.recipient.isPiaOnly,
+      record_count: $recipient!.earningsRecords.length,
+      is_pia_only: $recipient!.isPiaOnly,
     });
     // Let the app know we're done.
     ondone?.();
@@ -487,7 +484,7 @@ function handleSpouseQuestion(detail: {
     <PasteConfirm
       onconfirm={handleConfirm}
       ondecline={handleDecline}
-      earningsRecords={isRecipient ? context.recipient.earningsRecords : context.spouse.earningsRecords}
+      earningsRecords={isRecipient ? $recipient.earningsRecords : $spouse.earningsRecords}
       name={isRecipient ? '' : spouseName}
     />
   {:else if mode === Mode.PASTE_APOLOGY}

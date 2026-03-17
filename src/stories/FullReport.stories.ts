@@ -1,19 +1,19 @@
 import type { Meta } from '@storybook/svelte';
 import { Birthdate } from '$lib/birthday';
 
-import { context } from '$lib/context';
+import { recipient, spouse } from '$lib/context';
 import demo from '$lib/pastes/averagepaste.txt?raw';
 import demo_spouse_low from '$lib/pastes/averagepaste-spouse.txt?raw';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
 import App from '../routes/calculator/+page.svelte';
 
-const recipient = new Recipient();
-recipient.name = 'Alex';
-recipient.markFirst();
-recipient.earningsRecords = parsePaste(demo);
-recipient.birthdate = Birthdate.FromYMD(1950, 6, 1);
-context.recipient = recipient;
+const r = new Recipient();
+r.name = 'Alex';
+r.markFirst();
+r.earningsRecords = parsePaste(demo);
+r.birthdate = Birthdate.FromYMD(1950, 6, 1);
+recipient.set(r);
 
 // This data is such that the spouse has a low enough PIA that they can claim
 // spousal benefits, but not a zero PIA.
@@ -22,7 +22,7 @@ spouseLowEarner.name = 'Chris';
 spouseLowEarner.markSecond();
 spouseLowEarner.earningsRecords = parsePaste(demo_spouse_low);
 spouseLowEarner.birthdate = Birthdate.FromYMD(1950, 6, 1);
-context.spouse = spouseLowEarner;
+spouse.set(spouseLowEarner);
 
 const meta: Meta<App> = {
   component: App,

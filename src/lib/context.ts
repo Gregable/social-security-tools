@@ -1,11 +1,14 @@
 /**
  * Global context for the application.
+ *
+ * All reactive state is exposed as Svelte stores for uniform access
+ * and proper reactivity tracking.
  */
 
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { higherEarningsThan } from './benefit-calculator';
-import type { MonthDate } from './month-time';
+import { MonthDate } from './month-time';
 import { Recipient, type SerializedRecipient } from './recipient';
 
 const SESSION_KEY = 'ssa-tools-session';
@@ -14,17 +17,16 @@ interface SerializedSession {
   recipient: SerializedRecipient | null;
   spouse: SerializedRecipient | null;
   isDemo: boolean;
+  recipientFilingMonthsSinceEpoch: number | null;
+  spouseFilingMonthsSinceEpoch: number | null;
   version: number;
 }
 
-const SESSION_VERSION = 1;
+const SESSION_VERSION = 2;
 
-class Context {
-  recipient: Recipient | null = null;
-  spouse: Recipient | null = null;
-}
-
-export const context = new Context();
+// Core recipient stores
+export const recipient = writable<Recipient | null>(null);
+export const spouse = writable<Recipient | null>(null);
 
 /**
  * Flag to track if current data is demo data.
@@ -38,19 +40,28 @@ export const isDemo = writable<boolean>(false);
 export function saveSession(demo: boolean = false): void {
   if (!browser) return;
 
+  const r = get(recipient);
+  const s = get(spouse);
+
   const session: SerializedSession = {
-    recipient: context.recipient?.serialize() ?? null,
-    spouse: context.spouse?.serialize() ?? null,
+    recipient: r?.serialize() ?? null,
+    spouse: s?.serialize() ?? null,
     isDemo: demo,
+    recipientFilingMonthsSinceEpoch:
+      get(recipientFilingDate)?.monthsSinceEpoch() ?? null,
+    spouseFilingMonthsSinceEpoch:
+      get(spouseFilingDate)?.monthsSinceEpoch() ?? null,
     version: SESSION_VERSION,
   };
 
   try {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    isDemo.set(demo);
   } catch (e) {
     console.error('Failed to save session:', e);
   }
+
+  // Always update in-memory state regardless of storage success
+  isDemo.set(demo);
 }
 
 /**
@@ -71,20 +82,44 @@ export function restoreSession(): boolean {
       return false;
     }
 
+    // Deserialize everything into locals first so stores are only
+    // updated atomically after all deserialization succeeds.
+    let restoredRecipient: Recipient | null = null;
+    let restoredSpouse: Recipient | null = null;
+    let restoredRecipientFiling: MonthDate | null = null;
+    let restoredSpouseFiling: MonthDate | null = null;
+
     if (session.recipient) {
-      context.recipient = Recipient.deserialize(session.recipient);
+      restoredRecipient = Recipient.deserialize(session.recipient);
       if (session.spouse) {
-        context.recipient.markFirst();
+        restoredRecipient.markFirst();
       }
     }
 
     if (session.spouse) {
-      context.spouse = Recipient.deserialize(session.spouse);
-      context.spouse.markSecond();
+      restoredSpouse = Recipient.deserialize(session.spouse);
+      restoredSpouse.markSecond();
     }
 
+    if (typeof session.recipientFilingMonthsSinceEpoch === 'number') {
+      restoredRecipientFiling = new MonthDate(
+        session.recipientFilingMonthsSinceEpoch
+      );
+    }
+
+    if (typeof session.spouseFilingMonthsSinceEpoch === 'number') {
+      restoredSpouseFiling = new MonthDate(
+        session.spouseFilingMonthsSinceEpoch
+      );
+    }
+
+    // All deserialization succeeded -- commit to stores
+    recipient.set(restoredRecipient);
+    spouse.set(restoredSpouse);
+    recipientFilingDate.set(restoredRecipientFiling);
+    spouseFilingDate.set(restoredSpouseFiling);
     isDemo.set(session.isDemo);
-    return context.recipient !== null;
+    return restoredRecipient !== null;
   } catch (e) {
     console.error('Failed to restore session:', e);
     clearSession();
@@ -104,11 +139,9 @@ export function clearSession(): void {
     console.error('Failed to clear session:', e);
   }
 
-  context.recipient = null;
-  context.spouse = null;
+  recipient.set(null);
+  spouse.set(null);
   isDemo.set(false);
-  // Reset filing date stores to ensure derived stores (e.g., higherEarnerFilingDate)
-  // re-compute and detect the cleared context
   recipientFilingDate.set(null);
   spouseFilingDate.set(null);
 }
@@ -146,13 +179,14 @@ export const isStuck = derived(
 export const recipientFilingDate = writable<MonthDate | null>(null);
 export const spouseFilingDate = writable<MonthDate | null>(null);
 
-// Derived store for higher earner's filing date
+// Derived store for higher earner's filing date.
+// Depends on recipient/spouse stores so it re-evaluates when they change.
 export const higherEarnerFilingDate = derived(
-  [recipientFilingDate, spouseFilingDate],
-  ([$recipientDate, $spouseDate]) => {
-    if (!context.recipient || !context.spouse) return null;
+  [recipient, spouse, recipientFilingDate, spouseFilingDate],
+  ([$recipient, $spouse, $recipientDate, $spouseDate]) => {
+    if (!$recipient || !$spouse) return null;
 
-    if (higherEarningsThan(context.recipient, context.spouse)) {
+    if (higherEarningsThan($recipient, $spouse)) {
       return $recipientDate;
     } else {
       return $spouseDate;
@@ -162,9 +196,11 @@ export const higherEarnerFilingDate = derived(
 
 // Helper function to set higher earner filing date
 export function setHigherEarnerFilingDate(date: MonthDate | null) {
-  if (!context.recipient || !context.spouse) return;
+  const r = get(recipient);
+  const s = get(spouse);
+  if (!r || !s) return;
 
-  if (higherEarningsThan(context.recipient, context.spouse)) {
+  if (higherEarningsThan(r, s)) {
     recipientFilingDate.set(date);
   } else {
     spouseFilingDate.set(date);
