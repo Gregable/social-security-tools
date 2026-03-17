@@ -1,5 +1,4 @@
 <script lang="ts">
-import { createEventDispatcher } from 'svelte';
 import type { EarningRecord } from '$lib/earning-record';
 
 export let earningsRecords: ReadonlyArray<EarningRecord> = [];
@@ -9,16 +8,16 @@ export let earningsRecords: ReadonlyArray<EarningRecord> = [];
  */
 export let editable: boolean = false;
 
-const dispatch = createEventDispatcher<{
-  earningsChange: { index: number; year: number; wage: number };
-}>();
+export let onearningschange:
+  | ((detail: { index: number; year: number; wage: number }) => void)
+  | undefined = undefined;
 
 function handleEarningsInput(index: number, year: number, event: Event) {
   const input = event.target as HTMLInputElement;
   const rawValue = input.value.replace(/[^0-9]/g, '');
   let value = parseInt(rawValue, 10);
   if (isNaN(value)) value = 0;
-  dispatch('earningsChange', { index, year, wage: value });
+  onearningschange?.({ index, year, wage: value });
 }
 </script>
 

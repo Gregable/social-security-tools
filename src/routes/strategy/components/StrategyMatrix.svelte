@@ -232,9 +232,11 @@ function getCellStyle(i: number, j: number): string {
 }
 
 // Handle events
-function handleCellHover(event) {
-  const { rowIndex, colIndex } = event.detail;
-  onhovercell?.({ rowIndex, colIndex });
+function handleCellHover(detail: {
+  rowIndex: number;
+  colIndex: number;
+}) {
+  onhovercell?.(detail);
 }
 
 function handleCellHoverOut() {
@@ -265,8 +267,11 @@ function handleHeaderHoverOut() {
   headerHoverInfo = null;
 }
 
-function handleCellSelect(event) {
-  const { rowIndex, colIndex } = event.detail;
+function handleCellSelect(detail: {
+  rowIndex: number;
+  colIndex: number;
+}) {
+  const { rowIndex, colIndex } = detail;
   const result = calculationResults.get(
     rowIndex,
     colIndex
@@ -421,9 +426,9 @@ function handleCellSelect(event) {
               cellWidth={cellDimensions[i]?.[j]?.width || 0}
               cellHeight={cellDimensions[i]?.[j]?.height || 0}
               cellStyle={getCellStyle(i, j)}
-              on:hover={handleCellHover}
-              on:hoverout={handleCellHoverOut}
-              on:select={handleCellSelect}
+              onhover={handleCellHover}
+              onhoverout={handleCellHoverOut}
+              onselect={handleCellSelect}
             />
           {/each}
         {/each}

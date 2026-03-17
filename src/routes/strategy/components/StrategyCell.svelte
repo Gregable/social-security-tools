@@ -1,5 +1,4 @@
 <script lang="ts">
-import { createEventDispatcher } from 'svelte';
 import RecipientName from '$lib/components/RecipientName.svelte';
 import type { Recipient } from '$lib/recipient';
 import { getFilingAge, getFilingDate } from '$lib/strategy/ui';
@@ -17,7 +16,14 @@ export let cellWidth: number = 0;
 export let cellHeight: number = 0;
 export let cellStyle: string = '';
 
-const dispatch = createEventDispatcher();
+// Callback props
+export let onhover:
+  | ((detail: { rowIndex: number; colIndex: number }) => void)
+  | undefined = undefined;
+export let onhoverout: (() => void) | undefined = undefined;
+export let onselect:
+  | ((detail: { rowIndex: number; colIndex: number }) => void)
+  | undefined = undefined;
 
 // Cell hover overlay state
 let cellHoverInfo: {
@@ -47,7 +53,7 @@ $: isHighlightedRow =
 
 // Handle events
 function handleMouseOver(event: MouseEvent) {
-  dispatch('hover', { rowIndex, colIndex });
+  onhover?.({ rowIndex, colIndex });
 
   if (calculationResult) {
     // Calculate filing dates for both recipients
@@ -75,20 +81,20 @@ function handleMouseOver(event: MouseEvent) {
 }
 
 function handleFocus() {
-  dispatch('hover', { rowIndex, colIndex });
+  onhover?.({ rowIndex, colIndex });
 }
 
 function handleMouseOut() {
-  dispatch('hoverout');
+  onhoverout?.();
   cellHoverInfo = null;
 }
 
 function handleBlur() {
-  dispatch('hoverout');
+  onhoverout?.();
 }
 
 function handleClick() {
-  dispatch('select', { rowIndex, colIndex });
+  onselect?.({ rowIndex, colIndex });
 }
 
 function handleKeydown(e: KeyboardEvent) {

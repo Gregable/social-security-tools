@@ -17,10 +17,12 @@ $: editable = $recipient.first
   ? $firstFutureEarningsEditable
   : $secondFutureEarningsEditable;
 
-function handleEarningsChange(
-  event: CustomEvent<{ index: number; year: number; wage: number }>
-) {
-  const { index, wage } = event.detail;
+function handleEarningsChange(detail: {
+  index: number;
+  year: number;
+  wage: number;
+}) {
+  const { index, wage } = detail;
   // Build new records from existing, with the changed value
   const records = $recipient.futureEarningsRecords.map((r, i) => ({
     year: r.year,
@@ -97,7 +99,7 @@ $: priorYear = constants.CURRENT_YEAR - 1;
   <EarningsTable
     earningsRecords={$recipient.futureEarningsRecords}
     {editable}
-    on:earningsChange={handleEarningsChange}
+    onearningschange={handleEarningsChange}
   />
   {#if editable}
     <p class="cap-note noprint">
