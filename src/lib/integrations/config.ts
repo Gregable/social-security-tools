@@ -117,6 +117,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'rachaelcampwealth.com': {
+    id: 'rachaelcampwealth.com',
+    displayName: 'Rachael Camp Wealth',
+    reportEndLabel: '',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/rachaelcampwealth.com/rachel-camp.png'
+      );
+      return module.default;
+    },
+  },
 };
 
 /**
