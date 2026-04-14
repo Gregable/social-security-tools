@@ -40,3 +40,6 @@ dist-ssr
 
 # Test coverage reports
 /coverage
+
+# Local developer files
+/local
