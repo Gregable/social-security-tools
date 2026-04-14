@@ -316,10 +316,15 @@ export function survivorBenefit(
     } else {
       // If the deceased died after Normal Retirement Age, the survivor
       // benefit is based on the deceased recipient's benefit as though they
-      // filed for benefits on the date of death.
+      // filed for benefits on the date of death. Delayed retirement credits
+      // stop accruing at age 70, so cap the effective filing date there.
+      const age70Date = deceased.birthdate.dateAtSsaAge(
+        MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+      );
+      const effectiveFilingDate = MonthDate.min(deceasedDeathDate, age70Date);
       baseSurvivorBenefit = benefitOnDate(
         deceased,
-        deceasedDeathDate,
+        effectiveFilingDate,
         deceased.birthdate.dateAtSsaAge(
           MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
         )
