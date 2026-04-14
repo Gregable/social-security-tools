@@ -290,11 +290,6 @@
 
 <main>
   <div class="limited-width">
-    <h1>
-      Warning: This is a work in progress and probably incorrect. Please
-      disregard.
-    </h1>
-
     <p>
       This calculation shows an "optimal" social security filing strategy for
       your personal situation, for all possible years of death ranging from 62
