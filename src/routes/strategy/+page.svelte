@@ -28,6 +28,13 @@
   import StrategyDetailsSingle from "./components/StrategyDetailsSingle.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyPlotSingle from "./components/StrategyPlotSingle.svelte";
+  import {
+    expectedNPVSingle,
+    expectedNPVCouple,
+    type FilingAgeResult,
+    type CoupleFilingAgeResult,
+  } from "$lib/strategy/calculations/expected-npv";
+  import OptimalStrategyHeadline from "./components/OptimalStrategyHeadline.svelte";
 
   // Constants
   const DEFAULT_BIRTHDATE = "1965-03-15";
@@ -51,6 +58,8 @@
   let deathProbDistribution2: { age: number; probability: number }[] = [];
   // Elapsed time now accessed directly inside StrategyMatrixDisplay
   let displayAsAges: boolean = false;
+  let optimalSingleResult: FilingAgeResult | undefined = undefined;
+  let optimalCoupleResult: CoupleFilingAgeResult | undefined = undefined;
 
   // Form inputs
   let isSingle: boolean = false;
@@ -258,6 +267,30 @@
         }
       }
       calculationResults.completeRun();
+
+      // Compute probabilistic optimal filing age(s)
+      if (isSingle) {
+        const singleResults = expectedNPVSingle(
+          recipients[0],
+          currentDate,
+          discountRate,
+          deathProbDistribution1
+        );
+        optimalSingleResult =
+          singleResults.length > 0 ? singleResults[0] : undefined;
+        optimalCoupleResult = undefined;
+      } else {
+        const coupleResults = expectedNPVCouple(
+          recipients,
+          currentDate,
+          discountRate,
+          [deathProbDistribution1, deathProbDistribution2]
+        );
+        optimalCoupleResult =
+          coupleResults.length > 0 ? coupleResults[0] : undefined;
+        optimalSingleResult = undefined;
+      }
+
       calculationResultsStore.set(calculationResults);
     } catch (error) {
       console.error("Calculation error:", error);
@@ -340,6 +373,14 @@
   </section>
   <section class="calculation-section">
     {#if calculationResults.status() === CalculationStatus.Complete}
+      <div class="limited-width">
+        <OptimalStrategyHeadline
+          {isSingle}
+          singleResult={optimalSingleResult}
+          coupleResult={optimalCoupleResult}
+          recipientNames={[recipients[0].name, recipients[1].name]}
+        />
+      </div>
       {#if isSingle}
         <StrategyPlotSingle
           recipient={recipients[0]}
