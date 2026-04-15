@@ -92,6 +92,26 @@ export interface CoupleFilingAgeResult {
  * @returns Array of {filingAges, expectedNPVCents} sorted descending by
  *          expectedNPVCents. The first element is the optimal filing pair.
  */
+/**
+ * Optimized version of expectedNPVCouple. Must produce identical results
+ * to the exact version (validated against 1,000 golden test cases).
+ *
+ * TODO: Replace stub with actual optimization.
+ */
+export function expectedNPVCoupleOptimized(
+  recipients: [Recipient, Recipient],
+  currentDate: MonthDate,
+  discountRate: number,
+  deathProbDists: [DeathProbability[], DeathProbability[]]
+): CoupleFilingAgeResult[] {
+  return expectedNPVCouple(
+    recipients,
+    currentDate,
+    discountRate,
+    deathProbDists
+  );
+}
+
 export function expectedNPVCouple(
   recipients: [Recipient, Recipient],
   currentDate: MonthDate,
