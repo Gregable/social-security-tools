@@ -1,7 +1,6 @@
 import {
   benefitOnDate,
   eligibleForSpousalBenefit,
-  higherEarningsThan,
   spousalBenefitOnDate,
   survivorBenefit,
 } from '$lib/benefit-calculator';
@@ -9,6 +8,7 @@ import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { BenefitPeriod, BenefitType } from './benefit-period.js';
+import { classifyEarnerDependent } from './earner-dependent.js';
 import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
 
 /**
@@ -47,15 +47,7 @@ export function strategySumPeriodsCouple(
 
   // Determine the higher and lower earner based on their Primary Insurance
   // Amount (PIA).
-  let earnerIndex: number;
-  let dependentIndex: number;
-  if (higherEarningsThan(recipients[0], recipients[1])) {
-    earnerIndex = 0;
-    dependentIndex = 1;
-  } else {
-    earnerIndex = 1;
-    dependentIndex = 0;
-  }
+  const { earnerIndex, dependentIndex } = classifyEarnerDependent(recipients);
   earner = recipients[earnerIndex];
   dependent = recipients[dependentIndex];
   earnerFinalDate = finalDates[earnerIndex];
@@ -185,7 +177,9 @@ export function strategySumPeriodsCouple(
  * @param {number} annualDiscountRate - Annual discount rate (e.g., 0.03 for 3%).
  * @returns {number} Monthly discount rate.
  */
-function calculateMonthlyDiscountRate(annualDiscountRate: number): number {
+export function calculateMonthlyDiscountRate(
+  annualDiscountRate: number
+): number {
   if (annualDiscountRate === 0) {
     return 0;
   } else {
@@ -420,28 +414,13 @@ export function createOptimizationContext(
   monthlyDiscountRate: number
 ): OptimizationContext {
   // Determine the higher and lower earner based on their Primary Insurance Amount (PIA).
-  let earner: Recipient;
-  let dependent: Recipient;
-  let earnerFinalDate: MonthDate;
-  let dependentFinalDate: MonthDate;
-  let earnerIndex: number;
-  let dependentIndex: number;
-
-  if (higherEarningsThan(recipients[0], recipients[1])) {
-    earner = recipients[0];
-    dependent = recipients[1];
-    earnerFinalDate = finalDates[0];
-    dependentFinalDate = finalDates[1];
-    earnerIndex = 0;
-    dependentIndex = 1;
-  } else {
-    earner = recipients[1];
-    dependent = recipients[0];
-    earnerFinalDate = finalDates[1];
-    dependentFinalDate = finalDates[0];
-    earnerIndex = 1;
-    dependentIndex = 0;
-  }
+  const classified = classifyEarnerDependent(recipients);
+  const earner = classified.earner;
+  const dependent = classified.dependent;
+  const earnerIndex = classified.earnerIndex;
+  const dependentIndex = classified.dependentIndex;
+  const earnerFinalDate = finalDates[earnerIndex];
+  const dependentFinalDate = finalDates[dependentIndex];
 
   const dependentHasZeroPia =
     dependent.pia().primaryInsuranceAmount().cents() === 0;
