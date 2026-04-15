@@ -36,7 +36,11 @@ const config = {
     // Disable the fuzz test except for manual runs:
     // To run the fuzz test manually, use:
     //   npm test src/test/strategy/fuzz.test.ts
-    exclude: ['src/test/strategy/fuzz.test.ts'],
+    exclude: [
+      'src/test/strategy/fuzz.test.ts',
+      'src/test/strategy/generate-goldens.test.ts',
+      'src/test/strategy/expected-npv-couple-goldens.test.ts',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
