@@ -39,6 +39,7 @@
   const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
   const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
   const MIN_FILING_AGE = 62;
+  const REACTIVE_DEBOUNCE_MS = 200;
   // Wrap results in a store so internal mutations (status/selection) can trigger UI updates
   const calculationResultsStore = writable<CalculationResults>(
     new CalculationResults()
@@ -72,11 +73,53 @@
   let recipientInputsValid = false;
   let discountRateValid = true;
 
+  // Reactive recompute state (activated after first manual Calculate click).
+  let hasCalculatedOnce = false;
+  let rerunPending = false;
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  // In-flight guard kept separate from the published CalculationResults
+  // status so that we can keep the previous results visible while the next
+  // run computes and then swap atomically (no blank-flash between runs).
+  let isRunning = false;
+
   // Overall form validity
   $: formIsValid = recipientInputsValid && discountRateValid;
 
   // Reactive statement to convert percentage to decimal
   $: discountRate = discountRatePercent / 100;
+
+  // Watch the narrow set of "exploration" inputs and schedule a debounced
+  // recompute. Arguments (not free variables) are what Svelte tracks as
+  // dependencies, so the gate flags checked inside the helper do not
+  // themselves trigger re-evaluation of the reactive block.
+  $: maybeScheduleReactiveRecompute(
+    recipients[0].healthMultiplier,
+    isSingle ? 0 : recipients[1].healthMultiplier,
+    discountRatePercent,
+    isSingle
+  );
+
+  function maybeScheduleReactiveRecompute(
+    _h1: number,
+    _h2: number,
+    _d: number,
+    _s: boolean
+  ): void {
+    if (!hasCalculatedOnce || !formIsValid) return;
+    scheduleRecompute();
+  }
+
+  function scheduleRecompute(): void {
+    if (debounceTimer !== null) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      debounceTimer = null;
+      calculateStrategyMatrix();
+    }, REACTIVE_DEBOUNCE_MS);
+  }
+
+  onDestroy(() => {
+    if (debounceTimer !== null) clearTimeout(debounceTimer);
+  });
 
   // Recipients setup
   let recipients: [Recipient, Recipient] = initializeRecipients();
@@ -166,35 +209,38 @@
    * Main calculation function for optimal strategy matrix
    */
   async function calculateStrategyMatrix() {
-    if (calculationResults.status() === CalculationStatus.Running) return;
-    const fresh = new CalculationResults();
-    calculationResultsStore.set(fresh);
+    if (isRunning) {
+      // Another run is in flight. Queue the latest state for re-run so the
+      // user's newest inputs don't get dropped.
+      rerunPending = true;
+      return;
+    }
+    isRunning = true;
+
+    // Preserve previous selection so it survives an atomic swap. Row/col
+    // bucket labels are derived from birthdate/gender/age (not health or
+    // discount rate), so they stay stable across reactive recomputes.
+    const prevSelected = calculationResults.getSelectedLabels();
 
     try {
-      // Update death probability distributions first (in case they're not current)
       await updateDeathProbabilityDistributions();
 
-      // Calculate total calculations needed
-      const sized = new CalculationResults(
+      const next = new CalculationResults(
         deathAgeBuckets1.length,
         isSingle ? 1 : deathAgeBuckets2.length
       );
-      sized.beginRun();
-      calculationResultsStore.set(sized);
+      next.beginRun();
 
-      // Get current date for optimal strategy calculation
       const now = new Date();
       const currentDate = MonthDate.initFromYearsMonths({
         years: now.getFullYear(),
         months: now.getMonth(),
       });
 
-      // Initialize results matrix
-
-      // Grid calculation runs synchronously — it's fast enough (tens of ms
-      // on a typical laptop for the default grid) that yielding to the event
-      // loop between rows for progress-bar updates is pure overhead. Compute
-      // the whole matrix in one pass and render once at the end.
+      // Grid calculation runs synchronously — tens of ms on a typical
+      // laptop for the default grid. Compute the whole matrix into `next`
+      // and publish once at the end so the previous results remain
+      // visible until the swap.
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
           const bucket1 = deathAgeBuckets1[i];
@@ -208,7 +254,7 @@
             discountRate
           );
 
-          calculationResults.set(i, 0, {
+          next.set(i, 0, {
             deathAge1: bucket1.label,
             bucket1,
             filingAge1: optimalFilingAge,
@@ -238,7 +284,7 @@
                 discountRate
               );
 
-            calculationResults.set(i, j, {
+            next.set(i, j, {
               deathAge1: bucket1.label,
               deathAge2: bucket2.label,
               bucket1,
@@ -254,9 +300,9 @@
           }
         }
       }
-      calculationResults.completeRun();
+      next.completeRun();
 
-      // Compute probabilistic optimal filing age(s)
+      // Compute probabilistic optimal filing age(s).
       if (isSingle) {
         const singleResults = expectedNPVSingle(
           recipients[0],
@@ -279,15 +325,25 @@
         optimalSingleResult = undefined;
       }
 
-      calculationResultsStore.set(calculationResults);
+      if (prevSelected) {
+        next.setSelectedByLabels(
+          prevSelected.rowLabel,
+          prevSelected.colLabel
+        );
+      }
+
+      calculationResultsStore.set(next);
+      hasCalculatedOnce = true;
     } catch (error) {
       console.error("Calculation error:", error);
-      calculationResults.failRun(error.message || String(error));
-      calculationResultsStore.set(calculationResults);
+      const errResults = new CalculationResults();
+      errResults.failRun(error.message || String(error));
+      calculationResultsStore.set(errResults);
     } finally {
-      if (calculationResults.status() === CalculationStatus.Running) {
-        calculationResults.setStatus(CalculationStatus.Idle);
-        calculationResultsStore.set(calculationResults);
+      isRunning = false;
+      if (rerunPending) {
+        rerunPending = false;
+        calculateStrategyMatrix();
       }
     }
   }
@@ -354,7 +410,6 @@
 
   <section class="limited-width">
     <CalculationControls
-      {calculationResults}
       disabled={!formIsValid}
       oncalculate={calculateStrategyMatrix}
     />
