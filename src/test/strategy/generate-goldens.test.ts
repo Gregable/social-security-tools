@@ -44,6 +44,10 @@ interface GoldenTestCase {
     discountRate: number;
     currentDateYear: number;
     currentDateMonth: number;
+    // When true, recipients[0] is the lower-PIA "dependent" and recipients[1]
+    // is the higher-PIA "earner". Exercises the earner/dependent role
+    // classification in the optimized code.
+    swapOrder: boolean;
     deathProbs0: DeathProbability[];
     deathProbs1: DeathProbability[];
   };
@@ -93,9 +97,10 @@ function generateDeathProbs(
 }
 
 function generateTestCase(id: number, rng: () => number): GoldenTestCase {
-  // Random PIAs
+  // Random PIAs. ~10% of cases have a zero-PIA "dependent" (tests the
+  // depZeroPia branch of the optimized code).
   const earnerPIA = Math.floor(500 + rng() * 3500);
-  const depPIA = Math.floor(rng() * earnerPIA);
+  const depPIA = rng() < 0.1 ? 0 : Math.floor(rng() * earnerPIA);
 
   // Random birthdates
   const earnerBirthYear = Math.floor(1955 + rng() * 15); // 1955-1969
@@ -107,8 +112,14 @@ function generateTestCase(id: number, rng: () => number): GoldenTestCase {
   const depBirthMonth = Math.floor(rng() * 12);
   const depBirthDay = Math.floor(1 + rng() * 28);
 
-  // Random discount rate (0-7%)
-  const discountRate = rng() * 0.07;
+  // Random discount rate (0-7%). ~10% of cases have exactly 0 (tests the
+  // mRate===0 branch of the optimized code).
+  const discountRate = rng() < 0.1 ? 0 : rng() * 0.07;
+
+  // ~50% of the time, swap recipient order so the higher-PIA recipient is at
+  // recipients[1] instead of [0]. This exercises the classifyEarnerDependent
+  // index remapping in expectedNPVCoupleOptimized.
+  const swapOrder = rng() < 0.5;
 
   // Current date: use 2026-03 (April 2026) for consistency
   const currentDateYear = 2026;
@@ -127,33 +138,53 @@ function generateTestCase(id: number, rng: () => number): GoldenTestCase {
   const numDeathAges = 10 + Math.floor(rng() * 6); // 10-15
   const startAge0 = Math.max(earnerCurrentAge, 62);
   const startAge1 = Math.max(depCurrentAge, 62);
-  const deathProbs0 = generateDeathProbs(rng, numDeathAges, startAge0);
-  const deathProbs1 = generateDeathProbs(rng, numDeathAges, startAge1);
+  // These are keyed to the earner / dependent semantically (indices 0/1 by
+  // PIA). When swapOrder is true below, we'll reorder both recipients and
+  // their death distributions together so they stay paired correctly.
+  const deathProbs0Raw = generateDeathProbs(rng, numDeathAges, startAge0);
+  const deathProbs1Raw = generateDeathProbs(rng, numDeathAges, startAge1);
 
-  // Create recipients
-  const r0 = new Recipient();
-  r0.birthdate = Birthdate.FromYMD(
+  // Create recipients. When swapOrder is true, recipients[0] is the lower-PIA
+  // "dependent" and recipients[1] is the higher-PIA "earner". deathProbs0 /
+  // deathProbs1 are paired with recipients[0] / recipients[1] respectively.
+  const earnerRec = new Recipient();
+  earnerRec.birthdate = Birthdate.FromYMD(
     earnerBirthYear,
     earnerBirthMonth,
     earnerBirthDay
   );
-  r0.setPia(Money.from(earnerPIA));
+  earnerRec.setPia(Money.from(earnerPIA));
 
-  const r1 = new Recipient();
-  r1.birthdate = Birthdate.FromYMD(depBirthYear, depBirthMonth, depBirthDay);
-  r1.setPia(Money.from(depPIA));
+  const depRec = new Recipient();
+  depRec.birthdate = Birthdate.FromYMD(
+    depBirthYear,
+    depBirthMonth,
+    depBirthDay
+  );
+  depRec.setPia(Money.from(depPIA));
 
-  const recipients: [Recipient, Recipient] = [r0, r1];
+  const recipients: [Recipient, Recipient] = swapOrder
+    ? [depRec, earnerRec]
+    : [earnerRec, depRec];
+  // Death distributions are keyed to the earner/dependent semantics: they were
+  // generated from earnerCurrentAge/depCurrentAge. Keep them aligned with the
+  // person they were generated for when we swap recipient order.
+  const deathProbsByIndex: [DeathProbability[], DeathProbability[]] = swapOrder
+    ? [deathProbs1Raw, deathProbs0Raw]
+    : [deathProbs0Raw, deathProbs1Raw];
+
   const currentDate = MonthDate.initFromYearsMonths({
     years: currentDateYear,
     months: currentDateMonth,
   });
 
   // Run the exact calculation
-  const results = expectedNPVCouple(recipients, currentDate, discountRate, [
-    deathProbs0,
-    deathProbs1,
-  ]);
+  const results = expectedNPVCouple(
+    recipients,
+    currentDate,
+    discountRate,
+    deathProbsByIndex
+  );
 
   if (results.length === 0) return null as any;
 
@@ -177,8 +208,9 @@ function generateTestCase(id: number, rng: () => number): GoldenTestCase {
       discountRate,
       currentDateYear,
       currentDateMonth,
-      deathProbs0,
-      deathProbs1,
+      swapOrder,
+      deathProbs0: deathProbsByIndex[0],
+      deathProbs1: deathProbsByIndex[1],
     },
     output: {
       filingAge0Months: top5[0].filingAge0Months,
