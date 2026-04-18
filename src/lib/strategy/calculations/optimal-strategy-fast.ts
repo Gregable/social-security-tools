@@ -51,7 +51,20 @@ import {
 } from './strategy-calc.js';
 
 // ─────────────────────────────────────────────────────────────────────────
-// Shared primitives (duplicated from expected-npv.ts; keep in sync)
+// Shared primitives
+//
+// The four functions below (benefitCentsAtAge, filingYearCents,
+// spousalCentsForPair, survivorCentsCalc) are byte-for-byte copies of the
+// same-named helpers in expected-npv.ts (lines 153-317). They are
+// duplicated rather than imported to keep this hot-path module
+// self-contained for inlining. Authoritative docstrings (early-filing
+// rules, "January bump", survivor ratio, etc.) live in expected-npv.ts;
+// consult those when editing.
+//
+// Drift between the two copies will only surface through golden tests
+// (grid-optimal-goldens.test.ts + expected-npv-couple-goldens.test.ts),
+// so edit both copies together. Extracting to a shared module is a
+// pending follow-up.
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Personal benefit at a given filing age, in cents. */
@@ -273,6 +286,17 @@ export function optimalStrategyCoupleFast(
   // ── Pre-tabulate discount factors dkF[k] = (1+r)^-k for k=0..maxLag+1 ──
   const maxEpoch = Math.max(eDeath, dDeath) + 2;
   const tableSize = maxEpoch - curEpoch + 1;
+  // Invariant: tableSize >= 1. Guaranteed by the sentinel above (either
+  // eDeath >= eSsaBirth + eStart >= curEpoch, since earliestFiling returns
+  // a date no earlier than currentDate; similarly for dDeath). Assert
+  // explicitly so a cryptic Float64Array RangeError can't bury this if
+  // earliestFiling's semantics change.
+  if (tableSize < 1) {
+    throw new Error(
+      `discount-factor table size must be >= 1; got ${tableSize} ` +
+        `(curEpoch=${curEpoch}, eDeath=${eDeath}, dDeath=${dDeath})`
+    );
+  }
   const dkF = new Float64Array(tableSize);
   if (mRate === 0) {
     for (let k = 0; k < tableSize; k++) dkF[k] = 1;
@@ -335,10 +359,12 @@ export function optimalStrategyCoupleFast(
   const dFY = new Float64Array(nDF);
   const dPJ = new Float64Array(nDF);
   // `dPersFullNPV[i]` = dep personal NPV with no survivor truncation
-  // (dFile .. dDeath). Used when !isSurvivorActive.
+  // (dFile .. dDeath). Used whenever the dep personal period is not cut
+  // short by the survivor benefit kicking in.
   const dPersFullNPV = new Float64Array(nDF);
-  // `dPersTruncNPV[i]` = dep personal NPV when survivor activates at
-  // eDeath+1 (dFile .. min(dDeath, eDeath)). Used when isSurvivorActive.
+  // `dPersTruncNPV[i]` = dep personal NPV truncated at earner-death
+  // (dFile .. min(dDeath, eDeath)). Used when survivor is active and the
+  // dep outlives the earner.
   const dPersTruncNPV = new Float64Array(nDF);
   // For !depZeroPia these tables are independent of the earner's filing age
   // and can be precomputed per cell. (For depZeroPia we recompute inline.)
@@ -391,8 +417,10 @@ export function optimalStrategyCoupleFast(
       const svStart = eDeath + 1 > dFile ? eDeath + 1 : dFile;
 
       // Survivor amount, if dep actually outlives the survivor-start date.
-      // isSurvivorActive iff survAmt > dep's final personal benefit (the
-      // amount dep would get after filing + 1 year of delayed credits).
+      // Reference (strategy-calc.ts:91-98) compares survivor vs dep's
+      // post-January personal benefit (benefitOnDate at filingDate+1y,
+      // which equals benefitCentsAtAge for ages < 70). That value is
+      // already tabulated as dPJ[fdI]; for zero-PIA dep it's 0.
       let survAmt = 0;
       let isSurvivorActive = false;
       if (dDeath > svStart) {
@@ -410,12 +438,7 @@ export function optimalStrategyCoupleFast(
           svStart,
           dSsaBirth
         );
-        // Dep's final personal benefit = benefitOnDate(dep, dFile, dFile+1y).
-        // For non-zero-PIA that's benefitCentsAtAge(dFile + 12m); for
-        // zero-PIA it's 0.
-        const depFinalPers = depZeroPia
-          ? 0
-          : benefitCentsAtAge(dPiaDol, dNra, dDri, fd);
+        const depFinalPers = depZeroPia ? 0 : dPJ[fdI];
         if (depFinalPers < survAmt) isSurvivorActive = true;
       }
 
@@ -423,9 +446,10 @@ export function optimalStrategyCoupleFast(
       let total = ePersNPV[feI];
 
       if (depZeroPia) {
-        // Dep personal is always 0 (no earnings of their own).
-        // Nothing to add for dep personal.
-      } else if (isSurvivorActive && dDeath >= svStart) {
+        // Dep has no personal benefit; nothing to add.
+      } else if (isSurvivorActive) {
+        // isSurvivorActive implies dDeath > svStart (set at line above),
+        // so dPersTruncNPV is the right choice here.
         total += dPersTruncNPV[fdI];
       } else {
         total += dPersFullNPV[fdI];

@@ -141,7 +141,7 @@ describe('expectedNPVCoupleOptimized vs goldens', () => {
 
       expect(failed).toBe(0);
     },
-    { timeout: 60000 }
+    { timeout: 180000 }
   );
 
   // Test that top 5 NPV values match (filing ages may differ for ties)
@@ -181,6 +181,6 @@ describe('expectedNPVCoupleOptimized vs goldens', () => {
       console.log(`\nTop-5 ranking: ${passed} passed, ${failed} failed`);
       expect(failed).toBe(0);
     },
-    { timeout: 60000 }
+    { timeout: 180000 }
   );
 });

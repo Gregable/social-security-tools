@@ -191,10 +191,10 @@
 
       // Initialize results matrix
 
-      // Grid calculation runs synchronously — it's fast enough (~30ms for a
-      // full 14x14 grid) that yielding to the event loop for a progress bar
-      // is pure overhead. Compute the whole matrix in one pass and render
-      // once at the end.
+      // Grid calculation runs synchronously — it's fast enough (tens of ms
+      // on a typical laptop for the default grid) that yielding to the event
+      // loop between rows for progress-bar updates is pure overhead. Compute
+      // the whole matrix in one pass and render once at the end.
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
           const bucket1 = deathAgeBuckets1[i];

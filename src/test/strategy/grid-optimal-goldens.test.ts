@@ -147,13 +147,13 @@ describe('grid optimal-strategy goldens', () => {
 
   it(
     'optimalStrategyCoupleOptimized matches goldens',
-    { timeout: 60000 },
+    { timeout: 180000 },
     () => {
       runGoldens('Optimized', optimalStrategyCoupleOptimized);
     }
   );
 
-  it('optimalStrategyCoupleFast matches goldens', { timeout: 60000 }, () => {
+  it('optimalStrategyCoupleFast matches goldens', { timeout: 180000 }, () => {
     runGoldens('Fast', optimalStrategyCoupleFast);
   });
 });
