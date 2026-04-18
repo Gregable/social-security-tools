@@ -31,6 +31,10 @@ interface GoldenTestCase {
     discountRate: number;
     currentDateYear: number;
     currentDateMonth: number;
+    // If true, the higher-PIA recipient is at index 1 and the lower-PIA one
+    // is at index 0. Death distributions are already aligned with recipient
+    // indices by the generator.
+    swapOrder?: boolean;
     deathProbs0: Array<{ age: number; probability: number }>;
     deathProbs1: Array<{ age: number; probability: number }>;
   };
@@ -57,23 +61,25 @@ function loadGoldens(): GoldenTestCase[] {
 }
 
 function setupTestCase(tc: GoldenTestCase) {
-  const r0 = new Recipient();
-  r0.birthdate = Birthdate.FromYMD(
+  const earnerRec = new Recipient();
+  earnerRec.birthdate = Birthdate.FromYMD(
     tc.inputs.earnerBirthYear,
     tc.inputs.earnerBirthMonth,
     tc.inputs.earnerBirthDay
   );
-  r0.setPia(Money.from(tc.inputs.earnerPIA));
+  earnerRec.setPia(Money.from(tc.inputs.earnerPIA));
 
-  const r1 = new Recipient();
-  r1.birthdate = Birthdate.FromYMD(
+  const depRec = new Recipient();
+  depRec.birthdate = Birthdate.FromYMD(
     tc.inputs.depBirthYear,
     tc.inputs.depBirthMonth,
     tc.inputs.depBirthDay
   );
-  r1.setPia(Money.from(tc.inputs.depPIA));
+  depRec.setPia(Money.from(tc.inputs.depPIA));
 
-  const recipients: [Recipient, Recipient] = [r0, r1];
+  const recipients: [Recipient, Recipient] = tc.inputs.swapOrder
+    ? [depRec, earnerRec]
+    : [earnerRec, depRec];
   const currentDate = MonthDate.initFromYearsMonths({
     years: tc.inputs.currentDateYear,
     months: tc.inputs.currentDateMonth,

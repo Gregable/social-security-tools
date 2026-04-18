@@ -400,7 +400,11 @@ export function expectedNPVCoupleOptimized(
   const mRate = calculateMonthlyDiscountRate(discountRate);
   // The suffix-sum decomposition divides by mRate. In practice mRate is
   // either exactly 0 (handled separately) or >~1e-4 (1% annual rate).
-  // Tiny positive values would cause catastrophic cancellation.
+  // Tiny positive values would cause catastrophic cancellation. NaN slips
+  // past `!== 0 && < 1e-9` silently, so check finiteness explicitly.
+  if (!Number.isFinite(mRate)) {
+    throw new Error(`monthlyDiscountRate must be finite; got ${mRate}`);
+  }
   if (mRate !== 0 && mRate < 1e-9) {
     throw new Error(
       `monthlyDiscountRate must be either exactly 0 or >= 1e-9; got ${mRate}`
@@ -561,13 +565,16 @@ export function expectedNPVCoupleOptimized(
     }
   }
 
-  // Binary search: first index where arr[i] >= target
-  function lowerBound(arr: Int32Array, target: number): number {
+  // Binary search over ddE: first index where ddE[i] >= target.
+  // Specialized to ddE (the only array we ever search) so that hi=nDD is
+  // always the correct bound; don't add an arr parameter without also
+  // deriving hi from it.
+  function lowerBound(target: number): number {
     let lo = 0;
     let hi = nDD;
     while (lo < hi) {
       const mid = (lo + hi) >> 1;
-      if (arr[mid] < target) lo = mid + 1;
+      if (ddE[mid] < target) lo = mid + 1;
       else hi = mid;
     }
     return lo;
@@ -669,7 +676,7 @@ export function expectedNPVCoupleOptimized(
         ? depNPVSuffixSum[depNPVSuffixBase]
         : 0;
       const kSp = (curP1 > spStart + 1 ? curP1 : spStart + 1) - curEpoch;
-      const jSp = lowerBound(ddE, spStart); // first dep death >= spStart
+      const jSp = lowerBound(spStart); // first dep death >= spStart
       let expNPV = 0;
 
       for (let ei = 0; ei < nED; ei++) {
@@ -716,8 +723,8 @@ export function expectedNPVCoupleOptimized(
 
         // j0: first dep death index > svStart (survivor eligible)
         // jEq: first dep death index >= svStart (spousal bounded by earner death)
-        const j0 = lowerBound(ddE, svStart + 1);
-        const jEq = lowerBound(ddE, svStart);
+        const j0 = lowerBound(svStart + 1);
+        const jEq = lowerBound(svStart);
 
         if (svExceeds) {
           // Fixed dep personal NPV (ends at svStart-1)
