@@ -39,6 +39,7 @@ const config = {
     exclude: [
       'src/test/strategy/fuzz.test.ts',
       'src/test/strategy/generate-goldens.test.ts',
+      'src/test/strategy/generate-grid-goldens.test.ts',
     ],
     coverage: {
       provider: 'v8',
