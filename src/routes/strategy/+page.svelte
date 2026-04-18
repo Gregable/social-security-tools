@@ -30,7 +30,7 @@
   import StrategyPlotSingle from "./components/StrategyPlotSingle.svelte";
   import {
     expectedNPVSingle,
-    expectedNPVCouple,
+    expectedNPVCoupleOptimized,
     type FilingAgeResult,
     type CoupleFilingAgeResult,
   } from "$lib/strategy/calculations/expected-npv";
@@ -280,7 +280,7 @@
           singleResults.length > 0 ? singleResults[0] : undefined;
         optimalCoupleResult = undefined;
       } else {
-        const coupleResults = expectedNPVCouple(
+        const coupleResults = expectedNPVCoupleOptimized(
           recipients,
           currentDate,
           discountRate,
