@@ -8,6 +8,21 @@
  *
  * Run with: npm test src/test/strategy/generate-grid-goldens.test.ts
  * Output: src/test/strategy/goldens/grid-goldens.json
+ *
+ * Coverage scope:
+ *   - Inputs are constrained so both recipients have earliestFiling < 70y
+ *     (i.e. the optimization loop is non-empty). Cases where a recipient is
+ *     already past age 70+6m at currentDate are intentionally excluded —
+ *     they produce a sentinel result in both slow and optimized paths and
+ *     don't validate anything. The UI also never generates such cases.
+ *   - Death ages are always >= currentAge + 1 year (mirrors UI buckets,
+ *     which start past the person's current age).
+ *
+ * Stability:
+ *   - NPV values depend on src/lib/constants.ts (SSA bend points, COLA,
+ *     wage indices). Regenerate goldens after the annual constants update.
+ *   - PRNG is seeded (mulberry32 seed=42) for reproducibility; outputs are
+ *     stable across Node versions for a given constants snapshot.
  */
 
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -76,10 +91,14 @@ function generateCase(id: number, rng: () => number): GridGoldenCase | null {
   const currentDateYear = 2026;
   const currentDateMonth = 3;
 
+  // Both recipients must be able to file: earliestFiling <= 70y, which
+  // implies currentAge < 70y+6m. Year-subtraction may off-by-one the real
+  // age by up to 11 months (birthmonth not accounted for), so we use 69
+  // as a conservative cap and re-check via the sentinel below.
   const earnerCurrentAge = currentDateYear - earnerBirthYear;
   const depCurrentAge = currentDateYear - depBirthYear;
-  if (earnerCurrentAge < 55 || earnerCurrentAge > 75) return null;
-  if (depCurrentAge < 55 || depCurrentAge > 75) return null;
+  if (earnerCurrentAge < 55 || earnerCurrentAge > 69) return null;
+  if (depCurrentAge < 55 || depCurrentAge > 69) return null;
 
   const swapOrder = rng() < 0.5;
 
@@ -138,6 +157,11 @@ function generateCase(id: number, rng: () => number): GridGoldenCase | null {
     discountRate
   );
 
+  // Reject sentinel results (both recipients beyond filing-eligible range).
+  // Year-based age filtering above can miss late-birth cases (e.g. born Dec,
+  // currentDate March: age difference up to 1 year).
+  if (npv < 0) return null;
+
   return {
     id,
     inputs: {
@@ -170,7 +194,7 @@ describe('grid golden test case generation', () => {
     const goldens: GridGoldenCase[] = [];
     let attempts = 0;
 
-    while (goldens.length < 1000 && attempts < 2000) {
+    while (goldens.length < 1000 && attempts < 5000) {
       attempts++;
       const tc = generateCase(goldens.length, rng);
       if (tc !== null) {

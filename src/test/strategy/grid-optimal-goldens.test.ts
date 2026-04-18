@@ -99,8 +99,11 @@ describe('grid optimal-strategy goldens', () => {
     expect(goldens.length).toBe(1000);
   });
 
-  // The optimized solver should match the slow reference exactly on NPV.
-  // Filing ages must match unless multiple (filing0, filing1) pairs tie on NPV.
+  // The optimized solver must match the slow reference's NPV within 1¢.
+  // Filing ages are logged on failure for diagnosis but NOT asserted —
+  // multiple (filing0, filing1) pairs commonly tie on NPV, and the slow
+  // path also permits filing past death-age while the optimized path clips
+  // at death-age (these produce equal NPV by construction).
   it('all grid goldens produce correct optimal NPV', { timeout: 60000 }, () => {
     let passed = 0;
     let failed = 0;
