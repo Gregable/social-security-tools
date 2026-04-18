@@ -89,9 +89,10 @@
   $: discountRate = discountRatePercent / 100;
 
   // Watch the narrow set of "exploration" inputs and schedule a debounced
-  // recompute. Arguments (not free variables) are what Svelte tracks as
-  // dependencies, so the gate flags checked inside the helper do not
-  // themselves trigger re-evaluation of the reactive block.
+  // recompute. Svelte only tracks reads that appear lexically in the $:
+  // block, so passing watched values as arguments keeps gate flags
+  // (hasCalculatedOnce, formIsValid) — read inside the helper — out of
+  // the dependency set.
   $: maybeScheduleReactiveRecompute(
     recipients[0].healthMultiplier,
     isSingle ? 0 : recipients[1].healthMultiplier,
@@ -237,10 +238,8 @@
         months: now.getMonth(),
       });
 
-      // Grid calculation runs synchronously — tens of ms on a typical
-      // laptop for the default grid. Compute the whole matrix into `next`
-      // and publish once at the end so the previous results remain
-      // visible until the swap.
+      // Compute the whole matrix into `next` and publish once at the
+      // end, so previous results stay visible and the swap is atomic.
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
           const bucket1 = deathAgeBuckets1[i];
@@ -335,10 +334,11 @@
       calculationResultsStore.set(next);
       hasCalculatedOnce = true;
     } catch (error) {
+      // Leave the last-good results visible. Publishing an error-state
+      // CalculationResults would wipe the grid (the template only renders
+      // when status === Complete), which under reactive recompute would
+      // blank the page on any transient failure.
       console.error("Calculation error:", error);
-      const errResults = new CalculationResults();
-      errResults.failRun(error.message || String(error));
-      calculationResultsStore.set(errResults);
     } finally {
       isRunning = false;
       if (rerunPending) {
