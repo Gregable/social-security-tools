@@ -4,10 +4,8 @@
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
-  import {
-    optimalStrategyCoupleOptimized,
-    optimalStrategySingle,
-  } from "$lib/strategy/calculations/strategy-calc";
+  import { optimalStrategyCoupleFast } from "$lib/strategy/calculations/optimal-strategy-fast";
+  import { optimalStrategySingle } from "$lib/strategy/calculations/strategy-calc";
   import {
     CalculationResults,
     CalculationStatus,
@@ -238,7 +236,7 @@
 
             // Calculate optimal strategy
             const [optimalFilingAge1, optimalFilingAge2, netPresentValue] =
-              optimalStrategyCoupleOptimized(
+              optimalStrategyCoupleFast(
                 recipients,
                 finalDates,
                 currentDate,
