@@ -191,6 +191,10 @@
 
       // Initialize results matrix
 
+      // Grid calculation runs synchronously — it's fast enough (~30ms for a
+      // full 14x14 grid) that yielding to the event loop for a progress bar
+      // is pure overhead. Compute the whole matrix in one pass and render
+      // once at the end.
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
           const bucket1 = deathAgeBuckets1[i];
@@ -212,20 +216,12 @@
             filingAge1Years: optimalFilingAge.years(),
             filingAge1Months: optimalFilingAge.modMonths(),
           });
-
-          calculationResults.addScenarioProgress();
-          if (i % 5 === 0) {
-            calculationResultsStore.set(calculationResults);
-            await new Promise((resolve) => setTimeout(resolve, 0));
-          }
         }
       } else {
-        // Calculate optimal strategy for each death age combination
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
           for (let j = 0; j < deathAgeBuckets2.length; j++) {
             const bucket1 = deathAgeBuckets1[i];
             const bucket2 = deathAgeBuckets2[j];
-            // Representative (middle) ages for optimization
             const deathAge1 = bucket1.expectedAge;
             const deathAge2 = bucket2.expectedAge;
 
@@ -234,7 +230,6 @@
               recipients[1].birthdate.dateAtLayAge(deathAge2),
             ];
 
-            // Calculate optimal strategy
             const [optimalFilingAge1, optimalFilingAge2, netPresentValue] =
               optimalStrategyCoupleFast(
                 recipients,
@@ -243,7 +238,6 @@
                 discountRate
               );
 
-            // Store the result using the chosen strategy
             calculationResults.set(i, j, {
               deathAge1: bucket1.label,
               deathAge2: bucket2.label,
@@ -257,11 +251,7 @@
               filingAge2Years: optimalFilingAge2.years(),
               filingAge2Months: optimalFilingAge2.modMonths(),
             });
-
-            calculationResults.addScenarioProgress();
           }
-          calculationResultsStore.set(calculationResults); // update row progress
-          await new Promise((resolve) => setTimeout(resolve, 0));
         }
       }
       calculationResults.completeRun();
