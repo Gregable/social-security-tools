@@ -15,6 +15,7 @@ import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
+import { optimalStrategyCoupleFast } from '$lib/strategy/calculations/optimal-strategy-fast';
 import { optimalStrategyCoupleOptimized } from '$lib/strategy/calculations/strategy-calc';
 
 const GOLDENS_PATH = resolve(__dirname, 'goldens/grid-goldens.json');
@@ -99,19 +100,22 @@ describe('grid optimal-strategy goldens', () => {
     expect(goldens.length).toBe(1000);
   });
 
-  // The optimized solver must match the slow reference's NPV within 1¢.
+  // The optimized solvers must match the slow reference's NPV within 1¢.
   // Filing ages are logged on failure for diagnosis but NOT asserted —
   // multiple (filing0, filing1) pairs commonly tie on NPV, and the slow
-  // path also permits filing past death-age while the optimized path clips
+  // path also permits filing past death-age while the optimized paths clip
   // at death-age (these produce equal NPV by construction).
-  it('all grid goldens produce correct optimal NPV', { timeout: 60000 }, () => {
+  const runGoldens = (
+    name: string,
+    solver: typeof optimalStrategyCoupleOptimized
+  ) => {
     let passed = 0;
     let failed = 0;
     const failures: string[] = [];
 
     for (const tc of goldens) {
       const { recipients, finalDates, currentDate } = setupCase(tc);
-      const [f0, f1, npv] = optimalStrategyCoupleOptimized(
+      const [f0, f1, npv] = solver(
         recipients,
         finalDates,
         currentDate,
@@ -132,12 +136,24 @@ describe('grid optimal-strategy goldens', () => {
       }
     }
 
-    console.log(`\nGrid goldens: ${passed} passed, ${failed} failed`);
+    console.log(`\n[${name}] Grid goldens: ${passed} passed, ${failed} failed`);
     if (failures.length > 0) {
       console.log('First failures:');
       for (const f of failures) console.log(`  ${f}`);
     }
 
     expect(failed).toBe(0);
+  };
+
+  it(
+    'optimalStrategyCoupleOptimized matches goldens',
+    { timeout: 180000 },
+    () => {
+      runGoldens('Optimized', optimalStrategyCoupleOptimized);
+    }
+  );
+
+  it('optimalStrategyCoupleFast matches goldens', { timeout: 180000 }, () => {
+    runGoldens('Fast', optimalStrategyCoupleFast);
   });
 });
