@@ -43,3 +43,4 @@ dist-ssr
 
 # Local developer files
 /local
+/.superpowers/

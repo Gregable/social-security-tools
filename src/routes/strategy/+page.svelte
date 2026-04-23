@@ -13,19 +13,18 @@
     type DeathAgeBucket,
     generateMonthlyBuckets,
     generateThreeYearBuckets,
-    parseBirthdate as parseBirthdateUtil,
   } from "$lib/strategy/ui";
   import { writable } from "svelte/store";
   import AlternativeStrategiesSection from "./components/AlternativeStrategiesSection.svelte";
-  import CalculationControls from "./components/CalculationControls.svelte";
-  import DiscountRateInput from "./components/DiscountRateInput.svelte";
-  // Import components
-  import RecipientInputs from "./components/RecipientInputs.svelte";
   import AlternativeStrategiesRow from "./components/AlternativeStrategiesRow.svelte";
+  import LockedSummary from "./components/LockedSummary.svelte";
+  import ModePicker from "./components/ModePicker.svelte";
+  import RecipientInputs from "./components/RecipientInputs.svelte";
   import StrategyDetails from "./components/StrategyDetails.svelte";
   import StrategyDetailsSingle from "./components/StrategyDetailsSingle.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyPlotSingle from "./components/StrategyPlotSingle.svelte";
+  import TunableAssumptions from "./components/TunableAssumptions.svelte";
   import {
     expectedNPVSingle,
     expectedNPVCoupleOptimized,
@@ -34,13 +33,12 @@
   } from "$lib/strategy/calculations/expected-npv";
   import OptimalStrategyHeadline from "./components/OptimalStrategyHeadline.svelte";
 
-  // Constants
-  const DEFAULT_BIRTHDATE = "1965-03-15";
-  const DEFAULT_PIA_VALUES: [number, number] = [1000, 300];
-  const DEFAULT_NAMES: [string, string] = ["Alex", "Chris"];
   const MIN_FILING_AGE = 62;
   const REACTIVE_DEBOUNCE_MS = 200;
-  // Wrap results in a store so internal mutations (status/selection) can trigger UI updates
+
+  type Stage = "mode" | "form" | "results";
+  let stage: Stage = "mode";
+
   const calculationResultsStore = writable<CalculationResults>(
     new CalculationResults()
   );
@@ -50,49 +48,30 @@
   );
   onDestroy(unsubscribeResults);
 
-  // New three-year bucket lists
   let deathAgeBuckets1: DeathAgeBucket[] = [];
   let deathAgeBuckets2: DeathAgeBucket[] = [];
   let deathProbDistribution1: { age: number; probability: number }[] = [];
   let deathProbDistribution2: { age: number; probability: number }[] = [];
-  // Elapsed time now accessed directly inside StrategyMatrixDisplay
   let displayAsAges: boolean = false;
   let optimalSingleResult: FilingAgeResult | undefined = undefined;
   let optimalCoupleResult: CoupleFilingAgeResult | undefined = undefined;
 
-  // Form inputs
   let isSingle: boolean = false;
-  let birthdateInputs: [string, string] = [
-    DEFAULT_BIRTHDATE,
-    DEFAULT_BIRTHDATE,
-  ];
-  let piaValues: [number, number] = [...DEFAULT_PIA_VALUES];
+  let birthdateInputs: [string, string] = ["", ""];
+  let piaValues: [number, number] = [0, 0];
   let discountRatePercent: number = 2.5;
 
-  // Validation state
   let recipientInputsValid = false;
   let discountRateValid = true;
+  let formErrorMessage: string | null = null;
 
-  // Reactive recompute state (activated after first manual Calculate click).
-  let hasCalculatedOnce = false;
   let rerunPending = false;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-  // In-flight guard kept separate from the published CalculationResults
-  // status so that we can keep the previous results visible while the next
-  // run computes and then swap atomically (no blank-flash between runs).
   let isRunning = false;
 
-  // Overall form validity
   $: formIsValid = recipientInputsValid && discountRateValid;
-
-  // Reactive statement to convert percentage to decimal
   $: discountRate = discountRatePercent / 100;
 
-  // Watch the narrow set of "exploration" inputs and schedule a debounced
-  // recompute. Svelte only tracks reads that appear lexically in the $:
-  // block, so passing watched values as arguments keeps gate flags
-  // (hasCalculatedOnce, formIsValid) — read inside the helper — out of
-  // the dependency set.
   $: maybeScheduleReactiveRecompute(
     recipients[0].healthMultiplier,
     isSingle ? 0 : recipients[1].healthMultiplier,
@@ -106,7 +85,8 @@
     _d: number,
     _s: boolean
   ): void {
-    if (!hasCalculatedOnce || !formIsValid) return;
+    if (stage !== "results") return;
+    if (!formIsValid) return;
     scheduleRecompute();
   }
 
@@ -122,42 +102,27 @@
     if (debounceTimer !== null) clearTimeout(debounceTimer);
   });
 
-  // Recipients setup
   let recipients: [Recipient, Recipient] = initializeRecipients();
 
-  // Function to handle recipient data changes
   function handleRecipientUpdate() {
     try {
-      // Force reactivity by reassigning the recipients array
       recipients = [...recipients];
-
-      // Update death probability distributions if recipients' gender changed
       updateDeathProbabilityDistributions();
     } catch (error) {
       console.warn("Error updating form data:", error);
     }
   }
 
-  /**
-   * Update death probability distributions when gender or health mult changes.
-   * This is a lightweight operation compared to the full matrix calculation.
-   */
   async function updateDeathProbabilityDistributions() {
     try {
-      // Get current year for the probability distribution calculation
       const currentYear = new Date().getFullYear();
-
-      // Fetch death probability distributions for both recipients in parallel
       [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
         getDeathProbabilityDistribution(recipients[0], currentYear),
         getDeathProbabilityDistribution(recipients[1], currentYear),
       ]);
-
-      // Force Svelte update by reassigning arrays
       deathProbDistribution1 = [...deathProbDistribution1];
       deathProbDistribution2 = [...deathProbDistribution2];
 
-      // Calculate death age range start ages
       const startAge1 = Math.max(
         MIN_FILING_AGE,
         recipients[0].birthdate.currentAge()
@@ -179,48 +144,61 @@
     }
   }
 
-  // Discount rate now updated via two-way binding on DiscountRateInput.
-
-  /**
-   * Initialize recipients with default values
-   */
   function initializeRecipients(): [Recipient, Recipient] {
     const recipient1 = new Recipient();
     const recipient2 = new Recipient();
-
     recipient1.markFirst();
     recipient2.markSecond();
-    recipient1.name = DEFAULT_NAMES[0];
-    recipient2.name = DEFAULT_NAMES[1];
-
-    // Set initial birthdates and PIA values
-    try {
-      recipient1.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
-      recipient2.birthdate = parseBirthdateUtil(DEFAULT_BIRTHDATE);
-      recipient1.setPia(Money.from(DEFAULT_PIA_VALUES[0]));
-      recipient2.setPia(Money.from(DEFAULT_PIA_VALUES[1]));
-    } catch (error) {
-      console.warn("Error setting initial recipient data:", error);
-    }
-
+    recipient1.name = "Self";
+    recipient2.name = "Spouse";
+    recipient1.setPia(Money.from(0));
+    recipient2.setPia(Money.from(0));
     return [recipient1, recipient2];
   }
 
-  /**
-   * Main calculation function for optimal strategy matrix
-   */
+  function handleModeSelect(single: boolean) {
+    isSingle = single;
+    if (!single && recipients[1].name === "") {
+      recipients[1].name = "Spouse";
+      recipients = [...recipients];
+    }
+    stage = "form";
+  }
+
+  async function handleContinue() {
+    formErrorMessage = null;
+    try {
+      await calculateStrategyMatrix();
+      if (calculationResults.status() === CalculationStatus.Complete) {
+        stage = "results";
+      }
+    } catch (error) {
+      console.error("Continue failed:", error);
+      formErrorMessage =
+        "Could not compute results. Check your inputs and try again.";
+    }
+  }
+
+  function handleEdit() {
+    stage = "form";
+  }
+
+  function handleStartOver() {
+    formErrorMessage = null;
+    birthdateInputs = ["", ""];
+    piaValues = [0, 0];
+    recipients = initializeRecipients();
+    calculationResultsStore.set(new CalculationResults());
+    stage = "mode";
+  }
+
   async function calculateStrategyMatrix() {
     if (isRunning) {
-      // Another run is in flight. Queue the latest state for re-run so the
-      // user's newest inputs don't get dropped.
       rerunPending = true;
       return;
     }
     isRunning = true;
 
-    // Preserve previous selection so it survives an atomic swap. Row/col
-    // bucket labels are derived from birthdate/gender/age (not health or
-    // discount rate), so they stay stable across reactive recomputes.
     const prevSelected = calculationResults.getSelectedLabels();
 
     try {
@@ -238,8 +216,6 @@
         months: now.getMonth(),
       });
 
-      // Compute the whole matrix into `next` and publish once at the
-      // end, so previous results stay visible and the swap is atomic.
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
           const bucket1 = deathAgeBuckets1[i];
@@ -301,7 +277,6 @@
       }
       next.completeRun();
 
-      // Compute probabilistic optimal filing age(s).
       if (isSingle) {
         const singleResults = expectedNPVSingle(
           recipients[0],
@@ -325,20 +300,13 @@
       }
 
       if (prevSelected) {
-        next.setSelectedByLabels(
-          prevSelected.rowLabel,
-          prevSelected.colLabel
-        );
+        next.setSelectedByLabels(prevSelected.rowLabel, prevSelected.colLabel);
       }
 
       calculationResultsStore.set(next);
-      hasCalculatedOnce = true;
     } catch (error) {
-      // Leave the last-good results visible. Publishing an error-state
-      // CalculationResults would wipe the grid (the template only renders
-      // when status === Complete), which under reactive recompute would
-      // blank the page on any transient failure.
       console.error("Calculation error:", error);
+      throw error;
     } finally {
       isRunning = false;
       if (rerunPending) {
@@ -347,11 +315,9 @@
       }
     }
   }
+
   function handleCellSelect(detail: CellSelectionDetail) {
-    calculationResults.setSelectedByLabels(
-      detail.deathAge1,
-      detail.deathAge2
-    );
+    calculationResults.setSelectedByLabels(detail.deathAge1, detail.deathAge2);
     calculationResultsStore.set(calculationResults);
   }
 
@@ -375,108 +341,110 @@
       future.
     </p>
 
-    <section class="input-section">
-      <div class="section-header">
-        <h2>Recipient Information</h2>
-        <label class="toggle-label">
-          <input type="checkbox" bind:checked={isSingle} />
-          Single Recipient
-        </label>
-      </div>
+    {#if stage === "mode"}
+      <section class="stage-section">
+        <ModePicker onselect={handleModeSelect} />
+      </section>
+    {/if}
 
-      <RecipientInputs
-        {recipients}
-        {isSingle}
-        {piaValues}
-        {birthdateInputs}
-        onUpdate={handleRecipientUpdate}
-        onValidityChange={(isValid) => (recipientInputsValid = isValid)}
-      />
+    {#if stage === "form"}
+      <section class="stage-section input-section">
+        <RecipientInputs
+          {recipients}
+          {isSingle}
+          {piaValues}
+          {birthdateInputs}
+          continueDisabled={!formIsValid}
+          errorMessage={formErrorMessage}
+          onUpdate={handleRecipientUpdate}
+          onValidityChange={(isValid) => (recipientInputsValid = isValid)}
+          oncontinue={handleContinue}
+          onstartover={handleStartOver}
+        />
+      </section>
+    {/if}
 
-      <DiscountRateInput
-        bind:discountRatePercent
-        onValidityChange={(isValid) => (discountRateValid = isValid)}
-      />
-      <p class="mortality-guide-note">
-        Mortality assumptions use SSA cohort life tables. You can adjust
-        relative health using the slider above. Learn more in the <a
-          href="/guides/mortality"
-          target="_blank"
-          rel="noopener">mortality & health adjustment guide</a
-        >.
-      </p>
-    </section>
+    {#if stage === "results"}
+      <section class="stage-section locked-section">
+        <LockedSummary {recipients} {isSingle} onedit={handleEdit} />
+        <TunableAssumptions
+          {recipients}
+          {isSingle}
+          bind:discountRatePercent
+          onRecipientUpdate={handleRecipientUpdate}
+          onDiscountRateValidityChange={(isValid) =>
+            (discountRateValid = isValid)}
+        />
+      </section>
+    {/if}
   </div>
 
-  <section class="limited-width">
-    <CalculationControls
-      disabled={!formIsValid}
-      oncalculate={calculateStrategyMatrix}
-    />
-  </section>
-  <section class="calculation-section">
-    {#if calculationResults.status() === CalculationStatus.Complete}
-      <div class="limited-width">
-        <OptimalStrategyHeadline
-          {isSingle}
-          singleResult={optimalSingleResult}
-          coupleResult={optimalCoupleResult}
-          recipientNames={[recipients[0].name, recipients[1].name]}
-        />
-      </div>
-      {#if isSingle}
-        <StrategyPlotSingle
-          recipient={recipients[0]}
-          {calculationResults}
-          deathProbDistribution={deathProbDistribution1}
-          bind:displayAsAges
-          onselectpoint={handleSinglePointSelect}
-        />
-      {:else}
-        <StrategyMatrixDisplay
-          {recipients}
-          {calculationResults}
-          {deathProbDistribution1}
-          {deathProbDistribution2}
-          bind:displayAsAges
-          onselectcell={handleCellSelect}
-        />
+  {#if stage === "results"}
+    <section class="calculation-section">
+      {#if calculationResults.status() === CalculationStatus.Complete}
+        <div class="limited-width">
+          <OptimalStrategyHeadline
+            {isSingle}
+            singleResult={optimalSingleResult}
+            coupleResult={optimalCoupleResult}
+            recipientNames={[recipients[0].name, recipients[1].name]}
+          />
+        </div>
+        {#if isSingle}
+          <StrategyPlotSingle
+            recipient={recipients[0]}
+            {calculationResults}
+            deathProbDistribution={deathProbDistribution1}
+            bind:displayAsAges
+            onselectpoint={handleSinglePointSelect}
+          />
+        {:else}
+          <StrategyMatrixDisplay
+            {recipients}
+            {calculationResults}
+            {deathProbDistribution1}
+            {deathProbDistribution2}
+            bind:displayAsAges
+            onselectcell={handleCellSelect}
+          />
+        {/if}
       {/if}
-    {/if}
-  </section>
-  <section class="limited-width">
-    {#if calculationResults.getSelectedCellData() && !isSingle}
-      {#key calculationResults.getSelectedCellData()}
-        <!-- Pull the selected cell from CalculationResults and render details -->
-        <StrategyDetails
-          {recipients}
-          result={calculationResults.getSelectedCellData()}
-        />
-        <AlternativeStrategiesSection
-          {recipients}
-          result={calculationResults.getSelectedCellData()}
-          {discountRate}
-          bind:displayAsAges
-        />
-      {/key}
-    {/if}
-    {#if calculationResults.getSelectedCellData() && isSingle}
-      {#key calculationResults.getSelectedCellData()}
-        <StrategyDetailsSingle
-          recipient={recipients[0]}
-          result={calculationResults.getSelectedCellData()}
-        />
-        <AlternativeStrategiesRow
-          recipient={recipients[0]}
-          deathAge={calculationResults.getSelectedCellData().bucket1.expectedAge}
-          {discountRate}
-          optimalNPV={calculationResults.getSelectedCellData().totalBenefit}
-          optimalFilingAge={calculationResults.getSelectedCellData().filingAge1}
-          bind:displayAsAges
-        />
-      {/key}
-    {/if}
-  </section>
+    </section>
+    <section class="limited-width">
+      {#if calculationResults.getSelectedCellData() && !isSingle}
+        {#key calculationResults.getSelectedCellData()}
+          <StrategyDetails
+            {recipients}
+            result={calculationResults.getSelectedCellData()}
+          />
+          <AlternativeStrategiesSection
+            {recipients}
+            result={calculationResults.getSelectedCellData()}
+            {discountRate}
+            bind:displayAsAges
+          />
+        {/key}
+      {/if}
+      {#if calculationResults.getSelectedCellData() && isSingle}
+        {#key calculationResults.getSelectedCellData()}
+          <StrategyDetailsSingle
+            recipient={recipients[0]}
+            result={calculationResults.getSelectedCellData()}
+          />
+          <AlternativeStrategiesRow
+            recipient={recipients[0]}
+            deathAge={calculationResults.getSelectedCellData().bucket1
+              .expectedAge}
+            {discountRate}
+            optimalNPV={calculationResults.getSelectedCellData().totalBenefit}
+            optimalFilingAge={calculationResults.getSelectedCellData()
+              .filingAge1}
+            bind:displayAsAges
+          />
+        {/key}
+      {/if}
+    </section>
+  {/if}
 </main>
 
 <style>
@@ -492,43 +460,21 @@
     padding: 0.5rem;
   }
 
-  .input-section {
+  .stage-section {
     margin-bottom: 0;
+  }
+
+  .input-section {
     padding: 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
   }
 
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .section-header h2 {
-    margin: 0;
-  }
-
-  .toggle-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .mortality-guide-note {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: #444;
-  }
-  .mortality-guide-note a {
-    color: #0074d9;
-    text-decoration: none;
-  }
-  .mortality-guide-note a:hover {
-    text-decoration: underline;
+  .locked-section {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #f5f7fa;
   }
 
   .calculation-section {
@@ -539,24 +485,6 @@
     main {
       max-width: 100%;
       padding: 1rem;
-    }
-    .mortality-guide-note {
-      font-size: 0.85rem;
-    }
-  }
-
-  @keyframes fadeInOut {
-    0% {
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    90% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
     }
   }
 </style>
