@@ -58,7 +58,7 @@
 
   let isSingle: boolean = false;
   let birthdateInputs: [string, string] = ["", ""];
-  let piaValues: [number, number] = [0, 0];
+  let piaValues: [number | null, number | null] = [null, null];
   let discountRatePercent: number = 2.5;
 
   let recipientInputsValid = false;
@@ -94,7 +94,10 @@
     if (debounceTimer !== null) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       debounceTimer = null;
-      calculateStrategyMatrix();
+      // Reactive path has no banner; log and leave prior results visible.
+      calculateStrategyMatrix().catch((err) => {
+        console.error("Reactive recompute failed:", err);
+      });
     }, REACTIVE_DEBOUNCE_MS);
   }
 
@@ -156,6 +159,10 @@
     return [recipient1, recipient2];
   }
 
+  function snapshotHealthMultipliers(): [number, number] {
+    return [recipients[0].healthMultiplier, recipients[1].healthMultiplier];
+  }
+
   function handleModeSelect(single: boolean) {
     isSingle = single;
     if (!single && recipients[1].name === "") {
@@ -185,9 +192,14 @@
 
   function handleStartOver() {
     formErrorMessage = null;
+    // Preserve health tunings across Start over — they're exploration state,
+    // not identity data.
+    const prevHealth = snapshotHealthMultipliers();
     birthdateInputs = ["", ""];
-    piaValues = [0, 0];
+    piaValues = [null, null];
     recipients = initializeRecipients();
+    recipients[0].healthMultiplier = prevHealth[0];
+    recipients[1].healthMultiplier = prevHealth[1];
     calculationResultsStore.set(new CalculationResults());
     stage = "mode";
   }
@@ -311,7 +323,9 @@
       isRunning = false;
       if (rerunPending) {
         rerunPending = false;
-        calculateStrategyMatrix();
+        calculateStrategyMatrix().catch((err) => {
+          console.error("Queued reactive rerun failed:", err);
+        });
       }
     }
   }

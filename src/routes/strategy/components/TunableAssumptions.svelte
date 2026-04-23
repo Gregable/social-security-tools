@@ -10,10 +10,8 @@
   export let onDiscountRateValidityChange: (valid: boolean) => void;
 
   function handleHealthChange(index: number, sliderValue: number) {
-    // Slider 0.7..2.5 maps to health 2.5..0.7 (reversed so "right = better")
-    const healthMultiplier = 3.2 - sliderValue;
-    const clamped = Math.max(0.7, Math.min(2.5, healthMultiplier));
-    recipients[index].healthMultiplier = clamped;
+    // Slider [0.7, 2.5] maps to health [2.5, 0.7] — inverted so right = better.
+    recipients[index].healthMultiplier = 3.2 - sliderValue;
     recipients = [...recipients];
     onRecipientUpdate();
   }

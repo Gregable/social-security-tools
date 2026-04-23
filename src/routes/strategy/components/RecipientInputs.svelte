@@ -7,7 +7,7 @@
   import { onMount } from "svelte";
 
   export let recipients: [Recipient, Recipient];
-  export let piaValues: [number, number];
+  export let piaValues: [number | null, number | null];
   export let birthdateInputs: [string, string];
   export let isSingle: boolean = false;
   export let continueDisabled: boolean = true;
@@ -20,7 +20,7 @@
   export let onstartover: (() => void) | undefined = undefined;
 
   let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
-  export let birthdateValidity: boolean[] = [false, false];
+  let birthdateValidity: boolean[] = [false, false];
 
   let piaValidity: boolean[] = [false, false];
   let piaErrors: string[] = ["", ""];
@@ -63,19 +63,24 @@
     }
   }
 
-  function handlePiaChange(index: number, value: number) {
+  function handlePiaChange(index: number, value: number | null) {
     validatePia(index, value);
     piaValues[index] = value;
     piaValues = [...piaValues];
-    recipients[index].setPia(Money.from(value));
-    recipients = [...recipients];
+    if (value !== null && !Number.isNaN(value)) {
+      recipients[index].setPia(Money.from(value));
+      recipients = [...recipients];
+    }
     onUpdate?.();
   }
 
-  function validatePia(index: number, value: number) {
-    if (Number.isNaN(value) || value <= 0) {
+  function validatePia(index: number, value: number | null) {
+    if (value === null) {
       piaValidity[index] = false;
-      piaErrors[index] = "Enter a PIA greater than $0";
+      piaErrors[index] = "Enter a PIA";
+    } else if (Number.isNaN(value) || value < 0) {
+      piaValidity[index] = false;
+      piaErrors[index] = "PIA cannot be negative";
     } else if (value > 10000) {
       piaValidity[index] = false;
       piaErrors[index] =
@@ -86,6 +91,12 @@
     }
     piaValidity = [...piaValidity];
     piaErrors = [...piaErrors];
+  }
+
+  function parsePiaInput(raw: string): number | null {
+    if (raw.trim() === "") return null;
+    const n = parseFloat(raw);
+    return Number.isNaN(n) ? null : n;
   }
 
   function handleNameChange(index: number, event: Event) {
@@ -140,10 +151,10 @@
             type="number"
             step="100"
             min="0"
-            value={piaValues[i]}
+            value={piaValues[i] ?? ""}
             class:invalid={!piaValidity[i]}
             on:input={(event) =>
-              handlePiaChange(i, parseFloat(event.currentTarget.value) || 0)}
+              handlePiaChange(i, parsePiaInput(event.currentTarget.value))}
           />
           {#if !piaValidity[i] && piaErrors[i]}
             <span class="error-message">{piaErrors[i]}</span>
