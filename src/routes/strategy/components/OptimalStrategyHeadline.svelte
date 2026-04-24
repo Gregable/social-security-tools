@@ -1,7 +1,7 @@
 <script lang="ts">
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { Money } from "$lib/money";
-  import { MonthDuration } from "$lib/month-time";
+  import type { MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
   import type {
     FilingAgeResult,

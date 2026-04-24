@@ -42,10 +42,16 @@
       const year = Number(yearStr);
       const month = Number(monthStr);
       const day = Number(dayStr);
+      // Range-check before constructing Birthdate: FromYMD throws on
+      // out-of-range values (e.g. year < 1900), which would otherwise
+      // surface as an unhandled exception inside onMount.
       if (
-        !Number.isNaN(year) &&
-        !Number.isNaN(month) &&
-        !Number.isNaN(day)
+        year >= 1900 &&
+        year <= 2100 &&
+        month >= 1 &&
+        month <= 12 &&
+        day >= 1 &&
+        day <= 31
       ) {
         birthdates[index] = Birthdate.FromYMD(year, month - 1, day);
       }

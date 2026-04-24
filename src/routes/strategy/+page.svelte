@@ -88,6 +88,7 @@
     if (!el || typeof IntersectionObserver === "undefined") return;
     tunableObserver = new IntersectionObserver(
       (entries) => {
+        if (entries.length === 0) return;
         tunableIsStuck = !entries[0].isIntersecting;
       },
       { threshold: 0 }
@@ -112,6 +113,7 @@
   onDestroy(() => {
     tunableObserver?.disconnect();
     tunableResizeObserver?.disconnect();
+    if (debounceTimer !== null) clearTimeout(debounceTimer);
   });
 
   $: formIsValid = recipientInputsValid && discountRateValid;
@@ -145,10 +147,6 @@
       });
     }, REACTIVE_DEBOUNCE_MS);
   }
-
-  onDestroy(() => {
-    if (debounceTimer !== null) clearTimeout(debounceTimer);
-  });
 
   let recipients: [Recipient, Recipient] = initializeRecipients();
 
@@ -208,15 +206,13 @@
 
   function handleModeSelect(single: boolean) {
     isSingle = single;
-    if (single) {
-      // Single recipient: leave recipient1 in default (only=true) so
-      // <RecipientName> renders slot content ("Your") instead of the name.
-    } else {
+    // Couple mode marks the two recipients so <RecipientName> shows their
+    // colored names. Single mode leaves recipient1's default (only=true)
+    // intact so <RecipientName> renders slot content ("Your") instead.
+    if (!single) {
       recipients[0].markFirst();
       recipients[1].markSecond();
-      if (recipients[1].name === "") {
-        recipients[1].name = "Spouse";
-      }
+      if (recipients[1].name === "") recipients[1].name = "Spouse";
       recipients = [...recipients];
     }
     stage = "form";

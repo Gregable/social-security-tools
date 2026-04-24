@@ -218,7 +218,7 @@ function handleHoverCell(detail: CellPosition | null) {
       gap: 2rem;
     }
 
-    .header-content h3 {
+    .header-content {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;

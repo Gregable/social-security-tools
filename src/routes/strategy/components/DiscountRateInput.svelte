@@ -14,7 +14,7 @@ let treasuryRate: number = 2.5; // Default value
 let isValid = true;
 let errorMessage = '';
 
-let presetRates = [
+$: presetRates = [
   {
     label: `20-year Treasury rate (${treasuryRate}%)`,
     shortLabel: `${treasuryRate}%`,
@@ -28,30 +28,11 @@ onMount(async () => {
   try {
     // getRecommendedDiscountRate returns the rate as a decimal (e.g., 0.038 for 3.8%)
     const rate = await getRecommendedDiscountRate();
-
-    // Convert to percentage value by multiplying by 100
     treasuryRate = parseFloat((rate * 100).toFixed(2));
-
-    // Update the presetRates array with the new treasury rate
-    presetRates = [
-      {
-        label: `20-year Treasury rate (${treasuryRate}%)`,
-        shortLabel: `${treasuryRate}%`,
-        value: treasuryRate,
-      },
-      {
-        label: 'US Stock 10y expected (3.5%)',
-        shortLabel: '3.5%',
-        value: 3.5,
-      },
-      { label: 'US Stock historical (7%)', shortLabel: '7%', value: 7 },
-    ];
-
-    // Update the discountRatePercent if it's currently set to our default treasury rate (2.5%)
     handleDiscountRateChange(treasuryRate);
   } catch (error) {
     console.error('Failed to fetch recommended discount rate:', error);
-    // Keep default 2.5% if fetch fails
+    // Keep default 2.5% if fetch fails.
   }
 });
 

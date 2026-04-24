@@ -5,6 +5,9 @@
   let tipEl: HTMLSpanElement;
 
   function toggle(event: MouseEvent) {
+    // preventDefault stops the surrounding <label> from redirecting focus
+    // to its associated input when the InfoTip button is clicked.
+    event.preventDefault();
     event.stopPropagation();
     open = !open;
   }
