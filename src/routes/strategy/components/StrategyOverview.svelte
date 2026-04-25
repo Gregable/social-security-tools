@@ -183,7 +183,7 @@
                   <div class="period-info">
                     <span class="benefit-type">{period.type}</span>
                     <span class="period-dates"
-                      >{period.startFormatted} — {period.endFormatted}</span
+                      >{period.startFormatted} – {period.endFormatted}</span
                     >
                   </div>
                   <div class="benefit-amounts">
@@ -208,7 +208,7 @@
                   <div class="period-info">
                     <span class="benefit-type">{period.type}</span>
                     <span class="period-dates"
-                      >{period.startFormatted} — {period.endFormatted}</span
+                      >{period.startFormatted} – {period.endFormatted}</span
                     >
                   </div>
                   <div class="benefit-amounts">

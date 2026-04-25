@@ -1,4 +1,5 @@
 <script lang="ts">
+  import HowToReadChart from "$lib/components/HowToReadChart.svelte";
   import { MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
   import type { CalculationResults } from "$lib/strategy/ui";
@@ -637,23 +638,66 @@
 <div class="result-box">
   <div class="header-section">
     <div class="header-content">
-      <h3>
-        Optimal Strategy: Filing <span
+      <h3>How death age shapes the strategy</h3>
+      <div class="segmented" role="group" aria-label="Display filing as">
+        <button
+          type="button"
+          class="seg"
           class:active={!displayAsAges}
-          class:inactive={displayAsAges}>Date</span
-        ><label class="toggle-label">
-          <input
-            type="checkbox"
-            bind:checked={displayAsAges}
-            class="toggle-checkbox"
-          />
-          <span class="toggle-slider"></span>
-        </label><span
-          class:active={displayAsAges}
-          class:inactive={!displayAsAges}>Age</span
+          on:click={() => (displayAsAges = false)}
         >
-      </h3>
+          Date
+        </button>
+        <button
+          type="button"
+          class="seg"
+          class:active={displayAsAges}
+          on:click={() => (displayAsAges = true)}
+        >
+          Age
+        </button>
+      </div>
     </div>
+    <p class="lede">
+      Every death age has its own optimal filing. The
+      <strong>Recommended Filing</strong> above picks a single strategy that
+      works well across all of them; below, see what would be optimal at each
+      specific age.
+    </p>
+    <p class="caption">
+      The blue line shows the optimal filing {displayAsAges
+        ? "age"
+        : "date"} for each possible death age; the red line shows your cumulative
+      probability of dying by that age.
+    </p>
+    <HowToReadChart>
+      <ul>
+        <li>
+          <strong>X-axis (Death Age):</strong> a hypothetical age you live to.
+        </li>
+        <li>
+          <strong>Blue line (left axis):</strong> the filing {displayAsAges
+            ? "age"
+            : "date"} that would have maximized your lifetime benefits
+          <em>if</em> you knew you'd live exactly to that death age.
+        </li>
+        <li>
+          <strong>Red line (right axis):</strong> cumulative probability
+          you've died by that age. Steeper means a larger fraction of
+          outcomes fall in that range.
+        </li>
+        <li>
+          <strong>Hover the chart</strong> to see the values at each death
+          age.
+        </li>
+      </ul>
+      <p>
+        <strong>Takeaway:</strong> short lifespans favor filing early; long
+        lifespans favor delaying. The Recommended Filing picks the best
+        single date across the whole distribution, weighted by how likely
+        each lifespan is.
+      </p>
+    </HowToReadChart>
   </div>
 
   <div class="chart-container">
@@ -683,64 +727,74 @@
     padding-bottom: 1rem;
   }
 
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .header-content h3 {
     margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #060606;
   }
 
-  .toggle-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
+  .lede {
+    margin: 0.6rem 0 0;
+    font-size: 0.95rem;
+    color: #1f2937;
+    line-height: 1.5;
+  }
+
+  .caption {
+    margin: 0.35rem 0 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+
+  .segmented {
+    display: inline-flex;
+    background: #eef1f5;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 3px;
     flex-shrink: 0;
-    margin: 0 0.25rem;
   }
 
-  .active {
-    font-weight: bold;
-    color: #007bff;
+  .seg {
+    font: inherit;
+    border: none;
+    background: transparent;
+    color: #4b5563;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
-  .inactive {
-    font-weight: normal;
-    color: #999;
-    opacity: 0.7;
+  .seg:hover:not(.active) {
+    color: #081d88;
   }
 
-  .toggle-checkbox {
-    display: none;
+  .seg.active {
+    background: #ffffff;
+    color: #081d88;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(11, 17, 48, 0.08);
   }
 
-  .toggle-slider {
-    position: relative;
-    width: 40px;
-    height: 20px;
-    background-color: #ccc;
-    border-radius: 20px;
-    transition: background-color 0.3s ease;
-  }
-
-  .toggle-slider::before {
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 16px;
-    height: 16px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
-  }
-
-  .toggle-checkbox:checked + .toggle-slider {
-    background-color: #007bff;
-  }
-
-  .toggle-checkbox:checked + .toggle-slider::before {
-    transform: translateX(20px);
+  .seg:focus-visible {
+    outline: 2px solid #081d88;
+    outline-offset: 2px;
   }
 
   .chart-container {

@@ -33,9 +33,22 @@
 <div class="locked-header">
   <div class="locked-title">
     <strong>Recipient information</strong>
-    <span class="muted">· locked</span>
   </div>
   <button type="button" class="edit-btn" on:click={onedit}>
+    <svg
+      class="edit-arrow"
+      viewBox="0 0 16 16"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M10 3 5 8l5 5" />
+    </svg>
     Edit recipient info
   </button>
 </div>
@@ -44,7 +57,9 @@
   {#each recipients as recipient, i}
     {#if !isSingle || i === 0}
       <div class="card">
-        <div class="name"><RecipientName r={recipient} /></div>
+        {#if !recipient.only}
+          <div class="name"><RecipientName r={recipient} /></div>
+        {/if}
         <div class="details">
           Born {formatBirthdate(recipient)} · {formatGender(recipient)} · PIA {formatPia(
             recipient
@@ -66,25 +81,39 @@
     font-size: 0.95rem;
     color: #333;
   }
-  .muted {
-    color: #888;
-    font-weight: normal;
-  }
   .edit-btn {
-    font-size: 0.85rem;
+    flex: 0 0 auto;
     background: white;
-    border: 1px solid #bbb;
-    color: #333;
-    padding: 0.3rem 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
     font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease;
   }
   .edit-btn:hover,
-  .edit-btn:focus {
-    border-color: #005ea5;
-    color: #005ea5;
+  .edit-btn:focus-visible {
+    border-color: #081d88;
+    color: #081d88;
+    background-color: #f7f8fd;
     outline: none;
+  }
+  .edit-arrow {
+    display: block;
+    transition: transform 0.15s ease;
+  }
+  .edit-btn:hover .edit-arrow,
+  .edit-btn:focus-visible .edit-arrow {
+    transform: translateX(-2px);
   }
   .cards {
     display: grid;

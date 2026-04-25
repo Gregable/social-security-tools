@@ -1,5 +1,8 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  import { slide } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
+  import Header from "$lib/components/Header.svelte";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
@@ -52,7 +55,7 @@
   let deathAgeBuckets2: DeathAgeBucket[] = [];
   let deathProbDistribution1: { age: number; probability: number }[] = [];
   let deathProbDistribution2: { age: number; probability: number }[] = [];
-  let displayAsAges: boolean = false;
+  let displayAsAges: boolean = true;
   let optimalSingleResult: FilingAgeResult | undefined = undefined;
   let optimalCoupleResult: CoupleFilingAgeResult | undefined = undefined;
 
@@ -68,6 +71,50 @@
   let rerunPending = false;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let isRunning = false;
+
+  let tunableSentinelEl: HTMLDivElement | null = null;
+  let tunableWrapperEl: HTMLDivElement | null = null;
+  let tunableIsStuck = false;
+  let tunableExpandedHeight = 0;
+  let tunableObserver: IntersectionObserver | null = null;
+  let tunableResizeObserver: ResizeObserver | null = null;
+
+  $: observeTunableSentinel(tunableSentinelEl);
+  $: observeTunableWrapper(tunableWrapperEl);
+
+  function observeTunableSentinel(el: HTMLDivElement | null) {
+    tunableObserver?.disconnect();
+    tunableObserver = null;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    tunableObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.length === 0) return;
+        tunableIsStuck = !entries[0].isIntersecting;
+      },
+      { threshold: 0 }
+    );
+    tunableObserver.observe(el);
+  }
+
+  function observeTunableWrapper(el: HTMLDivElement | null) {
+    tunableResizeObserver?.disconnect();
+    tunableResizeObserver = null;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    tunableResizeObserver = new ResizeObserver(() => {
+      // Only track size while expanded — that's the "natural" height the
+      // spacer needs to reserve when we flip to fixed/compact.
+      if (!tunableIsStuck) {
+        tunableExpandedHeight = el.offsetHeight;
+      }
+    });
+    tunableResizeObserver.observe(el);
+  }
+
+  onDestroy(() => {
+    tunableObserver?.disconnect();
+    tunableResizeObserver?.disconnect();
+    if (debounceTimer !== null) clearTimeout(debounceTimer);
+  });
 
   $: formIsValid = recipientInputsValid && discountRateValid;
   $: discountRate = discountRatePercent / 100;
@@ -100,10 +147,6 @@
       });
     }, REACTIVE_DEBOUNCE_MS);
   }
-
-  onDestroy(() => {
-    if (debounceTimer !== null) clearTimeout(debounceTimer);
-  });
 
   let recipients: [Recipient, Recipient] = initializeRecipients();
 
@@ -150,8 +193,6 @@
   function initializeRecipients(): [Recipient, Recipient] {
     const recipient1 = new Recipient();
     const recipient2 = new Recipient();
-    recipient1.markFirst();
-    recipient2.markSecond();
     recipient1.name = "Self";
     recipient2.name = "Spouse";
     recipient1.setPia(Money.from(0));
@@ -165,8 +206,13 @@
 
   function handleModeSelect(single: boolean) {
     isSingle = single;
-    if (!single && recipients[1].name === "") {
-      recipients[1].name = "Spouse";
+    // Couple mode marks the two recipients so <RecipientName> shows their
+    // colored names. Single mode leaves recipient1's default (only=true)
+    // intact so <RecipientName> renders slot content ("Your") instead.
+    if (!single) {
+      recipients[0].markFirst();
+      recipients[1].markSecond();
+      if (recipients[1].name === "") recipients[1].name = "Spouse";
       recipients = [...recipients];
     }
     stage = "form";
@@ -345,29 +391,53 @@
   }
 </script>
 
+<svelte:head>
+  <link
+    href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap"
+    rel="stylesheet"
+  />
+</svelte:head>
+
+<Header />
+
 <main>
   <div class="limited-width">
-    <p>
-      This calculation shows an "optimal" social security filing strategy for
-      your personal situation, for all possible years of death ranging from 62
-      to 90. Optimal is defined as the largest sum of money, adjusted by the
-      discount rate such that a dollar today is worth more than a dollar in the
-      future.
-    </p>
+    {#if stage === "mode"}
+      <header
+        class="page-hero"
+        transition:slide={{ duration: 320, easing: cubicOut }}
+      >
+        <h1 class="page-hero__title">
+          Find your <span class="accent">optimal</span> filing strategy
+        </h1>
+        <p class="page-hero__lede">
+          See the Social Security filing strategy that maximizes your expected
+          benefits across every plausible life span. <em>Optimal</em> means
+          the largest total, adjusted by a discount rate so a dollar today is
+          worth more than a dollar in the future.
+        </p>
+      </header>
+    {/if}
 
     {#if stage === "mode"}
-      <section class="stage-section">
+      <section
+        class="stage-section"
+        transition:slide={{ duration: 320, easing: cubicOut }}
+      >
         <ModePicker onselect={handleModeSelect} />
       </section>
     {/if}
 
     {#if stage === "form"}
-      <section class="stage-section input-section">
+      <section
+        class="stage-section"
+        transition:slide={{ duration: 320, easing: cubicOut }}
+      >
         <RecipientInputs
           {recipients}
           {isSingle}
-          {piaValues}
-          {birthdateInputs}
+          bind:piaValues
+          bind:birthdateInputs
           continueDisabled={!formIsValid}
           errorMessage={formErrorMessage}
           onUpdate={handleRecipientUpdate}
@@ -379,21 +449,42 @@
     {/if}
 
     {#if stage === "results"}
-      <section class="stage-section locked-section">
+      <section
+        class="stage-section locked-section"
+        transition:slide={{ duration: 320, easing: cubicOut }}
+      >
         <LockedSummary {recipients} {isSingle} onedit={handleEdit} />
-        <TunableAssumptions
-          {recipients}
-          {isSingle}
-          bind:discountRatePercent
-          onRecipientUpdate={handleRecipientUpdate}
-          onDiscountRateValidityChange={(isValid) =>
-            (discountRateValid = isValid)}
-        />
       </section>
     {/if}
   </div>
 
   {#if stage === "results"}
+    <div class="tunable-sentinel" bind:this={tunableSentinelEl}></div>
+    <!-- Placeholder reserves the element's natural expanded height in flow
+         while the sticky is detached (position: fixed) in stuck/compact
+         mode, so the document height never changes. -->
+    <div
+      class="tunable-placeholder"
+      style:height={tunableIsStuck ? `${tunableExpandedHeight}px` : "0"}
+    ></div>
+    <div
+      class="tunable-sticky-outer"
+      class:is-stuck={tunableIsStuck}
+      bind:this={tunableWrapperEl}
+    >
+      <div class="limited-width tunable-sticky-inner">
+        <TunableAssumptions
+          {recipients}
+          {isSingle}
+          isStuck={tunableIsStuck}
+          bind:discountRatePercent
+          onRecipientUpdate={handleRecipientUpdate}
+          onDiscountRateValidityChange={(isValid) =>
+            (discountRateValid = isValid)}
+        />
+      </div>
+    </div>
+
     <section class="calculation-section">
       {#if calculationResults.status() === CalculationStatus.Complete}
         <div class="limited-width">
@@ -401,7 +492,7 @@
             {isSingle}
             singleResult={optimalSingleResult}
             coupleResult={optimalCoupleResult}
-            recipientNames={[recipients[0].name, recipients[1].name]}
+            {recipients}
           />
         </div>
         {#if isSingle}
@@ -465,7 +556,7 @@
   main {
     margin: 0 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: "Lato", -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   .limited-width {
@@ -474,14 +565,57 @@
     padding: 0.5rem;
   }
 
-  .stage-section {
-    margin-bottom: 0;
+  .page-hero {
+    padding: 2.75rem 0.25rem 2.25rem;
+    margin: 0;
+    text-align: center;
   }
 
-  .input-section {
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+  .page-hero__title {
+    color: #060606;
+    font-family: inherit;
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 0 1rem;
+  }
+
+  .page-hero__title .accent {
+    color: #081d88;
+  }
+
+  .page-hero__lede {
+    color: #4b4b4b;
+    font-family: inherit;
+    font-size: 1.125rem;
+    line-height: 1.55;
+    max-width: 62ch;
+    margin: 0 auto;
+  }
+
+  .page-hero__lede em {
+    font-style: normal;
+    font-weight: 700;
+    color: #333;
+  }
+
+  @media (max-width: 640px) {
+    .page-hero {
+      padding: 1.75rem 0.25rem 1.25rem;
+    }
+
+    .page-hero__title {
+      font-size: 1.875rem;
+    }
+
+    .page-hero__lede {
+      font-size: 1rem;
+    }
+  }
+
+  .stage-section {
+    margin-bottom: 0;
   }
 
   .locked-section {
@@ -489,6 +623,40 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     background: #f5f7fa;
+  }
+
+  .tunable-sentinel {
+    position: relative;
+    height: 1px;
+    width: 100%;
+    margin-bottom: -1px;
+    pointer-events: none;
+  }
+
+  .tunable-placeholder {
+    flex: none;
+    width: 100%;
+  }
+
+  .tunable-sticky-outer {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: box-shadow 0.15s ease;
+  }
+
+  .tunable-sticky-outer.is-stuck {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .tunable-sticky-inner {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
 
   .calculation-section {

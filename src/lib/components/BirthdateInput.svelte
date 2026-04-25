@@ -239,38 +239,47 @@ function autoFocusAction(el) {
   }
   .date-input-item {
     display: inline-block;
-    margin-right: 20px;
+    margin-right: 0.75rem;
   }
   .date-input-label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: 400;
-    color: #0b0c0c;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #4b5563;
   }
   .input {
-    font-size: 1.2em;
-    line-height: 1.3;
-    height: 2.5em;
-    padding: 5px;
-    border: 2px solid #0b0c0c;
-    border-radius: 0;
+    font-size: 1rem;
+    line-height: 1.4;
+    padding: 0.65rem 0.75rem;
+    border: 1.5px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    color: #0b0c0c;
+    font-family: inherit;
     appearance: none;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
   .input:focus {
-    outline: 3px solid #fd0;
-    outline-offset: 0;
-    box-shadow: inset 0 0 0 2px;
+    outline: none;
+    border-color: #081d88;
+    box-shadow: 0 0 0 3px rgba(8, 29, 136, 0.15);
   }
   .input-width-2 {
-    max-width: 2.75em;
+    max-width: 3.75rem;
   }
   .input-width-4 {
-    max-width: 4.5em;
+    max-width: 5.5rem;
   }
 
   .input.invalid {
     border-color: #d4351c;
-    background-color: #fee;
+    background-color: #fef5f5;
+  }
+  .input.invalid:focus {
+    box-shadow: 0 0 0 3px rgba(212, 53, 28, 0.15);
   }
 
   .error-messages {
@@ -280,7 +289,7 @@ function autoFocusAction(el) {
   .error-message {
     display: block;
     color: #d4351c;
-    font-size: 0.9em;
-    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.2rem;
   }
 </style>

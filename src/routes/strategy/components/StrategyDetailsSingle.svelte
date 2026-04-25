@@ -65,7 +65,7 @@
         {#each formattedPeriods as period}
           <div class="payment-period">
             <div class="period-dates">
-              {period.startFormatted} — {period.endFormatted}
+              {period.startFormatted} – {period.endFormatted}
             </div>
             <div class="benefit-amounts">
               <span class="monthly-amount">{period.amount}/mo</span>

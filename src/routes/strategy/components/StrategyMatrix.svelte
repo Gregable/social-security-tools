@@ -307,13 +307,6 @@ function handleCellSelect(position: CellPosition) {
       />
     </h4>
   </div>
-  <div class="matrix-legend">
-    <p>
-      <strong>Size</strong>: Row and Column width / height indicate the relative
-      probability of each person's death at that age range.
-    </p>
-  </div>
-
   <div class="strategy-grid-container">
     <!-- Column headers -->
     <div class="grid-headers">
@@ -441,7 +434,7 @@ function handleCellSelect(position: CellPosition) {
           <strong>Age Range:</strong>
           {#if headerHoverInfo.bucket?.endAgeInclusive !== null}
             {headerHoverInfo.bucket?.startAge}y
-            <span class="age-range-dash">—</span>
+            <span class="age-range-dash">–</span>
             {headerHoverInfo.bucket?.endAgeInclusive}y + 11m
           {:else}
             {headerHoverInfo.bucket?.startAge}+
@@ -493,17 +486,6 @@ function handleCellSelect(position: CellPosition) {
   .matrix-title h4 {
     margin: 0;
     color: #0056b3;
-  }
-
-  .matrix-legend {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background-color: #e9ecef;
-    border-radius: 4px;
-  }
-
-  .matrix-legend p {
-    margin: 0.5rem 0;
   }
 
   .strategy-grid-container {
