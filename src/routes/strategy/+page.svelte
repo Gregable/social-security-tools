@@ -34,6 +34,24 @@
   } from "$lib/strategy/calculations/expected-npv";
   import OptimalStrategyHeadline from "./components/OptimalStrategyHeadline.svelte";
   import SupportPrompt from "$lib/components/SupportPrompt.svelte";
+  import {
+    WebApplicationSchema,
+    renderWebsiteSocialMeta,
+  } from "$lib/schema-org";
+
+  const pageTitle =
+    "Social Security Filing Strategy Optimizer - SSA.tools";
+  const pageDescription =
+    "Find the Social Security filing strategy that maximizes your expected lifetime benefits. Free optimizer for singles and couples that accounts for life expectancy and a discount rate.";
+  const pageUrl = "https://ssa.tools/strategy";
+  const pageImage = "/strategy-og.png";
+  const pageImageAlt =
+    "Recommended Social Security filing ages for a couple, with expected combined lifetime benefit";
+
+  const webAppSchema = new WebApplicationSchema();
+  webAppSchema.url = pageUrl;
+  webAppSchema.name = pageTitle;
+  webAppSchema.description = pageDescription;
 
   const MIN_FILING_AGE = 62;
   const REACTIVE_DEBOUNCE_MS = 200;
@@ -458,6 +476,22 @@
 </script>
 
 <svelte:head>
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <link rel="canonical" href={pageUrl} />
+
+  <!-- Open Graph / Social Meta Tags -->
+  {@html renderWebsiteSocialMeta({
+    url: pageUrl,
+    title: pageTitle,
+    description: pageDescription,
+    image: pageImage,
+    imageAlt: pageImageAlt,
+  })}
+
+  <!-- Structured Data -->
+  {@html webAppSchema.render()}
+
   <link
     href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap"
     rel="stylesheet"
