@@ -189,11 +189,9 @@ $: cellDimensions = rowBuckets.map((_, i) =>
   }))
 );
 
-// Calculate cell styles including background color and border removal.
-// Dependencies are passed as parameters so callers (the reactive $: block
-// below) make Svelte's static dependency tracking see them — otherwise
-// inline calls like cellStyle={getCellStyle(i, j)} only track i/j and
-// won't re-evaluate when calculationResults or borderRemovalFuncs change.
+// Dependencies are passed as parameters so Svelte's static reactive
+// tracking sees them in the calling $: block. Closure-captured reactive
+// state is invisible to the compiler and won't trigger re-evaluation.
 function getCellStyle(
   i: number,
   j: number,
@@ -245,9 +243,6 @@ function getCellStyle(
   return style;
 }
 
-// Reactively precompute every cell's style. Mirrors the cellDimensions
-// pattern above so border/background updates flow through when
-// calculationResults or borderRemovalFuncs change (e.g. discount rate edits).
 $: cellStyles = rowBuckets.map((_, i) =>
   colBuckets.map((_, j) =>
     getCellStyle(i, j, calculationResults, borderRemovalFuncs, recipientIndex)
