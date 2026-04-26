@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, tick } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import Header from "$lib/components/Header.svelte";
@@ -80,6 +80,15 @@
   let tunableObserver: IntersectionObserver | null = null;
   let widgetEndObserver: IntersectionObserver | null = null;
   let tunableResizeObserver: ResizeObserver | null = null;
+  // The sticky compact bar overflows on narrow viewports and the placeholder
+  // it reserves leaves a visible gap. Disable the sticky behavior below this
+  // breakpoint and let the tunables flow normally.
+  let tunableMobileMq: MediaQueryList | null = null;
+  let tunableMobile = false;
+  const handleTunableMqChange = (e: MediaQueryListEvent | MediaQueryList) => {
+    tunableMobile = e.matches;
+    if (tunableMobile) tunableIsStuck = false;
+  };
 
   let widgetAnchorEl: HTMLDivElement | null = null;
   let scenarioAnchorEl: HTMLElement | null = null;
@@ -96,7 +105,7 @@
     tunableObserver = new IntersectionObserver(
       (entries) => {
         if (entries.length === 0) return;
-        tunableIsStuck = !entries[0].isIntersecting;
+        tunableIsStuck = !entries[0].isIntersecting && !tunableMobile;
       },
       { threshold: 0 }
     );
@@ -138,10 +147,17 @@
     tunableResizeObserver.observe(el);
   }
 
+  onMount(() => {
+    tunableMobileMq = window.matchMedia("(max-width: 768px)");
+    handleTunableMqChange(tunableMobileMq);
+    tunableMobileMq.addEventListener("change", handleTunableMqChange);
+  });
+
   onDestroy(() => {
     tunableObserver?.disconnect();
     widgetEndObserver?.disconnect();
     tunableResizeObserver?.disconnect();
+    tunableMobileMq?.removeEventListener("change", handleTunableMqChange);
     if (debounceTimer !== null) clearTimeout(debounceTimer);
     if (backToMatrixTimer !== null) clearTimeout(backToMatrixTimer);
   });
