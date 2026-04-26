@@ -37,14 +37,12 @@
       : null;
 
   // Calculate the benefit periods for the selected strategy
+  // Use expectedAge (probability-weighted) so the timeline matches the death
+  // dates the optimizer used to compute totalBenefit and choose filingAge1/2.
   $: finalDates = result
     ? ([
-        recipients[0].birthdate.dateAtLayAge(
-          new MonthDuration(result.bucket1.midAge * 12)
-        ),
-        recipients[1].birthdate.dateAtLayAge(
-          new MonthDuration(result.bucket2.midAge * 12)
-        ),
+        recipients[0].birthdate.dateAtLayAge(result.bucket1.expectedAge),
+        recipients[1].birthdate.dateAtLayAge(result.bucket2.expectedAge),
       ] as [MonthDate, MonthDate])
     : null;
 
