@@ -256,9 +256,9 @@
               id="pia{i}"
               class="pia-input"
               type="number"
-              step="100"
+              step="any"
               min="0"
-              inputmode="numeric"
+              inputmode="decimal"
               value={piaValues[i] ?? ""}
               class:invalid={piaValues[i] !== null && !piaValidity[i]}
               on:input={(event) =>
