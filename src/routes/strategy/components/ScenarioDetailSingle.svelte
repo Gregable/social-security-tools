@@ -1,7 +1,6 @@
 <script lang="ts">
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
-  import { MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
   import { strategySumPeriodsSingle } from "$lib/strategy/calculations/strategy-calc";
   import type { StrategyResult } from "$lib/strategy/ui";
@@ -22,9 +21,9 @@
   $: expectedAge = result.bucket1.expectedAge;
   $: deathDate = recipient.birthdate.dateAtLayAge(expectedAge);
 
-  $: finalDate = recipient.birthdate.dateAtLayAge(
-    new MonthDuration(result.bucket1.midAge * 12)
-  );
+  // Use expectedAge (probability-weighted) so the timeline matches the death
+  // date the optimizer used to compute totalBenefit and choose filingAge1.
+  $: finalDate = recipient.birthdate.dateAtLayAge(result.bucket1.expectedAge);
 
   $: benefitPeriods = strategySumPeriodsSingle(
     recipient,
