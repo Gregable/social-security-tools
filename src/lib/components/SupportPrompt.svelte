@@ -27,9 +27,10 @@
     <p class="kicker">Support this work</p>
   </header>
   <p class="copy">
-    Free, with no account or email, and your data never leaves your browser.
-    By comparison, Quicken's Social Security Optimizer is $50/year. Tips
-    keep ssa.tools free.
+    If it helped you with an important decision, consider supporting the
+    work. Free, no account, your data stays in your browser. By comparison,
+    Quicken's Social Security Optimizer is $50/year. Tips keep ssa.tools
+    free.
   </p>
   <p class="cta">
     <a
