@@ -31,72 +31,80 @@ function handleHoverCell(detail: CellPosition | null) {
 </script>
 
 <div class="result-box">
-  <div class="header-section">
-    <div class="header-content">
-      <h3>How death ages shape the strategies</h3>
-      <div class="segmented" role="group" aria-label="Display filing as">
-        <button
-          type="button"
-          class="seg"
-          class:active={!displayAsAges}
-          on:click={() => (displayAsAges = false)}
-        >
-          Date
-        </button>
-        <button
-          type="button"
-          class="seg"
-          class:active={displayAsAges}
-          on:click={() => (displayAsAges = true)}
-        >
-          Age
-        </button>
-      </div>
-    </div>
-  </div>
-  <p class="lede">
-    Every combination of lifespans has its own optimal filing strategy. The
-    <strong>Recommended Filing Ages</strong> above pick a single strategy
-    that works well across all of them; below, see what would be optimal at
-    each specific combination.
-  </p>
-  <p class="caption">
-    Each cell shows the optimal filing {displayAsAges ? 'age' : 'date'} for a
-    specific Self/Spouse death-age pair. <em>Taller rows</em> and
-    <em>wider columns</em> mark more likely death ages.
-  </p>
-  <HowToReadChart>
-    <ul>
-      <li>
-        <strong>Two matrices:</strong> the left one shows Self's optimal
-        filing {displayAsAges ? 'age' : 'date'}; the right one shows Spouse's.
-        Both depend on <em>both</em> death ages because of survivor benefits.
-      </li>
-      <li>
-        <strong>Row / column position:</strong> your death age on one axis,
-        your spouse's on the other. Each cell is one specific pair.
-      </li>
-      <li>
-        <strong>Row height &amp; column width:</strong> probability of that
-        death age. Big cells are likely outcomes; tiny cells are edge cases.
-      </li>
-      <li>
-        <strong>Cell color:</strong> similar strategies share a color, so
-        large bands of one color mean the same strategy is optimal across
-        many scenarios.
-      </li>
-      <li>
-        <strong>Click a cell</strong> to see the full month-by-month benefit
-        breakdown for that death-age pair.
-      </li>
-    </ul>
-    <p>
-      <strong>Takeaway:</strong> focus on the large, dense cells. Those are
-      the most likely outcomes and they drive the Recommended Filing Ages. A
-      single strategy usually covers most of the probability mass, which is
-      why one recommendation is useful even across many possible lifespans.
+  <div class="result-content">
+    <header class="section-header">
+      <p class="section-kicker">How death ages shape the strategies</p>
+    </header>
+    <p class="lede">
+      Every combination of lifespans has its own optimal filing strategy. The
+      <strong>Recommended Filing Ages</strong> above pick a single strategy
+      that works well across all of them; below, see what would be optimal at
+      each specific combination.
     </p>
-  </HowToReadChart>
+    <p class="caption">
+      Each cell shows the optimal filing {displayAsAges ? 'age' : 'date'} for a
+      specific Self/Spouse death-age pair. <em>Taller rows</em> and
+      <em>wider columns</em> mark more likely death ages.
+      <strong class="hint">Click any cell</strong> to see the full filing
+      breakdown for that scenario.
+    </p>
+    <HowToReadChart>
+      <ul>
+        <li>
+          <strong>Two matrices:</strong> the left one shows Self's optimal
+          filing {displayAsAges ? 'age' : 'date'}; the right one shows Spouse's.
+          Both depend on <em>both</em> death ages because of survivor benefits.
+        </li>
+        <li>
+          <strong>Row / column position:</strong> your death age on one axis,
+          your spouse's on the other. Each cell is one specific pair.
+        </li>
+        <li>
+          <strong>Row height &amp; column width:</strong> probability of that
+          death age. Big cells are likely outcomes; tiny cells are edge cases.
+        </li>
+        <li>
+          <strong>Cell color:</strong> similar strategies share a color, so
+          large bands of one color mean the same strategy is optimal across
+          many scenarios.
+        </li>
+        <li>
+          <strong>Click a cell</strong> to see the full month-by-month benefit
+          breakdown for that death-age pair.
+        </li>
+      </ul>
+      <p>
+        <strong>Takeaway:</strong> focus on the large, dense cells. Those are
+        the most likely outcomes and they drive the Recommended Filing Ages. A
+        single strategy usually covers most of the probability mass, which is
+        why one recommendation is useful even across many possible lifespans.
+      </p>
+    </HowToReadChart>
+
+    {#if calculationResults.status() === CalculationStatus.Complete}
+      <div class="matrices-toolbar">
+        <span class="toolbar-label">Display filing as</span>
+        <div class="segmented" role="group" aria-label="Display filing as">
+          <button
+            type="button"
+            class="seg"
+            class:active={!displayAsAges}
+            on:click={() => (displayAsAges = false)}
+          >
+            Date
+          </button>
+          <button
+            type="button"
+            class="seg"
+            class:active={displayAsAges}
+            on:click={() => (displayAsAges = true)}
+          >
+            Age
+          </button>
+        </div>
+      </div>
+    {/if}
+  </div>
 
   {#if calculationResults.status() === CalculationStatus.Complete}
     <div class="matrices-container">
@@ -119,32 +127,35 @@ function handleHoverCell(detail: CellPosition | null) {
 
 <style>
   .result-box {
-    margin-top: 1rem;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f8f9fa;
+    margin-top: 0.75rem;
   }
 
-  .header-section {
-    margin-bottom: 1rem;
+  /* The section heading, prose, and toolbar stay in the same 1200px column
+     as the rest of the page. The matrices below break out to full viewport
+     because the dense data needs every pixel. */
+  .result-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 0.5rem;
   }
 
-  .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+  .section-header {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid #e5e7eb;
   }
 
-  .header-content h3 {
+  .section-kicker {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    color: #060606;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
   }
 
   .lede {
+    max-width: 72ch;
     margin: 0.6rem 0 0;
     font-size: 0.95rem;
     color: #1f2937;
@@ -152,16 +163,38 @@ function handleHoverCell(detail: CellPosition | null) {
   }
 
   .caption {
+    max-width: 72ch;
     margin: 0.35rem 0 0;
     font-size: 0.85rem;
     color: #6b7280;
     line-height: 1.5;
   }
 
+  .matrices-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    margin-top: 1.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .toolbar-label {
+    font-size: 0.78rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
   .caption em {
     font-style: normal;
     color: #4b5563;
     font-weight: 500;
+  }
+
+  .caption .hint {
+    color: #081d88;
+    font-weight: 600;
   }
 
   .segmented {
@@ -209,19 +242,14 @@ function handleHoverCell(detail: CellPosition | null) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
+    padding: 0 0.5rem;
   }
 
   @media (max-width: 768px) {
     .matrices-container {
       grid-template-columns: 1fr;
       gap: 2rem;
-    }
-
-    .header-content {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
     }
   }
 </style>

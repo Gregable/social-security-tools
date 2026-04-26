@@ -48,7 +48,9 @@
 </script>
 
 <div class="tunable-wrapper" class:is-compact={isStuck}>
-  <div class="tunable-title"><strong>Tunable assumptions</strong></div>
+  <header class="section-header">
+    <p class="section-kicker">Tunable assumptions</p>
+  </header>
 
   <div class="health-cards" class:single={isSingle}>
   {#each recipients as recipient, i}
@@ -106,17 +108,23 @@
 
 <style>
   .tunable-wrapper {
+    margin: 0.75rem 0 0.75rem;
     transition: padding 0.15s ease;
   }
 
-  .tunable-title {
-    font-size: 0.95rem;
-    color: #333;
-    margin: 1rem 0 0.5rem;
-    transition:
-      margin 0.15s ease,
-      font-size 0.15s ease,
-      opacity 0.15s ease;
+  .section-header {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .section-kicker {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
   }
 
   .value-short {
@@ -131,7 +139,7 @@
     flex-wrap: wrap;
   }
 
-  .tunable-wrapper.is-compact .tunable-title {
+  .tunable-wrapper.is-compact .section-header {
     display: none;
   }
 
@@ -140,9 +148,11 @@
     display: flex;
     flex: 1 1 auto;
     margin: 0;
+    padding-bottom: 0;
     gap: 0.5rem;
     grid-template-columns: none;
     max-width: none;
+    border-bottom: none;
   }
 
   .tunable-wrapper.is-compact .health-card {
@@ -152,6 +162,9 @@
     min-width: 0;
     padding: 0.35rem 0.6rem;
     gap: 0.6rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
   }
 
   .tunable-wrapper.is-compact .row {
@@ -183,32 +196,36 @@
   .tunable-wrapper.is-compact .discount-row {
     padding: 0.35rem 0.6rem;
     flex: 0 1 auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
   }
   .health-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.4rem 2rem;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid #f3f4f6;
   }
   .health-cards.single {
     grid-template-columns: 1fr;
+    max-width: 720px;
   }
   .health-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 0.7rem 0.9rem;
+    padding: 0.4rem 0;
   }
   .row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    font-size: 0.9rem;
-    color: #333;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1f2937;
   }
   .value {
     color: #005ea5;
-    font-weight: bold;
+    font-weight: 700;
   }
   .endlabels {
     display: flex;
@@ -224,10 +241,7 @@
     margin-top: 2px;
   }
   .discount-row {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 0.5rem 0.9rem;
+    padding: 0.4rem 0;
   }
   @media (max-width: 768px) {
     .health-cards {

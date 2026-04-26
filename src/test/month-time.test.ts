@@ -159,4 +159,38 @@ describe('MonthDuration', () => {
     expect(md.subtract(new MonthDuration(1)).asMonths()).toBe(8);
     expect(md.add(new MonthDuration(1)).asMonths()).toBe(10);
   });
+  describe('toFullAgeString', () => {
+    it('whole years, plural', () => {
+      expect(
+        MonthDuration.initFromYearsMonths({
+          years: 67,
+          months: 0,
+        }).toFullAgeString()
+      ).toBe('67 years');
+    });
+    it('one year, singular', () => {
+      expect(
+        MonthDuration.initFromYearsMonths({
+          years: 1,
+          months: 0,
+        }).toFullAgeString()
+      ).toBe('1 year');
+    });
+    it('years and months, plural month', () => {
+      expect(
+        MonthDuration.initFromYearsMonths({
+          years: 65,
+          months: 8,
+        }).toFullAgeString()
+      ).toBe('65 years 8 months');
+    });
+    it('years and one month, singular', () => {
+      expect(
+        MonthDuration.initFromYearsMonths({
+          years: 1,
+          months: 1,
+        }).toFullAgeString()
+      ).toBe('1 year 1 month');
+    });
+  });
 });

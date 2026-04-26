@@ -26,6 +26,10 @@ export const Default: Story = {
     deathAge2: new MonthDuration(87 * 12),
     discountRate: 0,
     optimalNPV: Money.from(750000),
+    optimalFilingAges: [
+      new MonthDuration(67 * 12 + 3),
+      new MonthDuration(64 * 12 + 6),
+    ] as [MonthDuration, MonthDuration],
     displayAsAges: false,
   },
 };
@@ -46,6 +50,10 @@ export const DisplayAsAges: Story = {
     deathAge2: new MonthDuration(87 * 12),
     discountRate: 0,
     optimalNPV: Money.from(750000),
+    optimalFilingAges: [
+      new MonthDuration(67 * 12 + 3),
+      new MonthDuration(64 * 12 + 6),
+    ] as [MonthDuration, MonthDuration],
     displayAsAges: true,
   },
 };
@@ -66,6 +74,10 @@ export const WithDiscountRate: Story = {
     deathAge2: new MonthDuration(87 * 12),
     discountRate: 3.5,
     optimalNPV: Money.from(550000),
+    optimalFilingAges: [
+      new MonthDuration(65 * 12),
+      new MonthDuration(62 * 12 + 6),
+    ] as [MonthDuration, MonthDuration],
     displayAsAges: false,
   },
 };
@@ -86,6 +98,10 @@ export const ShortLifeExpectancy: Story = {
     deathAge2: new MonthDuration(70 * 12),
     discountRate: 0,
     optimalNPV: Money.from(250000),
+    optimalFilingAges: [
+      new MonthDuration(62 * 12),
+      new MonthDuration(62 * 12),
+    ] as [MonthDuration, MonthDuration],
     displayAsAges: false,
   },
 };
@@ -106,6 +122,10 @@ export const LongLifeExpectancy: Story = {
     deathAge2: new MonthDuration(92 * 12),
     discountRate: 0,
     optimalNPV: Money.from(1200000),
+    optimalFilingAges: [
+      new MonthDuration(70 * 12),
+      new MonthDuration(70 * 12),
+    ] as [MonthDuration, MonthDuration],
     displayAsAges: false,
   },
 };

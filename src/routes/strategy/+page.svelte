@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, tick } from "svelte";
   import { slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import Header from "$lib/components/Header.svelte";
@@ -18,13 +18,11 @@
     generateThreeYearBuckets,
   } from "$lib/strategy/ui";
   import { writable } from "svelte/store";
-  import AlternativeStrategiesSection from "./components/AlternativeStrategiesSection.svelte";
-  import AlternativeStrategiesRow from "./components/AlternativeStrategiesRow.svelte";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
   import RecipientInputs from "./components/RecipientInputs.svelte";
-  import StrategyDetails from "./components/StrategyDetails.svelte";
-  import StrategyDetailsSingle from "./components/StrategyDetailsSingle.svelte";
+  import ScenarioDetail from "./components/ScenarioDetail.svelte";
+  import ScenarioDetailSingle from "./components/ScenarioDetailSingle.svelte";
   import StrategyMatrixDisplay from "./components/StrategyMatrixDisplay.svelte";
   import StrategyPlotSingle from "./components/StrategyPlotSingle.svelte";
   import TunableAssumptions from "./components/TunableAssumptions.svelte";
@@ -35,6 +33,7 @@
     type CoupleFilingAgeResult,
   } from "$lib/strategy/calculations/expected-npv";
   import OptimalStrategyHeadline from "./components/OptimalStrategyHeadline.svelte";
+  import SupportPrompt from "$lib/components/SupportPrompt.svelte";
 
   const MIN_FILING_AGE = 62;
   const REACTIVE_DEBOUNCE_MS = 200;
@@ -73,13 +72,21 @@
   let isRunning = false;
 
   let tunableSentinelEl: HTMLDivElement | null = null;
+  let widgetEndSentinelEl: HTMLDivElement | null = null;
   let tunableWrapperEl: HTMLDivElement | null = null;
   let tunableIsStuck = false;
+  let tunablePastWidget = false;
   let tunableExpandedHeight = 0;
   let tunableObserver: IntersectionObserver | null = null;
+  let widgetEndObserver: IntersectionObserver | null = null;
   let tunableResizeObserver: ResizeObserver | null = null;
 
+  let widgetAnchorEl: HTMLDivElement | null = null;
+  let scenarioAnchorEl: HTMLElement | null = null;
+  let backToMatrixTimer: ReturnType<typeof setTimeout> | null = null;
+
   $: observeTunableSentinel(tunableSentinelEl);
+  $: observeWidgetEndSentinel(widgetEndSentinelEl);
   $: observeTunableWrapper(tunableWrapperEl);
 
   function observeTunableSentinel(el: HTMLDivElement | null) {
@@ -94,6 +101,27 @@
       { threshold: 0 }
     );
     tunableObserver.observe(el);
+  }
+
+  function observeWidgetEndSentinel(el: HTMLDivElement | null) {
+    widgetEndObserver?.disconnect();
+    widgetEndObserver = null;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    // rootMargin shrinks the top of the observer's root by 40% of the
+    // viewport, so the sentinel "leaves" intersection — and the bar
+    // begins to hide — once the bottom of the widget is 40% down from the
+    // top of the real viewport. That makes the bar fade as the widget
+    // starts to slide out, rather than waiting until it's fully gone.
+    widgetEndObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.length === 0) return;
+        const entry = entries[0];
+        const triggerLine = window.innerHeight * 0.4;
+        tunablePastWidget = entry.boundingClientRect.top < triggerLine;
+      },
+      { rootMargin: "-40% 0px 0px 0px", threshold: 0 }
+    );
+    widgetEndObserver.observe(el);
   }
 
   function observeTunableWrapper(el: HTMLDivElement | null) {
@@ -112,8 +140,10 @@
 
   onDestroy(() => {
     tunableObserver?.disconnect();
+    widgetEndObserver?.disconnect();
     tunableResizeObserver?.disconnect();
     if (debounceTimer !== null) clearTimeout(debounceTimer);
+    if (backToMatrixTimer !== null) clearTimeout(backToMatrixTimer);
   });
 
   $: formIsValid = recipientInputsValid && discountRateValid;
@@ -376,18 +406,38 @@
     }
   }
 
-  function handleCellSelect(detail: CellSelectionDetail) {
+  async function handleCellSelect(detail: CellSelectionDetail) {
     calculationResults.setSelectedByLabels(detail.deathAge1, detail.deathAge2);
     calculationResultsStore.set(calculationResults);
+    await tick();
+    scenarioAnchorEl?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function handleSinglePointSelect(detail: { rowIndex: number } | null) {
+  async function handleSinglePointSelect(
+    detail: { rowIndex: number } | null
+  ) {
     if (detail === null) {
       calculationResults.clearSelectedCell();
-    } else {
-      calculationResults.setSelectedCell(detail.rowIndex, 0);
+      calculationResultsStore.set(calculationResults);
+      return;
     }
+    calculationResults.setSelectedCell(detail.rowIndex, 0);
     calculationResultsStore.set(calculationResults);
+    await tick();
+    scenarioAnchorEl?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function handleBackToMatrix() {
+    widgetAnchorEl?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Clear the selection after the smooth scroll has had time to start, so
+    // the scenario card stays visible during the scroll-out and only unmounts
+    // once the user has reached the matrix.
+    if (backToMatrixTimer !== null) clearTimeout(backToMatrixTimer);
+    backToMatrixTimer = setTimeout(() => {
+      backToMatrixTimer = null;
+      calculationResults.clearSelectedCell();
+      calculationResultsStore.set(calculationResults);
+    }, 450);
   }
 </script>
 
@@ -450,7 +500,7 @@
 
     {#if stage === "results"}
       <section
-        class="stage-section locked-section"
+        class="stage-section"
         transition:slide={{ duration: 320, easing: cubicOut }}
       >
         <LockedSummary {recipients} {isSingle} onedit={handleEdit} />
@@ -470,6 +520,7 @@
     <div
       class="tunable-sticky-outer"
       class:is-stuck={tunableIsStuck}
+      class:is-hidden={tunableIsStuck && tunablePastWidget}
       bind:this={tunableWrapperEl}
     >
       <div class="limited-width tunable-sticky-inner">
@@ -488,63 +539,68 @@
     <section class="calculation-section">
       {#if calculationResults.status() === CalculationStatus.Complete}
         <div class="limited-width">
-          <OptimalStrategyHeadline
-            {isSingle}
-            singleResult={optimalSingleResult}
-            coupleResult={optimalCoupleResult}
-            {recipients}
-          />
+          <div class="hero-row">
+            <OptimalStrategyHeadline
+              {isSingle}
+              singleResult={optimalSingleResult}
+              coupleResult={optimalCoupleResult}
+              {recipients}
+            />
+            <SupportPrompt />
+          </div>
         </div>
-        {#if isSingle}
-          <StrategyPlotSingle
-            recipient={recipients[0]}
-            {calculationResults}
-            deathProbDistribution={deathProbDistribution1}
-            bind:displayAsAges
-            onselectpoint={handleSinglePointSelect}
-          />
-        {:else}
-          <StrategyMatrixDisplay
-            {recipients}
-            {calculationResults}
-            {deathProbDistribution1}
-            {deathProbDistribution2}
-            bind:displayAsAges
-            onselectcell={handleCellSelect}
-          />
-        {/if}
+        <div
+          class="widget-anchor"
+          bind:this={widgetAnchorEl}
+        >
+          {#if isSingle}
+            <StrategyPlotSingle
+              recipient={recipients[0]}
+              {calculationResults}
+              deathProbDistribution={deathProbDistribution1}
+              bind:displayAsAges
+              onselectpoint={handleSinglePointSelect}
+            />
+          {:else}
+            <StrategyMatrixDisplay
+              {recipients}
+              {calculationResults}
+              {deathProbDistribution1}
+              {deathProbDistribution2}
+              bind:displayAsAges
+              onselectcell={handleCellSelect}
+            />
+          {/if}
+        </div>
+        <div
+          class="widget-end-sentinel"
+          bind:this={widgetEndSentinelEl}
+        ></div>
       {/if}
     </section>
-    <section class="limited-width">
+    <section
+      class="limited-width scenario-anchor"
+      bind:this={scenarioAnchorEl}
+    >
       {#if calculationResults.getSelectedCellData() && !isSingle}
         {#key calculationResults.getSelectedCellData()}
-          <StrategyDetails
-            {recipients}
-            result={calculationResults.getSelectedCellData()}
-          />
-          <AlternativeStrategiesSection
+          <ScenarioDetail
             {recipients}
             result={calculationResults.getSelectedCellData()}
             {discountRate}
             bind:displayAsAges
+            onBack={handleBackToMatrix}
           />
         {/key}
       {/if}
       {#if calculationResults.getSelectedCellData() && isSingle}
         {#key calculationResults.getSelectedCellData()}
-          <StrategyDetailsSingle
+          <ScenarioDetailSingle
             recipient={recipients[0]}
             result={calculationResults.getSelectedCellData()}
-          />
-          <AlternativeStrategiesRow
-            recipient={recipients[0]}
-            deathAge={calculationResults.getSelectedCellData().bucket1
-              .expectedAge}
             {discountRate}
-            optimalNPV={calculationResults.getSelectedCellData().totalBenefit}
-            optimalFilingAge={calculationResults.getSelectedCellData()
-              .filingAge1}
             bind:displayAsAges
+            onBack={handleBackToMatrix}
           />
         {/key}
       {/if}
@@ -618,13 +674,6 @@
     margin-bottom: 0;
   }
 
-  .locked-section {
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: #f5f7fa;
-  }
-
   .tunable-sentinel {
     position: relative;
     height: 1px;
@@ -642,7 +691,10 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    transition: box-shadow 0.15s ease;
+    transition:
+      box-shadow 0.15s ease,
+      opacity 0.18s ease,
+      transform 0.18s ease;
   }
 
   .tunable-sticky-outer.is-stuck {
@@ -654,6 +706,22 @@
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
   }
 
+  /* Once the user has scrolled past the matrix/chart, the sliders no longer
+     act on what's on screen — fade the bar out (but keep its placeholder so
+     the page doesn't jump when the user scrolls back up). */
+  .tunable-sticky-outer.is-stuck.is-hidden {
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+  }
+
+  .widget-end-sentinel {
+    height: 1px;
+    width: 100%;
+    margin-top: -1px;
+    pointer-events: none;
+  }
+
   .tunable-sticky-inner {
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
@@ -661,6 +729,29 @@
 
   .calculation-section {
     margin-top: 2rem;
+  }
+
+  .hero-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+    margin: 0.75rem 0 1.75rem;
+  }
+
+  .hero-row :global(.headline),
+  .hero-row :global(.support-prompt) {
+    flex: 1 1 320px;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Scroll-margin keeps the matrix and the scenario card clear of the sticky
+     tunable bar when the user clicks a cell or hits "Back to matrix". */
+  .widget-anchor,
+  .scenario-anchor {
+    scroll-margin-top: 96px;
   }
 
   @media (max-width: 768px) {

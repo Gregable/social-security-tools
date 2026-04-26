@@ -25,6 +25,17 @@
   let hoveredPoint: any = null;
   let selectedRowIndex: number | null = null;
 
+  // Sync local crosshair selection with parent selection so external
+  // clears (e.g. "Back to chart") drop the crosshair too.
+  $: {
+    const sel = calculationResults.getSelectedCell();
+    const externalIdx = sel ? sel.row : null;
+    if (externalIdx !== selectedRowIndex) {
+      selectedRowIndex = externalIdx;
+      if (ctx) requestAnimationFrame(draw);
+    }
+  }
+
   // Dimensions
   const width = 800;
   const height = 400;
@@ -636,9 +647,55 @@
 </script>
 
 <div class="result-box">
-  <div class="header-section">
-    <div class="header-content">
-      <h3>How death age shapes the strategy</h3>
+  <header class="section-header">
+    <p class="section-kicker">How death age shapes the strategy</p>
+  </header>
+  <p class="lede">
+    Every death age has its own optimal filing. The
+    <strong>Recommended Filing</strong> above picks a single strategy that
+    works well across all of them; below, see what would be optimal at each
+    specific age.
+  </p>
+  <p class="caption">
+    The blue line shows the optimal filing {displayAsAges
+      ? "age"
+      : "date"} for each possible death age; the red line shows your cumulative
+    probability of dying by that age.
+    <strong class="hint">Click the chart</strong> to see the full filing
+    breakdown for a specific death age.
+  </p>
+  <HowToReadChart>
+    <ul>
+      <li>
+        <strong>X-axis (Death Age):</strong> a hypothetical age you live to.
+      </li>
+      <li>
+        <strong>Blue line (left axis):</strong> the filing {displayAsAges
+          ? "age"
+          : "date"} that would have maximized your lifetime benefits
+        <em>if</em> you knew you'd live exactly to that death age.
+      </li>
+      <li>
+        <strong>Red line (right axis):</strong> cumulative probability
+        you've died by that age. Steeper means a larger fraction of
+        outcomes fall in that range.
+      </li>
+      <li>
+        <strong>Hover the chart</strong> to see the values at each death
+        age.
+      </li>
+    </ul>
+    <p>
+      <strong>Takeaway:</strong> short lifespans favor filing early; long
+      lifespans favor delaying. The Recommended Filing picks the best
+      single date across the whole distribution, weighted by how likely
+      each lifespan is.
+    </p>
+  </HowToReadChart>
+
+  <div class="chart-block">
+    <div class="chart-toolbar">
+      <span class="toolbar-label">Display filing as</span>
       <div class="segmented" role="group" aria-label="Display filing as">
         <button
           type="button"
@@ -658,87 +715,38 @@
         </button>
       </div>
     </div>
-    <p class="lede">
-      Every death age has its own optimal filing. The
-      <strong>Recommended Filing</strong> above picks a single strategy that
-      works well across all of them; below, see what would be optimal at each
-      specific age.
-    </p>
-    <p class="caption">
-      The blue line shows the optimal filing {displayAsAges
-        ? "age"
-        : "date"} for each possible death age; the red line shows your cumulative
-      probability of dying by that age.
-    </p>
-    <HowToReadChart>
-      <ul>
-        <li>
-          <strong>X-axis (Death Age):</strong> a hypothetical age you live to.
-        </li>
-        <li>
-          <strong>Blue line (left axis):</strong> the filing {displayAsAges
-            ? "age"
-            : "date"} that would have maximized your lifetime benefits
-          <em>if</em> you knew you'd live exactly to that death age.
-        </li>
-        <li>
-          <strong>Red line (right axis):</strong> cumulative probability
-          you've died by that age. Steeper means a larger fraction of
-          outcomes fall in that range.
-        </li>
-        <li>
-          <strong>Hover the chart</strong> to see the values at each death
-          age.
-        </li>
-      </ul>
-      <p>
-        <strong>Takeaway:</strong> short lifespans favor filing early; long
-        lifespans favor delaying. The Recommended Filing picks the best
-        single date across the whole distribution, weighted by how likely
-        each lifespan is.
-      </p>
-    </HowToReadChart>
-  </div>
 
-  <div class="chart-container">
-    <canvas
-      bind:this={canvas}
-      on:mousemove={handleMouseMove}
-      on:mouseleave={handleMouseLeave}
-      on:click={handleClick}
-      style="width: 100%; height: auto; cursor: crosshair;"
-    ></canvas>
+    <div class="chart-container">
+      <canvas
+        bind:this={canvas}
+        on:mousemove={handleMouseMove}
+        on:mouseleave={handleMouseLeave}
+        on:click={handleClick}
+        style="width: 100%; height: auto; cursor: crosshair;"
+      ></canvas>
+    </div>
   </div>
 </div>
 
 <style>
   .result-box {
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+    margin: 0.75rem auto 2rem;
   }
 
-  .header-section {
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 1rem;
+  .section-header {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid #e5e7eb;
   }
 
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .header-content h3 {
+  .section-kicker {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    color: #060606;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
   }
 
   .lede {
@@ -755,6 +763,29 @@
     line-height: 1.5;
   }
 
+  .caption .hint {
+    color: #081d88;
+    font-weight: 600;
+  }
+
+  .chart-block {
+    margin-top: 1.5rem;
+  }
+
+  .chart-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .toolbar-label {
+    font-size: 0.78rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
 
   .segmented {
     display: inline-flex;
@@ -800,6 +831,6 @@
   .chart-container {
     width: 100%;
     max-width: 800px;
-    margin: 0 auto;
+    margin: 1rem auto 0;
   }
 </style>

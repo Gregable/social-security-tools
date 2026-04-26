@@ -30,82 +30,94 @@
   }
 </script>
 
-<div class="locked-header">
-  <div class="locked-title">
-    <strong>Recipient information</strong>
-  </div>
-  <button type="button" class="edit-btn" on:click={onedit}>
-    <svg
-      class="edit-arrow"
-      viewBox="0 0 16 16"
-      width="14"
-      height="14"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.75"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M10 3 5 8l5 5" />
-    </svg>
-    Edit recipient info
-  </button>
-</div>
+<section class="locked">
+  <header class="section-header">
+    <p class="section-kicker">Recipient information</p>
+    <button type="button" class="edit-btn" on:click={onedit}>
+      <svg
+        class="edit-arrow"
+        viewBox="0 0 16 16"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M10 3 5 8l5 5" />
+      </svg>
+      Edit recipient info
+    </button>
+  </header>
 
-<div class="cards" class:single={isSingle}>
-  {#each recipients as recipient, i}
-    {#if !isSingle || i === 0}
-      <div class="card">
-        {#if !recipient.only}
-          <div class="name"><RecipientName r={recipient} /></div>
-        {/if}
-        <div class="details">
-          Born {formatBirthdate(recipient)} · {formatGender(recipient)} · PIA {formatPia(
-            recipient
-          )}
+  <div class="rows" class:single={isSingle}>
+    {#each recipients as recipient, i}
+      {#if !isSingle || i === 0}
+        <div class="row">
+          {#if !recipient.only}
+            <span class="name"><RecipientName r={recipient} /></span>
+          {/if}
+          <span class="details">
+            Born {formatBirthdate(recipient)} · {formatGender(recipient)} · PIA {formatPia(
+              recipient
+            )}
+          </span>
         </div>
-      </div>
-    {/if}
-  {/each}
-</div>
+      {/if}
+    {/each}
+  </div>
+</section>
 
 <style>
-  .locked-header {
+  .locked {
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid #e5e7eb;
   }
-  .locked-title {
-    font-size: 0.95rem;
-    color: #333;
+
+  .section-kicker {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
   }
+
   .edit-btn {
     flex: 0 0 auto;
-    background: white;
-    border: 1px solid #d1d5db;
+    background: transparent;
+    border: none;
     color: #4b5563;
-    padding: 0.4rem 0.75rem;
-    border-radius: 6px;
+    padding: 0.25rem 0.4rem;
+    border-radius: 4px;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    transition:
-      border-color 0.15s ease,
-      color 0.15s ease,
-      background-color 0.15s ease;
+    gap: 0.35rem;
+    transition: color 0.15s ease;
   }
   .edit-btn:hover,
   .edit-btn:focus-visible {
-    border-color: #081d88;
     color: #081d88;
-    background-color: #f7f8fd;
     outline: none;
+  }
+  .edit-btn:focus-visible {
+    outline: 2px solid #081d88;
+    outline-offset: 2px;
   }
   .edit-arrow {
     display: block;
@@ -115,34 +127,33 @@
   .edit-btn:focus-visible .edit-arrow {
     transform: translateX(-2px);
   }
-  .cards {
+
+  .rows {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
+    gap: 0.4rem 1.5rem;
   }
-  .cards.single {
+  .rows.single {
     grid-template-columns: 1fr;
-    max-width: 600px;
   }
-  .card {
-    background: #eef1f5;
-    border: 1px solid #d5dae2;
-    border-radius: 6px;
-    padding: 0.7rem 0.9rem;
+  .row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.92rem;
+    line-height: 1.4;
   }
   .name {
-    font-weight: bold;
-    font-size: 1rem;
+    font-weight: 700;
     color: #0b0c0c;
-    margin-bottom: 0.2rem;
   }
   .details {
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 1.45;
+    color: #4b5563;
   }
+
   @media (max-width: 768px) {
-    .cards {
+    .rows {
       grid-template-columns: 1fr;
     }
   }

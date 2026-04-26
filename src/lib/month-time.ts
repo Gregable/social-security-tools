@@ -383,6 +383,21 @@ export class MonthDuration {
     if (m === 0) return `${y}`;
     return `${y} and ${m} month${m === 1 ? '' : 's'}`;
   }
+
+  /**
+   * Formats this duration as "X years Y months" or "X years" if whole years.
+   * Use this in spacious UI where "65y 8m" feels too telegraphic.
+   * Example: 65y 8m → "65 years 8 months"
+   * Example: 67y 0m → "67 years"
+   * Example: 1y 1m → "1 year 1 month"
+   */
+  toFullAgeString(): string {
+    const y = this.years();
+    const m = this.modMonths();
+    const yearLabel = `${y} ${y === 1 ? 'year' : 'years'}`;
+    if (m === 0) return yearLabel;
+    return `${yearLabel} ${m} ${m === 1 ? 'month' : 'months'}`;
+  }
 }
 
 /**

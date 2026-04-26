@@ -1,4 +1,5 @@
 <script lang="ts">
+  import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { Money } from "$lib/money";
   import type { MonthDuration } from "$lib/month-time";
@@ -18,10 +19,7 @@
   let { isSingle, singleResult, coupleResult, recipients }: Props = $props();
 
   function formatAge(age: MonthDuration): string {
-    const years = age.years();
-    const months = age.modMonths();
-    if (months === 0) return `${years}`;
-    return `${years}y ${months}m`;
+    return age.toFullAgeString();
   }
 
   function formatFilingDateFull(
@@ -33,7 +31,7 @@
   }
 
   function formatMoney(cents: number): string {
-    return Money.fromCents(Math.round(cents)).string();
+    return Money.fromCents(Math.round(cents)).wholeDollars();
   }
 </script>
 
@@ -109,6 +107,12 @@
             {formatMoney(coupleResult.expectedNPVCents)}
           {/if}
         </strong>
+        <InfoTip label="About expected NPV">
+          The recommended strategy's expected lifetime benefits, weighted by
+          each person's survival probability at every age and discounted to
+          today's dollars at the rate set above. It updates as you tune
+          health and discount rate.
+        </InfoTip>
       </div>
       <p class="explanation">
         {#if isSingle}
@@ -127,33 +131,31 @@
 
 <style>
   .headline {
-    margin: 0.5rem auto 1.5rem;
-    padding: 1.25rem 2rem 1.1rem;
-    border-radius: 14px;
-    background: #ffffff;
+    margin: 1.5rem auto 1.75rem;
+    padding: 1.5rem 2rem 1.75rem;
     color: #060606;
     max-width: 720px;
     text-align: center;
-    border: 1px solid #e5e7eb;
-    box-shadow:
-      0 2px 6px rgba(11, 17, 48, 0.06),
-      0 18px 36px -16px rgba(11, 17, 48, 0.22);
+    background: #f7f8fd;
+    border-radius: 14px;
   }
 
   .kicker {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.55rem;
     color: #081d88;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14rem;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.16rem;
     text-transform: uppercase;
-    margin-bottom: 1.1rem;
+    margin-bottom: 1.4rem;
   }
 
   .kicker-icon {
     display: block;
+    width: 16px;
+    height: 16px;
     color: #081d88;
   }
 
@@ -198,7 +200,8 @@
   }
 
   .couple-results .date-big {
-    font-size: 2.25rem;
+    font-size: 1.85rem;
+    white-space: nowrap;
   }
 
   .divider {
@@ -220,7 +223,12 @@
   }
 
   .npv-line {
-    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
     color: #4b5563;
   }
 
@@ -242,9 +250,6 @@
   }
 
   @media (max-width: 640px) {
-    .headline {
-      padding: 1.5rem 1.25rem 1.25rem;
-    }
     .date-big {
       font-size: 2.5rem;
     }
