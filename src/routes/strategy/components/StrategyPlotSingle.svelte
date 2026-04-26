@@ -681,8 +681,13 @@
         outcomes fall in that range.
       </li>
       <li>
-        <strong>Hover the chart</strong> to see the values at each death
-        age.
+        <span class="hover-only"
+          ><strong>Hover the chart</strong> to see the values at each death
+          age.</span
+        >
+        <span class="touch-only"
+          ><strong>Tap the chart</strong> to see the values at each death age.</span
+        >
       </li>
     </ul>
     <p>
@@ -729,6 +734,18 @@
 </div>
 
 <style>
+  .touch-only {
+    display: none;
+  }
+  @media (hover: none) {
+    .hover-only {
+      display: none;
+    }
+    .touch-only {
+      display: inline;
+    }
+  }
+
   .result-box {
     max-width: 800px;
     margin: 0.75rem auto 2rem;

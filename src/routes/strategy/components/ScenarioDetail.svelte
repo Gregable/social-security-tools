@@ -205,7 +205,12 @@
     <p class="section-lede">
       Each cell is one filing-age combination. Color shows how its NPV
       compares to the optimal (green) all the way to a poor outcome (red).
-      Hover or tap any cell to see the dollar gap from the optimal strategy.
+      <span class="hover-only"
+        >Hover any cell to see the dollar gap from the optimal strategy.</span
+      >
+      <span class="touch-only"
+        >Tap any cell to see the dollar gap from the optimal strategy.</span
+      >
     </p>
     <AlternativeStrategiesGrid
       {recipients}
@@ -304,6 +309,18 @@
     font-size: 0.9rem;
     color: #4b5563;
     line-height: 1.5;
+  }
+
+  .touch-only {
+    display: none;
+  }
+  @media (hover: none) {
+    .hover-only {
+      display: none;
+    }
+    .touch-only {
+      display: inline;
+    }
   }
 
   .filing-grid {

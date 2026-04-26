@@ -302,7 +302,8 @@
           {#if isPinned}
             Pinned cell
           {:else}
-            Hover any cell
+            <span class="hover-only">Hover any cell</span>
+            <span class="touch-only">Tap any cell</span>
           {/if}
         </span>
         {#if isPinned}
@@ -521,6 +522,18 @@
     color: #6b7280;
     letter-spacing: 0.06em;
     text-transform: uppercase;
+  }
+
+  .touch-only {
+    display: none;
+  }
+  @media (hover: none) {
+    .hover-only {
+      display: none;
+    }
+    .touch-only {
+      display: inline;
+    }
   }
 
   .info-hint-pin {
