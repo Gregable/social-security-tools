@@ -18,7 +18,6 @@
 
   let groupedByYear: YearGroup[] = [];
 
-  // Calculate alternatives when inputs change
   $: {
     groupedByYear = calculateAlternativeStrategies(
       recipient,
@@ -34,19 +33,23 @@
   }
 
   function formatFilingAge(filingAge: MonthDuration): string {
-    return formatFilingAgeDisplay(filingAge, displayAsAges, recipient.birthdate);
+    return formatFilingAgeDisplay(
+      filingAge,
+      displayAsAges,
+      recipient.birthdate
+    );
+  }
+
+  function formatDelta(npv: Money): string {
+    const delta = npv.sub(optimalNPV);
+    const cents = delta.cents();
+    if (cents === 0) return "$0";
+    if (cents > 0) return `+${delta.wholeDollars()}`;
+    return delta.wholeDollars();
   }
 </script>
 
-<div class="alternative-strategies-container">
-  <h3>
-    Alternative Filing {displayAsAges ? "Ages" : "Dates"}
-  </h3>
-  <p class="description">
-    Compare NPV outcomes for different filing ages given the selected death
-    scenario.
-  </p>
-
+<div class="alternatives-row">
   <div class="strategies-container">
     {#each groupedByYear as yearGroup}
       <div class="year-row">
@@ -54,8 +57,13 @@
         <div class="strategies-row">
           {#each yearGroup.results as result}
             {#if result.isPlaceholder}
-              <div class="strategy-box placeholder" title={result.placeholderReason}>
-                <div class="filing-label">{formatFilingAge(result.filingAge)}</div>
+              <div
+                class="strategy-box placeholder"
+                title={result.placeholderReason}
+              >
+                <div class="filing-label">
+                  {formatFilingAge(result.filingAge)}
+                </div>
                 <div class="placeholder-text">N/A</div>
               </div>
             {:else}
@@ -66,12 +74,23 @@
                   result.percentOfOptimal,
                   result.isOptimal
                 )};"
+                title={result.isOptimal
+                  ? `Optimal · ${result.npv.wholeDollars()}`
+                  : `${formatDelta(result.npv)} vs optimal · ${result.npv.wholeDollars()} (${result.percentOfOptimal.toFixed(1)}%)`}
               >
-                <div class="filing-label">{formatFilingAge(result.filingAge)}</div>
-                <div class="npv-value">{result.npv.wholeDollars()}</div>
-                <div class="percent-value">{result.percentOfOptimal.toFixed(1)}%</div>
+                <div class="filing-label">
+                  {formatFilingAge(result.filingAge)}
+                </div>
                 {#if result.isOptimal}
-                  <div class="optimal-badge">Optimal</div>
+                  <div class="delta-optimal">Optimal</div>
+                  <div class="percent-value">
+                    {result.npv.wholeDollars()}
+                  </div>
+                {:else}
+                  <div class="delta-value">{formatDelta(result.npv)}</div>
+                  <div class="percent-value">
+                    {result.percentOfOptimal.toFixed(1)}%
+                  </div>
                 {/if}
               </div>
             {/if}
@@ -82,67 +101,49 @@
   </div>
 
   <div class="legend">
+    <span class="legend-label">vs optimal:</span>
     <span class="legend-item">
-      <span class="color-box" style="background-color: rgb(0, 100, 0);"></span>
+      <span class="swatch" style="background-color: rgb(0, 100, 0);"></span>
       Optimal
     </span>
     <span class="legend-item">
-      <span class="color-box" style="background-color: rgb(34, 139, 34);"></span>
+      <span class="swatch" style="background-color: rgb(34, 139, 34);"></span>
       99%+
     </span>
     <span class="legend-item">
-      <span class="color-box" style="background-color: rgb(100, 170, 50);"></span>
-      95-99%
+      <span class="swatch" style="background-color: rgb(100, 170, 50);"></span>
+      95–99%
     </span>
     <span class="legend-item">
-      <span
-        class="color-box"
-        style="background-color: rgb(190, 210, 50);"
-      ></span>
-      90-95%
+      <span class="swatch" style="background-color: rgb(190, 210, 50);"></span>
+      90–95%
     </span>
     <span class="legend-item">
-      <span class="color-box" style="background-color: rgb(255, 215, 0);"></span>
-      85-90%
+      <span class="swatch" style="background-color: rgb(255, 215, 0);"></span>
+      85–90%
     </span>
     <span class="legend-item">
-      <span class="color-box" style="background-color: rgb(255, 165, 0);"></span>
-      80-85%
+      <span class="swatch" style="background-color: rgb(255, 165, 0);"></span>
+      80–85%
     </span>
     <span class="legend-item">
-      <span class="color-box" style="background-color: rgb(220, 20, 60);"></span>
+      <span class="swatch" style="background-color: rgb(220, 20, 60);"></span>
       &lt;80%
     </span>
   </div>
 </div>
 
 <style>
-  .alternative-strategies-container {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-
-  .alternative-strategies-container h3 {
-    color: #333;
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
-  }
-
-  .description {
-    color: #666;
-    font-size: 0.9rem;
-    margin: 0 0 1.5rem 0;
+  .alternatives-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .strategies-container {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
   }
 
   .year-row {
@@ -170,11 +171,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0.35rem 0.5rem;
+    padding: 0.4rem 0.5rem;
     border-radius: 4px;
     width: 70px;
     box-sizing: border-box;
-    color: white;
+    color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     transition: transform 0.1s ease;
     cursor: default;
@@ -191,7 +192,7 @@
   }
 
   .strategy-box.placeholder {
-    background-color: #e0e0e0;
+    background: #e0e0e0;
     color: #999;
     text-shadow: none;
     cursor: help;
@@ -208,55 +209,58 @@
 
   .filing-label {
     font-weight: bold;
-    font-size: 0.75rem;
-    margin-bottom: 0.1rem;
+    font-size: 0.72rem;
+    margin-bottom: 0.15rem;
   }
 
-  .npv-value {
+  .delta-value {
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 0.05rem;
+  }
+
+  .delta-optimal {
     font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     margin-bottom: 0.05rem;
   }
 
   .percent-value {
-    font-size: 0.65rem;
-    opacity: 0.9;
-  }
-
-  .optimal-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background-color: #ffd700;
-    color: #333;
-    font-size: 0.55rem;
-    font-weight: bold;
-    padding: 1px 4px;
-    border-radius: 8px;
-    text-shadow: none;
+    font-size: 0.62rem;
+    opacity: 0.92;
   }
 
   .legend {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-    font-size: 0.8rem;
-    color: #666;
-    border-top: 1px solid #eee;
-    padding-top: 1rem;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.4rem 0.85rem;
+    font-size: 0.78rem;
+    color: #4b5563;
+    border-top: 1px solid #eef0f5;
+    padding-top: 0.75rem;
+  }
+
+  .legend-label {
+    font-weight: 600;
+    color: #1f2937;
   }
 
   .legend-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.3rem;
   }
 
-  .color-box {
+  .swatch {
     width: 14px;
-    height: 14px;
+    height: 12px;
     border-radius: 2px;
     border: 1px solid rgba(0, 0, 0, 0.1);
+    display: inline-block;
   }
 
   @media (max-width: 768px) {
@@ -280,14 +284,18 @@
 
     .strategy-box {
       width: 55px;
-      padding: 0.25rem 0.4rem;
+      padding: 0.3rem 0.4rem;
     }
 
     .filing-label {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
     }
 
-    .npv-value {
+    .delta-value {
+      font-size: 0.68rem;
+    }
+
+    .delta-optimal {
       font-size: 0.6rem;
     }
 
@@ -296,7 +304,7 @@
     }
 
     .legend {
-      gap: 0.5rem;
+      gap: 0.3rem 0.55rem;
       font-size: 0.7rem;
     }
   }
