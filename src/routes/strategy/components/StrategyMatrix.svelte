@@ -189,14 +189,21 @@ $: cellDimensions = rowBuckets.map((_, i) =>
   }))
 );
 
-// Calculate cell styles including background color and border removal
-function getCellStyle(i: number, j: number): string {
+// Dependencies are passed as parameters so Svelte's static reactive
+// tracking sees them in the calling $: block. Closure-captured reactive
+// state is invisible to the compiler and won't trigger re-evaluation.
+function getCellStyle(
+  i: number,
+  j: number,
+  results: CalculationResults,
+  borderFns: ReturnType<typeof createBorderRemovalFunctions>,
+  recipientIdx: number
+): string {
   let style = '';
 
-  // Add background color based on filing date
-  const cell = calculationResults.get(i, j);
+  const cell = results.get(i, j);
   if (cell) {
-    const filingAge: MonthDuration = cell[`filingAge${recipientIndex + 1}`];
+    const filingAge: MonthDuration = cell[`filingAge${recipientIdx + 1}`];
     const backgroundColor = getMonthYearColor(
       filingAge.asMonths(),
       MonthDuration.initFromYearsMonths({
@@ -211,32 +218,36 @@ function getCellStyle(i: number, j: number): string {
     style += `background-color: ${backgroundColor}; `;
   }
 
-  // Apply border removal logic
   let bordersRemoved = 0;
-  if (borderRemovalFuncs.right(i, j)) {
+  if (borderFns.right(i, j)) {
     style += 'border-right: none; ';
     bordersRemoved++;
   }
-  if (borderRemovalFuncs.bottom(i, j)) {
+  if (borderFns.bottom(i, j)) {
     style += 'border-bottom: none; ';
     bordersRemoved++;
   }
-  if (borderRemovalFuncs.left(i, j)) {
+  if (borderFns.left(i, j)) {
     style += 'border-left: none; ';
     bordersRemoved++;
   }
-  if (borderRemovalFuncs.top(i, j)) {
+  if (borderFns.top(i, j)) {
     style += 'border-top: none; ';
     bordersRemoved++;
   }
 
-  // Add subtle visual indicator when borders are removed
   if (bordersRemoved > 0) {
     style += 'box-shadow: inset 0 0 2px rgba(0, 123, 255, 0.3); ';
   }
 
   return style;
 }
+
+$: cellStyles = rowBuckets.map((_, i) =>
+  colBuckets.map((_, j) =>
+    getCellStyle(i, j, calculationResults, borderRemovalFuncs, recipientIndex)
+  )
+);
 
 // Handle events
 function handleCellHover(position: CellPosition) {
@@ -407,7 +418,7 @@ function handleCellSelect(position: CellPosition) {
               isSelected={calculationResults.isSelected(i, j)}
               cellWidth={cellDimensions[i]?.[j]?.width || 0}
               cellHeight={cellDimensions[i]?.[j]?.height || 0}
-              cellStyle={getCellStyle(i, j)}
+              cellStyle={cellStyles[i]?.[j] || ''}
               onhover={handleCellHover}
               onhoverout={handleCellHoverOut}
               onselect={handleCellSelect}
