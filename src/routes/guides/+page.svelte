@@ -27,6 +27,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Apr 27, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/strategy-vs-opensocialsecurity">
+            SSA.tools vs OpenSocialSecurity
+          </a>
+        </h3>
+        <p class="description">
+          If both tools recommend different optimal filing dates, why? A look
+          at the mortality, trust-fund, and rounding choices that drive the
+          differences, and why the lifetime dollar impact is usually well
+          under 1%.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Feb 18, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/delayed-retirement-credits">
