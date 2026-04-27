@@ -30,6 +30,14 @@
     return `${date.monthFullName()} ${date.year()}`;
   }
 
+  function formatFilingDateShort(
+    recipient: Recipient,
+    age: MonthDuration
+  ): string {
+    const date = recipient.birthdate.dateAtLayAge(age);
+    return `${date.monthName()} ${date.year()}`;
+  }
+
   function formatMoney(cents: number): string {
     return Money.fromCents(Math.round(cents)).wholeDollars();
   }
@@ -73,7 +81,12 @@
           </div>
           <div class="prefix">File in</div>
           <div class="date-big">
-            {formatFilingDateFull(recipients[0], coupleResult.filingAges[0])}
+            <span class="date-full"
+              >{formatFilingDateFull(recipients[0], coupleResult.filingAges[0])}</span
+            >
+            <span class="date-short"
+              >{formatFilingDateShort(recipients[0], coupleResult.filingAges[0])}</span
+            >
           </div>
           <div class="age-sub">
             at age {formatAge(coupleResult.filingAges[0])}
@@ -86,7 +99,12 @@
           </div>
           <div class="prefix">File in</div>
           <div class="date-big">
-            {formatFilingDateFull(recipients[1], coupleResult.filingAges[1])}
+            <span class="date-full"
+              >{formatFilingDateFull(recipients[1], coupleResult.filingAges[1])}</span
+            >
+            <span class="date-short"
+              >{formatFilingDateShort(recipients[1], coupleResult.filingAges[1])}</span
+            >
           </div>
           <div class="age-sub">
             at age {formatAge(coupleResult.filingAges[1])}
@@ -138,6 +156,11 @@
     text-align: center;
     background: #f7f8fd;
     border-radius: 14px;
+    container-type: inline-size;
+  }
+
+  .date-short {
+    display: none;
   }
 
   .kicker {
@@ -247,6 +270,15 @@
     margin: 0.5rem auto 0;
     line-height: 1.45;
     max-width: 52ch;
+  }
+
+  @container (max-width: 440px) {
+    .couple-results .date-full {
+      display: none;
+    }
+    .couple-results .date-short {
+      display: inline;
+    }
   }
 
   @media (max-width: 640px) {
