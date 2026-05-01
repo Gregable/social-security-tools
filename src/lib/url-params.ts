@@ -12,6 +12,8 @@
  * server-side processing and maintain client-side privacy.
  */
 
+export type Gender = 'male' | 'female' | 'blended';
+
 /**
  * Parsed recipient or spouse data from URL parameters.
  */
@@ -265,10 +267,76 @@ export class UrlParams {
   }
 
   /**
+   * Get recipient (person 1) gender parameter.
+   * Returns 'blended' if not present or unrecognized.
+   *
+   * Example: #gender1=male
+   */
+  getRecipientGender(): Gender {
+    return UrlParams.parseGender(this.params.get('gender1'));
+  }
+
+  /**
+   * Get spouse (person 2) gender parameter.
+   * Returns 'blended' if not present or unrecognized.
+   *
+   * Example: #gender2=female
+   */
+  getSpouseGender(): Gender {
+    return UrlParams.parseGender(this.params.get('gender2'));
+  }
+
+  private static parseGender(value: string | null): Gender {
+    if (value === 'male' || value === 'female' || value === 'blended') {
+      return value;
+    }
+    return 'blended';
+  }
+
+  /**
+   * Check if valid strategy params are present for the primary recipient.
+   * Both PIA and DOB are required.
+   */
+  hasValidStrategyParams(): boolean {
+    return this.hasValidRecipientParams();
+  }
+
+  /**
    * Get the raw URLSearchParams instance for advanced use cases.
    * Use sparingly - prefer typed methods above.
    */
   getRaw(): URLSearchParams {
     return this.params;
   }
+}
+
+export interface StrategyHashParams {
+  isSingle: boolean;
+  pia1: number;
+  dob1: string;
+  name1?: string;
+  gender1?: Gender;
+  pia2?: number;
+  dob2?: string;
+  name2?: string;
+  gender2?: Gender;
+}
+
+/**
+ * Build a URL hash string for the /strategy page pre-fill.
+ * Only includes gender when non-default (blended) to keep URLs short.
+ */
+export function buildStrategyHash(p: StrategyHashParams): string {
+  const parts: string[] = [`pia1=${Math.round(p.pia1)}`, `dob1=${p.dob1}`];
+  if (p.name1) parts.push(`name1=${encodeURIComponent(p.name1)}`);
+  if (p.gender1 && p.gender1 !== 'blended') parts.push(`gender1=${p.gender1}`);
+
+  if (!p.isSingle && p.pia2 !== undefined && p.dob2) {
+    parts.push(`pia2=${Math.round(p.pia2)}`, `dob2=${p.dob2}`);
+    if (p.name2) parts.push(`name2=${encodeURIComponent(p.name2)}`);
+    if (p.gender2 && p.gender2 !== 'blended')
+      parts.push(`gender2=${p.gender2}`);
+  }
+
+  return `#${parts.join('&')}`;
 }

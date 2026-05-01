@@ -18,6 +18,7 @@
     generateThreeYearBuckets,
   } from "$lib/strategy/ui";
   import { writable } from "svelte/store";
+  import { UrlParams, buildStrategyHash } from "$lib/url-params";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
   import RecipientInputs from "./components/RecipientInputs.svelte";
@@ -169,7 +170,48 @@
     tunableMobileMq = window.matchMedia("(max-width: 768px)");
     handleTunableMqChange(tunableMobileMq);
     tunableMobileMq.addEventListener("change", handleTunableMqChange);
+
+    hydrateFromHash();
   });
+
+  function hydrateFromHash() {
+    const params = new UrlParams(window.location.hash);
+    if (!params.hasValidStrategyParams()) return;
+
+    const hasSpouse =
+      params.getSpousePia() !== null && params.getSpouseDob() !== null;
+    isSingle = !hasSpouse;
+
+    // Mirror handleModeSelect: couple mode needs markFirst/markSecond so
+    // RecipientName renders colored names.
+    if (!isSingle) {
+      recipients[0].markFirst();
+      recipients[1].markSecond();
+    }
+
+    const dob1 = params.getRecipientDob()!;
+    const pia1 = params.getRecipientPia()!;
+    birthdateInputs[0] = dob1;
+    piaValues[0] = pia1;
+    recipients[0].setPia(Money.from(pia1));
+    if (params.getRecipientName()) recipients[0].name = params.getRecipientName()!;
+    recipients[0].gender = params.getRecipientGender();
+
+    if (!isSingle) {
+      const dob2 = params.getSpouseDob()!;
+      const pia2 = params.getSpousePia()!;
+      birthdateInputs[1] = dob2;
+      piaValues[1] = pia2;
+      recipients[1].setPia(Money.from(pia2));
+      if (params.getSpouseName()) recipients[1].name = params.getSpouseName()!;
+      recipients[1].gender = params.getSpouseGender();
+    }
+
+    birthdateInputs = [...birthdateInputs];
+    piaValues = [...piaValues];
+    recipients = [...recipients];
+    stage = "form";
+  }
 
   onDestroy(() => {
     tunableObserver?.disconnect();
@@ -182,6 +224,34 @@
 
   $: formIsValid = recipientInputsValid && discountRateValid;
   $: discountRate = discountRatePercent / 100;
+  $: shareUrl = buildShareUrl(recipients, isSingle, piaValues, birthdateInputs);
+
+  function buildShareUrl(
+    rs: [typeof recipients[0], typeof recipients[1]],
+    single: boolean,
+    pias: [number | null, number | null],
+    dobs: [string, string]
+  ): string {
+    if (!dobs[0] || pias[0] === null) return "";
+    const hash = buildStrategyHash({
+      isSingle: single,
+      pia1: pias[0],
+      dob1: dobs[0],
+      name1: rs[0].name || undefined,
+      gender1: rs[0].gender,
+      ...(
+        !single && pias[1] !== null && dobs[1]
+          ? {
+              pia2: pias[1],
+              dob2: dobs[1],
+              name2: rs[1].name || undefined,
+              gender2: rs[1].gender,
+            }
+          : {}
+      ),
+    });
+    return `https://ssa.tools/strategy${hash}`;
+  }
 
   $: maybeScheduleReactiveRecompute(
     recipients[0].healthMultiplier,
@@ -553,7 +623,7 @@
         class="stage-section"
         transition:slide={{ duration: 320, easing: cubicOut }}
       >
-        <LockedSummary {recipients} {isSingle} onedit={handleEdit} />
+        <LockedSummary {recipients} {isSingle} {shareUrl} onedit={handleEdit} />
       </section>
     {/if}
   </div>

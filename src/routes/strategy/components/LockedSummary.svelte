@@ -4,7 +4,26 @@
 
   export let recipients: [Recipient, Recipient];
   export let isSingle: boolean;
+  export let shareUrl: string = "";
   export let onedit: () => void;
+
+  let copied = false;
+  let copyTimer: ReturnType<typeof setTimeout> | null = null;
+
+  async function handleCopy() {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      copied = true;
+      if (copyTimer) clearTimeout(copyTimer);
+      copyTimer = setTimeout(() => {
+        copied = false;
+        copyTimer = null;
+      }, 2000);
+    } catch {
+      // Fallback: select a temporary input
+    }
+  }
 
   function formatBirthdate(recipient: Recipient): string {
     const bd = recipient.birthdate;
@@ -33,23 +52,41 @@
 <section class="locked">
   <header class="section-header">
     <p class="section-kicker">Recipient information</p>
-    <button type="button" class="edit-btn" on:click={onedit}>
-      <svg
-        class="edit-arrow"
-        viewBox="0 0 16 16"
-        width="14"
-        height="14"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.75"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M10 3 5 8l5 5" />
-      </svg>
-      Edit recipient info
-    </button>
+    <div class="header-actions">
+      {#if shareUrl}
+        <button type="button" class="share-btn" on:click={handleCopy}>
+          {#if copied}
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 8l4 4 8-8" />
+            </svg>
+            Copied!
+          {:else}
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="5" y="2" width="9" height="11" rx="1.5" />
+              <path d="M11 2V1a1 1 0 00-1-1H2a1 1 0 00-1 1v11a1 1 0 001 1h1" />
+            </svg>
+            Copy share link
+          {/if}
+        </button>
+      {/if}
+      <button type="button" class="edit-btn" on:click={onedit}>
+        <svg
+          class="edit-arrow"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M10 3 5 8l5 5" />
+        </svg>
+        Edit recipient info
+      </button>
+    </div>
   </header>
 
   <div class="rows" class:single={isSingle}>
@@ -68,6 +105,12 @@
       {/if}
     {/each}
   </div>
+  {#if shareUrl && copied}
+    <p class="share-disclosure">
+      Link copied. Note: the link contains your birthdate and PIA — only share
+      it with people you trust.
+    </p>
+  {/if}
 </section>
 
 <style>
@@ -83,6 +126,46 @@
     padding-bottom: 0.5rem;
     margin-bottom: 0.6rem;
     border-bottom: 1px solid #e5e7eb;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+  }
+
+  .share-btn {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .share-btn:hover,
+  .share-btn:focus-visible {
+    color: #081d88;
+    border-color: #081d88;
+    outline: none;
+  }
+  .share-btn:focus-visible {
+    outline: 2px solid #081d88;
+    outline-offset: 2px;
+  }
+
+  .share-disclosure {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.45;
   }
 
   .section-kicker {
