@@ -8,10 +8,12 @@
   export let onedit: () => void;
 
   let copied = false;
+  let copyError = false;
   let copyTimer: ReturnType<typeof setTimeout> | null = null;
 
   async function handleCopy() {
     if (!shareUrl) return;
+    copyError = false;
     try {
       await navigator.clipboard.writeText(shareUrl);
       copied = true;
@@ -21,7 +23,7 @@
         copyTimer = null;
       }, 2000);
     } catch {
-      // Fallback: select a temporary input
+      copyError = true;
     }
   }
 
@@ -52,41 +54,23 @@
 <section class="locked">
   <header class="section-header">
     <p class="section-kicker">Recipient information</p>
-    <div class="header-actions">
-      {#if shareUrl}
-        <button type="button" class="share-btn" on:click={handleCopy}>
-          {#if copied}
-            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M2 8l4 4 8-8" />
-            </svg>
-            Copied!
-          {:else}
-            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="5" y="2" width="9" height="11" rx="1.5" />
-              <path d="M11 2V1a1 1 0 00-1-1H2a1 1 0 00-1 1v11a1 1 0 001 1h1" />
-            </svg>
-            Copy share link
-          {/if}
-        </button>
-      {/if}
-      <button type="button" class="edit-btn" on:click={onedit}>
-        <svg
-          class="edit-arrow"
-          viewBox="0 0 16 16"
-          width="14"
-          height="14"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.75"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M10 3 5 8l5 5" />
-        </svg>
-        Edit recipient info
-      </button>
-    </div>
+    <button type="button" class="edit-btn" on:click={onedit}>
+      <svg
+        class="edit-arrow"
+        viewBox="0 0 16 16"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M10 3 5 8l5 5" />
+      </svg>
+      Edit recipient info
+    </button>
   </header>
 
   <div class="rows" class:single={isSingle}>
@@ -105,11 +89,32 @@
       {/if}
     {/each}
   </div>
-  {#if shareUrl && copied}
-    <p class="share-disclosure">
-      Link copied. Note: the link contains your birthdate and PIA — only share
-      it with people you trust.
-    </p>
+
+  {#if shareUrl}
+    <div class="share-row">
+      <button type="button" class="share-btn" on:click={handleCopy}>
+        {#if copied}
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 8l4 4 8-8" />
+          </svg>
+          Copied!
+        {:else}
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="5" y="2" width="9" height="11" rx="1.5" />
+            <path d="M11 2V1a1 1 0 00-1-1H2a1 1 0 00-1 1v11a1 1 0 001 1h1" />
+          </svg>
+          Copy share link
+        {/if}
+      </button>
+      {#if copied}
+        <p class="share-disclosure">
+          Link copied. Note: the link contains your birthdate and PIA — only share
+          it with people you trust.
+        </p>
+      {:else if copyError}
+        <p class="share-error">Could not copy — please copy the URL from your browser's address bar.</p>
+      {/if}
+    </div>
   {/if}
 </section>
 
@@ -128,11 +133,12 @@
     border-bottom: 1px solid #e5e7eb;
   }
 
-  .header-actions {
+  .share-row {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex: 0 0 auto;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
   }
 
   .share-btn {
@@ -162,9 +168,16 @@
   }
 
   .share-disclosure {
-    margin: 0.5rem 0 0;
+    margin: 0;
     font-size: 0.8rem;
     color: #6b7280;
+    line-height: 1.45;
+  }
+
+  .share-error {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #d4351c;
     line-height: 1.45;
   }
 

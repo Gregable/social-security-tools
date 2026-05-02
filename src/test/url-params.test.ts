@@ -569,171 +569,6 @@ describe('UrlParams', () => {
       });
     });
 
-    describe('Gender Parameters', () => {
-      it('should parse recipient gender male', () => {
-        const params = new UrlParams('#gender1=male');
-        expect(params.getRecipientGender()).toBe('male');
-      });
-
-      it('should parse recipient gender female', () => {
-        const params = new UrlParams('#gender1=female');
-        expect(params.getRecipientGender()).toBe('female');
-      });
-
-      it('should parse recipient gender blended', () => {
-        const params = new UrlParams('#gender1=blended');
-        expect(params.getRecipientGender()).toBe('blended');
-      });
-
-      it('should default to blended for missing gender1', () => {
-        const params = new UrlParams('#pia1=3000&dob1=1965-09-21');
-        expect(params.getRecipientGender()).toBe('blended');
-      });
-
-      it('should default to blended for unrecognized gender1', () => {
-        const params = new UrlParams('#gender1=other');
-        expect(params.getRecipientGender()).toBe('blended');
-      });
-
-      it('should parse spouse gender', () => {
-        const params = new UrlParams('#gender2=female');
-        expect(params.getSpouseGender()).toBe('female');
-      });
-
-      it('should default to blended for missing gender2', () => {
-        const params = new UrlParams('#pia2=1000&dob2=1965-09-21');
-        expect(params.getSpouseGender()).toBe('blended');
-      });
-    });
-
-    describe('buildStrategyHash', () => {
-      it('should build single-person hash with required fields', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400,
-          dob1: '1965-09-21',
-        });
-        expect(hash).toBe('#pia1=2400&dob1=1965-09-21');
-      });
-
-      it('should include name1 when provided', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400,
-          dob1: '1965-09-21',
-          name1: 'Alex',
-        });
-        expect(hash).toContain('name1=Alex');
-      });
-
-      it('should include gender1 when not blended', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400,
-          dob1: '1965-09-21',
-          gender1: 'male',
-        });
-        expect(hash).toContain('gender1=male');
-      });
-
-      it('should omit gender1 when blended', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400,
-          dob1: '1965-09-21',
-          gender1: 'blended',
-        });
-        expect(hash).not.toContain('gender1');
-      });
-
-      it('should round PIA to nearest integer', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400.75,
-          dob1: '1965-09-21',
-        });
-        expect(hash).toContain('pia1=2401');
-      });
-
-      it('should build couple hash with spouse fields', () => {
-        const hash = buildStrategyHash({
-          isSingle: false,
-          pia1: 2400,
-          dob1: '1960-03-15',
-          name1: 'Alex',
-          gender1: 'male',
-          pia2: 1800,
-          dob2: '1962-07-22',
-          name2: 'Casey',
-          gender2: 'female',
-        });
-        expect(hash).toContain('pia1=2400');
-        expect(hash).toContain('dob1=1960-03-15');
-        expect(hash).toContain('name1=Alex');
-        expect(hash).toContain('gender1=male');
-        expect(hash).toContain('pia2=1800');
-        expect(hash).toContain('dob2=1962-07-22');
-        expect(hash).toContain('name2=Casey');
-        expect(hash).toContain('gender2=female');
-      });
-
-      it('should exclude spouse fields for isSingle=true even if provided', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400,
-          dob1: '1960-03-15',
-          pia2: 1800,
-          dob2: '1962-07-22',
-        });
-        expect(hash).not.toContain('pia2');
-        expect(hash).not.toContain('dob2');
-      });
-
-      it('should include names with special characters', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400,
-          dob1: '1965-09-21',
-          name1: "O'Brien",
-        });
-        // encodeURIComponent leaves apostrophe unencoded (unreserved char per RFC)
-        expect(hash).toContain("name1=O'Brien");
-      });
-
-      it('should URL-encode spaces in names', () => {
-        const hash = buildStrategyHash({
-          isSingle: true,
-          pia1: 2400,
-          dob1: '1965-09-21',
-          name1: 'Alex Smith',
-        });
-        expect(hash).toContain('name1=Alex%20Smith');
-      });
-
-      it('round-trip: hash can be re-parsed by UrlParams', () => {
-        const hash = buildStrategyHash({
-          isSingle: false,
-          pia1: 2400,
-          dob1: '1960-03-15',
-          name1: 'Alex',
-          gender1: 'male',
-          pia2: 1800,
-          dob2: '1962-07-22',
-          name2: 'Casey',
-          gender2: 'female',
-        });
-        const params = new UrlParams(hash);
-        expect(params.getRecipientPia()).toBe(2400);
-        expect(params.getRecipientDob()).toBe('1960-03-15');
-        expect(params.getRecipientName()).toBe('Alex');
-        expect(params.getRecipientGender()).toBe('male');
-        expect(params.getSpousePia()).toBe(1800);
-        expect(params.getSpouseDob()).toBe('1962-07-22');
-        expect(params.getSpouseName()).toBe('Casey');
-        expect(params.getSpouseGender()).toBe('female');
-      });
-    });
-
     describe('Real-World Earnings Examples', () => {
       it('should parse typical career progression', () => {
         const params = new UrlParams(
@@ -766,6 +601,171 @@ describe('UrlParams', () => {
         expect(recipientEarnings?.length).toBe(6);
         expect(spouseEarnings?.length).toBe(3);
       });
+    });
+  });
+
+  describe('Gender Parameters', () => {
+    it('should parse recipient gender male', () => {
+      const params = new UrlParams('#gender1=male');
+      expect(params.getRecipientGender()).toBe('male');
+    });
+
+    it('should parse recipient gender female', () => {
+      const params = new UrlParams('#gender1=female');
+      expect(params.getRecipientGender()).toBe('female');
+    });
+
+    it('should parse recipient gender blended', () => {
+      const params = new UrlParams('#gender1=blended');
+      expect(params.getRecipientGender()).toBe('blended');
+    });
+
+    it('should default to blended for missing gender1', () => {
+      const params = new UrlParams('#pia1=3000&dob1=1965-09-21');
+      expect(params.getRecipientGender()).toBe('blended');
+    });
+
+    it('should default to blended for unrecognized gender1', () => {
+      const params = new UrlParams('#gender1=other');
+      expect(params.getRecipientGender()).toBe('blended');
+    });
+
+    it('should parse spouse gender', () => {
+      const params = new UrlParams('#gender2=female');
+      expect(params.getSpouseGender()).toBe('female');
+    });
+
+    it('should default to blended for missing gender2', () => {
+      const params = new UrlParams('#pia2=1000&dob2=1965-09-21');
+      expect(params.getSpouseGender()).toBe('blended');
+    });
+  });
+
+  describe('buildStrategyHash', () => {
+    it('should build single-person hash with required fields', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400,
+        dob1: '1965-09-21',
+      });
+      expect(hash).toBe('#pia1=2400&dob1=1965-09-21');
+    });
+
+    it('should include name1 when provided', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400,
+        dob1: '1965-09-21',
+        name1: 'Alex',
+      });
+      expect(hash).toContain('name1=Alex');
+    });
+
+    it('should include gender1 when not blended', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400,
+        dob1: '1965-09-21',
+        gender1: 'male',
+      });
+      expect(hash).toContain('gender1=male');
+    });
+
+    it('should omit gender1 when blended', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400,
+        dob1: '1965-09-21',
+        gender1: 'blended',
+      });
+      expect(hash).not.toContain('gender1');
+    });
+
+    it('should round PIA to nearest integer', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400.75,
+        dob1: '1965-09-21',
+      });
+      expect(hash).toContain('pia1=2401');
+    });
+
+    it('should build couple hash with spouse fields', () => {
+      const hash = buildStrategyHash({
+        isSingle: false,
+        pia1: 2400,
+        dob1: '1960-03-15',
+        name1: 'Alex',
+        gender1: 'male',
+        pia2: 1800,
+        dob2: '1962-07-22',
+        name2: 'Casey',
+        gender2: 'female',
+      });
+      expect(hash).toContain('pia1=2400');
+      expect(hash).toContain('dob1=1960-03-15');
+      expect(hash).toContain('name1=Alex');
+      expect(hash).toContain('gender1=male');
+      expect(hash).toContain('pia2=1800');
+      expect(hash).toContain('dob2=1962-07-22');
+      expect(hash).toContain('name2=Casey');
+      expect(hash).toContain('gender2=female');
+    });
+
+    it('should exclude spouse fields for isSingle=true even if provided', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400,
+        dob1: '1960-03-15',
+        pia2: 1800,
+        dob2: '1962-07-22',
+      });
+      expect(hash).not.toContain('pia2');
+      expect(hash).not.toContain('dob2');
+    });
+
+    it('should include names with special characters', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400,
+        dob1: '1965-09-21',
+        name1: "O'Brien",
+      });
+      // encodeURIComponent leaves apostrophe unencoded (unreserved char per RFC)
+      expect(hash).toContain("name1=O'Brien");
+    });
+
+    it('should URL-encode spaces in names', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2400,
+        dob1: '1965-09-21',
+        name1: 'Alex Smith',
+      });
+      expect(hash).toContain('name1=Alex%20Smith');
+    });
+
+    it('round-trip: hash can be re-parsed by UrlParams', () => {
+      const hash = buildStrategyHash({
+        isSingle: false,
+        pia1: 2400,
+        dob1: '1960-03-15',
+        name1: 'Alex',
+        gender1: 'male',
+        pia2: 1800,
+        dob2: '1962-07-22',
+        name2: 'Casey',
+        gender2: 'female',
+      });
+      const params = new UrlParams(hash);
+      expect(params.getRecipientPia()).toBe(2400);
+      expect(params.getRecipientDob()).toBe('1960-03-15');
+      expect(params.getRecipientName()).toBe('Alex');
+      expect(params.getRecipientGender()).toBe('male');
+      expect(params.getSpousePia()).toBe(1800);
+      expect(params.getSpouseDob()).toBe('1962-07-22');
+      expect(params.getSpouseName()).toBe('Casey');
+      expect(params.getSpouseGender()).toBe('female');
     });
   });
 });

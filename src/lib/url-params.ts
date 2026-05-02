@@ -266,22 +266,12 @@ export class UrlParams {
     return this.getSpouseEarnings() !== null && this.getSpouseDob() !== null;
   }
 
-  /**
-   * Get recipient (person 1) gender parameter.
-   * Returns 'blended' if not present or unrecognized.
-   *
-   * Example: #gender1=male
-   */
+  // Returns 'blended' when absent or unrecognized. Example: #gender1=male
   getRecipientGender(): Gender {
     return UrlParams.parseGender(this.params.get('gender1'));
   }
 
-  /**
-   * Get spouse (person 2) gender parameter.
-   * Returns 'blended' if not present or unrecognized.
-   *
-   * Example: #gender2=female
-   */
+  // Returns 'blended' when absent or unrecognized. Example: #gender2=female
   getSpouseGender(): Gender {
     return UrlParams.parseGender(this.params.get('gender2'));
   }
@@ -291,14 +281,6 @@ export class UrlParams {
       return value;
     }
     return 'blended';
-  }
-
-  /**
-   * Check if valid strategy params are present for the primary recipient.
-   * Both PIA and DOB are required.
-   */
-  hasValidStrategyParams(): boolean {
-    return this.hasValidRecipientParams();
   }
 
   /**
@@ -322,10 +304,7 @@ export interface StrategyHashParams {
   gender2?: Gender;
 }
 
-/**
- * Build a URL hash string for the /strategy page pre-fill.
- * Only includes gender when non-default (blended) to keep URLs short.
- */
+// Omits gender params when blended (the default) to keep URLs short.
 export function buildStrategyHash(p: StrategyHashParams): string {
   const parts: string[] = [`pia1=${Math.round(p.pia1)}`, `dob1=${p.dob1}`];
   if (p.name1) parts.push(`name1=${encodeURIComponent(p.name1)}`);
