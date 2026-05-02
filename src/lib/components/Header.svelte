@@ -1,77 +1,125 @@
 <script lang="ts">
 export let active = 'none';
 
-let navOptions = [
-  { name: 'Calculator', link: 'calculator', active: false },
-  { name: 'Guides', link: 'guides', active: false },
-  { name: 'About', link: 'about', active: false },
-  { name: 'Contact', link: 'contact', active: false },
+const flowNav = [
+  { name: 'Calculator', link: 'calculator' },
+  { name: 'Strategy', link: 'strategy' },
 ];
-$: active && navOptions.forEach((o) => (o.active = o.name === active));
+
+const mainNav = [
+  { name: 'Guides', link: 'guides' },
+  { name: 'About', link: 'about' },
+  { name: 'Contact', link: 'contact' },
+];
 </script>
 
 <div class="header">
   <h3><a href="/">SSA.tools</a></h3>
 
-  <div class="navpills" style:--pill-count={navOptions.length.toString()}>
-    {#each navOptions as option}
-      <div class="pill noprint" class:active={option.active}>
-        <a href="/{option.link}">{option.name}</a>
-      </div>
-    {/each}
-  </div>
+  <nav class="navpills noprint">
+    <div class="flow-group">
+      {#each flowNav as option, i}
+        {#if i > 0}
+          <svg
+            class="flow-arrow"
+            viewBox="0 0 16 16"
+            width="10"
+            height="10"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 3l6 5-6 5" />
+          </svg>
+        {/if}
+        <div class="pill" class:active={option.name === active}>
+          <a href="/{option.link}">{option.name}</a>
+        </div>
+      {/each}
+    </div>
+
+    <div class="main-group">
+      {#each mainNav as option}
+        <div class="pill" class:active={option.name === active}>
+          <a href="/{option.link}">{option.name}</a>
+        </div>
+      {/each}
+    </div>
+  </nav>
+
   <div class="onlyprint printurl">https://ssa.tools/</div>
 </div>
 
 <style>
-  /* Page Header with title and static links */
   .header {
     display: grid;
     grid-template-columns: 1fr auto;
-    align-items: center; /* Added for vertical alignment */
+    align-items: center;
     width: 100%;
     border-bottom: 1px solid #c5c5c5;
-    margin-bottom: 1.5em; /* Adjusted for better spacing */
+    margin-bottom: 1.5em;
   }
 
   h3 {
     margin: 0;
-    /* Removed line-height: 40px; as align-items handles vertical centering */
-    color: #333; /* Made title more prominent */
+    color: #333;
     font-weight: 500;
-    font-size: 28px; /* Increased font size */
-    padding-left: 1em; /* Adjusted padding */
+    font-size: 28px;
+    padding-left: 1em;
     white-space: nowrap;
   }
   h3 a {
-    color: #333; /* Made title more prominent */
-    text-decoration: none; /* Remove underline */
+    color: #333;
+    text-decoration: none;
   }
+
   .printurl {
     margin: 0 1em;
     line-height: 40px;
     color: rgb(50, 50, 50);
     font-weight: 900;
     font-size: 20px;
-    display: none; /* Hidden by default, shown only in print */
+    display: none;
   }
-
   @media print {
     .printurl {
-      display: block; /* Show in print */
+      display: block;
     }
   }
 
-  /* Navigation Pills */
   .navpills {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0.5em 1em;
     font-size: 14px;
-    display: grid !important;
-    grid-template-columns: repeat(var(--pill-count), auto);
-    column-gap: 10px;
-    margin: 0.5em 1em; /* Adjusted margin */
   }
+
+  .flow-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .main-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #e0e0e0;
+  }
+
+  .flow-arrow {
+    color: #bbb;
+    flex-shrink: 0;
+    margin: 0 1px;
+  }
+
   .pill {
-    /** Vertically aligns he pill */
     display: flex;
   }
   .pill a {
@@ -80,22 +128,18 @@ $: active && navOptions.forEach((o) => (o.active = o.name === active));
     padding: 10px 15px;
     text-decoration: none;
     vertical-align: middle;
+    color: inherit;
   }
   .pill a:hover {
-    background-color: #f0f0f0; /* Added hover effect */
+    background-color: #f0f0f0;
   }
   .pill.active a {
-    /* Changed from span to a */
     color: #fff;
     background-color: #337ab7;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Added subtle shadow */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
 
   @media screen and (max-width: 675px) {
-    /**
-    * Below 650px the pills and header start to collide, so
-    * we move them to separate lines and center.
-    */
     .header {
       grid-template-columns: 1fr;
       justify-items: center;
