@@ -17,6 +17,7 @@ import Sidebar from '$lib/components/Sidebar.svelte';
 import SidebarSection from '$lib/components/SidebarSection.svelte';
 import Sponsor from '$lib/components/Sponsor.svelte';
 import SpousalReport from '$lib/components/SpousalReport.svelte';
+import StrategyPromo from '$lib/components/StrategyPromo.svelte';
 import SurvivorReport from '$lib/components/SurvivorReport.svelte';
 import { recipient, spouse } from '$lib/context';
 import { loadIntroBanner, loadReportEnd } from '$lib/integrations/config';
@@ -285,7 +286,11 @@ async function loadIntegrationComponents(
           />
         </SidebarSection>
       {/if}
-      {#if ReportEndComponent && $activeIntegration && integrationComponentsLoaded}
+      {#if !$activeIntegration}
+        <SidebarSection label="Strategy Optimizer">
+          <StrategyPromo recipient={$recipient} spouse={$spouse} />
+        </SidebarSection>
+      {:else if ReportEndComponent && integrationComponentsLoaded}
         <SidebarSection
           label={$activeIntegration.reportEndLabel}
           integration={true}
