@@ -47,12 +47,7 @@
 </script>
 
 <div class="pageBreakAvoid">
-  <p class="intro">
-    Now that you know your Primary Insurance Amount{spouse ? "s" : ""}, use
-    the SSA.tools <strong>Strategy Optimizer</strong> to find the filing
-    date{spouse ? "s" : ""} that maximize{spouse ? "" : "s"} your lifetime
-    benefits.
-  </p>
+  <h3 class="subheading">Strategy Optimizer</h3>
   {#if spouse}
     <p class="pia-summary">
       Your PIAs are <strong>{formatPia(recipient)}</strong> for
@@ -86,9 +81,11 @@
 </div>
 
 <style>
-  .intro {
-    margin: 0 0.5rem 0.75rem;
-    line-height: 1.5;
+  .subheading {
+    margin: 0.75rem 0.5rem 0.4rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0b0c0c;
   }
 
   .pia-summary {
