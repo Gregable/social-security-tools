@@ -8,7 +8,7 @@ const title = 'Sharing Social Security Scenarios with URL Parameters';
 const description =
   'Learn how to use URL parameters to link directly to the SSA.tools calculator with preloaded scenarios. Perfect for financial advisors, educators, or sharing examples with family and friends.';
 const publishDate = new Date('2025-10-07T00:00:00+00:00');
-const updateDate = new Date('2025-10-07T00:00:00+00:00');
+const updateDate = new Date('2026-05-01T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/url-parameters';
@@ -343,6 +343,100 @@ schema.tags = [
       educational settings.
     </li>
   </ul>
+
+  <h2>Strategy Optimizer Parameters</h2>
+
+  <p>
+    The <a href="/strategy">Strategy Optimizer</a> also supports URL parameters to
+    pre-fill recipient information. Parameters are added as a hash fragment to
+    <code>https://ssa.tools/strategy</code>:
+  </p>
+
+  <pre><code>https://ssa.tools/strategy#pia1=VALUE&dob1=DATE</code></pre>
+
+  <p>
+    The page will open with the form pre-filled. You can review and adjust the values
+    before running the optimization.
+  </p>
+
+  <h3>Strategy Parameters</h3>
+
+  <h4>Primary Recipient (required)</h4>
+
+  <ul>
+    <li>
+      <code>pia1</code> - Primary Insurance Amount in whole dollars (required)
+    </li>
+    <li>
+      <code>dob1</code> - Date of birth in YYYY-MM-DD format (required)
+    </li>
+    <li>
+      <code>name1</code> - Name for display (optional)
+    </li>
+    <li>
+      <code>gender1</code> - One of <code>male</code>, <code>female</code>, or
+      <code>blended</code> (optional, defaults to <code>blended</code>)
+    </li>
+  </ul>
+
+  <h4>Spouse (optional — omit for single-person analysis)</h4>
+
+  <ul>
+    <li>
+      <code>pia2</code> - Spouse's Primary Insurance Amount in whole dollars
+    </li>
+    <li>
+      <code>dob2</code> - Spouse's date of birth in YYYY-MM-DD format
+    </li>
+    <li>
+      <code>name2</code> - Spouse's name for display (optional)
+    </li>
+    <li>
+      <code>gender2</code> - One of <code>male</code>, <code>female</code>, or
+      <code>blended</code> (optional, defaults to <code>blended</code>)
+    </li>
+  </ul>
+
+  <p>
+    When both <code>pia2</code> and <code>dob2</code> are present, the optimizer
+    runs in couple mode. When only recipient 1 parameters are provided, it runs
+    in single-person mode.
+  </p>
+
+  <h3>Strategy Examples</h3>
+
+  <h4>Single Person</h4>
+
+  <p>Alex, born September 21, 1965, male, with a PIA of $2,400:</p>
+
+  <pre><code>https://ssa.tools/strategy#pia1=2400&dob1=1965-09-21&name1=Alex&gender1=male</code></pre>
+
+  <p>
+    <a
+      href="/strategy#pia1=2400&dob1=1965-09-21&name1=Alex&gender1=male"
+      target="_blank"
+      rel="noopener noreferrer">Try this example →</a
+    >
+  </p>
+
+  <h4>Couple</h4>
+
+  <p>Alex and Casey, born in 1960 and 1962, with different PIAs:</p>
+
+  <pre><code>https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&name1=Alex&gender1=male&pia2=1800&dob2=1962-07-22&name2=Casey&gender2=female</code></pre>
+
+  <p>
+    <a
+      href="/strategy#pia1=2400&dob1=1960-03-15&name1=Alex&gender1=male&pia2=1800&dob2=1962-07-22&name2=Casey&gender2=female"
+      target="_blank"
+      rel="noopener noreferrer">Try this example →</a
+    >
+  </p>
+
+  <p>
+    The strategy page also has a <em>Copy share link</em> button once results are
+    displayed, which generates these URLs automatically.
+  </p>
 
   <h2>Related Resources</h2>
 

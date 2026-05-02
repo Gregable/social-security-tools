@@ -4,6 +4,7 @@
   import { cubicOut } from "svelte/easing";
   import Header from "$lib/components/Header.svelte";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
+  import { Birthdate } from "$lib/birthday";
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
@@ -18,6 +19,7 @@
     generateThreeYearBuckets,
   } from "$lib/strategy/ui";
   import { writable } from "svelte/store";
+  import { UrlParams, buildStrategyHash } from "$lib/url-params";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
   import RecipientInputs from "./components/RecipientInputs.svelte";
@@ -169,7 +171,74 @@
     tunableMobileMq = window.matchMedia("(max-width: 768px)");
     handleTunableMqChange(tunableMobileMq);
     tunableMobileMq.addEventListener("change", handleTunableMqChange);
+
+    hydrateFromHash();
   });
+
+  function parseBirthdate(dateStr: string): Birthdate | null {
+    const parts = dateStr.split("-");
+    if (parts.length !== 3) return null;
+    const year = Number(parts[0]);
+    const month = Number(parts[1]) - 1;
+    const day = Number(parts[2]);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+    try {
+      return Birthdate.FromYMD(year, month, day);
+    } catch {
+      return null;
+    }
+  }
+
+  function hydrateFromHash() {
+    const params = new UrlParams(window.location.hash);
+    if (!params.hasValidRecipientParams()) return;
+
+    try {
+      const dob1 = params.getRecipientDob()!;
+      const bd1 = parseBirthdate(dob1);
+      if (!bd1) return;
+
+      const hasSpouse =
+        params.getSpousePia() !== null && params.getSpouseDob() !== null;
+      isSingle = !hasSpouse;
+
+      // Mirror handleModeSelect: couple mode needs markFirst/markSecond so
+      // RecipientName renders colored names.
+      if (!isSingle) {
+        recipients[0].markFirst();
+        recipients[1].markSecond();
+      }
+
+      const pia1 = params.getRecipientPia()!;
+      birthdateInputs[0] = dob1;
+      piaValues[0] = pia1;
+      recipients[0].setPia(Money.from(pia1));
+      recipients[0].birthdate = bd1;
+      if (params.getRecipientName()) recipients[0].name = params.getRecipientName()!;
+      recipients[0].gender = params.getRecipientGender();
+
+      if (!isSingle) {
+        const dob2 = params.getSpouseDob()!;
+        const bd2 = parseBirthdate(dob2);
+        if (!bd2) { isSingle = true; } else {
+          const pia2 = params.getSpousePia()!;
+          birthdateInputs[1] = dob2;
+          piaValues[1] = pia2;
+          recipients[1].setPia(Money.from(pia2));
+          recipients[1].birthdate = bd2;
+          if (params.getSpouseName()) recipients[1].name = params.getSpouseName()!;
+          recipients[1].gender = params.getSpouseGender();
+        }
+      }
+
+      birthdateInputs = [...birthdateInputs];
+      piaValues = [...piaValues];
+      recipients = [...recipients];
+      stage = "form";
+    } catch {
+      // Invalid URL params — leave the page at the mode-picker stage
+    }
+  }
 
   onDestroy(() => {
     tunableObserver?.disconnect();
@@ -182,6 +251,34 @@
 
   $: formIsValid = recipientInputsValid && discountRateValid;
   $: discountRate = discountRatePercent / 100;
+  $: shareUrl = buildShareUrl(recipients, isSingle, piaValues, birthdateInputs);
+
+  function buildShareUrl(
+    rs: [typeof recipients[0], typeof recipients[1]],
+    single: boolean,
+    pias: [number | null, number | null],
+    dobs: [string, string]
+  ): string {
+    if (!dobs[0] || pias[0] === null) return "";
+    const hash = buildStrategyHash({
+      isSingle: single,
+      pia1: pias[0],
+      dob1: dobs[0],
+      name1: rs[0].name && rs[0].name !== "Self" ? rs[0].name : undefined,
+      gender1: rs[0].gender,
+      ...(
+        !single && pias[1] !== null && dobs[1]
+          ? {
+              pia2: pias[1],
+              dob2: dobs[1],
+              name2: rs[1].name && rs[1].name !== "Spouse" ? rs[1].name : undefined,
+              gender2: rs[1].gender,
+            }
+          : {}
+      ),
+    });
+    return `https://ssa.tools/strategy${hash}`;
+  }
 
   $: maybeScheduleReactiveRecompute(
     recipients[0].healthMultiplier,
@@ -553,7 +650,7 @@
         class="stage-section"
         transition:slide={{ duration: 320, easing: cubicOut }}
       >
-        <LockedSummary {recipients} {isSingle} onedit={handleEdit} />
+        <LockedSummary {recipients} {isSingle} {shareUrl} onedit={handleEdit} />
       </section>
     {/if}
   </div>
