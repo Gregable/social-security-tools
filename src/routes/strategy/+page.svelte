@@ -4,6 +4,7 @@
   import { cubicOut } from "svelte/easing";
   import Header from "$lib/components/Header.svelte";
   import { getDeathProbabilityDistribution } from "$lib/life-tables";
+  import { Birthdate } from "$lib/birthday";
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
@@ -174,6 +175,11 @@
     hydrateFromHash();
   });
 
+  function parseBirthdate(dateStr: string): Birthdate {
+    const [yearStr, monthStr, dayStr] = dateStr.split("-");
+    return Birthdate.FromYMD(Number(yearStr), Number(monthStr) - 1, Number(dayStr));
+  }
+
   function hydrateFromHash() {
     const params = new UrlParams(window.location.hash);
     if (!params.hasValidStrategyParams()) return;
@@ -194,6 +200,7 @@
     birthdateInputs[0] = dob1;
     piaValues[0] = pia1;
     recipients[0].setPia(Money.from(pia1));
+    recipients[0].birthdate = parseBirthdate(dob1);
     if (params.getRecipientName()) recipients[0].name = params.getRecipientName()!;
     recipients[0].gender = params.getRecipientGender();
 
@@ -203,6 +210,7 @@
       birthdateInputs[1] = dob2;
       piaValues[1] = pia2;
       recipients[1].setPia(Money.from(pia2));
+      recipients[1].birthdate = parseBirthdate(dob2);
       if (params.getSpouseName()) recipients[1].name = params.getSpouseName()!;
       recipients[1].gender = params.getSpouseGender();
     }
