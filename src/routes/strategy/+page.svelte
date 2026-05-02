@@ -595,7 +595,7 @@
   />
 </svelte:head>
 
-<Header />
+<Header active="Strategy" />
 
 <main>
   <div class="limited-width">

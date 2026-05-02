@@ -203,8 +203,11 @@ async function loadIntegrationComponents(
           <SidebarSection label="Normal Retirement Age" underSticky>
             <NormalRetirementAgeReport recipient={$recipient} />
           </SidebarSection>
-          <SidebarSection label="Filing Date" underSticky>
+          <SidebarSection label="Filing Strategy" underSticky>
             <FilingDateReport recipient={$recipient} />
+            {#if !$activeIntegration && !$spouse}
+              <StrategyPromo recipient={$recipient} spouse={null} />
+            {/if}
           </SidebarSection>
         {:else}
           <SidebarSection label="Primary Insurance Amount" underSticky>
@@ -218,8 +221,11 @@ async function loadIntegrationComponents(
           <SidebarSection label="Normal Retirement Age">
             <NormalRetirementAgeReport recipient={$recipient} />
           </SidebarSection>
-          <SidebarSection label="Filing Date">
+          <SidebarSection label="Filing Strategy">
             <FilingDateReport recipient={$recipient} />
+            {#if !$activeIntegration && !$spouse}
+              <StrategyPromo recipient={$recipient} spouse={null} />
+            {/if}
           </SidebarSection>
         {/if}
       </div>
@@ -273,11 +279,14 @@ async function loadIntegrationComponents(
             spouse={$spouse}
           />
         </SidebarSection>
-        <SidebarSection label="Filing Dates">
+        <SidebarSection label="Filing Strategy">
           <CombinedChart
             recipient={$recipient}
             spouse={$spouse}
           />
+          {#if !$activeIntegration}
+            <StrategyPromo recipient={$recipient} spouse={$spouse} />
+          {/if}
         </SidebarSection>
         <SidebarSection label="Survivor Benefit">
           <SurvivorReport
@@ -286,11 +295,7 @@ async function loadIntegrationComponents(
           />
         </SidebarSection>
       {/if}
-      {#if !$activeIntegration}
-        <SidebarSection label="Strategy Optimizer">
-          <StrategyPromo recipient={$recipient} spouse={$spouse} />
-        </SidebarSection>
-      {:else if ReportEndComponent && integrationComponentsLoaded}
+      {#if $activeIntegration && ReportEndComponent && integrationComponentsLoaded}
         <SidebarSection
           label={$activeIntegration.reportEndLabel}
           integration={true}
