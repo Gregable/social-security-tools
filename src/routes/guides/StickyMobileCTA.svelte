@@ -3,6 +3,7 @@ import posthog from 'posthog-js';
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
+import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { getGuideCTAType } from './guide-cta-config';
 
 let visible = false;
@@ -17,11 +18,11 @@ $: guideSlug = ($page?.url?.pathname ?? '')
 $: show = visible && !dismissed && !footerInView;
 
 function handleClick() {
-  if (browser) {
-    posthog.capture('Guide Sticky CTA: Clicked', {
-      type,
-      guide_slug: guideSlug,
-    });
+  if (!browser) return;
+  if (type === 'projectionlab') {
+    trackOutboundClick('projectionlab', 'guide-sticky-mobile', { guide_slug: guideSlug });
+  } else {
+    posthog.capture('Guide Sticky CTA: Clicked', { type, guide_slug: guideSlug });
   }
 }
 
@@ -51,10 +52,11 @@ onMount(() => {
     if (nowVisible && !visible && !tracked) {
       tracked = true;
       if (browser) {
-        posthog.capture('Guide Sticky CTA: Visible', {
-          type,
-          guide_slug: guideSlug,
-        });
+        if (type === 'projectionlab') {
+          trackOutboundImpression('projectionlab', 'guide-sticky-mobile', { guide_slug: guideSlug });
+        } else {
+          posthog.capture('Guide Sticky CTA: Visible', { type, guide_slug: guideSlug });
+        }
       }
     }
     visible = nowVisible;

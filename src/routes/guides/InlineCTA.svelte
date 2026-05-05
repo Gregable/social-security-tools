@@ -4,6 +4,7 @@ import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import ProjectionLabAd from '$lib/components/ProjectionLabAd.svelte';
+import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import type { GuideCTAType } from './guide-cta-config';
 
 export let type: GuideCTAType;
@@ -15,11 +16,11 @@ $: guideSlug = ($page?.url?.pathname ?? '')
   .replace(/\/$/, '');
 
 function handleClick() {
-  if (browser) {
-    posthog.capture('Guide Inline CTA: Clicked', {
-      type,
-      guide_slug: guideSlug,
-    });
+  if (!browser) return;
+  if (type === 'projectionlab') {
+    trackOutboundClick('projectionlab', 'guide-inline', { guide_slug: guideSlug });
+  } else {
+    posthog.capture('Guide Inline CTA: Clicked', { type, guide_slug: guideSlug });
   }
 }
 
@@ -29,10 +30,11 @@ onMount(() => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
           if (browser) {
-            posthog.capture('Guide Inline CTA: Visible', {
-              type,
-              guide_slug: guideSlug,
-            });
+            if (type === 'projectionlab') {
+              trackOutboundImpression('projectionlab', 'guide-inline', { guide_slug: guideSlug });
+            } else {
+              posthog.capture('Guide Inline CTA: Visible', { type, guide_slug: guideSlug });
+            }
           }
           observer.unobserve(entry.target);
         }
@@ -41,14 +43,9 @@ onMount(() => {
     { threshold: 0.2 }
   );
 
-  if (ctaElement) {
-    observer.observe(ctaElement);
-  }
-
+  if (ctaElement) observer.observe(ctaElement);
   return () => {
-    if (ctaElement) {
-      observer.unobserve(ctaElement);
-    }
+    if (ctaElement) observer.unobserve(ctaElement);
   };
 });
 </script>

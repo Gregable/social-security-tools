@@ -3,6 +3,7 @@ import posthog from 'posthog-js';
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
+import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import StickyMobileCTA from './StickyMobileCTA.svelte';
 
 $: guideSlug = ($page?.url?.pathname ?? '')
@@ -21,12 +22,7 @@ function handleCtaClick() {
 }
 
 function handlePlClick() {
-  if (browser) {
-    posthog.capture('Guide PL Recommendation: Clicked', {
-      guide_slug: guideSlug,
-      sponsor_name: 'ProjectionLab',
-    });
-  }
+  trackOutboundClick('projectionlab', 'guide-footer', { guide_slug: guideSlug });
 }
 
 onMount(() => {
@@ -67,10 +63,7 @@ onMount(() => {
         if (entry.isIntersecting && !plTracked) {
           plTracked = true;
           if (browser) {
-            posthog.capture('Guide PL Recommendation: Visible', {
-              guide_slug: guideSlug,
-              sponsor_name: 'ProjectionLab',
-            });
+            trackOutboundImpression('projectionlab', 'guide-footer', { guide_slug: guideSlug });
           }
           observer.unobserve(entry.target);
         }
