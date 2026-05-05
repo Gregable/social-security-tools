@@ -17,7 +17,6 @@
     copyError = false;
     try {
       await navigator.clipboard.writeText(shareUrl);
-      posthog.capture("Strategy: Share URL Copied", { mode: isSingle ? "single" : "couple" });
       copied = true;
       if (copyTimer) clearTimeout(copyTimer);
       copyTimer = setTimeout(() => {
@@ -26,6 +25,12 @@
       }, 2000);
     } catch {
       copyError = true;
+      return;
+    }
+    try {
+      posthog.capture("Strategy: Share URL Copied", { mode: isSingle ? "single" : "couple" });
+    } catch {
+      // analytics must not affect copy UX
     }
   }
 

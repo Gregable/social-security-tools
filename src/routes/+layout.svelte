@@ -26,7 +26,7 @@ afterNavigate(({ to }) => {
   if (browser && to?.url) {
     const pathname = to.url.pathname;
     let eventName = 'Page View';
-    let properties: Record<string, string | undefined> = {};
+    let properties: Record<string, string | boolean | undefined> = {};
 
     // Determine the page type and event name
     if (pathname === '/') {
@@ -60,10 +60,10 @@ afterNavigate(({ to }) => {
       } catch {
         // ignore malformed referrer
       }
-      properties.has_prefill = String(hasPrefill);
+      properties.has_prefill = hasPrefill;
       properties.prefill_mode = prefillMode;
       properties.referrer_host = referrerHost;
-      properties.from_calculator_cta = String(fromCalculatorCta);
+      properties.from_calculator_cta = fromCalculatorCta;
     } else if (pathname === '/about') {
       eventName = 'Page View: About';
     } else if (pathname === '/contact') {
