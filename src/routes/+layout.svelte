@@ -41,6 +41,29 @@ afterNavigate(({ to }) => {
       properties.guide_slug = pathname.replace('/guides/', '');
     } else if (pathname === '/strategy') {
       eventName = 'Page View: Strategy';
+      const hash = to.url.hash || '';
+      const hashParams = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+      const hasPrefill = hashParams.has('pia1') && hashParams.has('dob1');
+      let prefillMode: 'single' | 'couple' | 'none' = 'none';
+      if (hasPrefill) {
+        prefillMode = hashParams.has('pia2') && hashParams.has('dob2') ? 'couple' : 'single';
+      }
+      let referrerHost = '';
+      let fromCalculatorCta = false;
+      try {
+        if (document.referrer) {
+          const ref = new URL(document.referrer);
+          referrerHost = ref.host;
+          fromCalculatorCta =
+            ref.host === window.location.host && ref.pathname === '/calculator';
+        }
+      } catch {
+        // ignore malformed referrer
+      }
+      properties.has_prefill = String(hasPrefill);
+      properties.prefill_mode = prefillMode;
+      properties.referrer_host = referrerHost;
+      properties.from_calculator_cta = String(fromCalculatorCta);
     } else if (pathname === '/about') {
       eventName = 'Page View: About';
     } else if (pathname === '/contact') {
