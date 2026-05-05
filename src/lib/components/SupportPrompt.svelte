@@ -1,28 +1,15 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
   import KoFiImg from "$lib/images/kofi.png";
-  import posthog from "posthog-js";
-  import { onMount } from "svelte";
+  import { trackOutboundClick, outboundImpression } from "$lib/analytics/outbound";
 
   const KOFI_URL = "https://ko-fi.com/ssatools";
 
-  let shownTracked = false;
-
   function handleClick() {
-    if (browser) {
-      posthog.capture("Support Prompt: Clicked");
-    }
+    trackOutboundClick("kofi", "support-prompt");
   }
-
-  onMount(() => {
-    if (browser && !shownTracked) {
-      shownTracked = true;
-      posthog.capture("Support Prompt: Shown");
-    }
-  });
 </script>
 
-<aside class="support-prompt">
+<aside class="support-prompt" use:outboundImpression={{ destination: "kofi", placement: "support-prompt" }}>
   <header class="header">
     <p class="kicker">Support this work</p>
   </header>

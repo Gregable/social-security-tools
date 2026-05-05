@@ -2,6 +2,7 @@
 import Header from '$lib/components/Header.svelte';
 import KoFiImg from '$lib/images/kofi.png';
 import { renderWebsiteSocialMeta } from '$lib/schema-org';
+import { trackOutboundClick, outboundImpression } from '$lib/analytics/outbound';
 
 const pageTitle = 'Contact - Social Security Calculator | SSA.tools';
 const pageDescription =
@@ -65,7 +66,11 @@ const pageImageAlt = 'Contact the Social Security Calculator developer';
       </p>
       <p class="onlyprint kofi-url">https://ko-fi.com/ssatools</p>
       <p class="kofi-button">
-        <a href="https://ko-fi.com/ssatools" target="_blank"
+        <a
+          href="https://ko-fi.com/ssatools"
+          target="_blank"
+          use:outboundImpression={{ destination: 'kofi', placement: 'contact-page' }}
+          on:click={() => trackOutboundClick('kofi', 'contact-page')}
           ><img
             height="55"
             width="214"

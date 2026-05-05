@@ -1,9 +1,8 @@
 <script lang="ts">
-import posthog from 'posthog-js';
 import { onMount } from 'svelte';
-import { browser } from '$app/environment';
 import ProjectionLabAd from './ProjectionLabAd.svelte';
 import { Recipient } from '$lib/recipient';
+import { trackOutboundClick, outboundImpression } from '$lib/analytics/outbound';
 
 export let recipient: Recipient = new Recipient();
 
@@ -11,43 +10,24 @@ let sponsorElement: HTMLElement;
 let isVisible = false;
 
 function handleSponsorClick() {
-  if (browser) {
-    posthog.capture('Sponsor: Clicked', {
-      sponsor_name: 'ProjectionLab',
-    });
-  }
+  trackOutboundClick('projectionlab', 'sponsor-box');
 }
 
 onMount(() => {
   const observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry) => {
+      for (const entry of entries) {
         if (entry.isIntersecting) {
           isVisible = true;
-          // Track sponsor visibility
-          if (browser) {
-            posthog.capture('Sponsor: Visible', {
-              sponsor_name: 'ProjectionLab',
-            });
-          }
           observer.unobserve(entry.target);
         }
-      });
+      }
     },
-    {
-      threshold: 0.2, // Trigger when 20% of the element is visible
-      rootMargin: '50px', // Start animation slightly before element is fully in view
-    }
+    { threshold: 0.2, rootMargin: '50px' }
   );
-
-  if (sponsorElement) {
-    observer.observe(sponsorElement);
-  }
-
+  if (sponsorElement) observer.observe(sponsorElement);
   return () => {
-    if (sponsorElement) {
-      observer.unobserve(sponsorElement);
-    }
+    if (sponsorElement) observer.unobserve(sponsorElement);
   };
 });
 </script>
@@ -72,7 +52,10 @@ onMount(() => {
     </div>
   </div>
 
-  <div bind:this={sponsorElement}>
+  <div
+    bind:this={sponsorElement}
+    use:outboundImpression={{ destination: 'projectionlab', placement: 'sponsor-box' }}
+  >
     <ProjectionLabAd animated {isVisible} />
   </div>
 </a>

@@ -2,6 +2,7 @@
 import BlueskyImg from '$lib/images/bluesky.jpg';
 import GithubImg from '$lib/images/github.svg';
 import KoFiImg from '$lib/images/kofi.png';
+import { trackOutboundClick, outboundImpression } from '$lib/analytics/outbound';
 </script>
 
 <div class="container pageBreakAvoid pageBreakBefore">
@@ -52,7 +53,11 @@ import KoFiImg from '$lib/images/kofi.png';
       https://ko-fi.com/ssatools
     </p>
     <p style:text-align="center">
-      <a href="https://ko-fi.com/ssatools" target="_blank"
+      <a
+        href="https://ko-fi.com/ssatools"
+        target="_blank"
+        use:outboundImpression={{ destination: 'kofi', placement: 'more-resources' }}
+        on:click={() => trackOutboundClick('kofi', 'more-resources')}
         ><img
           height="55"
           width="214"

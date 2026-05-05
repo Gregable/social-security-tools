@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import type { FAQItem } from "$lib/schema-org";
+  import { trackOutboundClick, outboundImpression } from "$lib/analytics/outbound";
   import GuideFooter from "../guide-footer.svelte";
 
   const title = "ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security";
@@ -72,7 +73,9 @@
     <a
       href="https://projectionlab.com?ref=ssa-tools"
       target="_blank"
-      rel="noopener noreferrer">ProjectionLab</a
+      rel="noopener noreferrer"
+      use:outboundImpression={{ destination: "projectionlab", placement: "review-page-primary" }}
+      on:click={() => trackOutboundClick("projectionlab", "review-page-primary")}>ProjectionLab</a
     > is a retirement planning simulator that pairs well with SSA.tools. Here's
     an overview of what it does, what it costs, and where it fits in.
   </p>
@@ -125,7 +128,9 @@
     <a
       href="https://projectionlab.com/blog/compare-mode-upgrades"
       target="_blank"
-      rel="noopener noreferrer">Compare Mode</a
+      rel="noopener noreferrer"
+      use:outboundImpression={{ destination: "projectionlab", placement: "review-page-blog-link" }}
+      on:click={() => trackOutboundClick("projectionlab", "review-page-blog-link")}>Compare Mode</a
     >, which lets you create "what if" variations of your baseline plan and see
     the differences side by side. For example, you might compare:
   </p>
