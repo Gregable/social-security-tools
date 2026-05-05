@@ -12,6 +12,15 @@ export function trackOutboundClick(
   posthog.capture('Outbound: Clicked', { destination, placement, ...extras });
 }
 
+export function trackOutboundImpression(
+  destination: OutboundDestination,
+  placement: string,
+  extras?: Record<string, string | number | boolean>
+): void {
+  if (!browser) return;
+  posthog.capture('Outbound: Visible', { destination, placement, ...extras });
+}
+
 interface ImpressionParams {
   destination: OutboundDestination;
   placement: string;
@@ -22,7 +31,7 @@ export function outboundImpression(
   node: HTMLElement,
   params: ImpressionParams
 ) {
-  if (!browser) return {};
+  if (!browser || typeof IntersectionObserver === 'undefined') return {};
   let current = params;
   let fired = false;
   const observer = new IntersectionObserver(

@@ -4,7 +4,7 @@ import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import ProjectionLabAd from '$lib/components/ProjectionLabAd.svelte';
-import { trackOutboundClick } from '$lib/analytics/outbound';
+import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import type { GuideCTAType } from './guide-cta-config';
 
 export let type: GuideCTAType;
@@ -31,11 +31,7 @@ onMount(() => {
         if (entry.isIntersecting) {
           if (browser) {
             if (type === 'projectionlab') {
-              posthog.capture('Outbound: Visible', {
-                destination: 'projectionlab',
-                placement: 'guide-inline',
-                guide_slug: guideSlug,
-              });
+              trackOutboundImpression('projectionlab', 'guide-inline', { guide_slug: guideSlug });
             } else {
               posthog.capture('Guide Inline CTA: Visible', { type, guide_slug: guideSlug });
             }

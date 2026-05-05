@@ -3,7 +3,7 @@ import posthog from 'posthog-js';
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
-import { trackOutboundClick } from '$lib/analytics/outbound';
+import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { getGuideCTAType } from './guide-cta-config';
 
 let visible = false;
@@ -53,11 +53,7 @@ onMount(() => {
       tracked = true;
       if (browser) {
         if (type === 'projectionlab') {
-          posthog.capture('Outbound: Visible', {
-            destination: 'projectionlab',
-            placement: 'guide-sticky-mobile',
-            guide_slug: guideSlug,
-          });
+          trackOutboundImpression('projectionlab', 'guide-sticky-mobile', { guide_slug: guideSlug });
         } else {
           posthog.capture('Guide Sticky CTA: Visible', { type, guide_slug: guideSlug });
         }
