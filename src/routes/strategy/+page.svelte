@@ -19,6 +19,7 @@
     generateThreeYearBuckets,
   } from "$lib/strategy/ui";
   import { writable } from "svelte/store";
+  import posthog from "posthog-js";
   import { UrlParams, buildStrategyHash } from "$lib/url-params";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
@@ -366,6 +367,7 @@
   }
 
   function handleModeSelect(single: boolean) {
+    posthog.capture("Strategy: Mode Selected", { mode: single ? "single" : "couple" });
     isSingle = single;
     // Couple mode marks the two recipients so <RecipientName> shows their
     // colored names. Single mode leaves recipient1's default (only=true)
@@ -384,6 +386,9 @@
     try {
       await calculateStrategyMatrix();
       if (calculationResults.status() === CalculationStatus.Complete) {
+        posthog.capture("Strategy: Results Computed", {
+          mode: isSingle ? "single" : "couple",
+        });
         stage = "results";
       }
     } catch (error) {

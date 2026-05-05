@@ -1,4 +1,5 @@
 <script lang="ts">
+  import posthog from "posthog-js";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import type { Recipient } from "$lib/recipient";
 
@@ -24,6 +25,12 @@
       }, 2000);
     } catch {
       copyError = true;
+      return;
+    }
+    try {
+      posthog.capture("Strategy: Share URL Copied", { mode: isSingle ? "single" : "couple" });
+    } catch {
+      // analytics must not affect copy UX
     }
   }
 
