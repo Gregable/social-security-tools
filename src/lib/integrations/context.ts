@@ -83,7 +83,12 @@ function migrateRefQueryParam(): IntegrationConfig | null {
   if (!ref) return null;
 
   const config = getIntegrationByRefAlias(ref);
-  if (!config) return null;
+  if (!config) {
+    console.warn(
+      `Unknown ?ref= alias in URL: ${ref}. Only registered integration aliases are supported.`
+    );
+    return null;
+  }
 
   const hashParams = new URLSearchParams(window.location.hash.slice(1));
   // Don't overwrite an explicit hash integration if one is already present.
@@ -99,7 +104,14 @@ function migrateRefQueryParam(): IntegrationConfig | null {
     (newSearch ? `?${newSearch}` : '') +
     (newHash ? `#${newHash}` : '');
 
-  window.history.replaceState(null, '', newUrl);
+  // history.replaceState can throw SecurityError in sandboxed iframes or
+  // some restricted contexts. The integration is still resolved in-memory,
+  // so swallow the failure rather than aborting initialization.
+  try {
+    window.history.replaceState(null, '', newUrl);
+  } catch (e) {
+    console.warn('Failed to rewrite URL during ?ref= migration', e);
+  }
   return config;
 }
 

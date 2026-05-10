@@ -265,6 +265,9 @@ describe('Integration Context', () => {
   });
 
   it('should ignore unknown ?ref= aliases', () => {
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
     const replaceState = vi.fn();
     (globalThis as any).window = {
       location: {
@@ -286,6 +289,38 @@ describe('Integration Context', () => {
 
     initializeIntegration();
     expect(get(activeIntegration)).toBeNull();
+    expect(replaceState).not.toHaveBeenCalled();
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Unknown ?ref= alias')
+    );
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('should let an explicit hash integration win over ?ref=', () => {
+    const replaceState = vi.fn();
+    (globalThis as any).window = {
+      location: {
+        hash: '#integration=opensocialsecurity.com',
+        search: '?ref=projectionlab',
+        pathname: '/',
+      },
+      sessionStorage: {
+        getItem: (key: string) => mockSessionStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockSessionStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockSessionStorage[key];
+        },
+      },
+      history: { replaceState },
+    };
+
+    initializeIntegration();
+    // Hash-based parser runs first, so the resolved integration is the
+    // explicit hash value; the ?ref= migration is short-circuited and
+    // does not rewrite the URL.
+    expect(get(activeIntegration)?.id).toBe('opensocialsecurity.com');
     expect(replaceState).not.toHaveBeenCalled();
   });
 
