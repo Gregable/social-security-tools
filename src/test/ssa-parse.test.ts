@@ -348,6 +348,46 @@ describe('parsePaste', () => {
     expect(parsed[2].incomplete).toBe(true);
   });
 
+  it('Parses ssa.gov format (Firefox 2026, single-line run-on)', () => {
+    // Some Firefox versions copy the entire earnings table onto a single
+    // line, with the header word glued to the first year ("Earnings2018").
+    const pasteData =
+      'Work YearTaxed Social Security EarningsTaxed Medicare Earnings' +
+      '2018 $100,000 $100,000 2017 $90,000 $90,000 2016 $80,000 $80,000\n' +
+      'Not sure if you need to request a correction? Take a closer look\n';
+    parsePasteExpect(parsePaste(pasteData));
+  });
+
+  it('Leaves a 2-year run-on line below the split threshold', () => {
+    // Boundary test: splitRunOnYearLine only activates at 3+ year tokens.
+    // A two-year line must pass through unchanged. Here the data is on
+    // separate lines (the normal case); the extra "2015 $70,000" tail on
+    // line one would be ignored as trailing garbage if not split.
+    const pasteData =
+      '2018 $100,000 2015 $70,000\n' + '2017 $90,000\n' + '2016 $80,000\n';
+    const parsed = parsePaste(pasteData);
+    // Should parse 3 records (2016, 2017, 2018) — the trailing "2015 $70,000"
+    // on the first line is dropped by parseFormattedTable (only first 2 cols
+    // are used), and the 2-year threshold prevents run-on splitting.
+    parsePasteExpect(parsed);
+  });
+
+  it('Parses Firefox run-on line with NotYetRecorded current year', () => {
+    const pasteData =
+      'Work YearTaxed Social Security EarningsTaxed Medicare Earnings' +
+      '2018 Not Yet Recorded Not Yet Recorded ' +
+      '2017 $90,000 $90,000 2016 $80,000 $80,000\n';
+    const parsed = parsePaste(pasteData);
+    expect(parsed.length).toBe(3);
+    expect(parsed[0].year).toBe(2016);
+    expect(parsed[0].taxedEarnings.value()).toBe(80000);
+    expect(parsed[1].year).toBe(2017);
+    expect(parsed[1].taxedEarnings.value()).toBe(90000);
+    expect(parsed[2].year).toBe(2018);
+    expect(parsed[2].taxedEarnings.value()).toBe(0);
+    expect(parsed[2].incomplete).toBe(true);
+  });
+
   it('Parses ssa.gov format before medicare', () => {
     const pasteData =
       '1966\t$2,966\t$2,966\n' +

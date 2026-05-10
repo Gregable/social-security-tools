@@ -243,6 +243,48 @@ function isYearString(maybeYearStr: string): boolean {
   return true;
 }
 
+/**
+ * Some browsers (notably Firefox) copy the SSA earnings table without row
+ * breaks, producing a single long line like:
+ *   "Work YearTaxed ... Earnings2025 $176,100 $200,259 2024 $125,370 ..."
+ * If the input line contains three or more year tokens, split it into one
+ * line per year. Tokens before the first year are dropped (header garbage).
+ * Lines that don't match this pattern are returned unchanged.
+ */
+function splitRunOnYearLine(line: string): string[] {
+  // Unglue a header word from a year, e.g. "Earnings2025" -> ["Earnings",
+  // "2025"]. The anchored shape keeps this from firing on normal tokens.
+  const gluedYear = /^([A-Za-z]+)(\d{4})$/;
+  const tokens: string[] = [];
+  for (const raw of line.split(' ')) {
+    const match = gluedYear.exec(raw);
+    if (match && isYearString(match[2])) {
+      tokens.push(match[1], match[2]);
+    } else {
+      tokens.push(raw);
+    }
+  }
+
+  let yearCount = 0;
+  for (const t of tokens) {
+    if (isYearString(t)) yearCount++;
+  }
+  if (yearCount < 3) return [line];
+
+  const rows: string[] = [];
+  let current: string[] = [];
+  for (const t of tokens) {
+    if (isYearString(t)) {
+      if (current.length > 0) rows.push(current.join(' '));
+      current = [t];
+    } else if (current.length > 0) {
+      current.push(t);
+    }
+  }
+  if (current.length > 0) rows.push(current.join(' '));
+  return rows;
+}
+
 export function parsePaste(paste: string): Array<EarningRecord> {
   // We first collapse whitespace on each line as
   // different browsers insert different whitespace for column
@@ -263,8 +305,12 @@ export function parsePaste(paste: string): Array<EarningRecord> {
     'MedicareBeganIn1966'
   );
 
-  // Split based on newlines.
-  const lines: string[] = replacedStr.split('\n');
+  // Split based on newlines. Firefox sometimes copies the entire SSA earnings
+  // table onto a single line; splitRunOnYearLine() detects this and expands
+  // such a line into one row per year. For all other formats it is a no-op.
+  const lines: string[] = replacedStr
+    .split('\n')
+    .flatMap((line) => splitRunOnYearLine(line));
 
   if (isPdfPaste(lines)) {
     const out = parseSsaPdfTable(lines);
