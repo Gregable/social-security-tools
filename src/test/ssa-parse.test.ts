@@ -348,6 +348,16 @@ describe('parsePaste', () => {
     expect(parsed[2].incomplete).toBe(true);
   });
 
+  it('Parses ssa.gov format (Firefox 2026, single-line run-on)', () => {
+    // Some Firefox versions copy the entire earnings table onto a single
+    // line, with the header word glued to the first year ("Earnings2018").
+    const pasteData =
+      'Work YearTaxed Social Security EarningsTaxed Medicare Earnings' +
+      '2018 $100,000 $100,000 2017 $90,000 $90,000 2016 $80,000 $80,000\n' +
+      'Not sure if you need to request a correction? Take a closer look\n';
+    parsePasteExpect(parsePaste(pasteData));
+  });
+
   it('Parses ssa.gov format before medicare', () => {
     const pasteData =
       '1966\t$2,966\t$2,966\n' +
