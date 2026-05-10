@@ -9,7 +9,11 @@ import posthog from 'posthog-js';
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { UrlParams } from '$lib/url-params';
-import { getIntegration, type IntegrationConfig } from './config';
+import {
+  getIntegration,
+  getIntegrationByRefAlias,
+  type IntegrationConfig,
+} from './config';
 
 const SESSION_STORAGE_KEY = 'activeIntegrationId';
 
@@ -67,13 +71,48 @@ export function parseIntegrationFromHash(): IntegrationConfig | null {
 }
 
 /**
+ * If the URL has a `?ref=<alias>` query param matching a registered
+ * integration alias, rewrite the URL to the canonical
+ * `#integration=<id>` form (preserving any other hash params) and strip
+ * `ref` from the query. Returns the resolved integration if migrated.
+ */
+function migrateRefQueryParam(): IntegrationConfig | null {
+  if (typeof window === 'undefined') return null;
+  const search = new URLSearchParams(window.location.search);
+  const ref = search.get('ref');
+  if (!ref) return null;
+
+  const config = getIntegrationByRefAlias(ref);
+  if (!config) return null;
+
+  const hashParams = new URLSearchParams(window.location.hash.slice(1));
+  // Don't overwrite an explicit hash integration if one is already present.
+  if (!hashParams.has('integration')) {
+    hashParams.set('integration', config.id);
+  }
+  search.delete('ref');
+
+  const newSearch = search.toString();
+  const newHash = hashParams.toString();
+  const newUrl =
+    window.location.pathname +
+    (newSearch ? `?${newSearch}` : '') +
+    (newHash ? `#${newHash}` : '');
+
+  window.history.replaceState(null, '', newUrl);
+  return config;
+}
+
+/**
  * Initialize the integration context by parsing the URL or session storage.
  * Priority: URL hash > session storage
  * Should be called on page mount.
  */
 export function initializeIntegration(): void {
-  // First try URL hash (explicit parameter takes precedence)
-  let config = parseIntegrationFromHash();
+  // First try URL hash (explicit parameter takes precedence), then a
+  // legacy `?ref=` query alias (which also rewrites the URL to the
+  // canonical hash form).
+  let config = parseIntegrationFromHash() ?? migrateRefQueryParam();
   const fromUrl = config !== null;
 
   // If not in URL, try session storage

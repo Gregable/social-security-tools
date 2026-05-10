@@ -233,6 +233,86 @@ describe('Integration Context', () => {
     expect(storeValue?.id).toBe('opensocialsecurity.com');
   });
 
+  it('should migrate ?ref=projectionlab to integration hash', () => {
+    const replaceState = vi.fn();
+    (globalThis as any).window = {
+      location: {
+        hash: '',
+        search: '?ref=projectionlab',
+        pathname: '/',
+      },
+      sessionStorage: {
+        getItem: (key: string) => mockSessionStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockSessionStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockSessionStorage[key];
+        },
+      },
+      history: { replaceState },
+    };
+
+    initializeIntegration();
+
+    const storeValue = get(activeIntegration);
+    expect(storeValue?.id).toBe('projectionlab.com');
+    expect(replaceState).toHaveBeenCalledWith(
+      null,
+      '',
+      '/#integration=projectionlab.com'
+    );
+  });
+
+  it('should ignore unknown ?ref= aliases', () => {
+    const replaceState = vi.fn();
+    (globalThis as any).window = {
+      location: {
+        hash: '',
+        search: '?ref=somethingelse',
+        pathname: '/',
+      },
+      sessionStorage: {
+        getItem: (key: string) => mockSessionStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockSessionStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockSessionStorage[key];
+        },
+      },
+      history: { replaceState },
+    };
+
+    initializeIntegration();
+    expect(get(activeIntegration)).toBeNull();
+    expect(replaceState).not.toHaveBeenCalled();
+  });
+
+  it('should match ?ref= aliases case-insensitively', () => {
+    const replaceState = vi.fn();
+    (globalThis as any).window = {
+      location: {
+        hash: '',
+        search: '?ref=ProjectionLab',
+        pathname: '/',
+      },
+      sessionStorage: {
+        getItem: (key: string) => mockSessionStorage[key] || null,
+        setItem: (key: string, value: string) => {
+          mockSessionStorage[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete mockSessionStorage[key];
+        },
+      },
+      history: { replaceState },
+    };
+
+    initializeIntegration();
+    expect(get(activeIntegration)?.id).toBe('projectionlab.com');
+  });
+
   it('should clear sessionStorage when clearing integration', () => {
     mockWindow('#integration=opensocialsecurity.com');
     initializeIntegration();
