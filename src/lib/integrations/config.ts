@@ -19,6 +19,12 @@ export interface IntegrationConfig {
   reportEndLabel: string;
   /** Maximum number of household members the integration supports */
   maxHouseholdMembers?: number;
+  /**
+   * Legacy `?ref=` query-string aliases that should be migrated to this
+   * integration. Matched case-insensitively against the `ref` query param
+   * when the page first loads.
+   */
+  refAliases?: string[];
   /** Function that returns the favicon URL (processed by Vite) */
   getFavicon: () => Promise<string>;
 }
@@ -117,6 +123,18 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'projectionlab.com': {
+    id: 'projectionlab.com',
+    displayName: 'ProjectionLab',
+    reportEndLabel: '',
+    refAliases: ['projectionlab'],
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/projectionlab.com/icon-logo.png'
+      );
+      return module.default;
+    },
+  },
   'rachaelcampwealth.com': {
     id: 'rachaelcampwealth.com',
     displayName: 'Rachael Camp Wealth',
@@ -136,6 +154,22 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
  */
 export function getIntegration(id: string): IntegrationConfig | null {
   return INTEGRATIONS[id] ?? null;
+}
+
+/**
+ * Look up an integration by a legacy `?ref=` query-string alias.
+ * Match is case-insensitive. Returns null if no integration claims the alias.
+ */
+export function getIntegrationByRefAlias(
+  ref: string
+): IntegrationConfig | null {
+  const needle = ref.toLowerCase();
+  for (const config of Object.values(INTEGRATIONS)) {
+    if (config.refAliases?.some((alias) => alias.toLowerCase() === needle)) {
+      return config;
+    }
+  }
+  return null;
 }
 
 /**
