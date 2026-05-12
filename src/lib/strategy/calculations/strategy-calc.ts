@@ -657,7 +657,10 @@ function clampZeroPiaDepStrategy(
   const depFile = dependent.birthdate.dateAtSsaAge(depAge);
   if (!depFile.lessThan(earnerFile)) return best;
 
-  const newDepAge = dependent.birthdate.ageAtSsaDate(earnerFile);
+  // Cap at SSA age 70 — dep can't file past their max benefit age. Matters
+  // when the earner is younger than the dep and files at 70.
+  const rawAge = dependent.birthdate.ageAtSsaDate(earnerFile).asMonths();
+  const newDepAge = new MonthDuration(Math.min(rawAge, 70 * 12));
   const result: [MonthDuration, MonthDuration, number] = [
     best[0],
     best[1],
