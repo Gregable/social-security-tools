@@ -487,5 +487,20 @@ export function optimalStrategyCoupleFast(
     }
   }
 
+  // Zero-PIA dep can't collect spousal until earner files; multiple
+  // dependent filing ages below earner's produce identical NPV. The loop's
+  // tie-break picks the earliest, which displays a misleading "62y1m". Bump
+  // the reported dep age to match the earner's filing whenever needed.
+  if (depZeroPia) {
+    const bestFE = earnerIndex === 0 ? bestF0 : bestF1;
+    const earnerFileEpoch = eSsaBirth + bestFE;
+    let bestFD = earnerIndex === 0 ? bestF1 : bestF0;
+    const depFileEpoch = dSsaBirth + bestFD;
+    if (depFileEpoch < earnerFileEpoch) {
+      bestFD = earnerFileEpoch - dSsaBirth;
+      if (earnerIndex === 0) bestF1 = bestFD;
+      else bestF0 = bestFD;
+    }
+  }
   return [new MonthDuration(bestF0), new MonthDuration(bestF1), bestNPV];
 }

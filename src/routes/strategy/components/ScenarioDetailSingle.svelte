@@ -17,7 +17,7 @@
     return `${(prob * 100).toFixed(1)}%`;
   }
 
-  $: filingDate = recipient.birthdate.dateAtLayAge(result.filingAge1);
+  $: filingDate = recipient.birthdate.dateAtSsaAge(result.filingAge1);
   $: expectedAge = result.bucket1.expectedAge;
   $: deathDate = recipient.birthdate.dateAtLayAge(expectedAge);
 

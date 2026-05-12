@@ -689,6 +689,36 @@ describe('Zero-PIA optimizer', () => {
     expect(bestNpv).toBeGreaterThan(0);
   });
 
+  it('reported dependent filing age is bumped to earner filing when earner files later', () => {
+    // Same setup as "for long-lived dependent, optimizer delays earner filing"
+    // — earner optimally files at 70. The zero-PIA dependent cannot start
+    // collecting spousal until the earner files, so the reported dependent
+    // filing age should be 70y0m, not 62y1m.
+    const earner = makeRecipient(2000, 1965, 5, 15);
+    const dependent = makeRecipient(0, 1965, 5, 15);
+    const earnerDeath = finalDateAtAge(earner, 75);
+    const depDeath = finalDateAtAge(dependent, 95);
+
+    const [bestStrat0, bestStrat1] = optimalStrategyCouple(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+    const [bestStrat0Opt, bestStrat1Opt] = optimalStrategyCoupleOptimized(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+
+    // Earner (r0) files at 70, dependent (r1) should also be reported at 70.
+    expect(bestStrat0.asMonths()).toBe(70 * 12);
+    expect(bestStrat1.asMonths()).toBe(70 * 12);
+    expect(bestStrat0Opt.asMonths()).toBe(70 * 12);
+    expect(bestStrat1Opt.asMonths()).toBe(70 * 12);
+  });
+
   it('optimized matches non-optimized for zero-PIA couple', () => {
     const earner = makeRecipient(2000, 1965, 5, 15);
     const dependent = makeRecipient(0, 1965, 5, 15);

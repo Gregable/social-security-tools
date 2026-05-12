@@ -637,6 +637,37 @@ export function strategySumPeriodsOptimized(
 }
 
 /**
+ * A $0-PIA dependent cannot collect spousal benefits until the earner files.
+ * If the brute-force optimizer recorded a dependent filing age earlier than
+ * the earner's, every such pair produces the same NPV as the (matching-earner)
+ * pair, so the reported dependent age would be misleading. Bump it forward.
+ */
+function clampZeroPiaDepStrategy(
+  recipients: [Recipient, Recipient],
+  best: [MonthDuration, MonthDuration, number]
+): [MonthDuration, MonthDuration, number] {
+  const { earnerIndex, dependentIndex } = classifyEarnerDependent(recipients);
+  const dependent = recipients[dependentIndex];
+  if (dependent.pia().primaryInsuranceAmount().cents() !== 0) return best;
+
+  const earner = recipients[earnerIndex];
+  const earnerAge = best[earnerIndex] as MonthDuration;
+  const depAge = best[dependentIndex] as MonthDuration;
+  const earnerFile = earner.birthdate.dateAtSsaAge(earnerAge);
+  const depFile = dependent.birthdate.dateAtSsaAge(depAge);
+  if (!depFile.lessThan(earnerFile)) return best;
+
+  const newDepAge = dependent.birthdate.ageAtSsaDate(earnerFile);
+  const result: [MonthDuration, MonthDuration, number] = [
+    best[0],
+    best[1],
+    best[2],
+  ];
+  result[dependentIndex] = newDepAge;
+  return result;
+}
+
+/**
  * Calculates the optimal filing ages for a couple so as to maximize lifetime
  * benefits as returned by strategySumCents
  *
@@ -693,7 +724,7 @@ export function optimalStrategyCouple(
     }
   }
 
-  return bestStrategy;
+  return clampZeroPiaDepStrategy(recipients, bestStrategy);
 }
 
 /**
@@ -775,7 +806,7 @@ export function optimalStrategyCoupleOptimized(
     }
   }
 
-  return bestStrategy;
+  return clampZeroPiaDepStrategy(recipients, bestStrategy);
 }
 
 /**

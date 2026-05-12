@@ -18,10 +18,10 @@
 
   // Compute filing dates from filing ages
   $: filingDate1 = result
-    ? recipients[0].birthdate.dateAtLayAge(result.filingAge1)
+    ? recipients[0].birthdate.dateAtSsaAge(result.filingAge1)
     : null;
   $: filingDate2 = result
-    ? recipients[1].birthdate.dateAtLayAge(result.filingAge2)
+    ? recipients[1].birthdate.dateAtSsaAge(result.filingAge2)
     : null;
 
   // Expected death ages (probability-weighted modeled midpoint) are always defined.

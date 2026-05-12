@@ -67,7 +67,7 @@ function createNormalizedValueExtractor(recipientIndex: number) {
       years: filingAgeYears,
       months: filingAgeMonths,
     });
-    const filingDate = birthdate.dateAtLayAge(filingAge);
+    const filingDate = birthdate.dateAtSsaAge(filingAge);
 
     return `${filingDate.year()}-${(filingDate.monthIndex() + 1).toString().padStart(2, '0')}`;
   };
@@ -302,9 +302,9 @@ function handleCellSelect(position: CellPosition) {
     deathAge1: bucket1.label,
     deathAge2: bucket2.label,
     filingAge1,
-    filingDate1: recipients[0].birthdate.dateAtLayAge(filingAge1),
+    filingDate1: recipients[0].birthdate.dateAtSsaAge(filingAge1),
     filingAge2,
-    filingDate2: recipients[1].birthdate.dateAtLayAge(filingAge2),
+    filingDate2: recipients[1].birthdate.dateAtSsaAge(filingAge2),
     netPresentValue: totalBenefit,
   });
 }
