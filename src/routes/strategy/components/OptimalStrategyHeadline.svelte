@@ -26,7 +26,7 @@
     recipient: Recipient,
     age: MonthDuration
   ): string {
-    const date = recipient.birthdate.dateAtLayAge(age);
+    const date = recipient.birthdate.dateAtSsaAge(age);
     return `${date.monthFullName()} ${date.year()}`;
   }
 
@@ -34,7 +34,7 @@
     recipient: Recipient,
     age: MonthDuration
   ): string {
-    const date = recipient.birthdate.dateAtLayAge(age);
+    const date = recipient.birthdate.dateAtSsaAge(age);
     return `${date.monthName()} ${date.year()}`;
   }
 

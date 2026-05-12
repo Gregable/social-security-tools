@@ -16,6 +16,7 @@ import {
   strategySumPeriodsCouple,
   sumBenefitPeriods,
 } from '$lib/strategy/calculations';
+import { optimalStrategyCoupleFast } from '$lib/strategy/calculations/optimal-strategy-fast';
 import {
   optimalStrategyCouple,
   optimalStrategyCoupleOptimized,
@@ -687,6 +688,123 @@ describe('Zero-PIA optimizer', () => {
     // r0=earner is index 0, so bestStrat0 = earner's strategy.
     expect(bestStrat0.asMonths()).toBe(70 * 12);
     expect(bestNpv).toBeGreaterThan(0);
+  });
+
+  it('reported dependent filing age is bumped to earner filing when earner files later', () => {
+    // Same setup as "for long-lived dependent, optimizer delays earner filing"
+    // — earner optimally files at 70. The zero-PIA dependent cannot start
+    // collecting spousal until the earner files, so the reported dependent
+    // filing age should be 70y0m, not 62y1m.
+    const earner = makeRecipient(2000, 1965, 5, 15);
+    const dependent = makeRecipient(0, 1965, 5, 15);
+    const earnerDeath = finalDateAtAge(earner, 75);
+    const depDeath = finalDateAtAge(dependent, 95);
+
+    const [bestStrat0, bestStrat1] = optimalStrategyCouple(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+    const [bestStrat0Opt, bestStrat1Opt] = optimalStrategyCoupleOptimized(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+
+    const [bestStrat0Fast, bestStrat1Fast] = optimalStrategyCoupleFast(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+
+    // Earner (r0) files at 70, dependent (r1) should also be reported at 70.
+    expect(bestStrat0.asMonths()).toBe(70 * 12);
+    expect(bestStrat1.asMonths()).toBe(70 * 12);
+    expect(bestStrat0Opt.asMonths()).toBe(70 * 12);
+    expect(bestStrat1Opt.asMonths()).toBe(70 * 12);
+    expect(bestStrat0Fast.asMonths()).toBe(70 * 12);
+    expect(bestStrat1Fast.asMonths()).toBe(70 * 12);
+  });
+
+  it('bump still works when zero-PIA dep is at index 0 (swapped order)', () => {
+    // Same scenario, but recipients are passed with dep first. The bump must
+    // update recipients[0] (the dep), not recipients[1].
+    const earner = makeRecipient(2000, 1965, 5, 15);
+    const dependent = makeRecipient(0, 1965, 5, 15);
+    const earnerDeath = finalDateAtAge(earner, 75);
+    const depDeath = finalDateAtAge(dependent, 95);
+
+    const [bestStrat0, bestStrat1] = optimalStrategyCouple(
+      [dependent, earner],
+      [depDeath, earnerDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+    const [bestStrat0Fast, bestStrat1Fast] = optimalStrategyCoupleFast(
+      [dependent, earner],
+      [depDeath, earnerDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+
+    // Dep (r0) bumped to 70; earner (r1) files at 70.
+    expect(bestStrat0.asMonths()).toBe(70 * 12);
+    expect(bestStrat1.asMonths()).toBe(70 * 12);
+    expect(bestStrat0Fast.asMonths()).toBe(70 * 12);
+    expect(bestStrat1Fast.asMonths()).toBe(70 * 12);
+  });
+
+  it('no bump when dep optimally files later than earner anyway', () => {
+    // Short-lived earner: optimal earner age is early (62y1m). Even so, the
+    // dep is zero-PIA and gains nothing from filing before earner; the bump
+    // should report the dep at the canonical match (62y1m), not later.
+    const earner = makeRecipient(2000, 1965, 5, 15);
+    const dependent = makeRecipient(0, 1965, 5, 15);
+    const earnerDeath = finalDateAtAge(earner, 64);
+    const depDeath = finalDateAtAge(dependent, 70);
+
+    const [bestStrat0, bestStrat1] = optimalStrategyCouple(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+    // Dep's reported age should equal earner's chosen age (no later bumping
+    // beyond what the constraint requires).
+    expect(bestStrat1.asMonths()).toBe(bestStrat0.asMonths());
+  });
+
+  it('bump is capped at SSA age 70 when earner is younger than dep', () => {
+    // Earner is 5 years younger than dep. If earner optimally files at 70,
+    // their filing month maps to a dep age of 75 — which exceeds 70 and is
+    // not a valid filing age. The clamp must cap the reported dep age at 70.
+    const dependent = makeRecipient(0, 1960, 5, 15);
+    const earner = makeRecipient(2000, 1965, 5, 15);
+    const earnerDeath = finalDateAtAge(earner, 75);
+    const depDeath = finalDateAtAge(dependent, 100);
+
+    const [bestStrat0, bestStrat1] = optimalStrategyCouple(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+    const [bestStrat0Fast, bestStrat1Fast] = optimalStrategyCoupleFast(
+      [earner, dependent],
+      [earnerDeath, depDeath],
+      FAR_PAST,
+      NO_DISCOUNT
+    );
+
+    // Whatever the earner does, the dep's reported age must not exceed 70.
+    expect(bestStrat1.asMonths()).toBeLessThanOrEqual(70 * 12);
+    expect(bestStrat1Fast.asMonths()).toBeLessThanOrEqual(70 * 12);
+    // And we expect the bump to have actually fired (earner files at 70).
+    expect(bestStrat0.asMonths()).toBe(70 * 12);
+    expect(bestStrat0Fast.asMonths()).toBe(70 * 12);
   });
 
   it('optimized matches non-optimized for zero-PIA couple', () => {

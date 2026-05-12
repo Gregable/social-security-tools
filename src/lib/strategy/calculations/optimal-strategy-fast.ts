@@ -487,5 +487,23 @@ export function optimalStrategyCoupleFast(
     }
   }
 
+  // Zero-PIA dep can't collect spousal until earner files; multiple
+  // dependent filing ages below earner's produce identical NPV. The loop's
+  // tie-break picks the earliest, which displays a misleading "62y1m". Bump
+  // the reported dep age to match the earner's filing whenever needed.
+  if (depZeroPia) {
+    const bestFE = earnerIndex === 0 ? bestF0 : bestF1;
+    const earnerFileEpoch = eSsaBirth + bestFE;
+    let bestFD = earnerIndex === 0 ? bestF1 : bestF0;
+    const depFileEpoch = dSsaBirth + bestFD;
+    if (depFileEpoch < earnerFileEpoch) {
+      // Cap at SSA age 70 — dep can't file past their max benefit age. This
+      // matters when the earner is younger than the dep and files at 70:
+      // their calendar filing month would map to a dep age above 70.
+      bestFD = Math.min(earnerFileEpoch - dSsaBirth, 840);
+      if (earnerIndex === 0) bestF1 = bestFD;
+      else bestF0 = bestFD;
+    }
+  }
   return [new MonthDuration(bestF0), new MonthDuration(bestF1), bestNPV];
 }

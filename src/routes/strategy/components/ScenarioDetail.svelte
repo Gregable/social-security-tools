@@ -32,8 +32,8 @@
     }
   }
 
-  $: filingDate1 = recipients[0].birthdate.dateAtLayAge(result.filingAge1);
-  $: filingDate2 = recipients[1].birthdate.dateAtLayAge(result.filingAge2);
+  $: filingDate1 = recipients[0].birthdate.dateAtSsaAge(result.filingAge1);
+  $: filingDate2 = recipients[1].birthdate.dateAtSsaAge(result.filingAge2);
   $: expectedAge1 = result.bucket1.expectedAge;
   $: expectedAge2 = result.bucket2.expectedAge;
   $: deathDate1 = recipients[0].birthdate.dateAtLayAge(expectedAge1);

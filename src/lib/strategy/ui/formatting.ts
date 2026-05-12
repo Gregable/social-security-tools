@@ -70,7 +70,7 @@ export function getFilingDate(
     years: filingAgeYears,
     months: filingAgeMonths,
   });
-  const filingDate = birthdate.dateAtLayAge(filingAge);
+  const filingDate = birthdate.dateAtSsaAge(filingAge);
 
   // Use different formats based on cell dimensions
   if (cellWidth < 35) {

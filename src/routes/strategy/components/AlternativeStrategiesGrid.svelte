@@ -90,7 +90,7 @@
     let monthCount = 0;
 
     for (const duration of ageRange) {
-      const filingDate = recipient.birthdate.dateAtLayAge(duration);
+      const filingDate = recipient.birthdate.dateAtSsaAge(duration);
       const calendarYear = filingDate.year();
 
       if (calendarYear !== currentYear) {
@@ -276,7 +276,7 @@
       return `Age ${years} and ${months} months`;
     }
     const filingDate =
-      recipients[recipientIndex].birthdate.dateAtLayAge(duration);
+      recipients[recipientIndex].birthdate.dateAtSsaAge(duration);
     return `${filingDate.monthName()} ${filingDate.year()}`;
   }
 </script>

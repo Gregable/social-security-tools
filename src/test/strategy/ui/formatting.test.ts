@@ -105,10 +105,11 @@ describe('formatting', () => {
     });
 
     it('calculates correct date from filing age for first recipient', () => {
-      // First recipient born March 1, 1962
-      // Filing at age 67y 0m = March 2029
+      // First recipient born March 1, 1962. SSA's "attains age the day before
+      // birthday" rule shifts the SSA birth month to February, so filing at
+      // age 67y 0m yields Feb 2029 (the first month benefits accrue).
       const result = getFilingDate(recipients, 0, 67, 0, 100);
-      expect(result).toBe('Mar 2029');
+      expect(result).toBe('Feb 2029');
     });
 
     it('calculates correct date for second recipient', () => {
@@ -119,10 +120,10 @@ describe('formatting', () => {
     });
 
     it('handles fractional months', () => {
-      // First recipient born March 1962
-      // Filing at 67y 6m = September 2029
+      // First recipient born March 1, 1962 (born-on-1st rule shifts SSA
+      // birth month to Feb). Filing at 67y 6m = Aug 2029.
       const result = getFilingDate(recipients, 0, 67, 6, 100);
-      expect(result).toBe('Sep 2029');
+      expect(result).toBe('Aug 2029');
     });
   });
 
