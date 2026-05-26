@@ -39,6 +39,7 @@
   import SupportPrompt from "$lib/components/SupportPrompt.svelte";
   import {
     WebApplicationSchema,
+    renderActionSchema,
     renderWebsiteSocialMeta,
   } from "$lib/schema-org";
 
@@ -55,6 +56,67 @@
   webAppSchema.url = pageUrl;
   webAppSchema.name = pageTitle;
   webAppSchema.description = pageDescription;
+
+  const strategyActionJsonLd = renderActionSchema({
+    name: "Optimize Social Security filing strategy",
+    description:
+      "Pre-populate the SSA.tools strategy optimizer from URL hash parameters. Finds the claim age(s) that maximize expected lifetime benefits. Supplying both pia2 and dob2 switches the optimizer to couple mode.",
+    urlTemplate:
+      "https://ssa.tools/strategy#pia1={pia1}&dob1={dob1}&name1={name1?}&gender1={gender1?}&pia2={pia2?}&dob2={dob2?}&name2={name2?}&gender2={gender2?}",
+    targetUrl: pageUrl,
+    parameters: [
+      {
+        name: "pia1",
+        description:
+          "Primary Insurance Amount in whole US dollars for recipient 1.",
+        required: true,
+        valuePattern: "^\\d+$",
+      },
+      {
+        name: "dob1",
+        description: "Date of birth for recipient 1 in YYYY-MM-DD format.",
+        required: true,
+        valuePattern: "^\\d{4}-\\d{2}-\\d{2}$",
+      },
+      {
+        name: "name1",
+        description: "Display name for recipient 1.",
+        required: false,
+      },
+      {
+        name: "gender1",
+        description:
+          "Mortality table for recipient 1: male, female, or blended (default).",
+        required: false,
+        valuePattern: "^(male|female|blended)$",
+      },
+      {
+        name: "pia2",
+        description:
+          "Spouse's Primary Insurance Amount in whole US dollars (couple mode).",
+        required: false,
+        valuePattern: "^\\d+$",
+      },
+      {
+        name: "dob2",
+        description: "Spouse's date of birth in YYYY-MM-DD format.",
+        required: false,
+        valuePattern: "^\\d{4}-\\d{2}-\\d{2}$",
+      },
+      {
+        name: "name2",
+        description: "Spouse's display name.",
+        required: false,
+      },
+      {
+        name: "gender2",
+        description:
+          "Mortality table for spouse: male, female, or blended (default).",
+        required: false,
+        valuePattern: "^(male|female|blended)$",
+      },
+    ],
+  });
 
   const MIN_FILING_AGE = 62;
   const REACTIVE_DEBOUNCE_MS = 200;
@@ -593,6 +655,7 @@
 
   <!-- Structured Data -->
   {@html webAppSchema.render()}
+  {@html strategyActionJsonLd}
 
   <link
     href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap"

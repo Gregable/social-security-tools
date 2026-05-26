@@ -25,7 +25,11 @@ import {
   activeIntegration,
   initializeIntegration,
 } from '$lib/integrations/context';
-import { WebApplicationSchema, renderWebsiteSocialMeta } from '$lib/schema-org';
+import {
+  WebApplicationSchema,
+  renderActionSchema,
+  renderWebsiteSocialMeta,
+} from '$lib/schema-org';
 
 const pageTitle = 'Social Security Calculator - SSA.tools';
 const pageDescription =
@@ -37,6 +41,65 @@ const webAppSchema = new WebApplicationSchema();
 webAppSchema.url = pageUrl;
 webAppSchema.name = pageTitle;
 webAppSchema.description = pageDescription;
+
+const calculatorActionJsonLd = renderActionSchema({
+  name: 'Calculate Social Security retirement benefits',
+  description:
+    'Pre-populate the SSA.tools calculator from URL hash parameters. Accepts either a Primary Insurance Amount (pia1/pia2) or a year-by-year earnings history (earnings1/earnings2) for one or two recipients.',
+  urlTemplate:
+    'https://ssa.tools/calculator#pia1={pia1}&dob1={dob1}&name1={name1?}&pia2={pia2?}&dob2={dob2?}&name2={name2?}&earnings1={earnings1?}&earnings2={earnings2?}',
+  targetUrl: pageUrl,
+  parameters: [
+    {
+      name: 'pia1',
+      description:
+        'Primary Insurance Amount in whole US dollars for recipient 1. Required unless earnings1 is supplied.',
+      required: false,
+      valuePattern: '^\\d+$',
+    },
+    {
+      name: 'earnings1',
+      description:
+        'Year-by-year earnings history for recipient 1 as comma-separated year:amount pairs, e.g. 2020:50000,2021:55000. Years 1951-2100; amounts are non-negative integer USD.',
+      required: false,
+    },
+    {
+      name: 'dob1',
+      description: 'Date of birth for recipient 1 in YYYY-MM-DD format.',
+      required: true,
+      valuePattern: '^\\d{4}-\\d{2}-\\d{2}$',
+    },
+    {
+      name: 'name1',
+      description: 'Display name for recipient 1.',
+      required: false,
+    },
+    {
+      name: 'pia2',
+      description:
+        "Spouse's Primary Insurance Amount in whole US dollars (couple mode).",
+      required: false,
+      valuePattern: '^\\d+$',
+    },
+    {
+      name: 'earnings2',
+      description:
+        "Spouse's earnings history in the same year:amount,... format as earnings1.",
+      required: false,
+    },
+    {
+      name: 'dob2',
+      description: "Spouse's date of birth in YYYY-MM-DD format.",
+      required: false,
+      valuePattern: '^\\d{4}-\\d{2}-\\d{2}$',
+    },
+    {
+      name: 'name2',
+      description: "Spouse's display name.",
+      required: false,
+    },
+  ],
+});
 
 export let isPasteFlow: boolean = true;
 
@@ -134,6 +197,7 @@ async function loadIntegrationComponents(
 
   <!-- Structured Data -->
   {@html webAppSchema.render()}
+  {@html calculatorActionJsonLd}
 
   <!-- Google tag (gtag.js) -->
   <script

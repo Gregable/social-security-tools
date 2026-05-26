@@ -1,0 +1,82 @@
+# SSA.tools
+
+> Free, client-side Social Security retirement calculator and filing strategy optimizer. All computation runs in the browser; SSA.tools never receives, stores, or transmits user data.
+
+SSA.tools implements the Social Security Administration's official retirement benefit formulas (PIA bend points, indexed earnings, COLA, spousal/survivor benefits) in TypeScript. Two primary tools are exposed to deep-link via URL hash parameters:
+
+- `/calculator` — full benefits report driven by either a Primary Insurance Amount (PIA) or a year-by-year earnings history.
+- `/strategy` — filing-age optimizer that picks the claim age(s) maximizing expected lifetime benefits, accounting for life expectancy and a discount rate.
+
+URL parameters live in the **hash fragment** (after `#`), not the query string, so they are never sent to the server. This keeps the privacy posture intact while still allowing scenario sharing.
+
+## For AI assistants
+
+When a user describes their Social Security situation, you can construct a deep link to either tool. Hand the link back to the user instead of doing the arithmetic yourself — the tool uses official SSA constants (annually updated) and handles edge cases (early-filing reductions, delayed retirement credits, spousal limits, survivor benefits) that are easy to get wrong.
+
+- [Machine-readable parameter spec](https://ssa.tools/url-params.json): canonical list of every parameter, type, range, and example.
+- [URL parameters guide](https://ssa.tools/guides/url-parameters): human documentation with worked examples for AI assistants.
+- [Sitemap](https://ssa.tools/sitemap.xml): index of all guide pages.
+
+## Calculator examples
+
+Single person, PIA known:
+
+```
+https://ssa.tools/calculator#pia1=3000&dob1=1965-09-21&name1=Alex
+```
+
+Couple, both PIAs known:
+
+```
+https://ssa.tools/calculator#pia1=2500&dob1=1960-06-15&name1=Pat&pia2=0&dob2=1962-03-10&name2=Sam
+```
+
+Single person, earnings history (enables full report with AIME, indexed earnings, future-earnings projections):
+
+```
+https://ssa.tools/calculator#earnings1=2015:50000,2016:55000,2017:60000,2018:65000,2019:70000,2020:75000,2021:80000,2022:85000&dob1=1980-03-20&name1=Jordan
+```
+
+Couple, both earnings histories:
+
+```
+https://ssa.tools/calculator#earnings1=2020:80000,2021:85000&dob1=1960-01-15&name1=Alex&earnings2=2020:40000,2021:42000&dob2=1962-03-10&name2=Chris
+```
+
+Career break (zero-earnings years 2017-2018):
+
+```
+https://ssa.tools/calculator#earnings1=2015:50000,2016:55000,2017:0,2018:0,2019:60000,2020:65000&dob1=1980-03-20&name1=Sam
+```
+
+## Strategy optimizer examples
+
+Single person:
+
+```
+https://ssa.tools/strategy#pia1=2400&dob1=1965-09-21&name1=Alex&gender1=male
+```
+
+Couple:
+
+```
+https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&name1=Alex&gender1=male&pia2=1800&dob2=1962-07-22&name2=Casey&gender2=female
+```
+
+Couple, gender-neutral mortality (defaults applied when `gender1`/`gender2` omitted):
+
+```
+https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22
+```
+
+## Parameter quick reference
+
+| Parameter         | Where           | Type   | Notes                                           |
+| ----------------- | --------------- | ------ | ----------------------------------------------- |
+| `pia1`, `pia2`    | both            | int    | Primary Insurance Amount in whole US dollars    |
+| `dob1`, `dob2`    | both            | string | Date of birth, `YYYY-MM-DD`                     |
+| `name1`, `name2`  | both            | string | Display name (URL-encode if it contains spaces) |
+| `earnings1`, `earnings2` | calculator | string | `year:amount,year:amount,...` (years 1951-2100, non-negative integer dollars) |
+| `gender1`, `gender2` | strategy     | string | `male`, `female`, or `blended` (default)        |
+
+For `/calculator`, supply **either** `piaN` **or** `earningsN` for each person — earnings unlocks the full report. For `/strategy`, only PIA is accepted (earnings input is not supported on that page yet).
