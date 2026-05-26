@@ -1,0 +1,207 @@
+{
+  "$schema": "https://ssa.tools/url-params.json",
+  "name": "SSA.tools URL parameter spec",
+  "description": "Machine-readable specification of the hash-fragment URL parameters accepted by the SSA.tools calculator and strategy pages. Parameters live in the fragment (after #), not the query string, so they are never sent to the server.",
+  "version": "1.0.0",
+  "site": "https://ssa.tools",
+  "contact": "https://ssa.tools/contact",
+  "documentation": "https://ssa.tools/guides/url-parameters",
+  "fragment_delimiter": "#",
+  "parameter_separator": "&",
+  "endpoints": [
+    {
+      "path": "/calculator",
+      "url": "https://ssa.tools/calculator",
+      "description": "Full Social Security benefits report. Accepts either a known PIA or a year-by-year earnings history for one or two recipients.",
+      "parameters": [
+        {
+          "name": "pia1",
+          "type": "integer",
+          "required": "if earnings1 absent",
+          "unit": "USD per month",
+          "description": "Primary Insurance Amount in whole US dollars for recipient 1. Mutually exclusive with earnings1; if both are supplied, earnings1 wins.",
+          "example": 3000
+        },
+        {
+          "name": "earnings1",
+          "type": "string",
+          "format": "year:amount,year:amount,...",
+          "required": "if pia1 absent",
+          "description": "Year-by-year earnings history for recipient 1. Each pair is YYYY:dollars. Year range 1951-2100. Amount is non-negative integer USD, no $ or commas. Years may be non-consecutive; use 0 for years with no earnings.",
+          "example": "2015:50000,2016:55000,2017:60000,2018:65000,2019:70000,2020:75000,2021:80000,2022:85000"
+        },
+        {
+          "name": "dob1",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "required": true,
+          "description": "Date of birth for recipient 1, ISO 8601 calendar date.",
+          "example": "1965-09-21"
+        },
+        {
+          "name": "name1",
+          "type": "string",
+          "required": false,
+          "default": "Self",
+          "description": "Display name for recipient 1. URL-encode if it contains spaces or special characters.",
+          "example": "Alex"
+        },
+        {
+          "name": "pia2",
+          "type": "integer",
+          "required": false,
+          "unit": "USD per month",
+          "description": "Primary Insurance Amount in whole US dollars for recipient 2 (spouse). Supplying any recipient-2 parameter turns on couple mode.",
+          "example": 0
+        },
+        {
+          "name": "earnings2",
+          "type": "string",
+          "format": "year:amount,year:amount,...",
+          "required": false,
+          "description": "Year-by-year earnings history for recipient 2 (spouse). Same format and rules as earnings1.",
+          "example": "2020:40000,2021:42000,2022:45000"
+        },
+        {
+          "name": "dob2",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "required": "if any other recipient-2 param is present",
+          "description": "Date of birth for recipient 2 (spouse).",
+          "example": "1962-03-10"
+        },
+        {
+          "name": "name2",
+          "type": "string",
+          "required": false,
+          "description": "Display name for recipient 2 (spouse).",
+          "example": "Chris"
+        },
+        {
+          "name": "integration",
+          "type": "string",
+          "required": false,
+          "description": "Optional integration partner ID. Theming and surrounding chrome may change. Typical callers should omit this.",
+          "example": "opensocialsecurity.com"
+        }
+      ],
+      "examples": [
+        {
+          "label": "Single recipient, PIA known",
+          "url": "https://ssa.tools/calculator#pia1=3000&dob1=1965-09-21&name1=Alex"
+        },
+        {
+          "label": "Couple, both PIAs known",
+          "url": "https://ssa.tools/calculator#pia1=2500&dob1=1960-06-15&name1=Pat&pia2=0&dob2=1962-03-10&name2=Sam"
+        },
+        {
+          "label": "Single recipient, earnings history",
+          "url": "https://ssa.tools/calculator#earnings1=2015:50000,2016:55000,2017:60000,2018:65000,2019:70000,2020:75000,2021:80000,2022:85000&dob1=1980-03-20&name1=Jordan"
+        },
+        {
+          "label": "Couple, both earnings histories",
+          "url": "https://ssa.tools/calculator#earnings1=2020:80000,2021:85000&dob1=1960-01-15&name1=Alex&earnings2=2020:40000,2021:42000&dob2=1962-03-10&name2=Chris"
+        },
+        {
+          "label": "Career break (zero-earnings years)",
+          "url": "https://ssa.tools/calculator#earnings1=2015:50000,2016:55000,2017:0,2018:0,2019:60000,2020:65000&dob1=1980-03-20&name1=Sam"
+        }
+      ]
+    },
+    {
+      "path": "/strategy",
+      "url": "https://ssa.tools/strategy",
+      "description": "Filing-age optimizer. Finds the claim age(s) maximizing expected lifetime benefits given a discount rate and life-expectancy assumption. Couple mode runs when recipient-2 PIA and DOB are both present.",
+      "parameters": [
+        {
+          "name": "pia1",
+          "type": "integer",
+          "required": true,
+          "unit": "USD per month",
+          "description": "Primary Insurance Amount in whole US dollars for recipient 1.",
+          "example": 2400
+        },
+        {
+          "name": "dob1",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "required": true,
+          "description": "Date of birth for recipient 1.",
+          "example": "1965-09-21"
+        },
+        {
+          "name": "name1",
+          "type": "string",
+          "required": false,
+          "description": "Display name for recipient 1.",
+          "example": "Alex"
+        },
+        {
+          "name": "gender1",
+          "type": "string",
+          "enum": ["male", "female", "blended"],
+          "required": false,
+          "default": "blended",
+          "description": "Mortality table for recipient 1. `blended` averages the male and female SSA period life tables and is the default when omitted or unrecognized.",
+          "example": "male"
+        },
+        {
+          "name": "pia2",
+          "type": "integer",
+          "required": false,
+          "unit": "USD per month",
+          "description": "Primary Insurance Amount in whole US dollars for recipient 2 (spouse). Supplying both pia2 and dob2 switches the optimizer to couple mode.",
+          "example": 1800
+        },
+        {
+          "name": "dob2",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "required": false,
+          "description": "Date of birth for recipient 2 (spouse).",
+          "example": "1962-07-22"
+        },
+        {
+          "name": "name2",
+          "type": "string",
+          "required": false,
+          "description": "Display name for recipient 2 (spouse).",
+          "example": "Casey"
+        },
+        {
+          "name": "gender2",
+          "type": "string",
+          "enum": ["male", "female", "blended"],
+          "required": false,
+          "default": "blended",
+          "description": "Mortality table for recipient 2 (spouse).",
+          "example": "female"
+        }
+      ],
+      "examples": [
+        {
+          "label": "Single person",
+          "url": "https://ssa.tools/strategy#pia1=2400&dob1=1965-09-21&name1=Alex&gender1=male"
+        },
+        {
+          "label": "Couple with gender-specific mortality",
+          "url": "https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&name1=Alex&gender1=male&pia2=1800&dob2=1962-07-22&name2=Casey&gender2=female"
+        },
+        {
+          "label": "Couple with default (blended) mortality",
+          "url": "https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "All parameters live in the URL fragment (after #), so the browser never sends them to the server. SSA.tools is fully client-side; this contract is the only way to pre-populate the tools.",
+    "Earnings history (earnings1/earnings2) only applies to /calculator. The /strategy page accepts PIA directly.",
+    "Whole-dollar PIA values should be rounded before substitution; the calculator does not interpret decimal points.",
+    "URL-encode display names that contain spaces or non-ASCII characters."
+  ]
+}

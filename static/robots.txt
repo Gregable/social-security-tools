@@ -1,4 +1,66 @@
+# SSA.tools welcomes AI crawlers and assistants.
+# The site is purely informational; user data never reaches our servers.
+# An AI-friendly summary lives at /llms.txt; a machine-readable URL
+# parameter spec lives at /url-params.json.
+
 User-agent: *
+Allow: /
+
+# OpenAI — training and live answer engines
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic — training and live answer engines
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Google — Gemini and AI Overviews (separate from regular Googlebot)
+User-agent: Google-Extended
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Common Crawl (used by many model trainers)
+User-agent: CCBot
+Allow: /
+
+# Meta
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+
+# Bytedance (Doubao)
+User-agent: Bytespider
+Allow: /
+
+# Mistral
+User-agent: MistralAI-User
 Allow: /
 
 Sitemap: https://ssa.tools/sitemap.xml

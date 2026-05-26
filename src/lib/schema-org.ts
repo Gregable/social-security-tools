@@ -259,3 +259,62 @@ export function renderFAQSchema(faqs: FAQItem[]): string {
   };
   return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
 }
+
+/**
+ * A single parameter of a tool exposed through a URL template.
+ *
+ * Maps to schema.org's PropertyValueSpecification. The `name` field must
+ * match a placeholder in the EntryPoint's `urlTemplate` (e.g. `pia1` for
+ * `{pia1}`).
+ */
+export interface ActionParameter {
+  name: string;
+  description: string;
+  required: boolean;
+  valuePattern?: string;
+}
+
+/**
+ * Renders a schema.org Action with an EntryPoint URL template, describing a
+ * tool that accepts inputs through hash-fragment URL parameters.
+ *
+ * Designed for AI assistants and search engines that can construct deep links
+ * from a structured contract. Emitted as a standalone JSON-LD block alongside
+ * the page's existing WebApplication schema.
+ */
+export function renderActionSchema(options: {
+  name: string;
+  description: string;
+  urlTemplate: string;
+  targetUrl: string;
+  parameters: ActionParameter[];
+}): string {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Action',
+    name: options.name,
+    description: options.description,
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: options.urlTemplate,
+      contentType: 'text/html',
+      httpMethod: 'GET',
+      actionPlatform: [
+        'https://schema.org/DesktopWebPlatform',
+        'https://schema.org/MobileWebPlatform',
+      ],
+    },
+    object: {
+      '@type': 'WebApplication',
+      url: options.targetUrl,
+    },
+    'query-input': options.parameters.map((p) => ({
+      '@type': 'PropertyValueSpecification',
+      valueName: p.name,
+      description: p.description,
+      valueRequired: p.required,
+      ...(p.valuePattern ? { valuePattern: p.valuePattern } : {}),
+    })),
+  };
+  return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
+}
