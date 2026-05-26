@@ -18,8 +18,6 @@
           "name": "pia1",
           "type": "integer",
           "required": "if earnings1 absent",
-          "min": 0,
-          "max": 10000,
           "unit": "USD per month",
           "description": "Primary Insurance Amount in whole US dollars for recipient 1. Mutually exclusive with earnings1; if both are supplied, earnings1 wins.",
           "example": 3000
@@ -53,8 +51,6 @@
           "name": "pia2",
           "type": "integer",
           "required": false,
-          "min": 0,
-          "max": 10000,
           "unit": "USD per month",
           "description": "Primary Insurance Amount in whole US dollars for recipient 2 (spouse). Supplying any recipient-2 parameter turns on couple mode.",
           "example": 0
@@ -123,8 +119,6 @@
           "name": "pia1",
           "type": "integer",
           "required": true,
-          "min": 0,
-          "max": 10000,
           "unit": "USD per month",
           "description": "Primary Insurance Amount in whole US dollars for recipient 1.",
           "example": 2400
@@ -158,8 +152,6 @@
           "name": "pia2",
           "type": "integer",
           "required": false,
-          "min": 0,
-          "max": 10000,
           "unit": "USD per month",
           "description": "Primary Insurance Amount in whole US dollars for recipient 2 (spouse). Supplying both pia2 and dob2 switches the optimizer to couple mode.",
           "example": 1800

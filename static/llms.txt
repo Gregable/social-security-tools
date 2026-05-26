@@ -79,4 +79,4 @@ https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22
 | `earnings1`, `earnings2` | calculator | string | `year:amount,year:amount,...` (years 1951-2100, non-negative integer dollars) |
 | `gender1`, `gender2` | strategy     | string | `male`, `female`, or `blended` (default)        |
 
-For `/calculator`, supply **either** `piaN` **or** `earningsN` for each person — earnings unlocks the full report. For `/strategy`, only PIA is accepted (earnings input is not supported on that page yet).
+For `/calculator`, supply **either** `piaN` **or** `earningsN` for each person — earnings unlocks the full report. For `/strategy`, only PIA is accepted (earnings input is not supported on that page).
