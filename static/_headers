@@ -11,6 +11,5 @@
   Cross-Origin-Opener-Policy: same-origin
 
 /embed/*
-  X-Frame-Options: ALLOWALL
   Content-Security-Policy: frame-ancestors *
   Cross-Origin-Resource-Policy: cross-origin

@@ -81,18 +81,20 @@
 
     if (valid) {
       const r1 = hydrateRecipient(params);
+      let r2: Recipient | null = null;
       if (r1 && requires === 'couple-pia-and-dob') {
-        const r2 = hydrateSpouse(params);
+        r2 = hydrateSpouse(params);
+      }
+      const needsSpouse = requires === 'couple-pia-and-dob';
+      if (r1 && (!needsSpouse || r2)) {
         if (r2) {
           r1.markFirst();
           r2.markSecond();
           spouse.set(r2);
         }
-      }
-      if (r1) {
         recipient.set(r1);
       } else {
-        // Hydration failed despite param validation passing (e.g. malformed DOB).
+        // Param shape valid but values unparseable; treat as invalid.
         valid = false;
       }
     }

@@ -20,6 +20,18 @@ describe('parseDob', () => {
   it('returns null for malformed input', () => {
     expect(parseDob('not-a-date')).toBeNull();
   });
+
+  it('rejects unanchored matches', () => {
+    expect(parseDob('1965-09-21-extra')).toBeNull();
+    expect(parseDob('junk1965-09-21')).toBeNull();
+  });
+
+  it('returns null for out-of-range year/month/day instead of throwing', () => {
+    expect(parseDob('1899-09-21')).toBeNull();
+    expect(parseDob('2300-01-01')).toBeNull();
+    expect(parseDob('2025-13-01')).toBeNull();
+    expect(parseDob('2025-02-31')).toBeNull();
+  });
 });
 
 describe('earningsEntriesToRecords', () => {

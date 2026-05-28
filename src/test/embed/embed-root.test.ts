@@ -34,4 +34,11 @@ describe('validateRequires', () => {
     const params = new UrlParams('#dob1=1965-09-21');
     expect(validateRequires('recipient-earnings-and-dob', params)).toBe(false);
   });
+
+  it('rejects pia-only input for the earnings-required bend-points route', () => {
+    // The most likely AI-assistant mistake: copy the calculator's pia1/dob1
+    // pattern and apply it to /embed/bend-points (which needs earnings).
+    const params = new UrlParams('#pia1=3000&dob1=1965-09-21');
+    expect(validateRequires('recipient-earnings-and-dob', params)).toBe(false);
+  });
 });

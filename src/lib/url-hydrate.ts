@@ -7,8 +7,8 @@ import type { EarningsEntry } from '$lib/url-params';
 export function parseDob(dob: string | null): Birthdate | null {
   if (!dob) return null;
 
-  const dobRegex = /(\d{4})-(\d{2})-(\d{2})/;
-  const match = dob.match(dobRegex);
+  // Anchored so "1965-09-21-extra" / "junk1965-09-21" don't slip through.
+  const match = dob.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return null;
 
   const year = parseInt(match[1], 10);
@@ -17,7 +17,13 @@ export function parseDob(dob: string | null): Birthdate | null {
   if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day))
     return null;
 
-  return Birthdate.FromYMD(year, month, day);
+  // Birthdate.FromYMD throws on out-of-range year/month/day (e.g. 1899, month=13,
+  // Feb 30). Treat any throw as "unparseable DOB" — same contract as a regex miss.
+  try {
+    return Birthdate.FromYMD(year, month, day);
+  } catch {
+    return null;
+  }
 }
 
 export function earningsEntriesToRecords(
