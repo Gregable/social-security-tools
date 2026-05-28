@@ -249,8 +249,8 @@ function render() {
   ctx_.save();
   ctx_.clearRect(0, 0, canvasEl_.width, canvasEl_.height);
 
-  renderHorizontalLines(ctx_, recipient, l);
   renderYearVerticalLines(ctx_, recipient, l);
+  renderHorizontalLines(ctx_, recipient, l);
   renderBenefit(ctx_, recipient, userSelectedDate(), userFloor_, l);
 
   if (lastMouseX_ > 0) {

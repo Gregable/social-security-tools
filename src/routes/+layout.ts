@@ -20,6 +20,12 @@ function isInternalTraffic(): boolean {
 
 export const load = async () => {
   if (browser) {
+    if (window.location.pathname.startsWith('/embed/')) {
+      // Embed routes use their own scoped PostHog init in
+      // src/routes/embed/+layout.ts to keep autocapture and session
+      // storage off inside third-party iframes.
+      return;
+    }
     posthog.init('phc_hCY7L2NR1CymU5BYBsvZOQ7eblUWH1eOrKX8jQ3ZcUK', {
       api_host: 'https://ssa.tools/api/v1',
       ui_host: 'https://app.posthog.com',

@@ -9,3 +9,7 @@
 /strategy/
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Opener-Policy: same-origin
+
+/embed/*
+  Content-Security-Policy: frame-ancestors *
+  Cross-Origin-Resource-Policy: cross-origin
