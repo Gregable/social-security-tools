@@ -196,6 +196,177 @@
           "url": "https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22"
         }
       ]
+    },
+    {
+      "path": "/embed/bend-points",
+      "url": "https://ssa.tools/embed/bend-points",
+      "description": "Embeddable iframe view of the bend-points curve showing the recipient's AIME on the SSA PIA formula. Renders the chart with no surrounding chrome. CORS-permissive for cross-origin iframing. Requires an earnings history because the chart needs to compute the recipient's specific AIME point on the curve.",
+      "embeddable": true,
+      "parameters": [
+        {
+          "name": "earnings1",
+          "type": "string",
+          "format": "year:amount,year:amount,...",
+          "required": true,
+          "description": "Year-by-year earnings history. Same format as calculator.",
+          "example": "2018:50000,2019:55000,2020:60000,2021:65000,2022:70000"
+        },
+        {
+          "name": "dob1",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "required": true,
+          "description": "Date of birth.",
+          "example": "1965-09-21"
+        },
+        {
+          "name": "name1",
+          "type": "string",
+          "required": false,
+          "description": "Display name.",
+          "example": "Alex"
+        }
+      ],
+      "examples": [
+        {
+          "label": "Bend-points from earnings",
+          "url": "https://ssa.tools/embed/bend-points#earnings1=2018:50000,2019:55000,2020:60000,2021:65000,2022:70000&dob1=1965-09-21"
+        }
+      ]
+    },
+    {
+      "path": "/embed/filing-age",
+      "url": "https://ssa.tools/embed/filing-age",
+      "description": "Embeddable iframe view of an interactive single-recipient benefit-vs-filing-age chart. Slider lets the iframe's user explore claim ages.",
+      "embeddable": true,
+      "parameters": [
+        {
+          "name": "pia1",
+          "type": "integer",
+          "required": true,
+          "unit": "USD per month",
+          "example": 3000
+        },
+        {
+          "name": "dob1",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "required": true,
+          "example": "1965-09-21"
+        },
+        {
+          "name": "name1",
+          "type": "string",
+          "required": false,
+          "example": "Alex"
+        }
+      ],
+      "examples": [
+        {
+          "label": "Single recipient",
+          "url": "https://ssa.tools/embed/filing-age#pia1=3000&dob1=1965-09-21"
+        }
+      ]
+    },
+    {
+      "path": "/embed/filing-age-couple",
+      "url": "https://ssa.tools/embed/filing-age-couple",
+      "description": "Embeddable iframe view of the joint couple benefit-vs-filing-age chart with spousal and survivor interactions.",
+      "embeddable": true,
+      "parameters": [
+        {
+          "name": "pia1",
+          "type": "integer",
+          "required": true,
+          "example": 3000
+        },
+        {
+          "name": "dob1",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "required": true,
+          "example": "1965-09-21"
+        },
+        {
+          "name": "pia2",
+          "type": "integer",
+          "required": true,
+          "example": 2200
+        },
+        {
+          "name": "dob2",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "required": true,
+          "example": "1967-04-10"
+        },
+        {
+          "name": "name1",
+          "type": "string",
+          "required": false,
+          "example": "Alex"
+        },
+        {
+          "name": "name2",
+          "type": "string",
+          "required": false,
+          "example": "Sam"
+        },
+        {
+          "name": "gender1",
+          "type": "string",
+          "enum": ["male", "female", "blended"],
+          "required": false,
+          "default": "blended"
+        },
+        {
+          "name": "gender2",
+          "type": "string",
+          "enum": ["male", "female", "blended"],
+          "required": false,
+          "default": "blended"
+        }
+      ],
+      "examples": [
+        {
+          "label": "Couple",
+          "url": "https://ssa.tools/embed/filing-age-couple#pia1=3000&dob1=1965-09-21&pia2=2200&dob2=1967-04-10"
+        }
+      ]
+    },
+    {
+      "path": "/embed/indexed-earnings",
+      "url": "https://ssa.tools/embed/indexed-earnings",
+      "description": "Embeddable iframe view of the year-by-year indexed earnings table with the top 35 years highlighted (the ones that count toward AIME).",
+      "embeddable": true,
+      "parameters": [
+        {
+          "name": "earnings1",
+          "type": "string",
+          "format": "year:amount,year:amount,...",
+          "required": true,
+          "example": "2018:50000,2019:55000,2020:60000,2021:65000,2022:70000"
+        },
+        {
+          "name": "dob1",
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "required": true,
+          "example": "1965-09-21"
+        },
+        {
+          "name": "name1",
+          "type": "string",
+          "required": false,
+          "example": "Alex"
+        }
+      ],
+      "examples": [
+        {
+          "label": "Indexed earnings",
+          "url": "https://ssa.tools/embed/indexed-earnings#earnings1=2018:50000,2019:55000,2020:60000,2021:65000,2022:70000&dob1=1965-09-21"
+        }
+      ]
     }
   ],
   "notes": [

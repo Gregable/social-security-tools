@@ -80,3 +80,31 @@ https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22
 | `gender1`, `gender2` | strategy     | string | `male`, `female`, or `blended` (default)        |
 
 For `/calculator`, supply **either** `piaN` **or** `earningsN` for each person — earnings unlocks the full report. For `/strategy`, only PIA is accepted (earnings input is not supported on that page).
+
+## Embed routes for iframes and AI artifacts
+
+Each `/embed/*` route renders a single ssa.tools widget without the surrounding app chrome, intended for iframing from third-party origins (AI artifacts, blog posts, financial-planning tools). They accept the same hash parameters as the calculator. CORS headers permit cross-origin iframing.
+
+Bend-points curve — visualizes the recipient's AIME on the SSA PIA bend-points curve. Requires `earnings1` and `dob1`; `name1` is optional.
+
+```
+https://ssa.tools/embed/bend-points#earnings1=2018:50000,2019:55000,2020:60000,2021:65000,2022:70000&dob1=1965-09-21
+```
+
+Single-recipient filing-age chart — interactive chart of benefit amount by filing age. Requires `pia1` and `dob1`; `name1` optional.
+
+```
+https://ssa.tools/embed/filing-age#pia1=3000&dob1=1965-09-21
+```
+
+Couple filing-age chart — interactive joint chart with spousal and survivor interactions. Requires `pia1`, `dob1`, `pia2`, `dob2`; `name1`, `name2`, `gender1`, `gender2` optional.
+
+```
+https://ssa.tools/embed/filing-age-couple#pia1=3000&dob1=1965-09-21&pia2=2200&dob2=1967-04-10
+```
+
+Indexed earnings table — year-by-year indexed earnings with the top-35 years highlighted. Requires `earnings1` and `dob1`; `name1` optional.
+
+```
+https://ssa.tools/embed/indexed-earnings#earnings1=2018:50000,2019:55000,2020:60000,2021:65000,2022:70000&dob1=1965-09-21
+```

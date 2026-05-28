@@ -246,8 +246,8 @@
     ctx_.save();
     ctx_.clearRect(0, 0, canvasEl_.width, canvasEl_.height);
 
-    renderHorizontalLines(ctx_, recipientCtx_, spouseCtx_, l);
     renderYearVerticalLines(ctx_, recipient, spouse, l);
+    renderHorizontalLines(ctx_, recipientCtx_, spouseCtx_, l);
     renderBenefit(ctx_, recipientCtx_, recipientCtx_, spouseCtx_, recipient, spouse, l);
     renderBenefit(ctx_, spouseCtx_, recipientCtx_, spouseCtx_, recipient, spouse, l);
 
