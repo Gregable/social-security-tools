@@ -112,7 +112,9 @@ export function benefitOnDateOptimized(
  * the same current-dollar value as `benefitOnDate`.
  */
 function colaYearForDisplayDate(atDate: MonthDate): number {
-  // monthIndex() === 11 is December (the January precedent is === 0 below).
+  // monthIndex() is 0 for January and 11 for December. A December benefit is the
+  // first month to reflect that year's COLA; January through November reflect
+  // only through the prior year's.
   const raw = atDate.monthIndex() === 11 ? atDate.year() : atDate.year() - 1;
   return Math.min(raw, constants.CURRENT_YEAR - 1);
 }
@@ -123,12 +125,17 @@ function colaYearForDisplayDate(atDate: MonthDate): number {
  *
  * benefitOnDate always applies every COLA through `CURRENT_YEAR - 1`, so a past
  * month is shown inflated by COLAs that had not yet taken effect then. This
- * variant instead caps COLAs at the vintage in effect for `atDate`, matching
- * SSA letters/deposits for historical months. For any `atDate` at or after the
- * most recent applied COLA, it is identical to benefitOnDate.
+ * variant instead caps COLAs at the vintage in effect for `atDate`, so a past
+ * month reflects the nominal amount payable then (matching SSA letters/deposits
+ * to within whole-dollar rounding). For any `atDate` at or after the most recent
+ * applied COLA, it is identical to benefitOnDate.
  *
  * Used by the filing-date chart display only; the strategy optimizer continues
  * to use benefitOnDate/benefitOnDateOptimized (constant today's dollars).
+ *
+ * PIA-only recipients have no earnings history to unwind COLAs from, so their
+ * override PIA (already in current dollars) is returned unchanged; for them this
+ * matches benefitOnDate for every date.
  *
  * @param recipient - The recipient
  * @param filingDate - The date the recipient files for benefits

@@ -178,4 +178,13 @@ describe('primaryInsuranceAmount COLA cutoff (throughColaYear)', () => {
       pia.primaryInsuranceAmount(2023).value()
     );
   });
+
+  it('ignores the cutoff for PIA-only recipients (returns the override)', () => {
+    const r = new Recipient();
+    r.birthdate = BIRTHDATE;
+    r.setPia(Money.from(2000));
+    const pia = r.pia();
+    expect(pia.primaryInsuranceAmount(2019).value()).toEqual(2000);
+    expect(pia.primaryInsuranceAmount().value()).toEqual(2000);
+  });
 });
