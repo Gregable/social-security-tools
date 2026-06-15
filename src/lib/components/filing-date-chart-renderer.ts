@@ -1,4 +1,4 @@
-import { benefitOnDate } from '$lib/benefit-calculator';
+import { benefitOnDateNominal } from '$lib/benefit-calculator';
 import {
   type ChartLayout,
   dollarLineIncrement,
@@ -127,7 +127,7 @@ export function benefitBoxes(
   const birthdate = recipient.birthdate;
 
   const boxes: Array<[number, number, Money]> = [];
-  let benefit = benefitOnDate(recipient, selectedDate, selectedDate);
+  let benefit = benefitOnDateNominal(recipient, selectedDate, selectedDate);
   boxes.push([
     canvasX(selectedDate, birthdate, layout),
     canvasY(benefit, maxY, layout),
@@ -140,8 +140,11 @@ export function benefitBoxes(
     i.lessThanOrEqual(endDate);
     i = i.addDuration(new MonthDuration(1))
   ) {
-    if (benefitOnDate(recipient, selectedDate, i).value() !== benefit.value()) {
-      benefit = benefitOnDate(recipient, selectedDate, i);
+    if (
+      benefitOnDateNominal(recipient, selectedDate, i).value() !==
+      benefit.value()
+    ) {
+      benefit = benefitOnDateNominal(recipient, selectedDate, i);
       boxes.push([
         canvasX(i, birthdate, layout),
         canvasY(benefit, maxY, layout),
@@ -303,7 +306,7 @@ export function renderTrendline(
     i = i.addDuration(new MonthDuration(1))
   ) {
     const thisX = canvasX(i, birthdate, layout);
-    const yDollars = benefitOnDate(recipient, i, i);
+    const yDollars = benefitOnDateNominal(recipient, i, i);
     const thisY = canvasY(yDollars, maxY, layout);
     if (i.monthsSinceEpoch() === startDate.monthsSinceEpoch()) {
       ctx.moveTo(thisX, thisY);

@@ -2,7 +2,7 @@
 import { onMount } from 'svelte';
 
 import type { Birthdate } from '$lib/birthday';
-import { benefitOnDate } from '$lib/benefit-calculator';
+import { benefitOnDateNominal } from '$lib/benefit-calculator';
 import {
   type ChartLayout,
   type TickItem,
@@ -344,7 +344,7 @@ $: filingDateString_ = updateFilingDateString(
       > benefit will be:
 
       <b>
-        {benefitOnDate($recipient, userSelectedDate(), dateX(lastMouseX_, recipient.birthdate, layout()))
+        {benefitOnDateNominal($recipient, userSelectedDate(), dateX(lastMouseX_, recipient.birthdate, layout()))
           .wholeDollars()}</b
       >
     {:else}
