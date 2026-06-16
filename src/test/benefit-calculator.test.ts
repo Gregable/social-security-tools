@@ -244,4 +244,32 @@ describe('allBenefitsOnDateNominal (spousal)', () => {
     expect(today).toBeGreaterThan(0);
     expect(nominal).toBeLessThan(today);
   });
+
+  it('caps COLA vintage in the combined-max branch (lower earner files after NRA)', () => {
+    const low = lowEarner();
+    const high = highEarner();
+    // Lower earner files July 2024 (after their NRA of Jan 2023), entering the
+    // combined-max branch where the personal benefit is subtracted from half
+    // the higher earner's PIA. That personal benefit must also honor the COLA
+    // cutoff (computed via benefitOnDateCore, not benefitOnDate).
+    const lateFiling = ym(2024, 6);
+    const at = ym(2025, 5);
+    const today = spousalBenefitOnDate(
+      low,
+      high,
+      FILING,
+      lateFiling,
+      at
+    ).value();
+    const nominal = spousalBenefitOnDate(
+      low,
+      high,
+      FILING,
+      lateFiling,
+      at,
+      2024
+    ).value();
+    expect(today).toBeGreaterThan(0);
+    expect(nominal).toBeLessThan(today);
+  });
 });
