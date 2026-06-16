@@ -1,4 +1,5 @@
 <script lang="ts">
+import { benefitOnDateNominal } from '$lib/benefit-calculator';
 import * as constants from '$lib/constants';
 import { Money } from '$lib/money';
 import { MonthDate } from '$lib/month-time';
@@ -11,21 +12,27 @@ const r: Recipient = recipient;
 const exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
 
 /**
- * The benefit amount at normal retirement age.
- */
-let benefit: Money = Money.from(0);
-$: benefit = $recipient.pia().primaryInsuranceAmount().floorToDollar();
-
-/**
- * Whether normal retirement age is already in the past. When it is, the PIA
- * shown is no longer an amount the user can newly elect at NRA; it is the NRA
- * benefit restated in today's dollars (COLAs since NRA already applied), so the
- * explanatory text switches to past tense.
+ * Whether normal retirement age is already in the past. When it is, the benefit
+ * is shown in the nominal dollars actually payable at NRA (matching the
+ * filing-date chart); otherwise it is shown in today's dollars.
  */
 let isPastNra = false;
 $: isPastNra = $recipient
   .normalRetirementDate()
   .lessThan(MonthDate.initFromNow());
+
+/**
+ * The benefit amount at normal retirement age. Filing exactly at NRA means no
+ * reduction or delayed credits, so this is the PIA. benefitOnDateNominal caps
+ * the COLA vintage at the NRA month, so a past NRA yields the nominal amount
+ * payable then and a future NRA yields today's dollars.
+ */
+let benefit: Money = Money.from(0);
+$: benefit = benefitOnDateNominal(
+  $recipient,
+  $recipient.normalRetirementDate(),
+  $recipient.normalRetirementDate()
+).floorToDollar();
 </script>
 
 <div>
@@ -33,12 +40,14 @@ $: isPastNra = $recipient
   <div class="text pageBreakAvoid">
     {#if isPastNra}
       <p>
-        The primary insurance amount rounded down (<b>{benefit.wholeDollars()}</b
-        >
-        / month) is the benefit you would have earned by collecting at your
-        <u>normal retirement age</u> (NRA), which has already passed. It is shown
-        in <u>today's dollars</u>: the amount has already been adjusted upward
-        for the cost-of-living adjustments (COLAs) applied since then.
+        The benefit you would have earned by collecting at your
+        <u>normal retirement age</u> (NRA) in
+        {recipient.normalRetirementDate().monthFullName()}
+        {recipient.normalRetirementDate().year()} was
+        <b>{benefit.wholeDollars()} / month</b>. This is the nominal amount
+        payable then; it has since grown with annual
+        <u>cost-of-living adjustments</u> (COLAs), so the equivalent in today's
+        dollars is higher.
       </p>
     {:else}
       <p>
