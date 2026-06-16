@@ -154,9 +154,14 @@ export class PrimaryInsuranceAmount {
    * This is the final PIA value that would be used to determine actual benefit
    * payments. COLAs are applied starting from the year the individual turns 62.
    *
+   * @param throughColaYear - Optional last COLA year to apply. Defaults to
+   *   `lastAppliedColaYear()` (the current-dollar value). Pass an earlier year
+   *   to obtain the nominal PIA payable at a past date, used by display code
+   *   that shows historical amounts (see benefitOnDateNominal). PIA-only
+   *   recipients ignore this and always return their (current-dollar) override.
    * @returns {Money} The final PIA amount after all applicable COLA adjustments
    */
-  primaryInsuranceAmount(): Money {
+  primaryInsuranceAmount(throughColaYear?: number): Money {
     if (this.input_.isPiaOnly) {
       if (this.input_.overridePia === null) {
         throw new Error('overridePia must not be null when isPiaOnly is true');
@@ -165,7 +170,7 @@ export class PrimaryInsuranceAmount {
     }
 
     const pia = this.primaryInsuranceAmountUnadjusted();
-    return this.applyColaAdjustments(pia);
+    return this.applyColaAdjustments(pia, throughColaYear);
   }
 
   /**
@@ -217,17 +222,23 @@ export class PrimaryInsuranceAmount {
 
   /**
    * Applies COLA adjustments to a PIA value from the year the individual turns 62
-   * through the last applied COLA year. Each year's adjustment is rounded down
-   * to the nearest dime per SSA rules.
+   * through the given (or last applied) COLA year. Each year's adjustment is
+   * rounded down to the nearest dime per SSA rules.
    *
    * @param pia - The unadjusted PIA to apply COLA to
+   * @param throughYear - The last COLA year to apply, inclusive. Defaults to
+   *   `lastAppliedColaYear()`. An earlier value yields the nominal PIA payable
+   *   before later COLAs took effect.
    * @returns The COLA-adjusted PIA
    */
-  private applyColaAdjustments(pia: Money): Money {
+  private applyColaAdjustments(
+    pia: Money,
+    throughYear: number = this.lastAppliedColaYear()
+  ): Money {
     let adjusted = pia;
     for (
       let year = this.input_.birthdate.yearTurningSsaAge(62);
-      year <= this.lastAppliedColaYear();
+      year <= throughYear;
       ++year
     ) {
       if (constants.COLA[year] !== undefined) {

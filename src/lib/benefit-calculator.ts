@@ -1,3 +1,4 @@
+import * as constants from '$lib/constants';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
@@ -31,11 +32,19 @@ function benefitMultiplierAtAge(
 
 /**
  * Returns personal benefit amount if starting benefits at a given age.
+ *
+ * @param throughColaYear - Optional last COLA year to apply to the PIA. Defaults
+ *   to the current-dollar value. Pass an earlier year (see benefitOnDateNominal)
+ *   to compute the nominal benefit payable before later COLAs took effect.
  */
-export function benefitAtAge(recipient: Recipient, age: MonthDuration): Money {
+export function benefitAtAge(
+  recipient: Recipient,
+  age: MonthDuration,
+  throughColaYear?: number
+): Money {
   return recipient
     .pia()
-    .primaryInsuranceAmount()
+    .primaryInsuranceAmount(throughColaYear)
     .floorToDollar()
     .times(
       1 +
@@ -93,32 +102,108 @@ export function benefitOnDateOptimized(
 }
 
 /**
+ * Returns the last COLA year in effect for a benefit shown for the month
+ * `atDate`, for display of historical (nominal) amounts.
+ *
+ * A given year's COLA is effective in December of that year (payable the
+ * following January), so a benefit "for" a month only reflects COLA[Y] once
+ * that December has arrived. We also never assume COLAs beyond those already
+ * applied today (`CURRENT_YEAR - 1`), so any current or future `atDate` yields
+ * the same current-dollar value as `benefitOnDate`.
+ */
+function colaYearForDisplayDate(atDate: MonthDate): number {
+  // monthIndex() is 0 for January and 11 for December. A December benefit is the
+  // first month to reflect that year's COLA; January through November reflect
+  // only through the prior year's.
+  const raw = atDate.monthIndex() === 11 ? atDate.year() : atDate.year() - 1;
+  return Math.min(raw, constants.CURRENT_YEAR - 1);
+}
+
+/**
+ * Like benefitOnDate, but expresses the result in the dollars actually payable
+ * in the month `atDate` rather than in today's dollars.
+ *
+ * benefitOnDate always applies every COLA through `CURRENT_YEAR - 1`, so a past
+ * month is shown inflated by COLAs that had not yet taken effect then. This
+ * variant instead caps COLAs at the vintage in effect for `atDate`, so a past
+ * month reflects the nominal amount payable then (matching SSA letters/deposits
+ * to within whole-dollar rounding). For any `atDate` at or after the most recent
+ * applied COLA, it is identical to benefitOnDate.
+ *
+ * Used by the filing-date chart display only; the strategy optimizer continues
+ * to use benefitOnDate/benefitOnDateOptimized (constant today's dollars).
+ *
+ * PIA-only recipients have no earnings history to unwind COLAs from, so their
+ * override PIA (already in current dollars) is returned unchanged; for them this
+ * matches benefitOnDate for every date.
+ *
+ * @param recipient - The recipient
+ * @param filingDate - The date the recipient files for benefits
+ * @param atDate - The month to express the benefit in (and to calculate for)
+ * @throws Error if filing age is less than 62
+ */
+export function benefitOnDateNominal(
+  recipient: Recipient,
+  filingDate: MonthDate,
+  atDate: MonthDate
+): Money {
+  const filingAge = recipient.birthdate.ageAtSsaDate(filingDate);
+  const minFilingAge = MonthDuration.initFromYearsMonths({
+    years: 62,
+    months: 0,
+  });
+  if (filingAge.lessThan(minFilingAge)) {
+    throw new Error(
+      `Filing age must be at least 62, got ${filingAge.years()}y ${filingAge.modMonths()}m`
+    );
+  }
+
+  // If the recipient hasn't filed yet, return $0:
+  if (filingDate.greaterThan(atDate)) return Money.from(0);
+
+  return benefitOnDateCore(
+    recipient,
+    filingDate,
+    atDate,
+    filingAge,
+    colaYearForDisplayDate(atDate)
+  );
+}
+
+/**
  * Core benefit calculation logic shared between benefitOnDate variants.
  * Calculates delayed retirement credits based on filing date.
+ *
+ * @param throughColaYear - Optional last COLA year to apply to the PIA. When
+ *   omitted, the current-dollar PIA is used (today's dollars). benefitOnDateNominal
+ *   passes the vintage in effect for `atDate` to show historical amounts.
  */
 function benefitOnDateCore(
   recipient: Recipient,
   filingDate: MonthDate,
   atDate: MonthDate,
-  filingAge: MonthDuration
+  filingAge: MonthDuration,
+  throughColaYear?: number
 ): Money {
   // If this is the year after filing, delayed credits are fully applied.
   if (filingDate.year() < atDate.year())
-    return benefitAtAge(recipient, filingAge);
+    return benefitAtAge(recipient, filingAge, throughColaYear);
 
   const normalRetirementDate: MonthDate = recipient.normalRetirementDate();
 
   // If you are filing before normal retirement, no delayed credits apply.
   if (filingDate.lessThanOrEqual(normalRetirementDate))
-    return benefitAtAge(recipient, filingAge);
+    return benefitAtAge(recipient, filingAge, throughColaYear);
 
   // 70 is an explicit exception because the SSA likes to make my life harder.
   // Normally, you'd need to wait until the next year to get delayed credits,
   // but not if you file at exactly 70.
-  if (filingAge.years() >= 70) return benefitAtAge(recipient, filingAge);
+  if (filingAge.years() >= 70)
+    return benefitAtAge(recipient, filingAge, throughColaYear);
 
   // If you file in January, delayed credits are fully applied.
-  if (filingDate.monthIndex() === 0) return benefitAtAge(recipient, filingAge);
+  if (filingDate.monthIndex() === 0)
+    return benefitAtAge(recipient, filingAge, throughColaYear);
 
   // Otherwise, you only get credits up to January of this year,
   // or NRA, whichever is later.
@@ -133,7 +218,8 @@ function benefitOnDateCore(
 
   return benefitAtAge(
     recipient,
-    recipient.birthdate.ageAtSsaDate(benefitComputationDate)
+    recipient.birthdate.ageAtSsaDate(benefitComputationDate),
+    throughColaYear
   );
 }
 

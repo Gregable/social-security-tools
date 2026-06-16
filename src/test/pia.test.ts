@@ -111,3 +111,80 @@ describe('Recipient', () => {
     ).toEqual(r.pia().primaryInsuranceAmount().value());
   });
 });
+
+describe('primaryInsuranceAmount COLA cutoff (throughColaYear)', () => {
+  // Born Sep 29, 1956 -> turns 62 in 2018, so COLAs 2018..present apply.
+  const BIRTHDATE = Birthdate.FromYMD(1956, 8, 29);
+
+  function earningsPia(): PrimaryInsuranceAmount {
+    const r = new Recipient();
+    r.birthdate = BIRTHDATE;
+    r.earningsRecords = parsePaste(demo0);
+    return r.pia();
+  }
+
+  it('default argument applies all COLAs through CURRENT_YEAR - 1', () => {
+    const pia = earningsPia();
+    expect(
+      pia.primaryInsuranceAmount(constants.CURRENT_YEAR - 1).value()
+    ).toEqual(pia.primaryInsuranceAmount().value());
+  });
+
+  it('a cutoff before age 62 applies no COLAs (equals unadjusted)', () => {
+    const pia = earningsPia();
+    const age62Year = BIRTHDATE.yearTurningSsaAge(62);
+    expect(pia.primaryInsuranceAmount(age62Year - 1).value()).toEqual(
+      pia.primaryInsuranceAmountUnadjusted().value()
+    );
+  });
+
+  it('is monotonic non-decreasing as the cutoff year advances', () => {
+    const pia = earningsPia();
+    let prev = pia
+      .primaryInsuranceAmount(BIRTHDATE.yearTurningSsaAge(62) - 1)
+      .value();
+    for (
+      let year = BIRTHDATE.yearTurningSsaAge(62);
+      year <= constants.CURRENT_YEAR - 1;
+      year++
+    ) {
+      const current = pia.primaryInsuranceAmount(year).value();
+      expect(current).toBeGreaterThanOrEqual(prev);
+      prev = current;
+    }
+  });
+
+  it('matches manual COLA application up to the cutoff year', () => {
+    const pia = earningsPia();
+    const cutoff = 2020;
+    let expected = pia.primaryInsuranceAmountUnadjusted();
+    for (let year = BIRTHDATE.yearTurningSsaAge(62); year <= cutoff; year++) {
+      if (constants.COLA[year] !== undefined) {
+        expected = expected
+          .times(1 + constants.COLA[year] / 100.0)
+          .floorToDime();
+      }
+    }
+    expect(pia.primaryInsuranceAmount(cutoff).value()).toEqual(
+      expected.value()
+    );
+  });
+
+  it('excludes a COLA whose cutoff year has not been reached', () => {
+    const pia = earningsPia();
+    // 2024's COLA (effective for benefits starting Dec 2024) should be present
+    // at cutoff 2024 but absent at cutoff 2023.
+    expect(pia.primaryInsuranceAmount(2024).value()).toBeGreaterThan(
+      pia.primaryInsuranceAmount(2023).value()
+    );
+  });
+
+  it('ignores the cutoff for PIA-only recipients (returns the override)', () => {
+    const r = new Recipient();
+    r.birthdate = BIRTHDATE;
+    r.setPia(Money.from(2000));
+    const pia = r.pia();
+    expect(pia.primaryInsuranceAmount(2019).value()).toEqual(2000);
+    expect(pia.primaryInsuranceAmount().value()).toEqual(2000);
+  });
+});
