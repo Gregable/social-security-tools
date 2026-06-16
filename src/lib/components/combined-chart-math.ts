@@ -1,4 +1,7 @@
-import { allBenefitsOnDate as allBenefitsOnDate_ } from '$lib/benefit-calculator';
+import {
+  allBenefitsOnDate as allBenefitsOnDate_,
+  allBenefitsOnDateNominal as allBenefitsOnDateNominal_,
+} from '$lib/benefit-calculator';
 import type { ChartLayout } from '$lib/components/chart-utils';
 import type { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
@@ -276,6 +279,32 @@ export function minRenderedYDollars(
  * `firstCtx` or `secondCtx`). The function uses `personCtx.r.first` to
  * determine which context is self vs spouse for the filing date lookup.
  */
+/**
+ * Resolves the self vs spouse recipient and filing dates for the combined
+ * chart from the per-person contexts. `personCtx.r.first` determines which
+ * context is self vs spouse; a zero `selfFilingDate` means "use the slider".
+ */
+function resolveCouple(
+  personCtx: RecipientContext,
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
+  selfFilingDate: MonthDate
+): {
+  spouse: Recipient;
+  spouseFilingDate: MonthDate;
+  selfFilingDate: MonthDate;
+} {
+  const selfCtx = personCtx.r.first ? firstCtx : secondCtx;
+  const spouseCtx = personCtx.r.first ? secondCtx : firstCtx;
+  if (selfFilingDate.monthsSinceEpoch() === 0)
+    selfFilingDate = userSelectedDate(selfCtx);
+  return {
+    spouse: spouseCtx.r,
+    spouseFilingDate: userSelectedDate(spouseCtx),
+    selfFilingDate,
+  };
+}
+
 export function allBenefitsOnDate(
   personCtx: RecipientContext,
   firstCtx: RecipientContext,
@@ -283,25 +312,35 @@ export function allBenefitsOnDate(
   atDate: MonthDate,
   selfFilingDate: MonthDate = new MonthDate(0)
 ): Money {
-  let spouseFilingDate: MonthDate;
-  let spouse: Recipient;
-  if (personCtx.r.first) {
-    if (selfFilingDate.monthsSinceEpoch() === 0)
-      selfFilingDate = userSelectedDate(firstCtx);
-    spouseFilingDate = userSelectedDate(secondCtx);
-    spouse = secondCtx.r;
-  } else {
-    if (selfFilingDate.monthsSinceEpoch() === 0)
-      selfFilingDate = userSelectedDate(secondCtx);
-    spouseFilingDate = userSelectedDate(firstCtx);
-    spouse = firstCtx.r;
-  }
-
+  const couple = resolveCouple(personCtx, firstCtx, secondCtx, selfFilingDate);
   return allBenefitsOnDate_(
     personCtx.r,
-    spouse,
-    spouseFilingDate,
-    selfFilingDate,
+    couple.spouse,
+    couple.spouseFilingDate,
+    couple.selfFilingDate,
+    atDate
+  );
+}
+
+/**
+ * Like allBenefitsOnDate, but expresses the combined personal + spousal benefit
+ * in the dollars payable in the month `atDate` (historical COLA vintage) rather
+ * than today's dollars. Used by the combined chart display so past months match
+ * the amounts actually received then.
+ */
+export function allBenefitsOnDateNominal(
+  personCtx: RecipientContext,
+  firstCtx: RecipientContext,
+  secondCtx: RecipientContext,
+  atDate: MonthDate,
+  selfFilingDate: MonthDate = new MonthDate(0)
+): Money {
+  const couple = resolveCouple(personCtx, firstCtx, secondCtx, selfFilingDate);
+  return allBenefitsOnDateNominal_(
+    personCtx.r,
+    couple.spouse,
+    couple.spouseFilingDate,
+    couple.selfFilingDate,
     atDate
   );
 }

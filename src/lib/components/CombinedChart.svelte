@@ -14,7 +14,7 @@
     userSelectedDate,
   } from "./combined-chart-context";
   import {
-    allBenefitsOnDate,
+    allBenefitsOnDateNominal,
     canvasX,
     dateX,
     youngerOlder,
@@ -412,7 +412,7 @@
                 <RecipientName r={recipientCtx_.r} apos shortenTo={50} /> Benefit:
               </td>
               <td class="value">
-                {allBenefitsOnDate(recipientCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout())).wholeDollars()}
+                {allBenefitsOnDateNominal(recipientCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout())).wholeDollars()}
               </td>
             </tr>
             <tr>
@@ -421,7 +421,7 @@
                 <RecipientName r={spouseCtx_.r} apos shortenTo={50} /> Benefit:
               </td>
               <td class="value">
-                {allBenefitsOnDate(spouseCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout())).wholeDollars()}
+                {allBenefitsOnDateNominal(spouseCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout())).wholeDollars()}
               </td>
             </tr>
             <tr>
@@ -430,10 +430,10 @@
                 <b>Total</b> Benefit:
               </td>
               <td class="value sum"
-                >{allBenefitsOnDate(recipientCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout()))
+                >{allBenefitsOnDateNominal(recipientCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout()))
                   .roundToDollar()
                   .plus(
-                    allBenefitsOnDate(spouseCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout())).roundToDollar()
+                    allBenefitsOnDateNominal(spouseCtx_, recipientCtx_, spouseCtx_, dateX(lastMouseX_, recipient, spouse, layout())).roundToDollar()
                   )
                   .wholeDollars()}</td
               >

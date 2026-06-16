@@ -10,7 +10,7 @@ import type { Recipient } from '$lib/recipient';
 import type { RecipientContext } from './combined-chart-context';
 import { userSelectedDate } from './combined-chart-context';
 import {
-  allBenefitsOnDate,
+  allBenefitsOnDateNominal,
   canvasX,
   canvasY,
   dateRange,
@@ -223,7 +223,12 @@ export function benefitBoxes(
   const selectedDate = userSelectedDate(personCtx);
 
   const boxes: Array<[number, number, Money]> = [];
-  let benefit = allBenefitsOnDate(personCtx, firstCtx, secondCtx, selectedDate);
+  let benefit = allBenefitsOnDateNominal(
+    personCtx,
+    firstCtx,
+    secondCtx,
+    selectedDate
+  );
   boxes.push([
     canvasX(selectedDate, recipient, spouse, layout),
     canvasY(personCtx, benefit, maxY, minY, layout),
@@ -236,7 +241,7 @@ export function benefitBoxes(
     i.lessThanOrEqual(endDate);
     i = i.addDuration(new MonthDuration(1))
   ) {
-    const all = allBenefitsOnDate(
+    const all = allBenefitsOnDateNominal(
       personCtx,
       firstCtx,
       secondCtx,
@@ -513,7 +518,13 @@ export function renderTrendline(
     i = i.addDuration(new MonthDuration(1))
   ) {
     const thisX = canvasX(i, recipient, spouse, layout);
-    const yDollars = allBenefitsOnDate(personCtx, firstCtx, secondCtx, i, i);
+    const yDollars = allBenefitsOnDateNominal(
+      personCtx,
+      firstCtx,
+      secondCtx,
+      i,
+      i
+    );
     const thisY = canvasY(personCtx, yDollars, maxY, minY, layout);
     if (i.monthsSinceEpoch() === startDate.monthsSinceEpoch()) {
       ctx.moveTo(thisX, thisY);
