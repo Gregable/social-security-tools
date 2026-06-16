@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { benefitOnDate, benefitOnDateNominal } from '$lib/benefit-calculator';
+import {
+  allBenefitsOnDate,
+  allBenefitsOnDateNominal,
+  benefitOnDate,
+  benefitOnDateNominal,
+  spousalBenefitOnDate,
+} from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate } from '$lib/month-time';
@@ -143,5 +149,99 @@ describe('benefitOnDateNominal', () => {
     expect(benefitOnDateNominal(r, FILING, at).value()).toEqual(
       benefitOnDate(r, FILING, at).value()
     );
+  });
+});
+
+/**
+ * allBenefitsOnDateNominal applies the same historical-COLA-vintage rule to the
+ * combined personal + spousal benefit shown on the spousal (combined) chart.
+ */
+describe('allBenefitsOnDateNominal (spousal)', () => {
+  const BIRTHDATE = Birthdate.FromYMD(1956, 8, 29);
+  // Both file at NRA (Jan 2023 for someone born in 1956), so the lower earner
+  // receives an unreduced spousal top-up.
+  const FILING = ym(2023, 0);
+
+  function paste(annual: number): string {
+    const lines: string[] = [];
+    for (let year = 2024; year >= 1985; year--) {
+      lines.push(`${year} $${annual} $${annual}`);
+    }
+    return lines.join('\n');
+  }
+
+  function earner(annual: number): Recipient {
+    const r = new Recipient();
+    r.birthdate = BIRTHDATE;
+    r.earningsRecords = parsePaste(paste(annual));
+    return r;
+  }
+
+  // Low earner gets a spousal top-up from the high earner.
+  const lowEarner = () => earner(18000);
+  const highEarner = () => earner(160000);
+
+  it('has a positive spousal component for this fixture', () => {
+    const low = lowEarner();
+    const high = highEarner();
+    const at = ym(constants.CURRENT_YEAR, 0);
+    const combined = allBenefitsOnDate(low, high, FILING, FILING, at).value();
+    const personalOnly = benefitOnDate(low, FILING, at).value();
+    expect(combined).toBeGreaterThan(personalOnly);
+  });
+
+  it('equals allBenefitsOnDate for a current/future month', () => {
+    const low = lowEarner();
+    const high = highEarner();
+    const at = ym(constants.CURRENT_YEAR, 0);
+    expect(
+      allBenefitsOnDateNominal(low, high, FILING, FILING, at).value()
+    ).toEqual(allBenefitsOnDate(low, high, FILING, FILING, at).value());
+  });
+
+  it('shows a smaller (nominal) combined benefit for a past mid-year month', () => {
+    const low = lowEarner();
+    const high = highEarner();
+    const at = ym(2025, 5); // June 2025: excludes the Dec-2025 COLA.
+    expect(
+      allBenefitsOnDateNominal(low, high, FILING, FILING, at).value()
+    ).toBeLessThan(allBenefitsOnDate(low, high, FILING, FILING, at).value());
+  });
+
+  it('steps up the combined benefit at the December COLA effective date', () => {
+    const low = lowEarner();
+    const high = highEarner();
+    const nov = allBenefitsOnDateNominal(
+      low,
+      high,
+      FILING,
+      FILING,
+      ym(2025, 10)
+    ).value();
+    const dec = allBenefitsOnDateNominal(
+      low,
+      high,
+      FILING,
+      FILING,
+      ym(2025, 11)
+    ).value();
+    expect(dec).toBeGreaterThan(nov);
+  });
+
+  it('caps the spousal component COLA vintage via throughColaYear', () => {
+    const low = lowEarner();
+    const high = highEarner();
+    const at = ym(2025, 5);
+    const today = spousalBenefitOnDate(low, high, FILING, FILING, at).value();
+    const nominal = spousalBenefitOnDate(
+      low,
+      high,
+      FILING,
+      FILING,
+      at,
+      2024
+    ).value();
+    expect(today).toBeGreaterThan(0);
+    expect(nominal).toBeLessThan(today);
   });
 });

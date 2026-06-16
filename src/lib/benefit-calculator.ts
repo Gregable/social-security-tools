@@ -263,6 +263,10 @@ export function eligibleForSpousalBenefit(
  * @param spouseFilingDate - The date when the higher-earning spouse files
  * @param filingDate - The date when this recipient (lower earner) files
  * @param atDate - The specific date for which to calculate the benefit amount
+ * @param throughColaYear - Optional last COLA year to apply to the underlying
+ *   PIAs and personal benefit. Defaults to the current-dollar value; pass an
+ *   earlier year (see allBenefitsOnDateNominal) to express the spousal benefit
+ *   in the dollars payable at a past month.
  * @returns The calculated spousal benefit amount
  */
 export function spousalBenefitOnDate(
@@ -270,7 +274,8 @@ export function spousalBenefitOnDate(
   spouse: Recipient,
   spouseFilingDate: MonthDate,
   filingDate: MonthDate,
-  atDate: MonthDate
+  atDate: MonthDate,
+  throughColaYear?: number
 ): Money {
   // Calculate the starting date as the latest of the two filing dates:
   const startDate = spouseFilingDate.greaterThan(filingDate)
@@ -285,11 +290,11 @@ export function spousalBenefitOnDate(
 
   const piaAmountCents: number = recipient
     .pia()
-    .primaryInsuranceAmount()
+    .primaryInsuranceAmount(throughColaYear)
     .cents();
   const spousePiaAmountCents: number = spouse
     .pia()
-    .primaryInsuranceAmount()
+    .primaryInsuranceAmount(throughColaYear)
     .cents();
 
   // Calculate the base spousal benefit amount:
@@ -313,7 +318,18 @@ export function spousalBenefitOnDate(
     // The way this is computed is to reduce the spousal benefit if the sum
     // of the spousal and personal benefits exceeds 50% of the higher
     // earner's PIA.
-    const personalBenefit = benefitOnDate(recipient, filingDate, atDate);
+    // Use benefitOnDateCore (not benefitOnDate) so the optional COLA cutoff is
+    // applied to the personal benefit too. In this branch filingDate is past
+    // NRA and startDate <= atDate, so benefitOnDate's age>=62 and
+    // filingDate>atDate guards are never relevant here; the result matches
+    // benefitOnDate when throughColaYear is undefined.
+    const personalBenefit = benefitOnDateCore(
+      recipient,
+      filingDate,
+      atDate,
+      recipient.birthdate.ageAtSsaDate(filingDate),
+      throughColaYear
+    );
     const spouseBenefitCents =
       spousePiaAmountCents / 2 - personalBenefit.cents();
     if (spouseBenefitCents <= 0) {
@@ -361,6 +377,38 @@ export function allBenefitsOnDate(
       spouseFilingDate,
       filingDate,
       atDate
+    )
+  );
+}
+
+/**
+ * Like allBenefitsOnDate, but expresses the combined personal + spousal benefit
+ * in the dollars actually payable in the month `atDate` rather than in today's
+ * dollars. Used by the combined (spousal) chart display only; the strategy
+ * optimizer continues to use allBenefitsOnDate (constant today's dollars).
+ *
+ * For any `atDate` at or after the most recent applied COLA this is identical
+ * to allBenefitsOnDate. See benefitOnDateNominal for the COLA-vintage rule.
+ *
+ * Note: this covers the personal and spousal components only; survivor benefits
+ * are not adjusted here (tracked separately on issue #559).
+ */
+export function allBenefitsOnDateNominal(
+  recipient: Recipient,
+  spouse: Recipient,
+  spouseFilingDate: MonthDate,
+  filingDate: MonthDate,
+  atDate: MonthDate
+): Money {
+  const throughColaYear = colaYearForDisplayDate(atDate);
+  return benefitOnDateNominal(recipient, filingDate, atDate).plus(
+    spousalBenefitOnDate(
+      recipient,
+      spouse,
+      spouseFilingDate,
+      filingDate,
+      atDate,
+      throughColaYear
     )
   );
 }
