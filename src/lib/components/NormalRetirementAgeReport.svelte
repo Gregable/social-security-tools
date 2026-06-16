@@ -1,6 +1,7 @@
 <script lang="ts">
 import * as constants from '$lib/constants';
 import { Money } from '$lib/money';
+import { MonthDate } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
 import RName from './RecipientName.svelte';
 
@@ -14,16 +15,39 @@ const exampleAge = recipient.birthdate.exampleSsaAge(constants.CURRENT_YEAR);
  */
 let benefit: Money = Money.from(0);
 $: benefit = $recipient.pia().primaryInsuranceAmount().floorToDollar();
+
+/**
+ * Whether normal retirement age is already in the past. When it is, the PIA
+ * shown is no longer an amount the user can newly elect at NRA; it is the NRA
+ * benefit restated in today's dollars (COLAs since NRA already applied), so the
+ * explanatory text switches to past tense.
+ */
+let isPastNra = false;
+$: isPastNra = $recipient
+  .normalRetirementDate()
+  .lessThan(MonthDate.initFromNow());
 </script>
 
 <div>
   <h2>Normal Retirement Age</h2>
   <div class="text pageBreakAvoid">
-    <p>
-      The primary insurance amount rounded down (<b>{benefit.wholeDollars()}</b>
-      / month) is the benefit you will earn if you begin collecting your benefit
-      at your <u>normal retirement age</u> (NRA).
-    </p>
+    {#if isPastNra}
+      <p>
+        The primary insurance amount rounded down (<b>{benefit.wholeDollars()}</b
+        >
+        / month) is the benefit you would have earned by collecting at your
+        <u>normal retirement age</u> (NRA), which has already passed. It is shown
+        in <u>today's dollars</u>: the amount has already been adjusted upward
+        for the cost-of-living adjustments (COLAs) applied since then.
+      </p>
+    {:else}
+      <p>
+        The primary insurance amount rounded down (<b>{benefit.wholeDollars()}</b
+        >
+        / month) is the benefit you will earn if you begin collecting your
+        benefit at your <u>normal retirement age</u> (NRA).
+      </p>
+    {/if}
     <p>
       You may also see this referred to as the <u>full retirement age</u> (FRA).
     </p>
