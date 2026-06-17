@@ -97,90 +97,82 @@ describe('expectedNPVCoupleOptimized vs goldens', () => {
 
   // Test all 1000 goldens: optimal NPV must match within 1 cent.
   // Filing ages must match unless it's a tie (multiple pairs with same NPV).
-  it(
-    'all goldens produce correct optimal filing ages',
-    () => {
-      let passed = 0;
-      let failed = 0;
-      const failures: string[] = [];
+  it('all goldens produce correct optimal filing ages', () => {
+    let passed = 0;
+    let failed = 0;
+    const failures: string[] = [];
 
-      for (const tc of goldens) {
-        const { recipients, currentDate } = setupTestCase(tc);
+    for (const tc of goldens) {
+      const { recipients, currentDate } = setupTestCase(tc);
 
-        const results = expectedNPVCoupleOptimized(
-          recipients,
-          currentDate,
-          tc.inputs.discountRate,
-          [tc.inputs.deathProbs0, tc.inputs.deathProbs1]
-        );
+      const results = expectedNPVCoupleOptimized(
+        recipients,
+        currentDate,
+        tc.inputs.discountRate,
+        [tc.inputs.deathProbs0, tc.inputs.deathProbs1]
+      );
 
-        const best = results[0];
+      const best = results[0];
 
-        // NPV must match within 1 cent (floating point tolerance)
-        const npvMatch =
-          Math.abs(best.expectedNPVCents - tc.output.expectedNPVCents) < 1;
+      // NPV must match within 1 cent (floating point tolerance)
+      const npvMatch =
+        Math.abs(best.expectedNPVCents - tc.output.expectedNPVCents) < 1;
 
-        if (npvMatch) {
-          passed++;
-        } else {
-          failed++;
-          if (failures.length < 10) {
-            failures.push(
-              `Golden #${tc.id}: expected r0=${tc.output.filingAge0Months}m r1=${tc.output.filingAge1Months}m $${(tc.output.expectedNPVCents / 100).toFixed(0)}, ` +
-                `got r0=${best.filingAges[0].asMonths()}m r1=${best.filingAges[1].asMonths()}m $${(best.expectedNPVCents / 100).toFixed(0)}`
-            );
-          }
+      if (npvMatch) {
+        passed++;
+      } else {
+        failed++;
+        if (failures.length < 10) {
+          failures.push(
+            `Golden #${tc.id}: expected r0=${tc.output.filingAge0Months}m r1=${tc.output.filingAge1Months}m $${(tc.output.expectedNPVCents / 100).toFixed(0)}, ` +
+              `got r0=${best.filingAges[0].asMonths()}m r1=${best.filingAges[1].asMonths()}m $${(best.expectedNPVCents / 100).toFixed(0)}`
+          );
         }
       }
+    }
 
-      console.log(`\nGolden results: ${passed} passed, ${failed} failed`);
-      if (failures.length > 0) {
-        console.log('First failures:');
-        for (const f of failures) console.log(`  ${f}`);
-      }
+    console.log(`\nGolden results: ${passed} passed, ${failed} failed`);
+    if (failures.length > 0) {
+      console.log('First failures:');
+      for (const f of failures) console.log(`  ${f}`);
+    }
 
-      expect(failed).toBe(0);
-    },
-    { timeout: 180000 }
-  );
+    expect(failed).toBe(0);
+  }, 180000);
 
   // Test that top 5 NPV values match (filing ages may differ for ties)
-  it(
-    'all goldens produce correct top 5 NPV values',
-    () => {
-      let passed = 0;
-      let failed = 0;
+  it('all goldens produce correct top 5 NPV values', () => {
+    let passed = 0;
+    let failed = 0;
 
-      for (const tc of goldens) {
-        const { recipients, currentDate } = setupTestCase(tc);
+    for (const tc of goldens) {
+      const { recipients, currentDate } = setupTestCase(tc);
 
-        const results = expectedNPVCoupleOptimized(
-          recipients,
-          currentDate,
-          tc.inputs.discountRate,
-          [tc.inputs.deathProbs0, tc.inputs.deathProbs1]
-        );
+      const results = expectedNPVCoupleOptimized(
+        recipients,
+        currentDate,
+        tc.inputs.discountRate,
+        [tc.inputs.deathProbs0, tc.inputs.deathProbs1]
+      );
 
-        let tcPassed = true;
-        for (let i = 0; i < Math.min(5, tc.output.top5.length); i++) {
-          const expected = tc.output.top5[i];
-          const actual = results[i];
+      let tcPassed = true;
+      for (let i = 0; i < Math.min(5, tc.output.top5.length); i++) {
+        const expected = tc.output.top5[i];
+        const actual = results[i];
 
-          if (
-            Math.abs(actual.expectedNPVCents - expected.expectedNPVCents) >= 1
-          ) {
-            tcPassed = false;
-            break;
-          }
+        if (
+          Math.abs(actual.expectedNPVCents - expected.expectedNPVCents) >= 1
+        ) {
+          tcPassed = false;
+          break;
         }
-
-        if (tcPassed) passed++;
-        else failed++;
       }
 
-      console.log(`\nTop-5 ranking: ${passed} passed, ${failed} failed`);
-      expect(failed).toBe(0);
-    },
-    { timeout: 180000 }
-  );
+      if (tcPassed) passed++;
+      else failed++;
+    }
+
+    console.log(`\nTop-5 ranking: ${passed} passed, ${failed} failed`);
+    expect(failed).toBe(0);
+  }, 180000);
 });

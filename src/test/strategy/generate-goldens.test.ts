@@ -222,43 +222,39 @@ function generateTestCase(id: number, rng: () => number): GoldenTestCase {
 }
 
 describe('golden test case generation', () => {
-  it(
-    'generate 1000 golden test cases',
-    () => {
-      const rng = mulberry32(42);
-      const goldens: GoldenTestCase[] = [];
-      let attempts = 0;
+  it('generate 1000 golden test cases', () => {
+    const rng = mulberry32(42);
+    const goldens: GoldenTestCase[] = [];
+    let attempts = 0;
 
-      while (goldens.length < 1000 && attempts < 2000) {
-        attempts++;
-        const tc = generateTestCase(goldens.length, rng);
-        if (tc !== null) {
-          goldens.push(tc);
-          if (goldens.length % 50 === 0) {
-            console.log(
-              `Generated ${goldens.length}/1000 goldens (${attempts} attempts)`
-            );
-          }
+    while (goldens.length < 1000 && attempts < 2000) {
+      attempts++;
+      const tc = generateTestCase(goldens.length, rng);
+      if (tc !== null) {
+        goldens.push(tc);
+        if (goldens.length % 50 === 0) {
+          console.log(
+            `Generated ${goldens.length}/1000 goldens (${attempts} attempts)`
+          );
         }
       }
+    }
 
-      console.log(
-        `\nGenerated ${goldens.length} goldens from ${attempts} attempts`
-      );
+    console.log(
+      `\nGenerated ${goldens.length} goldens from ${attempts} attempts`
+    );
 
-      // Write to file
-      const outDir = resolve(__dirname, 'goldens');
-      mkdirSync(outDir, { recursive: true });
-      const outPath = resolve(outDir, 'couple-goldens.json');
-      writeFileSync(outPath, JSON.stringify(goldens, null, 2));
-      console.log(`Written to ${outPath}`);
+    // Write to file
+    const outDir = resolve(__dirname, 'goldens');
+    mkdirSync(outDir, { recursive: true });
+    const outPath = resolve(outDir, 'couple-goldens.json');
+    writeFileSync(outPath, JSON.stringify(goldens, null, 2));
+    console.log(`Written to ${outPath}`);
 
-      // Basic stats
-      const avgNPV =
-        goldens.reduce((s, g) => s + g.output.expectedNPVCents, 0) /
-        goldens.length;
-      console.log(`Average optimal NPV: $${(avgNPV / 100).toFixed(0)}`);
-    },
-    { timeout: 3600000 }
-  ); // 1 hour timeout
+    // Basic stats
+    const avgNPV =
+      goldens.reduce((s, g) => s + g.output.expectedNPVCents, 0) /
+      goldens.length;
+    console.log(`Average optimal NPV: $${(avgNPV / 100).toFixed(0)}`);
+  }, 3600000); // 1 hour timeout
 });
