@@ -11,7 +11,8 @@ import { Recipient } from '$lib/recipient';
  *
  * The "Explore Filing Dates" selection must be stored as a date and converted
  * to a pixel at render time, so the selected month is stable no matter what
- * canvas width is in effect (screen min(55vw,740px) vs print 80vw).
+ * canvas width is in effect (the canvas is a different width in print than on a
+ * wide screen).
  *
  * These tests guard the canvasX/dateX pair the fix relies on:
  *  - a stored DATE round-trips to the same month at any width (the property
@@ -35,7 +36,8 @@ function recipientBornJan1960(): Recipient {
   return recipient;
 }
 
-// Screen (capped), a mid mobile width, and a representative print width.
+// Three differing canvas widths. The exact values don't matter; the invariant
+// is that the round-trip holds regardless of width.
 const WIDTHS = [320, 740, 1184];
 
 describe('filing-date chart coordinate math', () => {
@@ -44,21 +46,33 @@ describe('filing-date chart coordinate math', () => {
   const startDate = birthdate.dateAtSsaAge(
     MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
   );
-  const endDate = birthdate.dateAtSsaAge(
-    MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
-  );
 
   it('round-trips every month (date -> x -> date) at every canvas width', () => {
-    for (const width of WIDTHS) {
-      const layout = layoutOfWidth(width);
-      for (
-        let date = startDate;
-        date.lessThanOrEqual(endDate);
-        date = date.addDuration(new MonthDuration(1))
-      ) {
-        const x = canvasX(date, birthdate, layout);
-        const back = dateX(x, birthdate, layout);
-        expect(back.monthsSinceEpoch()).toBe(date.monthsSinceEpoch());
+    // Cover a clean year-aligned start (born on the 1st -> age-62 floor is
+    // 62y0m) and a mid-month birth (floor is 62y1m, so startDate is not aligned
+    // to a year boundary), which exercises the dateAtSsaAge floor inside the map.
+    const birthdates = [
+      Birthdate.FromYMD(1960, 0, 1),
+      Birthdate.FromYMD(1960, 5, 15),
+    ];
+    for (const bd of birthdates) {
+      const start = bd.dateAtSsaAge(
+        MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
+      );
+      const end = bd.dateAtSsaAge(
+        MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
+      );
+      for (const width of WIDTHS) {
+        const layout = layoutOfWidth(width);
+        for (
+          let date = start;
+          date.lessThanOrEqual(end);
+          date = date.addDuration(new MonthDuration(1))
+        ) {
+          const x = canvasX(date, bd, layout);
+          const back = dateX(x, bd, layout);
+          expect(back.monthsSinceEpoch()).toBe(date.monthsSinceEpoch());
+        }
       }
     }
   });
