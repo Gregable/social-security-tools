@@ -185,16 +185,26 @@ export function buildCalculatorAiExport(
   // --- Methodology footnotes (the most important section for an AI: it pins
   //     which SSA constants produced these numbers, preventing the assistant
   //     from inventing different ones). ---
-  const methodology: string[] = [
-    '## Methodology',
-    '',
-    `- PIA uses the SSA bend-point formula wage-indexed to the eligibility year (${recipient.indexingYear()}): first bend point ${pia
-      .firstBendPoint()
-      .wholeDollars()}, second bend point ${pia.secondBendPoint().wholeDollars()}.`,
-    `- Cost-of-living adjustments (COLA) are applied through ${MAX_COLA_YEAR} (the latest published COLA).`,
-    `- Average-wage indexing uses national wage data through ${MAX_WAGE_INDEX_YEAR}.`,
-    "- Figures are estimates in today's dollars and exclude spousal and survivor benefits, taxation, and Medicare premiums.",
-  ];
+  const methodology: string[] = ['## Methodology', ''];
+  if (recipient.isPiaOnly) {
+    // The PIA was typed in directly, so the bend-point/COLA/wage-indexing
+    // derivation does not apply; only the filing-age adjustments do.
+    methodology.push(
+      "- The Primary Insurance Amount was entered directly (in today's dollars), not derived from an earnings record, so bend points, wage indexing, and COLA assumptions do not apply."
+    );
+  } else {
+    methodology.push(
+      `- PIA uses the SSA bend-point formula wage-indexed to the eligibility year (${recipient.indexingYear()}): first bend point ${pia
+        .firstBendPoint()
+        .wholeDollars()}, second bend point ${pia.secondBendPoint().wholeDollars()}.`,
+      `- Cost-of-living adjustments (COLA) are applied through ${MAX_COLA_YEAR} (the latest published COLA).`,
+      `- Average-wage indexing uses national wage data through ${MAX_WAGE_INDEX_YEAR}.`
+    );
+  }
+  methodology.push(
+    '- Monthly benefit by filing age applies the standard early-filing reduction and delayed retirement credits to the PIA.',
+    "- Figures are estimates in today's dollars and exclude spousal and survivor benefits, taxation, and Medicare premiums."
+  );
   sections.push(methodology.join('\n'));
 
   // --- Deep link ---

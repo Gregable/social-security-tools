@@ -164,9 +164,22 @@ describe('buildCalculatorAiExport', () => {
     const r = eligibleRecipient();
     const md = buildCalculatorAiExport(r);
 
+    expect(md).toContain('PIA uses the SSA bend-point formula');
     expect(md).toContain(String(MAX_COLA_YEAR));
     expect(md).toContain(String(MAX_WAGE_INDEX_YEAR));
     expect(md).toContain(String(r.indexingYear()));
+  });
+
+  it('does not claim a bend-point/COLA derivation for a PIA-only recipient', () => {
+    // A PIA-only recipient entered the PIA directly, so the bend-point formula
+    // and COLA assumptions were NOT used to derive it. Saying otherwise would
+    // feed the AI a false methodology.
+    const md = buildCalculatorAiExport(piaOnlyRecipient());
+    expect(md).not.toContain('PIA uses the SSA bend-point formula');
+    expect(md).not.toMatch(
+      /Cost-of-living adjustments \(COLA\) are applied through/i
+    );
+    expect(md).toMatch(/not derived from an earnings record/i);
   });
 
   it('includes a /calculator deep link with pia/dob/name/gender params', () => {
