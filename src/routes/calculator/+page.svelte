@@ -3,6 +3,7 @@ import type { ComponentType, SvelteComponent } from 'svelte';
 import { onMount } from 'svelte';
 import CombinedChart from '$lib/components/CombinedChart.svelte';
 import CombinedHeading from '$lib/components/CombinedHeading.svelte';
+import CopyForAiButton from '$lib/components/CopyForAiButton.svelte';
 import EarningsReport from '$lib/components/EarningsReport.svelte';
 import EligibilityReport from '$lib/components/EligibilityReport.svelte';
 import FilingDateReport from '$lib/components/FilingDateReport.svelte';
@@ -372,6 +373,17 @@ async function loadIntegrationComponents(
           />
         </SidebarSection>
       {/if}
+      <SidebarSection label="Copy for AI" heading={true}>
+        <div class="copyForAiSection">
+          <h2>Copy for AI assistant</h2>
+          <p>
+            Turn this entire report into a self-contained markdown summary you
+            can paste into ChatGPT, Claude, or another AI assistant — then ask
+            follow-up questions about your own Social Security benefits.
+          </p>
+          <CopyForAiButton recipient={$recipient} spouse={$spouse} />
+        </div>
+      </SidebarSection>
       <SidebarSection label="More Reading" heading={true}>
         <MoreResources />
       </SidebarSection>
@@ -395,6 +407,13 @@ async function loadIntegrationComponents(
   }
   .recipientName {
     text-decoration: underline;
+  }
+  .copyForAiSection {
+    margin: 0 0.5em;
+  }
+  .copyForAiSection p {
+    max-width: 640px;
+    line-height: 1.5;
   }
   @media screen {
     .printFooter {
