@@ -87,11 +87,13 @@ function eligibilityLine(recipient: Recipient): string | null {
  * Social Security situation, intended to be pasted into an AI assistant such as
  * Claude or ChatGPT. See issue #553.
  *
- * The function is pure and deterministic: every value is derived from the
- * recipient and the fixed SSA constants, and any "as of today" value comes from
- * {@link CalculatorAiExportOptions.generatedDate} rather than the system clock.
- * Nothing is transmitted anywhere; the caller copies the returned string to the
- * clipboard only when the user asks.
+ * The function performs no I/O and transmits nothing; the caller copies the
+ * returned string to the clipboard only when the user asks. The only formatted
+ * "as of today" value (the generated-on header line) comes from
+ * {@link CalculatorAiExportOptions.generatedDate} rather than the system clock,
+ * so the snippet is stable to copy. (Benefit and PIA amounts still depend on
+ * `constants.CURRENT_YEAR` via the default COLA cutoff, which is resolved once
+ * at module load — the same values the calculator itself displays.)
  */
 export function buildCalculatorAiExport(
   recipient: Recipient,
