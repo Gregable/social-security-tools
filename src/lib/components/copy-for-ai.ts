@@ -24,7 +24,9 @@ export function localIsoDate(d: Date): string {
  * Builds the "Copy for AI assistant" markdown for the calculator report. Uses
  * the single-recipient builder, or the couple builder when a spouse is present.
  * Options (baseUrl, generatedDate) are forwarded unchanged to the underlying
- * builder, keeping this function deterministic for a given set of inputs.
+ * builder, which is deterministic for a given set of inputs (see
+ * buildCalculatorAiExport; amounts depend on constants.CURRENT_YEAR resolved
+ * at module load, not on the wall clock).
  */
 export function buildCalculatorExport(
   recipient: Recipient,

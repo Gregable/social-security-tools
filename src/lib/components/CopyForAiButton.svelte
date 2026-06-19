@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
   import posthog from "posthog-js";
   import type { Recipient } from "$lib/recipient";
   import { buildCalculatorExport, localIsoDate } from "$lib/components/copy-for-ai";
@@ -11,6 +12,13 @@
   let copied = false;
   let copyError = false;
   let copyTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Clear the pending "Copied!" reset timer if the component is destroyed
+  // before it fires, so the callback can't assign to state on a torn-down
+  // component (matches the timer cleanup in Sidebar / MobileDesktopPrompt).
+  onDestroy(() => {
+    if (copyTimer) clearTimeout(copyTimer);
+  });
 
   function openPreview() {
     // Build lazily, only when the user asks to see it, so editing earnings
@@ -315,6 +323,7 @@
     line-height: 1.4;
   }
 
+  /* The button is interactive-only; omit it from printouts / PDFs. */
   @media print {
     .copy-for-ai {
       display: none;

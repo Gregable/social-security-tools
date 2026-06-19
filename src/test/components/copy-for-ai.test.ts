@@ -70,7 +70,8 @@ describe('localIsoDate', () => {
 
   it('reads the local calendar day, not the UTC day', () => {
     // Mirror the contract against the local getters. A toISOString()-based
-    // implementation would diverge from this in any non-UTC timezone.
+    // implementation would diverge from this in timezones east of UTC near
+    // local midnight, where the local day and the UTC day differ.
     const d = new Date(2026, 5, 18, 23, 30);
     const expected = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     expect(localIsoDate(d)).toBe(expected);
@@ -103,6 +104,13 @@ describe('buildCalculatorExport', () => {
       baseUrl: 'https://example.test/calculator',
     });
     expect(out).toContain('https://example.test/calculator');
+  });
+
+  it('uses the production calculator URL when no baseUrl is given', () => {
+    // The live button calls this with only generatedDate, so the default
+    // deep-link target must resolve to the production URL.
+    const out = buildCalculatorExport(eligibleRecipient(), null);
+    expect(out).toContain('https://ssa.tools/calculator');
   });
 
   it('is deterministic given the same inputs and options', () => {
