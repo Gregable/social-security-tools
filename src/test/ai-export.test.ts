@@ -3,8 +3,12 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCalculatorAiExport,
   buildCoupleCalculatorAiExport,
+  renderTable,
 } from '$lib/ai-export';
-import { benefitAtAge } from '$lib/benefit-calculator';
+import {
+  benefitAtAge,
+  eligibleForSpousalBenefit,
+} from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
@@ -68,6 +72,44 @@ function piaOnlyRecipient(): Recipient {
   return r;
 }
 
+/** Under 40 credits: not eligible, PIA is $0. */
+function ineligibleRecipient(): Recipient {
+  const r = new Recipient();
+  r.birthdate = Birthdate.FromYMD(1965, 8, 21);
+  r.earningsRecords = [
+    earningsRecord(2016, 50000),
+    earningsRecord(2017, 55000),
+    earningsRecord(2018, 60000),
+  ];
+  return r;
+}
+
+/** Under 40 earned credits now, but projected past 40 with future earnings. */
+function projectedEligibleRecipient(): Recipient {
+  const r = new Recipient();
+  r.birthdate = Birthdate.FromYMD(1990, 0, 1);
+  r.earningsRecords = [
+    earningsRecord(2022, 50000),
+    earningsRecord(2023, 55000),
+    earningsRecord(2024, 60000),
+  ];
+  r.simulateFutureEarningsYears(15, Money.from(60000));
+  return r;
+}
+
+/** A second high earner so that neither partner qualifies for a spousal top-up. */
+function nearEqualEarner(name: string): Recipient {
+  const r = new Recipient();
+  r.name = name;
+  r.birthdate = Birthdate.FromYMD(1966, 3, 5);
+  const records: EarningRecord[] = [];
+  for (let year = 1990; year <= 2024; year++) {
+    records.push(earningsRecord(year, 58000));
+  }
+  r.earningsRecords = records;
+  return r;
+}
+
 const ageOf = (years: number) =>
   MonthDuration.initFromYearsMonths({ years, months: 0 });
 
@@ -127,6 +169,28 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     expect(md).toContain('| Year | Taxed earnings | Credits | Cumulative |');
   });
 
+  it('flags a not-yet-eligible earner so the $0 PIA is explained', () => {
+    const r = ineligibleRecipient();
+    expect(r.pia().primaryInsuranceAmount().value()).toBe(0);
+    const md = buildCalculatorAiExport(r);
+    expect(md).toMatch(/NOT yet eligible/i);
+    expect(md).toMatch(/\$0 until 40 credits/);
+  });
+
+  it('notes projected eligibility with future earnings', () => {
+    const r = projectedEligibleRecipient();
+    // Self-verify the fixture sits in the middle branch.
+    expect(r.earnedCredits()).toBeLessThan(40);
+    expect(r.totalCredits()).toBeGreaterThanOrEqual(40);
+    expect(buildCalculatorAiExport(r)).toMatch(/projected to reach 40/i);
+  });
+
+  it('does not throw for a recipient with no earnings records', () => {
+    const r = new Recipient();
+    r.birthdate = Birthdate.FromYMD(1965, 8, 21);
+    expect(() => buildCalculatorAiExport(r)).not.toThrow();
+  });
+
   it('includes the indexed-earnings formula and the AIME averaging', () => {
     const r = eligibleRecipient();
     const md = buildCalculatorAiExport(r);
@@ -163,8 +227,12 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     const r = eligibleRecipient();
     const md = buildCalculatorAiExport(r);
     const benefitRows = md.match(/^\|\s*\d+y \d+m\s*\|\s*\$[\d,]+ \|$/gm) ?? [];
-    // Earliest filing (62y1m here) through 70y0m is ~96 months.
+    // Earliest filing (62y1m here) through 70y0m is ~96 months; bound both ends
+    // so a runaway loop past 70 would also fail.
     expect(benefitRows.length).toBeGreaterThan(90);
+    expect(benefitRows.length).toBeLessThan(110);
+    // The table ends exactly at age 70.
+    expect(benefitRows[benefitRows.length - 1]).toMatch(/\|\s*70y 0m\s*\|/);
     // Use ages that are in the table (it starts at the earliest filing month,
     // 62y1m for a birthday after the 2nd, not 62y0m).
     const ages = [
@@ -287,5 +355,92 @@ describe('buildCoupleCalculatorAiExport', () => {
     expect(md).toContain('https://ssa.tools/embed/filing-age-couple#');
     expect(md).toContain('name1=Alex');
     expect(md).toContain('name2=Jordan');
+  });
+
+  it('keeps the spousal fixture eligible (guards against silent drift)', () => {
+    // If the annual constants update ever flips this, the eligible-branch tests
+    // above would silently start exercising the wrong branch.
+    expect(eligibleForSpousalBenefit(lowerEarner(), eligibleRecipient())).toBe(
+      true
+    );
+  });
+
+  it('handles a couple where neither partner qualifies for a spousal top-up', () => {
+    const md = buildCoupleCalculatorAiExport(
+      eligibleRecipient('Alex'),
+      nearEqualEarner('Sam')
+    );
+    expect(md).toContain('## Spousal benefits');
+    expect(md).toMatch(/Neither partner qualifies/i);
+    expect(md).not.toContain('| Lower earner files at |');
+  });
+
+  it('handles a couple with a PIA-only partner without throwing', () => {
+    const build = () =>
+      buildCoupleCalculatorAiExport(
+        eligibleRecipient('Alex'),
+        piaOnlyRecipient()
+      );
+    expect(build).not.toThrow();
+    const md = build();
+    expect(md).toContain('## Spousal benefits');
+    expect(md).toContain('## Survivor benefits');
+  });
+
+  it('numerically anchors the survivor widow-limit (82.5% of PIA)', () => {
+    const higher = eligibleRecipient('Alex');
+    const md = buildCoupleCalculatorAiExport(higher, lowerEarner('Jordan'));
+    const widowLimit = higher
+      .pia()
+      .primaryInsuranceAmount()
+      .times(0.825)
+      .wholeDollars();
+    expect(md).toContain(widowLimit);
+  });
+
+  it('orders the spousal/survivor framing by PIA regardless of argument order', () => {
+    const region = (md: string) =>
+      md.slice(
+        md.indexOf('## Spousal benefits'),
+        md.indexOf('## Interactive charts')
+      );
+    const a = buildCoupleCalculatorAiExport(
+      eligibleRecipient('Alex'),
+      lowerEarner('Jordan')
+    );
+    const b = buildCoupleCalculatorAiExport(
+      lowerEarner('Jordan'),
+      eligibleRecipient('Alex')
+    );
+    expect(region(a)).toEqual(region(b));
+  });
+});
+
+describe('renderTable', () => {
+  it('pads every column to a consistent per-column width', () => {
+    const t = renderTable(
+      ['Year', 'Amount'],
+      [
+        ['2020', '$5'],
+        ['1999', '$1,234'],
+      ],
+      ['left', 'right']
+    );
+    const lines = t.split('\n');
+    const cols = (l: string) =>
+      l
+        .split('|')
+        .slice(1, -1)
+        .map((c) => c.length);
+    const header = cols(lines[0]);
+    for (const line of lines) {
+      expect(line.length).toBe(lines[0].length);
+      expect(cols(line)).toEqual(header);
+    }
+  });
+
+  it('does not throw on a single-character center column or empty rows', () => {
+    expect(() => renderTable(['X'], [['a'], ['b']], ['center'])).not.toThrow();
+    expect(() => renderTable(['A', 'B'], [], ['left', 'right'])).not.toThrow();
   });
 });

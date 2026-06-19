@@ -47,9 +47,9 @@ type Align = 'left' | 'right' | 'center';
 /**
  * Renders an aligned GitHub-flavored markdown table. Cells are padded to a
  * fixed column width so the table also lines up when read as plain monospace
- * text (e.g. before an AI renders the markdown).
+ * text (e.g. before an AI renders the markdown). Exported for unit testing.
  */
-function renderTable(
+export function renderTable(
   headers: string[],
   rows: string[][],
   aligns: Align[]
@@ -69,9 +69,13 @@ function renderTable(
   };
 
   const sepCell = (width: number, align: Align): string => {
-    if (align === 'right') return `${'-'.repeat(width - 1)}:`;
-    if (align === 'center') return `:${'-'.repeat(width - 2)}:`;
-    return '-'.repeat(width);
+    // Clamp the dash count so very narrow columns can't make repeat() throw.
+    if (align === 'right') return `${'-'.repeat(Math.max(1, width - 1))}:`;
+    if (align === 'center')
+      return width < 2
+        ? '-'.repeat(Math.max(1, width))
+        : `:${'-'.repeat(width - 2)}:`;
+    return '-'.repeat(Math.max(1, width));
   };
 
   const line = (cells: string[]): string => `| ${cells.join(' | ')} |`;
@@ -611,9 +615,11 @@ function survivorSection(higher: Recipient, lower: Recipient): string {
     `  actually receiving, INCLUDING any delayed retirement credits ${higherName}`,
     `  earned by waiting past FRA. So delaying the higher earner's own filing also`,
     '  raises the survivor benefit — often the most valuable reason to delay.',
-    `- If ${higherName} had instead claimed early, the survivor benefit is the`,
-    `  larger of that reduced benefit or 82.5% of ${higherName}'s PIA (the`,
-    `  "widow(er)'s limit"). For ${higherName}, 82.5% of PIA = ${higherPia.times(0.825).wholeDollars()}.`,
+    `- If ${higherName} had already filed at death, the survivor benefit is the`,
+    `  larger of ${higherName}'s own benefit or 82.5% of ${higherName}'s PIA (the`,
+    `  "widow(er)'s limit", or RIB-LIM). This 82.5% floor only matters when`,
+    `  ${higherName} had reduced their benefit by filing early. For ${higherName},`,
+    `  82.5% of PIA = ${higherPia.times(0.825).wholeDollars()}.`,
     `- Survivor benefits use a separate survivor full retirement age`,
     `  (${lowerName}'s is ${survivorFra.toFullAgeString()}), which can be earlier than the`,
     '  retirement FRA. Claiming before it reduces the benefit proportionally, down',
