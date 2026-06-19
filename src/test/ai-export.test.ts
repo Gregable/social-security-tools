@@ -4,6 +4,7 @@ import {
   buildCalculatorAiExport,
   buildCoupleCalculatorAiExport,
   renderTable,
+  wrapText,
 } from '$lib/ai-export';
 import {
   benefitAtAge,
@@ -255,14 +256,76 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     }
   });
 
+  it('opens with an "About this summary" intro that orients the AI', () => {
+    const md = buildCalculatorAiExport(eligibleRecipient());
+    const idx = (s: string) => md.indexOf(s);
+    expect(md).toContain('## About this summary');
+    // The intro tells the AI how to use the document. Normalize whitespace so
+    // the assertion isn't coupled to where the prose hard-wraps.
+    const flat = md.replace(/\s+/g, ' ');
+    expect(flat).toMatch(/show your work/i);
+    expect(flat).toMatch(/link to or embed/i);
+    // It comes first, before the inputs and the computed sections.
+    expect(idx('## About this summary')).toBeGreaterThan(-1);
+    expect(idx('## About this summary')).toBeLessThan(idx('## Inputs'));
+  });
+
+  it('describes what each interactive chart shows', () => {
+    const md = buildCalculatorAiExport(eligibleRecipient());
+    expect(md).toContain('## Interactive charts');
+    // Normalize whitespace so prose assertions don't depend on wrap positions.
+    const flat = md.replace(/\s+/g, ' ');
+    // The reframed intro recommends embedding.
+    expect(flat).toMatch(/link to or embed/i);
+    // A "what it shows" line for each of the three single-recipient charts.
+    expect(flat).toContain('every filing age from 62 to 70');
+    expect(flat).toMatch(/wage-index/i);
+    expect(flat).toContain('90% / 32% / 15%');
+  });
+
   it('includes embeddable chart links (with the name) and iframe snippets', () => {
     const md = buildCalculatorAiExport(eligibleRecipient());
-    expect(md).toContain('## Interactive charts (embeddable)');
+    expect(md).toContain('## Interactive charts');
     expect(md).toContain('https://ssa.tools/embed/filing-age#pia1=');
     expect(md).toContain('name1=Alex');
     expect(md).toContain('https://ssa.tools/embed/indexed-earnings#earnings1=');
     expect(md).toContain('https://ssa.tools/embed/bend-points#earnings1=');
     expect(md).toMatch(/<iframe src="https:\/\/ssa\.tools\/embed\/filing-age/);
+  });
+
+  it('links to the strategy optimizer, pre-filled with the recipient', () => {
+    const md = buildCalculatorAiExport(eligibleRecipient());
+    expect(md).toContain('## Find the optimal filing age');
+    expect(md).toContain('https://ssa.tools/strategy#');
+    const strategyLink =
+      md.match(/https:\/\/ssa\.tools\/strategy#\S+/)?.[0] ?? '';
+    expect(strategyLink).toMatch(/pia1=\d+/);
+    expect(strategyLink).toContain('dob1=1965-09-21');
+  });
+
+  it('derives the strategy link from a custom baseUrl', () => {
+    const md = buildCalculatorAiExport(eligibleRecipient(), {
+      baseUrl: 'https://example.test/calculator',
+    });
+    expect(md).toContain('https://example.test/strategy#');
+  });
+
+  it('derives a /strategy base even when baseUrl has no /calculator suffix', () => {
+    const md = buildCalculatorAiExport(eligibleRecipient(), {
+      baseUrl: 'https://example.test',
+    });
+    expect(md).toContain('https://example.test/strategy#');
+  });
+
+  it('refers to an unnamed recipient as "this person" in the intro', () => {
+    // piaOnlyRecipient sets no name; the intro must not emit an empty
+    // possessive or leak the internal "Self"/"Spouse" sentinels.
+    const flat = buildCalculatorAiExport(piaOnlyRecipient()).replace(
+      /\s+/g,
+      ' '
+    );
+    expect(flat).toContain("this person's Social");
+    expect(flat).not.toMatch(/\bSelf\b|\bSpouse\b/);
   });
 
   it('includes a /calculator deep link with ISO dob and name', () => {
@@ -357,6 +420,33 @@ describe('buildCoupleCalculatorAiExport', () => {
     expect(md).toContain('name2=Jordan');
   });
 
+  it('opens with an About intro and describes the couple chart', () => {
+    const md = buildCoupleCalculatorAiExport(
+      eligibleRecipient('Alex'),
+      lowerEarner('Jordan')
+    );
+    expect(md).toContain('## About this summary');
+    // Normalize whitespace so prose assertions don't depend on wrap positions.
+    const flat = md.replace(/\s+/g, ' ');
+    // Couple intro names both partners and mentions spousal/survivor coverage.
+    expect(flat).toMatch(/Alex and Jordan/);
+    expect(flat).toMatch(/spousal and survivor/i);
+    // The couple chart gets its own "what it shows" description.
+    expect(flat).toContain('combined monthly benefit');
+  });
+
+  it('links to the couple strategy optimizer with both partners', () => {
+    const md = buildCoupleCalculatorAiExport(
+      eligibleRecipient('Alex'),
+      lowerEarner('Jordan')
+    );
+    expect(md).toContain('## Find the optimal filing age');
+    const strategyLink =
+      md.match(/https:\/\/ssa\.tools\/strategy#\S+/)?.[0] ?? '';
+    expect(strategyLink).toMatch(/pia1=\d+/);
+    expect(strategyLink).toMatch(/pia2=\d+/);
+  });
+
   it('keeps the spousal fixture eligible (guards against silent drift)', () => {
     // If the annual constants update ever flips this, the eligible-branch tests
     // above would silently start exercising the wrong branch.
@@ -442,5 +532,29 @@ describe('renderTable', () => {
   it('does not throw on a single-character center column or empty rows', () => {
     expect(() => renderTable(['X'], [['a'], ['b']], ['center'])).not.toThrow();
     expect(() => renderTable(['A', 'B'], [], ['left', 'right'])).not.toThrow();
+  });
+});
+
+describe('wrapText', () => {
+  it('wraps prose to the given column width on word boundaries', () => {
+    const wrapped = wrapText('one two three four five', 9);
+    for (const line of wrapped.split('\n')) {
+      expect(line.length).toBeLessThanOrEqual(9);
+    }
+    // No content is lost or reordered.
+    expect(wrapped.replace(/\s+/g, ' ')).toBe('one two three four five');
+  });
+
+  it('emits a word longer than the width whole on its own line', () => {
+    const longWord = 'x'.repeat(40);
+    expect(wrapText(`a ${longWord} b`, 10).split('\n')).toContain(longWord);
+  });
+
+  it('collapses runs of whitespace to a single space', () => {
+    expect(wrapText('a    b', 80)).toBe('a b');
+  });
+
+  it('returns an empty string for empty input', () => {
+    expect(wrapText('', 80)).toBe('');
   });
 });
