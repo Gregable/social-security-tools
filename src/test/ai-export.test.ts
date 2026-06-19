@@ -4,6 +4,7 @@ import {
   buildCalculatorAiExport,
   buildCoupleCalculatorAiExport,
   renderTable,
+  wrapText,
 } from '$lib/ai-export';
 import {
   benefitAtAge,
@@ -309,6 +310,24 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     expect(md).toContain('https://example.test/strategy#');
   });
 
+  it('derives a /strategy base even when baseUrl has no /calculator suffix', () => {
+    const md = buildCalculatorAiExport(eligibleRecipient(), {
+      baseUrl: 'https://example.test',
+    });
+    expect(md).toContain('https://example.test/strategy#');
+  });
+
+  it('refers to an unnamed recipient as "this person" in the intro', () => {
+    // piaOnlyRecipient sets no name; the intro must not emit an empty
+    // possessive or leak the internal "Self"/"Spouse" sentinels.
+    const flat = buildCalculatorAiExport(piaOnlyRecipient()).replace(
+      /\s+/g,
+      ' '
+    );
+    expect(flat).toContain("this person's Social");
+    expect(flat).not.toMatch(/\bSelf\b|\bSpouse\b/);
+  });
+
   it('includes a /calculator deep link with ISO dob and name', () => {
     const md = buildCalculatorAiExport(eligibleRecipient());
     expect(md).toContain('https://ssa.tools/calculator#');
@@ -513,5 +532,29 @@ describe('renderTable', () => {
   it('does not throw on a single-character center column or empty rows', () => {
     expect(() => renderTable(['X'], [['a'], ['b']], ['center'])).not.toThrow();
     expect(() => renderTable(['A', 'B'], [], ['left', 'right'])).not.toThrow();
+  });
+});
+
+describe('wrapText', () => {
+  it('wraps prose to the given column width on word boundaries', () => {
+    const wrapped = wrapText('one two three four five', 9);
+    for (const line of wrapped.split('\n')) {
+      expect(line.length).toBeLessThanOrEqual(9);
+    }
+    // No content is lost or reordered.
+    expect(wrapped.replace(/\s+/g, ' ')).toBe('one two three four five');
+  });
+
+  it('emits a word longer than the width whole on its own line', () => {
+    const longWord = 'x'.repeat(40);
+    expect(wrapText(`a ${longWord} b`, 10).split('\n')).toContain(longWord);
+  });
+
+  it('collapses runs of whitespace to a single space', () => {
+    expect(wrapText('a    b', 80)).toBe('a b');
+  });
+
+  it('returns an empty string for empty input', () => {
+    expect(wrapText('', 80)).toBe('');
   });
 });

@@ -383,11 +383,15 @@ function recipientStrategyLink(recipient: Recipient, baseUrl: string): string {
   return `${strategyBase(baseUrl)}${recipientLinkHash(recipient)}`;
 }
 
-/** Greedily word-wraps prose to `width` columns for monospace readability. */
-function wrapText(text: string, width = 76): string {
+/**
+ * Greedily word-wraps prose to `width` columns for monospace readability.
+ * Runs of whitespace collapse to a single space; a word longer than `width`
+ * is emitted whole on its own line (never broken). Exported for unit testing.
+ */
+export function wrapText(text: string, width = 76): string {
   const lines: string[] = [];
   let current = '';
-  for (const word of text.split(' ')) {
+  for (const word of text.split(/ +/).filter((w) => w !== '')) {
     if (current === '') current = word;
     else if (current.length + 1 + word.length <= width) current += ` ${word}`;
     else {
@@ -401,7 +405,7 @@ function wrapText(text: string, width = 76): string {
 
 /**
  * Points the AI at the filing-strategy optimizer, pre-filled with this person's
- * (or couple's) data. `subject` is the possessive-ready name phrase.
+ * (or couple's) data. `subject` is a name phrase callers suffix with "'s".
  */
 function strategySection(url: string, subject: string): string {
   const prose =
@@ -429,7 +433,7 @@ function deepLinkSection(url: string): string {
   ].join('\n');
 }
 
-/** The recipient's display name in possessive-ready form, or "this person". */
+/** A name phrase callers can suffix with "'s": the display name, or "this person". */
 function subjectName(recipient: Recipient): string {
   const name = recipient.name;
   return name && name !== 'Self' && name !== 'Spouse' ? name : 'this person';
@@ -478,7 +482,7 @@ function earningsParam(recipient: Recipient): string {
     .join(',');
 }
 
-/** One-line "what it shows" descriptions for each embeddable chart. */
+/** Short "what it shows" blurb per embeddable chart (wrapped by wrapText at render). */
 const CHART_DESCRIPTIONS = {
   filingAge:
     'Shows the monthly benefit for every filing age from 62 to 70, making the early-filing reduction and delayed-retirement increase visible at a glance.',
