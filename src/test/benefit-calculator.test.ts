@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   allBenefitsOnDate,
   allBenefitsOnDateNominal,
+  baseSpousalBenefit,
   benefitOnDate,
   benefitOnDateNominal,
+  eligibleForSpousalBenefit,
   spousalBenefitOnDate,
 } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
@@ -271,5 +273,38 @@ describe('allBenefitsOnDateNominal (spousal)', () => {
     ).value();
     expect(today).toBeGreaterThan(0);
     expect(nominal).toBeLessThan(today);
+  });
+});
+
+describe('baseSpousalBenefit', () => {
+  function piaOnly(pia: number): Recipient {
+    const r = new Recipient();
+    r.birthdate = Birthdate.FromYMD(1960, 0, 1);
+    r.setPia(Money.from(pia));
+    return r;
+  }
+
+  it('is 50% of the higher PIA minus the lower PIA when eligible', () => {
+    // 50% of $2,000 = $1,000; minus $400 = $600.
+    expect(baseSpousalBenefit(piaOnly(2000), piaOnly(400)).wholeDollars()).toBe(
+      '$600'
+    );
+  });
+
+  it('floors at $0 when half the higher PIA does not exceed the lower PIA', () => {
+    expect(baseSpousalBenefit(piaOnly(2000), piaOnly(1000)).value()).toBe(0);
+    expect(baseSpousalBenefit(piaOnly(2000), piaOnly(1500)).value()).toBe(0);
+  });
+
+  it('is positive exactly when eligibleForSpousalBenefit is true', () => {
+    const higher = piaOnly(2000);
+    const eligibleLower = piaOnly(400);
+    const ineligibleLower = piaOnly(1200);
+    expect(baseSpousalBenefit(higher, eligibleLower).value()).toBeGreaterThan(
+      0
+    );
+    expect(eligibleForSpousalBenefit(eligibleLower, higher)).toBe(true);
+    expect(baseSpousalBenefit(higher, ineligibleLower).value()).toBe(0);
+    expect(eligibleForSpousalBenefit(ineligibleLower, higher)).toBe(false);
   });
 });
