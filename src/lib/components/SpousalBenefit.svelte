@@ -1,5 +1,8 @@
 <script lang="ts">
-import { higherEarningsThan } from '$lib/benefit-calculator';
+import {
+  baseSpousalBenefit,
+  higherEarningsThan,
+} from '$lib/benefit-calculator';
 import HorizCurlyImg from '$lib/images/horiz-curly.png';
 import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
@@ -16,17 +19,8 @@ let lowerEarner: Recipient;
 $: higherEarner = higherEarningsThan($recipient, $spouse) ? $recipient : $spouse;
 $: lowerEarner = higherEarningsThan($recipient, $spouse) ? $spouse : $recipient;
 
-function spousalBenefitCalc(higher: Recipient, lower: Recipient): Money {
-  let maxSpousal = higher.pia().primaryInsuranceAmount().div(2);
-  let spousal = maxSpousal.sub(lower.pia().primaryInsuranceAmount());
-  if (spousal.value() > 0) {
-    return spousal;
-  } else {
-    return Money.from(0);
-  }
-}
 let spousalBenefit: Money = Money.from(0);
-$: spousalBenefit = spousalBenefitCalc(higherEarner, lowerEarner);
+$: spousalBenefit = baseSpousalBenefit(higherEarner, lowerEarner);
 
 /**
  * Returns the personal benefit as a percentage of personal + spousal

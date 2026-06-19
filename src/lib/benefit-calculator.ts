@@ -235,16 +235,32 @@ export function higherEarningsThan(a: Recipient, b: Recipient): boolean {
 }
 
 /**
+ * The base (unreduced) spousal benefit at normal retirement age: 50% of the
+ * higher earner's PIA minus the lower earner's own PIA, floored at $0. This is
+ * the spousal top-up before any early-filing reduction. A lower earner is
+ * eligible for a spousal benefit exactly when this is positive.
+ *
+ * @param higher - The higher earner (whose PIA the spousal benefit is based on)
+ * @param lower - The potential spousal claimant
+ */
+export function baseSpousalBenefit(higher: Recipient, lower: Recipient): Money {
+  const spousal = higher
+    .pia()
+    .primaryInsuranceAmount()
+    .div(2)
+    .sub(lower.pia().primaryInsuranceAmount());
+  return spousal.value() > 0 ? spousal : Money.from(0);
+}
+
+/**
  * Returns true if recipient is eligible for spousal benefits from spouse.
  */
 export function eligibleForSpousalBenefit(
   recipient: Recipient,
   spouse: Recipient
 ): boolean {
-  const piaAmount: Money = recipient.pia().primaryInsuranceAmount();
-  const spousePiaAmount: Money = spouse.pia().primaryInsuranceAmount();
-
-  return spousePiaAmount.div(2).greaterThan(piaAmount);
+  // recipient is the potential claimant; spouse is the higher earner.
+  return baseSpousalBenefit(spouse, recipient).value() > 0;
 }
 
 /**
