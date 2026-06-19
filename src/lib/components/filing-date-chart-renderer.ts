@@ -335,19 +335,24 @@ export function renderBenefit(
 }
 
 /**
- * Renders a vertical dashed line at a mouse position with a date label.
+ * Renders a vertical dashed line at the selected date with a month/year label.
+ *
+ * The selected date is passed as a MonthDate (not a pixel) so the line and its
+ * label land on the same month regardless of the current canvas width. The
+ * pixel position is recomputed here via canvasX for whatever width is in
+ * effect, which keeps screen and print output consistent. See issue #561.
  */
 export function renderSelectedDateVerticalLine(
   ctx: CanvasRenderingContext2D,
-  mouseX: number,
+  date: MonthDate,
   recipient: Recipient,
   layout: ChartLayout
 ): void {
-  if (mouseX <= 0 || mouseX >= layout.canvasWidth) return;
+  const x = canvasX(date, recipient.birthdate, layout);
+  if (x < layout.reservedLeft || x >= layout.canvasWidth) return;
 
   ctx.save();
 
-  const date = dateX(mouseX, recipient.birthdate, layout);
   const text = `${date.monthName()} ${date.year()}`;
   const textWidth = ctx.measureText(text).width;
   // This seems to position the year to line up with the vertical year lines.
@@ -362,11 +367,11 @@ export function renderSelectedDateVerticalLine(
 
   // Draw vertical line.
   ctx.beginPath();
-  ctx.moveTo(mouseX, 0);
-  ctx.lineTo(mouseX, layout.canvasHeight);
+  ctx.moveTo(x, 0);
+  ctx.lineTo(x, layout.canvasHeight);
   ctx.stroke();
   ctx.save();
-  ctx.translate(mouseX + 5, xpos);
+  ctx.translate(x + 5, xpos);
   ctx.rotate((-90 * Math.PI) / 180);
   ctx.fillStyle = '#337ab7';
   renderTextInWhiteBox(ctx, text, 0, 0);

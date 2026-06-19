@@ -145,15 +145,25 @@ function removeMediaQueryListener() {
 }
 
 let mouseToggle_: boolean = true;
-let lastMouseX_: number = -1;
-let lastMouseDate_: MonthDate = new MonthDate(0);
+// The "Explore Filing Dates" selection is persisted as a date (or null when
+// nothing is hovered), NOT as a pixel. The pixel is recomputed from this date
+// at render time for whatever canvas width is in effect, so the drop-line and
+// its label stay on the same month across screen and print, even though the
+// @media print block resizes the canvas. See issue #561.
+let selectedDate_: MonthDate | null = null;
+
+function eventDate(event: MouseEvent): MonthDate {
+  const mouseX = event.clientX - canvasEl_.getBoundingClientRect().left;
+  return dateX(mouseX, recipient.birthdate, layout());
+}
+
 function onClick(event: MouseEvent) {
   if (!canvasEl_) return;
   if (mouseToggle_) {
     mouseToggle_ = false;
   } else {
     mouseToggle_ = true;
-    lastMouseX_ = event.clientX - canvasEl_.getBoundingClientRect().left;
+    selectedDate_ = eventDate(event);
   }
   render();
 }
@@ -161,25 +171,27 @@ function onClick(event: MouseEvent) {
 function onMove(event: MouseEvent) {
   if (!mouseToggle_) return;
   if (!canvasEl_) return;
-  lastMouseX_ = event.clientX - canvasEl_.getBoundingClientRect().left;
+  const mouseDate = eventDate(event);
   // Avoid redrawing if the mouse hasn't moved to a new month.
-  const mouseDate = dateX(lastMouseX_, recipient.birthdate, layout());
-  if (mouseDate.monthsSinceEpoch() === lastMouseDate_.monthsSinceEpoch())
+  if (
+    selectedDate_ !== null &&
+    mouseDate.monthsSinceEpoch() === selectedDate_.monthsSinceEpoch()
+  )
     return;
-  lastMouseDate_ = mouseDate;
+  selectedDate_ = mouseDate;
 
   render();
 }
 
 function onOut(_event: MouseEvent) {
   if (!mouseToggle_) return;
-  lastMouseX_ = -1;
+  selectedDate_ = null;
   render();
 }
 
 function onBlur(_event: FocusEvent) {
   if (!mouseToggle_) return;
-  lastMouseX_ = -1;
+  selectedDate_ = null;
   render();
 }
 
@@ -253,8 +265,8 @@ function render() {
   renderHorizontalLines(ctx_, recipient, l);
   renderBenefit(ctx_, recipient, userSelectedDate(), userFloor_, l);
 
-  if (lastMouseX_ > 0) {
-    renderSelectedDateVerticalLine(ctx_, lastMouseX_, recipient, l);
+  if (selectedDate_ !== null) {
+    renderSelectedDateVerticalLine(ctx_, selectedDate_, recipient, l);
   }
 
   ctx_.restore();
@@ -328,23 +340,23 @@ $: filingDateString_ = updateFilingDateString(
     style:--selected-date-border-color={blueish_}
     style:--selected-date-text-color={blueish_}
     style:--filing-date-text-color={recipient.colors().dark}
-    class:hidden={lastMouseX_ <= 0}
+    class:hidden={selectedDate_ === null}
   >
-    {#if lastMouseX_ > 0}
+    {#if selectedDate_ !== null}
       If filing for benefits in <span class="filingDate"
         >{filingDateString_}</span
       >,
       <br />
       In
       <span class="selectedDate"
-        >{dateX(lastMouseX_, recipient.birthdate, layout()).monthName()}
-        {dateX(lastMouseX_, recipient.birthdate, layout()).year()}</span
+        >{selectedDate_.monthName()}
+        {selectedDate_.year()}</span
       >, <RecipientName r={recipient} apos noColor={true} shortenTo={30}
         >your</RecipientName
       > benefit will be:
 
       <b>
-        {benefitOnDateNominal($recipient, userSelectedDate(), dateX(lastMouseX_, recipient.birthdate, layout()))
+        {benefitOnDateNominal($recipient, userSelectedDate(), selectedDate_)
           .wholeDollars()}</b
       >
     {:else}
