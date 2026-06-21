@@ -151,6 +151,41 @@ describe('recommendedFromDistributions', () => {
     const got = recommendedFromDistributions(r1, r2, dist1, null, FAR_PAST, 0);
     expect(got).toBeNull();
   });
+
+  it('single: returns null when the distribution is empty', () => {
+    const r = makeRecipient(1500, 1960);
+    const got = recommendedFromDistributions(r, null, [], null, FAR_PAST, 0);
+    expect(got).toBeNull();
+  });
+
+  it('defaults the discount rate to DEFAULT_DISCOUNT_RATE when omitted', () => {
+    const r = makeRecipient(1500, 1960);
+    const dist: DeathProbability[] = [
+      { age: 80, probability: 0.5 },
+      { age: 90, probability: 0.5 },
+    ];
+
+    const withDefault = recommendedFromDistributions(
+      r,
+      null,
+      dist,
+      null,
+      FAR_PAST
+    );
+    const withExplicit = recommendedFromDistributions(
+      r,
+      null,
+      dist,
+      null,
+      FAR_PAST,
+      DEFAULT_DISCOUNT_RATE
+    );
+
+    expect(withDefault).not.toBeNull();
+    expect(withDefault!.single!.expectedNPVCents).toBe(
+      withExplicit!.single!.expectedNPVCents
+    );
+  });
 });
 
 describe('buildStrategyUrl', () => {

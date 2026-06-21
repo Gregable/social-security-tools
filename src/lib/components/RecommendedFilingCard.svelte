@@ -20,16 +20,19 @@
   let dist2: DeathProbability[] | null = null;
   let result: RecommendedFiling | null = null;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-  // Key the loaded distributions to gender+birthYear so that PIA changes
-  // (earnings sliders) do not trigger a life-table refetch.
+  // Key the loaded distributions to the inputs that actually affect mortality
+  // (gender, birth year, health multiplier) so that PIA changes (earnings
+  // sliders) do not trigger a life-table refetch. healthMultiplier is keyed for
+  // correctness even though the calculator does not currently expose it.
   let distKey = "";
 
   function mortalityKey(r: Recipient): string {
-    return `${r.gender}:${r.birthdate.layBirthYear()}`;
+    return `${r.gender}:${r.birthdate.layBirthYear()}:${r.healthMultiplier}`;
   }
 
-  // Recipient/spouse are store-backed object props; Svelte re-runs these
-  // reactive blocks on every store notification.
+  // Recipient/spouse implement the Svelte store contract; the parent re-passes
+  // them on each store update, which invalidates these reactive blocks (e.g. on
+  // a PIA, gender, or health change).
   $: void maybeLoadDistributions(recipient, spouse);
   $: scheduleRecompute(recipient, spouse, dist1, dist2);
   $: strategyUrl = buildStrategyUrl(recipient, spouse);
@@ -43,12 +46,16 @@
     distKey = key;
     try {
       const loaded = await loadDeathDistributions(r, s);
+      // A newer load may have started while this one was in flight; if so, let
+      // the latest win rather than applying out-of-order (stale) data.
+      if (distKey !== key) return;
       dist1 = loaded.dist1;
       dist2 = loaded.dist2;
     } catch (e) {
+      if (distKey !== key) return;
       console.warn("RecommendedFilingCard: failed to load mortality data", e);
-      // Reset the key so an identical recipient retries on the next update,
-      // rather than staying blank after a transient load failure.
+      // Reset the key so the next store update retries the fetch rather than
+      // treating the failed state as current.
       distKey = "";
       dist1 = null;
       dist2 = null;
@@ -64,8 +71,10 @@
   ): void {
     // _r/_s are unused by name: they only register recipient/spouse as reactive
     // dependencies so this block re-runs on store updates (e.g. PIA changes).
-    // The debounced callback intentionally reads the latest module-level
-    // recipient/spouse when it fires, not these scheduled-time values.
+    // The debounced callback intentionally reads the latest component-scope
+    // recipient/spouse when it fires, not these scheduled-time values. d1/d2 are
+    // safe to close over: they are keyed to recipient identity via distKey and
+    // are stable across the PIA changes that trigger a recompute.
     if (!d1) return;
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -79,7 +88,9 @@
           currentMonthDate()
         );
       } catch (e) {
-        console.warn("RecommendedFilingCard: compute failed", e);
+        // The optimizer returns an empty array for edge cases rather than
+        // throwing, so a throw here signals a real bug, not expected input.
+        console.error("RecommendedFilingCard: compute failed", e);
         result = null;
       }
     }, RECOMPUTE_DEBOUNCE_MS);

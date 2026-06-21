@@ -31,8 +31,9 @@ export function currentMonthDate(now: Date = new Date()): MonthDate {
 
 /**
  * Loads mortality (death-probability) distributions for the recipient and, if
- * present, the spouse. Depends only on birth year + gender, so callers can load
- * once and reuse across PIA changes.
+ * present, the spouse. The result depends on birth year, gender, and health
+ * multiplier (not PIA), so callers can cache it and skip reloading when only
+ * PIA changes.
  */
 export async function loadDeathDistributions(
   recipient: Recipient,
