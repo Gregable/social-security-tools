@@ -14,9 +14,16 @@
     singleResult?: FilingAgeResult;
     coupleResult?: CoupleFilingAgeResult;
     recipients: [Recipient, Recipient];
+    showInfoTip?: boolean;
   }
 
-  let { isSingle, singleResult, coupleResult, recipients }: Props = $props();
+  let {
+    isSingle,
+    singleResult,
+    coupleResult,
+    recipients,
+    showInfoTip = true,
+  }: Props = $props();
 
   function formatAge(age: MonthDuration): string {
     return age.toFullAgeString();
@@ -125,12 +132,14 @@
             {formatMoney(coupleResult.expectedNPVCents)}
           {/if}
         </strong>
-        <InfoTip label="About expected NPV">
-          The recommended strategy's expected lifetime benefits, weighted by
-          each person's survival probability at every age and discounted to
-          today's dollars at the rate set above. It updates as you tune
-          health and discount rate.
-        </InfoTip>
+        {#if showInfoTip}
+          <InfoTip label="About expected NPV">
+            The recommended strategy's expected lifetime benefits, weighted by
+            each person's survival probability at every age and discounted to
+            today's dollars at the rate set above. It updates as you tune
+            health and discount rate.
+          </InfoTip>
+        {/if}
       </div>
       <p class="explanation">
         {#if isSingle}
@@ -141,6 +150,10 @@
           Maximizes your expected combined lifetime benefits, weighted by
           each person's probability of surviving to each age and adjusted for
           the discount rate.
+        {/if}
+        {#if !showInfoTip}
+          Based on default assumptions — a 2.5% discount rate and blended life
+          expectancy. Open the optimizer to adjust.
         {/if}
       </p>
     </div>
