@@ -35,7 +35,7 @@
     type FilingAgeResult,
     type CoupleFilingAgeResult,
   } from "$lib/strategy/calculations/expected-npv";
-  import OptimalStrategyHeadline from "./components/OptimalStrategyHeadline.svelte";
+  import OptimalStrategyHeadline from "$lib/components/OptimalStrategyHeadline.svelte";
   import SupportPrompt from "$lib/components/SupportPrompt.svelte";
   import {
     WebApplicationSchema,
