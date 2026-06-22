@@ -63,6 +63,29 @@
     }
   }
 
+  function compute(
+    d1: DeathProbability[],
+    d2: DeathProbability[] | null
+  ): void {
+    try {
+      // Reads the latest component-scope recipient/spouse. d1/d2 are passed in:
+      // they are keyed to recipient identity via distKey and stay valid across
+      // the PIA changes that trigger a recompute.
+      result = recommendedFromDistributions(
+        recipient,
+        spouse,
+        d1,
+        d2,
+        currentMonthDate()
+      );
+    } catch (e) {
+      // The optimizer returns an empty array for edge cases rather than
+      // throwing, so a throw here signals a real bug, not expected input.
+      console.error("RecommendedFilingCard: compute failed", e);
+      result = null;
+    }
+  }
+
   function scheduleRecompute(
     _r: Recipient,
     _s: Recipient | null,
@@ -71,28 +94,22 @@
   ): void {
     // _r/_s are unused by name: they only register recipient/spouse as reactive
     // dependencies so this block re-runs on store updates (e.g. PIA changes).
-    // The debounced callback intentionally reads the latest component-scope
-    // recipient/spouse when it fires, not these scheduled-time values. d1/d2 are
-    // safe to close over: they are keyed to recipient identity via distKey and
-    // are stable across the PIA changes that trigger a recompute.
     if (!d1) return;
-    if (debounceTimer) clearTimeout(debounceTimer);
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
+    // Compute the first result immediately so the card appears as soon as the
+    // distributions load (also makes it deterministic for Chromatic, which
+    // would otherwise snapshot before the debounce fires). Debounce only
+    // subsequent recomputes so rapid PIA edits don't thrash the optimizer.
+    if (result === null) {
+      compute(d1, d2);
+      return;
+    }
     debounceTimer = setTimeout(() => {
       debounceTimer = null;
-      try {
-        result = recommendedFromDistributions(
-          recipient,
-          spouse,
-          d1,
-          d2,
-          currentMonthDate()
-        );
-      } catch (e) {
-        // The optimizer returns an empty array for edge cases rather than
-        // throwing, so a throw here signals a real bug, not expected input.
-        console.error("RecommendedFilingCard: compute failed", e);
-        result = null;
-      }
+      compute(d1, d2);
     }, RECOMPUTE_DEBOUNCE_MS);
   }
 

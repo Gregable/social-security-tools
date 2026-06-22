@@ -12,7 +12,7 @@ const r = new Recipient();
 r.name = 'Alex';
 r.markFirst();
 r.earningsRecords = parsePaste(demo);
-r.birthdate = Birthdate.FromYMD(1950, 6, 1);
+r.birthdate = Birthdate.FromYMD(1962, 6, 1);
 recipient.set(r);
 
 // This data is such that the spouse has a low enough PIA that they can claim
@@ -21,7 +21,7 @@ const spouseLowEarner = new Recipient();
 spouseLowEarner.name = 'Chris';
 spouseLowEarner.markSecond();
 spouseLowEarner.earningsRecords = parsePaste(demo_spouse_low);
-spouseLowEarner.birthdate = Birthdate.FromYMD(1950, 6, 1);
+spouseLowEarner.birthdate = Birthdate.FromYMD(1962, 6, 1);
 spouse.set(spouseLowEarner);
 
 const meta: Meta<App> = {
