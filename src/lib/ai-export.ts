@@ -13,6 +13,7 @@ import {
   MAX_COLA_YEAR,
   MAX_WAGE_INDEX_YEAR,
 } from '$lib/constants';
+import type { EarningRecord } from '$lib/earning-record';
 import { MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { buildStrategyHash, type Gender } from '$lib/url-params';
@@ -116,6 +117,23 @@ function nameParam(name: string, defaultName: string): string | undefined {
 // Per-recipient sections (reused by the single and couple exports)
 // ---------------------------------------------------------------------------
 
+/**
+ * All earnings the AIME is computed from, in year order: the recorded
+ * (historical) years plus any estimated future years the user added. The AIME
+ * total blends both (EarningsManager concatenates them before taking the top
+ * 35), so every table derived from the earnings history must show both — or the
+ * printed rows can't account for the printed AIME. Future years always fall
+ * after historical ones; the sort is defensive.
+ */
+function allEarningsRecords(
+  recipient: Recipient
+): ReadonlyArray<EarningRecord> {
+  return [
+    ...recipient.earningsRecords,
+    ...recipient.futureEarningsRecords,
+  ].sort((a, b) => a.year - b.year);
+}
+
 /** Eligibility: 40 work credits, with a year-by-year breakdown until reached. */
 function eligibilitySection(recipient: Recipient): string {
   const lines = [
@@ -141,7 +159,7 @@ function eligibilitySection(recipient: Recipient): string {
   // for eligibility).
   const rows: string[][] = [];
   let cumulative = 0;
-  for (const record of recipient.earningsRecords) {
+  for (const record of allEarningsRecords(recipient)) {
     if (cumulative >= 40) break;
     cumulative = Math.min(40, cumulative + record.credits());
     rows.push([
@@ -187,7 +205,7 @@ function aimeSection(recipient: Recipient): string {
     '',
   ];
 
-  const rows = recipient.earningsRecords.map((record) => [
+  const rows = allEarningsRecords(recipient).map((record) => [
     String(record.year),
     record.taxedEarnings.wholeDollars(),
     record.indexFactor().toFixed(4),
@@ -477,7 +495,7 @@ const EMBED_BASE = 'https://ssa.tools/embed';
 
 /** Encodes a recipient's earnings history as the `earnings1` URL parameter. */
 function earningsParam(recipient: Recipient): string {
-  return recipient.earningsRecords
+  return allEarningsRecords(recipient)
     .map((r) => `${r.year}:${Math.round(r.taxedEarnings.value())}`)
     .join(',');
 }
