@@ -205,6 +205,37 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     expect(md).toContain(r.monthlyIndexedEarnings().wholeDollars());
   });
 
+  it('lists estimated future-earnings years in the AIME table (issue #553)', () => {
+    // Regression: estimated (future) earnings feed the AIME total but were
+    // omitted from the indexed-earnings table, so the visible rows could not
+    // account for the printed AIME. The table must show every year the AIME
+    // is computed from, historical and estimated alike.
+    const r = eligibleRecipient(); // 1990-2024 historical
+    r.simulateFutureEarningsYears(3, Money.from(70000));
+    const futureYears = r.futureEarningsRecords.map((rec) => rec.year);
+    expect(futureYears.length).toBe(3); // fixture self-check
+    expect(Math.min(...futureYears)).toBeGreaterThan(2024);
+
+    const md = buildCalculatorAiExport(r);
+    // Isolate the AIME section so we don't match the eligibility credit table,
+    // which shares the leading "| Year | Taxed earnings |" columns.
+    const aime = md.slice(
+      md.indexOf('## Average Indexed Monthly Earnings'),
+      md.indexOf('## Primary Insurance Amount')
+    );
+    const rows = tableLines(aime, '| Year | Taxed earnings | Index factor');
+    const dataRows = rows.slice(2); // drop header + separator
+    const yearCells = dataRows.map((row) => row.split('|')[1].trim());
+
+    // One row per combined earnings year, and every estimated year present.
+    expect(dataRows.length).toBe(
+      r.earningsRecords.length + r.futureEarningsRecords.length
+    );
+    for (const year of futureYears) {
+      expect(yearCells).toContain(String(year));
+    }
+  });
+
   it('includes the worked PIA bend-point formula', () => {
     const r = eligibleRecipient();
     const md = buildCalculatorAiExport(r);
