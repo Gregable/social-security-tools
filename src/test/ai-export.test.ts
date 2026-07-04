@@ -183,7 +183,22 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     // Self-verify the fixture sits in the middle branch.
     expect(r.earnedCredits()).toBeLessThan(40);
     expect(r.totalCredits()).toBeGreaterThanOrEqual(40);
-    expect(buildCalculatorAiExport(r)).toMatch(/projected to reach 40/i);
+    const md = buildCalculatorAiExport(r);
+    expect(md).toMatch(/projected to reach 40/i);
+
+    // The credit table must extend into the estimated future years backing
+    // that projection, and stop once the cumulative count reaches 40.
+    const rows = tableLines(
+      md,
+      '| Year | Taxed earnings | Credits | Cumulative |'
+    );
+    const dataRows = rows.slice(2);
+    const futureYear = String(r.futureEarningsRecords[0].year);
+    expect(
+      dataRows.some((row) => row.split('|')[1].trim() === futureYear)
+    ).toBe(true);
+    const lastCumulative = dataRows[dataRows.length - 1].split('|')[4].trim();
+    expect(lastCumulative).toBe('40');
   });
 
   it('does not throw for a recipient with no earnings records', () => {
@@ -234,6 +249,10 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     for (const year of futureYears) {
       expect(yearCells).toContain(String(year));
     }
+
+    // The chart-embed earnings1= param must carry the same combined series,
+    // or the linked interactive chart would show a different AIME.
+    expect(md).toContain(`${futureYears[0]}:70000`);
   });
 
   it('includes the worked PIA bend-point formula', () => {
