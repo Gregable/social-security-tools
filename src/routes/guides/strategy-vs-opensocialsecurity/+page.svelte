@@ -121,10 +121,9 @@ const faqs: FAQItem[] = [
   <p>
     Over an entire lifetime of benefits, the difference between the absolute
     best month and any month within a year of it is a few hundred dollars.
-    That is the key context to keep in mind: if two tools recommend filing
-    dates that differ by a few months, the lifetime dollar gap between their
-    answers is small, often smaller than the uncertainty in your own life
-    expectancy or in next year's COLA.
+    So if the two tools disagree by a few months, does it matter? Not much.
+    The lifetime dollar gap between their answers is often smaller than the
+    uncertainty in your own life expectancy or in next year's COLA.
   </p>
 
   <h2>Where the Two Tools Differ</h2>
@@ -207,20 +206,17 @@ const faqs: FAQItem[] = [
     tables from several years, plus Society of Actuaries smoker and
     nonsmoker tables for users with specific actuarial preferences.
     ssa.tools/strategy combines a single cohort table with a continuous
-    health-multiplier slider and an optional blended-gender mode. They
-    are different shapes of the same underlying flexibility.
+    health-multiplier slider and an optional blended-gender mode. Both let
+    you adjust for your own health; they just expose it differently.
   </p>
 
-  <h2>Bottom Line</h2>
+  <h2>So which date should you pick?</h2>
 
   <p>
-    The choice between filing at, say, 68 years and 0 months versus 68 years
-    and 6 months is not the kind of decision worth agonizing over. The flat
-    shape of the expected-value curve means that any date in the
-    neighborhood the two tools agree on is a good answer. Pick the tool
-    whose interface and inputs you prefer, file within a few months of its
-    suggested date, and turn your attention to the bigger questions in
-    your retirement plan.
+    The flat shape of the curve means any date in the neighborhood both tools
+    point to is a good answer. Use whichever tool you find easier, and don't
+    lose sleep over a six-month difference. There are bigger questions in a
+    retirement plan than this one.
   </p>
 
   <h2>Related Guides</h2>

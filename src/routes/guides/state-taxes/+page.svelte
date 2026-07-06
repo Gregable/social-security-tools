@@ -92,34 +92,10 @@
   <p>
     When planning for retirement, most people focus on federal taxes on their
     Social Security benefits. But depending on where you live, your state may
-    also take a bite. The good news: the vast majority of states do not tax
-    Social Security income. The even better news: the list of states that do
-    tax benefits keeps shrinking.
+    also take a bite. Most states don't tax Social Security at all — as of
+    2026, only 8 do. And that list keeps getting shorter: it was 13 states as
+    recently as 2020.
   </p>
-
-  <div class="key-takeaways">
-    <h3>Key Takeaways</h3>
-    <ul>
-      <li>
-        <strong>42 states + D.C.</strong> do not tax Social Security benefits at
-        all
-      </li>
-      <li>
-        Only <strong>8 states</strong> tax Social Security benefits in 2026
-      </li>
-      <li>
-        Most taxing states offer <strong>generous exemptions</strong> based on
-        age or income
-      </li>
-      <li>
-        The trend is clear: states are <strong>eliminating</strong> their Social
-        Security taxes (down from 13 states in 2020)
-      </li>
-      <li>
-        State taxes are <strong>separate from</strong> federal taxes on benefits
-      </li>
-    </ul>
-  </div>
 
   <h2>The 8 States That Tax Social Security in 2026</h2>
 
@@ -183,11 +159,11 @@
 
   <h3>Colorado</h3>
   <p>
-    Colorado offers a full exemption for retirees <strong>age 65 and older</strong>.
-    For those <strong>age 55-64</strong>, benefits are also fully exempt if AGI
-    is below <strong>$75,000</strong> (single) or <strong>$95,000</strong>
+    Colorado offers a full exemption for retirees age 65 and older.
+    For those age 55-64, benefits are also fully exempt if AGI
+    is below $75,000 (single) or $95,000
     (joint); above those thresholds, the deduction is capped at $20,000.
-    Taxpayers <strong>under age 55</strong> are generally not eligible for the
+    Taxpayers under age 55 are generally not eligible for the
     Social Security subtraction. This makes Colorado one of the most generous
     taxing states, since the vast majority of Social Security recipients are
     over 65 and pay nothing.
@@ -196,8 +172,8 @@
   <h3>Connecticut</h3>
   <p>
     Connecticut exempts Social Security benefits for single filers with federal
-    AGI below <strong>$75,000</strong> and joint filers below
-    <strong>$100,000</strong>. Above those thresholds, up to 25% of benefits
+    AGI below $75,000 and joint filers below
+    $100,000. Above those thresholds, up to 25% of benefits
     may be taxed. Connecticut has been gradually increasing these thresholds to
     exempt more retirees.
   </p>
@@ -206,8 +182,8 @@
   <p>
     Minnesota offers a Social Security subtraction that phases out at higher
     incomes. The phase-out thresholds are adjusted annually for inflation; for
-    2025, they begin at approximately <strong>$84,490</strong> for single filers
-    and <strong>$108,320</strong> for joint filers (2026 amounts have not yet
+    2025, they begin at approximately $84,490 for single filers
+    and $108,320 for joint filers (2026 amounts have not yet
     been published). Below these thresholds, benefits can be fully or partially
     exempt. Minnesota's subtraction is tied to the federal taxable amount, so
     you only pay state tax on the portion already taxable federally.
@@ -215,7 +191,7 @@
 
   <h3>Montana</h3>
   <p>
-    Montana allows a deduction of up to <strong>$5,500+</strong>
+    Montana allows a deduction of up to $5,500+
     (inflation-adjusted annually) for Social Security and other retirement
     income for taxpayers age 65 and older. The deduction is reduced for
     higher-income filers based on AGI. Montana uses the federal taxable amount
@@ -226,8 +202,8 @@
   <h3>New Mexico</h3>
   <p>
     New Mexico exempts Social Security benefits for single filers with AGI
-    below <strong>$100,000</strong> and joint filers below
-    <strong>$150,000</strong>. Above those thresholds, benefits are taxed as
+    below $100,000 and joint filers below
+    $150,000. Above those thresholds, benefits are taxed as
     regular income. This generous threshold means the majority of New Mexico
     retirees pay no state tax on their Social Security.
   </p>
@@ -235,9 +211,9 @@
   <h3>Rhode Island</h3>
   <p>
     Rhode Island exempts Social Security benefits for filers who have reached
-    <strong>full retirement age</strong> (typically 66 to 67, depending on birth
-    year) and whose federal AGI is below <strong>$107,000</strong> for single filers or
-    <strong>$133,750</strong> for joint filers. Filers who have not reached
+    full retirement age (typically 66 to 67, depending on birth
+    year) and whose federal AGI is below $107,000 for single filers or
+    $133,750 for joint filers. Filers who have not reached
     full retirement age, or who exceed the income limits, may owe state tax on
     benefits.
   </p>
@@ -246,8 +222,8 @@
   <p>
     Utah offers a nonrefundable tax credit that offsets the tax on Social
     Security benefits. The credit is available to single filers with a modified
-    AGI below <strong>$54,000</strong> and joint filers below
-    <strong>$90,000</strong>. The credit phases out above those thresholds. For
+    AGI below $54,000 and joint filers below
+    $90,000. The credit phases out above those thresholds. For
     filers below the income limits, the credit effectively eliminates the state
     tax on benefits.
   </p>
@@ -255,8 +231,8 @@
   <h3>Vermont</h3>
   <p>
     Vermont provides a full exemption for single filers with AGI below
-    <strong>$55,000</strong> and joint filers below
-    <strong>$70,000</strong>. Above those thresholds, a partial exemption
+    $55,000 and joint filers below
+    $70,000. Above those thresholds, a partial exemption
     applies that phases out at higher incomes. Vermont has been steadily
     increasing its exemption thresholds in recent years.
   </p>
@@ -266,8 +242,8 @@
   <h2>Recent Changes: States Eliminating Social Security Taxes</h2>
 
   <p>
-    The trend is unmistakable: states are dropping their taxes on Social
-    Security benefits. Here are the most recent changes:
+    Several states have dropped their Social Security taxes just in the last
+    few years:
   </p>
 
   <table class="benefit-table">
@@ -299,17 +275,16 @@
 
   <p>
     In 2020, thirteen states taxed Social Security benefits. By 2026, that
-    number has dropped to just eight. This trend reflects growing recognition
-    that taxing retirement benefits places a disproportionate burden on
-    fixed-income seniors.
+    number has dropped to just eight. If your state is on the list of 8 today,
+    there's a reasonable chance it won't be in a few years.
   </p>
 
   <h2>States That Do Not Tax Social Security</h2>
 
   <p>
-    The following <strong>42 states and Washington, D.C.</strong> do not tax
-    Social Security benefits. Some of these states have no income tax at all,
-    while others specifically exempt Social Security from taxation.
+    The following 42 states and Washington, D.C. do not tax Social Security
+    benefits. Some of these states have no income tax at all, while others
+    specifically exempt Social Security from taxation.
   </p>
 
   <div class="state-grid">
@@ -365,10 +340,10 @@
 
   <p>
     State and federal taxation of Social Security are completely independent.
-    At the federal level, up to <strong>85%</strong> of your benefits may be
-    taxable, depending on your "provisional income" (AGI + tax-exempt interest
-    + half of your Social Security benefits). The federal thresholds have not
-    changed since 1993.
+    At the federal level, up to 85% of your benefits may be taxable, depending
+    on your "provisional income" (AGI + tax-exempt interest + half of your
+    Social Security benefits). The federal thresholds have not changed since
+    1993.
   </p>
 
   <p>
@@ -380,40 +355,33 @@
     > guide.
   </p>
 
-  <div class="highlight-box">
-    <strong>New for 2025-2028:</strong> The One Big Beautiful Bill Act created a
-    new senior tax deduction of up to $6,000 for those age 65+. This can
-    significantly reduce federal taxes on benefits. See our
+  <p>
+    Separately, for 2025 through 2028 there's also a new federal senior tax
+    deduction of up to $6,000 for those 65 and older, which can reduce federal
+    taxes on benefits. See our
     <a href="/guides/senior-tax-deduction">Senior Tax Deduction guide</a> for
     details.
-  </div>
+  </p>
 
   <h2>Planning Strategies</h2>
 
-  <h3>Consider State Taxes When Choosing Where to Retire</h3>
   <p>
-    If you are deciding where to retire, state tax treatment of Social Security
-    is one factor to consider. Moving from a taxing state to a non-taxing state
-    can save hundreds or thousands of dollars per year. However, don't let
-    Social Security tax be the only factor; also consider overall state income
-    tax rates, property taxes, sales taxes, and cost of living.
+    Should you move to avoid the tax? Probably not just for this. Even in the
+    8 taxing states, most retirees end up exempt, and other costs — property
+    tax, sales tax, housing — usually matter more. If you're already choosing
+    between states for other reasons, the Social Security tax is one more
+    thing to weigh, but it's rarely the deciding factor.
   </p>
 
-  <h3>Manage Your Income to Stay Below Exemption Thresholds</h3>
   <p>
-    If you live in a state with income-based exemptions, keeping your AGI below
-    the threshold can eliminate your state tax on Social Security. Strategies
-    include timing IRA withdrawals, spreading Roth conversions across multiple
-    years, and harvesting capital losses to offset gains.
-  </p>
-
-  <h3>Coordinate Roth Conversions</h3>
-  <p>
-    Roth IRA distributions are not included in AGI. Converting traditional IRA
-    funds to a Roth before retirement increases your income now but can help
-    keep your AGI below exemption thresholds in retirement. This is especially
-    valuable in states like Connecticut, New Mexico, and Vermont with clear AGI
-    cutoffs.
+    If you live in a state with income-based exemptions, keeping your AGI
+    below the threshold can eliminate your state tax on Social Security.
+    Timing IRA withdrawals, spreading Roth conversions across multiple years,
+    and harvesting capital losses can all help. Roth conversions are worth a
+    special mention: Roth distributions aren't included in AGI, so converting
+    before retirement increases your income now but can keep your AGI below
+    exemption thresholds later. That's especially useful in states like
+    Connecticut, New Mexico, and Vermont with clear AGI cutoffs.
   </p>
 
   <InlineCTA type="projectionlab" />
@@ -421,10 +389,19 @@
   <h2>Frequently Asked Questions</h2>
 
   <div class="faq">
-    {#each faqs as faq}
-      <h3>{faq.question}</h3>
-      <p>{faq.answer}</p>
-    {/each}
+    <h3>Will my benefits be taxed if I move to a different state?</h3>
+    <p>
+      State tax depends on where you live, not where you earned your benefits.
+      Move from a taxing state to a non-taxing one and the state tax goes
+      away. Your federal taxes don't change either way.
+    </p>
+
+    <h3>Does my state tax Social Security the same way the federal government does?</h3>
+    <p>
+      No. Each of the 8 taxing states has its own rules and thresholds,
+      different from the federal formula. Some start from your federal AGI,
+      others use their own income measures.
+    </p>
   </div>
 
   <h2>Learn More</h2>
@@ -439,8 +416,8 @@
   </p>
 
   <p>
-    Use the <a href="/calculator">SSA.tools calculator</a> to estimate your
-    Social Security benefits based on your earnings history.
+    To see what your own benefit would be, try the
+    <a href="/calculator">ssa.tools calculator</a> with your earnings record.
   </p>
 
   <GuideFooter />
@@ -458,33 +435,6 @@
   .hero-map :global(img) {
     width: 100%;
     height: auto;
-  }
-
-  .key-takeaways {
-    background-color: #e8f5e9;
-    border: 1px solid #4caf50;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .key-takeaways h3 {
-    margin-top: 0;
-    color: #2e7d32;
-  }
-
-  .key-takeaways ul {
-    margin-bottom: 0;
-  }
-
-  .highlight-box {
-    background-color: #f0f8ff;
-    border-left: 4px solid #4a90e2;
-    padding: 15px;
-    margin: 20px auto;
-    border-radius: 4px;
-    width: fit-content;
-    max-width: 70%;
   }
 
   .benefit-table {
@@ -549,10 +499,6 @@
   }
 
   @media (max-width: 768px) {
-    .highlight-box {
-      max-width: 100%;
-    }
-
     .state-grid ul {
       column-count: 2;
     }

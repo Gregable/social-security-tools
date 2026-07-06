@@ -1,10 +1,14 @@
 <script lang="ts">
-  import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
+  import {
+    outboundImpression,
+    trackOutboundClick,
+  } from "$lib/analytics/outbound";
   import type { FAQItem } from "$lib/schema-org";
-  import { trackOutboundClick, outboundImpression } from "$lib/analytics/outbound";
+  import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 
-  const title = "ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security";
+  const title =
+    "ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security";
   const description =
     "A review of ProjectionLab, a retirement planning tool that complements Social Security calculators like SSA.tools. Covers features, pros and cons, and an exclusive SSA-TOOLS coupon code for 10% off.";
   const published = "2026-02-15";
@@ -63,10 +67,10 @@
   <p class="postdate">Published: {new Date(published).toLocaleDateString()}</p>
 
   <p>
-    SSA.tools focuses on one thing: helping you understand your Social Security
+    This site focuses on one thing: helping you understand your Social Security
     benefits. But Social Security is just one piece of your retirement income.
-    To plan around investments, taxes, and drawdown strategies,
-    you need a broader planning tool.
+    To plan around investments, taxes, and drawdown strategies, you need a
+    broader planning tool.
   </p>
 
   <p>
@@ -74,65 +78,58 @@
       href="https://projectionlab.com?ref=ssa-tools"
       target="_blank"
       rel="noopener noreferrer"
-      use:outboundImpression={{ destination: "projectionlab", placement: "review-page-primary" }}
-      on:click={() => trackOutboundClick("projectionlab", "review-page-primary")}>ProjectionLab</a
-    > is a retirement planning simulator that pairs well with SSA.tools. Here's
-    an overview of what it does, what it costs, and where it fits in.
+      use:outboundImpression={{
+        destination: "projectionlab",
+        placement: "review-page-primary",
+      }}
+      on:click={() =>
+        trackOutboundClick("projectionlab", "review-page-primary")}
+      >ProjectionLab</a
+    > is a retirement planning simulator that pairs well with the ssa.tools calculator.
+    Here's an overview of what it does, what it costs, and where it fits in.
   </p>
 
-  <p><em>
-    Disclosure: ProjectionLab is a sponsor of SSA.tools. This review reflects
-    honest assessment. See the Drawbacks section below for areas where
-    it falls short.
-  </em></p>
+  <p>
+    <em>
+      Disclosure: ProjectionLab is a sponsor of this site. This review reflects
+      honest assessment. See the Drawbacks section below for areas where it
+      falls short.
+    </em>
+  </p>
 
   <h2>What is ProjectionLab?</h2>
 
   <p>
-    ProjectionLab is a financial planning simulator that lets you model your
-    retirement under different scenarios. Rather than giving you a single number,
-    it runs Monte Carlo simulations across thousands of possible market outcomes
-    to show you the probability of your plan succeeding.
+    The core of the tool is Monte Carlo simulation: instead of one projected
+    number, it runs your plan through thousands of possible market outcomes and
+    tells you how often it succeeds. On top of that it estimates federal and
+    state taxes, including how Social Security taxation fits into the picture,
+    models Roth conversions, and lets you compare what-if scenarios side by side
+    (more on this below).
   </p>
 
-  <p>Key features include:</p>
-
-  <ul>
-    <li>
-      <strong>Monte Carlo simulations:</strong> Test your plan against
-      thousands of possible market scenarios to see your likelihood of success.
-    </li>
-    <li>
-      <strong>Tax estimation:</strong> See projected federal and state
-      taxes, including how Social Security taxation fits into the picture.
-    </li>
-    <li>
-      <strong>Roth conversion modeling:</strong> Explore whether and when
-      Roth conversions make sense for your situation.
-    </li>
-    <li>
-      <strong>What-if scenario comparison:</strong> Build multiple
-      versions of your plan and compare them side by side (more on this below).
-    </li>
-    <li>
-      <strong>No account linking:</strong> Your financial data stays
-      under your control. ProjectionLab doesn't connect to your bank or brokerage
-      accounts.
-    </li>
-  </ul>
+  <p>
+    One thing it doesn't do is link to your bank or brokerage accounts. You type
+    your numbers in yourself. It's the same privacy approach this site takes.
+  </p>
 
   <h2>Scenario Comparison: Compare Mode</h2>
 
   <p>
-    One of ProjectionLab's strongest features is its
+    The feature I find most useful is
     <a
       href="https://projectionlab.com/blog/compare-mode-upgrades"
       target="_blank"
       rel="noopener noreferrer"
-      use:outboundImpression={{ destination: "projectionlab", placement: "review-page-blog-link" }}
-      on:click={() => trackOutboundClick("projectionlab", "review-page-blog-link")}>Compare Mode</a
-    >, which lets you create "what if" variations of your baseline plan and see
-    the differences side by side. For example, you might compare:
+      use:outboundImpression={{
+        destination: "projectionlab",
+        placement: "review-page-blog-link",
+      }}
+      on:click={() =>
+        trackOutboundClick("projectionlab", "review-page-blog-link")}
+      >Compare Mode</a
+    >, which lets you build "what if" variations of your plan and see them side
+    by side. For example, you might compare:
   </p>
 
   <ul>
@@ -151,9 +148,9 @@
   </p>
 
   <p>
-    If you've used the SSA.tools <a href="/calculator">calculator</a>, this
-    approach will feel familiar. SSA.tools lets you explore how different Social
-    Security filing ages change your monthly benefit. You can see the
+    If you've used the ssa.tools <a href="/calculator">calculator</a>, this
+    approach will feel familiar. The calculator lets you explore how different
+    Social Security filing ages change your monthly benefit. You can see the
     trade-off between claiming early at 62 for a reduced amount vs. waiting
     until 70 for the maximum. The
     <a href="/guides/filing-date-chart">filing date chart</a> visualizes this as
@@ -163,18 +160,17 @@
   <p>
     ProjectionLab takes that same "explore the trade-offs" idea and applies it
     to your entire financial picture: not just when to claim Social Security,
-    but when to retire, how much to spend, which accounts to draw from, and
-    how taxes change across each scenario.
+    but when to retire, how much to spend, which accounts to draw from, and how
+    taxes change across each scenario.
   </p>
 
   <h2>How It Works With SSA.tools</h2>
 
   <p>
-    The workflow is straightforward. Use SSA.tools to calculate your Social
-    Security benefit based on your actual earnings record. Then enter that
-    benefit amount into ProjectionLab as an income source in your retirement plan.
-    This gives you an accurate Social Security figure within your broader
-    financial projection.
+    Using the two together is simple: run your earnings record through the
+    ssa.tools calculator to get your benefit, then enter that number into
+    ProjectionLab as an income source. This gives you an accurate Social
+    Security figure within your broader financial projection.
   </p>
 
   <p>
@@ -184,7 +180,7 @@
   </p>
 
   <div class="highlight-box">
-    <strong>SSA.tools reader discount:</strong> Use the code
+    <strong>Reader discount:</strong> Use the code
     <strong>SSA-TOOLS</strong> at checkout for 10% off any ProjectionLab plan.
   </div>
 
@@ -192,57 +188,32 @@
 
   <p>
     ProjectionLab is a good fit if you want to go beyond "when should I claim
-    Social Security?" and start planning your overall retirement income strategy.
-    It's particularly useful if you're:
+    Social Security?" and start planning your overall retirement income
+    strategy. It's most useful if you're within about ten years of retirement
+    and want to stress-test your plan, or if you're weighing an early retirement
+    and need to figure out how to bridge the years before Social Security and
+    Medicare kick in. It's also a natural fit if you're trying to decide whether
+    Roth conversions make sense, or just want to see how Social Security
+    coordinates with your other income sources.
   </p>
-
-  <ul>
-    <li>Within 10 years of retirement and want to stress-test your plan</li>
-    <li>Considering early retirement and need to model bridge strategies</li>
-    <li>Evaluating Roth conversion strategies across multiple years</li>
-    <li>Trying to coordinate Social Security with other income sources</li>
-  </ul>
 
   <h2>Strengths</h2>
 
-  <ul>
-    <li>
-      The Monte Carlo approach gives a realistic range of outcomes rather than
-      a single misleading number.
-    </li>
-    <li>
-      The privacy model is similar to SSA.tools. There is no linking to financial
-      accounts and no data harvesting.
-    </li>
-    <li>
-      The free tier is genuinely useful for quick projections, not just a demo.
-    </li>
-    <li>
-      Active development with regular updates and new features.
-    </li>
-  </ul>
-
-  <h2>Drawbacks</h2>
-
-  <ul>
-    <li>
-      There's a learning curve. The interface has a lot of options, which can
-      be overwhelming at first.
-    </li>
-    <li>
-      Social Security benefit estimation within ProjectionLab itself is basic,
-      so using SSA.tools for your actual benefit calculation
-      and then entering it manually gives better results.
-    </li>
-  </ul>
+  <p>
+    The Monte Carlo approach gives a realistic range of outcomes rather than a
+    single misleading number. The privacy model is similar to this site's: no
+    linking to financial accounts, no data harvesting. And the free tier is
+    genuinely useful for quick projections, not just a demo. The tool is also
+    under active development, with regular updates and new features.
+  </p>
 
   <h2>Frequently Asked Questions</h2>
 
   <h3>Is there a ProjectionLab coupon code?</h3>
   <p>
-    Yes. SSA.tools readers can use the code <strong>SSA-TOOLS</strong> for
-    <strong>10% off</strong> any ProjectionLab premium plan. Just enter the code
-    at checkout.
+    Yes. Readers of this site can use the code <strong>SSA-TOOLS</strong> for 10%
+    off any ProjectionLab premium plan. Just enter the code at checkout. The code
+    is still valid in 2026 and beyond.
   </p>
 
   <h3>Is ProjectionLab free?</h3>
@@ -255,10 +226,9 @@
 
   <h3>How does ProjectionLab work with Social Security?</h3>
   <p>
-    Use the <a href="/calculator">SSA.tools calculator</a> to get your projected
-    Social Security benefit, then add it as an income source in ProjectionLab.
-    This gives you an accurate benefit figure within your overall retirement
-    plan.
+    Use the <a href="/calculator">ssa.tools calculator</a> to get your projected
+    Social Security benefit, then add it as an income source in ProjectionLab. This
+    gives you an accurate benefit figure within your overall retirement plan.
   </p>
 
   <h3>Does ProjectionLab connect to my bank accounts?</h3>

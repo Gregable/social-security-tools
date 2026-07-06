@@ -87,29 +87,17 @@ const faqs = [
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
   <p>
-    <strong>Can I collect Social Security from my ex-husband or ex-wife?</strong> Yes,
-    you may be entitled to divorced spouse benefits worth up to <strong>50% of your
-    ex-spouse's benefit amount</strong>, even if they've remarried and even without
-    their knowledge or consent.
+    If you were married for at least 10 years before divorcing, you may be able
+    to collect a Social Security benefit based on your ex-spouse's earnings
+    record, up to half of their full benefit. Your ex doesn't need to know, and
+    it doesn't reduce their check.
   </p>
 
   <p>
     Divorce doesn't necessarily end your connection to Social Security benefits earned
-    during your marriage. If you were married for at least 10 years, you may have
-    valuable benefit options that many people don't know about.
+    during your marriage. This guide walks through who qualifies, how the
+    benefit is calculated, and how to apply.
   </p>
-
-  <div class="key-takeaways">
-    <h3>Key Takeaways</h3>
-    <ul>
-      <li>You can receive up to <strong>50%</strong> of your ex-spouse's full retirement benefit</li>
-      <li>Your marriage must have lasted at least <strong>10 years</strong></li>
-      <li>You must be <strong>currently unmarried</strong> (with some exceptions)</li>
-      <li>Your ex-spouse's benefit is <strong>not reduced</strong> by your claim</li>
-      <li>Your ex-spouse is <strong>not notified</strong> when you claim</li>
-      <li>If your ex dies, you may receive up to <strong>100%</strong> as a survivor benefit</li>
-    </ul>
-  </div>
 
   <h2>Eligibility Requirements for Divorced Spouse Benefits</h2>
 
@@ -122,27 +110,27 @@ const faqs = [
     <h3>The Five Requirements</h3>
     <ol>
       <li>
-        <strong>10-Year Marriage:</strong> Your marriage must have lasted at least
-        10 years. This is measured from the date of marriage to the date the divorce
-        was finalized, even if you were separated before then.
+        10-year marriage: Your marriage must have lasted at least 10 years,
+        measured from the date of marriage to the date the divorce was
+        finalized, even if you were separated before then.
       </li>
       <li>
-        <strong>Currently Unmarried:</strong> You must be currently unmarried. If you
-        remarried but that marriage ended (through divorce, annulment, or death), you
-        may regain eligibility.
+        Currently unmarried: You must be currently unmarried. If you remarried
+        but that marriage ended (through divorce, annulment, or death), you may
+        regain eligibility.
       </li>
       <li>
-        <strong>Age 62 or Older:</strong> You must be at least 62 years old to claim
-        divorced spouse retirement benefits.
+        Age 62 or older: You must be at least 62 years old to claim divorced
+        spouse retirement benefits.
       </li>
       <li>
-        <strong>Ex-Spouse Eligible:</strong> Your ex-spouse must be entitled to Social
-        Security retirement or disability benefits. They don't need to have filed yet
+        Ex-spouse eligible: Your ex-spouse must be entitled to Social Security
+        retirement or disability benefits. They don't need to have filed yet
         (see below).
       </li>
       <li>
-        <strong>Your Own Benefit Is Lower:</strong> If you're entitled to your own
-        Social Security benefit, it must be less than what you'd receive as a divorced
+        Your own benefit is lower: If you're entitled to your own Social
+        Security benefit, it must be less than what you'd receive as a divorced
         spouse. Social Security automatically pays you the higher amount.
       </li>
     </ol>
@@ -151,16 +139,13 @@ const faqs = [
   <h2>The 10-Year Marriage Rule Explained</h2>
 
   <p>
-    The <strong>10-year marriage requirement</strong> is the most common reason people
-    don't qualify for divorced spouse benefits. Social Security counts from your
-    wedding date to the date your divorce was legally finalized.
+    The 10-year marriage requirement is the most common reason people don't
+    qualify for divorced spouse benefits. Social Security counts from your
+    wedding date to the date your divorce was legally finalized. The rule is
+    strict: if your marriage lasted 9 years and 364 days, you don't qualify.
+    If you're close to 10 years and considering divorce, when you finalize it
+    matters.
   </p>
-
-  <div class="highlight-box">
-    <strong>Important:</strong> The 10-year rule is strict. If your marriage lasted
-    9 years and 364 days, you don't qualify. If you're close to 10 years and considering
-    divorce, the timing of when you finalize can have significant financial implications.
-  </div>
 
   <p>
     Periods of separation do not count against you. What matters is the legal duration
@@ -181,8 +166,8 @@ const faqs = [
     The divorced spouse benefit is based on your ex-spouse's
     <a href="/guides/pia">Primary Insurance Amount (PIA)</a>, which is the benefit
     they would receive at their <a href="/guides/nra">Normal Retirement Age (NRA)</a>.
-    The maximum divorced spouse benefit is <strong>50% of your ex-spouse's PIA</strong>,
-    which you'd receive if you claim at your own full retirement age. Claiming
+    The maximum divorced spouse benefit is 50% of your ex-spouse's PIA, which
+    you'd receive if you claim at your own full retirement age. Claiming
     earlier reduces your benefit:
   </p>
 
@@ -207,47 +192,33 @@ const faqs = [
     *Exact percentage depends on your birth year and corresponding Normal Retirement Age.
   </p>
 
-  <div class="highlight-box">
-    <strong>No Delayed Credits:</strong> Unlike your own retirement benefit, divorced
-    spouse benefits do not increase if you wait past your full retirement age. The
-    maximum is always 50% of your ex-spouse's PIA, so there's no advantage to
-    delaying past your NRA.
-  </div>
+  <p>
+    Unlike your own retirement benefit, divorced spouse benefits do not
+    increase if you wait past your full retirement age. The maximum is always
+    50% of your ex-spouse's PIA, so there's no advantage to delaying past your
+    NRA.
+  </p>
 
   <h3>Example Calculation</h3>
 
-  <div class="example-box">
-    <h4>Example: Alex's Divorced Spouse Benefit</h4>
-    <p>
-      Alex was married to Chris for 15 years before divorcing. Chris's PIA is $2,400
-      per month. Alex's own PIA based on their work history is $900 per month.
-    </p>
-    <ul>
-      <li><strong>Alex's divorced spouse benefit at NRA:</strong> $2,400 × 50% = $1,200</li>
-      <li><strong>Alex's own benefit at NRA:</strong> $900</li>
-      <li><strong>Alex receives:</strong> $1,200 (the higher amount)</li>
-    </ul>
-    <p>
-      If Alex claims at 62, their divorced spouse benefit would be reduced to
-      approximately $840 per month (assuming a 30% reduction for early claiming).
-    </p>
-  </div>
+  <p>
+    Say Alex was married to Chris for 15 years before divorcing. Chris's PIA is
+    $2,400 per month, so Alex's divorced spouse benefit at NRA would be half of
+    that, or $1,200. Alex's own PIA based on their work history is $900. Since
+    the divorced spouse benefit is higher, Alex receives $1,200. If Alex claims
+    at 62 instead, the divorced spouse benefit drops to roughly $840 per month
+    (about a 30% reduction for early claiming).
+  </p>
 
   <InlineCTA type="projectionlab" />
 
   <h2>Does My Ex-Spouse Know If I Claim Benefits?</h2>
 
   <p>
-    <strong>No.</strong> The Social Security Administration maintains strict
-    confidentiality. When you apply for divorced spouse benefits:
+    Worried your ex will find out? They won't. Social Security doesn't notify
+    them, doesn't need their consent, and doesn't touch their benefit. Your ex
+    can't block or prevent your claim.
   </p>
-
-  <ul>
-    <li>Your ex-spouse is not contacted or notified</li>
-    <li>Your ex-spouse does not need to consent or sign anything</li>
-    <li>Your ex-spouse's benefit amount is completely unaffected</li>
-    <li>Your ex-spouse cannot block or prevent your claim</li>
-  </ul>
 
   <p>
     The divorced spouse benefit is paid from Social Security's general trust fund,
@@ -258,14 +229,14 @@ const faqs = [
   <h2>What If My Ex-Spouse Hasn't Filed Yet?</h2>
 
   <p>
-    Under the <strong>independently entitled divorced spouse</strong> rule, you can
-    claim benefits even if your ex-spouse hasn't filed for their own benefits, as
+    Under the independently entitled divorced spouse rule, you can claim
+    benefits even if your ex-spouse hasn't filed for their own benefits, as
     long as:
   </p>
 
   <ul>
-    <li>You have been divorced for at least <strong>2 years</strong></li>
-    <li>Your ex-spouse is at least <strong>62 years old</strong></li>
+    <li>You have been divorced for at least 2 years</li>
+    <li>Your ex-spouse is at least 62 years old</li>
     <li>Your ex-spouse is entitled to benefits (has enough work credits)</li>
   </ul>
 
@@ -278,49 +249,33 @@ const faqs = [
   <h2>What If My Ex-Spouse Remarried?</h2>
 
   <p>
-    Your ex-spouse's current marital status has <strong>no effect</strong> on your
-    eligibility for divorced spouse benefits. You can claim even if they:
-  </p>
-
-  <ul>
-    <li>Have remarried once or multiple times</li>
-    <li>Have a current spouse also claiming spousal benefits</li>
-    <li>Have other ex-spouses from 10+ year marriages claiming benefits</li>
-  </ul>
-
-  <p>
-    Social Security allows unlimited divorced spouse beneficiaries on one worker's
-    record. Each person's benefit is calculated independently, and none affects
-    the others.
+    Your ex-spouse's current marital status has no effect on your eligibility.
+    You can claim even if they've remarried, even if their current spouse is
+    also claiming spousal benefits, and even if other ex-spouses from 10+ year
+    marriages are claiming too. Social Security allows unlimited divorced
+    spouse beneficiaries on one worker's record. Each person's benefit is
+    calculated independently, and none affects the others.
   </p>
 
   <h2>Can I Claim If I Remarried?</h2>
 
   <p>
-    Generally, remarriage ends your eligibility for divorced spouse benefits. However,
-    there are important exceptions:
+    Generally, remarriage ends your eligibility for divorced spouse benefits,
+    but there are exceptions. If your subsequent marriage ended through
+    divorce, annulment, or your spouse's death, you may regain eligibility for
+    benefits from your first ex-spouse (assuming the 10-year requirement was
+    met). And if you remarry after age 60 (or age 50 if disabled), you can
+    still receive divorced spouse <em>survivor</em> benefits if your ex-spouse
+    has died.
   </p>
-
-  <ul>
-    <li>
-      <strong>Marriage ended:</strong> If your subsequent marriage ended through
-      divorce, annulment, or your spouse's death, you may regain eligibility for
-      benefits from your first ex-spouse (assuming the 10-year requirement was met).
-    </li>
-    <li>
-      <strong>Survivor benefits after age 60:</strong> If you remarry after age 60
-      (or age 50 if disabled), you can still receive divorced spouse
-      <em>survivor</em> benefits if your ex-spouse has died.
-    </li>
-  </ul>
 
   <h2>Divorced Spouse Survivor Benefits</h2>
 
   <p>
     If your ex-spouse dies, you may be eligible for <a href="/guides/survivor-benefits">survivor benefits</a>,
-    which are significantly more generous than divorced spouse retirement benefits.
-    The maximum survivor benefit is <strong>100% of your ex-spouse's benefit</strong>,
-    compared to 50% while they were alive.
+    which are more generous than divorced spouse retirement benefits. The
+    maximum survivor benefit is 100% of your ex-spouse's benefit, compared to
+    50% while they were alive.
   </p>
 
   <h3>Survivor Benefit Requirements</h3>
@@ -337,13 +292,13 @@ const faqs = [
     approximately 71.5% of the full survivor benefit.
   </p>
 
-  <div class="highlight-box">
-    <strong>Strategy:</strong> If you qualify for both your own retirement benefit
-    and a divorced spouse survivor benefit, you may be able to claim one first and
-    switch to the other later to maximize your lifetime benefits. See our
-    <a href="/guides/survivor-benefits">survivor benefits guide</a> for detailed
+  <p>
+    If you qualify for both your own retirement benefit and a divorced spouse
+    survivor benefit, you may be able to claim one first and switch to the
+    other later. See our
+    <a href="/guides/survivor-benefits">survivor benefits guide</a> for
     claiming strategies.
-  </div>
+  </p>
 
   <h2>Divorced Spouse Benefits vs. Your Own Benefits</h2>
 
@@ -352,19 +307,15 @@ const faqs = [
     benefit, Social Security effectively pays you the higher amount. Technically,
     you receive your own benefit first, and if the divorced spouse benefit is
     higher, you receive an additional amount to bring you up to that level.
+    You cannot receive both benefits in full; it's always the higher of the two.
   </p>
 
   <p>
-    You cannot receive both benefits in full. It's always the higher of the two.
+    Your own benefit might be the higher one if you had substantial earnings
+    throughout your career, if your ex-spouse had relatively low lifetime
+    earnings, or if you delay claiming past your full retirement age (your own
+    benefit grows with delay, but the divorced spouse benefit doesn't).
   </p>
-
-  <h3>When Your Own Benefit Might Be Higher</h3>
-
-  <ul>
-    <li>You had substantial earnings throughout your career</li>
-    <li>Your ex-spouse had relatively low lifetime earnings</li>
-    <li>You delay claiming past your full retirement age (your own benefit grows, but divorced spouse benefit doesn't)</li>
-  </ul>
 
   <h2>How to Apply for Divorced Spouse Benefits</h2>
 
@@ -380,34 +331,46 @@ const faqs = [
   </ul>
 
   <p>
-    You can apply:
-  </p>
-
-  <ul>
-    <li><strong>Online:</strong> Through ssa.gov (limited for divorced spouse claims)</li>
-    <li><strong>By phone:</strong> Call 1-800-772-1213</li>
-    <li><strong>In person:</strong> At your local Social Security office</li>
-  </ul>
-
-  <p>
-    Divorced spouse benefit applications often require a phone or in-person
-    appointment, as the online system may not fully support these claims.
+    You can apply online at ssa.gov, by phone at 1-800-772-1213, or in person
+    at your local Social Security office. In practice, divorced spouse claims
+    often require a phone or in-person appointment, as the online system may
+    not fully support them.
   </p>
 
   <h2>Frequently Asked Questions</h2>
 
   <div class="faq">
-    {#each faqs as faq}
-      <h3>{faq.question}</h3>
-      <p>{faq.answer}</p>
-    {/each}
+    <h3>What if my ex-spouse remarried?</h3>
+    <p>
+      It doesn't matter. Your ex's marital status has no effect on your
+      eligibility, and their new spouse can claim spousal benefits
+      independently.
+    </p>
+
+    <h3>Can I receive divorced spouse benefits if I remarried?</h3>
+    <p>
+      Generally no, unless your later marriage ended through death, divorce, or
+      annulment. Remarriage after age 60 (50 if disabled) doesn't block
+      divorced spouse survivor benefits.
+    </p>
+
+    <h3>Can I collect divorced spouse benefits if my ex hasn't filed yet?</h3>
+    <p>
+      Yes, as long as you've been divorced at least 2 years and your ex is at
+      least 62.
+    </p>
+
+    <h3>What happens to my divorced spouse benefits if my ex-spouse dies?</h3>
+    <p>
+      You may switch to divorced spouse survivor benefits, worth up to 100% of
+      their benefit rather than 50%.
+    </p>
   </div>
 
   <h2>Calculate Your Benefits</h2>
 
   <p>
-    Understanding your divorced spouse benefit options starts with knowing the numbers.
-    Use the <a href="/calculator">SSA.tools calculator</a> to estimate your own
+    Use the <a href="/calculator">ssa.tools calculator</a> to estimate your own
     Social Security benefit based on your earnings record. If you know your ex-spouse's
     approximate benefit amount, you can compare to see whether your own benefit or
     the divorced spouse benefit would be higher.
@@ -423,23 +386,6 @@ const faqs = [
 </div>
 
 <style>
-  .key-takeaways {
-    background-color: #e8f5e9;
-    border: 1px solid #4caf50;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .key-takeaways h3 {
-    margin-top: 0;
-    color: #2e7d32;
-  }
-
-  .key-takeaways ul {
-    margin-bottom: 0;
-  }
-
   .requirements-box {
     background-color: #fff3e0;
     border: 1px solid #ff9800;
@@ -463,29 +409,6 @@ const faqs = [
 
   .requirements-box li:last-child {
     margin-bottom: 0;
-  }
-
-  .highlight-box {
-    background-color: #f0f8ff;
-    border-left: 4px solid #4a90e2;
-    padding: 15px;
-    margin: 20px auto;
-    border-radius: 4px;
-    width: fit-content;
-    max-width: 70%;
-  }
-
-  .example-box {
-    background-color: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .example-box h4 {
-    margin-top: 0;
-    color: #333;
   }
 
   .benefit-table {

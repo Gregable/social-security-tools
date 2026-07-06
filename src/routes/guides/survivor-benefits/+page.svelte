@@ -86,44 +86,16 @@
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
   <p>
-    <strong>How much can a surviving spouse receive?</strong> Survivor benefits
-    can be up to <strong>100% of your deceased spouse's benefit amount</strong>,
-    making them significantly more valuable than the 50% maximum for spousal
-    benefits while your spouse was alive.
+    How much can a surviving spouse receive? Up to 100% of the deceased
+    spouse's benefit amount. That's twice the 50% maximum for spousal benefits
+    while your spouse was alive.
   </p>
 
   <p>
-    Social Security survivor benefits provide crucial financial support for
-    widows, widowers, children, and in some cases dependent parents.
-    Understanding the rules can help you maximize your benefits during a
-    difficult time.
+    Survivor benefits go to widows and widowers, and sometimes to children and
+    dependent parents. The rules are different from regular retirement benefits
+    in a few ways that are worth knowing about.
   </p>
-
-  <div class="key-takeaways">
-    <h3>Key Takeaways</h3>
-    <ul>
-      <li>
-        Survivor benefits can be up to <strong>100%</strong> of the deceased's benefit
-        (vs. 50% for spousal benefits)
-      </li>
-      <li>
-        Widows and widowers can claim as early as <strong>age 60</strong> (age 50
-        if disabled)
-      </li>
-      <li>
-        Remarriage before age 60 generally ends eligibility (with exceptions)
-      </li>
-      <li>Children may qualify until age 18 (19 if still in high school)</li>
-      <li>
-        You may be able to <strong>switch</strong> between survivor and your own
-        benefits strategically
-      </li>
-      <li>
-        Survivor benefits have a <strong>different retirement age</strong> schedule
-        than regular retirement benefits
-      </li>
-    </ul>
-  </div>
 
   <h2>Who Qualifies for Survivor Benefits?</h2>
 
@@ -174,23 +146,12 @@
 
   <p>
     To qualify for survivor benefits as a widow or widower, your marriage
-    generally must have lasted at least <strong>9 months</strong> before your spouse's
-    death. However, there are important exceptions:
+    generally must have lasted at least 9 months before your spouse's death.
+    There are exceptions, though. The 9-month rule doesn't apply if the death
+    was accidental, if it occurred in the line of military duty, if you and
+    your spouse were previously married, divorced, and then remarried, or if
+    you are the parent of the worker's child.
   </p>
-
-  <div class="highlight-box">
-    <strong>Exceptions to the 9-Month Rule:</strong>
-    <ul>
-      <li>Death was accidental</li>
-      <li>Death occurred in the line of military duty</li>
-      <li>
-        You and your spouse were previously married, divorced, and then
-        remarried
-      </li>
-      <li>You are the parent of the worker's child</li>
-    </ul>
-    If any of these apply, you may qualify even with a shorter marriage.
-  </div>
 
   <h2>How Survivor Benefits Are Calculated</h2>
 
@@ -231,22 +192,21 @@
     </tbody>
   </table>
 
-  <div class="highlight-box">
-    <strong>The 82.5% Floor:</strong> If your spouse claimed benefits early and received
-    a reduced amount, you're protected. Your survivor benefit will be at least 82.5%
-    of their PIA, even if they were receiving less than that due to early claiming.
-  </div>
+  <p>
+    What if your spouse claimed early and was receiving a reduced amount? You
+    have some protection: your survivor benefit will be at least 82.5% of
+    their PIA, even if they were receiving less than that due to early
+    claiming.
+  </p>
 
   <InlineCTA type="projectionlab" />
 
   <h2>Survivor Normal Retirement Age</h2>
 
   <p>
-    Survivor benefits have their own <strong
-      >full retirement age schedule</strong
-    >, which is different from the regular retirement age. The survivor NRA
-    determines when you can receive 100% of the survivor benefit without
-    reduction.
+    Survivor benefits have their own full retirement age schedule, which is
+    different from the regular retirement age. The survivor NRA determines
+    when you can receive 100% of the survivor benefit without reduction.
   </p>
 
   <table class="benefit-table">
@@ -311,122 +271,70 @@
     age 60 to 67.
   </p>
 
-  <div class="warning-box">
-    <strong>No Delayed Retirement Credits:</strong> Unlike your own retirement benefit,
-    survivor benefits do NOT increase if you wait past your survivor NRA. The maximum
-    is reached at your survivor full retirement age. Waiting until 70 provides no
-    additional increase for survivor benefits.
-  </div>
+  <p>
+    Note that survivor benefits do not earn delayed retirement credits. The
+    maximum is reached at your survivor full retirement age; waiting until 70
+    provides no additional increase.
+  </p>
 
   <h2>Strategic Claiming: Switching Between Benefits</h2>
 
   <p>
-    One of the most valuable aspects of survivor benefits is the ability to
-    <strong>claim one type of benefit first and switch later</strong>. This is
-    different from spousal benefits, where such strategies are more limited.
+    Here's the part most people miss: you can claim one benefit first and
+    switch to the other later. That's not allowed with spousal benefits, but
+    it is with survivor benefits.
   </p>
 
-  <div class="example-box">
-    <h4>Example: Maria's Switching Strategy</h4>
-    <p>
-      Maria is 60 when her husband dies. Her own <a href="/guides/pia">PIA</a> is
-      $1,800, and her full survivor benefit would be $2,400.
-    </p>
+  <p>
+    Take an example. Maria is 60 when her husband dies. Her own
+    <a href="/guides/pia">PIA</a> is $1,800, and her full survivor benefit would
+    be $2,400.
+  </p>
 
-    <h5>Option A: Survivor First, Own Later</h5>
-    <ul>
-      <li>
-        Age 60: Claim survivor benefit at 71.5% = $2,400 × 71.5% = <strong
-          >$1,716/month</strong
-        >
-      </li>
-      <li>
-        Age 70: Switch to own benefit with delayed credits = $1,800 × 124% = <strong
-          >$2,232/month</strong
-        >
-      </li>
-    </ul>
+  <p>
+    Option A is survivor first, own later. At 60, Maria claims the survivor
+    benefit at 71.5%: $2,400 × 71.5% = $1,716/month. At 70, she switches to her
+    own benefit with delayed credits: $1,800 × 124% = $2,232/month.
+  </p>
 
-    <h5>Option B: Own First, Survivor Later</h5>
-    <ul>
-      <li>
-        Age 62: Claim own benefit at 70% = $1,800 × 70% = <strong
-          >$1,260/month</strong
-        >
-      </li>
-      <li>
-        Age 67: Switch to full survivor benefit = <strong>$2,400/month</strong>
-      </li>
-    </ul>
+  <p>
+    Option B is own first, survivor later. At 62, she claims her own benefit at
+    70%: $1,800 × 70% = $1,260/month. At 67, she switches to the full survivor
+    benefit of $2,400/month.
+  </p>
 
-    <p>
-      The best choice depends on Maria's health, financial needs, and life
-      expectancy. Option A provides more money initially; Option B provides a
-      higher ultimate benefit.
-    </p>
-  </div>
-
-  <h3>When Each Strategy Makes Sense</h3>
-
-  <ul>
-    <li>
-      <strong>Claim survivor first:</strong> If your own benefit at 70 would be higher
-      than your full survivor benefit, claim survivor early and let your own benefit
-      grow.
-    </li>
-    <li>
-      <strong>Claim own first:</strong> If the full survivor benefit is higher than
-      your own benefit at 70, claim your reduced own benefit early and switch to
-      the full survivor benefit at your survivor NRA.
-    </li>
-  </ul>
+  <p>
+    Which order? Compare your own benefit at 70 against your full survivor
+    benefit. Whichever is bigger, save it for later and claim the other one
+    early. In Maria's case, the survivor benefit at 67 ($2,400) beats her own
+    at 70 ($2,232), so Option B gives her the higher ultimate benefit, while
+    Option A provides more money initially. Health, financial needs, and life
+    expectancy all factor in.
+  </p>
 
   <h2>Remarriage and Survivor Benefits</h2>
 
   <p>
-    Remarriage can affect your eligibility for survivor benefits, but the rules
-    are flexible:
+    If you remarry before age 60 (or 50 if disabled), you generally cannot
+    receive survivor benefits from your deceased spouse while you remain
+    married. If that marriage ends, you may regain eligibility.
   </p>
 
-  <div class="requirements-box">
-    <h3>Remarriage Rules</h3>
-
-    <h4>Remarriage Before Age 60</h4>
-    <p>
-      If you remarry before age 60 (or 50 if disabled), you generally cannot
-      receive survivor benefits from your deceased spouse while you remain
-      married. However, if that marriage ends, you may regain eligibility.
-    </p>
-
-    <h4>Remarriage at Age 60 or Later</h4>
-    <p>
-      If you remarry at age 60 or later (50 if disabled), you can still receive
-      survivor benefits from your deceased spouse. This is a significant
-      exception that preserves your benefit eligibility.
-    </p>
-  </div>
-
-  <div class="highlight-box">
-    <strong>Planning Tip:</strong> If you're considering remarriage and are close
-    to age 60, waiting until after your 60th birthday preserves your survivor benefit
-    eligibility from your deceased spouse.
-  </div>
+  <p>
+    If you remarry at age 60 or later (50 if disabled), you keep your
+    eligibility. So if you're considering remarriage and are close to 60,
+    waiting until after your 60th birthday preserves your survivor benefit.
+  </p>
 
   <h2>Work Credits Required</h2>
 
   <p>
     For survivors to receive benefits, the deceased worker must have earned
     enough <a href="/guides/work-credits">work credits</a>. The number required
-    depends on the worker's age at death:
+    depends on the worker's age at death: generally 6 credits for workers under
+    age 28, and 1 credit for each year after age 21 for older workers, up to a
+    maximum of 40.
   </p>
-
-  <ul>
-    <li><strong>Under age 28:</strong> Generally 6 credits needed</li>
-    <li>
-      <strong>Age 28 and older:</strong> Generally 1 credit for each year after age
-      21, up to 40 credits maximum
-    </li>
-  </ul>
 
   <p>
     There's also a special rule: if a worker dies leaving a spouse with
@@ -438,7 +346,7 @@
 
   <p>
     In addition to monthly survivor benefits, Social Security pays a one-time
-    <strong>lump sum death benefit of $255</strong> to:
+    lump sum death benefit of $255 to:
   </p>
 
   <ul>
@@ -457,8 +365,8 @@
   <p>
     Prior to January 2025, the Government Pension Offset (GPO) reduced survivor
     benefits for those receiving government pensions from work not covered by
-    Social Security. The <strong>Social Security Fairness Act of 2025</strong>
-    repealed this provision.
+    Social Security. The Social Security Fairness Act of 2025 repealed this
+    provision.
   </p>
 
   <p>
@@ -470,74 +378,55 @@
 
   <h2>Common Misconceptions</h2>
 
-  <div class="warning-box">
-    <strong>Myth: "I have to wait until 62 to claim survivor benefits."</strong>
-    <p>
-      Reality: Widows and widowers can claim survivor benefits as early as age
-      60. If disabled, you can claim as early as age 50. This is different from
-      retirement and spousal benefits, which require age 62.
-    </p>
-  </div>
+  <p>
+    A common one: thinking you have to wait until 62 to claim. Not so. Widows
+    and widowers can claim survivor benefits as early as age 60, or 50 if
+    disabled. The age-62 minimum applies to retirement and spousal benefits,
+    not survivor benefits.
+  </p>
 
-  <div class="warning-box">
-    <strong>Myth: "Survivor benefits are half of my spouse's benefit."</strong>
-    <p>
-      Reality: That's spousal benefits you're thinking of. Survivor benefits can
-      be up to 100% of your deceased spouse's benefit amount, not 50%.
-    </p>
-  </div>
-
-  <div class="warning-box">
-    <strong
-      >Myth: "If I claim survivor benefits, I can never get my own."</strong
-    >
-    <p>
-      Reality: You can switch between survivor benefits and your own retirement
-      benefit. Many people strategically claim one first and switch to the other
-      later to maximize lifetime benefits.
-    </p>
-  </div>
-
-  <div class="warning-box">
-    <strong>Myth: "I remarried, so I can't get survivor benefits."</strong>
-    <p>
-      Reality: If you remarried at age 60 or later (50 if disabled), you can
-      still receive survivor benefits from your deceased spouse. Even if you
-      remarried earlier, you may regain eligibility if that marriage ends.
-    </p>
-  </div>
-
-  <div class="warning-box">
-    <strong
-      >Myth: "Waiting past my survivor NRA will increase my benefit."</strong
-    >
-    <p>
-      Reality: Survivor benefits do NOT earn delayed retirement credits. Your
-      maximum survivor benefit is at your survivor NRA. Unlike your own
-      retirement benefit, there's no advantage to waiting past that age.
-    </p>
-  </div>
+  <p>
+    Another: assuming survivor benefits are half of your spouse's benefit.
+    That's spousal benefits you're thinking of. Survivor benefits can be up to
+    100% of your deceased spouse's benefit, not 50%.
+  </p>
 
   <h2>Frequently Asked Questions</h2>
 
   <div class="faq">
-    {#each faqs as faq}
-      <h3>{faq.question}</h3>
-      <p>{faq.answer}</p>
-    {/each}
+    <h3>Can I collect survivor benefits at age 60?</h3>
+    <p>
+      Yes, though claiming at 60 reduces the benefit to about 71.5% of the full
+      amount. If you're disabled, you can claim as early as 50.
+    </p>
+
+    <h3>Can I receive both my own Social Security and survivor benefits?</h3>
+    <p>
+      Not both at once; Social Security pays the higher of the two. But you can
+      claim one first and switch to the other later, as described above.
+    </p>
+
+    <h3>Can I remarry and still collect survivor benefits?</h3>
+    <p>
+      It depends on when. Remarriage at 60 or later (50 if disabled) doesn't
+      affect your eligibility; remarriage before then generally does, at least
+      while the new marriage lasts.
+    </p>
+
+    <h3>Do survivor benefits increase if I wait past full retirement age?</h3>
+    <p>
+      They don't. Survivor benefits max out at your survivor NRA; there are no
+      delayed retirement credits.
+    </p>
   </div>
 
   <h2>How to Apply for Survivor Benefits</h2>
 
-  <p>You can apply for survivor benefits:</p>
-
-  <ul>
-    <li><strong>By phone:</strong> Call Social Security at 1-800-772-1213</li>
-    <li><strong>In person:</strong> Visit your local Social Security office</li>
-    <li>
-      <strong>Online:</strong> Limited online options available at ssa.gov
-    </li>
-  </ul>
+  <p>
+    You can apply by phone at 1-800-772-1213 or in person at your local Social
+    Security office. Online options at ssa.gov are limited for survivor
+    claims.
+  </p>
 
   <p>You'll need:</p>
 
@@ -553,8 +442,7 @@
   <h2>Calculate Your Benefits</h2>
 
   <p>
-    Understanding your options starts with knowing your own benefit amount. Use
-    the <a href="/calculator">SSA.tools calculator</a> to estimate your retirement
+    Use the <a href="/calculator">ssa.tools calculator</a> to estimate your retirement
     benefit based on your earnings history.
   </p>
 
@@ -577,23 +465,6 @@
 </div>
 
 <style>
-  .key-takeaways {
-    background-color: #e8f5e9;
-    border: 1px solid #4caf50;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .key-takeaways h3 {
-    margin-top: 0;
-    color: #2e7d32;
-  }
-
-  .key-takeaways ul {
-    margin-bottom: 0;
-  }
-
   .requirements-box {
     background-color: #fff3e0;
     border: 1px solid #ff9800;
@@ -629,41 +500,6 @@
     border-radius: 4px;
     width: fit-content;
     max-width: 70%;
-  }
-
-  .highlight-box ul {
-    margin-bottom: 0;
-    margin-top: 0.5em;
-  }
-
-  .warning-box {
-    background-color: #fffde7;
-    border-left: 4px solid #fbc02d;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 4px;
-  }
-
-  .warning-box p {
-    margin: 0.5em 0 0 0;
-  }
-
-  .example-box {
-    background-color: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .example-box h4 {
-    margin-top: 0;
-    color: #333;
-  }
-
-  .example-box h5 {
-    color: #555;
-    margin-bottom: 0.5em;
   }
 
   .benefit-table {
