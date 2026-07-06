@@ -45,8 +45,14 @@
     "terser": "^5.43.1",
     "tslib": "^2.4.1",
     "typescript": "^5.3.3",
-    "vite": "^7.3.2",
+    "vite": "^7.3.6",
     "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "uuid": "^11.1.1",
+    "vite": {
+      "esbuild": "^0.28.1"
+    }
   },
   "type": "module",
   "engines": {
