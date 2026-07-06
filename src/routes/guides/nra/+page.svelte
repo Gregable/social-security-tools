@@ -72,38 +72,12 @@ fraTable.push({
   <h1>{title}</h1>
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
-  <div class="key-takeaways">
-    <h3>Key Takeaways</h3>
-    <ul>
-      <li>
-        <strong>Normal Retirement Age</strong> (NRA) is the age at which you receive
-        your full <a href="/guides/pia">Primary Insurance Amount (PIA)</a> with no
-        reduction or increase
-      </li>
-      <li>
-        NRA ranges from <strong>65 to 67</strong> depending on your birth year
-      </li>
-      <li>
-        Filing before NRA permanently <strong>reduces</strong> your benefit
-      </li>
-      <li>
-        Filing after NRA <strong>increases</strong> your benefit through delayed
-        retirement credits, up to age 70
-      </li>
-      <li>
-        The Social Security Administration uses both "Normal Retirement Age" and
-        "Full Retirement Age" interchangeably
-      </li>
-    </ul>
-  </div>
-
   <h2>What Is Normal Retirement Age?</h2>
 
   <p>
-    <strong>Normal Retirement Age</strong> (NRA), also called
-    <strong>Full Retirement Age</strong>
-    (FRA), is the age at which you're entitled to receive 100% of your calculated
-    Social Security benefit, known as your
+    Normal Retirement Age (NRA), also called Full Retirement Age (FRA), is the
+    age at which you're entitled to receive 100% of your calculated Social
+    Security benefit, known as your
     <a href="/guides/pia">Primary Insurance Amount (PIA)</a>.
   </p>
 
@@ -113,19 +87,10 @@ fraTable.push({
     "Normal Retirement Age" is common in technical documents and benefit
     calculations. This site primarily uses NRA because "full" can be misleading:
     you can actually receive <em>more</em> than your "full" benefit by delaying
-    past NRA up to age 70.
+    past NRA, up to 24–32% more at age 70 depending on your birth year. NRA is
+    simply the reference point: the age where there's no reduction for early
+    filing and no increase for delayed filing.
   </p>
-
-  <div class="highlight-box">
-    <strong>Why "Normal" Instead of "Full"?</strong>
-    <p>
-      The term "Full Retirement Age" suggests you receive your maximum benefit
-      at that age. In reality, delaying benefits until age 70 results in a
-      benefit that's 24–32% higher than your NRA benefit (depending on your
-      birth year). NRA is simply the reference point: the age where there's no
-      reduction for early filing and no increase for delayed filing.
-    </p>
-  </div>
 
   <h2>NRA by Birth Year</h2>
 
@@ -179,16 +144,11 @@ fraTable.push({
 
   <div class="formula-box">
     <h3>Early Filing Reduction Formula</h3>
-    <ul>
-      <li>
-        <strong>First 36 months early:</strong> Benefit reduced by 5/9 of 1% per
-        month (6.67% per year)
-      </li>
-      <li>
-        <strong>Additional months beyond 36:</strong> Benefit reduced by 5/12 of
-        1% per month (5% per year)
-      </li>
-    </ul>
+    <p>
+      For the first 36 months before NRA, your benefit is reduced by 5/9 of 1%
+      per month (6.67% per year). For each month beyond 36, the reduction is
+      5/12 of 1% per month (5% per year).
+    </p>
   </div>
 
   <h3>Example: Filing at 62 with NRA of 67</h3>
@@ -226,16 +186,16 @@ fraTable.push({
   <h2>Filing After Normal Retirement Age</h2>
 
   <p>
-    If you delay filing past your NRA, you earn <strong>delayed retirement
-    credits</strong> that increase your benefit. These credits accrue monthly
-    until age 70, after which there's no additional benefit to waiting.
+    If you delay filing past your NRA, you earn delayed retirement credits
+    that increase your benefit. These credits accrue monthly until age 70,
+    after which there's no additional benefit to waiting.
   </p>
 
   <div class="formula-box">
     <h3>Delayed Retirement Credits</h3>
     <p>
-      For those born in 1943 or later, the credit is <strong>8% per year</strong>
-      (2/3 of 1% per month) for each year you delay past NRA, up to age 70.
+      For those born in 1943 or later, the credit is 8% per year (2/3 of 1% per
+      month) for each year you delay past NRA, up to age 70.
     </p>
   </div>
 
@@ -259,16 +219,17 @@ fraTable.push({
     </p>
   </div>
 
-  <div class="highlight-box">
-    <strong>Note:</strong> If you're already receiving benefits and delay past NRA,
-    your delayed credits are applied in January of the following year, not immediately.
-    See our guide on the <a href="/guides/delayed-january-bump">delayed January bump</a>
-    for more details.
-  </div>
+  <p>
+    One quirk: if you're already receiving benefits and delay past NRA, your
+    delayed credits are applied in January of the following year, not
+    immediately. See our guide on the
+    <a href="/guides/delayed-january-bump">delayed January bump</a> for more
+    details.
+  </p>
 
   <h2>Why NRA Matters Beyond Personal Benefits</h2>
 
-  <p>Your NRA affects more than just your own retirement benefit:</p>
+  <p>NRA also shows up in a few other places.</p>
 
   <h3>Spousal Benefits</h3>
   <p>
@@ -300,42 +261,35 @@ fraTable.push({
 
   <h2>Common Misconceptions</h2>
 
-  <div class="warning-box">
-    <strong>Myth: "I should file at my Full Retirement Age to get my full benefit."</strong>
-    <p>
-      Reality: NRA is not the age at which you receive the most money. If you
-      can afford to wait, delaying until 70 provides a significantly higher
-      lifetime benefit if you live past your early 80s. The "full" in Full
-      Retirement Age simply means no reduction or increase. It's the neutral
-      reference point.
-    </p>
-  </div>
+  <p>
+    One common mistake: assuming that filing at your "Full Retirement Age" gets
+    you the biggest check. It doesn't. If you can afford to wait, delaying
+    until 70 gives you a higher monthly benefit for life, which works out to
+    more total money if you live past your early 80s. The "full" in Full
+    Retirement Age just means no reduction and no increase; it's the neutral
+    reference point.
+  </p>
 
-  <div class="warning-box">
-    <strong>Myth: "Everyone's NRA is 65."</strong>
-    <p>
-      Reality: This was true for those born before 1938, but NRA has been
-      gradually increasing. For anyone born in 1960 or later, NRA is 67. Using
-      65 as your NRA could lead to significant miscalculations in retirement
-      planning.
-    </p>
-  </div>
+  <p>
+    Another: assuming everyone's NRA is 65. That was true for people born
+    before 1938, but NRA has been rising since then. For anyone born in 1960 or
+    later, it's 67. Planning around age 65 can throw off your numbers by a fair
+    amount.
+  </p>
 
-  <div class="warning-box">
-    <strong>Myth: "The early filing reduction goes away at NRA."</strong>
-    <p>
-      Reality: If you file early, the reduction is permanent. Your benefit will
-      never increase to what it would have been had you waited until NRA (though
-      it will still receive annual COLA adjustments).
-    </p>
-  </div>
+  <p>
+    Finally, some people believe the early filing reduction goes away once you
+    reach NRA. It doesn't. If you file early, the reduction is permanent; your
+    benefit never catches up to what it would have been had you waited (though
+    it still receives annual COLA adjustments).
+  </p>
 
   <h2>Calculate Your Specific Situation</h2>
 
   <p>
-    Your optimal filing age depends on many personal factors: your health, other
-    income sources, spousal considerations, and more. Use the
-    <a href="/calculator">SSA.tools calculator</a> to see exactly how different
+    There's no single right filing age; it depends on your health, your other
+    income, and your spouse's situation. Use the
+    <a href="/calculator">ssa.tools calculator</a> to see exactly how different
     filing ages affect your benefits based on your actual earnings record.
   </p>
 
@@ -377,45 +331,6 @@ fraTable.push({
 </div>
 
 <style>
-  .key-takeaways {
-    background-color: #e8f5e9;
-    border: 1px solid #4caf50;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .key-takeaways h3 {
-    margin-top: 0;
-    color: #2e7d32;
-  }
-
-  .key-takeaways ul {
-    margin-bottom: 0;
-  }
-
-  .key-takeaways li {
-    margin-bottom: 8px;
-  }
-
-  .key-takeaways li:last-child {
-    margin-bottom: 0;
-  }
-
-  .highlight-box {
-    background-color: #f0f8ff;
-    border-left: 4px solid #4a90e2;
-    padding: 15px;
-    margin: 20px auto;
-    border-radius: 4px;
-    width: fit-content;
-    max-width: 70%;
-  }
-
-  .highlight-box p {
-    margin: 10px 0 0 0;
-  }
-
   .table-container {
     overflow-x: auto;
   }
@@ -463,22 +378,6 @@ fraTable.push({
     color: #2c3e50;
   }
 
-  .formula-box ul {
-    list-style: none;
-    padding-left: 0;
-    margin-bottom: 0;
-  }
-
-  .formula-box li {
-    padding: 8px 0;
-    border-bottom: 1px solid #e9ecef;
-  }
-
-  .formula-box li:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
   .formula-box p {
     margin-bottom: 0;
   }
@@ -516,18 +415,6 @@ fraTable.push({
     margin-bottom: 0;
     font-style: italic;
     color: #555;
-  }
-
-  .warning-box {
-    background-color: #fffde7;
-    border-left: 4px solid #fbc02d;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 4px;
-  }
-
-  .warning-box p {
-    margin: 0.5em 0 0 0;
   }
 
   @media (max-width: 600px) {

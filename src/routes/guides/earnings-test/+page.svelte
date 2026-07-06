@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
+  import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
 
@@ -29,43 +29,6 @@
     "retirement earnings limit",
   ];
 
-  const faqs = [
-    {
-      question: "Can I work while receiving Social Security retirement benefits?",
-      answer:
-        "Yes, you can work while receiving Social Security benefits at any age. However, if you're under full retirement age (FRA), your benefits may be temporarily reduced if your earnings exceed certain limits. Once you reach FRA, you can earn any amount without affecting your benefits.",
-    },
-    {
-      question: "What is the Social Security earnings limit for 2026?",
-      answer:
-        "For 2026, if you're under full retirement age all year, you can earn up to $24,480 before your benefits are reduced. If you reach FRA during 2026, the limit is $65,160 for the months before you reach FRA. After reaching FRA, there is no earnings limit.",
-    },
-    {
-      question: "How much will my Social Security be reduced if I work?",
-      answer:
-        "If you're under full retirement age all year, Social Security deducts $1 from your benefits for every $2 you earn above the annual limit. In the year you reach FRA, they deduct $1 for every $3 above a higher limit, and only count earnings before your birthday month.",
-    },
-    {
-      question: "Do I lose Social Security benefits permanently if I earn too much?",
-      answer:
-        "No, you do not lose benefits permanently. Any benefits withheld due to the earnings test are returned to you after you reach full retirement age through higher monthly payments. Social Security recalculates your benefit amount to credit you for the months when benefits were withheld.",
-    },
-    {
-      question: "What income counts toward the Social Security earnings test?",
-      answer:
-        "Only wages from employment and net self-employment income count toward the earnings test. This includes bonuses, commissions, and vacation pay. Investment income, pensions, annuities, interest, capital gains, government benefits, and retirement account withdrawals do NOT count.",
-    },
-    {
-      question: "Does the earnings test apply after full retirement age?",
-      answer:
-        "No. Once you reach full retirement age, the earnings test no longer applies. You can earn any amount from working without any reduction to your Social Security benefits.",
-    },
-    {
-      question: "What is the monthly earnings test?",
-      answer:
-        "In your first year of retirement, Social Security uses a monthly test as an alternative. In 2026, if you earn $2,040 or less in a month (or $5,430 if reaching FRA that year), you receive full benefits for that month regardless of your annual earnings. This helps people who retire mid-year.",
-    },
-  ];
 </script>
 
 <svelte:head>
@@ -74,7 +37,6 @@
   <link rel="canonical" href="https://ssa.tools/guides/earnings-test" />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
-  {@html renderFAQSchema(faqs)}
 </svelte:head>
 
 <div class="guide-page">
@@ -82,47 +44,14 @@
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
   <p>
-    <strong>Can you work while collecting Social Security?</strong> Yes, but if
-    you haven't reached <a href="/guides/nra">full retirement age</a>, your
-    benefits may be temporarily reduced if you earn above certain limits. The
-    good news: <strong>any withheld benefits are returned to you later</strong>.
+    A lot of people believe that if they work while collecting Social Security,
+    they'll permanently lose part of their benefit. That's not how it works.
+    If you're under <a href="/guides/nra">full retirement age</a> and earn
+    above certain limits, some of your benefit is withheld for now — but the
+    money that gets withheld comes back to you later. Once you understand this,
+    the decision about whether to keep working while claiming looks quite
+    different.
   </p>
-
-  <p>
-    The Social Security "earnings test" is one of the most misunderstood aspects
-    of the program. Many people believe that working will permanently reduce
-    their benefits, but this isn't true. Understanding how the earnings test
-    actually works can help you make better decisions about when to claim
-    benefits and whether to continue working.
-  </p>
-
-  <div class="key-takeaways">
-    <h3>Key Takeaways</h3>
-    <ul>
-      <li>
-        You <strong>can</strong> work and receive Social Security at any age
-      </li>
-      <li>
-        <strong>Before full retirement age:</strong> Benefits reduced $1 for every
-        $2 earned above $24,480 (2026)
-      </li>
-      <li>
-        <strong>Year you reach FRA:</strong> Reduced $1 for every $3 above $65,160
-        (2026)
-      </li>
-      <li>
-        <strong>At or after FRA:</strong> No earnings limit - earn any amount
-      </li>
-      <li>
-        Withheld benefits are <strong>not lost</strong> - they're returned
-        through higher payments after FRA
-      </li>
-      <li>
-        Only <strong>wages and self-employment income</strong> count - not investments,
-        pensions, or retirement withdrawals
-      </li>
-    </ul>
-  </div>
 
   <h2>2025 and 2026 Earnings Limits</h2>
 
@@ -164,101 +93,75 @@
     <a href="/guides/nra">full retirement age (FRA)</a>:
   </p>
 
-  <div class="requirements-box">
-    <h3>Under Full Retirement Age All Year</h3>
-    <p>
-      If you won't reach FRA at any point during the year, Social Security
-      deducts <strong>$1 from your benefits for every $2</strong> you earn above
-      the annual limit.
-    </p>
+  <h3>Under Full Retirement Age All Year</h3>
 
-    <h4>Example: Sarah, Age 63</h4>
-    <ul>
-      <li>Sarah's benefit: $1,500/month ($18,000/year)</li>
-      <li>Her 2026 earnings: $34,480</li>
-      <li>Amount over limit: $34,480 - $24,480 = $10,000</li>
-      <li>Benefit reduction: $10,000 ÷ 2 = $5,000</li>
-      <li>Annual benefits received: $18,000 - $5,000 = $13,000</li>
-    </ul>
-    <p>
-      Social Security withholds benefits starting in January until the $5,000 is
-      recovered. Sarah receives no checks for the first 3-4 months, then full
-      checks the rest of the year.
-    </p>
-  </div>
+  <p>
+    If you won't reach FRA at any point during the year, Social Security
+    deducts $1 from your benefits for every $2 you earn above the annual limit.
+  </p>
 
-  <div class="requirements-box">
-    <h3>Year You Reach Full Retirement Age</h3>
-    <p>
-      In the year you turn FRA, the rules are more generous. Social Security
-      only counts earnings from months <strong>before</strong> your birthday month,
-      and deducts just <strong>$1 for every $3</strong> over a higher limit.
-    </p>
+  <p>
+    Take Sarah, age 63, with a benefit of $1,500 per month ($18,000 per year).
+    She earns $34,480 in 2026 — that's $10,000 over the $24,480 limit. Half of
+    the excess, $5,000, is withheld from her benefits, so she receives $13,000
+    for the year instead of $18,000. In practice, Social Security withholds
+    whole checks starting in January until the $5,000 is recovered: Sarah gets
+    no checks for the first 3-4 months, then full checks the rest of the year.
+  </p>
 
-    <h4>Example: Tom Turns 67 (FRA) in August 2026</h4>
-    <ul>
-      <li>Tom's benefit: $2,000/month</li>
-      <li>His earnings January-July: $70,000</li>
-      <li>Amount over limit: $70,000 - $65,160 = $4,840</li>
-      <li>Benefit reduction: $4,840 ÷ 3 = $1,613</li>
-      <li>Tom loses about one month of benefits</li>
-      <li>Starting in August, no earnings test applies</li>
-    </ul>
-  </div>
+  <h3>Year You Reach Full Retirement Age</h3>
 
-  <div class="highlight-box">
-    <strong>At Full Retirement Age or Older:</strong> The earnings test disappears
-    entirely. You can earn any amount from working without any reduction to your
-    Social Security benefits.
-  </div>
+  <p>
+    In the year you turn FRA, the rules are more generous. Social Security
+    only counts earnings from months before your birthday month, and deducts
+    just $1 for every $3 over a higher limit.
+  </p>
+
+  <p>
+    Say Tom turns 67 — his FRA — in August 2026, and his benefit is $2,000 per
+    month. He earns $70,000 from January through July, which is $4,840 over
+    the $65,160 limit. One third of that, about $1,613, is withheld — roughly
+    one month of benefits. Starting in August, the earnings test no longer
+    applies to him at all.
+  </p>
+
+  <p>
+    And once you're at full retirement age or older, the earnings test
+    disappears entirely. You can earn any amount from working without any
+    reduction to your benefits.
+  </p>
 
   <InlineCTA type="calculator" />
 
   <h2>Your Withheld Benefits Are Returned</h2>
 
   <p>
-    This is the most important and least understood part of the earnings test:
-    <strong>benefits withheld are not lost forever</strong>. When you reach full
-    retirement age, Social Security recalculates your benefit to give you credit
-    for the months when benefits were withheld.
+    So what happens to the money that was withheld? You get it back. When you
+    reach full retirement age, Social Security recalculates your benefit as if
+    you had claimed later than you actually did, giving you credit for the
+    months when benefits were withheld.
   </p>
 
-  <div class="example-box">
-    <h4>Example: How Benefits Are Returned</h4>
-    <p>
-      Lisa claimed benefits at 62 and had benefits withheld for 24 months due to
-      the earnings test before reaching her FRA of 67.
-    </p>
-    <ul>
-      <li>Original reduction for claiming at 62: 30% (she gets 70% of PIA)</li>
-      <li>
-        After FRA recalculation: Credit for 24 months of withheld benefits
-      </li>
-      <li>
-        New reduction: Approximately 20% instead of 30% (she now gets ~80% of
-        PIA)
-      </li>
-      <li>
-        This higher amount continues for the rest of her life
-      </li>
-    </ul>
-    <p>
-      The recalculated benefit effectively "pays back" the withheld benefits
-      over time through permanently higher monthly payments.
-    </p>
-  </div>
+  <p>
+    For example, Lisa claimed benefits at 62 and had benefits withheld for 24
+    months before reaching her FRA of 67. Her original reduction for claiming
+    at 62 was 30% — she got 70% of her PIA. At FRA, Social Security credits her
+    for those 24 withheld months, and her reduction shrinks to roughly 20%. She
+    now gets about 80% of PIA, and that higher amount continues for the rest of
+    her life.
+  </p>
 
-  <div class="warning-box">
-    <strong>The payback isn't immediate:</strong> You won't receive a lump sum for
-    withheld benefits. Instead, your monthly benefit is increased, and over time
-    (typically 12-15 years) you recover the full amount that was withheld.
-  </div>
+  <p>
+    The payback isn't immediate, though. You won't receive a lump sum. Instead,
+    your monthly benefit is increased, and over time — typically 12 to 15 years
+    — you recover the full amount that was withheld.
+  </p>
 
   <h2>What Counts as "Earnings"?</h2>
 
   <p>
-    Only certain types of income count toward the earnings test. Understanding
-    this distinction is crucial for retirement planning.
+    Not all income counts. The earnings test only looks at money you earn from
+    working.
   </p>
 
   <div class="two-column">
@@ -290,19 +193,19 @@
     </div>
   </div>
 
-  <div class="highlight-box">
-    <strong>Planning Tip:</strong> If you're under FRA and want to minimize the
-    earnings test impact, you can shift income sources. For example, drawing more
-    from retirement accounts while working less may result in higher total income
+  <p>
+    This distinction matters if you're under FRA and want to reduce the impact
+    of the earnings test. Because only work income counts, drawing more from
+    retirement accounts while working less can give you the same total income
     while keeping your Social Security benefits intact.
-  </div>
+  </p>
 
   <h2>The Monthly Earnings Test (First Year Rule)</h2>
 
   <p>
     In your first year of receiving benefits, Social Security offers an
-    alternative <strong>monthly test</strong>. This helps people who retire
-    mid-year after earning significant income earlier in the year.
+    alternative monthly test. This helps people who retire mid-year after
+    earning a lot earlier in the year.
   </p>
 
   <table class="benefit-table">
@@ -327,32 +230,22 @@
     </tbody>
   </table>
 
-  <div class="example-box">
-    <h4>Example: Mid-Year Retirement</h4>
-    <p>
-      Mike, age 64, earned $80,000 from January through June 2026, then retired
-      and started Social Security in July. From July through December, he earns
-      nothing.
-    </p>
-    <ul>
-      <li>Annual test: $80,000 is way over the $24,480 limit</li>
-      <li>
-        Monthly test: In July-December, he earns $0/month (under $2,040 limit)
-      </li>
-      <li>Result: Mike receives full benefits for July-December</li>
-    </ul>
-    <p>
-      The monthly test only applies in the first year you receive benefits. In
-      subsequent years, only the annual test applies.
-    </p>
-  </div>
+  <p>
+    Here's how it helps. Mike, age 64, earned $80,000 from January through June
+    2026, then retired and started Social Security in July. Under the annual
+    test, $80,000 is way over the $24,480 limit. But under the monthly test, he
+    earns $0 per month from July through December — well under the $2,040
+    monthly limit — so he receives full benefits for those months. The monthly
+    test only applies in the first year you receive benefits; after that, only
+    the annual test applies.
+  </p>
 
   <h2>Special Situations</h2>
 
   <h3>Self-Employment</h3>
 
   <p>
-    If you're self-employed, Social Security counts your <strong>net earnings</strong>
+    If you're self-employed, Social Security counts your net earnings
     (profit after business expenses). In your first year of retirement, they may
     also apply a "services test" - if you work more than 45 hours per month in your
     business (or 15-45 hours in a highly skilled occupation), you may not be considered
@@ -379,109 +272,52 @@
 
   <h2>Common Misconceptions</h2>
 
-  <div class="warning-box">
-    <strong>Myth: "Working will permanently reduce my Social Security."</strong>
-    <p>
-      Reality: Benefits withheld due to the earnings test are credited back to
-      you at full retirement age through higher monthly payments. You eventually
-      recover the withheld amounts.
-    </p>
-  </div>
+  <p>
+    Does working permanently reduce your Social Security? No. Benefits withheld
+    by the earnings test are credited back to you at full retirement age
+    through higher monthly payments, so you eventually recover the withheld
+    amounts.
+  </p>
 
-  <div class="warning-box">
-    <strong>Myth: "All my income counts toward the earnings test."</strong>
-    <p>
-      Reality: Only wages and self-employment income count. Investment income,
-      pensions, retirement account withdrawals, and other passive income do not
-      trigger the earnings test.
-    </p>
-  </div>
+  <p>
+    Does all your income count toward the test? Also no. Only wages and
+    self-employment income count. Investment income, pensions, retirement
+    account withdrawals, and other passive income don't trigger the earnings
+    test at all. And once you reach full retirement age, the test simply stops
+    applying — you can earn any amount without affecting your benefits.
+  </p>
 
-  <div class="warning-box">
-    <strong>Myth: "I should wait until FRA to claim if I'm still working."</strong>
-    <p>
-      Reality: This depends on your situation. Because withheld benefits are
-      returned, continuing to work while claiming early may still make sense.
-      The math depends on your expected earnings, life expectancy, and other
-      factors.
-    </p>
-  </div>
-
-  <div class="warning-box">
-    <strong>Myth: "The earnings test applies after full retirement age."</strong>
-    <p>
-      Reality: Once you reach full retirement age, the earnings test no longer
-      applies. You can earn unlimited amounts without any impact on your Social
-      Security benefits.
-    </p>
-  </div>
+  <p>
+    So should you wait until FRA to claim if you're still working? Not
+    necessarily. Because withheld benefits are returned, claiming early while
+    working can still make sense. The math depends on your expected earnings,
+    life expectancy, and other factors.
+  </p>
 
   <h2>Strategic Considerations</h2>
 
-  <h3>Should You Claim Early If Still Working?</h3>
-
   <p>
-    The decision to claim Social Security while still working depends on several
-    factors:
+    If you're deciding whether to claim while still working, start by
+    estimating how much would be withheld using the limits above. Then weigh
+    the usual claiming factors: a longer life expectancy favors delaying,
+    working income plus Social Security may push you into a higher tax bracket,
+    and your claiming decision affects the survivor benefit your spouse could
+    receive later. If you can cover expenses without Social Security, waiting
+    is often the simpler choice.
   </p>
 
-  <ul>
-    <li>
-      <strong>How much will be withheld?</strong> Calculate your expected reduction
-      using the limits above
-    </li>
-    <li>
-      <strong>Life expectancy:</strong> Longer life expectancy favors delaying benefits
-    </li>
-    <li>
-      <strong>Other income sources:</strong> Can you cover expenses without Social
-      Security?
-    </li>
-    <li>
-      <strong>Tax implications:</strong> Working income plus Social Security may
-      push you into higher tax brackets
-    </li>
-    <li>
-      <strong>Spousal benefits:</strong> Your claiming decision affects your spouse's
-      potential survivor benefits
-    </li>
-  </ul>
-
-  <h3>Partial-Year Strategies</h3>
-
   <p>
-    If you're planning to reduce work, consider timing:
+    Timing within the year matters too. Retiring early in the year means fewer
+    months of earnings count against you, the monthly test can help in your
+    first year if you retire mid-year, and earnings after your FRA birthday
+    month don't count at all.
   </p>
-
-  <ul>
-    <li>
-      Retiring early in the year means fewer months of earnings count against
-      you
-    </li>
-    <li>
-      The monthly test in your first year can help if you retire mid-year
-    </li>
-    <li>
-      Timing your FRA birthday month is important - earnings after that month
-      don't count
-    </li>
-  </ul>
-
-  <h2>Frequently Asked Questions</h2>
-
-  <div class="faq">
-    {#each faqs as faq}
-      <h3>{faq.question}</h3>
-      <p>{faq.answer}</p>
-    {/each}
-  </div>
 
   <h2>Calculate Your Benefits</h2>
 
   <p>
-    Understanding how the earnings test affects you starts with knowing your
-    benefit amount. Use the <a href="/calculator">SSA.tools calculator</a> to estimate
-    your Social Security benefits based on your earnings history.
+    To see what your own benefit would be, try the
+    <a href="/calculator">ssa.tools calculator</a> with your earnings record.
   </p>
 
   <p>
@@ -495,85 +331,6 @@
 </div>
 
 <style>
-  .key-takeaways {
-    background-color: #e8f5e9;
-    border: 1px solid #4caf50;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .key-takeaways h3 {
-    margin-top: 0;
-    color: #2e7d32;
-  }
-
-  .key-takeaways ul {
-    margin-bottom: 0;
-  }
-
-  .requirements-box {
-    background-color: #fff3e0;
-    border: 1px solid #ff9800;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .requirements-box h3 {
-    margin-top: 0;
-    color: #e65100;
-  }
-
-  .requirements-box h4 {
-    color: #e65100;
-    margin-bottom: 0.5em;
-  }
-
-  .requirements-box ul {
-    margin-top: 0.5em;
-    margin-bottom: 1em;
-  }
-
-  .requirements-box ul:last-child {
-    margin-bottom: 0;
-  }
-
-  .highlight-box {
-    background-color: #f0f8ff;
-    border-left: 4px solid #4a90e2;
-    padding: 15px;
-    margin: 20px auto;
-    border-radius: 4px;
-    width: fit-content;
-    max-width: 70%;
-  }
-
-  .warning-box {
-    background-color: #fffde7;
-    border-left: 4px solid #fbc02d;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 4px;
-  }
-
-  .warning-box p {
-    margin: 0.5em 0 0 0;
-  }
-
-  .example-box {
-    background-color: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .example-box h4 {
-    margin-top: 0;
-    color: #333;
-  }
-
   .benefit-table {
     width: fit-content;
     max-width: 80%;
@@ -643,23 +400,9 @@
     margin-bottom: 0;
   }
 
-  .faq h3 {
-    color: #2c3e50;
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-  }
-
-  .faq p {
-    margin-top: 0;
-  }
-
   @media (max-width: 768px) {
     .two-column {
       grid-template-columns: 1fr;
-    }
-
-    .highlight-box {
-      max-width: 100%;
     }
   }
 

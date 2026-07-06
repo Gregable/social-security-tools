@@ -78,43 +78,15 @@
     Delayed Retirement Credits (DRCs) are the core mechanism behind that
     decision. For every month you delay claiming past your
     <a href="/guides/nra">Full Retirement Age (FRA)</a>, your monthly benefit
-    permanently increases. Wait long enough and the increase is substantial.
+    permanently increases. Wait from 67 to 70 and your check is 24% bigger, for
+    life.
   </p>
 
   <p>
-    DRCs are one of the few guaranteed, risk-free ways to increase lifetime
-    income in retirement. Understanding exactly how they work — and when they
-    apply — is essential to making a well-informed claiming decision.
+    The rule itself is simple: your benefit grows by 2/3 of 1% for every month
+    you wait, or 8% per year. But there are a few details worth understanding,
+    especially around spousal and survivor benefits.
   </p>
-
-  <div class="key-takeaways">
-    <h3>Key Takeaways</h3>
-    <ul>
-      <li>
-        DRCs increase your benefit by <strong>2/3 of 1% per month</strong> (8%
-        per year) for each month past FRA
-      </li>
-      <li>
-        Credits stop accruing at <strong>age 70</strong> — never delay past then
-      </li>
-      <li>
-        Maximum increase: <strong>32%</strong> if your FRA is 66, or
-        <strong>24%</strong> if your FRA is 67
-      </li>
-      <li>
-        DRCs apply only to <strong>your own worker benefit</strong>, not to
-        spousal benefits claimed on another's record
-      </li>
-      <li>
-        Survivor benefits <strong>do include</strong> your DRCs — delaying
-        protects your spouse
-      </li>
-      <li>
-        The enhanced amount receives <strong>COLA</strong> — the advantage
-        compounds over time
-      </li>
-    </ul>
-  </div>
 
   <h2>What Are Delayed Retirement Credits?</h2>
 
@@ -127,10 +99,10 @@
   </p>
 
   <p>
-    The credit rate is <strong>2/3 of 1% per month</strong>, which equals
-    exactly <strong>8% per year</strong>. This rate applies to everyone born in
-    1943 or later. (People born before 1943 had lower credit rates — 3% to 7%
-    per year — but that cohort is now past age 82 and largely retired.)
+    The credit rate is 2/3 of 1% per month, which equals exactly 8% per year.
+    This rate applies to everyone born in 1943 or later. People born before
+    1943 had lower credit rates of 3% to 7% per year, but that cohort is now
+    past age 82 and largely retired.
   </p>
 
   <p>
@@ -217,48 +189,39 @@
       <li>Decides to claim at age 69 and 6 months (July 2029)</li>
       <li>Months of delay past FRA: 30 months</li>
       <li>
-        DRC rate: 30 × (2/3 of 1%) = 30 × 0.6667% = <strong>20%</strong>
+        DRC rate: 30 × (2/3 of 1%) = 30 × 0.6667% = 20%
       </li>
-      <li>Benefit at claim: $2,000 × 1.20 = <strong>$2,400/month</strong></li>
+      <li>Benefit at claim: $2,000 × 1.20 = $2,400/month</li>
     </ul>
     <p>
       Had James waited 6 more months to age 70 (January 2030), he would earn
-      the full 36-month credit: $2,000 × 1.24 = <strong>$2,480/month</strong>.
+      the full 36-month credit: $2,000 × 1.24 = $2,480/month.
     </p>
   </div>
 
   <h2>Who Earns Delayed Retirement Credits?</h2>
 
   <p>
-    DRCs apply only to your <strong>own worker benefit</strong> — the retirement
-    benefit calculated from your own earnings record. They do not apply to:
+    DRCs apply only to your own worker benefit, the retirement benefit
+    calculated from your own earnings record. If you collect a spousal benefit
+    based on your spouse's work record, that benefit is capped at 50% of your
+    spouse's PIA no matter how old you are. Your own DRCs have no effect on it.
+    Disability benefits are similar: SSDI converts to a retirement benefit at
+    FRA, and there is no option to delay SSDI to earn DRCs.
   </p>
 
-  <ul>
-    <li>
-      <strong>Spousal benefits:</strong> If you collect a benefit based on your
-      spouse's work record, that benefit is capped at 50% of your spouse's PIA
-      regardless of your age. Your own DRCs have no effect on a spousal benefit.
-    </li>
-    <li>
-      <strong>Disability benefits:</strong> SSDI converts to a retirement
-      benefit at FRA — there is no option to delay SSDI to earn DRCs.
-    </li>
-  </ul>
-
-  <div class="highlight-box">
-    <strong>Important:</strong> If you are eligible for both your own worker
-    benefit and a spousal benefit, SSA pays your own benefit first. Your own
-    DRCs do increase your worker benefit, which may reduce or eliminate the
-    spousal top-up.
-  </div>
+  <p>
+    What if you're eligible for both your own worker benefit and a spousal
+    benefit? SSA pays your own benefit first. Your DRCs do increase your worker
+    benefit, which may reduce or eliminate the spousal top-up.
+  </p>
 
   <h2>DRCs and Survivor Benefits</h2>
 
   <p>
-    One of the most compelling reasons for a high-earning spouse to delay is the
-    effect on survivor benefits. When you die, your surviving spouse can receive
-    up to 100% of what you were receiving. That amount includes your DRCs.
+    There's a second reason to delay that many people miss: survivor benefits.
+    When you die, your surviving spouse can receive up to 100% of what you were
+    actually receiving, including the delayed credits.
   </p>
 
   <div class="example-box">
@@ -281,9 +244,9 @@
       </li>
     </ul>
     <p>
-      For married couples where one spouse has significantly higher earnings,
-      delaying the higher earner's benefit is often the most impactful financial
-      decision they can make.
+      If one of you earned a lot more than the other, delaying the higher
+      earner's benefit protects whichever of you lives longer. That's worth
+      more than the breakeven math alone suggests.
     </p>
   </div>
 
@@ -296,22 +259,17 @@
 
   <p>
     Social Security benefits receive annual Cost-of-Living Adjustments (COLA)
-    to keep pace with inflation. Importantly, COLA applies to your
-    <strong>entire benefit amount</strong>, including the portion added by DRCs.
+    to keep pace with inflation. COLA applies to your entire benefit amount,
+    including the portion added by DRCs.
   </p>
 
   <p>
-    This means the advantage of delaying compounds over time. A larger base
-    benefit grows faster in absolute dollar terms with each COLA increase. If
-    COLA averages 2.5% per year, the gap between a benefit claimed at 67 versus
-    70 widens every single year — not just at the time of claim.
+    Why does this matter? Because COLA is a percentage, a bigger benefit grows
+    by more dollars each year. The gap between claiming at 67 and 70 actually
+    widens over time. A $2,480 benefit at 70 versus $2,000 at 67 starts with a
+    $480 monthly gap. After 10 years of 2.5% COLA, that gap grows to roughly
+    $615.
   </p>
-
-  <div class="highlight-box">
-    <strong>Example:</strong> A $2,480 benefit at 70 versus $2,000 at 67 starts
-    with a $480 monthly gap. After 10 years of 2.5% COLA, the monthly gap grows
-    to roughly $615. The delay advantage never shrinks.
-  </div>
 
   <p>
     For more on how COLA works, see our guide on
@@ -323,7 +281,7 @@
   <p>
     There is a subtle nuance to how DRCs are applied. If you claim benefits
     between February and December of a year, a portion of your DRCs for that
-    year may not appear in your initial benefit check — they are delayed until
+    year may not appear in your initial benefit check. They are delayed until
     January of the following year.
   </p>
 
@@ -353,28 +311,28 @@
   </p>
   <ul>
     <li>
-      <a href="/guides/nra">Normal Retirement Age (FRA)</a> — understand when your
-      DRC window begins
+      <a href="/guides/nra">Normal Retirement Age (FRA)</a>: when your DRC
+      window begins
     </li>
     <li>
-      <a href="/guides/pia">Primary Insurance Amount (PIA)</a> — the base amount
+      <a href="/guides/pia">Primary Insurance Amount (PIA)</a>: the base amount
       DRCs are applied to
     </li>
     <li>
-      <a href="/guides/survivor-benefits">Survivor Benefits</a> — how your DRCs
+      <a href="/guides/survivor-benefits">Survivor Benefits</a>: how your DRCs
       protect a surviving spouse
     </li>
     <li>
-      <a href="/guides/delayed-january-bump">Delayed January Bump</a> — nuance in
+      <a href="/guides/delayed-january-bump">Delayed January Bump</a>: nuance in
       how DRCs are applied month-to-month
     </li>
     <li>
-      <a href="/guides/earnings-test">Earnings Test</a> — how working before FRA
+      <a href="/guides/earnings-test">Earnings Test</a>: how working before FRA
       interacts with DRCs
     </li>
     <li>
-      <a href="/guides/inflation">COLA and Inflation</a> — how your enhanced benefit
-      grows over time
+      <a href="/guides/inflation">COLA and Inflation</a>: how your enhanced
+      benefit grows over time
     </li>
   </ul>
 
@@ -382,33 +340,6 @@
 </div>
 
 <style>
-  .key-takeaways {
-    background-color: #e8f5e9;
-    border: 1px solid #4caf50;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-
-  .key-takeaways h3 {
-    margin-top: 0;
-    color: #2e7d32;
-  }
-
-  .key-takeaways ul {
-    margin-bottom: 0;
-  }
-
-  .highlight-box {
-    background-color: #f0f8ff;
-    border-left: 4px solid #4a90e2;
-    padding: 15px;
-    margin: 20px auto;
-    border-radius: 4px;
-    width: fit-content;
-    max-width: 70%;
-  }
-
   .example-box {
     background-color: #f5f5f5;
     border: 1px solid #ddd;
@@ -458,12 +389,6 @@
 
   .faq p {
     margin-top: 0;
-  }
-
-  @media (max-width: 768px) {
-    .highlight-box {
-      max-width: 100%;
-    }
   }
 
   @media (max-width: 600px) {
