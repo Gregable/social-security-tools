@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
+  import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
   import HeroImage from "./senior-tax-deduction.jpg";
@@ -28,40 +28,6 @@
     "no tax on Social Security",
   ];
 
-  const faqs = [
-    {
-      question:
-        "Does the new senior tax deduction eliminate taxes on Social Security?",
-      answer:
-        "Not directly. The deduction does not change how Social Security benefits are taxed. However, by reducing your taxable income, it may lower or eliminate the amount of federal tax you owe on those benefits. For retirees with modest incomes, the deduction may effectively result in zero federal tax on Social Security.",
-    },
-    {
-      question: "How much is the new senior tax deduction?",
-      answer:
-        "The deduction is $6,000 per eligible individual for tax years 2025 through 2028. A married couple filing jointly where both spouses are 65 or older can deduct up to $12,000.",
-    },
-    {
-      question: "Who qualifies for the senior tax deduction?",
-      answer:
-        "You must be age 65 or older by the end of the tax year, provide a valid Social Security number, and if married, you must file a joint return. The deduction phases out for higher-income filers: beginning at $75,000 MAGI for single filers and $150,000 for joint filers.",
-    },
-    {
-      question: "Is the senior tax deduction permanent?",
-      answer:
-        "No. The deduction applies only to tax years 2025 through 2028. Unless Congress extends it, the provision expires after the 2028 tax year.",
-    },
-    {
-      question:
-        "Can I take the new senior tax deduction along with the existing senior standard deduction?",
-      answer:
-        "Yes. The new deduction stacks on top of both the regular standard deduction and the existing additional standard deduction for taxpayers age 65 and older. For example, a single filer age 65+ in 2026 could receive the standard deduction plus the existing senior addition plus the new $6,000 senior deduction.",
-    },
-    {
-      question: "What is the income phase-out for the senior tax deduction?",
-      answer:
-        "The deduction phases out by $60 for every $1,000 of modified adjusted gross income (MAGI) above $75,000 for single filers or $150,000 for joint filers. It is fully phased out at $175,000 for single filers and $250,000 for joint filers.",
-    },
-  ];
 </script>
 
 <svelte:head>
@@ -73,7 +39,6 @@
   />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
-  {@html renderFAQSchema(faqs)}
 </svelte:head>
 
 <div class="guide-page">

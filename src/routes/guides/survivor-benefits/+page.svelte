@@ -31,43 +31,26 @@
 
   const faqs = [
     {
-      question: "How much is the Social Security survivor benefit?",
-      answer:
-        "The survivor benefit can be up to 100% of the deceased spouse's benefit amount. If you claim at your full survivor retirement age (66-67 depending on birth year), you receive the full amount. Claiming as early as age 60 reduces the benefit to approximately 71.5%. This is significantly higher than spousal benefits, which max out at 50%.",
-    },
-    {
       question: "Can I collect survivor benefits at age 60?",
       answer:
-        "Yes. Widows and widowers can claim survivor benefits as early as age 60. However, claiming at 60 reduces your benefit to approximately 71.5% of the full amount. If you're disabled, you may claim as early as age 50 with a larger reduction. Waiting until your full survivor retirement age (66-67) provides the maximum survivor benefit.",
+        "Yes, though claiming at 60 reduces the benefit to about 71.5% of the full amount. If you're disabled, you can claim as early as 50.",
     },
     {
       question:
         "Can I receive both my own Social Security and survivor benefits?",
       answer:
-        "You cannot receive both benefits simultaneously in full. However, you can claim one benefit first and switch to the other later. For example, claim reduced survivor benefits at 60 while your own benefit grows, then switch to your own benefit at 70 for a higher amount. Social Security pays you the higher of the two.",
+        "Not both at once; Social Security pays the higher of the two. But you can claim one first and switch to the other later, as described above.",
     },
     {
       question: "Can I remarry and still collect survivor benefits?",
       answer:
-        "If you remarry before age 60 (or age 50 if disabled), you generally cannot receive survivor benefits on your deceased spouse's record while married. However, if you remarry at age 60 or later, you can still receive survivor benefits. If the subsequent marriage ends, you may also regain eligibility.",
-    },
-    {
-      question:
-        "What is the difference between survivor benefits and spousal benefits?",
-      answer:
-        "Spousal benefits are for living couples and max out at 50% of your spouse's benefit. Survivor benefits are for widows and widowers and can be up to 100% of the deceased's benefit. Survivor benefits can start at age 60 (vs. 62 for spousal), and have a different full retirement age schedule.",
-    },
-    {
-      question:
-        "How long do you have to be married to collect survivor benefits?",
-      answer:
-        "You must have been married for at least 9 months before your spouse's death to qualify for survivor benefits. Exceptions exist for accidental death, death in military service, or if you were previously married to the same person. For divorced surviving spouses, the marriage must have lasted at least 10 years.",
+        "It depends on when. Remarriage at 60 or later (50 if disabled) doesn't affect your eligibility; remarriage before then generally does, at least while the new marriage lasts.",
     },
     {
       question:
         "Do survivor benefits increase if I wait past full retirement age?",
       answer:
-        "No. Unlike your own retirement benefit, survivor benefits do not earn delayed retirement credits. Your maximum survivor benefit is reached at your full survivor retirement age (66-67 depending on birth year). Waiting past that age provides no additional increase to survivor benefits.",
+        "They don't. Survivor benefits max out at your survivor NRA; there are no delayed retirement credits.",
     },
   ];
 </script>

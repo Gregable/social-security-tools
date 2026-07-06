@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
+  import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
 
@@ -29,43 +29,6 @@
     "retirement earnings limit",
   ];
 
-  const faqs = [
-    {
-      question: "Can I work while receiving Social Security retirement benefits?",
-      answer:
-        "Yes, you can work while receiving Social Security benefits at any age. However, if you're under full retirement age (FRA), your benefits may be temporarily reduced if your earnings exceed certain limits. Once you reach FRA, you can earn any amount without affecting your benefits.",
-    },
-    {
-      question: "What is the Social Security earnings limit for 2026?",
-      answer:
-        "For 2026, if you're under full retirement age all year, you can earn up to $24,480 before your benefits are reduced. If you reach FRA during 2026, the limit is $65,160 for the months before you reach FRA. After reaching FRA, there is no earnings limit.",
-    },
-    {
-      question: "How much will my Social Security be reduced if I work?",
-      answer:
-        "If you're under full retirement age all year, Social Security deducts $1 from your benefits for every $2 you earn above the annual limit. In the year you reach FRA, they deduct $1 for every $3 above a higher limit, and only count earnings before your birthday month.",
-    },
-    {
-      question: "Do I lose Social Security benefits permanently if I earn too much?",
-      answer:
-        "No, you do not lose benefits permanently. Any benefits withheld due to the earnings test are returned to you after you reach full retirement age through higher monthly payments. Social Security recalculates your benefit amount to credit you for the months when benefits were withheld.",
-    },
-    {
-      question: "What income counts toward the Social Security earnings test?",
-      answer:
-        "Only wages from employment and net self-employment income count toward the earnings test. This includes bonuses, commissions, and vacation pay. Investment income, pensions, annuities, interest, capital gains, government benefits, and retirement account withdrawals do NOT count.",
-    },
-    {
-      question: "Does the earnings test apply after full retirement age?",
-      answer:
-        "No. Once you reach full retirement age, the earnings test no longer applies. You can earn any amount from working without any reduction to your Social Security benefits.",
-    },
-    {
-      question: "What is the monthly earnings test?",
-      answer:
-        "In your first year of retirement, Social Security uses a monthly test as an alternative. In 2026, if you earn $2,040 or less in a month (or $5,430 if reaching FRA that year), you receive full benefits for that month regardless of your annual earnings. This helps people who retire mid-year.",
-    },
-  ];
 </script>
 
 <svelte:head>
@@ -74,7 +37,6 @@
   <link rel="canonical" href="https://ssa.tools/guides/earnings-test" />
   {@html schema.render()}
   {@html schema.renderSocialMeta()}
-  {@html renderFAQSchema(faqs)}
 </svelte:head>
 
 <div class="guide-page">

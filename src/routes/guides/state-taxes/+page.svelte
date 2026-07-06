@@ -30,39 +30,16 @@
 
   const faqs = [
     {
-      question: "How many states tax Social Security benefits?",
-      answer:
-        "As of 2026, only 8 states tax Social Security benefits: Colorado, Connecticut, Minnesota, Montana, New Mexico, Rhode Island, Utah, and Vermont. The remaining 42 states and Washington, D.C. do not tax Social Security benefits at all.",
-    },
-    {
       question:
-        "Will my Social Security benefits be taxed if I move to a different state?",
+        "Will my benefits be taxed if I move to a different state?",
       answer:
-        "Your state tax on Social Security depends on where you live, not where you earned your benefits. If you move from a state that taxes Social Security to one that doesn't, you will no longer owe state tax on your benefits. Your federal tax obligations remain the same regardless of which state you live in.",
-    },
-    {
-      question:
-        "Are states eliminating their taxes on Social Security benefits?",
-      answer:
-        "Yes, there is a clear trend of states eliminating Social Security taxes. West Virginia stopped taxing benefits in 2026, Nebraska in 2025, and Missouri in 2024. The number of states taxing benefits has dropped from 13 in 2020 to just 8 in 2026.",
-    },
-    {
-      question:
-        "Do I have to pay both state and federal taxes on Social Security?",
-      answer:
-        "Potentially, yes. Federal taxation of Social Security is separate from state taxation. Up to 85% of your benefits may be federally taxable depending on your provisional income. If you also live in one of the 8 states that tax benefits, you may owe state income tax as well, though most of these states offer exemptions or deductions that reduce or eliminate the state tax for lower-income retirees.",
+        "State tax depends on where you live, not where you earned your benefits. Move from a taxing state to a non-taxing one and the state tax goes away. Your federal taxes don't change either way.",
     },
     {
       question:
         "Does my state tax Social Security the same way the federal government does?",
       answer:
-        "No. Each state that taxes Social Security has its own rules, thresholds, and exemptions that are different from the federal formula. Some states use your federal AGI, others use state-specific income measures. The exemption thresholds and deduction amounts vary widely between states.",
-    },
-    {
-      question:
-        "Can I reduce my state taxes on Social Security by managing my income?",
-      answer:
-        "Yes. In states with income-based exemptions, keeping your adjusted gross income below the exemption threshold can eliminate your state tax on Social Security benefits. Strategies include timing Roth conversions, managing capital gains, and coordinating retirement account withdrawals. Consult a tax professional for advice specific to your state and situation.",
+        "No. Each of the 8 taxing states has its own rules and thresholds, different from the federal formula. Some start from your federal AGI, others use their own income measures.",
     },
   ];
 </script>

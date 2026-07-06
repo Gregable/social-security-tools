@@ -31,44 +31,24 @@ schema.tags = [
 
 const faqs = [
   {
-    question: 'Can I collect Social Security from my ex-spouse?',
-    answer:
-      'Yes, if your marriage lasted at least 10 years, you are currently unmarried (or remarried after age 60), you are at least 62 years old, and your ex-spouse is entitled to Social Security benefits. You can receive up to 50% of your ex-spouse\'s benefit amount.',
-  },
-  {
-    question: 'Does my ex-spouse need to know I\'m claiming benefits on their record?',
-    answer:
-      'No. The Social Security Administration does not notify your ex-spouse when you claim divorced spouse benefits. Your claim is completely confidential and has no effect on their benefit amount.',
-  },
-  {
-    question: 'Will claiming divorced spouse benefits reduce my ex\'s Social Security?',
-    answer:
-      'No. Your divorced spouse benefit is paid from Social Security\'s general funds, not from your ex-spouse\'s benefit. Their monthly payment remains exactly the same regardless of whether you claim.',
-  },
-  {
     question: 'What if my ex-spouse remarried?',
     answer:
-      'Your ex-spouse\'s marital status does not affect your eligibility. You can still claim divorced spouse benefits even if your ex has remarried. Their new spouse can also claim spousal benefits independently.',
+      "It doesn't matter. Your ex's marital status has no effect on your eligibility, and their new spouse can claim spousal benefits independently.",
   },
   {
     question: 'Can I receive divorced spouse benefits if I remarried?',
     answer:
-      'Generally no, unless your subsequent marriage ended through death, divorce, or annulment. However, if you remarry after age 60 (or age 50 if disabled), you can still receive divorced spouse survivor benefits.',
+      "Generally no, unless your later marriage ended through death, divorce, or annulment. Remarriage after age 60 (50 if disabled) doesn't block divorced spouse survivor benefits.",
   },
   {
-    question: 'What is the 10-year marriage rule for Social Security?',
+    question: "Can I collect divorced spouse benefits if my ex hasn't filed yet?",
     answer:
-      'To qualify for divorced spouse benefits, your marriage must have lasted at least 10 years. This is measured from the date of marriage to the date the divorce was finalized. Even one day short of 10 years disqualifies you.',
-  },
-  {
-    question: 'Can I collect divorced spouse benefits if my ex hasn\'t filed yet?',
-    answer:
-      'Yes, under the independently entitled divorced spouse rule. If you have been divorced for at least 2 years and your ex-spouse is at least 62, you can claim benefits even if they haven\'t filed. This prevents an ex from deliberately delaying to block your benefits.',
+      "Yes, as long as you've been divorced at least 2 years and your ex is at least 62.",
   },
   {
     question: 'What happens to my divorced spouse benefits if my ex-spouse dies?',
     answer:
-      'You may be eligible for divorced spouse survivor benefits, which can be up to 100% of your ex-spouse\'s benefit amount (compared to 50% while they were alive). You must have been married for at least 10 years and be at least 60 years old (or 50 if disabled).',
+      'You may switch to divorced spouse survivor benefits, worth up to 100% of their benefit rather than 50%.',
   },
 ];
 </script>

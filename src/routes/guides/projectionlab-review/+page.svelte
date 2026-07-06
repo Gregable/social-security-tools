@@ -33,7 +33,7 @@
     {
       question: "Is there a ProjectionLab coupon code or promo code?",
       answer:
-        "Yes. Use the code SSA-TOOLS at checkout for 10% off any ProjectionLab premium plan. This is an exclusive discount for SSA.tools readers.",
+        "Yes. Use the code SSA-TOOLS at checkout for 10% off any ProjectionLab premium plan. This is an exclusive discount for SSA.tools readers. The code is still valid in 2026 and beyond.",
     },
     {
       question: "Is ProjectionLab free?",
