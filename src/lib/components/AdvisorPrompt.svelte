@@ -29,7 +29,7 @@
       rel="noopener"
       on:click={handleClick}
     >
-      Book a Free Consultation &rarr;
+      Schedule a Free Call &rarr;
     </a>
   </p>
 </aside>

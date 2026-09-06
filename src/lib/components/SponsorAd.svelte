@@ -19,12 +19,11 @@ export let isVisible = true;
     <div class="left-bottom-region">
       <img
         src={SponsorLogo}
-        width="380"
-        height="60"
+        width="313"
+        height="163"
         class="sponsor-image image-fit"
         alt=""
       />
-      <p class="credential">Personalized claiming strategies</p>
     </div>
     <div class="right-region">
       <div class="text">
@@ -32,29 +31,23 @@ export let isVisible = true;
           {SPONSOR.name} <span class="mobile-sponsor-badge">Sponsor</span>
         </h3>
         <p>
-          Want an expert to check your claiming strategy? <span
-            class="inline-link">{SPONSOR.name}</span
-          > builds a personalized plan for your situation, whether you are single,
-          married, divorced, or widowed.
+          Still weighing when to file? You can schedule a free call with a
+          Social Security specialist at <span class="inline-link"
+            >{SPONSOR.name}</span
+          > to talk through your specific situation.
         </p>
         <ul>
           <li>
-            <strong>Personalized claiming plan:</strong> Compare multiple filing
-            scenarios and get a clear recommendation for your situation.
+            A real person looks at your numbers, including things this
+            calculator doesn't cover like taxes, pensions, and health.
           </li>
-          <li>
-            <strong>Help with filing:</strong> Get assistance with your application
-            and reminders for the dates that matter.
-          </li>
-          <li>
-            <strong>Free initial consultation:</strong> Talk through your situation
-            with an advisor at no cost before deciding anything.
-          </li>
+          <li>The first call is free, and you pick the time.</li>
+          <li>If you want more help after that, they can also handle the filing.</li>
         </ul>
         <div class="cta-section">
-          <div class="cta-button">Book a Free Consultation →</div>
+          <div class="cta-button">Schedule a Free Call →</div>
           <div class="cta-subtext">
-            Talk it through before you decide anything
+            Opens their scheduling calendar in a new tab
           </div>
         </div>
       </div>
@@ -103,13 +96,6 @@ export let isVisible = true;
     grid-column-end: 2;
     grid-row-start: 2;
     grid-row-end: 3;
-  }
-
-  .credential {
-    margin: 10px 0 0;
-    font-size: 0.85em;
-    color: #23527c;
-    text-align: center;
   }
   .right-region {
     display: flex;

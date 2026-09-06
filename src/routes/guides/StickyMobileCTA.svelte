@@ -110,7 +110,7 @@ onMount(() => {
           rel="noopener"
           on:click={handleClick}
         >
-          Free Consultation
+          Schedule a Call
         </a>
         <span class="sticky-sponsor">Sponsor</span>
       {/if}

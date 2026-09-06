@@ -49,7 +49,7 @@ onMount(() => {
         >. Deciding when to claim it is the bigger decision, and the right
         answer depends on your health, your spouse, your other income, and
         your taxes. If you'd like an experienced advisor to review your
-        strategy, our sponsor offers a free initial consultation.
+        strategy, our sponsor offers a free call with a specialist.
       </p>
     </div>
   </div>

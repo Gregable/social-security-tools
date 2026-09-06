@@ -134,10 +134,10 @@ onMount(() => {
       <div class="sponsor-badge">Sponsor</div>
       <div class="sponsor-text">
         Deciding when to claim is a big decision.
-        <strong>{SPONSOR.name}</strong> offers a free initial consultation with
-        an experienced advisor.
+        <strong>{SPONSOR.name}</strong> offers a free call with
+        a Social Security specialist.
       </div>
-      <span class="sponsor-cta">Book a Free Consultation &rarr;</span>
+      <span class="sponsor-cta">Schedule a Free Call &rarr;</span>
       <div class="sponsor-note">No cost for the first conversation</div>
     </div>
   </a>
