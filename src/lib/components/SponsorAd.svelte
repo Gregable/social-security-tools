@@ -128,11 +128,6 @@ export let isVisible = true;
       margin: 0 0 10px 0;
     }
 
-    /* Hide link icon on mobile */
-    .sponsor::before {
-      display: none;
-    }
-
     /* Optimize CTA for mobile */
     .cta-section {
       margin-top: 15px;
@@ -221,20 +216,6 @@ export let isVisible = true;
     box-shadow: 0 6px 20px rgba(51, 122, 183, 0.15);
   }
 
-  .sponsor::before {
-    content: '🔗';
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.2em;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-  }
-
-  .sponsor:hover::before {
-    opacity: 1;
-    transform: scale(1.1) rotate(15deg);
-  }
   .project-title {
     color: #337ab7;
     text-decoration: underline;
@@ -350,6 +331,11 @@ export let isVisible = true;
   img.image-fit {
     max-width: 100%;
     height: auto;
+    /* Override guide-page image chrome so the logo sits flat on the card */
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
     transition:
       transform 0.3s ease,
       filter 0.3s ease;
