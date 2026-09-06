@@ -135,10 +135,10 @@ onMount(() => {
       <div class="sponsor-text">
         Deciding when to claim is a big decision.
         <strong>{SPONSOR.name}</strong> offers a free initial consultation with
-        a certified advisor.
+        an experienced advisor.
       </div>
       <span class="sponsor-cta">Book a Free Consultation &rarr;</span>
-      <div class="sponsor-discount">No cost for the first conversation</div>
+      <div class="sponsor-note">No cost for the first conversation</div>
     </div>
   </a>
 </div>
@@ -343,7 +343,7 @@ onMount(() => {
     text-decoration: underline;
   }
 
-  .sponsor-discount {
+  .sponsor-note {
     font-size: 0.85em;
     color: #777;
     margin-top: 0.4em;

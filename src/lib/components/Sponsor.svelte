@@ -48,7 +48,7 @@ onMount(() => {
           >{$recipient.pia().primaryInsuranceAmount().string()}/month</b
         >. Deciding when to claim it is the bigger decision, and the right
         answer depends on your health, your spouse, your other income, and
-        your taxes. If you'd like a certified advisor to review your
+        your taxes. If you'd like an experienced advisor to review your
         strategy, our sponsor offers a free initial consultation.
       </p>
     </div>

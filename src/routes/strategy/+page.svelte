@@ -955,7 +955,7 @@
   }
 
   .hero-row :global(.headline),
-  .hero-row :global(.support-prompt) {
+  .hero-row :global(.advisor-prompt) {
     flex: 1 1 320px;
     min-width: 0;
     max-width: none;

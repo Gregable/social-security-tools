@@ -22,9 +22,9 @@ export let isVisible = true;
         width="380"
         height="60"
         class="sponsor-image image-fit"
-        alt={SPONSOR.name}
+        alt=""
       />
-      <p class="credential">Certified Social Security Advisors</p>
+      <p class="credential">Personalized claiming strategies</p>
     </div>
     <div class="right-region">
       <div class="text">
@@ -40,7 +40,7 @@ export let isVisible = true;
         <ul>
           <li>
             <strong>Personalized claiming plan:</strong> Compare multiple filing
-            scenarios and get a clear recommendation from a certified advisor.
+            scenarios and get a clear recommendation for your situation.
           </li>
           <li>
             <strong>Help with filing:</strong> Get assistance with your application
@@ -53,8 +53,8 @@ export let isVisible = true;
         </ul>
         <div class="cta-section">
           <div class="cta-button">Book a Free Consultation →</div>
-          <div class="discount-reminder">
-            Free initial consultation with a certified advisor
+          <div class="cta-subtext">
+            Talk it through before you decide anything
           </div>
         </div>
       </div>
@@ -335,7 +335,7 @@ export let isVisible = true;
     left: 100%;
   }
 
-  .discount-reminder {
+  .cta-subtext {
     font-size: 0.9em;
     color: #666;
     font-style: italic;

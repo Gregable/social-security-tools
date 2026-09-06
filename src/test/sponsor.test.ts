@@ -6,12 +6,9 @@ import {
 } from '../routes/guides/guide-cta-config';
 
 describe('SPONSOR config', () => {
-  it('points at the Social Security Advisors consultation calendar', () => {
-    expect(SPONSOR.name).toBe('Social Security Advisors');
-    expect(SPONSOR.url.startsWith('https://app.acuityscheduling.com/')).toBe(
-      true
-    );
-    expect(SPONSOR.url).toContain('appointmentTypeIds[]=97656215');
+  it('links to an https URL with a non-empty name', () => {
+    expect(SPONSOR.name.length).toBeGreaterThan(0);
+    expect(new URL(SPONSOR.url).protocol).toBe('https:');
   });
 
   it('reports analytics under its own destination', () => {

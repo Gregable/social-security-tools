@@ -3,8 +3,10 @@ import type { OutboundDestination } from './analytics/outbound';
 /**
  * The site's current paid sponsor. Every sponsor placement (calculator
  * sponsor box, guide CTAs, strategy prompt) links here and reports analytics
- * under `destination`, so swapping sponsors is a change to this one object
- * plus the ad copy in SponsorAd.svelte.
+ * under `destination`. Swapping sponsors means updating this object, adding
+ * the new destination to OutboundDestination, and revising the placement
+ * copy in SponsorAd, Sponsor, AdvisorPrompt, guide-footer, and
+ * StickyMobileCTA.
  */
 export interface SponsorConfig {
   readonly name: string;

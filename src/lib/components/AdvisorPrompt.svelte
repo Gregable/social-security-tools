@@ -17,7 +17,7 @@
     <p class="kicker">Sponsor</p>
   </header>
   <p class="copy">
-    This optimizer gives you a data-driven starting point. A certified
+    This optimizer gives you a data-driven starting point. An experienced
     advisor can review the parts it can't model, like your taxes, pensions,
     and health, and help you file. <strong>{SPONSOR.name}</strong> offers a
     free initial consultation.
