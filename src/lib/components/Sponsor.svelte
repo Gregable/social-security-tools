@@ -81,19 +81,12 @@ onMount(() => {
     margin: 0 0.5em;
   }
 
+  /* No hover effect on the anchor itself: it wraps the intro text as well
+     as the card, and SponsorAd already highlights the card on hover. */
   .spon-anchor {
     display: block;
     text-decoration: none;
     color: inherit;
     margin: 30px 4px;
-    border-radius: 8px;
-    transition:
-      transform 0.2s ease,
-      box-shadow 0.2s ease;
-  }
-
-  .spon-anchor:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 </style>
