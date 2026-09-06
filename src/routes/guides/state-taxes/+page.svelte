@@ -361,7 +361,7 @@
     Connecticut, New Mexico, and Vermont with clear AGI cutoffs.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>Frequently Asked Questions</h2>
 

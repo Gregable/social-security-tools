@@ -134,7 +134,7 @@ schema.tags = [
     people visiting field offices weekly.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h3>3. Communication Changes</h3>
   <p>

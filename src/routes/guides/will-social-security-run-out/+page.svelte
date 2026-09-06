@@ -101,7 +101,7 @@ const faqs: FAQItem[] = [
     >
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>How Could Congress Fix Social Security?</h2>
   <p>

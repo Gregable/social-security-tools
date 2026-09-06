@@ -145,7 +145,7 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
     strategy matrix. Larger segments correspond to more likely death age ranges.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>Health Adjustment Slider</h2>
   <p>

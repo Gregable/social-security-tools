@@ -182,7 +182,7 @@
     claiming.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>Survivor Normal Retirement Age</h2>
 

@@ -4,6 +4,7 @@ import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
+import { SPONSOR } from '$lib/sponsor';
 import { getGuideCTAType } from './guide-cta-config';
 
 let visible = false;
@@ -19,8 +20,8 @@ $: show = visible && !dismissed && !footerInView;
 
 function handleClick() {
   if (!browser) return;
-  if (type === 'projectionlab') {
-    trackOutboundClick('projectionlab', 'guide-sticky-mobile', { guide_slug: guideSlug });
+  if (type === 'sponsor') {
+    trackOutboundClick(SPONSOR.destination, 'guide-sticky-mobile', { guide_slug: guideSlug });
   } else {
     posthog.capture('Guide Sticky CTA: Clicked', { type, guide_slug: guideSlug });
   }
@@ -52,8 +53,8 @@ onMount(() => {
     if (nowVisible && !visible && !tracked) {
       tracked = true;
       if (browser) {
-        if (type === 'projectionlab') {
-          trackOutboundImpression('projectionlab', 'guide-sticky-mobile', { guide_slug: guideSlug });
+        if (type === 'sponsor') {
+          trackOutboundImpression(SPONSOR.destination, 'guide-sticky-mobile', { guide_slug: guideSlug });
         } else {
           posthog.capture('Guide Sticky CTA: Visible', { type, guide_slug: guideSlug });
         }
@@ -101,15 +102,15 @@ onMount(() => {
           Try it free
         </a>
       {:else}
-        <span class="sticky-text">Full retirement planning</span>
+        <span class="sticky-text">Talk to an expert</span>
         <a
-          href="https://projectionlab.com?ref=ssa-tools"
-          class="sticky-button projectionlab"
+          href={SPONSOR.url}
+          class="sticky-button sponsor"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener"
           on:click={handleClick}
         >
-          ProjectionLab
+          Free Consultation
         </a>
         <span class="sticky-sponsor">Sponsor</span>
       {/if}
@@ -173,7 +174,7 @@ onMount(() => {
     background: #5cb85c;
   }
 
-  .sticky-button.projectionlab {
+  .sticky-button.sponsor {
     background: #337ab7;
   }
 

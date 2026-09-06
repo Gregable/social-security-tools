@@ -3,8 +3,9 @@ import posthog from 'posthog-js';
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
-import ProjectionLabAd from '$lib/components/ProjectionLabAd.svelte';
+import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
+import { SPONSOR } from '$lib/sponsor';
 import type { GuideCTAType } from './guide-cta-config';
 
 export let type: GuideCTAType;
@@ -17,8 +18,8 @@ $: guideSlug = ($page?.url?.pathname ?? '')
 
 function handleClick() {
   if (!browser) return;
-  if (type === 'projectionlab') {
-    trackOutboundClick('projectionlab', 'guide-inline', { guide_slug: guideSlug });
+  if (type === 'sponsor') {
+    trackOutboundClick(SPONSOR.destination, 'guide-inline', { guide_slug: guideSlug });
   } else {
     posthog.capture('Guide Inline CTA: Clicked', { type, guide_slug: guideSlug });
   }
@@ -30,8 +31,8 @@ onMount(() => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
           if (browser) {
-            if (type === 'projectionlab') {
-              trackOutboundImpression('projectionlab', 'guide-inline', { guide_slug: guideSlug });
+            if (type === 'sponsor') {
+              trackOutboundImpression(SPONSOR.destination, 'guide-inline', { guide_slug: guideSlug });
             } else {
               posthog.capture('Guide Inline CTA: Visible', { type, guide_slug: guideSlug });
             }
@@ -104,14 +105,14 @@ onMount(() => {
   </a>
 {:else}
   <a
-    href="https://projectionlab.com?ref=ssa-tools"
-    class="inline-cta projectionlab"
+    href={SPONSOR.url}
+    class="inline-cta sponsor"
     target="_blank"
-    rel="noopener noreferrer"
+    rel="noopener"
     bind:this={ctaElement}
     on:click={handleClick}
   >
-    <ProjectionLabAd />
+    <SponsorAd />
   </a>
 {/if}
 
@@ -343,8 +344,8 @@ onMount(() => {
     margin-left: 8px;
   }
 
-  /* ProjectionLab variant - just a wrapper, ProjectionLabAd handles visuals */
-  .inline-cta.projectionlab {
+  /* Sponsor variant - just a wrapper, SponsorAd handles visuals */
+  .inline-cta.sponsor {
     max-width: 700px;
   }
 
@@ -383,7 +384,7 @@ onMount(() => {
       margin: 2em 0;
     }
 
-    .inline-cta.projectionlab {
+    .inline-cta.sponsor {
       margin: 2em 0;
     }
   }

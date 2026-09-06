@@ -36,7 +36,7 @@
     type CoupleFilingAgeResult,
   } from "$lib/strategy/calculations/expected-npv";
   import OptimalStrategyHeadline from "$lib/components/OptimalStrategyHeadline.svelte";
-  import SupportPrompt from "$lib/components/SupportPrompt.svelte";
+  import AdvisorPrompt from "$lib/components/AdvisorPrompt.svelte";
   import {
     WebApplicationSchema,
     renderActionSchema,
@@ -761,7 +761,7 @@
               coupleResult={optimalCoupleResult}
               {recipients}
             />
-            <SupportPrompt />
+            <AdvisorPrompt />
           </div>
         </div>
         <div

@@ -131,7 +131,7 @@ schema.tags = [
     </li>
   </ul>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>Benefit Payment Date</h2>
   In most cases, the date of payment is also based on the day of the month you were

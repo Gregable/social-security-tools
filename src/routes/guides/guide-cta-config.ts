@@ -1,4 +1,4 @@
-export type GuideCTAType = 'calculator' | 'projectionlab';
+export type GuideCTAType = 'calculator' | 'sponsor';
 
 export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   // Calculator: guides where reader can immediately use the calculator
@@ -21,26 +21,26 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'spousal-benefit-filing-date': 'calculator',
   'url-parameters': 'calculator',
   'work-credits': 'calculator',
-  // ProjectionLab: broader retirement topics
-  'agency-changes': 'projectionlab',
-  'covid-awi-drop': 'projectionlab',
-  'divorced-spouse': 'projectionlab',
-  'federal-taxes': 'projectionlab',
-  'government-shutdown': 'projectionlab',
-  integrations: 'projectionlab',
-  'international-agreements': 'projectionlab',
-  mortality: 'projectionlab',
-  privacy: 'projectionlab',
+  // Sponsor: broader retirement topics
+  'agency-changes': 'sponsor',
+  'covid-awi-drop': 'sponsor',
+  'divorced-spouse': 'sponsor',
+  'federal-taxes': 'sponsor',
+  'government-shutdown': 'sponsor',
+  integrations: 'sponsor',
+  'international-agreements': 'sponsor',
+  mortality: 'sponsor',
+  privacy: 'sponsor',
   'projectionlab-review': 'calculator',
-  'senior-tax-deduction': 'projectionlab',
-  'state-taxes': 'projectionlab',
-  'survivor-benefits': 'projectionlab',
-  '1st-and-2nd-of-month': 'projectionlab',
-  wep: 'projectionlab',
-  'will-social-security-run-out': 'projectionlab',
+  'senior-tax-deduction': 'sponsor',
+  'state-taxes': 'sponsor',
+  'survivor-benefits': 'sponsor',
+  '1st-and-2nd-of-month': 'sponsor',
+  wep: 'sponsor',
+  'will-social-security-run-out': 'sponsor',
 };
 
 export function getGuideCTAType(pathname: string): GuideCTAType {
   const slug = pathname.replace('/guides/', '').replace(/\/$/, '');
-  return GUIDE_CTA_TYPES[slug] ?? 'projectionlab';
+  return GUIDE_CTA_TYPES[slug] ?? 'sponsor';
 }

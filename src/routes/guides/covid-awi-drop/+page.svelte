@@ -156,7 +156,7 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
     2008 multiplier is slightly lower than the 2009 multiplier (1.31 vs 1.33)
     because of the 2008 recession.
   </p>
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <p>
     How does Covid-19 factor into this? If the AWI (year 2020) is reduced by

@@ -1,5 +1,6 @@
 <script lang="ts">
-import ProjectionLabImage from '$lib/images/projection-lab.png';
+import SponsorLogo from '$lib/images/social-security-advisors.png';
+import { SPONSOR } from '$lib/sponsor';
 
 export let animated = false;
 export let isVisible = true;
@@ -12,49 +13,48 @@ export let isVisible = true;
 >
   <div class="spon-container">
     <div class="left-top-region">
-      <h2 class="project-title">ProjectionLab</h2>
+      <h2 class="project-title">{SPONSOR.name}</h2>
       <h4 class="sponsor-badge">Sponsor</h4>
     </div>
     <div class="left-bottom-region">
       <img
-        src={ProjectionLabImage}
-        width="1160px"
-        height="940px"
+        src={SponsorLogo}
+        width="380"
+        height="60"
         class="sponsor-image image-fit"
-        alt="ProjectionLab"
+        alt={SPONSOR.name}
       />
+      <p class="credential">Certified Social Security Advisors</p>
     </div>
     <div class="right-region">
       <div class="text">
         <h3 class="mobile-title">
-          ProjectionLab <span class="mobile-sponsor-badge">Sponsor</span>
+          {SPONSOR.name} <span class="mobile-sponsor-badge">Sponsor</span>
         </h3>
         <p>
-          Already optimizing your Social Security? Take your retirement
-          planning to the next level with <span class="inline-link"
-            >ProjectionLab</span
-          >, the comprehensive financial modeling platform trusted by serious
-          planners.
+          Want an expert to check your claiming strategy? <span
+            class="inline-link">{SPONSOR.name}</span
+          > builds a personalized plan for your situation, whether you are single,
+          married, divorced, or widowed.
         </p>
         <ul>
           <li>
-            <strong>Monte Carlo simulations:</strong> Run thousands of market scenarios
-            using 150+ years of historical data to stress-test your plan.
+            <strong>Personalized claiming plan:</strong> Compare multiple filing
+            scenarios and get a clear recommendation from a certified advisor.
           </li>
           <li>
-            <strong>Advanced modeling:</strong> Model complex strategies including
-            Roth conversions, tax-loss harvesting, and dynamic withdrawal rates.
+            <strong>Help with filing:</strong> Get assistance with your application
+            and reminders for the dates that matter.
           </li>
           <li>
-            <strong>Professional-grade analytics:</strong> Analyze success probabilities,
-            sequence of returns risk, and optimal asset allocation across market
-            cycles.
+            <strong>Free initial consultation:</strong> Talk through your situation
+            with an advisor at no cost before deciding anything.
           </li>
         </ul>
         <div class="cta-section">
-          <div class="cta-button">Try ProjectionLab Free →</div>
+          <div class="cta-button">Book a Free Consultation →</div>
           <div class="discount-reminder">
-            Use code <strong>SSA-TOOLS</strong> for 10% off
+            Free initial consultation with a certified advisor
           </div>
         </div>
       </div>
@@ -96,12 +96,20 @@ export let isVisible = true;
   }
   .left-bottom-region {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     grid-column-start: 1;
     grid-column-end: 2;
     grid-row-start: 2;
     grid-row-end: 3;
+  }
+
+  .credential {
+    margin: 10px 0 0;
+    font-size: 0.85em;
+    color: #23527c;
+    text-align: center;
   }
   .right-region {
     display: flex;

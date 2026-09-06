@@ -1,7 +1,10 @@
 import posthog from 'posthog-js';
 import { browser } from '$app/environment';
 
-export type OutboundDestination = 'projectionlab' | 'kofi';
+export type OutboundDestination =
+  | 'projectionlab'
+  | 'kofi'
+  | 'socialsecurityadvisors';
 
 export function trackOutboundClick(
   destination: OutboundDestination,

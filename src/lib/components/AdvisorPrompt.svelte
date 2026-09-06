@@ -1,43 +1,41 @@
 <script lang="ts">
-  import KoFiImg from "$lib/images/kofi.png";
   import { trackOutboundClick, outboundImpression } from "$lib/analytics/outbound";
+  import { SPONSOR } from "$lib/sponsor";
 
-  const KOFI_URL = "https://ko-fi.com/ssatools";
+  const PLACEMENT = "strategy-prompt";
 
   function handleClick() {
-    trackOutboundClick("kofi", "support-prompt");
+    trackOutboundClick(SPONSOR.destination, PLACEMENT);
   }
 </script>
 
-<aside class="support-prompt" use:outboundImpression={{ destination: "kofi", placement: "support-prompt" }}>
+<aside
+  class="advisor-prompt"
+  use:outboundImpression={{ destination: SPONSOR.destination, placement: PLACEMENT }}
+>
   <header class="header">
-    <p class="kicker">Support this work</p>
+    <p class="kicker">Sponsor</p>
   </header>
   <p class="copy">
-    If it helped you with an important decision, consider supporting the
-    work. Free, no account, your data stays in your browser. By comparison,
-    Quicken's Social Security Optimizer is $50/year. Tips keep ssa.tools
-    free.
+    This optimizer gives you a data-driven starting point. A certified
+    advisor can review the parts it can't model, like your taxes, pensions,
+    and health, and help you file. <strong>{SPONSOR.name}</strong> offers a
+    free initial consultation.
   </p>
   <p class="cta">
     <a
-      href={KOFI_URL}
+      href={SPONSOR.url}
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
       on:click={handleClick}
     >
-      <img
-        src={KoFiImg}
-        alt="Buy me a coffee on Ko-fi"
-        height="55"
-        width="214"
-      />
+      Book a Free Consultation &rarr;
     </a>
   </p>
 </aside>
 
 <style>
-  .support-prompt {
+  .advisor-prompt {
     margin: 1.5rem 0;
   }
 
@@ -70,7 +68,13 @@
 
   .cta a {
     display: inline-block;
+    padding: 12px 24px;
     border-radius: 8px;
+    background: linear-gradient(135deg, #337ab7 0%, #23527c 100%);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition:
       transform 0.15s ease,
       box-shadow 0.15s ease;
@@ -84,10 +88,5 @@
   .cta a:focus-visible {
     outline: 2px solid #081d88;
     outline-offset: 4px;
-  }
-
-  .cta img {
-    display: block;
-    border: 0;
   }
 </style>

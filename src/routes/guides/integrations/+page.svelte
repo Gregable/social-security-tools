@@ -162,7 +162,7 @@
     </tbody>
   </table>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>How Integrations Work</h2>
 

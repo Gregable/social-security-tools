@@ -187,7 +187,7 @@ schema.tags = [
     of Social Security in favor of separate pension systems.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>What's the Difference Between WEP and GPO?</h2>
 

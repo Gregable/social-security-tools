@@ -190,7 +190,7 @@ const faqs = [
     (about a 30% reduction for early claiming).
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>Does My Ex-Spouse Know If I Claim Benefits?</h2>
 

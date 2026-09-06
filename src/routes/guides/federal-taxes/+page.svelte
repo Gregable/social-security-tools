@@ -210,7 +210,7 @@ schema.tags = [
     Benefits, then exactly 85% of your Social Security benefits are taxable.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h3>Last word</h3>
 

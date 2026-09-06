@@ -197,7 +197,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
     </li>
   </ul>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>Disability Claims Face Unique Challenges</h2>
 

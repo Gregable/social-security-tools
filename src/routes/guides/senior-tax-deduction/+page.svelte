@@ -132,7 +132,7 @@
     20 x $60 = $1,200. She can deduct $4,800 instead of the full $6,000.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>How It Stacks with Existing Deductions</h2>
 
