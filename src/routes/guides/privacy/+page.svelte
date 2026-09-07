@@ -72,7 +72,7 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
     that no requests containing your earnings data are made.
   </p>
 
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <h2>What Data Does the Site Collect?</h2>
   <p>

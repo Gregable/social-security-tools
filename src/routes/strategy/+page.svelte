@@ -36,7 +36,7 @@
     type CoupleFilingAgeResult,
   } from "$lib/strategy/calculations/expected-npv";
   import OptimalStrategyHeadline from "$lib/components/OptimalStrategyHeadline.svelte";
-  import SupportPrompt from "$lib/components/SupportPrompt.svelte";
+  import AdvisorPrompt from "$lib/components/AdvisorPrompt.svelte";
   import {
     WebApplicationSchema,
     renderActionSchema,
@@ -761,7 +761,7 @@
               coupleResult={optimalCoupleResult}
               {recipients}
             />
-            <SupportPrompt />
+            <AdvisorPrompt />
           </div>
         </div>
         <div
@@ -955,7 +955,7 @@
   }
 
   .hero-row :global(.headline),
-  .hero-row :global(.support-prompt) {
+  .hero-row :global(.advisor-prompt) {
     flex: 1 1 320px;
     min-width: 0;
     max-width: none;

@@ -1,5 +1,6 @@
 <script lang="ts">
-import ProjectionLabImage from '$lib/images/projection-lab.png';
+import SponsorLogo from '$lib/images/social-security-advisors.png';
+import { SPONSOR } from '$lib/sponsor';
 
 export let animated = false;
 export let isVisible = true;
@@ -12,49 +13,41 @@ export let isVisible = true;
 >
   <div class="spon-container">
     <div class="left-top-region">
-      <h2 class="project-title">ProjectionLab</h2>
+      <h2 class="project-title">{SPONSOR.name}</h2>
       <h4 class="sponsor-badge">Sponsor</h4>
     </div>
     <div class="left-bottom-region">
       <img
-        src={ProjectionLabImage}
-        width="1160px"
-        height="940px"
+        src={SponsorLogo}
+        width="313"
+        height="163"
         class="sponsor-image image-fit"
-        alt="ProjectionLab"
+        alt=""
       />
     </div>
     <div class="right-region">
       <div class="text">
         <h3 class="mobile-title">
-          ProjectionLab <span class="mobile-sponsor-badge">Sponsor</span>
+          {SPONSOR.name} <span class="mobile-sponsor-badge">Sponsor</span>
         </h3>
         <p>
-          Already optimizing your Social Security? Take your retirement
-          planning to the next level with <span class="inline-link"
-            >ProjectionLab</span
-          >, the comprehensive financial modeling platform trusted by serious
-          planners.
+          Still weighing when to file? You can schedule a free call with a
+          Social Security specialist at <span class="inline-link"
+            >{SPONSOR.name}</span
+          > to talk through your specific situation.
         </p>
         <ul>
           <li>
-            <strong>Monte Carlo simulations:</strong> Run thousands of market scenarios
-            using 150+ years of historical data to stress-test your plan.
+            A real person looks at your numbers, including things this
+            calculator doesn't cover like taxes, pensions, and health.
           </li>
-          <li>
-            <strong>Advanced modeling:</strong> Model complex strategies including
-            Roth conversions, tax-loss harvesting, and dynamic withdrawal rates.
-          </li>
-          <li>
-            <strong>Professional-grade analytics:</strong> Analyze success probabilities,
-            sequence of returns risk, and optimal asset allocation across market
-            cycles.
-          </li>
+          <li>The first call is free, and you pick the time.</li>
+          <li>If you want more help after that, they can also handle the filing.</li>
         </ul>
         <div class="cta-section">
-          <div class="cta-button">Try ProjectionLab Free →</div>
-          <div class="discount-reminder">
-            Use code <strong>SSA-TOOLS</strong> for 10% off
+          <div class="cta-button">Schedule a Free Call →</div>
+          <div class="cta-subtext">
+            Opens their scheduling calendar in a new tab
           </div>
         </div>
       </div>
@@ -96,6 +89,7 @@ export let isVisible = true;
   }
   .left-bottom-region {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     grid-column-start: 1;
@@ -132,11 +126,6 @@ export let isVisible = true;
     .mobile-title {
       display: block;
       margin: 0 0 10px 0;
-    }
-
-    /* Hide link icon on mobile */
-    .sponsor::before {
-      display: none;
     }
 
     /* Optimize CTA for mobile */
@@ -227,20 +216,6 @@ export let isVisible = true;
     box-shadow: 0 6px 20px rgba(51, 122, 183, 0.15);
   }
 
-  .sponsor::before {
-    content: '🔗';
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.2em;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-  }
-
-  .sponsor:hover::before {
-    opacity: 1;
-    transform: scale(1.1) rotate(15deg);
-  }
   .project-title {
     color: #337ab7;
     text-decoration: underline;
@@ -327,7 +302,7 @@ export let isVisible = true;
     left: 100%;
   }
 
-  .discount-reminder {
+  .cta-subtext {
     font-size: 0.9em;
     color: #666;
     font-style: italic;
@@ -356,6 +331,11 @@ export let isVisible = true;
   img.image-fit {
     max-width: 100%;
     height: auto;
+    /* Override guide-page image chrome so the logo sits flat on the card */
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
     transition:
       transform 0.3s ease,
       filter 0.3s ease;

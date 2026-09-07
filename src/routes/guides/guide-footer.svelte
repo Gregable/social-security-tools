@@ -4,6 +4,7 @@ import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
+import { SPONSOR } from '$lib/sponsor';
 import StickyMobileCTA from './StickyMobileCTA.svelte';
 
 $: guideSlug = ($page?.url?.pathname ?? '')
@@ -21,8 +22,8 @@ function handleCtaClick() {
   }
 }
 
-function handlePlClick() {
-  trackOutboundClick('projectionlab', 'guide-footer', { guide_slug: guideSlug });
+function handleSponsorClick() {
+  trackOutboundClick(SPONSOR.destination, 'guide-footer', { guide_slug: guideSlug });
 }
 
 onMount(() => {
@@ -53,17 +54,17 @@ onMount(() => {
   };
 });
 
-let plElement: HTMLElement;
-let plTracked = false;
+let sponsorElement: HTMLElement;
+let sponsorTracked = false;
 
 onMount(() => {
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting && !plTracked) {
-          plTracked = true;
+        if (entry.isIntersecting && !sponsorTracked) {
+          sponsorTracked = true;
           if (browser) {
-            trackOutboundImpression('projectionlab', 'guide-footer', { guide_slug: guideSlug });
+            trackOutboundImpression(SPONSOR.destination, 'guide-footer', { guide_slug: guideSlug });
           }
           observer.unobserve(entry.target);
         }
@@ -72,13 +73,13 @@ onMount(() => {
     { threshold: 0.2 }
   );
 
-  if (plElement) {
-    observer.observe(plElement);
+  if (sponsorElement) {
+    observer.observe(sponsorElement);
   }
 
   return () => {
-    if (plElement) {
-      observer.unobserve(plElement);
+    if (sponsorElement) {
+      observer.unobserve(sponsorElement);
     }
   };
 });
@@ -122,21 +123,22 @@ onMount(() => {
   </div>
 
   <a
-    href="https://projectionlab.com?ref=ssa-tools"
-    class="pl-recommendation"
+    href={SPONSOR.url}
+    class="sponsor-recommendation"
     target="_blank"
-    rel="noopener noreferrer"
-    bind:this={plElement}
-    on:click={handlePlClick}
+    rel="noopener"
+    bind:this={sponsorElement}
+    on:click={handleSponsorClick}
   >
-    <div class="pl-content">
-      <div class="pl-badge">Sponsor</div>
-      <div class="pl-text">
-        Social Security is one piece of the puzzle.
-        <strong>ProjectionLab</strong> lets you model your full retirement plan.
+    <div class="sponsor-content">
+      <div class="sponsor-badge">Sponsor</div>
+      <div class="sponsor-text">
+        Deciding when to claim is a big decision.
+        <strong>{SPONSOR.name}</strong> offers a free call with
+        a Social Security specialist.
       </div>
-      <span class="pl-cta">Try ProjectionLab Free &rarr;</span>
-      <div class="pl-discount">Use code <strong>SSA-TOOLS</strong> for 10% off</div>
+      <span class="sponsor-cta">Schedule a Free Call &rarr;</span>
+      <div class="sponsor-note">No cost for the first conversation</div>
     </div>
   </a>
 </div>
@@ -287,8 +289,8 @@ onMount(() => {
     font-weight: 500;
   }
 
-  /* ProjectionLab Recommendation */
-  .pl-recommendation {
+  /* Sponsor Recommendation */
+  .sponsor-recommendation {
     display: block;
     text-decoration: none;
     color: inherit;
@@ -302,17 +304,17 @@ onMount(() => {
       box-shadow 0.2s ease;
   }
 
-  .pl-recommendation:hover {
+  .sponsor-recommendation:hover {
     border-color: #337ab7;
     box-shadow: 0 2px 8px rgba(51, 122, 183, 0.15);
   }
 
-  .pl-content {
+  .sponsor-content {
     padding: 1.5em 2em;
     text-align: center;
   }
 
-  .pl-badge {
+  .sponsor-badge {
     display: inline-block;
     font-size: 0.7em;
     color: #999;
@@ -324,24 +326,24 @@ onMount(() => {
     letter-spacing: 0.3px;
   }
 
-  .pl-text {
+  .sponsor-text {
     font-size: 1em;
     color: #555;
     line-height: 1.5;
     margin-bottom: 0.8em;
   }
 
-  .pl-cta {
+  .sponsor-cta {
     font-weight: 600;
     color: #337ab7;
     font-size: 1em;
   }
 
-  .pl-recommendation:hover .pl-cta {
+  .sponsor-recommendation:hover .sponsor-cta {
     text-decoration: underline;
   }
 
-  .pl-discount {
+  .sponsor-note {
     font-size: 0.85em;
     color: #777;
     margin-top: 0.4em;
@@ -382,11 +384,11 @@ onMount(() => {
       display: none; /* Hide on mobile to avoid stacking */
     }
 
-    .pl-recommendation {
+    .sponsor-recommendation {
       margin: 0 1em 2em 1em;
     }
 
-    .pl-content {
+    .sponsor-content {
       padding: 1.2em 1.5em;
     }
   }

@@ -261,7 +261,7 @@ async function loadIntegrationComponents(
             <PiaReport recipient={$recipient} />
           </SidebarSection>
           {#if !$activeIntegration}
-            <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
+            <SidebarSection label="Sponsor - Advisors" sponsor underSticky>
               <Sponsor recipient={$recipient} />
             </SidebarSection>
           {/if}
@@ -279,7 +279,7 @@ async function loadIntegrationComponents(
             <PiaReport recipient={$recipient} />
           </SidebarSection>
           {#if !$activeIntegration}
-            <SidebarSection label="Sponsor - ProjectionLab" sponsor underSticky>
+            <SidebarSection label="Sponsor - Advisors" sponsor underSticky>
               <Sponsor recipient={$recipient} />
             </SidebarSection>
           {/if}

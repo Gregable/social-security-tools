@@ -1,8 +1,9 @@
 <script lang="ts">
 import { onMount } from 'svelte';
-import ProjectionLabAd from './ProjectionLabAd.svelte';
+import SponsorAd from './SponsorAd.svelte';
 import { Recipient } from '$lib/recipient';
 import { trackOutboundClick, outboundImpression } from '$lib/analytics/outbound';
+import { SPONSOR } from '$lib/sponsor';
 
 export let recipient: Recipient = new Recipient();
 
@@ -10,7 +11,7 @@ let sponsorElement: HTMLElement;
 let isVisible = false;
 
 function handleSponsorClick() {
-  trackOutboundClick('projectionlab', 'sponsor-box');
+  trackOutboundClick(SPONSOR.destination, 'sponsor-box');
 }
 
 onMount(() => {
@@ -33,30 +34,31 @@ onMount(() => {
 </script>
 
 <a
-  href="https://projectionlab.com?ref=ssa-tools"
+  href={SPONSOR.url}
   class="spon-anchor"
   target="_blank"
-  rel="noopener noreferrer"
+  rel="noopener"
   on:click={handleSponsorClick}
 >
   <div class="transition-section">
-    <h2>Beyond Social Security: Complete Retirement Planning</h2>
+    <h2>Want an Expert Second Opinion?</h2>
     <div class="text">
       <p>
         You've calculated your Social Security benefit of <b
           >{$recipient.pia().primaryInsuranceAmount().string()}/month</b
-        >. Now see how this fits into your complete retirement picture.
-        Professional retirement planning goes beyond Social Security to model
-        your entire financial future with advanced tools and projections.
+        >. Deciding when to claim it is the bigger decision, and the right
+        answer depends on your health, your spouse, your other income, and
+        your taxes. If you'd like an experienced advisor to review your
+        strategy, our sponsor offers a free call with a specialist.
       </p>
     </div>
   </div>
 
   <div
     bind:this={sponsorElement}
-    use:outboundImpression={{ destination: 'projectionlab', placement: 'sponsor-box' }}
+    use:outboundImpression={{ destination: SPONSOR.destination, placement: 'sponsor-box' }}
   >
-    <ProjectionLabAd animated {isVisible} />
+    <SponsorAd animated {isVisible} />
   </div>
 </a>
 
@@ -79,19 +81,12 @@ onMount(() => {
     margin: 0 0.5em;
   }
 
+  /* No hover effect on the anchor itself: it wraps the intro text as well
+     as the card, and SponsorAd already highlights the card on hover. */
   .spon-anchor {
     display: block;
     text-decoration: none;
     color: inherit;
     margin: 30px 4px;
-    border-radius: 8px;
-    transition:
-      transform 0.2s ease,
-      box-shadow 0.2s ease;
-  }
-
-  .spon-anchor:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 </style>

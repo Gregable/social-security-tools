@@ -63,7 +63,7 @@ schema.tags = [
       >Totalization Agreements</a
     >.
   </p>
-  <InlineCTA type="projectionlab" />
+  <InlineCTA type="sponsor" />
 
   <p>
     These agreements allow earned income credits to be earned overseas and still
