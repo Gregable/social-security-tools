@@ -5,7 +5,6 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { SPONSOR } from '$lib/sponsor';
-import StickyMobileCTA from './StickyMobileCTA.svelte';
 
 $: guideSlug = ($page?.url?.pathname ?? '')
   .replace('/guides/', '')
@@ -85,7 +84,7 @@ onMount(() => {
 });
 </script>
 
-<!-- Marker for StickyMobileCTA to detect when footer is in view -->
+<!-- Wrapper observed for the "Guide Footer: Visible" impression event -->
 <div class="guide-footer-marker" bind:this={footerElement}>
   <div class="footer">
     <div class="footer-content">
@@ -142,8 +141,6 @@ onMount(() => {
     </div>
   </a>
 </div>
-
-<StickyMobileCTA />
 
 <style>
   .guide-footer-marker {

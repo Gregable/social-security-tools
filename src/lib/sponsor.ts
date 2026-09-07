@@ -5,8 +5,7 @@ import type { OutboundDestination } from './analytics/outbound';
  * sponsor box, guide CTAs, strategy prompt) links here and reports analytics
  * under `destination`. Swapping sponsors means updating this object, adding
  * the new destination to OutboundDestination, and revising the placement
- * copy in SponsorAd, Sponsor, AdvisorPrompt, guide-footer, and
- * StickyMobileCTA.
+ * copy in SponsorAd, Sponsor, AdvisorPrompt, and guide-footer.
  */
 export interface SponsorConfig {
   readonly name: string;
