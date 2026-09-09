@@ -5,10 +5,12 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
-import { SPONSOR } from '$lib/sponsor';
+import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
 import type { GuideCTAType } from './guide-cta-config';
 
 export let type: GuideCTAType;
+/** Optional guide-specific pitch for the sponsor variant. */
+export let sponsorCopy: SponsorCopy = DEFAULT_SPONSOR_COPY;
 
 let ctaElement: HTMLElement;
 
@@ -112,7 +114,7 @@ onMount(() => {
     bind:this={ctaElement}
     on:click={handleClick}
   >
-    <SponsorAd />
+    <SponsorAd copy={sponsorCopy} />
   </a>
 {/if}
 

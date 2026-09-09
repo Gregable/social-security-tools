@@ -358,7 +358,8 @@ const faqs = [
 
   <p>
     For a deeper understanding of how benefits are calculated, see our guides on
-    <a href="/guides/pia">Primary Insurance Amount (PIA)</a> and
+    <a href="/guides/pia">Primary Insurance Amount (PIA)</a>,
+    <a href="/guides/spousal-benefits">Spousal Benefits</a>, and
     <a href="/guides/spousal-benefit-filing-date">Spousal Benefits and Filing Dates</a>.
   </p>
 

@@ -1,9 +1,10 @@
 <script lang="ts">
 import SponsorLogo from '$lib/images/social-security-advisors.png';
-import { SPONSOR } from '$lib/sponsor';
+import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
 
 export let animated = false;
 export let isVisible = true;
+export let copy: SponsorCopy = DEFAULT_SPONSOR_COPY;
 </script>
 
 <div
@@ -31,18 +32,14 @@ export let isVisible = true;
           {SPONSOR.name} <span class="mobile-sponsor-badge">Sponsor</span>
         </h3>
         <p>
-          Still weighing when to file? You can schedule a free call with a
-          Social Security specialist at <span class="inline-link"
-            >{SPONSOR.name}</span
-          > to talk through your specific situation.
+          {copy.intro}
+          <span class="inline-link">{SPONSOR.name}</span>
+          {copy.outro}
         </p>
         <ul>
-          <li>
-            A real person looks at your numbers, including things this
-            calculator doesn't cover like taxes, pensions, and health.
-          </li>
-          <li>The first call is free, and you pick the time.</li>
-          <li>If you want more help after that, they can also handle the filing.</li>
+          {#each copy.bullets as bullet}
+            <li>{bullet}</li>
+          {/each}
         </ul>
         <div class="cta-section">
           <div class="cta-button">Schedule a Free Call →</div>

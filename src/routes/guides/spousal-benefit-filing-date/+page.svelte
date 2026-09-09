@@ -347,6 +347,10 @@
 
   <ul>
     <li>
+      <a href="/guides/spousal-benefits">Spousal Benefits Guide</a> — Eligibility,
+      the 50% rule, deemed filing, and how to apply
+    </li>
+    <li>
       <a href="/guides/pia">Primary Insurance Amount (PIA)</a> — The foundation
       for all spousal benefit calculations
     </li>

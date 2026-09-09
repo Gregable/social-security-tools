@@ -33,6 +33,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   privacy: 'sponsor',
   'projectionlab-review': 'calculator',
   'senior-tax-deduction': 'sponsor',
+  'spousal-benefits': 'sponsor',
   'state-taxes': 'sponsor',
   'survivor-benefits': 'sponsor',
   '1st-and-2nd-of-month': 'sponsor',

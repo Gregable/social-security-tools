@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SPONSOR } from '$lib/sponsor';
+import { DEFAULT_SPONSOR_COPY, SPONSOR } from '$lib/sponsor';
 import {
   GUIDE_CTA_TYPES,
   getGuideCTAType,
@@ -13,6 +13,14 @@ describe('SPONSOR config', () => {
 
   it('reports analytics under its own destination', () => {
     expect(SPONSOR.destination).toBe('socialsecurityadvisors');
+  });
+});
+
+describe('DEFAULT_SPONSOR_COPY', () => {
+  it('has a two-part pitch sentence and at least one bullet', () => {
+    expect(DEFAULT_SPONSOR_COPY.intro.length).toBeGreaterThan(0);
+    expect(DEFAULT_SPONSOR_COPY.outro.length).toBeGreaterThan(0);
+    expect(DEFAULT_SPONSOR_COPY.bullets.length).toBeGreaterThan(0);
   });
 });
 
