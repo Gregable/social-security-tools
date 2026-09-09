@@ -35,6 +35,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'senior-tax-deduction': 'sponsor',
   'state-taxes': 'sponsor',
   'survivor-benefits': 'sponsor',
+  'spousal-benefits': 'sponsor',
   '1st-and-2nd-of-month': 'sponsor',
   wep: 'sponsor',
   'will-social-security-run-out': 'sponsor',

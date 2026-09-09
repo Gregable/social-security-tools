@@ -27,6 +27,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Sep 9, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/spousal-benefits">
+            Social Security Spousal Benefits: Eligibility, How Much You Get,
+            and When to Claim
+          </a>
+        </h3>
+        <p class="description">
+          Who qualifies for benefits on a spouse's record, why the 50% rule is
+          based on the PIA rather than the actual check, how claiming age
+          reduces the amount, and what happens if you never worked.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Apr 27, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/strategy-vs-opensocialsecurity">
