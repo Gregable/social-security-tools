@@ -33,7 +33,8 @@ export let copy: SponsorCopy = DEFAULT_SPONSOR_COPY;
         </h3>
         <p>
           {copy.intro}
-          <span class="inline-link">{SPONSOR.name}</span>{copy.outro}
+          <span class="inline-link">{SPONSOR.name}</span>
+          {copy.outro}
         </p>
         <ul>
           {#each copy.bullets as bullet}

@@ -19,7 +19,7 @@ describe('SPONSOR config', () => {
 describe('DEFAULT_SPONSOR_COPY', () => {
   it('has a two-part pitch sentence and at least one bullet', () => {
     expect(DEFAULT_SPONSOR_COPY.intro.length).toBeGreaterThan(0);
-    expect(DEFAULT_SPONSOR_COPY.outro.startsWith(' ')).toBe(true);
+    expect(DEFAULT_SPONSOR_COPY.outro.length).toBeGreaterThan(0);
     expect(DEFAULT_SPONSOR_COPY.bullets.length).toBeGreaterThan(0);
   });
 });

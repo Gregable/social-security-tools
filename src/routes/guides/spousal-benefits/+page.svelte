@@ -32,7 +32,7 @@ schema.tags = [
 const sponsorCopy: SponsorCopy = {
   intro:
     'Spousal benefits mean two filing dates that have to work together. You can schedule a free call with a Social Security specialist at',
-  outro: " to talk through how your claiming age and your spouse's fit together.",
+  outro: "to talk through how your claiming age and your spouse's fit together.",
   bullets: [
     "They look at both records side by side, including the survivor benefit that depends on the higher earner's choice.",
     "They cover what this guide can't, like taxes, pensions, and health.",
@@ -197,8 +197,7 @@ const faqs: FAQItem[] = [
     <p>
       You still qualify. With no benefit of your own, the spousal benefit is
       the entire 50% of your spouse's PIA, reduced only if you claim before
-      your Normal Retirement Age. About one in twenty retirees receives a
-      benefit based solely on a spouse's record.
+      your Normal Retirement Age.
     </p>
   </div>
 
@@ -307,8 +306,11 @@ const faqs: FAQItem[] = [
   <h3>Remarriage</h3>
   <p>
     If you remarry, you can claim spousal benefits on your new spouse's
-    record once the marriage has lasted one year, or sooner if you were
-    already receiving Social Security benefits the month before the marriage.
+    record once the marriage has lasted one year. The one-year wait is waived
+    only if you were entitled to certain benefits in the month before the
+    marriage, such as spouse's, widow's or widower's, parent's, or childhood
+    disability benefits. Receiving your own retirement benefit does not waive
+    it.
   </p>
 
   <h3>Same-Sex and Common-Law Marriages</h3>
