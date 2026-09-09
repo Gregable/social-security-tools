@@ -438,6 +438,7 @@
 
   <p>
     For more information on related topics, see our guides on
+    <a href="/guides/spousal-benefits">spousal benefits</a>,
     <a href="/guides/divorced-spouse">divorced spouse benefits</a>,
     <a href="/guides/spousal-benefit-filing-date"
       >spousal benefits and filing dates</a
