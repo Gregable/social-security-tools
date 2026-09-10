@@ -28,7 +28,6 @@ schema.tags = [
   'spousal benefit age 62',
 ];
 
-
 const faqs: FAQItem[] = [
   {
     question: 'Can I get Social Security spousal benefits if I never worked?',

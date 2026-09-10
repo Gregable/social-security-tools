@@ -71,16 +71,16 @@ export const GUIDE_SPONSOR_COPY: Record<string, SponsorCopy> = {
     outro: 'instead of waiting on hold.',
     bullets: [
       'They work with SSA regularly and know which requests still move during a funding gap.',
-      'If you were about to file, they can tell you whether to submit now or wait it out.',
+      'If you were about to file, they can tell you what to expect on timing and what to document.',
       'The first call is free, and you pick the time.',
     ],
   },
   integrations: {
     intro:
-      'These tools can carry your numbers around, but none of them will tell you which plan is right. For that you can talk to a Social Security specialist at',
+      'These tools each model one slice of the picture, and stitching them together is still your job. For a second opinion on the whole plan you can talk to a Social Security specialist at',
     outro: 'once your numbers are in place.',
     bullets: [
-      "A real person looks at your situation, including things these tools don't model like taxes, pensions, and health.",
+      'A real person weighs the parts no calculator sees, like your health, your job, and what you want retirement to look like.',
       'They can also handle the filing itself if you want the help.',
       'The first call is free, and you pick the time.',
     ],
@@ -111,7 +111,7 @@ export const GUIDE_SPONSOR_COPY: Record<string, SponsorCopy> = {
     outro: 'and decide for yourself what to share.',
     bullets: [
       "A real person looks at the whole picture, including things this calculator doesn't cover like taxes, pensions, and health.",
-      'Nothing you enter here is sent to them. Any conversation starts because you started it.',
+      'Nothing you enter here is sent to them, or to anyone. Any conversation starts because you started it.',
       'The first call is free, and you pick the time.',
     ],
   },
@@ -127,7 +127,7 @@ export const GUIDE_SPONSOR_COPY: Record<string, SponsorCopy> = {
   },
   'spousal-benefits': {
     intro:
-      'Spousal benefits mean two filing dates that have to work together. You can schedule a free call with a Social Security specialist at',
+      'Spousal benefits mean two filing dates that have to work together. You can talk that through with a Social Security specialist at',
     outro:
       "to talk through how your claiming age and your spouse's fit together.",
     bullets: [
@@ -152,7 +152,7 @@ export const GUIDE_SPONSOR_COPY: Record<string, SponsorCopy> = {
     outro: 'before you file for either one.',
     bullets: [
       'They can tell you which benefit to take now and which to leave growing, working from both records.',
-      "If you're recently widowed, they also know what SSA needs and how quickly it has to be filed.",
+      "If you're recently widowed, they know what SSA asks for, and which pieces, like the lump-sum death payment, do run on a clock.",
       'The first call is free, and you pick the time.',
     ],
   },
@@ -171,8 +171,8 @@ export const GUIDE_SPONSOR_COPY: Record<string, SponsorCopy> = {
       'Nobody can tell you what Congress will do, but you can plan around the range. You can do that with a Social Security specialist at',
     outro: 'rather than planning around headlines.',
     bullets: [
-      'They can show what a reduction like this would do to your own benefit, and what it would leave untouched.',
-      "Claiming early to get yours first usually costs more than the shortfall it's meant to avoid.",
+      'They can show what a 26% reduction would do to your own benefit, and what it would take to absorb it.',
+      'Claiming early to get ahead of a cut carries its own permanent reduction, and the two are worth comparing directly.',
       'The first call is free, and you pick the time.',
     ],
   },

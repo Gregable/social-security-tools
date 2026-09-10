@@ -7,16 +7,14 @@ import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { SPONSOR } from '$lib/sponsor';
 import type { GuideCTAType } from './guide-cta-config';
+import { guideSlugFromPath } from './guide-slug';
 import { getGuideSponsorCopy } from './sponsor-copy';
 
 export let type: GuideCTAType;
 
 let ctaElement: HTMLElement;
 
-$: guideSlug = ($page?.url?.pathname ?? '')
-  .replace('/guides/', '')
-  .replace(/\/$/, '');
-/* The pitch is tied to the guide it appears in; see sponsor-copy.ts. */
+$: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
 $: sponsorCopy = getGuideSponsorCopy(guideSlug);
 
 function handleClick() {

@@ -1,3 +1,5 @@
+import { guideSlugFromPath } from './guide-slug';
+
 export type GuideCTAType = 'calculator' | 'sponsor';
 
 export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
@@ -42,6 +44,5 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
 };
 
 export function getGuideCTAType(pathname: string): GuideCTAType {
-  const slug = pathname.replace('/guides/', '').replace(/\/$/, '');
-  return GUIDE_CTA_TYPES[slug] ?? 'sponsor';
+  return GUIDE_CTA_TYPES[guideSlugFromPath(pathname)] ?? 'sponsor';
 }
