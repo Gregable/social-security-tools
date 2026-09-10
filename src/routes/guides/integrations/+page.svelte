@@ -2,6 +2,17 @@
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "These tools each model one slice of the picture, and stitching them together is still your job. For a second opinion on the whole plan you can talk to a Social Security specialist at",
+  outro: "once your numbers are in place.",
+  bullets: [
+    "A real person weighs the parts no calculator sees, like your health, your job, and what you want retirement to look like.",
+    "They can also handle the filing itself if you want the help.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
   const title = "Third-Party Integrations";
   const description =
@@ -162,7 +173,7 @@
     </tbody>
   </table>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>How Integrations Work</h2>
 

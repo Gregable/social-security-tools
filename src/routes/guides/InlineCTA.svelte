@@ -5,17 +5,21 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
-import { SPONSOR } from '$lib/sponsor';
+import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
 import type { GuideCTAType } from './guide-cta-config';
 import { guideSlugFromPath } from './guide-slug';
-import { getGuideSponsorCopy } from './sponsor-copy';
 
 export let type: GuideCTAType;
+/**
+ * The sponsor pitch, written in the guide it appears in so it can pick up
+ * where the surrounding prose left off. Every guide using the sponsor
+ * variant supplies its own; guide-sponsor-copy-sync.test.ts enforces that.
+ */
+export let sponsorCopy: SponsorCopy = DEFAULT_SPONSOR_COPY;
 
 let ctaElement: HTMLElement;
 
 $: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
-$: sponsorCopy = getGuideSponsorCopy(guideSlug);
 
 function handleClick() {
   if (!browser) return;

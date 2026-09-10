@@ -2,6 +2,17 @@
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Spousal benefits mean two filing dates that have to work together. You can talk that through with a Social Security specialist at",
+  outro: "to talk through how your claiming age and your spouse's fit together.",
+  bullets: [
+    "They look at both records side by side, including the survivor benefit that depends on the higher earner's choice.",
+    "They cover what this guide can't, like taxes, pensions, and health.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title =
   'Social Security Spousal Benefits: Eligibility, How Much You Get, and When to Claim';
@@ -189,7 +200,7 @@ const faqs: FAQItem[] = [
     </p>
   </div>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>How Claiming Age Changes the Amount</h2>
 

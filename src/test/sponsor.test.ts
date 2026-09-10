@@ -1,14 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
+import { DEFAULT_SPONSOR_COPY, SPONSOR } from '$lib/sponsor';
 import {
   GUIDE_CTA_TYPES,
   getGuideCTAType,
 } from '../routes/guides/guide-cta-config';
 import { guideSlugFromPath } from '../routes/guides/guide-slug';
-import {
-  GUIDE_SPONSOR_COPY,
-  getGuideSponsorCopy,
-} from '../routes/guides/sponsor-copy';
 
 describe('SPONSOR config', () => {
   it('links to an https URL with a non-empty name', () => {
@@ -18,6 +14,28 @@ describe('SPONSOR config', () => {
 
   it('reports analytics under its own destination', () => {
     expect(SPONSOR.destination).toBe('socialsecurityadvisors');
+  });
+});
+
+describe('DEFAULT_SPONSOR_COPY', () => {
+  // Guides write their own pitch, but this one still renders on the
+  // calculator's sponsor box, so it is held to the same rules. The guide
+  // pitches are checked in invariants/guide-sponsor-copy-sync.test.ts.
+  it('reads as one sentence built around the sponsor name', () => {
+    expect(DEFAULT_SPONSOR_COPY.intro).toBe(DEFAULT_SPONSOR_COPY.intro.trim());
+    expect(DEFAULT_SPONSOR_COPY.outro).toBe(DEFAULT_SPONSOR_COPY.outro.trim());
+    expect(DEFAULT_SPONSOR_COPY.intro.endsWith(' at')).toBe(true);
+    expect(DEFAULT_SPONSOR_COPY.outro).toMatch(/^[a-z]/);
+    expect(DEFAULT_SPONSOR_COPY.outro.endsWith('.')).toBe(true);
+  });
+
+  it('has bullets that never repeat the sponsor name', () => {
+    expect(DEFAULT_SPONSOR_COPY.bullets.length).toBeGreaterThan(0);
+    for (const bullet of DEFAULT_SPONSOR_COPY.bullets) {
+      expect(bullet).toBe(bullet.trim());
+      expect(bullet.endsWith('.')).toBe(true);
+      expect(bullet).not.toContain(SPONSOR.name);
+    }
   });
 });
 
@@ -58,62 +76,5 @@ describe('guide slugs', () => {
 
   it('only strips a leading /guides/, not one appearing later', () => {
     expect(guideSlugFromPath('/other/guides/wep')).toBe('');
-  });
-});
-
-describe('guide sponsor copy', () => {
-  // DEFAULT_SPONSOR_COPY renders on the calculator's sponsor box and on any
-  // guide without its own entry, so it is held to the same rules.
-  const allCopy: [string, SponsorCopy][] = [
-    ['the default pitch', DEFAULT_SPONSOR_COPY],
-    ...Object.entries(GUIDE_SPONSOR_COPY),
-  ];
-
-  it('has a pitch for every guide it claims to cover', () => {
-    // A floor, so an emptied map cannot make the it.each blocks vacuous.
-    expect(allCopy.length).toBeGreaterThan(10);
-  });
-
-  it.each(allCopy)(
-    'renders %s as one sentence built around the sponsor name',
-    (_label, copy) => {
-      // SponsorAd emits intro, the name, and outro as sibling nodes and
-      // relies on HTML collapsing the newlines between them into single
-      // spaces, so each fragment must carry no padding of its own.
-      expect(copy.intro).toBe(copy.intro.trim());
-      expect(copy.outro).toBe(copy.outro.trim());
-      // The name has to read as part of the clause: "...specialist at
-      // Social Security Advisors to talk it through."
-      expect(copy.intro.endsWith(' at')).toBe(true);
-      expect(copy.outro).toMatch(/^[a-z]/);
-      expect(copy.outro.endsWith('.')).toBe(true);
-    }
-  );
-
-  it.each(allCopy)('names the sponsor exactly once in %s', (_label, copy) => {
-    // SponsorAd supplies the name itself; a fragment repeating it would
-    // render "Social Security Advisors Social Security Advisors".
-    for (const fragment of [copy.intro, copy.outro, ...copy.bullets]) {
-      expect(fragment).not.toContain(SPONSOR.name);
-    }
-  });
-
-  it.each(allCopy)('supports %s with well-formed bullets', (_label, copy) => {
-    expect(copy.bullets.length).toBeGreaterThan(0);
-    for (const bullet of copy.bullets) {
-      expect(bullet).toBe(bullet.trim());
-      expect(bullet.endsWith('.')).toBe(true);
-    }
-  });
-
-  it.each(Object.entries(GUIDE_SPONSOR_COPY))(
-    'writes %s a pitch of its own rather than a copy of the default',
-    (_slug, copy) => {
-      expect(copy).not.toEqual(DEFAULT_SPONSOR_COPY);
-    }
-  );
-
-  it('falls back to the default pitch for an unlisted guide', () => {
-    expect(getGuideSponsorCopy('__not-a-guide__')).toBe(DEFAULT_SPONSOR_COPY);
   });
 });

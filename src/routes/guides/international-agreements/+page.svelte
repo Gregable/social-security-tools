@@ -3,6 +3,17 @@ import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "A career split across countries is exactly the case this calculator can't finish. You can hand the details to a Social Security specialist at",
+  outro: "and get an estimate that counts your overseas work.",
+  bullets: [
+    "A totalization claim runs through two systems and needs records from both, and mistakes are slow to unwind.",
+    "They also cover what this guide doesn't, like taxes, pensions, and health.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Social Security International Agreements';
 const description = 'How does working abroad affect social security?';
@@ -63,7 +74,7 @@ schema.tags = [
       >Totalization Agreements</a
     >.
   </p>
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <p>
     These agreements allow earned income credits to be earned overseas and still

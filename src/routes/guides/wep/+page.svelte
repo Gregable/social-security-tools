@@ -2,6 +2,17 @@
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "If WEP once cut your benefit, your corrected amount and any back pay are worth a second look. You can review them with a Social Security specialist at",
+  outro: "to confirm the repeal was applied to your record.",
+  bullets: [
+    "They can tell whether your payment reflects the repeal, and what to do if it does not.",
+    "A pension alongside Social Security also reshapes your tax picture, which this guide doesn't cover.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Windfall Elimination Provision (WEP): What It Was and Why It No Longer Applies';
 const description =
@@ -187,7 +198,7 @@ schema.tags = [
     of Social Security in favor of separate pension systems.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>What's the Difference Between WEP and GPO?</h2>
 

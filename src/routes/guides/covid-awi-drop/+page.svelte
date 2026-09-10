@@ -8,6 +8,17 @@ import CovidAimeImage from './covid-aime.jpg';
 import CovidEarningsImage from './covid-earnings.jpg';
 import CovidPiaImage from './covid-pia.jpg';
 import CovidPia2Image from './covid-pia-2.jpg';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "If you were born around 1960, you're close enough to filing that your actual record matters more than any forecast. You can go through it with a Social Security specialist at",
+  outro: "to see where your benefit really lands.",
+  bullets: [
+    "They work from your indexed earnings as they stand, not from a projection of where the wage index might go.",
+    "They also cover what this guide doesn't, like taxes, pensions, and health.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Effect of Covid-19 on Social Security Benefits';
 const description =
@@ -156,7 +167,7 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
     2008 multiplier is slightly lower than the 2009 multiplier (1.31 vs 1.33)
     because of the 2008 recession.
   </p>
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <p>
     How does Covid-19 factor into this? If the AWI (year 2020) is reduced by

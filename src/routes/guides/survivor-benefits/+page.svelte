@@ -2,6 +2,17 @@
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "A survivor benefit and your own retirement benefit can be claimed in either order, and the order changes the total. You can sort that out with a Social Security specialist at",
+  outro: "before you file for either one.",
+  bullets: [
+    "They can tell you which benefit to take now and which to leave growing, working from both records.",
+    "If you're recently widowed, they know what SSA asks for, and which pieces, like the lump-sum death payment, do run on a clock.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
   const title =
     "Social Security Survivor Benefits: Guide for Widows, Widowers & Families";
@@ -182,7 +193,7 @@
     claiming.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Survivor Normal Retirement Age</h2>
 
