@@ -341,6 +341,10 @@ const faqs: FAQItem[] = [
 
   <ul>
     <li>
+      <a href="/guides/cola">Social Security COLA</a> — This year's adjustment,
+      the full history since 1975, and what else changes each January
+    </li>
+    <li>
       <a href="/guides/indexing-factors">Wage Indexing Guide</a> — Detailed explanation
       of how indexing factors are calculated and why they matter
     </li>
