@@ -27,6 +27,20 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Sep 10, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/cola">
+            Social Security COLA: How the Annual Increase Works
+          </a>
+        </h3>
+        <p class="description">
+          How the cost-of-living adjustment is calculated from the CPI-W, when
+          it reaches your check, why you receive it even before you file, the
+          full history since 1975, and what else changes each January.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 9, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/spousal-benefits">
