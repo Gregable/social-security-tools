@@ -20,7 +20,7 @@ const LAST_MIDYEAR_COLA_YEAR = 1982;
  * announced in October 2025 is "the 2026 COLA". Readers search for that later
  * year, so anything user-facing should show `paymentYear`.
  */
-export interface ColaAdjustment {
+export interface AnnualCola {
   /** Year SSA announced the adjustment. The key in `constants.COLA`. */
   readonly announcementYear: number;
   /** Calendar year in which the larger payment first arrives. */
@@ -29,32 +29,44 @@ export interface ColaAdjustment {
   readonly percent: number;
 }
 
-function toAdjustment(announcementYear: number): ColaAdjustment {
+function toAnnualCola(announcementYear: number): AnnualCola {
+  const percent = COLA[announcementYear];
+  if (percent === undefined) {
+    throw new Error(`No COLA on record for ${announcementYear}`);
+  }
   return {
     announcementYear,
     paymentYear:
       announcementYear <= LAST_MIDYEAR_COLA_YEAR
         ? announcementYear
         : announcementYear + 1,
-    percent: COLA[announcementYear],
+    percent,
   };
 }
 
 /** Every COLA on record, oldest first. */
-export function colaHistory(): ColaAdjustment[] {
+export function colaHistory(): AnnualCola[] {
   return Object.keys(COLA)
     .map(Number)
     .sort((a, b) => a - b)
-    .map(toAdjustment);
+    .map(toAnnualCola);
 }
 
-/** The most recent COLA, which is the increase currently being paid. */
-export function latestCola(): ColaAdjustment {
-  return toAdjustment(MAX_COLA_YEAR);
+/**
+ * The most recently announced adjustment.
+ *
+ * SSA announces in October and the larger payment arrives the following
+ * January, so between those two dates this adjustment is public knowledge but
+ * is not yet reflected in anyone's check. Compare `paymentYear` against the
+ * current year before describing it in the past tense.
+ */
+export function latestAnnouncedCola(): AnnualCola {
+  return toAnnualCola(MAX_COLA_YEAR);
 }
 
 /** Arithmetic mean of every COLA on record, in whole percent. */
 export function averageCola(): number {
-  const percents = Object.values(COLA);
-  return percents.reduce((sum, percent) => sum + percent, 0) / percents.length;
+  const all = colaHistory();
+  const sum = all.reduce((total, adjustment) => total + adjustment.percent, 0);
+  return sum / all.length;
 }

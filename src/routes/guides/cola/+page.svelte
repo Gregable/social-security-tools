@@ -1,38 +1,70 @@
 <script lang="ts">
-import { averageCola, colaHistory, latestCola } from '$lib/cola';
+import {
+  type AnnualCola,
+  averageCola,
+  colaHistory,
+  latestAnnouncedCola,
+} from '$lib/cola';
+import { CURRENT_YEAR, MEDICARE_PART_B_PREMIUM } from '$lib/constants';
 import { Money } from '$lib/money';
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
-const latest = latestCola();
+const headline = latestAnnouncedCola();
 const history = colaHistory();
 const newestFirst = [...history].reverse();
 const recent = newestFirst.slice(0, 10);
 const average = averageCola();
 
-// Years in which prices did not rise enough to produce any increase.
-const zeroYears = history
-  .filter((adjustment) => adjustment.percent === 0)
-  .map((adjustment) => adjustment.paymentYear);
-const zeroYearsText = `${zeroYears.slice(0, -1).join(', ')}, and ${zeroYears[zeroYears.length - 1]}`;
+// SSA announces in October and the larger payment arrives the following
+// January, so for part of every year the newest adjustment is public but has
+// not reached anyone's check. Every tense on this page follows this flag.
+const isBeingPaid = headline.paymentYear <= CURRENT_YEAR;
 
-// The adjustment that has not been announced yet at publication time.
-const nextAnnouncementYear = latest.announcementYear + 1;
-const nextPaymentYear = latest.paymentYear + 1;
+const nextPaymentYear = headline.paymentYear + 1;
+const nextAnnouncementYear = headline.announcementYear + 1;
+
+function percentText(adjustment: AnnualCola): string {
+  return `${adjustment.percent.toFixed(1)}%`;
+}
+
+function yearList(years: number[]): string {
+  if (years.length <= 1) return years.join('');
+  if (years.length === 2) return `${years[0]} and ${years[1]}`;
+  return `${years.slice(0, -1).join(', ')}, and ${years[years.length - 1]}`;
+}
+
+// Years in which prices did not rise enough to produce any increase.
+const zeroYearsText = yearList(
+  history.filter((a) => a.percent === 0).map((a) => a.paymentYear)
+);
 
 // A round benefit makes the percentage concrete.
 const exampleBenefit = Money.from(2000);
-const exampleIncrease = exampleBenefit.times(latest.percent / 100);
+const exampleIncrease = exampleBenefit.times(headline.percent / 100);
 const exampleTotal = exampleBenefit.plus(exampleIncrease);
 
-// Medicare figures are published each November and are not part of
-// constants.ts. Update these alongside the annual SSA constants.
-const partBPremium = Money.from(202.9);
-const partBIncrease = Money.from(17.9);
+// Medicare premiums are set by CMS a month after the COLA is announced, so the
+// newest COLA year may not have one yet. Show the most recent year we have and
+// label it, rather than attaching a stale figure to the wrong year.
+const partBYears = Object.keys(MEDICARE_PART_B_PREMIUM)
+  .map(Number)
+  .sort((a, b) => a - b)
+  .filter((year) => year <= headline.paymentYear);
+const partBYear =
+  partBYears.length > 0 ? partBYears[partBYears.length - 1] : undefined;
+const partBPremium =
+  partBYear === undefined ? undefined : MEDICARE_PART_B_PREMIUM[partBYear];
+const partBPrior =
+  partBYear === undefined ? undefined : MEDICARE_PART_B_PREMIUM[partBYear - 1];
+const partBIncrease =
+  partBPremium === undefined || partBPrior === undefined
+    ? undefined
+    : partBPremium.sub(partBPrior);
 
-const title = `Social Security COLA ${latest.paymentYear}: What the ${latest.percent}% Increase Means`;
-const description = `Social Security benefits rose ${latest.percent}% in ${latest.paymentYear}. Learn how the cost-of-living adjustment is calculated, when it reaches your check, whether you receive it before you file, and what else changes in January.`;
+const title = `Social Security COLA ${headline.paymentYear}: What the ${percentText(headline)} Increase Means`;
+const description = `Social Security benefits ${isBeingPaid ? 'rose' : 'will rise'} ${percentText(headline)} in ${headline.paymentYear}. Learn how the cost-of-living adjustment is calculated, when it reaches your check, whether you receive it before you file, and what else changes in January.`;
 const publishDate = new Date('2026-09-10T00:00:00+00:00');
 const updateDate = new Date('2026-09-10T00:00:00+00:00');
 
@@ -43,10 +75,11 @@ schema.image = '/laptop-piggybank.jpg';
 schema.datePublished = publishDate.toISOString();
 schema.dateModified = updateDate.toISOString();
 schema.description = description;
-schema.imageAlt = 'Social Security calculator showing cost-of-living adjustments';
+schema.imageAlt =
+  'Social Security calculator showing cost-of-living adjustments';
 schema.tags = [
   'Social Security COLA',
-  `COLA ${latest.paymentYear}`,
+  `COLA ${headline.paymentYear}`,
   'cost of living adjustment',
   'CPI-W',
   'Social Security raise',
@@ -57,12 +90,12 @@ schema.tags = [
 const faqs: FAQItem[] = [
   {
     question: `When is the ${nextPaymentYear} COLA announced?`,
-    answer: `Social Security announces the ${nextPaymentYear} cost-of-living adjustment in mid-October ${nextAnnouncementYear}, once the Bureau of Labor Statistics publishes September inflation data. The figure is set by the CPI-W for July, August, and September compared with the same three months a year earlier.`,
+    answer: `Social Security announces the ${nextPaymentYear} cost-of-living adjustment in October ${nextAnnouncementYear}, once the Bureau of Labor Statistics publishes September inflation data. The date moves with that release, so it can fall late in the month.`,
   },
   {
     question: 'Do I get the COLA if I have not started benefits yet?',
     answer:
-      'Yes. Cost-of-living adjustments are applied to your benefit formula starting with the year you turn 62, whether or not you have filed. Waiting to claim does not cost you any COLA. Before 62, your earnings are protected by wage indexing instead.',
+      'Yes. Cost-of-living adjustments are applied to your benefit formula starting with the year you turn 62, whether or not you have filed. Waiting to claim does not cost you any COLA.',
   },
   {
     question: 'Can a COLA ever reduce my benefit?',
@@ -91,20 +124,23 @@ const faqs: FAQItem[] = [
 </svelte:head>
 
 <div class="guide-page">
-  <h1>Social Security COLA {latest.paymentYear}</h1>
+  <h1>Social Security COLA {headline.paymentYear}</h1>
   <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
 
   <p>
-    Social Security benefits rose {latest.percent}% in {latest.paymentYear}.
-    The increase, called a cost-of-living adjustment, was announced in October
-    {latest.announcementYear} and first appeared in the payment for January
-    {latest.paymentYear}.
+    Social Security benefits {isBeingPaid ? 'rose' : 'will rise'}
+    {percentText(headline)} in {headline.paymentYear}. The increase, called a
+    cost-of-living adjustment, was announced in October
+    {headline.announcementYear} and
+    {isBeingPaid ? 'first appeared in' : 'takes effect with'} the payment for
+    January {headline.paymentYear}.
   </p>
 
   <div class="headline-box">
-    <h3>The {latest.paymentYear} adjustment</h3>
+    <h3>The {headline.paymentYear} adjustment</h3>
     <p>
-      A gross benefit of {exampleBenefit.wholeDollars()} a month becomes
+      A gross benefit of {exampleBenefit.wholeDollars()} a month
+      {isBeingPaid ? 'became' : 'becomes'}
       {exampleTotal.wholeDollars()}, an increase of
       {exampleIncrease.wholeDollars()} a month. Your own increase is the same
       percentage applied to whatever you were receiving in December.
@@ -123,13 +159,19 @@ const faqs: FAQItem[] = [
     The adjustment is tied to the Consumer Price Index for Urban Wage Earners
     and Clerical Workers, known as CPI-W. Social Security averages that index
     for July, August, and September, then compares it with the same three
-    months of the previous year. The percentage change, rounded to the nearest
-    tenth of a percent, becomes the COLA.
+    months of the last year in which a COLA took effect. The percentage change,
+    rounded to the nearest tenth of a percent, becomes the COLA.
+  </p>
+
+  <p>
+    In most years the comparison is simply against the year before. After a
+    year with no increase the comparison reaches further back, to the last year
+    that produced one, so no inflation is skipped.
   </p>
 
   <p>
     Because the third quarter ends in September, the figure is announced in
-    mid-October and takes effect a few months later. Nothing about your own
+    October and takes effect a few months later. Nothing about your own
     earnings or filing age enters the calculation. Every beneficiary receives
     the same percentage.
   </p>
@@ -144,15 +186,17 @@ const faqs: FAQItem[] = [
   <p>
     The adjustment officially applies to benefits for December, and Social
     Security pays December benefits in January. So the first larger payment
-    arrives in January {latest.paymentYear}. Supplemental Security Income
-    recipients see it slightly earlier, at the end of December.
+    {isBeingPaid ? 'arrived' : 'arrives'} in January {headline.paymentYear}.
+    Supplemental Security Income works slightly differently. The increase
+    applies to the January payment, and January SSI is always issued on the last
+    business day of December because the first of the month is a holiday.
   </p>
 
   <p>
-    Social Security posts a personalized COLA notice in early December showing
-    your new amount. It appears in the message center of your my Social
-    Security account, and is mailed to people who have not opted out of paper
-    notices.
+    Social Security posts a personalized COLA notice in the message center of
+    your my Social Security account in late November, along with your new
+    Medicare premium. Paper notices are mailed starting in early December to
+    people who have not opted out of them.
   </p>
 
   <InlineCTA type="calculator" />
@@ -177,10 +221,12 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    Before you turn 62, your record is protected a different way. Past earnings
-    are restated in current terms through
-    <a href="/guides/indexing-factors">wage indexing</a>, which tracks average
-    wages rather than prices. Our guide on
+    Earlier in your career a different mechanism does the work. Your past
+    earnings are restated relative to the average wage level of the year you
+    turn 60, through
+    <a href="/guides/indexing-factors">wage indexing</a>, which tracks wages
+    rather than prices. Earnings from age 60 onward, including 61 and 62, count
+    at face value. Our guide on
     <a href="/guides/inflation">inflation and Social Security</a> covers the
     handoff between the two.
   </p>
@@ -205,7 +251,7 @@ const faqs: FAQItem[] = [
         {#each recent as adjustment}
           <tr>
             <td>{adjustment.paymentYear}</td>
-            <td>{adjustment.percent.toFixed(1)}%</td>
+            <td>{percentText(adjustment)}</td>
           </tr>
         {/each}
       </tbody>
@@ -232,7 +278,7 @@ const faqs: FAQItem[] = [
           {#each newestFirst as adjustment}
             <tr>
               <td>{adjustment.paymentYear}</td>
-              <td>{adjustment.percent.toFixed(1)}%</td>
+              <td>{percentText(adjustment)}</td>
             </tr>
           {/each}
         </tbody>
@@ -242,47 +288,57 @@ const faqs: FAQItem[] = [
       Adjustments announced for 1975 through 1982 took effect in June of the
       same year. Since 1983 an adjustment applies to December benefits, which
       arrive the following January, so those rows are listed under the later
-      year.
+      year. Source:
+      <a href="https://www.ssa.gov/oact/cola/colaseries.html">
+        SSA cost-of-living adjustment series
+      </a>.
     </p>
   </details>
 
   <h2>What Else Changes in January</h2>
 
   <h3>Medicare Part B</h3>
-  <p>
-    Most people have the Part B premium deducted from their Social Security
-    payment, and it is set separately from the COLA. The standard premium is
-    {partBPremium.string()} a month in {latest.paymentYear}, up
-    {partBIncrease.string()} from the year before. That deduction comes out of
-    the same check, so the amount deposited rises by less than the headline
-    percentage.
-  </p>
+  {#if partBPremium !== undefined && partBYear !== undefined}
+    <p>
+      Most people have the Part B premium deducted from their Social Security
+      payment, and it is set separately from the COLA. The standard premium is
+      {partBPremium.string()} a month in {partBYear}{#if partBIncrease !== undefined}, up
+        {partBIncrease.string()} from the year before{/if}. That deduction comes
+      out of the same check, so the amount deposited rises by less than the
+      headline percentage. Higher earners pay an income-related surcharge on top
+      of the standard premium.
+    </p>
+  {/if}
 
   <p>
     A rule known as hold harmless protects most beneficiaries from going
     backwards. If your dollar COLA is smaller than the increase in your Part B
     premium, the premium increase is limited so your net payment does not fall
-    below the previous year. It does not apply to people paying
-    income-related premium surcharges or those new to Medicare that year.
+    below the previous year. It does not cover everyone. People paying
+    income-related surcharges, those new to Medicare that year, those not yet
+    collecting Social Security, and those whose premiums Medicaid pays are all
+    outside it.
   </p>
 
   <h3>Limits That Move With Wages, Not Prices</h3>
   <p>
-    Two figures change every January but are driven by average wage growth
+    Two figures change most Januarys but are driven by average wage growth
     rather than the COLA, so they rise by a different percentage. The first is
     the <a href="/guides/earnings-cap">taxable maximum</a>, the ceiling on
     earnings that count toward Social Security. The second is the
     <a href="/guides/earnings-test">earnings test</a> limit, which affects
-    people who work while collecting before Normal Retirement Age.
+    people who work while collecting before Normal Retirement Age. Neither one
+    rises in a year when no COLA is payable.
   </p>
 
   <h3>Tax Thresholds That Never Change</h3>
   <p>
     The income thresholds that determine how much of your benefit is subject to
-    federal income tax are not indexed at all. They have been fixed since 1984
-    and 1993. Each COLA therefore pushes a few more people over them, which is
-    why the share of beneficiaries owing tax on benefits keeps growing. See our
-    guide on <a href="/guides/federal-taxes">federal taxation of benefits</a>.
+    federal income tax are not indexed at all. They have been fixed since the
+    1984 and 1994 tax years. Each COLA therefore pushes a few more people over
+    them, which is why the share of beneficiaries owing tax on benefits keeps
+    growing. See our guide on
+    <a href="/guides/federal-taxes">federal taxation of benefits</a>.
   </p>
 
   <h2>Why the Increase Can Feel Too Small</h2>
@@ -294,11 +350,12 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    The Bureau of Labor Statistics publishes an experimental index for people
-    62 and older, CPI-E, which has usually risen slightly faster than CPI-W.
-    Proposals to switch the COLA to CPI-E come up regularly in Congress. Others
-    propose a slower-growing measure instead. No change has been enacted, and
-    CPI-W remains the basis today.
+    The Bureau of Labor Statistics publishes a research index for people 62 and
+    older, CPI-E. It rose faster than CPI-W through the 1980s and 1990s, but the
+    gap has narrowed since, and in some years it would have produced a smaller
+    increase rather than a larger one. Proposals to switch the COLA to CPI-E
+    come up regularly in Congress, as do proposals for a slower-growing measure.
+    No change has been enacted, and CPI-W remains the basis today.
   </p>
 
   <h2>Frequently Asked Questions</h2>
@@ -313,9 +370,9 @@ const faqs: FAQItem[] = [
   <p>
     The <a href="/calculator">SSA.tools calculator</a> applies every
     cost-of-living adjustment on record to your earnings history, so the
-    benefit it shows already reflects the {latest.paymentYear} increase. Paste
-    your earnings record from ssa.gov and it will show your benefit at every
-    possible filing date, in today's dollars.
+    benefit it shows already reflects them. Paste your earnings record from
+    ssa.gov and it will show your benefit at every possible filing date, in
+    today's dollars.
   </p>
 
   <GuideFooter />

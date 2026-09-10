@@ -451,6 +451,22 @@ export const COLA: { [key: number]: number } = {
 export const MAX_COLA_YEAR: number = Math.max(...Object.keys(COLA).map(Number));
 
 /**
+ * Standard monthly Medicare Part B premium, keyed by the year it applies to.
+ *
+ * Most beneficiaries have this deducted from their Social Security payment, so
+ * it determines how much of a COLA actually reaches the bank account. Set by
+ * CMS rather than SSA and announced each November, one month after the COLA.
+ * Higher earners pay income-related surcharges on top of these amounts.
+ *
+ * Values from https://www.cms.gov/newsroom/fact-sheets
+ */
+export const MEDICARE_PART_B_PREMIUM: { [key: number]: Money } = {
+  2024: Money.from(174.7),
+  2025: Money.from(185.0),
+  2026: Money.from(202.9),
+};
+
+/**
  * Number of top years of earnings which contribute to SSA calculations.
  */
 export const SSA_EARNINGS_YEARS: number = 35;
