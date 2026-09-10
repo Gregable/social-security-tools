@@ -5,18 +5,19 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
-import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
+import { SPONSOR } from '$lib/sponsor';
 import type { GuideCTAType } from './guide-cta-config';
+import { getGuideSponsorCopy } from './sponsor-copy';
 
 export let type: GuideCTAType;
-/** Optional guide-specific pitch for the sponsor variant. */
-export let sponsorCopy: SponsorCopy = DEFAULT_SPONSOR_COPY;
 
 let ctaElement: HTMLElement;
 
 $: guideSlug = ($page?.url?.pathname ?? '')
   .replace('/guides/', '')
   .replace(/\/$/, '');
+/* The pitch is tied to the guide it appears in; see sponsor-copy.ts. */
+$: sponsorCopy = getGuideSponsorCopy(guideSlug);
 
 function handleClick() {
   if (!browser) return;

@@ -5,9 +5,9 @@ import type { OutboundDestination } from './analytics/outbound';
  * sponsor box, guide CTAs, strategy prompt) links here and reports analytics
  * under `destination`. Swapping sponsors means updating this object, adding
  * the new destination to OutboundDestination, revising DEFAULT_SPONSOR_COPY
- * and any guide-level SponsorCopy overrides (grep for SponsorCopy under
- * src/routes/guides), and revising the remaining hard-coded text in
- * SponsorAd, Sponsor, AdvisorPrompt, and guide-footer.
+ * and every guide pitch in src/routes/guides/sponsor-copy.ts, and revising
+ * the remaining hard-coded text in SponsorAd, Sponsor, AdvisorPrompt, and
+ * guide-footer.
  */
 export interface SponsorConfig {
   readonly name: string;
@@ -21,8 +21,8 @@ export interface SponsorConfig {
  * The pitch shown inside a sponsor placement. SponsorAd renders
  * `intro`, the sponsor name (styled as a link; the whole card is the
  * anchor), and `outro` as one sentence, supplying the spaces between them,
- * then lists `bullets`. Guides can pass their own copy to tie the pitch to
- * the topic at hand.
+ * then lists `bullets`. Guides tie the pitch to the topic at hand through
+ * src/routes/guides/sponsor-copy.ts.
  */
 export interface SponsorCopy {
   /** Trimmed fragment before the sponsor name, usually ending in "at". */
