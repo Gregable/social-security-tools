@@ -6,6 +6,7 @@ import {
   currentMonthDate,
   DEFAULT_DISCOUNT_RATE,
   loadDeathDistributions,
+  loadDiscountRateAssumption,
   recommendedFromDistributions,
 } from '$lib/components/recommended-filing-card';
 import type { DeathProbability } from '$lib/life-tables';
@@ -22,7 +23,12 @@ vi.mock('$lib/life-tables', async (importOriginal) => {
   return { ...actual, getDeathProbabilityDistribution: vi.fn() };
 });
 
+vi.mock('$lib/strategy/data', () => ({
+  fetchRecommendedDiscountRate: vi.fn(),
+}));
+
 import { getDeathProbabilityDistribution } from '$lib/life-tables';
+import { fetchRecommendedDiscountRate } from '$lib/strategy/data';
 
 // Filing window is fixed at 62-70 when "now" is before the birthdate, matching
 // the existing expected-npv tests (FAR_PAST removes the "filing in the past"
@@ -59,6 +65,45 @@ describe('currentMonthDate', () => {
     const md = currentMonthDate(new Date(2025, 11, 1));
     expect(md.year()).toBe(2025);
     expect(md.monthName()).toBe('Dec');
+  });
+});
+
+describe('loadDiscountRateAssumption', () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it('uses the fetched 20-year Treasury rate when the fetch succeeds', async () => {
+    vi.mocked(fetchRecommendedDiscountRate).mockResolvedValue({
+      date: '2026-09-10',
+      rate: 0.031,
+      success: true,
+    });
+
+    const got = await loadDiscountRateAssumption();
+
+    expect(got).toEqual({ rate: 0.031, source: 'treasury' });
+  });
+
+  it('falls back to the default rate when every source fails', async () => {
+    vi.mocked(fetchRecommendedDiscountRate).mockResolvedValue({
+      date: '2026-09-10',
+      rate: 0.025,
+      success: false,
+      error: 'network down',
+    });
+
+    const got = await loadDiscountRateAssumption();
+
+    expect(got).toEqual({ rate: DEFAULT_DISCOUNT_RATE, source: 'default' });
+  });
+
+  it('falls back to the default rate when the fetch throws', async () => {
+    vi.mocked(fetchRecommendedDiscountRate).mockRejectedValue(
+      new Error('boom')
+    );
+
+    const got = await loadDiscountRateAssumption();
+
+    expect(got).toEqual({ rate: DEFAULT_DISCOUNT_RATE, source: 'default' });
   });
 });
 

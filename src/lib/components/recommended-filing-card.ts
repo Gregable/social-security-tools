@@ -11,10 +11,45 @@ import {
   expectedNPVSingle,
 } from '$lib/strategy/calculations/expected-npv';
 import { filingAgeRange } from '$lib/strategy/calculations/strategy-calc';
+import { fetchRecommendedDiscountRate } from '$lib/strategy/data';
 import { buildStrategyHash } from '$lib/url-params';
 
-/** Default assumptions matching the strategy optimizer's initial state. */
+/**
+ * Discount rate used until the live 20-year Treasury rate arrives, and when
+ * it cannot be fetched at all. Matches the strategy optimizer's fallback.
+ */
 export const DEFAULT_DISCOUNT_RATE = 0.025;
+
+/**
+ * The discount rate the card computed with, and where it came from, so the
+ * card's copy can say "the current 20-year Treasury rate" only when that is
+ * actually true.
+ */
+export interface DiscountRateAssumption {
+  readonly rate: number;
+  readonly source: 'treasury' | 'default';
+}
+
+export const DEFAULT_DISCOUNT_RATE_ASSUMPTION: DiscountRateAssumption = {
+  rate: DEFAULT_DISCOUNT_RATE,
+  source: 'default',
+};
+
+/**
+ * Loads the current 20-year Treasury real yield, the same rate the strategy
+ * optimizer preselects. Never throws: on any failure it returns the default
+ * assumption so the card can still render.
+ */
+export async function loadDiscountRateAssumption(): Promise<DiscountRateAssumption> {
+  try {
+    const data = await fetchRecommendedDiscountRate();
+    if (!data.success) return DEFAULT_DISCOUNT_RATE_ASSUMPTION;
+    return { rate: data.rate, source: 'treasury' };
+  } catch (e) {
+    console.warn('RecommendedFilingCard: failed to load discount rate', e);
+    return DEFAULT_DISCOUNT_RATE_ASSUMPTION;
+  }
+}
 
 export interface RecommendedFiling {
   readonly isSingle: boolean;

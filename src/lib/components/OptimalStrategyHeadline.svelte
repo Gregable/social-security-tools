@@ -1,6 +1,10 @@
 <script lang="ts">
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
+  import {
+    DEFAULT_DISCOUNT_RATE_ASSUMPTION,
+    type DiscountRateAssumption,
+  } from "$lib/components/recommended-filing-card";
   import { Money } from "$lib/money";
   import type { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
@@ -15,6 +19,12 @@
     coupleResult?: CoupleFilingAgeResult;
     recipients: [Recipient, Recipient];
     showInfoTip?: boolean;
+    /**
+     * The discount rate the result was computed with. Only shown when the
+     * info tip is hidden (the calculator card), where the surrounding page
+     * has no rate input to point at.
+     */
+    discountRateAssumption?: DiscountRateAssumption;
     /**
      * Per recipient: false once filing immediately is their only remaining
      * option. Such a recipient gets a "file now" card rather than a filing
@@ -40,6 +50,7 @@
     coupleResult,
     recipients,
     showInfoTip = true,
+    discountRateAssumption = DEFAULT_DISCOUNT_RATE_ASSUMPTION,
     hasFilingChoice,
     currentDate,
   }: Props = $props();
@@ -83,6 +94,11 @@
 
   function formatMoney(cents: number): string {
     return Money.fromCents(Math.round(cents)).wholeDollars();
+  }
+
+  /** 0.0312 -> "3.12%"; trailing zeros dropped so 0.025 -> "2.5%". */
+  function formatPercent(rate: number): string {
+    return `${parseFloat((rate * 100).toFixed(2))}%`;
   }
 </script>
 
@@ -191,8 +207,17 @@
           the discount rate.
         {/if}
         {#if !showInfoTip}
-          Based on default assumptions — a 2.5% discount rate and blended life
-          expectancy. Open the optimizer to adjust.
+          {#if discountRateAssumption.source === "treasury"}
+            Based on the current 20-year Treasury rate ({formatPercent(
+              discountRateAssumption.rate
+            )}) as the discount rate and blended life expectancy. Open the
+            optimizer to adjust.
+          {:else}
+            Based on default assumptions — a {formatPercent(
+              discountRateAssumption.rate
+            )} discount rate and blended life expectancy. Open the optimizer
+            to adjust.
+          {/if}
         {/if}
       </p>
     </div>
