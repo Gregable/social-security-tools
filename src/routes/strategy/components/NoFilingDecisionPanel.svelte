@@ -9,13 +9,12 @@
 -->
 
 <script lang="ts">
-// True when the scenario is a couple and both are past 70.
-export let bothRecipients: boolean = false;
+export let bothPastSeventy: boolean = false;
 </script>
 
 <div class="no-decision-note">
   <h2>There is no filing age left to choose</h2>
-  {#if bothRecipients}
+  {#if bothPastSeventy}
     <p>
       These charts normally show how the best filing ages shift with how long
       each of you lives. You are both past 70, so that trade-off is settled:

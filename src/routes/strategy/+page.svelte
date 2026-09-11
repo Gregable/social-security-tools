@@ -9,11 +9,11 @@
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
   import { optimalStrategyCoupleFast } from "$lib/strategy/calculations/optimal-strategy-fast";
+  import { optimalStrategySingle } from "$lib/strategy/calculations/strategy-calc";
   import {
-    filingAgeRange,
-    optimalStrategySingle,
-  } from "$lib/strategy/calculations/strategy-calc";
-  import { currentMonthDate } from "$lib/components/recommended-filing-card";
+    currentMonthDate,
+    filingChoices,
+  } from "$lib/components/recommended-filing-card";
   import {
     CalculationResults,
     CalculationStatus,
@@ -154,6 +154,9 @@
   let recipientInputsValid = false;
   let discountRateValid = true;
   let formErrorMessage: string | null = null;
+  // Set when a recompute triggered from the results stage fails. The form's
+  // banner is not mounted there, so the results stage needs its own.
+  let recomputeErrorMessage: string | null = null;
 
   let rerunPending = false;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -319,21 +322,13 @@
 
   $: formIsValid = recipientInputsValid && discountRateValid;
 
-  // A recipient past 70 has no filing decision left: delayed credits have
-  // stopped and the optimizer's only remaining option is "file now". The
-  // headline needs to know so it does not present that as a future date.
-  $: hasFilingChoice = computeFilingChoice(recipients, isSingle);
-
-  function computeFilingChoice(
-    rs: [Recipient, Recipient],
-    single: boolean
-  ): [boolean, boolean] {
-    const currentDate = currentMonthDate();
-    return [
-      filingAgeRange(rs[0], currentDate).hasChoice,
-      single ? true : filingAgeRange(rs[1], currentDate).hasChoice,
-    ];
-  }
+  // A recipient with no filing choice left has only one option: file now.
+  // The headline and the grids need to know so they do not present that as a
+  // decision. Assigned inside calculateStrategyMatrix from the same
+  // currentDate as the results it describes — deriving it reactively from
+  // live form state would let it flip a card to "File now" while the figures
+  // beside it still belong to the previous birthdate.
+  let hasFilingChoice: [boolean, boolean] = [true, true];
   $: discountRate = discountRatePercent / 100;
   $: shareUrl = buildShareUrl(recipients, isSingle, piaValues, birthdateInputs);
 
@@ -386,52 +381,74 @@
     if (debounceTimer !== null) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       debounceTimer = null;
-      // Reactive path has no banner; log and leave prior results visible.
-      calculateStrategyMatrix().catch((err) => {
-        console.error("Reactive recompute failed:", err);
-      });
+      calculateStrategyMatrix()
+        .then(() => {
+          recomputeErrorMessage = null;
+        })
+        .catch((err) => {
+          console.error("Reactive recompute failed:", err);
+          // The figures still on screen were computed for the previous
+          // inputs. Leaving them unlabelled is worse than showing nothing:
+          // they look like an answer to what the user just typed.
+          recomputeErrorMessage =
+            "These figures are out of date — we could not recompute them " +
+            "for your latest changes.";
+        });
     }, REACTIVE_DEBOUNCE_MS);
   }
 
   let recipients: [Recipient, Recipient] = initializeRecipients();
 
   function handleRecipientUpdate() {
-    try {
-      recipients = [...recipients];
-      updateDeathProbabilityDistributions();
-    } catch (error) {
-      console.warn("Error updating form data:", error);
-    }
+    recipients = [...recipients];
+    // A speculative refresh while the user is still typing. Failures here are
+    // not worth interrupting them for: calculateStrategyMatrix awaits the
+    // same function on Continue, and surfaces the error then.
+    updateDeathProbabilityDistributions().catch((error) => {
+      console.warn("Error updating death probability distributions:", error);
+    });
   }
 
+  /**
+   * Loads mortality data and rebuilds the death-age buckets.
+   *
+   * Throws rather than swallowing. Returning quietly on failure leaves the
+   * buckets empty, and an empty bucket list still runs to "Complete" with
+   * nothing in it — which is exactly how the over-70 bug stayed invisible.
+   */
   async function updateDeathProbabilityDistributions() {
-    try {
-      const currentYear = new Date().getFullYear();
-      [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
-        getDeathProbabilityDistribution(recipients[0], currentYear),
-        getDeathProbabilityDistribution(recipients[1], currentYear),
-      ]);
-      deathProbDistribution1 = [...deathProbDistribution1];
-      deathProbDistribution2 = [...deathProbDistribution2];
+    const currentYear = new Date().getFullYear();
+    [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
+      getDeathProbabilityDistribution(recipients[0], currentYear),
+      getDeathProbabilityDistribution(recipients[1], currentYear),
+    ]);
+    deathProbDistribution1 = [...deathProbDistribution1];
+    deathProbDistribution2 = [...deathProbDistribution2];
 
-      const startAge1 = Math.max(
-        MIN_FILING_AGE,
-        recipients[0].birthdate.currentAge()
-      );
-      const startAge2 = Math.max(
-        MIN_FILING_AGE,
-        recipients[1].birthdate.currentAge()
-      );
+    const startAge1 = Math.max(
+      MIN_FILING_AGE,
+      recipients[0].birthdate.currentAge()
+    );
+    const startAge2 = Math.max(
+      MIN_FILING_AGE,
+      recipients[1].birthdate.currentAge()
+    );
 
-      deathAgeBuckets1 = isSingle
-        ? generateMonthlyBuckets(startAge1, deathProbDistribution1)
-        : generateThreeYearBuckets(startAge1, deathProbDistribution1);
-      deathAgeBuckets2 = generateThreeYearBuckets(
-        startAge2,
-        deathProbDistribution2
+    deathAgeBuckets1 = isSingle
+      ? generateMonthlyBuckets(startAge1, deathProbDistribution1)
+      : generateThreeYearBuckets(startAge1, deathProbDistribution1);
+    deathAgeBuckets2 = generateThreeYearBuckets(
+      startAge2,
+      deathProbDistribution2
+    );
+
+    // A run over no scenarios is a failure, not a result.
+    if (deathAgeBuckets1.length === 0 || deathAgeBuckets2.length === 0) {
+      throw new Error(
+        `no death-age buckets (recipient 0: ${deathAgeBuckets1.length}, ` +
+          `recipient 1: ${deathAgeBuckets2.length}); mortality data is ` +
+          "missing or unusable"
       );
-    } catch (error) {
-      console.warn("Error updating death probability distributions:", error);
     }
   }
 
@@ -466,6 +483,7 @@
 
   async function handleContinue() {
     formErrorMessage = null;
+    recomputeErrorMessage = null;
     try {
       await calculateStrategyMatrix();
       if (calculationResults.status() === CalculationStatus.Complete) {
@@ -492,6 +510,7 @@
 
   function handleStartOver() {
     formErrorMessage = null;
+    recomputeErrorMessage = null;
     // Preserve health tunings across Start over — they're exploration state,
     // not identity data.
     const prevHealth = snapshotHealthMultipliers();
@@ -523,6 +542,11 @@
       next.beginRun();
 
       const currentDate = currentMonthDate();
+      hasFilingChoice = filingChoices(
+        recipients[0],
+        isSingle ? null : recipients[1],
+        currentDate
+      );
 
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
@@ -774,8 +798,13 @@
     </div>
 
     <section class="calculation-section">
-      {#if calculationResults.status() === CalculationStatus.Complete}
+      {#if recomputeErrorMessage}
         <div class="limited-width">
+          <p class="stale-banner" role="alert">{recomputeErrorMessage}</p>
+        </div>
+      {/if}
+      {#if calculationResults.status() === CalculationStatus.Complete}
+        <div class="limited-width" class:is-stale={recomputeErrorMessage}>
           <div class="hero-row">
             <OptimalStrategyHeadline
               {isSingle}
@@ -783,6 +812,7 @@
               coupleResult={optimalCoupleResult}
               {recipients}
               {hasFilingChoice}
+              currentDate={currentMonthDate()}
             />
             <AdvisorPrompt />
           </div>
@@ -862,6 +892,22 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0.5rem;
+  }
+
+  .stale-banner {
+    margin: 0.75rem auto;
+    padding: 0.7rem 0.95rem;
+    background: #fef8ec;
+    border: 1px solid #e8cf9a;
+    color: #7a5606;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
+  /* Dim figures that no longer match the inputs on screen, so they are not
+     read as the answer to what the user just changed. */
+  .limited-width.is-stale {
+    opacity: 0.55;
   }
 
   .page-hero {

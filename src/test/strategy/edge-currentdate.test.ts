@@ -212,9 +212,10 @@ describe('earliestFiling - well past NRA (6-month limit)', () => {
 describe('earliestFiling - at or past 70', () => {
   // When the recipient is at or past age 70, the 6-month retroactive rule
   // still applies, so earliest = currentAge - 6 months.
-  // Past 70 that earliest age exceeds 70y0m. Optimizers must bound their
-  // search with `filingAgeRange` rather than a literal 70, which collapses
-  // the range to that single remaining choice (see over-70-filing.test.ts).
+  // That earliest age reaches 70y0m at age 70y6m and exceeds it thereafter.
+  // Optimizers must bound their search with `filingAgeRange` rather than a
+  // literal 70; `filingAgeRange` collapses the range to the single remaining
+  // choice from that point on (see over-70-filing.test.ts).
 
   it('currentDate Jan 2030 (age 70y0m): earliest = 69y6m', () => {
     const r = makeRecipient(1000, 1960, 0, 15);
@@ -236,7 +237,9 @@ describe('earliestFiling - at or past 70', () => {
     const earliest = earliestFiling(r, currentDate);
     // 6-month rule gives 72y0m - 6m = 71y6m, which exceeds 70y0m.
     expect(earliest.asMonths()).toBe(ageDuration(71, 6).asMonths());
-    // Past the age-70 cap, so this is the only filing age left:
+    // Past the age-70 cap, so this is the only filing age left. (At exactly
+    // age 70y6m the earliest age equals 70y0m, which is also a single
+    // remaining choice; it first exceeds 70y0m from 70y7m on.)
     expect(earliest.asMonths()).toBeGreaterThan(ageDuration(70, 0).asMonths());
   });
 });

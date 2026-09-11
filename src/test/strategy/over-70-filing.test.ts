@@ -11,17 +11,19 @@
  * passed 70 that range went empty or negative, which produced a nonsense
  * "file at age 0" result in the single optimizer and a
  * `RangeError: Invalid typed array length` in the couple optimizer. The couple
- * case surfaced on /strategy as "Could not compute results", which also hid the
- * still-meaningful filing decision of an under-70 spouse.
+ * case surfaced on /strategy as a generic computation-failure banner, which
+ * also hid the still-meaningful filing decision of an under-70 spouse.
  */
 
 import { describe, expect, it } from 'vitest';
 import { benefitAtAge, survivorBenefit } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
+import { filingChoices } from '$lib/components/recommended-filing-card';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
 import {
+  expectedNPVCouple,
   expectedNPVCoupleOptimized,
   expectedNPVSingle,
 } from '$lib/strategy/calculations/expected-npv';
@@ -34,9 +36,17 @@ import {
   optimalStrategySingle,
 } from '$lib/strategy/calculations/strategy-calc';
 
-function makeRecipient(piaDollars: number, birthYear: number): Recipient {
+function makeRecipient(
+  piaDollars: number,
+  birthYear: number,
+  birthMonthIndex: number = 5
+): Recipient {
+  // Normalize so callers may pass an out-of-range month index (e.g. a month
+  // arithmetic result of -2, meaning November of the previous year).
+  const year = birthYear + Math.floor(birthMonthIndex / 12);
+  const month = ((birthMonthIndex % 12) + 12) % 12;
   const r = new Recipient();
-  r.birthdate = Birthdate.FromYMD(birthYear, 5, 15);
+  r.birthdate = Birthdate.FromYMD(year, month, 15);
   r.setPia(Money.from(piaDollars));
   return r;
 }
@@ -171,9 +181,73 @@ describe('filingAgeRange', () => {
     expect(range.latest.asMonths()).toBe(earliest.asMonths());
   });
 
+  // The flip is at 70y6m, not 70y0m: SSA's six-month retroactive window means
+  // `earliest` lags current age by six months once past full retirement age.
+  // Both sides of that boundary are pinned here, because an off-by-one in
+  // either direction reintroduces a shipped bug — `lessThanOrEqual` would show
+  // a 70y6m user a filing date six months in the past, and dropping the
+  // `hasChoice` ternary on `latest` would put the range back to negative
+  // length at 70y7m.
+  describe('the 70y6m boundary', () => {
+    // Born on the 15th, so earliestFilingMonth is the month after the 62nd
+    // birthday and `earliest` tracks currentAge - 6 months past FRA.
+    const atAge = (years: number, months: number): Recipient =>
+      makeRecipient(
+        2000,
+        CURRENT_DATE.year() - years,
+        CURRENT_DATE.monthIndex() - months
+      );
+
+    it('still has a choice at 70y5m (two ages left to search)', () => {
+      const range = filingAgeRange(atAge(70, 5), CURRENT_DATE);
+      expect(range.hasChoice).toBe(true);
+      expect(range.earliest.asMonths()).toBe(MAX_FILING_AGE.asMonths() - 1);
+      expect(range.latest.asMonths()).toBe(MAX_FILING_AGE.asMonths());
+    });
+
+    it('has no choice left at exactly 70y6m', () => {
+      const range = filingAgeRange(atAge(70, 6), CURRENT_DATE);
+      expect(range.hasChoice).toBe(false);
+      expect(range.earliest.asMonths()).toBe(MAX_FILING_AGE.asMonths());
+      expect(range.latest.asMonths()).toBe(MAX_FILING_AGE.asMonths());
+    });
+
+    it('keeps a non-empty range past the boundary at 70y7m', () => {
+      const range = filingAgeRange(atAge(70, 7), CURRENT_DATE);
+      expect(range.hasChoice).toBe(false);
+      expect(range.earliest.asMonths()).toBe(MAX_FILING_AGE.asMonths() + 1);
+      // The span must never invert: a negative (latest - earliest + 1) is
+      // what threw RangeError from the fast paths' typed arrays.
+      expect(range.latest.asMonths()).toBe(range.earliest.asMonths());
+      expect(
+        range.latest.asMonths() - range.earliest.asMonths() + 1
+      ).toBeGreaterThan(0);
+    });
+  });
+
   it('reports whether a filing decision remains', () => {
     expect(filingAgeRange(UNDER_70(), CURRENT_DATE).hasChoice).toBe(true);
     expect(filingAgeRange(OVER_70(), CURRENT_DATE).hasChoice).toBe(false);
+  });
+});
+
+describe('filingChoices', () => {
+  // Shared by the strategy page and the calculator's recommendation card so
+  // the two cannot disagree about who still has a decision to make.
+  it('reports both recipients for a couple', () => {
+    expect(filingChoices(UNDER_70(), OVER_70(), CURRENT_DATE)).toEqual([
+      true,
+      false,
+    ]);
+    expect(filingChoices(OVER_70(), UNDER_70(), CURRENT_DATE)).toEqual([
+      false,
+      true,
+    ]);
+  });
+
+  it('reports the second slot as true when there is no spouse', () => {
+    expect(filingChoices(OVER_70(), null, CURRENT_DATE)).toEqual([false, true]);
+    expect(filingChoices(UNDER_70(), null, CURRENT_DATE)).toEqual([true, true]);
   });
 });
 
@@ -296,6 +370,51 @@ describe('couple optimizer with one recipient past age 70', () => {
     // Within a cent, matching the tolerance the golden tests use: the two
     // implementations accumulate the same sum in a different order.
     expect(Math.abs(fast[2] - reference[2])).toBeLessThan(1);
+  });
+
+  it('the production NPV path agrees with its slow reference', () => {
+    // The /strategy page and the calculator card both consume
+    // expectedNPVCoupleOptimized, a different implementation from
+    // optimalStrategyCoupleFast above, with its own resized typed arrays.
+    // Unlike the golden tests (which compare an implementation against a
+    // stored snapshot of itself), this compares two independent
+    // implementations, so agreement here is the stronger claim.
+    const over = OVER_70();
+    const under = UNDER_70();
+    over.markFirst();
+    under.markSecond();
+    const recipients: [Recipient, Recipient] = [over, under];
+    const dists: [
+      { age: number; probability: number }[],
+      { age: number; probability: number }[],
+    ] = [flatDeathDistribution(78), flatDeathDistribution(64)];
+
+    const fast = expectedNPVCoupleOptimized(
+      recipients,
+      CURRENT_DATE,
+      DISCOUNT_RATE,
+      dists
+    );
+    const reference = expectedNPVCouple(
+      recipients,
+      CURRENT_DATE,
+      DISCOUNT_RATE,
+      dists
+    );
+
+    expect(fast.length).toBe(reference.length);
+    expect(fast.length).toBeGreaterThan(1);
+    for (let i = 0; i < fast.length; i++) {
+      expect(fast[i].filingAges[0].asMonths()).toBe(
+        reference[i].filingAges[0].asMonths()
+      );
+      expect(fast[i].filingAges[1].asMonths()).toBe(
+        reference[i].filingAges[1].asMonths()
+      );
+      expect(
+        Math.abs(fast[i].expectedNPVCents - reference[i].expectedNPVCents)
+      ).toBeLessThan(1);
+    }
   });
 
   it('handles both recipients being past 70', () => {

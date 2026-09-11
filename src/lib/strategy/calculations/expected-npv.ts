@@ -200,7 +200,11 @@ function filingYearCents(
   nraEpoch: number
 ): number {
   const filingEpoch = ssaBirthEpoch + ageMonths;
-  if (filingEpoch <= nraEpoch || ageMonths >= 840 || filingEpoch % 12 === 0)
+  if (
+    filingEpoch <= nraEpoch ||
+    ageMonths >= MAX_BENEFIT_AGE_MONTHS ||
+    filingEpoch % 12 === 0
+  )
     return benefitCentsAtAge(
       piaDollarCents,
       nraMonths,
@@ -381,7 +385,7 @@ export function expectedNPVCoupleOptimized(
     .dateAtSsaAge(new MonthDuration(0))
     .monthsSinceEpoch();
   const eNraEpoch = eSsaBirth + eNra;
-  const e70Epoch = eSsaBirth + 840;
+  const e70Epoch = eSsaBirth + MAX_BENEFIT_AGE_MONTHS;
 
   const dPiaRaw = dependent.pia().primaryInsuranceAmount().cents();
   const dPiaDol = Math.floor(dPiaRaw / 100) * 100;
@@ -458,8 +462,8 @@ export function expectedNPVCoupleOptimized(
   }
 
   // ── Filing ranges ──
-  // A recipient past 70 has a single remaining option (file now), so their
-  // range collapses to one entry rather than going empty.
+  // A recipient with no filing choice left has a single remaining option, so
+  // their range collapses to one entry rather than going empty.
   const eRange = filingAgeRange(earner, currentDate);
   const dRange = filingAgeRange(dependent, currentDate);
   const eStart = eRange.earliest.asMonths();
@@ -469,8 +473,8 @@ export function expectedNPVCoupleOptimized(
 
   // dkF[kSp] is indexed up to (maxFiling + 1 - curEpoch). The pvF/dkF tables
   // are sized from maxDeath. Ensure death distribution extends past any
-  // filing epoch (normally holds: SSA life tables run to age 120, and nobody
-  // files later than today).
+  // filing epoch (normally holds: SSA life tables run to age 120, and no
+  // filing age exceeds max(70, current age)).
   const eMaxFilingEpoch = eSsaBirth + eEnd;
   const dMaxFilingEpoch = dSsaBirth + dEnd;
   const maxFilingEpoch =

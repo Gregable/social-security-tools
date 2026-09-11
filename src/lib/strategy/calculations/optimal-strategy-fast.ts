@@ -58,7 +58,8 @@ import {
 //
 // The four functions below (benefitCentsAtAge, filingYearCents,
 // spousalCentsForPair, survivorCentsCalc) are byte-for-byte copies of the
-// same-named helpers in expected-npv.ts (lines 153-317). They are
+// same-named helpers in the "Shared primitives" block of expected-npv.ts.
+// (Named rather than line-numbered: line ranges rot on the next edit.) They are
 // duplicated rather than imported to keep this hot-path module
 // self-contained for inlining. Authoritative docstrings (early-filing
 // rules, "January bump", survivor ratio, etc.) live in expected-npv.ts;
@@ -104,7 +105,11 @@ function filingYearCents(
   nraEpoch: number
 ): number {
   const filingEpoch = ssaBirthEpoch + ageMonths;
-  if (filingEpoch <= nraEpoch || ageMonths >= 840 || filingEpoch % 12 === 0)
+  if (
+    filingEpoch <= nraEpoch ||
+    ageMonths >= MAX_BENEFIT_AGE_MONTHS ||
+    filingEpoch % 12 === 0
+  )
     return benefitCentsAtAge(
       piaDollarCents,
       nraMonths,
@@ -230,7 +235,7 @@ export function optimalStrategyCoupleFast(
     .dateAtSsaAge(new MonthDuration(0))
     .monthsSinceEpoch();
   const eNraEpoch = eSsaBirth + eNra;
-  const e70Epoch = eSsaBirth + 840;
+  const e70Epoch = eSsaBirth + MAX_BENEFIT_AGE_MONTHS;
 
   const dPiaRaw = dependent.pia().primaryInsuranceAmount().cents();
   const dPiaDol = Math.floor(dPiaRaw / 100) * 100;
@@ -269,7 +274,7 @@ export function optimalStrategyCoupleFast(
   const dDeath = finalDates[dependentIndex].monthsSinceEpoch();
 
   // ── Filing ranges ──
-  // A recipient past 70 has one option left (file now), so their range
+  // A recipient with no filing choice left has one option, so their range
   // collapses to a single entry rather than going empty.
   const eRange = filingAgeRange(earner, currentDate);
   const dRange = filingAgeRange(dependent, currentDate);
@@ -510,7 +515,12 @@ export function optimalStrategyCoupleFast(
       // Cap at SSA age 70 — dep can't file past their max benefit age. This
       // matters when the earner is younger than the dep and files at 70:
       // their calendar filing month would map to a dep age above 70.
-      bestFD = Math.min(earnerFileEpoch - dSsaBirth, 840);
+      // Clamp into the dependent's own searched range: reporting an age
+      // below dStart would name a filing month they cannot file in.
+      bestFD = Math.max(
+        dStart,
+        Math.min(earnerFileEpoch - dSsaBirth, MAX_BENEFIT_AGE_MONTHS)
+      );
       if (earnerIndex === 0) bestF1 = bestFD;
       else bestF0 = bestFD;
     }

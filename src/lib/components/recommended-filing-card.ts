@@ -10,6 +10,7 @@ import {
   expectedNPVCoupleOptimized,
   expectedNPVSingle,
 } from '$lib/strategy/calculations/expected-npv';
+import { filingAgeRange } from '$lib/strategy/calculations/strategy-calc';
 import { buildStrategyHash } from '$lib/url-params';
 
 /** Default assumptions matching the strategy optimizer's initial state. */
@@ -27,6 +28,28 @@ export function currentMonthDate(now: Date = new Date()): MonthDate {
     years: now.getFullYear(),
     months: now.getMonth(),
   });
+}
+
+/**
+ * Whether each recipient still has a filing age to choose, as of `currentDate`.
+ *
+ * False once a recipient is past 70: delayed retirement credits have stopped,
+ * so filing now is their only remaining option and presenting a filing date
+ * would imply a decision they no longer have. Index 1 is always true when
+ * there is no second recipient, so single-recipient callers can ignore it.
+ *
+ * Shared so the two surfaces that render a recommendation — the strategy page
+ * and the calculator's card — cannot disagree about who still has a choice.
+ */
+export function filingChoices(
+  recipient: Recipient,
+  spouse: Recipient | null,
+  currentDate: MonthDate = currentMonthDate()
+): [boolean, boolean] {
+  return [
+    filingAgeRange(recipient, currentDate).hasChoice,
+    spouse ? filingAgeRange(spouse, currentDate).hasChoice : true,
+  ];
 }
 
 /**

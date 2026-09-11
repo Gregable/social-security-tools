@@ -342,9 +342,9 @@ export function earliestFiling(
 }
 
 /**
- * The oldest filing age worth considering, as a duration. Filing past the age
- * at which delayed credits stop only forgoes payments, so the two bounds are
- * by definition the same age.
+ * The oldest filing age worth considering, as a duration. Filing later than
+ * the age at which delayed credits stop only forgoes payments, so the maximum
+ * useful filing age and MAX_BENEFIT_AGE_MONTHS are by definition the same age.
  */
 export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
   MAX_BENEFIT_AGE_MONTHS
@@ -353,11 +353,21 @@ export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
 /**
  * The inclusive span of filing ages an optimizer should search over.
  *
- * `hasChoice` is false when the recipient is already past 70. There is then
- * exactly one option left — file now, at `earliest` — so `earliest` and
- * `latest` are equal and the "optimization" is a formality. Callers that
- * present results to a user should say so rather than implying a decision was
- * made on the recipient's behalf.
+ * `hasChoice` is false once `earliest` has reached 70. Because SSA allows
+ * filing up to six months retroactively, `earliest` lags the recipient's
+ * current age by six months once they are past full retirement age, so the
+ * flip happens at age 70y6m rather than at 70y0m. A recipient aged 70y3m
+ * still has a real, if narrow, range to search.
+ *
+ * Past that point exactly one option remains: file as soon as possible,
+ * backdated to `earliest` — the most retroactive month SSA allows — so
+ * `earliest` and `latest` are equal and the "optimization" is a formality.
+ * Callers presenting results to a user should say so rather than implying a
+ * decision was made on the recipient's behalf.
+ *
+ * Note that `latest` is NOT bounded by `MAX_FILING_AGE`: in exactly that case
+ * it exceeds it, which is the whole point of the type. The span is always
+ * non-empty (`earliest <= latest`).
  */
 export interface FilingAgeRange {
   readonly earliest: MonthDuration;
@@ -368,9 +378,13 @@ export interface FilingAgeRange {
 /**
  * Computes the filing ages still available to a recipient as of `currentDate`.
  *
- * Callers must use this rather than iterating to a hardcoded age 70: a
- * recipient past 70 has an `earliest` filing age beyond 70, and a loop bounded
- * by a literal 70 would run zero (or negatively many) times.
+ * Any search that starts from `earliestFiling` must bound itself with this
+ * rather than a hardcoded age 70: that starting age can exceed 70, leaving a
+ * loop bounded by a literal 70 to run zero times, and any length derived from
+ * the range (`end - start + 1`) to go negative and throw `RangeError` from the
+ * typed-array allocations in the fast paths. (Searches that start from
+ * `earliestFilingMonth`, the age-62 month, are not affected — see
+ * alternative-strategies.ts and ai-export.ts.)
  */
 export function filingAgeRange(
   recipient: Recipient,
@@ -380,7 +394,11 @@ export function filingAgeRange(
   const hasChoice = earliest.lessThan(MAX_FILING_AGE);
   return {
     earliest,
-    latest: hasChoice ? MAX_FILING_AGE : earliest,
+    // A fresh instance rather than MAX_FILING_AGE itself: MonthDuration's
+    // increment()/decrement() mutate in place, and that idiom is used
+    // elsewhere, so handing out the shared constant by identity would let one
+    // caller corrupt it for every later call.
+    latest: hasChoice ? new MonthDuration(MAX_BENEFIT_AGE_MONTHS) : earliest,
     hasChoice,
   };
 }
@@ -703,9 +721,14 @@ function clampZeroPiaDepStrategy(
   if (!depFile.lessThan(earnerFile)) return best;
 
   // Cap at SSA age 70 — dep can't file past their max benefit age. Matters
-  // when the earner is younger than the dep and files at 70.
+  // when the earner is younger than the dep and files at 70. Floor at the age
+  // the optimizer actually searched: a dependent already past 70 has no age
+  // below that available, so the age-70 cap alone would name a filing month
+  // they cannot file in.
   const rawAge = dependent.birthdate.ageAtSsaDate(earnerFile).asMonths();
-  const newDepAge = new MonthDuration(Math.min(rawAge, 70 * 12));
+  const newDepAge = new MonthDuration(
+    Math.max(depAge.asMonths(), Math.min(rawAge, MAX_BENEFIT_AGE_MONTHS))
+  );
   const result: [MonthDuration, MonthDuration, number] = [
     best[0],
     best[1],
@@ -824,6 +847,9 @@ export function optimalStrategyCoupleOptimized(
   // Pre-compute final loop bounds to avoid expensive calculations in loops.
   // filingAgeRange, not a literal 70: a recipient past 70 has a single
   // remaining filing age above it, and a literal bound empties the loop.
+  // Clamping to the death date can still empty the range when a recipient
+  // dies before they could file; the loops below then do not execute and the
+  // sentinel [0, 0, -1] is returned, as in optimalStrategySingle.
   const endFilingAge0: number = Math.min(
     filingAgeRange(recipients[0], currentDate).latest.asMonths(),
     recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths()
@@ -1028,8 +1054,10 @@ export function optimalStrategySingle(
   const startFilingDate: number = range.earliest.asMonths();
 
   // Filing after death is not a strategy. If the recipient dies before they
-  // could file at all the loop below is empty and the sentinel [0, -1] is
-  // returned, matching the pre-existing contract.
+  // could file at all, the loop below is empty and the [0, -1] sentinel is
+  // returned. No caller checks for -1, so such a result would surface in the
+  // UI as a filing age of 0; that is unchanged by this fix, but it is a
+  // latent gap rather than a designed contract.
   const endFilingAge: number = Math.min(
     range.latest.asMonths(),
     recipient.birthdate.ageAtSsaDate(finalDate).asMonths()

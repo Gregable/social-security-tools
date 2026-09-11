@@ -44,9 +44,13 @@ function handleHoverCell(detail: CellPosition | null) {
 
 <div class="result-box">
   {#if gridIndexes.length === 0}
-    <div class="result-content">
-      <NoFilingDecisionPanel bothRecipients={true} />
-    </div>
+    <!-- Gated on Complete like the grid branch below, so the panel does not
+         flash while a calculation is still running. -->
+    {#if calculationResults.status() === CalculationStatus.Complete}
+      <div class="result-content">
+        <NoFilingDecisionPanel bothPastSeventy={true} />
+      </div>
+    {/if}
   {:else}
     <div class="result-content">
       <header class="section-header">

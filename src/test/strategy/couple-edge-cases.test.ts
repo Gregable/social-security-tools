@@ -329,7 +329,19 @@ describe('One spouse already past 70', () => {
       currentDate,
       NO_DISCOUNT
     );
+
+    // Guard against a vacuous pass: before the past-70 fix both sides
+    // returned the -1 sentinel, so comparing them to each other proved
+    // nothing. Assert a real result first, then agreement.
+    expect(result[2]).toBeGreaterThan(0);
     expect(resultOpt[2]).toBe(result[2]);
+    expect(resultOpt[0].asMonths()).toBe(result[0].asMonths());
+    expect(resultOpt[1].asMonths()).toBe(result[1].asMonths());
+    // The past-70 spouse has one option; the under-70 spouse keeps a range.
+    expect(result[0].asMonths()).toBe(
+      earliestFiling(r1, currentDate).asMonths()
+    );
+    expect(result[1].asMonths()).toBeLessThanOrEqual(70 * 12);
   });
 });
 
