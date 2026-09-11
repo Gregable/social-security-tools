@@ -1,7 +1,6 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
-import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Privacy & Security';
 const description =
@@ -72,8 +71,6 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
     that no requests containing your earnings data are made.
   </p>
 
-  <InlineCTA type="sponsor" />
-
   <h2>What Data Does the Site Collect?</h2>
   <p>
     SSA.tools uses privacy-focused analytics to understand how people use the
@@ -96,6 +93,7 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
     clicks, and similar interaction data that contains no personal financial
     information.
   </p>
+
 
   <h2>Open Source Transparency</h2>
   <p>

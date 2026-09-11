@@ -3,6 +3,17 @@
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
   import HeroImage from "./senior-tax-deduction.jpg";
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "This deduction phases out over a range you have some control over. You can map that out with a Social Security specialist at",
+  outro: "while there are still years left to plan.",
+  bullets: [
+    "They look at how your filing date, IRA withdrawals, and Roth conversions move your MAGI across the phase-out.",
+    "The deduction runs only through 2028, so which year you do what matters.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
   const title =
     "The New Senior Tax Deduction: What It Means for Social Security Recipients";
@@ -132,7 +143,7 @@
     20 x $60 = $1,200. She can deduct $4,800 instead of the full $6,000.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>How It Stacks with Existing Deductions</h2>
 

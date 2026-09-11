@@ -1,7 +1,6 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
-  import InlineCTA from "../InlineCTA.svelte";
 
   const title = "Third-Party Integrations";
   const description =
@@ -162,7 +161,6 @@
     </tbody>
   </table>
 
-  <InlineCTA type="sponsor" />
 
   <h2>How Integrations Work</h2>
 

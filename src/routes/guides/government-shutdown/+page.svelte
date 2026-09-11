@@ -3,6 +3,17 @@ import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.jpg';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Payments continue, but anything that needs SSA staff slows down. You can get help navigating that from a Social Security specialist at",
+  outro: "instead of waiting on hold.",
+  bullets: [
+    "They work with SSA regularly and know which requests still move during a funding gap.",
+    "If you were about to file, they can tell you what to expect on timing and what to document.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 // Hero image: Lincoln Memorial During Government Shutdown 2013
 // Source: https://commons.wikimedia.org/wiki/File:Lincoln_Memorial_During_Government_Shutdown_2013.jpg
@@ -197,7 +208,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
     </li>
   </ul>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Disability Claims Face Unique Challenges</h2>
 

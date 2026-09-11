@@ -3,6 +3,17 @@
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
   import HeroImage from "./state-taxes.jpg";
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Keeping your income under a state threshold takes planning several years ahead. You can map that out with a Social Security specialist at",
+  outro: "before your next round of withdrawals.",
+  bullets: [
+    "They look at how withdrawal timing and Roth conversions interact with your state's exemption cutoff.",
+    "Federal taxation of your benefit follows its own rules, and the two have to be planned together.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
   const title =
     "State Taxes on Social Security Benefits: Which States Tax Your Benefits?";
@@ -361,7 +372,7 @@
     Connecticut, New Mexico, and Vermont with clear AGI cutoffs.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Frequently Asked Questions</h2>
 

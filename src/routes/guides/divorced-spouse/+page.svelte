@@ -2,6 +2,17 @@
 import { GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Claims like this one turn on dates and documents from a marriage that ended years ago. You can walk through yours with a Social Security specialist at",
+  outro: "before you file.",
+  bullets: [
+    "They check whether your own record or your ex's produces more, and at what age each one peaks.",
+    "They know what SSA asks for when the marriage ended decades ago and the paperwork is long gone.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Social Security Benefits for Divorced Spouses: Eligibility, Rules & How to Claim';
 const description =
@@ -190,7 +201,7 @@ const faqs = [
     (about a 30% reduction for early claiming).
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Does My Ex-Spouse Know If I Claim Benefits?</h2>
 

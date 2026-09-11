@@ -4,6 +4,17 @@ import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 import HeroImage from './taxes.jpg';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Provisional income is something you can steer, and your filing date is one of the levers. You can work through it with a Social Security specialist at",
+  outro: "to find the years this tax actually bites.",
+  bullets: [
+    "They look at how filing age, IRA withdrawals, and Roth conversions move you across the break points above.",
+    "State tax and the new senior deduction stack on top of this, and the arithmetic differs by household.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Federal Taxation of Social Security Benefits';
 const description =
@@ -210,7 +221,7 @@ schema.tags = [
     Benefits, then exactly 85% of your Social Security benefits are taxable.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h3>Last word</h3>
 

@@ -2,7 +2,18 @@
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
-import lifeTable from './life-table.png'; // imported so bundler serves asset
+import lifeTable from './life-table.png';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "A life table describes a cohort, not you. If you'd rather not plan on the average, you can talk it through with a Social Security specialist at",
+  outro: "and weigh your own health and family history.",
+  bullets: [
+    "They can show how much your filing decision actually changes if you outlive the table, or if you do not.",
+    "For couples, the survivor benefit usually matters more than either person's own life expectancy.",
+    "The first call is free, and you pick the time.",
+  ],
+}; // imported so bundler serves asset
 
 const title = 'Mortality Tables and Health Adjustments';
 const description =
@@ -145,7 +156,7 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
     strategy matrix. Larger segments correspond to more likely death age ranges.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Health Adjustment Slider</h2>
   <p>

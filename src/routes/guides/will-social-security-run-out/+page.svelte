@@ -2,6 +2,17 @@
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Nobody can tell you what Congress will do, but you can plan around the range. You can do that with a Social Security specialist at",
+  outro: "rather than planning around headlines.",
+  bullets: [
+    "They can show what a 26% reduction would do to your own benefit, and what it would take to absorb it.",
+    "Claiming early to get ahead of a cut carries its own permanent reduction, and the two are worth comparing directly.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Will Social Security Run Out of Money?';
 const description =
@@ -101,7 +112,7 @@ const faqs: FAQItem[] = [
     >
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>How Could Congress Fix Social Security?</h2>
   <p>
