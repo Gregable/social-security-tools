@@ -12,6 +12,7 @@ import {
 import {
   fetchFredDFII20Yield,
   fetchLatest20YearTreasuryYield,
+  fetchRecommendedDiscountRate,
   getRecommendedDiscountRate,
 } from '$lib/strategy/data';
 
@@ -173,6 +174,46 @@ describe('Treasury Yields Library', () => {
         'FRED DFII20 data not found or is invalid in the response'
       );
       expect(result.rate).toBe(0.025); // Default to 2.5%
+    });
+  });
+
+  describe('fetchRecommendedDiscountRate', () => {
+    it('reports success with the treasury rate when the treasury fetch works', async () => {
+      const result = await fetchRecommendedDiscountRate();
+
+      expect(result.success).toBe(true);
+      expect(result.rate).toBe(0.035);
+    });
+
+    it('reports success with the FRED rate when treasury fails', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve('DATE,DFII20\n2024-06-27,2.1'),
+      });
+
+      const result = await fetchRecommendedDiscountRate();
+
+      expect(result.success).toBe(true);
+      expect(result.rate).toBe(0.021);
+    });
+
+    it('reports failure with the default rate when both sources fail', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
+      mockFetch.mockRejectedValueOnce(new Error('FRED network error'));
+
+      const result = await fetchRecommendedDiscountRate();
+
+      expect(result.success).toBe(false);
+      expect(result.rate).toBe(0.025);
     });
   });
 

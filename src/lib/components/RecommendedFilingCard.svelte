@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import OptimalStrategyHeadline from "$lib/components/OptimalStrategyHeadline.svelte";
   import {
     buildStrategyUrl,
     currentMonthDate,
+    DEFAULT_DISCOUNT_RATE_ASSUMPTION,
+    type DiscountRateAssumption,
     filingChoices,
     loadDeathDistributions,
+    loadDiscountRateAssumption,
     recommendedFromDistributions,
     type RecommendedFiling,
   } from "$lib/components/recommended-filing-card";
@@ -20,6 +23,10 @@
   let dist1: DeathProbability[] | null = null;
   let dist2: DeathProbability[] | null = null;
   let result: RecommendedFiling | null = null;
+  // Starts at the default so the card can render as soon as mortality data
+  // loads; swapped for the live 20-year Treasury rate once that arrives, the
+  // same way the strategy page's rate input behaves.
+  let discountRate: DiscountRateAssumption = DEFAULT_DISCOUNT_RATE_ASSUMPTION;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   // Key the loaded distributions to the inputs that actually affect mortality
   // (gender, birth year, health multiplier) so that PIA changes (earnings
@@ -35,8 +42,12 @@
   // them on each store update, which invalidates these reactive blocks (e.g. on
   // a PIA, gender, or health change).
   $: void maybeLoadDistributions(recipient, spouse);
-  $: scheduleRecompute(recipient, spouse, dist1, dist2);
+  $: scheduleRecompute(recipient, spouse, dist1, dist2, discountRate);
   $: strategyUrl = buildStrategyUrl(recipient, spouse);
+
+  onMount(async () => {
+    discountRate = await loadDiscountRateAssumption();
+  });
 
   async function maybeLoadDistributions(
     r: Recipient,
@@ -73,8 +84,16 @@
       // they are keyed to recipient identity via distKey and stay valid across
       // the PIA changes that trigger a recompute.
       const now = currentMonthDate();
-      result = recommendedFromDistributions(recipient, spouse, d1, d2, now);
+      result = recommendedFromDistributions(
+        recipient,
+        spouse,
+        d1,
+        d2,
+        now,
+        discountRate.rate
+      );
       hasFilingChoice = filingChoices(recipient, spouse, now);
+      computedDiscountRate = discountRate;
     } catch (e) {
       // The optimizer returns an empty array for edge cases rather than
       // throwing, so a throw here signals a real bug, not expected input.
@@ -87,10 +106,12 @@
     _r: Recipient,
     _s: Recipient | null,
     d1: DeathProbability[] | null,
-    d2: DeathProbability[] | null
+    d2: DeathProbability[] | null,
+    _rate: DiscountRateAssumption
   ): void {
-    // _r/_s are unused by name: they only register recipient/spouse as reactive
-    // dependencies so this block re-runs on store updates (e.g. PIA changes).
+    // _r/_s/_rate are unused by name: they only register recipient, spouse,
+    // and the discount rate as reactive dependencies so this block re-runs on
+    // store updates (e.g. PIA changes) and when the Treasury rate arrives.
     if (!d1) return;
     if (debounceTimer) {
       clearTimeout(debounceTimer);
@@ -125,6 +146,11 @@
   // reactively here would let it change during the debounce window while
   // `result` still belongs to the previous inputs.
   let hasFilingChoice: [boolean, boolean] = [true, true];
+  // Likewise: the rate the displayed `result` was actually computed with, so
+  // the card's copy never names the Treasury rate while the figures above it
+  // still reflect the default from before that rate arrived.
+  let computedDiscountRate: DiscountRateAssumption =
+    DEFAULT_DISCOUNT_RATE_ASSUMPTION;
 </script>
 
 {#if result}
@@ -139,6 +165,7 @@
       coupleResult={result.couple}
       recipients={recipientsTuple}
       showInfoTip={false}
+      discountRateAssumption={computedDiscountRate}
       {hasFilingChoice}
       currentDate={currentMonthDate()}
     />
