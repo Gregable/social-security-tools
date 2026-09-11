@@ -421,7 +421,8 @@
       href="/guides/inflation"
     >
       inflation</a
-    > through annual Cost-of-Living Adjustments (COLA). These adjustments:
+    > through annual <a href="/guides/cola">Cost-of-Living Adjustments (COLA)</a
+    >. These adjustments:
   </p>
 
   <ul>

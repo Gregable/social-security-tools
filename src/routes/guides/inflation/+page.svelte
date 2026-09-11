@@ -79,7 +79,7 @@ const faqs: FAQItem[] = [
   {
     question: 'What is COLA and when does it apply?',
     answer:
-      "COLA stands for Cost of Living Adjustment. It's an annual increase to your Social Security benefit based on the Consumer Price Index (CPI-W). COLA is applied starting the January after you begin receiving benefits, and continues every year thereafter.",
+      "COLA stands for Cost of Living Adjustment. It's an annual increase to your Social Security benefit based on the Consumer Price Index (CPI-W). COLA is applied starting with the year you turn 62, whether or not you have filed, and continues every year thereafter.",
   },
   {
     question: "Why is my estimated benefit shown in 'today's dollars'?",
@@ -278,7 +278,7 @@ const faqs: FAQItem[] = [
       <tr>
         <td><strong>When it applies</strong></td>
         <td>During your working years (until age 60)</td>
-        <td>After you start receiving benefits</td>
+        <td>From the year you turn 62 onward</td>
       </tr>
       <tr>
         <td><strong>What it measures</strong></td>
@@ -340,6 +340,10 @@ const faqs: FAQItem[] = [
   <h2>Related Guides</h2>
 
   <ul>
+    <li>
+      <a href="/guides/cola">Social Security COLA</a> — This year's adjustment,
+      the full history since 1975, and what else changes each January
+    </li>
     <li>
       <a href="/guides/indexing-factors">Wage Indexing Guide</a> — Detailed explanation
       of how indexing factors are calculated and why they matter

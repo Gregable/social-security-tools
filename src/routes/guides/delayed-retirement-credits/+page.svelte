@@ -272,7 +272,9 @@
   </p>
 
   <p>
-    For more on how COLA works, see our guide on
+    For this year's adjustment and the full history, see our
+    <a href="/guides/cola">Social Security COLA guide</a>. For how COLA fits
+    alongside wage indexing, see
     <a href="/guides/inflation">inflation and Social Security benefits</a>.
   </p>
 
