@@ -16,7 +16,9 @@ import { buildStrategyHash } from '$lib/url-params';
 
 /**
  * Discount rate used until the live 20-year Treasury rate arrives, and when
- * it cannot be fetched at all. Matches the strategy optimizer's fallback.
+ * it cannot be fetched at all. Matches the strategy optimizer's fallback,
+ * which is spelled out as literals in treasury-yields.ts and
+ * DiscountRateInput.svelte; changing this constant alone will not change it.
  */
 export const DEFAULT_DISCOUNT_RATE = 0.025;
 
@@ -30,23 +32,63 @@ export interface DiscountRateAssumption {
   readonly source: 'treasury' | 'default';
 }
 
+/** The assumption used before the Treasury fetch resolves and whenever it fails. */
 export const DEFAULT_DISCOUNT_RATE_ASSUMPTION: DiscountRateAssumption = {
   rate: DEFAULT_DISCOUNT_RATE,
   source: 'default',
 };
 
 /**
+ * The range of annual discount rates the strategy page's input accepts
+ * (0% to 50%). Kept in step with DiscountRateInput.svelte so a rate the card
+ * shows is always one the optimizer will run with when the user clicks
+ * through. The 20-year real yield was negative for stretches of 2020-2022.
+ */
+const MIN_DISCOUNT_RATE = 0;
+const MAX_DISCOUNT_RATE = 0.5;
+
+/**
+ * Rounds an annual rate to two decimal places of a percent (0.031249 to
+ * 0.0312), which is what the strategy page's input does to the fetched rate
+ * before running the optimizer. Rounding here too keeps both surfaces
+ * computing with the identical number.
+ */
+function roundToOptimizerPrecision(rate: number): number {
+  return Number((rate * 100).toFixed(2)) / 100;
+}
+
+/** 0.0312 -> "3.12%"; trailing zeros dropped so 0.025 -> "2.5%". */
+export function formatDiscountRatePercent(rate: number): string {
+  return `${Number((rate * 100).toFixed(2))}%`;
+}
+
+/**
  * Loads the current 20-year Treasury real yield, the same rate the strategy
- * optimizer preselects. Never throws: on any failure it returns the default
- * assumption so the card can still render.
+ * optimizer preselects. Never throws: on any failure, or a rate outside the
+ * range the optimizer accepts, it returns the default assumption so the card
+ * can still render.
  */
 export async function loadDiscountRateAssumption(): Promise<DiscountRateAssumption> {
   try {
     const data = await fetchRecommendedDiscountRate();
     if (!data.success) return DEFAULT_DISCOUNT_RATE_ASSUMPTION;
-    return { rate: data.rate, source: 'treasury' };
+    const rate = roundToOptimizerPrecision(data.rate);
+    if (
+      !Number.isFinite(rate) ||
+      rate < MIN_DISCOUNT_RATE ||
+      rate > MAX_DISCOUNT_RATE
+    ) {
+      console.warn(
+        'RecommendedFilingCard: fetched discount rate outside optimizer range, using default',
+        data.rate
+      );
+      return DEFAULT_DISCOUNT_RATE_ASSUMPTION;
+    }
+    return { rate, source: 'treasury' };
   } catch (e) {
-    console.warn('RecommendedFilingCard: failed to load discount rate', e);
+    // fetchRecommendedDiscountRate is documented never to throw, so reaching
+    // here is a bug rather than a routine network fallback.
+    console.error('RecommendedFilingCard: unexpected discount rate failure', e);
     return DEFAULT_DISCOUNT_RATE_ASSUMPTION;
   }
 }

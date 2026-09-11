@@ -5,6 +5,8 @@ import {
   buildStrategyUrl,
   currentMonthDate,
   DEFAULT_DISCOUNT_RATE,
+  DEFAULT_DISCOUNT_RATE_ASSUMPTION,
+  formatDiscountRatePercent,
   loadDeathDistributions,
   loadDiscountRateAssumption,
   recommendedFromDistributions,
@@ -23,9 +25,10 @@ vi.mock('$lib/life-tables', async (importOriginal) => {
   return { ...actual, getDeathProbabilityDistribution: vi.fn() };
 });
 
-vi.mock('$lib/strategy/data', () => ({
-  fetchRecommendedDiscountRate: vi.fn(),
-}));
+vi.mock('$lib/strategy/data', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('$lib/strategy/data')>();
+  return { ...actual, fetchRecommendedDiscountRate: vi.fn() };
+});
 
 import { getDeathProbabilityDistribution } from '$lib/life-tables';
 import { fetchRecommendedDiscountRate } from '$lib/strategy/data';
@@ -83,6 +86,35 @@ describe('loadDiscountRateAssumption', () => {
     expect(got).toEqual({ rate: 0.031, source: 'treasury' });
   });
 
+  it('rounds to two decimal places of a percent, as the optimizer does', async () => {
+    vi.mocked(fetchRecommendedDiscountRate).mockResolvedValue({
+      date: '2026-09-10',
+      rate: 0.031249,
+      success: true,
+    });
+
+    const got = await loadDiscountRateAssumption();
+
+    // Written as the strategy page computes it (rounded percent / 100) so the
+    // two surfaces are asserted to use the bit-identical number.
+    expect(got).toEqual({ rate: 3.12 / 100, source: 'treasury' });
+  });
+
+  it.each([-0.0075, 0.51, Number.NaN])(
+    'falls back to the default when the fetched rate (%s) is outside the optimizer range',
+    async (rate) => {
+      vi.mocked(fetchRecommendedDiscountRate).mockResolvedValue({
+        date: '2026-09-10',
+        rate,
+        success: true,
+      });
+
+      const got = await loadDiscountRateAssumption();
+
+      expect(got).toEqual(DEFAULT_DISCOUNT_RATE_ASSUMPTION);
+    }
+  );
+
   it('falls back to the default rate when every source fails', async () => {
     vi.mocked(fetchRecommendedDiscountRate).mockResolvedValue({
       date: '2026-09-10',
@@ -104,6 +136,18 @@ describe('loadDiscountRateAssumption', () => {
     const got = await loadDiscountRateAssumption();
 
     expect(got).toEqual({ rate: DEFAULT_DISCOUNT_RATE, source: 'default' });
+  });
+});
+
+describe('formatDiscountRatePercent', () => {
+  it.each([
+    [0.025, '2.5%'],
+    [0.0312, '3.12%'],
+    [0.03, '3%'],
+    [0, '0%'],
+    [0.031249, '3.12%'],
+  ])('formats %s as %s', (rate, expected) => {
+    expect(formatDiscountRatePercent(rate)).toBe(expected);
   });
 });
 
@@ -201,6 +245,35 @@ describe('recommendedFromDistributions', () => {
     const r = makeRecipient(1500, 1960);
     const got = recommendedFromDistributions(r, null, [], null, FAR_PAST, 0);
     expect(got).toBeNull();
+  });
+
+  it('passes the discount rate through: a higher rate lowers the NPV', () => {
+    const r = makeRecipient(1500, 1960);
+    const dist: DeathProbability[] = [
+      { age: 80, probability: 0.5 },
+      { age: 90, probability: 0.5 },
+    ];
+
+    const low = recommendedFromDistributions(
+      r,
+      null,
+      dist,
+      null,
+      FAR_PAST,
+      0.01
+    );
+    const high = recommendedFromDistributions(
+      r,
+      null,
+      dist,
+      null,
+      FAR_PAST,
+      0.06
+    );
+
+    expect(high!.single!.expectedNPVCents).toBeLessThan(
+      low!.single!.expectedNPVCents
+    );
   });
 
   it('defaults the discount rate to DEFAULT_DISCOUNT_RATE when omitted', () => {

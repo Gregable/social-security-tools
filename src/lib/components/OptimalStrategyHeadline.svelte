@@ -4,6 +4,7 @@
   import {
     DEFAULT_DISCOUNT_RATE_ASSUMPTION,
     type DiscountRateAssumption,
+    formatDiscountRatePercent,
   } from "$lib/components/recommended-filing-card";
   import { Money } from "$lib/money";
   import type { MonthDate, MonthDuration } from "$lib/month-time";
@@ -94,11 +95,6 @@
 
   function formatMoney(cents: number): string {
     return Money.fromCents(Math.round(cents)).wholeDollars();
-  }
-
-  /** 0.0312 -> "3.12%"; trailing zeros dropped so 0.025 -> "2.5%". */
-  function formatPercent(rate: number): string {
-    return `${parseFloat((rate * 100).toFixed(2))}%`;
   }
 </script>
 
@@ -208,12 +204,12 @@
         {/if}
         {#if !showInfoTip}
           {#if discountRateAssumption.source === "treasury"}
-            Based on the current 20-year Treasury rate ({formatPercent(
+            Based on the current 20-year Treasury rate ({formatDiscountRatePercent(
               discountRateAssumption.rate
             )}) as the discount rate and blended life expectancy. Open the
             optimizer to adjust.
           {:else}
-            Based on default assumptions — a {formatPercent(
+            Based on default assumptions — a {formatDiscountRatePercent(
               discountRateAssumption.rate
             )} discount rate and blended life expectancy. Open the optimizer
             to adjust.

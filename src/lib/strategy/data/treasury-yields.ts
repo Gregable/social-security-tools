@@ -1,10 +1,14 @@
 /**
- * Interface for Treasury yield data
+ * Result of a 20-year Treasury real-yield lookup.
  */
 export interface TreasuryYieldData {
+  /** Observation date (YYYY-MM-DD), or today's date when the fetch failed. */
   date: string;
+  /** Annual rate as a decimal (0.025 = 2.5%); the 2.5% default on failure. */
   rate: number;
+  /** True only when `rate` came from a live feed. */
   success: boolean;
+  /** Set only on failure. */
   error?: string;
 }
 
@@ -39,7 +43,7 @@ async function fetchTreasuryMonth(
 
 /**
  * Fetches the latest 20-year Treasury yield from the Treasury Department API
- * @returns Promise resolving to the yield rate as a decimal (e.g., 0.025 for 2.5%)
+ * @returns Promise resolving to the yield data; `success` is false on failure
  */
 export async function fetchLatest20YearTreasuryYield(): Promise<TreasuryYieldData> {
   try {
@@ -124,7 +128,7 @@ export async function fetchLatest20YearTreasuryYield(): Promise<TreasuryYieldDat
 
 /**
  * Fetches the latest 20-year inflation-adjusted Treasury yield from FRED (Federal Reserve Economic Data).
- * @returns Promise resolving to the yield rate as a decimal (e.g., 0.025 for 2.5%)
+ * @returns Promise resolving to the yield data; `success` is false on failure
  */
 export async function fetchFredDFII20Yield(): Promise<TreasuryYieldData> {
   try {
