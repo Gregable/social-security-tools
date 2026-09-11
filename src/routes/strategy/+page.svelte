@@ -9,7 +9,10 @@
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
   import { optimalStrategyCoupleFast } from "$lib/strategy/calculations/optimal-strategy-fast";
-  import { optimalStrategySingle } from "$lib/strategy/calculations/strategy-calc";
+  import {
+    earliestModelableDeathAge,
+    optimalStrategySingle,
+  } from "$lib/strategy/calculations/strategy-calc";
   import {
     currentMonthDate,
     filingChoices,
@@ -425,20 +428,34 @@
     deathProbDistribution1 = [...deathProbDistribution1];
     deathProbDistribution2 = [...deathProbDistribution2];
 
-    const startAge1 = Math.max(
+    // Monthly buckets start at the first death age that admits any filing at
+    // all: the later of "now" and the earliest month the recipient could file.
+    // A death age below that leaves the optimizer nothing to search — it is
+    // not a scenario worth modelling, and asking about it is what produced
+    // the "file at age 0" result. currentAge() is whole years, so the month
+    // precision has to come from earliestFiling.
+    const currentDate = currentMonthDate();
+    const startAgeMonths1 = Math.max(
+      MIN_FILING_AGE * 12,
+      earliestModelableDeathAge(recipients[0], currentDate).asMonths()
+    );
+
+    // Three-year buckets represent each bucket by its midpoint (start + 18
+    // months), so they clear the earliest filing age without this adjustment.
+    const startAge1Years = Math.max(
       MIN_FILING_AGE,
       recipients[0].birthdate.currentAge()
     );
-    const startAge2 = Math.max(
+    const startAge2Years = Math.max(
       MIN_FILING_AGE,
       recipients[1].birthdate.currentAge()
     );
 
     deathAgeBuckets1 = isSingle
-      ? generateMonthlyBuckets(startAge1, deathProbDistribution1)
-      : generateThreeYearBuckets(startAge1, deathProbDistribution1);
+      ? generateMonthlyBuckets(startAgeMonths1, deathProbDistribution1)
+      : generateThreeYearBuckets(startAge1Years, deathProbDistribution1);
     deathAgeBuckets2 = generateThreeYearBuckets(
-      startAge2,
+      startAge2Years,
       deathProbDistribution2
     );
 

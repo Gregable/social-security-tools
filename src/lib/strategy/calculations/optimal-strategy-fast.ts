@@ -280,20 +280,29 @@ export function optimalStrategyCoupleFast(
   const dRange = filingAgeRange(dependent, currentDate);
   const eStart = eRange.earliest.asMonths();
   const dStart = dRange.earliest.asMonths();
-  const eEnd = Math.min(
-    eRange.latest.asMonths(),
-    earner.birthdate.ageAtSsaDate(finalDates[earnerIndex]).asMonths()
+  // Clamped to the death date, but never below the start: one recipient dying
+  // before they could file does NOT make the couple's scenario meaningless —
+  // the other still has a real filing decision, and the survivor benefit
+  // still depends on it. Collapsing the dead recipient's range to a single
+  // (immaterial) age preserves that, where inverting it would return the
+  // [0, 0, -1] sentinel and throw the surviving spouse's answer away. The
+  // slow reference reaches the same result by not clamping at all: every
+  // filing age past death yields an identical NPV, so it settles on the
+  // earliest, which is the one value kept here.
+  const eEnd = Math.max(
+    eStart,
+    Math.min(
+      eRange.latest.asMonths(),
+      earner.birthdate.ageAtSsaDate(finalDates[earnerIndex]).asMonths()
+    )
   );
-  const dEnd = Math.min(
-    dRange.latest.asMonths(),
-    dependent.birthdate.ageAtSsaDate(finalDates[dependentIndex]).asMonths()
+  const dEnd = Math.max(
+    dStart,
+    Math.min(
+      dRange.latest.asMonths(),
+      dependent.birthdate.ageAtSsaDate(finalDates[dependentIndex]).asMonths()
+    )
   );
-
-  // Sentinel: either recipient can't file (loop is empty). Matches the slow
-  // reference's behavior (returns initial [0, 0, -1]).
-  if (eStart > eEnd || dStart > dEnd) {
-    return [new MonthDuration(0), new MonthDuration(0), -1];
-  }
 
   const nEF = eEnd - eStart + 1;
   const nDF = dEnd - dStart + 1;

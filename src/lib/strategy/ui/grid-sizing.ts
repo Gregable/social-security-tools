@@ -281,16 +281,21 @@ export function generateOneYearBuckets(
 }
 
 /**
- * Generate monthly buckets starting at startAge.
+ * Generate monthly buckets starting at `startAgeMonths`.
  * Continue while (age < 100). After that, create a final open-ended bucket.
+ *
+ * Takes months rather than years because the caller's lower bound is a filing
+ * age, which is inherently a month count: deriving it via years would lose the
+ * months and can place the first bucket's death age before the recipient could
+ * file at all, which leaves the optimizer with an empty search range.
  */
 export function generateMonthlyBuckets(
-  startAge: number,
+  startAgeMonths: number,
   probDistribution: { age: number; probability: number }[]
 ): DeathAgeBucket[] {
   const buckets: DeathAgeBucket[] = [];
 
-  let currentAgeMonths = Math.floor(startAge * 12);
+  let currentAgeMonths = Math.floor(startAgeMonths);
   const endAgeMonths = 100 * 12;
 
   const sumProbabilityRange = (from: number, to: number | null): number => {

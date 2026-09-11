@@ -376,6 +376,51 @@ export interface FilingAgeRange {
 }
 
 /**
+ * The earliest death age worth modelling for a recipient: the later of their
+ * current age and the earliest age they could still file.
+ *
+ * Below this there is no filing strategy to find — the recipient would have
+ * died before they could claim anything — so asking the optimizer about such
+ * a scenario is a malformed question rather than one with a degenerate
+ * answer. Death-age buckets must start here.
+ *
+ * `Birthdate.currentAge()` is whole years and so cannot express this on its
+ * own: someone aged 62y1m whose earliest filing month is 62y1m would get a
+ * bucket at 62y0m, one month short of being able to file.
+ */
+export function earliestModelableDeathAge(
+  recipient: Recipient,
+  currentDate: MonthDate
+): MonthDuration {
+  const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
+  const earliest = earliestFiling(recipient, currentDate);
+  return currentAge.greaterThan(earliest) ? currentAge : earliest;
+}
+
+/**
+ * Thrown when a recipient's death date precedes every filing age available to
+ * them, so no filing strategy exists for the scenario.
+ *
+ * The optimizers used to return a `[MonthDuration(0), -1]` sentinel here — an
+ * "answer" of "file at age 0 for minus one cent" that is indistinguishable,
+ * to both the type system and the caller, from a real result. The UI wrote it
+ * straight into the results grid, and a downstream filter quietly dropped it,
+ * which is how the over-70 bug rendered an empty chart with no error. Callers
+ * should avoid asking (do not model a death age earlier than the recipient
+ * could file); reaching this means a scenario was built that cannot happen.
+ */
+export class NoFilingAgeAvailableError extends Error {
+  constructor(startFilingAge: number, endFilingAge: number) {
+    super(
+      `no filing age available: the earliest filing age is ` +
+        `${startFilingAge} months but the recipient's death allows filing ` +
+        `only through ${endFilingAge} months`
+    );
+    this.name = 'NoFilingAgeAvailableError';
+  }
+}
+
+/**
  * Computes the filing ages still available to a recipient as of `currentDate`.
  *
  * Any search that starts from `earliestFiling` must bound itself with this
@@ -847,16 +892,21 @@ export function optimalStrategyCoupleOptimized(
   // Pre-compute final loop bounds to avoid expensive calculations in loops.
   // filingAgeRange, not a literal 70: a recipient past 70 has a single
   // remaining filing age above it, and a literal bound empties the loop.
-  // Clamping to the death date can still empty the range when a recipient
-  // dies before they could file; the loops below then do not execute and the
-  // sentinel [0, 0, -1] is returned, as in optimalStrategySingle.
-  const endFilingAge0: number = Math.min(
-    filingAgeRange(recipients[0], currentDate).latest.asMonths(),
-    recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths()
+  // Never below the start: see optimalStrategyCoupleFast. One recipient dying
+  // before they could file must not discard the other's filing decision.
+  const endFilingAge0: number = Math.max(
+    startFilingDate0,
+    Math.min(
+      filingAgeRange(recipients[0], currentDate).latest.asMonths(),
+      recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths()
+    )
   );
-  const endFilingAge1: number = Math.min(
-    filingAgeRange(recipients[1], currentDate).latest.asMonths(),
-    recipients[1].birthdate.ageAtSsaDate(finalDates[1]).asMonths()
+  const endFilingAge1: number = Math.max(
+    startFilingDate1,
+    Math.min(
+      filingAgeRange(recipients[1], currentDate).latest.asMonths(),
+      recipients[1].birthdate.ageAtSsaDate(finalDates[1]).asMonths()
+    )
   );
 
   for (let i = startFilingDate0; i <= endFilingAge0; ++i) {
@@ -1048,20 +1098,24 @@ export function optimalStrategySingle(
   currentDate: MonthDate,
   discountRate: number
 ): [MonthDuration, number] {
+  // Seed only; the guard below guarantees at least one iteration replaces it.
   let bestStrategy: [MonthDuration, number] = [new MonthDuration(0), -1];
 
   const range = filingAgeRange(recipient, currentDate);
   const startFilingDate: number = range.earliest.asMonths();
 
-  // Filing after death is not a strategy. If the recipient dies before they
-  // could file at all, the loop below is empty and the [0, -1] sentinel is
-  // returned. No caller checks for -1, so such a result would surface in the
-  // UI as a filing age of 0; that is unchanged by this fix, but it is a
-  // latent gap rather than a designed contract.
+  // Filing after death is not a strategy.
   const endFilingAge: number = Math.min(
     range.latest.asMonths(),
     recipient.birthdate.ageAtSsaDate(finalDate).asMonths()
   );
+
+  // The loop below would otherwise run zero times and return its seed value
+  // as though it were an answer. Every value of this function's return type
+  // is now a real strategy.
+  if (endFilingAge < startFilingDate) {
+    throw new NoFilingAgeAvailableError(startFilingDate, endFilingAge);
+  }
 
   for (let i = startFilingDate; i <= endFilingAge; ++i) {
     const strategy = new MonthDuration(i);

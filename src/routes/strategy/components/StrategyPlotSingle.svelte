@@ -60,8 +60,12 @@
     .map((_, i) => {
       const result = calculationResults.get(i, 0);
       if (!result) return null;
-      // Filter out invalid results where no filing strategy was found (e.g. death before earliest filing age)
-      if (result.filingAge1.asMonths() < earliestFilingAge) return null;
+      // No filtering on filing age here. This used to drop any point below
+      // the earliest filing age, which silently swallowed the optimizer's
+      // "file at age 0" sentinel and left the chart blank with no error.
+      // Buckets now start at the first death age that admits a filing, and
+      // the optimizer throws rather than inventing an answer, so any point
+      // reaching here is real.
       return {
         deathAge: result.bucket1.startAge,
         filingAgeMonths: result.filingAge1.asMonths(),
