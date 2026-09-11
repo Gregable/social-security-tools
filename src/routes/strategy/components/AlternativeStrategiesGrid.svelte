@@ -52,7 +52,14 @@
       years: 70,
       months: 0,
     });
-    const cap = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
+    // Cap by the SSA age at the death date, as the optimizers do, rather than
+    // by the death age itself: for a recipient born on the 1st the two differ
+    // by a month, and the last column must be the death month so that the
+    // "never files" strategy (see filedBeforeDeath) has a cell.
+    const deathAgeSsa = recipient.birthdate.ageAtSsaDate(
+      recipient.birthdate.dateAtLayAge(deathAge)
+    );
+    const cap = maxAge70.lessThan(deathAgeSsa) ? maxAge70 : deathAgeSsa;
     // A recipient already past 70 (or one who dies before reaching it) has a
     // starting age beyond that cap. Collapse the range to that single
     // remaining age rather than letting it invert: MonthDurationRange has no
@@ -279,10 +286,11 @@
     // The last row/column is the death month itself. Filing then is the
     // "never files" strategy, not a filing month: say so.
     const recipient = recipients[recipientIndex];
+    const filingDate = recipient.birthdate.dateAtSsaAge(duration);
     const deathDate = recipient.birthdate.dateAtLayAge(
       recipientIndex === 0 ? deathAge1 : deathAge2
     );
-    if (!filedBeforeDeath(recipient.birthdate.dateAtSsaAge(duration), deathDate)) {
+    if (!filedBeforeDeath(filingDate, deathDate)) {
       return NEVER_FILES_LABEL;
     }
     if (displayAsAges) {
@@ -292,8 +300,6 @@
       if (months === 1) return `Age ${years} and 1 month`;
       return `Age ${years} and ${months} months`;
     }
-    const filingDate =
-      recipients[recipientIndex].birthdate.dateAtSsaAge(duration);
     return `${filingDate.monthName()} ${filingDate.year()}`;
   }
 </script>

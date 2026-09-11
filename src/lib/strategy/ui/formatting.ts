@@ -147,6 +147,12 @@ export function getFilingAge(
 export const NEVER_FILES_LABEL = 'Does not file';
 
 /**
+ * Secondary line shown under NEVER_FILES_LABEL where a filing date would
+ * otherwise appear.
+ */
+export const NEVER_FILES_DETAIL = 'Dies before filing';
+
+/**
  * Get the "never files" label sized to a matrix cell, mirroring the width
  * breakpoints of getFilingDate so the two read consistently side by side.
  * @param cellWidth The computed width of the cell in pixels

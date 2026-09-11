@@ -6,7 +6,11 @@
   import { filedBeforeDeath } from "$lib/benefit-calculator";
   import { BenefitType } from "$lib/strategy/calculations/benefit-period";
   import { strategySumPeriodsCouple } from "$lib/strategy/calculations/strategy-calc";
-  import { NEVER_FILES_LABEL, type StrategyResult } from "$lib/strategy/ui";
+  import {
+    NEVER_FILES_DETAIL,
+    NEVER_FILES_LABEL,
+    type StrategyResult,
+  } from "$lib/strategy/ui";
   import AlternativeStrategiesGrid from "./AlternativeStrategiesGrid.svelte";
 
   export let recipients: [Recipient, Recipient];
@@ -137,7 +141,7 @@
             <p class="filing-date">{filingDate1.toString()}</p>
           {:else}
             <p class="filing-age">{NEVER_FILES_LABEL}</p>
-            <p class="filing-date">Dies before filing</p>
+            <p class="filing-date">{NEVER_FILES_DETAIL}</p>
           {/if}
         </div>
         <div class="filing-person">
@@ -147,7 +151,7 @@
             <p class="filing-date">{filingDate2.toString()}</p>
           {:else}
             <p class="filing-age">{NEVER_FILES_LABEL}</p>
-            <p class="filing-date">Dies before filing</p>
+            <p class="filing-date">{NEVER_FILES_DETAIL}</p>
           {/if}
         </div>
       </div>

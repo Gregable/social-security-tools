@@ -1,8 +1,13 @@
 <script lang="ts">
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import HowToReadChart from "$lib/components/HowToReadChart.svelte";
   import { MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
-  import type { CalculationResults } from "$lib/strategy/ui";
+  import {
+    type CalculationResults,
+    NEVER_FILES_LABEL,
+    type StrategyResult,
+  } from "$lib/strategy/ui";
   import { onMount } from "svelte";
 
   /** The recipient for whom the strategy is calculated. */
@@ -197,6 +202,28 @@
     const date = recipient.birthdate.dateAtSsaAge(new MonthDuration(months));
     const d = new Date(date.year(), date.monthIndex());
     return d.toLocaleString("default", { month: "short", year: "numeric" });
+  }
+
+  /**
+   * Axis label for a point's filing age. A filing month in or after the
+   * death month is the "never files" strategy, not a filing month.
+   */
+  function formatFiling(point: {
+    filingAgeMonths: number;
+    result: StrategyResult;
+  }): string {
+    const filingDate = recipient.birthdate.dateAtSsaAge(
+      new MonthDuration(point.filingAgeMonths)
+    );
+    const deathDate = recipient.birthdate.dateAtLayAge(
+      point.result.bucket1.expectedAge
+    );
+    if (!filedBeforeDeath(filingDate, deathDate)) {
+      return NEVER_FILES_LABEL;
+    }
+    return displayAsAges
+      ? formatAge(point.filingAgeMonths)
+      : formatDate(point.filingAgeMonths);
   }
 
   // Draw Loop
@@ -525,9 +552,7 @@
       ctx.fillText(label, x, height - padding.bottom + 20);
 
       // Y Axis Label Highlight
-      const yLabel = displayAsAges
-        ? formatAge(hoveredPoint.filingAgeMonths)
-        : formatDate(hoveredPoint.filingAgeMonths);
+      const yLabel = formatFiling(hoveredPoint);
 
       ctx.textAlign = "right";
       const textWidth = ctx.measureText(yLabel).width;

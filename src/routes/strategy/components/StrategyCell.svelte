@@ -3,11 +3,12 @@ import { filedBeforeDeath } from '$lib/benefit-calculator';
 import RecipientName from '$lib/components/RecipientName.svelte';
 import type { MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
-import type { CellPosition } from '$lib/strategy/ui';
+import type { CellPosition, StrategyResult } from '$lib/strategy/ui';
 import {
   getFilingAge,
   getFilingDate,
   getNeverFilesLabel,
+  NEVER_FILES_DETAIL,
   NEVER_FILES_LABEL,
 } from '$lib/strategy/ui';
 
@@ -40,20 +41,43 @@ let cellHoverInfo: {
 } | null = null;
 
 /**
+ * The per-recipient half of a couple result. StrategyResult declares the
+ * second recipient's fields optional because the same shape serves single
+ * results; this cell is couple-only, and reading the fields through here
+ * makes a missing half a visible error rather than a property read on
+ * undefined.
+ */
+interface RecipientStrategy {
+  readonly filingAge: MonthDuration;
+  readonly deathAge: MonthDuration;
+}
+
+function recipientStrategy(
+  result: StrategyResult,
+  recipientIndex: number
+): RecipientStrategy {
+  if (recipientIndex === 0) {
+    return { filingAge: result.filingAge1, deathAge: result.bucket1.expectedAge };
+  }
+  if (result.filingAge2 === undefined || result.bucket2 === undefined) {
+    throw new Error('StrategyCell requires a couple result');
+  }
+  return { filingAge: result.filingAge2, deathAge: result.bucket2.expectedAge };
+}
+
+/**
  * Whether this cell's strategy has the recipient filing before their death
- * month. The optimizer's search includes the death month itself, and a
- * filing then is the "never files" strategy rather than a filing.
+ * month. The optimizer's search runs up to the death month (or, for a
+ * recipient who dies before they could file, the one age past death that is
+ * left), and a filing then is the "never files" strategy rather than a filing.
  */
 function filesInCell(
-  calculationResult: any,
+  result: StrategyResult,
   recipients: [Recipient, Recipient],
   recipientIndex: number
 ): boolean {
   const recipient = recipients[recipientIndex];
-  const filingAge: MonthDuration =
-    calculationResult[`filingAge${recipientIndex + 1}`];
-  const deathAge: MonthDuration =
-    calculationResult[`bucket${recipientIndex + 1}`].expectedAge;
+  const { filingAge, deathAge } = recipientStrategy(result, recipientIndex);
   return filedBeforeDeath(
     recipient.birthdate.dateAtSsaAge(filingAge),
     recipient.birthdate.dateAtLayAge(deathAge)
@@ -61,21 +85,18 @@ function filesInCell(
 }
 
 function describeFiling(
-  calculationResult: any,
+  result: StrategyResult,
   recipients: [Recipient, Recipient],
   recipientIndex: number
 ): string {
-  if (!filesInCell(calculationResult, recipients, recipientIndex)) {
-    return `${NEVER_FILES_LABEL} (dies first)`;
+  if (!filesInCell(result, recipients, recipientIndex)) {
+    return `${NEVER_FILES_LABEL} (${NEVER_FILES_DETAIL.toLowerCase()})`;
   }
-  const years = calculationResult[`filingAge${recipientIndex + 1}Years`];
-  const months = calculationResult[`filingAge${recipientIndex + 1}Months`];
-  const filingAge: MonthDuration =
-    calculationResult[`filingAge${recipientIndex + 1}`];
+  const { filingAge } = recipientStrategy(result, recipientIndex);
   const filingDate = recipients[recipientIndex].birthdate.dateAtSsaAge(
     filingAge
   );
-  return `${years}y ${months}m (${filingDate.toString()})`;
+  return `${filingAge.years()}y ${filingAge.modMonths()}m (${filingDate.toString()})`;
 }
 
 // Calculate conditional CSS classes

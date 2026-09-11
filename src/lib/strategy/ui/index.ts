@@ -17,6 +17,7 @@ export {
   getFilingAge,
   getFilingDate,
   getNeverFilesLabel,
+  NEVER_FILES_DETAIL,
   NEVER_FILES_LABEL,
   parseBirthdate,
 } from './formatting.js';

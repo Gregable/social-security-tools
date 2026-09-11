@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import { Money } from "$lib/money";
   import { MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
@@ -8,6 +9,7 @@
     getStrategyColor,
     type YearGroup,
   } from "$lib/strategy/calculations/alternative-strategies";
+  import { NEVER_FILES_LABEL } from "$lib/strategy/ui";
 
   export let recipient: Recipient;
   export let deathAge: MonthDuration;
@@ -33,6 +35,12 @@
   }
 
   function formatFilingAge(filingAge: MonthDuration): string {
+    // The last box is the death month itself: the "never files" strategy.
+    const filingDate = recipient.birthdate.dateAtSsaAge(filingAge);
+    const deathDate = recipient.birthdate.dateAtLayAge(deathAge);
+    if (!filedBeforeDeath(filingDate, deathDate)) {
+      return NEVER_FILES_LABEL;
+    }
     return formatFilingAgeDisplay(
       filingAge,
       displayAsAges,
