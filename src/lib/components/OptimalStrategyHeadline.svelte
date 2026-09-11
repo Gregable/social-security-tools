@@ -2,7 +2,7 @@
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { Money } from "$lib/money";
-  import type { MonthDuration } from "$lib/month-time";
+  import type { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
   import type {
     FilingAgeResult,
@@ -15,6 +15,23 @@
     coupleResult?: CoupleFilingAgeResult;
     recipients: [Recipient, Recipient];
     showInfoTip?: boolean;
+    /**
+     * Per recipient: false once filing immediately is their only remaining
+     * option. Such a recipient gets a "file now" card rather than a filing
+     * date, because the optimizer's answer for them is the most retroactive
+     * month SSA allows — a month that has already passed, which under a
+     * "File in" label reads as a bug rather than as advice.
+     *
+     * Required rather than defaulted: defaulting it to [true, true] would
+     * silently reinstate that already-passed date for any caller that forgot
+     * to pass it.
+     */
+    hasFilingChoice: [boolean, boolean];
+    /**
+     * The month the recommendation was computed for. Used to tell a filing
+     * date that is still ahead from one that has already passed.
+     */
+    currentDate: MonthDate;
   }
 
   let {
@@ -23,7 +40,26 @@
     coupleResult,
     recipients,
     showInfoTip = true,
+    hasFilingChoice,
+    currentDate,
   }: Props = $props();
+
+  /**
+   * Whether the recommended filing month has already passed.
+   *
+   * SSA lets anyone past full retirement age file up to six months
+   * retroactively, so the optimizer legitimately returns a month in the past
+   * whenever filing sooner beats waiting — always once a recipient is past
+   * 70, but also for a younger recipient at a high discount rate. Rendering
+   * such a month under a "File in" label reads as a bug, so those cases get a
+   * "File now" card naming the month to backdate to instead.
+   */
+  function isAlreadyPast(index: number, filingAge: MonthDuration): boolean {
+    const filingDate = recipients[index].birthdate.dateAtSsaAge(filingAge);
+    // Strictly before: a recommendation for the current month is "file this
+    // month", with nothing to backdate, and reads correctly as a date.
+    return filingDate.lessThan(currentDate);
+  }
 
   function formatAge(age: MonthDuration): string {
     return age.toFullAgeString();
@@ -50,6 +86,33 @@
   }
 </script>
 
+{#snippet filingCard(index: number, filingAge: MonthDuration)}
+  {#if isAlreadyPast(index, filingAge)}
+    <div class="prefix">File</div>
+    <div class="date-big">now</div>
+    <div class="age-sub">
+      {#if !hasFilingChoice[index]}
+        Past 70, so the benefit has stopped growing.
+      {/if}
+      Ask SSA to backdate the claim to {formatFilingDateFull(
+        recipients[index],
+        filingAge
+      )}; they can pay up to six months retroactively.
+    </div>
+  {:else}
+    <div class="prefix">File in</div>
+    <div class="date-big">
+      <span class="date-full"
+        >{formatFilingDateFull(recipients[index], filingAge)}</span
+      >
+      <span class="date-short"
+        >{formatFilingDateShort(recipients[index], filingAge)}</span
+      >
+    </div>
+    <div class="age-sub">at age {formatAge(filingAge)}</div>
+  {/if}
+{/snippet}
+
 {#if (isSingle && singleResult) || (!isSingle && coupleResult)}
   <div class="headline" class:couple={!isSingle}>
     <div class="kicker">
@@ -72,13 +135,7 @@
 
     {#if isSingle && singleResult}
       <div class="result">
-        <div class="prefix">File in</div>
-        <div class="date-big">
-          {formatFilingDateFull(recipients[0], singleResult.filingAge)}
-        </div>
-        <div class="age-sub">
-          at age {formatAge(singleResult.filingAge)}
-        </div>
+        {@render filingCard(0, singleResult.filingAge)}
       </div>
     {:else if coupleResult}
       <div class="couple-results">
@@ -86,36 +143,14 @@
           <div class="person-name">
             <RecipientName r={recipients[0]} />
           </div>
-          <div class="prefix">File in</div>
-          <div class="date-big">
-            <span class="date-full"
-              >{formatFilingDateFull(recipients[0], coupleResult.filingAges[0])}</span
-            >
-            <span class="date-short"
-              >{formatFilingDateShort(recipients[0], coupleResult.filingAges[0])}</span
-            >
-          </div>
-          <div class="age-sub">
-            at age {formatAge(coupleResult.filingAges[0])}
-          </div>
+          {@render filingCard(0, coupleResult.filingAges[0])}
         </div>
         <div class="divider" aria-hidden="true"></div>
         <div class="result">
           <div class="person-name">
             <RecipientName r={recipients[1]} />
           </div>
-          <div class="prefix">File in</div>
-          <div class="date-big">
-            <span class="date-full"
-              >{formatFilingDateFull(recipients[1], coupleResult.filingAges[1])}</span
-            >
-            <span class="date-short"
-              >{formatFilingDateShort(recipients[1], coupleResult.filingAges[1])}</span
-            >
-          </div>
-          <div class="age-sub">
-            at age {formatAge(coupleResult.filingAges[1])}
-          </div>
+          {@render filingCard(1, coupleResult.filingAges[1])}
         </div>
       </div>
     {/if}
@@ -142,7 +177,11 @@
         {/if}
       </div>
       <p class="explanation">
-        {#if isSingle}
+        {#if isSingle && !hasFilingChoice[0]}
+          Delayed retirement credits stop at 70, so the monthly amount is
+          already at its maximum. Every further month of waiting is a payment
+          forgone.
+        {:else if isSingle}
           Maximizes your expected lifetime benefits, weighted by the
           probability of surviving to each age and adjusted for the discount
           rate.

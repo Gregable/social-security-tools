@@ -10,11 +10,19 @@
  * Output: src/test/strategy/goldens/grid-goldens.json
  *
  * Coverage scope:
- *   - Inputs are constrained so both recipients have earliestFiling < 70y
- *     (i.e. the optimization loop is non-empty). Cases where a recipient is
- *     already past age 70+6m at currentDate are intentionally excluded —
- *     they produce a sentinel result in both slow and optimized paths and
- *     don't validate anything. The UI also never generates such cases.
+ *   - Inputs are constrained so both recipients have earliestFiling < 70y,
+ *     i.e. both still have a filing age to choose. Cases where a recipient is
+ *     already past age 70y6m at currentDate are not represented here.
+ *
+ *     They used to be excluded on the grounds that they produced a sentinel
+ *     in both paths and that the UI never generated them. Both claims were
+ *     wrong: the UI does reach them (a user simply enters a birthdate over
+ *     70), and the sentinel was the bug — the couple path actually threw
+ *     `RangeError: Invalid typed array length`. Since the optimizers now
+ *     return a real result there, these cases WOULD validate something, and
+ *     extending the generator to cover them is worthwhile. Until then, see
+ *     over-70-filing.test.ts, which pins slow-vs-fast agreement in that
+ *     regime directly.
  *   - Death ages are always >= currentAge + 1 year (mirrors UI buckets,
  *     which start past the person's current age).
  *

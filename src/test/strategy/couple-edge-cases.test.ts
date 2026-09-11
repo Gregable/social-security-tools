@@ -16,6 +16,7 @@ import {
   strategySumPeriodsCouple,
 } from '$lib/strategy/calculations';
 import {
+  earliestFiling,
   optimalStrategyCouple,
   optimalStrategyCoupleOptimized,
 } from '$lib/strategy/calculations/strategy-calc';
@@ -247,12 +248,10 @@ describe('Same birthdate, same PIA -- symmetric couple', () => {
 // 3. One spouse already past 70
 // ---------------------------------------------------------------------------
 describe('One spouse already past 70', () => {
-  it('born 1950, currentDate 2025 (age 75): optimizer returns -1 (no valid filing window)', () => {
-    // When the recipient is past 70 and currentDate is recent,
-    // earliestFiling returns an age greater than 70*12. Since the optimizer
-    // loop goes from earliestFiling to 70*12, it never iterates and returns
-    // the default -1 value. This documents that the optimizer does not
-    // support recipients who are already past 70.
+  it('born 1950, currentDate 2025 (age 75): files at the only age left', () => {
+    // Past 70 the earliest filing age exceeds 70, so there is exactly one
+    // option: file now (backdated as far as SSA allows). The spouse who is
+    // still under 70 keeps a real filing decision.
     const r1 = makeRecipient(1500, 1950, 5, 15);
     const r2 = makeRecipient(1000, 1960, 0, 15);
     const fd1 = finalDateAtAge(r1, 90);
@@ -268,14 +267,21 @@ describe('One spouse already past 70', () => {
       currentDate,
       NO_DISCOUNT
     );
-    // The optimizer returns -1 when the earliest filing age exceeds 70*12,
-    // because no valid strategy exists within the search space.
-    expect(result[2]).toBe(-1);
+
+    expect(result[2]).toBeGreaterThan(0);
+    expect(result[0].asMonths()).toBe(
+      earliestFiling(r1, currentDate).asMonths()
+    );
+    // The under-70 spouse still gets a genuine optimization.
+    expect(result[1].asMonths()).toBeGreaterThanOrEqual(
+      earliestFiling(r2, currentDate).asMonths()
+    );
+    expect(result[1].asMonths()).toBeLessThanOrEqual(70 * 12);
   });
 
-  it('both born 1950, currentDate 2025: both past 70, optimizer returns -1', () => {
-    // When both recipients are past 70 with a recent currentDate, the
-    // optimizer cannot find any valid strategy and returns its default -1.
+  it('both born 1950, currentDate 2025: both past 70, both file now', () => {
+    // With both past 70 the search space is a single pair, but it is a valid
+    // pair and must produce a real NPV rather than the empty-range sentinel.
     const r1 = makeRecipient(2000, 1950, 3, 10);
     const r2 = makeRecipient(1500, 1950, 6, 20);
     const fd1 = finalDateAtAge(r1, 90);
@@ -291,7 +297,14 @@ describe('One spouse already past 70', () => {
       currentDate,
       NO_DISCOUNT
     );
-    expect(result[2]).toBe(-1);
+
+    expect(result[2]).toBeGreaterThan(0);
+    expect(result[0].asMonths()).toBe(
+      earliestFiling(r1, currentDate).asMonths()
+    );
+    expect(result[1].asMonths()).toBe(
+      earliestFiling(r2, currentDate).asMonths()
+    );
   });
 
   it('optimized version matches non-optimized when one spouse past 70', () => {
@@ -316,7 +329,19 @@ describe('One spouse already past 70', () => {
       currentDate,
       NO_DISCOUNT
     );
+
+    // Guard against a vacuous pass: before the past-70 fix both sides
+    // returned the -1 sentinel, so comparing them to each other proved
+    // nothing. Assert a real result first, then agreement.
+    expect(result[2]).toBeGreaterThan(0);
     expect(resultOpt[2]).toBe(result[2]);
+    expect(resultOpt[0].asMonths()).toBe(result[0].asMonths());
+    expect(resultOpt[1].asMonths()).toBe(result[1].asMonths());
+    // The past-70 spouse has one option; the under-70 spouse keeps a range.
+    expect(result[0].asMonths()).toBe(
+      earliestFiling(r1, currentDate).asMonths()
+    );
+    expect(result[1].asMonths()).toBeLessThanOrEqual(70 * 12);
   });
 });
 

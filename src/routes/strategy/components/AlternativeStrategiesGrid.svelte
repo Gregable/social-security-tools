@@ -50,7 +50,13 @@
       years: 70,
       months: 0,
     });
-    const end = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
+    const cap = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
+    // A recipient already past 70 (or one who dies before reaching it) has a
+    // starting age beyond that cap. Collapse the range to that single
+    // remaining age rather than letting it invert: MonthDurationRange has no
+    // notion of an empty range, so end < start yields a negative getLength()
+    // and Array(negative) throws.
+    const end = cap.lessThan(startingAge) ? startingAge : cap;
     return new MonthDurationRange(startingAge, end);
   }
 

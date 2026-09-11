@@ -41,13 +41,17 @@
  * slow reference; see `src/test/strategy/grid-optimal-goldens.test.ts`.
  */
 
-import { eligibleForSpousalBenefit } from '$lib/benefit-calculator';
+import {
+  eligibleForSpousalBenefit,
+  MAX_BENEFIT_AGE_MONTHS,
+  MIN_SURVIVOR_BENEFIT_RATIO,
+} from '$lib/benefit-calculator';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import {
   calculateMonthlyDiscountRate,
-  earliestFiling,
+  filingAgeRange,
 } from './strategy-calc.js';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -55,7 +59,8 @@ import {
 //
 // The four functions below (benefitCentsAtAge, filingYearCents,
 // spousalCentsForPair, survivorCentsCalc) are byte-for-byte copies of the
-// same-named helpers in expected-npv.ts (lines 153-317). They are
+// same-named helpers in the "Shared primitives" block of expected-npv.ts.
+// (Named rather than line-numbered: line ranges rot on the next edit.) They are
 // duplicated rather than imported to keep this hot-path module
 // self-contained for inlining. Authoritative docstrings (early-filing
 // rules, "January bump", survivor ratio, etc.) live in expected-npv.ts;
@@ -82,7 +87,10 @@ function benefitCentsAtAge(
       (Math.max(0, before - 36) * 5) / 1200
     );
   } else {
-    const after = ageMonths - nraMonths;
+    // Delayed credits stop accruing at age 70.
+    const creditedMonths =
+      ageMonths < MAX_BENEFIT_AGE_MONTHS ? ageMonths : MAX_BENEFIT_AGE_MONTHS;
+    const after = creditedMonths - nraMonths;
     mult = (delayedRetirementIncrease / 12) * after;
   }
   return Math.floor(Math.round(piaDollarCents * (1 + mult)) / 100) * 100;
@@ -98,7 +106,11 @@ function filingYearCents(
   nraEpoch: number
 ): number {
   const filingEpoch = ssaBirthEpoch + ageMonths;
-  if (filingEpoch <= nraEpoch || ageMonths >= 840 || filingEpoch % 12 === 0)
+  if (
+    filingEpoch <= nraEpoch ||
+    ageMonths >= MAX_BENEFIT_AGE_MONTHS ||
+    filingEpoch % 12 === 0
+  )
     return benefitCentsAtAge(
       piaDollarCents,
       nraMonths,
@@ -190,7 +202,11 @@ function survivorCentsCalc(
 
   const m60toNRA = depSurvNra - 720;
   const m60toAge = survAge - 720;
-  const ratio = 0.715 + 0.285 * Math.max(0, m60toAge / m60toNRA);
+  // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
+  // literal, which is a different double and rounds half-cents differently.
+  const ratio =
+    MIN_SURVIVOR_BENEFIT_RATIO +
+    (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
   return Math.floor(Math.round(base * ratio) / 100) * 100;
 }
 
@@ -200,10 +216,12 @@ function survivorCentsCalc(
 
 /**
  * Find the (filing0, filing1) pair that maximizes NPV of benefits for a
- * couple with known death dates. Identical result to `optimalStrategyCouple`.
+ * couple with known death dates. Matches `optimalStrategyCouple` to within a
+ * cent (the golden tests' tolerance).
  *
- * Returns `[MonthDuration(0), MonthDuration(0), -1]` sentinel if the filing
- * range is empty for either recipient (e.g. already past 70y at currentDate).
+ * Every return value is a real strategy. A recipient who dies before they
+ * could file is searched at their single earliest age, where their personal
+ * NPV is zero, rather than emptying the range — see the clamp below.
  */
 export function optimalStrategyCoupleFast(
   recipients: [Recipient, Recipient],
@@ -224,7 +242,7 @@ export function optimalStrategyCoupleFast(
     .dateAtSsaAge(new MonthDuration(0))
     .monthsSinceEpoch();
   const eNraEpoch = eSsaBirth + eNra;
-  const e70Epoch = eSsaBirth + 840;
+  const e70Epoch = eSsaBirth + MAX_BENEFIT_AGE_MONTHS;
 
   const dPiaRaw = dependent.pia().primaryInsuranceAmount().cents();
   const dPiaDol = Math.floor(dPiaRaw / 100) * 100;
@@ -263,22 +281,35 @@ export function optimalStrategyCoupleFast(
   const dDeath = finalDates[dependentIndex].monthsSinceEpoch();
 
   // ── Filing ranges ──
-  const eStart = earliestFiling(earner, currentDate).asMonths();
-  const dStart = earliestFiling(dependent, currentDate).asMonths();
-  const eEnd = Math.min(
-    840,
-    earner.birthdate.ageAtSsaDate(finalDates[earnerIndex]).asMonths()
+  // A recipient with no filing choice left has one option, so their range
+  // collapses to a single entry rather than going empty.
+  const eRange = filingAgeRange(earner, currentDate);
+  const dRange = filingAgeRange(dependent, currentDate);
+  const eStart = eRange.earliest.asMonths();
+  const dStart = dRange.earliest.asMonths();
+  // Clamped to the death date, but never below the start: one recipient dying
+  // before they could file does NOT make the couple's scenario meaningless —
+  // the other still has a real filing decision, and the survivor benefit
+  // still depends on it. Collapsing the dead recipient's range to a single
+  // (immaterial) age preserves that, where inverting it would return the
+  // [0, 0, -1] sentinel and throw the surviving spouse's answer away. The
+  // slow reference reaches the same result by not clamping at all: every
+  // filing age past death yields an identical NPV, so it settles on the
+  // earliest, which is the one value kept here.
+  const eEnd = Math.max(
+    eStart,
+    Math.min(
+      eRange.latest.asMonths(),
+      earner.birthdate.ageAtSsaDate(finalDates[earnerIndex]).asMonths()
+    )
   );
-  const dEnd = Math.min(
-    840,
-    dependent.birthdate.ageAtSsaDate(finalDates[dependentIndex]).asMonths()
+  const dEnd = Math.max(
+    dStart,
+    Math.min(
+      dRange.latest.asMonths(),
+      dependent.birthdate.ageAtSsaDate(finalDates[dependentIndex]).asMonths()
+    )
   );
-
-  // Sentinel: either recipient can't file (loop is empty). Matches the slow
-  // reference's behavior (returns initial [0, 0, -1]).
-  if (eStart > eEnd || dStart > dEnd) {
-    return [new MonthDuration(0), new MonthDuration(0), -1];
-  }
 
   const nEF = eEnd - eStart + 1;
   const nDF = dEnd - dStart + 1;
@@ -286,9 +317,8 @@ export function optimalStrategyCoupleFast(
   // ── Pre-tabulate discount factors dkF[k] = (1+r)^-k for k=0..maxLag+1 ──
   const maxEpoch = Math.max(eDeath, dDeath) + 2;
   const tableSize = maxEpoch - curEpoch + 1;
-  // Invariant: tableSize >= 1. Guaranteed by the sentinel above (either
-  // eDeath >= eSsaBirth + eStart >= curEpoch, since earliestFiling returns
-  // a date no earlier than currentDate; similarly for dDeath). Assert
+  // Invariant: tableSize >= 1, since each death epoch is at or after the
+  // bucket start, which is never before currentDate. Assert
   // explicitly so a cryptic Float64Array RangeError can't bury this if
   // earliestFiling's semantics change.
   if (tableSize < 1) {
@@ -417,10 +447,10 @@ export function optimalStrategyCoupleFast(
       const svStart = eDeath + 1 > dFile ? eDeath + 1 : dFile;
 
       // Survivor amount, if dep actually outlives the survivor-start date.
-      // Reference (strategy-calc.ts:91-98) compares survivor vs dep's
+      // Reference (strategySumPeriodsCouple) compares survivor vs dep's
       // post-January personal benefit (benefitOnDate at filingDate+1y,
-      // which equals benefitCentsAtAge for ages < 70). That value is
-      // already tabulated as dPJ[fdI]; for zero-PIA dep it's 0.
+      // which equals benefitCentsAtAge). That value is already tabulated
+      // as dPJ[fdI]; for zero-PIA dep it's 0.
       let survAmt = 0;
       let isSurvivorActive = false;
       if (dDeath > svStart) {
@@ -500,7 +530,12 @@ export function optimalStrategyCoupleFast(
       // Cap at SSA age 70 — dep can't file past their max benefit age. This
       // matters when the earner is younger than the dep and files at 70:
       // their calendar filing month would map to a dep age above 70.
-      bestFD = Math.min(earnerFileEpoch - dSsaBirth, 840);
+      // Clamp into the dependent's own searched range: reporting an age
+      // below dStart would name a filing month they cannot file in.
+      bestFD = Math.max(
+        dStart,
+        Math.min(earnerFileEpoch - dSsaBirth, MAX_BENEFIT_AGE_MONTHS)
+      );
       if (earnerIndex === 0) bestF1 = bestFD;
       else bestF0 = bestFD;
     }

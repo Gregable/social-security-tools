@@ -292,7 +292,13 @@
 </div>
 
 {#if errorMessage}
-  <div class="error-banner" role="alert">{errorMessage}</div>
+  <div class="error-banner" role="alert">
+    <p class="error-text">{errorMessage}</p>
+    <p class="error-help">
+      Reloading the page and trying again often clears it. If it keeps
+      happening, <a href="/contact">let us know</a>.
+    </p>
+  </div>
 {/if}
 
 <div class="actions">
@@ -496,6 +502,20 @@
     color: #a1241a;
     border-radius: 6px;
     font-size: 0.9rem;
+  }
+
+  .error-text {
+    margin: 0;
+  }
+
+  .error-help {
+    margin: 0.4rem 0 0;
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+
+  .error-help a {
+    color: inherit;
   }
 
   .actions {
