@@ -16,7 +16,6 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   '60k-income': 'calculator',
   '80k-income': 'calculator',
   aime: 'calculator',
-  cola: 'calculator',
   'delayed-january-bump': 'calculator',
   'earnings-cap': 'calculator',
   'earnings-record-paste': 'calculator',
@@ -32,6 +31,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'work-credits': 'calculator',
   // Sponsor: broader retirement topics
   'agency-changes': 'sponsor',
+  cola: 'sponsor',
   'covid-awi-drop': 'sponsor',
   'divorced-spouse': 'sponsor',
   'federal-taxes': 'sponsor',

@@ -8,6 +8,7 @@ import {
 import { CURRENT_YEAR, MEDICARE_PART_B_PREMIUM } from '$lib/constants';
 import { Money } from '$lib/money';
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
+import type { SponsorCopy } from '$lib/sponsor';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
@@ -62,6 +63,17 @@ const partBIncrease =
   partBPremium === undefined || partBPrior === undefined
     ? undefined
     : partBPremium.sub(partBPrior);
+
+const sponsorCopy: SponsorCopy = {
+  intro:
+    'A COLA raises every year of benefits ahead of you, so the bigger the benefit it lands on, the more it is worth. You can work through that with a Social Security specialist at',
+  outro: 'before you settle on a filing date.',
+  bullets: [
+    'They look at how your filing age sets the base that every future adjustment compounds on.',
+    'Medicare premiums and the tax thresholds above decide how much of the increase you actually keep.',
+    'The first call is free, and you pick the time.',
+  ],
+};
 
 const title = `Social Security COLA ${headline.paymentYear}: What the ${percentText(headline)} Increase Means`;
 const description = `Social Security benefits ${isBeingPaid ? 'rose' : 'will rise'} ${percentText(headline)} in ${headline.paymentYear}. Learn how the cost-of-living adjustment is calculated, when it reaches your check, whether you receive it before you file, and what else changes in January.`;
@@ -199,7 +211,7 @@ const faqs: FAQItem[] = [
     people who have not opted out of them.
   </p>
 
-  <InlineCTA type="calculator" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>You Get the COLA Before You File</h2>
 
