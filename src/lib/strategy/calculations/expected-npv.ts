@@ -42,6 +42,7 @@
 import {
   eligibleForSpousalBenefit,
   MAX_BENEFIT_AGE_MONTHS,
+  MIN_SURVIVOR_BENEFIT_RATIO,
 } from '$lib/benefit-calculator';
 import type { DeathProbability } from '$lib/life-tables';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
@@ -323,7 +324,11 @@ function survivorCentsCalc(
 
   const m60toNRA = depSurvNra - 720;
   const m60toAge = survAge - 720;
-  const ratio = 0.715 + 0.285 * Math.max(0, m60toAge / m60toNRA);
+  // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
+  // literal, which is a different double and rounds half-cents differently.
+  const ratio =
+    MIN_SURVIVOR_BENEFIT_RATIO +
+    (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
   return Math.floor(Math.round(base * ratio) / 100) * 100;
 }
 

@@ -44,6 +44,7 @@
 import {
   eligibleForSpousalBenefit,
   MAX_BENEFIT_AGE_MONTHS,
+  MIN_SURVIVOR_BENEFIT_RATIO,
 } from '$lib/benefit-calculator';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
@@ -201,7 +202,11 @@ function survivorCentsCalc(
 
   const m60toNRA = depSurvNra - 720;
   const m60toAge = survAge - 720;
-  const ratio = 0.715 + 0.285 * Math.max(0, m60toAge / m60toNRA);
+  // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
+  // literal, which is a different double and rounds half-cents differently.
+  const ratio =
+    MIN_SURVIVOR_BENEFIT_RATIO +
+    (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
   return Math.floor(Math.round(base * ratio) / 100) * 100;
 }
 
@@ -211,10 +216,12 @@ function survivorCentsCalc(
 
 /**
  * Find the (filing0, filing1) pair that maximizes NPV of benefits for a
- * couple with known death dates. Identical result to `optimalStrategyCouple`.
+ * couple with known death dates. Matches `optimalStrategyCouple` to within a
+ * cent (the golden tests' tolerance).
  *
- * Returns `[MonthDuration(0), MonthDuration(0), -1]` sentinel if the filing
- * range is empty for either recipient (e.g. already past 70y at currentDate).
+ * Every return value is a real strategy. A recipient who dies before they
+ * could file is searched at their single earliest age, where their personal
+ * NPV is zero, rather than emptying the range — see the clamp below.
  */
 export function optimalStrategyCoupleFast(
   recipients: [Recipient, Recipient],
@@ -310,9 +317,8 @@ export function optimalStrategyCoupleFast(
   // ── Pre-tabulate discount factors dkF[k] = (1+r)^-k for k=0..maxLag+1 ──
   const maxEpoch = Math.max(eDeath, dDeath) + 2;
   const tableSize = maxEpoch - curEpoch + 1;
-  // Invariant: tableSize >= 1. Guaranteed by the sentinel above (either
-  // eDeath >= eSsaBirth + eStart >= curEpoch, since earliestFiling returns
-  // a date no earlier than currentDate; similarly for dDeath). Assert
+  // Invariant: tableSize >= 1, since each death epoch is at or after the
+  // bucket start, which is never before currentDate. Assert
   // explicitly so a cryptic Float64Array RangeError can't bury this if
   // earliestFiling's semantics change.
   if (tableSize < 1) {
@@ -441,10 +447,10 @@ export function optimalStrategyCoupleFast(
       const svStart = eDeath + 1 > dFile ? eDeath + 1 : dFile;
 
       // Survivor amount, if dep actually outlives the survivor-start date.
-      // Reference (strategy-calc.ts:91-98) compares survivor vs dep's
+      // Reference (strategySumPeriodsCouple) compares survivor vs dep's
       // post-January personal benefit (benefitOnDate at filingDate+1y,
-      // which equals benefitCentsAtAge for ages < 70). That value is
-      // already tabulated as dPJ[fdI]; for zero-PIA dep it's 0.
+      // which equals benefitCentsAtAge). That value is already tabulated
+      // as dPJ[fdI]; for zero-PIA dep it's 0.
       let survAmt = 0;
       let isSurvivorActive = false;
       if (dDeath > svStart) {

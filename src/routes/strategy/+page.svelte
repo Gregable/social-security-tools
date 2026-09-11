@@ -128,6 +128,9 @@
 
   const MIN_FILING_AGE = 62;
   const REACTIVE_DEBOUNCE_MS = 200;
+  const STALE_RESULTS_MESSAGE =
+    "These figures are out of date — we could not recompute them for your " +
+    "latest changes.";
 
   type Stage = "mode" | "form" | "results";
   let stage: Stage = "mode";
@@ -393,9 +396,7 @@
           // The figures still on screen were computed for the previous
           // inputs. Leaving them unlabelled is worse than showing nothing:
           // they look like an answer to what the user just typed.
-          recomputeErrorMessage =
-            "These figures are out of date — we could not recompute them " +
-            "for your latest changes.";
+          recomputeErrorMessage = STALE_RESULTS_MESSAGE;
         });
     }, REACTIVE_DEBOUNCE_MS);
   }
@@ -434,11 +435,12 @@
     // not a scenario worth modelling, and asking about it is what produced
     // the "file at age 0" result. currentAge() is whole years, so the month
     // precision has to come from earliestFiling.
+    // No MIN_FILING_AGE floor needed: earliestFiling is never below 62.
     const currentDate = currentMonthDate();
-    const startAgeMonths1 = Math.max(
-      MIN_FILING_AGE * 12,
-      earliestModelableDeathAge(recipients[0], currentDate).asMonths()
-    );
+    const startAgeMonths1 = earliestModelableDeathAge(
+      recipients[0],
+      currentDate
+    ).asMonths();
 
     // Three-year buckets represent each bucket by its midpoint (start + 18
     // months), so they clear the earliest filing age without this adjustment.
@@ -459,12 +461,15 @@
       deathProbDistribution2
     );
 
-    // A run over no scenarios is a failure, not a result.
-    if (deathAgeBuckets1.length === 0 || deathAgeBuckets2.length === 0) {
+    // A run over no mortality data is a failure, not a result. (The bucket
+    // generators always emit a final open-ended bucket, so bucket count is
+    // not the thing to check; an empty distribution is.)
+    if (
+      deathProbDistribution1.length === 0 ||
+      (!isSingle && deathProbDistribution2.length === 0)
+    ) {
       throw new Error(
-        `no death-age buckets (recipient 0: ${deathAgeBuckets1.length}, ` +
-          `recipient 1: ${deathAgeBuckets2.length}); mortality data is ` +
-          "missing or unusable"
+        "empty mortality distribution; life-table data is missing or unusable"
       );
     }
   }
@@ -559,7 +564,11 @@
       next.beginRun();
 
       const currentDate = currentMonthDate();
-      hasFilingChoice = filingChoices(
+      // Computed here but assigned only once the run has fully succeeded,
+      // together with the results it describes. If a loop below throws, the
+      // store keeps the previous results, and this flag must keep describing
+      // those — not the inputs that just failed.
+      const nextFilingChoice = filingChoices(
         recipients[0],
         isSingle ? null : recipients[1],
         currentDate
@@ -626,6 +635,8 @@
       }
       next.completeRun();
 
+      let nextSingleResult: FilingAgeResult | undefined;
+      let nextCoupleResult: CoupleFilingAgeResult | undefined;
       if (isSingle) {
         const singleResults = expectedNPVSingle(
           recipients[0],
@@ -633,9 +644,8 @@
           discountRate,
           deathProbDistribution1
         );
-        optimalSingleResult =
+        nextSingleResult =
           singleResults.length > 0 ? singleResults[0] : undefined;
-        optimalCoupleResult = undefined;
       } else {
         const coupleResults = expectedNPVCoupleOptimized(
           recipients,
@@ -643,15 +653,20 @@
           discountRate,
           [deathProbDistribution1, deathProbDistribution2]
         );
-        optimalCoupleResult =
+        nextCoupleResult =
           coupleResults.length > 0 ? coupleResults[0] : undefined;
-        optimalSingleResult = undefined;
       }
 
       if (prevSelected) {
         next.setSelectedByLabels(prevSelected.rowLabel, prevSelected.colLabel);
       }
 
+      // Everything the results stage renders changes in one step, so the
+      // headline, the grids and the flag that re-skins them always describe
+      // the same run.
+      hasFilingChoice = nextFilingChoice;
+      optimalSingleResult = nextSingleResult;
+      optimalCoupleResult = nextCoupleResult;
       calculationResultsStore.set(next);
     } catch (error) {
       console.error("Calculation error:", error);
@@ -660,9 +675,14 @@
       isRunning = false;
       if (rerunPending) {
         rerunPending = false;
-        calculateStrategyMatrix().catch((err) => {
-          console.error("Queued reactive rerun failed:", err);
-        });
+        calculateStrategyMatrix()
+          .then(() => {
+            recomputeErrorMessage = null;
+          })
+          .catch((err) => {
+            console.error("Queued reactive rerun failed:", err);
+            recomputeErrorMessage = STALE_RESULTS_MESSAGE;
+          });
       }
     }
   }

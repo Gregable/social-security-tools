@@ -34,6 +34,7 @@ import {
   MAX_FILING_AGE,
   optimalStrategyCouple,
   optimalStrategySingle,
+  strategySumCentsCouple,
 } from '$lib/strategy/calculations/strategy-calc';
 
 function makeRecipient(
@@ -285,6 +286,46 @@ describe('single optimizer past age 70', () => {
   });
 });
 
+describe('survivor rounding agrees between fast path and reference', () => {
+  // Found by fuzzing the regime this change opens: the fast copies used a
+  // literal 0.285 where the reference computes (1 - 0.715), a different
+  // double. On a half-cent base*ratio the two rounded opposite ways, giving
+  // a $1/month survivor benefit that the grid-cell NPV and the scenario
+  // detail (which re-sums periods with the reference) disagreed on by ~$200.
+  it('pins a half-cent case to within a cent', () => {
+    const earner = new Recipient();
+    earner.birthdate = Birthdate.FromYMD(1949, 10, 1);
+    earner.setPia(Money.from(1899));
+    const dependent = new Recipient();
+    dependent.birthdate = Birthdate.FromYMD(1962, 6, 28);
+    dependent.setPia(Money.from(544));
+    earner.markFirst();
+    dependent.markSecond();
+    const recipients: [Recipient, Recipient] = [earner, dependent];
+    const currentDate = monthDate(2026, 10);
+    const finalDates: [MonthDate, MonthDate] = [
+      monthDate(2029, 3),
+      monthDate(2055, 10),
+    ];
+
+    const [age0, age1, fastNpv] = optimalStrategyCoupleFast(
+      recipients,
+      finalDates,
+      currentDate,
+      0.03
+    );
+    const referenceNpv = strategySumCentsCouple(
+      recipients,
+      finalDates,
+      currentDate,
+      0.03,
+      [age0, age1]
+    );
+
+    expect(Math.abs(fastNpv - referenceNpv)).toBeLessThan(1);
+  });
+});
+
 describe('couple optimizer with one recipient past age 70', () => {
   it('computes a strategy instead of throwing', () => {
     const over = OVER_70();
@@ -311,7 +352,7 @@ describe('couple optimizer with one recipient past age 70', () => {
     expect(npvCents).toBeGreaterThan(0);
   });
 
-  it('still optimizes the under-70 spouse across their whole range', () => {
+  it('still searches the under-70 spouse across their whole range', () => {
     const over = OVER_70();
     const under = UNDER_70();
     over.markFirst();
@@ -332,8 +373,9 @@ describe('couple optimizer with one recipient past age 70', () => {
       earliestFiling(over, CURRENT_DATE).asMonths()
     );
 
-    // The under-70 spouse's filing age is the result of a real search: the
-    // ranking must contain more than one distinct choice for them.
+    // The under-70 spouse's range was actually searched: the ranking holds
+    // more than one distinct age for them. (Which age wins depends on the
+    // discount rate, so the winner itself is not pinned here.)
     const underAges = new Set(results.map((r) => r.filingAges[1].asMonths()));
     expect(underAges.size).toBeGreaterThan(1);
   });

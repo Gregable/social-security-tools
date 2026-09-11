@@ -56,7 +56,9 @@
    */
   function isAlreadyPast(index: number, filingAge: MonthDuration): boolean {
     const filingDate = recipients[index].birthdate.dateAtSsaAge(filingAge);
-    return !filingDate.greaterThan(currentDate);
+    // Strictly before: a recommendation for the current month is "file this
+    // month", with nothing to backdate, and reads correctly as a date.
+    return filingDate.lessThan(currentDate);
   }
 
   function formatAge(age: MonthDuration): string {

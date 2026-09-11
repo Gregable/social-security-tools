@@ -11,6 +11,19 @@ import type { Recipient } from '$lib/recipient';
 export const MAX_BENEFIT_AGE_MONTHS = 70 * 12;
 
 /**
+ * A survivor benefit claimed at age 60 is reduced to this fraction of the
+ * base amount, scaling linearly to 100% at survivor full retirement age.
+ *
+ * Shared with the fast paths in strategy/calculations so all three copies of
+ * the survivor formula multiply by the same floating-point value. They must
+ * agree to the last rounding step, and `1 - 0.715` is not `0.285` in IEEE
+ * arithmetic — a literal 0.285 in one copy rounded a half-cent case the other
+ * way, giving a $1/month survivor benefit the grid-cell NPV and the scenario
+ * detail then disagreed on.
+ */
+export const MIN_SURVIVOR_BENEFIT_RATIO = 0.715;
+
+/**
  * Returns benefit multiplier at a given age relative to normal retirement age.
  *
  * The early retirement reduction factor changes from 6.67%/yr for years
@@ -542,9 +555,9 @@ export function survivorBenefit(
       0,
       monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
     );
-    const minSurvivorBenefitRatio = 0.715;
     const result = baseSurvivorBenefit.times(
-      minSurvivorBenefitRatio + (1 - minSurvivorBenefitRatio) * reductionRatio
+      MIN_SURVIVOR_BENEFIT_RATIO +
+        (1 - MIN_SURVIVOR_BENEFIT_RATIO) * reductionRatio
     );
     return result.floorToDollar();
   }

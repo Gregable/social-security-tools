@@ -40,8 +40,6 @@
   const width = 800;
   const height = 400;
   const padding = { top: 20, right: 60, bottom: 50, left: 100 };
-  // Actual earliest filing age (for filtering invalid results)
-  $: earliestFilingAge = recipient.birthdate.earliestFilingMonth().asMonths();
   // Y-axis display range with padding above and below
   const minFilingAge = 61 * 12 + 11; // 61 years 11 months
   const maxFilingAge = 70 * 12 + 1; // 70 years 1 month

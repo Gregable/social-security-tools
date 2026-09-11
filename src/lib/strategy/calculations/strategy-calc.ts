@@ -368,6 +368,15 @@ export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
  * Note that `latest` is NOT bounded by `MAX_FILING_AGE`: in exactly that case
  * it exceeds it, which is the whole point of the type. The span is always
  * non-empty (`earliest <= latest`).
+ *
+ * Model limitation: the NPV functions count payments from the month after
+ * `currentDate`, so the retroactive lump sum SSA pays for a backdated claim
+ * is worth $0 to the optimizer. Past full retirement age the winner among
+ * the backdated ages is therefore predetermined (the amount either rises
+ * with age or, past 70, is flat), and the narrow past-70y0m range is
+ * searched but cannot surprise. Valuing those months as a lump at
+ * `currentDate + 1` would let the "up to six months retroactively" the UI
+ * mentions actually influence the recommendation; it is left for follow-up.
  */
 export interface FilingAgeRange {
   readonly earliest: MonthDuration;

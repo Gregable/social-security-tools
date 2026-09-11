@@ -72,13 +72,9 @@
       // Reads the latest component-scope recipient/spouse. d1/d2 are passed in:
       // they are keyed to recipient identity via distKey and stay valid across
       // the PIA changes that trigger a recompute.
-      result = recommendedFromDistributions(
-        recipient,
-        spouse,
-        d1,
-        d2,
-        currentMonthDate()
-      );
+      const now = currentMonthDate();
+      result = recommendedFromDistributions(recipient, spouse, d1, d2, now);
+      hasFilingChoice = filingChoices(recipient, spouse, now);
     } catch (e) {
       // The optimizer returns an empty array for edge cases rather than
       // throwing, so a throw here signals a real bug, not expected input.
@@ -124,9 +120,11 @@
     spouse ? [recipient, spouse] : [recipient, recipient]
   ) as [Recipient, Recipient];
 
-  // Someone past 70 has no filing decision left, so the headline shows them
-  // "file now" instead of the (already past) date the optimizer returns.
-  $: hasFilingChoice = filingChoices(recipient, spouse);
+  // Assigned inside compute(), alongside `result`, so the flag and the
+  // figures it re-skins always come from the same inputs: deriving it
+  // reactively here would let it change during the debounce window while
+  // `result` still belongs to the previous inputs.
+  let hasFilingChoice: [boolean, boolean] = [true, true];
 </script>
 
 {#if result}
