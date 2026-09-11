@@ -15,6 +15,14 @@
     coupleResult?: CoupleFilingAgeResult;
     recipients: [Recipient, Recipient];
     showInfoTip?: boolean;
+    /**
+     * Per recipient: false once they are past 70 and filing immediately is
+     * their only remaining option. Such a recipient gets a "file now" card
+     * rather than a future filing date, because the optimizer's answer for
+     * them is a date in the past (the most retroactive month SSA allows),
+     * which reads as advice to wait when shown as a date.
+     */
+    hasFilingChoice?: [boolean, boolean];
   }
 
   let {
@@ -23,6 +31,7 @@
     coupleResult,
     recipients,
     showInfoTip = true,
+    hasFilingChoice = [true, true],
   }: Props = $props();
 
   function formatAge(age: MonthDuration): string {
@@ -50,6 +59,28 @@
   }
 </script>
 
+{#snippet filingCard(index: number, filingAge: MonthDuration)}
+  {#if hasFilingChoice[index]}
+    <div class="prefix">File in</div>
+    <div class="date-big">
+      <span class="date-full"
+        >{formatFilingDateFull(recipients[index], filingAge)}</span
+      >
+      <span class="date-short"
+        >{formatFilingDateShort(recipients[index], filingAge)}</span
+      >
+    </div>
+    <div class="age-sub">at age {formatAge(filingAge)}</div>
+  {:else}
+    <div class="prefix">File</div>
+    <div class="date-big">now</div>
+    <div class="age-sub">
+      Past 70, so the benefit has stopped growing. SSA can backdate the claim
+      up to six months.
+    </div>
+  {/if}
+{/snippet}
+
 {#if (isSingle && singleResult) || (!isSingle && coupleResult)}
   <div class="headline" class:couple={!isSingle}>
     <div class="kicker">
@@ -72,13 +103,7 @@
 
     {#if isSingle && singleResult}
       <div class="result">
-        <div class="prefix">File in</div>
-        <div class="date-big">
-          {formatFilingDateFull(recipients[0], singleResult.filingAge)}
-        </div>
-        <div class="age-sub">
-          at age {formatAge(singleResult.filingAge)}
-        </div>
+        {@render filingCard(0, singleResult.filingAge)}
       </div>
     {:else if coupleResult}
       <div class="couple-results">
@@ -86,36 +111,14 @@
           <div class="person-name">
             <RecipientName r={recipients[0]} />
           </div>
-          <div class="prefix">File in</div>
-          <div class="date-big">
-            <span class="date-full"
-              >{formatFilingDateFull(recipients[0], coupleResult.filingAges[0])}</span
-            >
-            <span class="date-short"
-              >{formatFilingDateShort(recipients[0], coupleResult.filingAges[0])}</span
-            >
-          </div>
-          <div class="age-sub">
-            at age {formatAge(coupleResult.filingAges[0])}
-          </div>
+          {@render filingCard(0, coupleResult.filingAges[0])}
         </div>
         <div class="divider" aria-hidden="true"></div>
         <div class="result">
           <div class="person-name">
             <RecipientName r={recipients[1]} />
           </div>
-          <div class="prefix">File in</div>
-          <div class="date-big">
-            <span class="date-full"
-              >{formatFilingDateFull(recipients[1], coupleResult.filingAges[1])}</span
-            >
-            <span class="date-short"
-              >{formatFilingDateShort(recipients[1], coupleResult.filingAges[1])}</span
-            >
-          </div>
-          <div class="age-sub">
-            at age {formatAge(coupleResult.filingAges[1])}
-          </div>
+          {@render filingCard(1, coupleResult.filingAges[1])}
         </div>
       </div>
     {/if}
@@ -142,7 +145,11 @@
         {/if}
       </div>
       <p class="explanation">
-        {#if isSingle}
+        {#if isSingle && !hasFilingChoice[0]}
+          Delayed retirement credits stop at 70, so the monthly amount is
+          already at its maximum. Every further month of waiting is a payment
+          forgone.
+        {:else if isSingle}
           Maximizes your expected lifetime benefits, weighted by the
           probability of surviving to each age and adjusted for the discount
           rate.

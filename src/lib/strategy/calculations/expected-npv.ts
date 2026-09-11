@@ -39,14 +39,17 @@
  * form is provided.
  */
 
-import { eligibleForSpousalBenefit } from '$lib/benefit-calculator';
+import {
+  eligibleForSpousalBenefit,
+  MAX_BENEFIT_AGE_MONTHS,
+} from '$lib/benefit-calculator';
 import type { DeathProbability } from '$lib/life-tables';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import {
   calculateMonthlyDiscountRate,
-  earliestFiling,
+  filingAgeRange,
   strategySumCentsCouple,
   strategySumCentsSingle,
 } from './strategy-calc.js';
@@ -79,8 +82,9 @@ export function expectedNPVSingle(
 ): FilingAgeResult[] {
   if (deathProbDist.length === 0) return [];
 
-  const startFilingMonths = earliestFiling(recipient, currentDate).asMonths();
-  const endFilingMonths = 70 * 12;
+  const range = filingAgeRange(recipient, currentDate);
+  const startFilingMonths = range.earliest.asMonths();
+  const endFilingMonths = range.latest.asMonths();
 
   const results: FilingAgeResult[] = [];
 
@@ -164,7 +168,10 @@ function benefitCentsAtAge(
       (Math.max(0, before - 36) * 5) / 1200
     );
   } else {
-    const after = ageMonths - nraMonths;
+    // Delayed credits stop accruing at age 70.
+    const creditedMonths =
+      ageMonths < MAX_BENEFIT_AGE_MONTHS ? ageMonths : MAX_BENEFIT_AGE_MONTHS;
+    const after = creditedMonths - nraMonths;
     mult = (delayedRetirementIncrease / 12) * after;
   }
   return Math.floor(Math.round(piaDollarCents * (1 + mult)) / 100) * 100;
@@ -451,24 +458,31 @@ export function expectedNPVCoupleOptimized(
   }
 
   // ── Filing ranges ──
-  const eStart = earliestFiling(earner, currentDate).asMonths();
-  const dStart = earliestFiling(dependent, currentDate).asMonths();
+  // A recipient past 70 has a single remaining option (file now), so their
+  // range collapses to one entry rather than going empty.
+  const eRange = filingAgeRange(earner, currentDate);
+  const dRange = filingAgeRange(dependent, currentDate);
+  const eStart = eRange.earliest.asMonths();
+  const dStart = dRange.earliest.asMonths();
+  const eEnd = eRange.latest.asMonths();
+  const dEnd = dRange.latest.asMonths();
 
   // dkF[kSp] is indexed up to (maxFiling + 1 - curEpoch). The pvF/dkF tables
   // are sized from maxDeath. Ensure death distribution extends past any
-  // filing epoch (normally holds: SSA life tables go to age 120, filings
-  // cap at age 70).
+  // filing epoch (normally holds: SSA life tables run to age 120, and nobody
+  // files later than today).
+  const eMaxFilingEpoch = eSsaBirth + eEnd;
+  const dMaxFilingEpoch = dSsaBirth + dEnd;
   const maxFilingEpoch =
-    eSsaBirth + 840 > dSsaBirth + 840 ? eSsaBirth + 840 : dSsaBirth + 840;
+    eMaxFilingEpoch > dMaxFilingEpoch ? eMaxFilingEpoch : dMaxFilingEpoch;
   if (maxDeath < maxFilingEpoch) {
     throw new Error(
       `death distribution max epoch (${maxDeath}) must reach at least max ` +
         `filing epoch (${maxFilingEpoch}); life table may be truncated`
     );
   }
-  const endF = 840;
-  const nEF = endF - eStart + 1;
-  const nDF = endF - dStart + 1;
+  const nEF = eEnd - eStart + 1;
+  const nDF = dEnd - dStart + 1;
 
   // ── Pre-compute benefit amounts per filing age ──
   const eFY = new Float64Array(nEF);
@@ -636,9 +650,11 @@ export function expectedNPVCoupleOptimized(
   const results: CoupleFilingAgeResult[] = [];
   const sf0 = earnerIndex === 0 ? eStart : dStart;
   const sf1 = earnerIndex === 0 ? dStart : eStart;
+  const ef0 = earnerIndex === 0 ? eEnd : dEnd;
+  const ef1 = earnerIndex === 0 ? dEnd : eEnd;
 
-  for (let f0 = sf0; f0 <= endF; f0++) {
-    for (let f1 = sf1; f1 <= endF; f1++) {
+  for (let f0 = sf0; f0 <= ef0; f0++) {
+    for (let f1 = sf1; f1 <= ef1; f1++) {
       const fe = earnerIndex === 0 ? f0 : f1;
       const fd = earnerIndex === 0 ? f1 : f0;
       const feI = fe - eStart;
@@ -857,9 +873,12 @@ export function expectedNPVCouple(
     return [];
   }
 
-  const startFiling0 = earliestFiling(recipients[0], currentDate).asMonths();
-  const startFiling1 = earliestFiling(recipients[1], currentDate).asMonths();
-  const endFiling = 70 * 12;
+  const range0 = filingAgeRange(recipients[0], currentDate);
+  const range1 = filingAgeRange(recipients[1], currentDate);
+  const startFiling0 = range0.earliest.asMonths();
+  const startFiling1 = range1.earliest.asMonths();
+  const endFiling0 = range0.latest.asMonths();
+  const endFiling1 = range1.latest.asMonths();
 
   // Pre-compute death dates for each death age to avoid repeated allocation
   const deathDates: [MonthDate[], MonthDate[]] = [[], []];
@@ -875,10 +894,10 @@ export function expectedNPVCouple(
 
   const results: CoupleFilingAgeResult[] = [];
 
-  for (let f0 = startFiling0; f0 <= endFiling; f0++) {
+  for (let f0 = startFiling0; f0 <= endFiling0; f0++) {
     const filingAge0 = new MonthDuration(f0);
 
-    for (let f1 = startFiling1; f1 <= endFiling; f1++) {
+    for (let f1 = startFiling1; f1 <= endFiling1; f1++) {
       const filingAge1 = new MonthDuration(f1);
       const strats: [MonthDuration, MonthDuration] = [filingAge0, filingAge1];
 

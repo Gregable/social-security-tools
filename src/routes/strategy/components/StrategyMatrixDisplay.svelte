@@ -1,6 +1,8 @@
 <script lang="ts">
 import HowToReadChart from '$lib/components/HowToReadChart.svelte';
+import RecipientName from '$lib/components/RecipientName.svelte';
 import type { Recipient } from '$lib/recipient';
+import NoFilingDecisionPanel from './NoFilingDecisionPanel.svelte';
 import type {
   CalculationResults,
   CellPosition,
@@ -12,6 +14,12 @@ import StrategyMatrix from './StrategyMatrix.svelte';
 // Props
 export let recipients: [Recipient, Recipient];
 export let displayAsAges: boolean;
+/**
+ * Per recipient: false once they are past 70. A recipient with no choice left
+ * has the same filing age in every cell, so their grid carries no
+ * information and is not drawn at all.
+ */
+export let hasFilingChoice: [boolean, boolean] = [true, true];
 
 // Callback props for events
 export let onselectcell:
@@ -20,6 +28,10 @@ export let onselectcell:
 export let calculationResults: CalculationResults;
 export let deathProbDistribution1: { age: number; probability: number }[];
 export let deathProbDistribution2: { age: number; probability: number }[];
+
+// Only recipients who still have a filing decision get a grid.
+$: gridIndexes = [0, 1].filter((i) => hasFilingChoice[i]);
+$: skippedIndex = [0, 1].find((i) => !hasFilingChoice[i]);
 
 // Shared state for matrix hovering
 let hoveredCell: CellPosition | null = null;
@@ -31,103 +43,134 @@ function handleHoverCell(detail: CellPosition | null) {
 </script>
 
 <div class="result-box">
-  <div class="result-content">
-    <header class="section-header">
-      <p class="section-kicker">How death ages shape the strategies</p>
-    </header>
-    <p class="lede">
-      Every combination of lifespans has its own optimal filing strategy. The
-      <strong>Recommended Filing Ages</strong> above pick a single strategy
-      that works well across all of them; below, see what would be optimal at
-      each specific combination.
-    </p>
-    <p class="caption">
-      Each cell shows the optimal filing {displayAsAges ? 'age' : 'date'} for a
-      specific Self/Spouse death-age pair. <em>Taller rows</em> and
-      <em>wider columns</em> mark more likely death ages.
-      <strong class="hint">Click any cell</strong> to see the full filing
-      breakdown for that scenario.
-    </p>
-    <HowToReadChart>
-      <ul>
-        <li>
-          <strong>Two matrices:</strong> the left one shows Self's optimal
-          filing {displayAsAges ? 'age' : 'date'}; the right one shows Spouse's.
-          Both depend on <em>both</em> death ages because of survivor benefits.
-        </li>
-        <li>
-          <strong>Row / column position:</strong> your death age on one axis,
-          your spouse's on the other. Each cell is one specific pair.
-        </li>
-        <li>
-          <strong>Row height &amp; column width:</strong> probability of that
-          death age. Big cells are likely outcomes; tiny cells are edge cases.
-        </li>
-        <li>
-          <strong>Cell color:</strong> similar strategies share a color, so
-          large bands of one color mean the same strategy is optimal across
-          many scenarios.
-        </li>
-        <li>
-          <strong>Click a cell</strong> to see the full month-by-month benefit
-          breakdown for that death-age pair.
-        </li>
-      </ul>
-      <p>
-        <strong>Takeaway:</strong> focus on the large, dense cells. Those are
-        the most likely outcomes and they drive the Recommended Filing Ages. A
-        single strategy usually covers most of the probability mass, which is
-        why one recommendation is useful even across many possible lifespans.
+  {#if gridIndexes.length === 0}
+    <div class="result-content">
+      <NoFilingDecisionPanel bothRecipients={true} />
+    </div>
+  {:else}
+    <div class="result-content">
+      <header class="section-header">
+        <p class="section-kicker">How death ages shape the strategies</p>
+      </header>
+      <p class="lede">
+        Every combination of lifespans has its own optimal filing strategy. The
+        <strong>Recommended Filing Ages</strong> above pick a single strategy
+        that works well across all of them; below, see what would be optimal at
+        each specific combination.
       </p>
-    </HowToReadChart>
+      <p class="caption">
+        Each cell shows the optimal filing {displayAsAges ? 'age' : 'date'} for a
+        specific Self/Spouse death-age pair. <em>Taller rows</em> and
+        <em>wider columns</em> mark more likely death ages.
+        <strong class="hint">Click any cell</strong> to see the full filing
+        breakdown for that scenario.
+      </p>
+      <HowToReadChart>
+        <ul>
+          <li>
+            <strong>Two matrices:</strong> the left one shows Self's optimal
+            filing {displayAsAges ? 'age' : 'date'}; the right one shows Spouse's.
+            Both depend on <em>both</em> death ages because of survivor benefits.
+          </li>
+          <li>
+            <strong>Row / column position:</strong> your death age on one axis,
+            your spouse's on the other. Each cell is one specific pair.
+          </li>
+          <li>
+            <strong>Row height &amp; column width:</strong> probability of that
+            death age. Big cells are likely outcomes; tiny cells are edge cases.
+          </li>
+          <li>
+            <strong>Cell color:</strong> similar strategies share a color, so
+            large bands of one color mean the same strategy is optimal across
+            many scenarios.
+          </li>
+          <li>
+            <strong>Click a cell</strong> to see the full month-by-month benefit
+            breakdown for that death-age pair.
+          </li>
+        </ul>
+        <p>
+          <strong>Takeaway:</strong> focus on the large, dense cells. Those are
+          the most likely outcomes and they drive the Recommended Filing Ages. A
+          single strategy usually covers most of the probability mass, which is
+          why one recommendation is useful even across many possible lifespans.
+        </p>
+      </HowToReadChart>
+
+      {#if calculationResults.status() === CalculationStatus.Complete}
+        <div class="matrices-toolbar">
+          <span class="toolbar-label">Display filing as</span>
+          <div class="segmented" role="group" aria-label="Display filing as">
+            <button
+              type="button"
+              class="seg"
+              class:active={!displayAsAges}
+              on:click={() => (displayAsAges = false)}
+            >
+              Date
+            </button>
+            <button
+              type="button"
+              class="seg"
+              class:active={displayAsAges}
+              on:click={() => (displayAsAges = true)}
+            >
+              Age
+            </button>
+          </div>
+        </div>
+      {/if}
+    </div>
 
     {#if calculationResults.status() === CalculationStatus.Complete}
-      <div class="matrices-toolbar">
-        <span class="toolbar-label">Display filing as</span>
-        <div class="segmented" role="group" aria-label="Display filing as">
-          <button
-            type="button"
-            class="seg"
-            class:active={!displayAsAges}
-            on:click={() => (displayAsAges = false)}
-          >
-            Date
-          </button>
-          <button
-            type="button"
-            class="seg"
-            class:active={displayAsAges}
-            on:click={() => (displayAsAges = true)}
-          >
-            Age
-          </button>
+      {#if skippedIndex !== undefined}
+        <div class="result-content">
+          <p class="past-70-note">
+            <RecipientName r={recipients[skippedIndex]} /> is past 70, so there
+            is no grid for them: delayed retirement credits have stopped and
+            filing now is their only remaining option. The lifespan trade-off
+            below is <RecipientName
+              r={recipients[skippedIndex === 0 ? 1 : 0]}
+            />'s alone.
+          </p>
         </div>
+      {/if}
+      <div
+        class="matrices-container"
+        class:single-matrix={gridIndexes.length === 1}
+      >
+        {#each gridIndexes as recipientIndex (recipientIndex)}
+          <StrategyMatrix
+            {recipientIndex}
+            {recipients}
+            {calculationResults}
+            {deathProbDistribution1}
+            {deathProbDistribution2}
+            {hoveredCell}
+            {displayAsAges}
+            onhovercell={handleHoverCell}
+            {onselectcell}
+          />
+        {/each}
       </div>
     {/if}
-  </div>
-
-  {#if calculationResults.status() === CalculationStatus.Complete}
-    <div class="matrices-container">
-      {#each [0, 1] as recipientIndex}
-        <StrategyMatrix
-          {recipientIndex}
-          {recipients}
-          {calculationResults}
-          {deathProbDistribution1}
-          {deathProbDistribution2}
-          {hoveredCell}
-          {displayAsAges}
-          onhovercell={handleHoverCell}
-          {onselectcell}
-        />
-      {/each}
-    </div>
   {/if}
 </div>
 
 <style>
   .result-box {
     margin-top: 0.75rem;
+  }
+
+  .past-70-note {
+    margin: 0 0 1rem;
+    padding: 0.75rem 1rem;
+    background: #f7f8fd;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #333;
   }
 
   /* The section heading, prose, and toolbar stay in the same 1200px column
@@ -244,6 +287,14 @@ function handleHoverCell(detail: CellPosition | null) {
     gap: 2rem;
     margin-top: 1rem;
     padding: 0 0.5rem;
+  }
+
+  /* With only one recipient still facing a decision, a half-width grid
+     stranded on the left reads as a missing second chart. */
+  .matrices-container.single-matrix {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 900px;
+    margin-inline: auto;
   }
 
   @media (max-width: 768px) {

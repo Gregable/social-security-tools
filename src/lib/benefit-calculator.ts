@@ -4,11 +4,21 @@ import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 
 /**
+ * The oldest age at which filing still changes the benefit amount. Delayed
+ * retirement credits stop accruing the month a recipient turns 70, so waiting
+ * beyond it only forgoes payments.
+ */
+export const MAX_BENEFIT_AGE_MONTHS = 70 * 12;
+
+/**
  * Returns benefit multiplier at a given age relative to normal retirement age.
  *
  * The early retirement reduction factor changes from 6.67%/yr for years
  * earlier than 3 years before normal retirement age to 5%/yr for the 3 years
  * immediately before normal retirement age.
+ *
+ * Delayed credits are capped at age 70; an age past 70 yields the same
+ * multiplier as age 70 exactly.
  */
 function benefitMultiplierAtAge(
   nra: MonthDuration,
@@ -24,9 +34,10 @@ function benefitMultiplierAtAge(
         (Math.max(0, before.asMonths() - 36) * 5) / 1200)
     );
   } else {
-    // Increased benefits due to taking benefits late.
-    const after = age.subtract(nra);
-    return (delayedRetirementIncrease / 12) * after.asMonths();
+    // Increased benefits due to taking benefits late, up to age 70.
+    const creditedMonths = Math.min(age.asMonths(), MAX_BENEFIT_AGE_MONTHS);
+    const after = creditedMonths - nra.asMonths();
+    return (delayedRetirementIncrease / 12) * after;
   }
 }
 
@@ -457,6 +468,14 @@ export function survivorBenefit(
     );
   }
 
+  // The base amount is read at a date late enough that every delayed credit
+  // has taken effect. A year after filing always qualifies (delayed credits
+  // land the January after filing at the latest). A fixed age-71 date does
+  // not: someone who files past 71 would be read *before* they filed, and
+  // benefitOnDate returns $0 for a date before filing.
+  const afterAllCredits = (filingDate: MonthDate): MonthDate =>
+    filingDate.addDuration(MonthDuration.OneYear());
+
   if (deceasedFilingDate.greaterThanOrEqual(deceasedDeathDate)) {
     // If the deceased recipient did not file for benefits before death:
     if (deceasedDeathDate.lessThan(deceased.normalRetirementDate())) {
@@ -475,9 +494,7 @@ export function survivorBenefit(
       baseSurvivorBenefit = benefitOnDate(
         deceased,
         effectiveFilingDate,
-        deceased.birthdate.dateAtSsaAge(
-          MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
-        )
+        afterAllCredits(effectiveFilingDate)
       );
     }
   } else {
@@ -489,9 +506,7 @@ export function survivorBenefit(
       benefitOnDate(
         deceased,
         deceasedFilingDate,
-        deceased.birthdate.dateAtSsaAge(
-          MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
-        )
+        afterAllCredits(deceasedFilingDate)
       )
     );
     baseSurvivorBenefit = Money.fromCents(

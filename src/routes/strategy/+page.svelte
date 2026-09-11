@@ -9,7 +9,11 @@
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
   import { optimalStrategyCoupleFast } from "$lib/strategy/calculations/optimal-strategy-fast";
-  import { optimalStrategySingle } from "$lib/strategy/calculations/strategy-calc";
+  import {
+    filingAgeRange,
+    optimalStrategySingle,
+  } from "$lib/strategy/calculations/strategy-calc";
+  import { currentMonthDate } from "$lib/components/recommended-filing-card";
   import {
     CalculationResults,
     CalculationStatus,
@@ -23,6 +27,7 @@
   import { UrlParams, buildStrategyHash } from "$lib/url-params";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
+  import NoFilingDecisionPanel from "./components/NoFilingDecisionPanel.svelte";
   import RecipientInputs from "./components/RecipientInputs.svelte";
   import ScenarioDetail from "./components/ScenarioDetail.svelte";
   import ScenarioDetailSingle from "./components/ScenarioDetailSingle.svelte";
@@ -313,6 +318,22 @@
   });
 
   $: formIsValid = recipientInputsValid && discountRateValid;
+
+  // A recipient past 70 has no filing decision left: delayed credits have
+  // stopped and the optimizer's only remaining option is "file now". The
+  // headline needs to know so it does not present that as a future date.
+  $: hasFilingChoice = computeFilingChoice(recipients, isSingle);
+
+  function computeFilingChoice(
+    rs: [Recipient, Recipient],
+    single: boolean
+  ): [boolean, boolean] {
+    const currentDate = currentMonthDate();
+    return [
+      filingAgeRange(rs[0], currentDate).hasChoice,
+      single ? true : filingAgeRange(rs[1], currentDate).hasChoice,
+    ];
+  }
   $: discountRate = discountRatePercent / 100;
   $: shareUrl = buildShareUrl(recipients, isSingle, piaValues, birthdateInputs);
 
@@ -455,8 +476,13 @@
       }
     } catch (error) {
       console.error("Continue failed:", error);
+      // Every input the form accepts should produce a result, so reaching
+      // here means a bug on our side rather than bad data. Say so: telling
+      // people to "check your inputs" sends them hunting for a mistake they
+      // did not make.
       formErrorMessage =
-        "Could not compute results. Check your inputs and try again.";
+        "Something went wrong while working out your results. This looks " +
+        "like a problem on our end, not with what you entered.";
     }
   }
 
@@ -496,11 +522,7 @@
       );
       next.beginRun();
 
-      const now = new Date();
-      const currentDate = MonthDate.initFromYearsMonths({
-        years: now.getFullYear(),
-        months: now.getMonth(),
-      });
+      const currentDate = currentMonthDate();
 
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
@@ -760,6 +782,7 @@
               singleResult={optimalSingleResult}
               coupleResult={optimalCoupleResult}
               {recipients}
+              {hasFilingChoice}
             />
             <AdvisorPrompt />
           </div>
@@ -768,7 +791,11 @@
           class="widget-anchor"
           bind:this={widgetAnchorEl}
         >
-          {#if isSingle}
+          {#if isSingle && !hasFilingChoice[0]}
+            <div class="limited-width">
+              <NoFilingDecisionPanel />
+            </div>
+          {:else if isSingle}
             <StrategyPlotSingle
               recipient={recipients[0]}
               {calculationResults}
@@ -782,6 +809,7 @@
               {calculationResults}
               {deathProbDistribution1}
               {deathProbDistribution2}
+              {hasFilingChoice}
               bind:displayAsAges
               onselectcell={handleCellSelect}
             />

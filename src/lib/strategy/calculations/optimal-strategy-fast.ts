@@ -41,13 +41,16 @@
  * slow reference; see `src/test/strategy/grid-optimal-goldens.test.ts`.
  */
 
-import { eligibleForSpousalBenefit } from '$lib/benefit-calculator';
+import {
+  eligibleForSpousalBenefit,
+  MAX_BENEFIT_AGE_MONTHS,
+} from '$lib/benefit-calculator';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import {
   calculateMonthlyDiscountRate,
-  earliestFiling,
+  filingAgeRange,
 } from './strategy-calc.js';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -82,7 +85,10 @@ function benefitCentsAtAge(
       (Math.max(0, before - 36) * 5) / 1200
     );
   } else {
-    const after = ageMonths - nraMonths;
+    // Delayed credits stop accruing at age 70.
+    const creditedMonths =
+      ageMonths < MAX_BENEFIT_AGE_MONTHS ? ageMonths : MAX_BENEFIT_AGE_MONTHS;
+    const after = creditedMonths - nraMonths;
     mult = (delayedRetirementIncrease / 12) * after;
   }
   return Math.floor(Math.round(piaDollarCents * (1 + mult)) / 100) * 100;
@@ -263,14 +269,18 @@ export function optimalStrategyCoupleFast(
   const dDeath = finalDates[dependentIndex].monthsSinceEpoch();
 
   // ── Filing ranges ──
-  const eStart = earliestFiling(earner, currentDate).asMonths();
-  const dStart = earliestFiling(dependent, currentDate).asMonths();
+  // A recipient past 70 has one option left (file now), so their range
+  // collapses to a single entry rather than going empty.
+  const eRange = filingAgeRange(earner, currentDate);
+  const dRange = filingAgeRange(dependent, currentDate);
+  const eStart = eRange.earliest.asMonths();
+  const dStart = dRange.earliest.asMonths();
   const eEnd = Math.min(
-    840,
+    eRange.latest.asMonths(),
     earner.birthdate.ageAtSsaDate(finalDates[earnerIndex]).asMonths()
   );
   const dEnd = Math.min(
-    840,
+    dRange.latest.asMonths(),
     dependent.birthdate.ageAtSsaDate(finalDates[dependentIndex]).asMonths()
   );
 

@@ -1,6 +1,7 @@
 import {
   benefitOnDate,
   eligibleForSpousalBenefit,
+  MAX_BENEFIT_AGE_MONTHS,
   spousalBenefitOnDate,
   survivorBenefit,
 } from '$lib/benefit-calculator';
@@ -338,6 +339,50 @@ export function earliestFiling(
   }
 
   return earliestMonth;
+}
+
+/**
+ * The oldest filing age worth considering, as a duration. Filing past the age
+ * at which delayed credits stop only forgoes payments, so the two bounds are
+ * by definition the same age.
+ */
+export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
+  MAX_BENEFIT_AGE_MONTHS
+);
+
+/**
+ * The inclusive span of filing ages an optimizer should search over.
+ *
+ * `hasChoice` is false when the recipient is already past 70. There is then
+ * exactly one option left — file now, at `earliest` — so `earliest` and
+ * `latest` are equal and the "optimization" is a formality. Callers that
+ * present results to a user should say so rather than implying a decision was
+ * made on the recipient's behalf.
+ */
+export interface FilingAgeRange {
+  readonly earliest: MonthDuration;
+  readonly latest: MonthDuration;
+  readonly hasChoice: boolean;
+}
+
+/**
+ * Computes the filing ages still available to a recipient as of `currentDate`.
+ *
+ * Callers must use this rather than iterating to a hardcoded age 70: a
+ * recipient past 70 has an `earliest` filing age beyond 70, and a loop bounded
+ * by a literal 70 would run zero (or negatively many) times.
+ */
+export function filingAgeRange(
+  recipient: Recipient,
+  currentDate: MonthDate
+): FilingAgeRange {
+  const earliest = earliestFiling(recipient, currentDate);
+  const hasChoice = earliest.lessThan(MAX_FILING_AGE);
+  return {
+    earliest,
+    latest: hasChoice ? MAX_FILING_AGE : earliest,
+    hasChoice,
+  };
 }
 
 /**
@@ -698,17 +743,15 @@ export function optimalStrategyCouple(
     -1,
   ];
 
-  const startFilingDate0: number = earliestFiling(
-    recipients[0],
-    currentDate
-  ).asMonths();
-  const startFilingDate1: number = earliestFiling(
-    recipients[1],
-    currentDate
-  ).asMonths();
+  const range0 = filingAgeRange(recipients[0], currentDate);
+  const range1 = filingAgeRange(recipients[1], currentDate);
+  const startFilingDate0: number = range0.earliest.asMonths();
+  const startFilingDate1: number = range1.earliest.asMonths();
+  const endFilingAge0: number = range0.latest.asMonths();
+  const endFilingAge1: number = range1.latest.asMonths();
 
-  for (let i = startFilingDate0; i <= 70 * 12; ++i) {
-    for (let j = startFilingDate1; j <= 70 * 12; ++j) {
+  for (let i = startFilingDate0; i <= endFilingAge0; ++i) {
+    for (let j = startFilingDate1; j <= endFilingAge1; ++j) {
       const strategy: [MonthDuration, MonthDuration] = [
         new MonthDuration(i),
         new MonthDuration(j),
@@ -778,13 +821,15 @@ export function optimalStrategyCoupleOptimized(
     currentDate
   ).asMonths();
 
-  // Pre-compute final loop bounds to avoid expensive calculations in loops
+  // Pre-compute final loop bounds to avoid expensive calculations in loops.
+  // filingAgeRange, not a literal 70: a recipient past 70 has a single
+  // remaining filing age above it, and a literal bound empties the loop.
   const endFilingAge0: number = Math.min(
-    70 * 12,
+    filingAgeRange(recipients[0], currentDate).latest.asMonths(),
     recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths()
   );
   const endFilingAge1: number = Math.min(
-    70 * 12,
+    filingAgeRange(recipients[1], currentDate).latest.asMonths(),
     recipients[1].birthdate.ageAtSsaDate(finalDates[1]).asMonths()
   );
 
@@ -979,13 +1024,14 @@ export function optimalStrategySingle(
 ): [MonthDuration, number] {
   let bestStrategy: [MonthDuration, number] = [new MonthDuration(0), -1];
 
-  const startFilingDate: number = earliestFiling(
-    recipient,
-    currentDate
-  ).asMonths();
+  const range = filingAgeRange(recipient, currentDate);
+  const startFilingDate: number = range.earliest.asMonths();
 
+  // Filing after death is not a strategy. If the recipient dies before they
+  // could file at all the loop below is empty and the sentinel [0, -1] is
+  // returned, matching the pre-existing contract.
   const endFilingAge: number = Math.min(
-    70 * 12,
+    range.latest.asMonths(),
     recipient.birthdate.ageAtSsaDate(finalDate).asMonths()
   );
 

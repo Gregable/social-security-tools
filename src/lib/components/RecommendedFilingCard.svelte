@@ -10,6 +10,7 @@
   } from "$lib/components/recommended-filing-card";
   import type { DeathProbability } from "$lib/life-tables";
   import type { Recipient } from "$lib/recipient";
+  import { filingAgeRange } from "$lib/strategy/calculations/strategy-calc";
 
   export let recipient: Recipient;
   export let spouse: Recipient | null = null;
@@ -122,6 +123,13 @@
   $: recipientsTuple = (
     spouse ? [recipient, spouse] : [recipient, recipient]
   ) as [Recipient, Recipient];
+
+  // Someone past 70 has no filing decision left, so the headline shows them
+  // "file now" instead of the (already past) date the optimizer returns.
+  $: hasFilingChoice = [
+    filingAgeRange(recipient, currentMonthDate()).hasChoice,
+    spouse ? filingAgeRange(spouse, currentMonthDate()).hasChoice : true,
+  ] as [boolean, boolean];
 </script>
 
 {#if result}
@@ -136,6 +144,7 @@
       coupleResult={result.couple}
       recipients={recipientsTuple}
       showInfoTip={false}
+      {hasFilingChoice}
     />
   </a>
 {/if}
