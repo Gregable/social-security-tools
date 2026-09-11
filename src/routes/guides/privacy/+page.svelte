@@ -1,18 +1,6 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
-import InlineCTA from '../InlineCTA.svelte';
-import type { SponsorCopy } from '$lib/sponsor';
-
-const sponsorCopy: SponsorCopy = {
-  intro: "This calculator never learns who you are, which also means it can't weigh anything outside your earnings record. When you want that judgment, you can talk to a Social Security specialist at",
-  outro: "and decide for yourself what to share.",
-  bullets: [
-    "A real person looks at the whole picture, including things this calculator doesn't cover like taxes, pensions, and health.",
-    "Nothing you enter here is sent to them, or to anyone. Any conversation starts because you started it.",
-    "The first call is free, and you pick the time.",
-  ],
-};
 
 const title = 'Privacy & Security';
 const description =
@@ -106,7 +94,6 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
     information.
   </p>
 
-  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Open Source Transparency</h2>
   <p>
