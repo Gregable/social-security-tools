@@ -454,6 +454,30 @@ export function allBenefitsOnDateNominal(
 }
 
 /**
+ * Whether a filing month means the recipient actually filed before dying.
+ *
+ * SSA pays no retirement benefit for the month of death, so a claim effective
+ * in that month or later is no claim at all. The survivor rules below treat
+ * such a worker as never having filed, and the UI labels the strategy "does
+ * not file" rather than naming a filing month.
+ *
+ * The optimizers do not model a separate "never file" choice. They cap the
+ * search at the death month (or, for a recipient who dies before they could
+ * file, at the one age left), so a filing age in or past the death month is
+ * how that strategy is represented.
+ *
+ * Model limitation: the benefit-period generators still count the death
+ * month inclusive, so a death-month filing earns one month of personal
+ * benefit in the NPV even though SSA would not pay it.
+ */
+export function filedBeforeDeath(
+  filingDate: MonthDate,
+  deathDate: MonthDate
+): boolean {
+  return filingDate.lessThan(deathDate);
+}
+
+/**
  * Determines the survivor benefit for a recipient.
  * @param survivor The surviving recipient.
  * @param deceased The deceased recipient.
@@ -464,6 +488,7 @@ export function allBenefitsOnDateNominal(
  * @param survivorFilingDate The date the survivor recipient filed for
  * survivor benefits.
  */
+
 export function survivorBenefit(
   survivor: Recipient,
   deceased: Recipient,
@@ -489,7 +514,7 @@ export function survivorBenefit(
   const afterAllCredits = (filingDate: MonthDate): MonthDate =>
     filingDate.addDuration(MonthDuration.OneYear());
 
-  if (deceasedFilingDate.greaterThanOrEqual(deceasedDeathDate)) {
+  if (!filedBeforeDeath(deceasedFilingDate, deceasedDeathDate)) {
     // If the deceased recipient did not file for benefits before death:
     if (deceasedDeathDate.lessThan(deceased.normalRetirementDate())) {
       // If the deceased died before Normal Retirement Age, the survivor
