@@ -8,6 +8,12 @@
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
+  import {
+    type AlreadyFiled,
+    type AlreadyFiledInput,
+    isEligibleToHaveFiled,
+    NOT_FILED,
+  } from "$lib/strategy/calculations/already-filed";
   import { optimalStrategyCoupleFast } from "$lib/strategy/calculations/optimal-strategy-fast";
   import {
     earliestModelableDeathAge,
@@ -155,6 +161,10 @@
   let isSingle: boolean = false;
   let birthdateInputs: [string, string] = ["", ""];
   let piaValues: [number | null, number | null] = [null, null];
+  // Per recipient, the month benefits actually started, or null. Couple mode
+  // only. Kept with the other form inputs rather than on Recipient: the
+  // calculator's filing-date stores mean "what if", this means "what happened".
+  let alreadyFiled: AlreadyFiledInput = [null, null];
   let discountRatePercent: number = 2.5;
 
   let recipientInputsValid = false;
@@ -305,6 +315,21 @@
           recipients[1].birthdate = bd2;
           if (params.getSpouseName()) recipients[1].name = params.getSpouseName()!;
           recipients[1].gender = params.getSpouseGender();
+          // The form re-validates a restored month only for someone old
+          // enough to show the control. A hand-edited link can mark an
+          // under-62 person as filed; drop that here so it never reaches the
+          // optimizer, which refuses it. Restore always lands on the form
+          // stage, where FiledMonthInput re-validates the month on mount;
+          // that is what completes validation before any calculation runs.
+          const restoredNow = currentMonthDate();
+          const restored = [
+            params.getRecipientFiledMonth(),
+            params.getSpouseFiledMonth(),
+          ];
+          alreadyFiled = [
+            isEligibleToHaveFiled(bd1, restoredNow) ? restored[0] : null,
+            isEligibleToHaveFiled(bd2, restoredNow) ? restored[1] : null,
+          ];
         }
       }
 
@@ -328,21 +353,32 @@
 
   $: formIsValid = recipientInputsValid && discountRateValid;
 
-  // A recipient with no filing choice left has only one option: file now.
+  // A recipient with no filing choice left, because they are past 70 or have
+  // already filed, has nothing to decide.
   // The headline and the grids need to know so they do not present that as a
   // decision. Assigned inside calculateStrategyMatrix from the same
   // currentDate as the results it describes — deriving it reactively from
   // live form state would let it flip a card to "File now" while the figures
   // beside it still belong to the previous birthdate.
   let hasFilingChoice: [boolean, boolean] = [true, true];
+  // The filed months the current results were computed with; see
+  // hasFilingChoice for why this is not derived reactively from the form.
+  let resultsAlreadyFiled: AlreadyFiled = NOT_FILED;
   $: discountRate = discountRatePercent / 100;
-  $: shareUrl = buildShareUrl(recipients, isSingle, piaValues, birthdateInputs);
+  $: shareUrl = buildShareUrl(
+    recipients,
+    isSingle,
+    piaValues,
+    birthdateInputs,
+    alreadyFiled
+  );
 
   function buildShareUrl(
     rs: [typeof recipients[0], typeof recipients[1]],
     single: boolean,
     pias: [number | null, number | null],
-    dobs: [string, string]
+    dobs: [string, string],
+    filed: [MonthDate | null, MonthDate | null]
   ): string {
     if (!dobs[0] || pias[0] === null) return "";
     const hash = buildStrategyHash({
@@ -351,6 +387,7 @@
       dob1: dobs[0],
       name1: rs[0].name && rs[0].name !== "Self" ? rs[0].name : undefined,
       gender1: rs[0].gender,
+      filed1: filed[0],
       ...(
         !single && pias[1] !== null && dobs[1]
           ? {
@@ -358,6 +395,7 @@
               dob2: dobs[1],
               name2: rs[1].name && rs[1].name !== "Spouse" ? rs[1].name : undefined,
               gender2: rs[1].gender,
+              filed2: filed[1],
             }
           : {}
       ),
@@ -538,6 +576,7 @@
     const prevHealth = snapshotHealthMultipliers();
     birthdateInputs = ["", ""];
     piaValues = [null, null];
+    alreadyFiled = [null, null];
     recipients = initializeRecipients();
     recipients[0].healthMultiplier = prevHealth[0];
     recipients[1].healthMultiplier = prevHealth[1];
@@ -564,6 +603,11 @@
       next.beginRun();
 
       const currentDate = currentMonthDate();
+      // Snapshot: single mode never has a filed spouse, and the results must
+      // describe one set of inputs even if the form changes mid-run.
+      const filedSnapshot: AlreadyFiled = isSingle
+        ? NOT_FILED
+        : [alreadyFiled[0], alreadyFiled[1]];
       // Computed here but assigned only once the run has fully succeeded,
       // together with the results it describes. If a loop below throws, the
       // store keeps the previous results, and this flag must keep describing
@@ -571,7 +615,8 @@
       const nextFilingChoice = filingChoices(
         recipients[0],
         isSingle ? null : recipients[1],
-        currentDate
+        currentDate,
+        filedSnapshot
       );
 
       if (isSingle) {
@@ -614,7 +659,8 @@
                 recipients,
                 finalDates,
                 currentDate,
-                discountRate
+                discountRate,
+                filedSnapshot
               );
 
             next.set(i, j, {
@@ -651,7 +697,8 @@
           recipients,
           currentDate,
           discountRate,
-          [deathProbDistribution1, deathProbDistribution2]
+          [deathProbDistribution1, deathProbDistribution2],
+          filedSnapshot
         );
         nextCoupleResult =
           coupleResults.length > 0 ? coupleResults[0] : undefined;
@@ -665,6 +712,7 @@
       // headline, the grids and the flag that re-skins them always describe
       // the same run.
       hasFilingChoice = nextFilingChoice;
+      resultsAlreadyFiled = filedSnapshot;
       optimalSingleResult = nextSingleResult;
       optimalCoupleResult = nextCoupleResult;
       calculationResultsStore.set(next);
@@ -786,6 +834,7 @@
           {isSingle}
           bind:piaValues
           bind:birthdateInputs
+          bind:alreadyFiled
           continueDisabled={!formIsValid}
           errorMessage={formErrorMessage}
           onUpdate={handleRecipientUpdate}
@@ -850,6 +899,8 @@
               {recipients}
               {hasFilingChoice}
               currentDate={currentMonthDate()}
+              alreadyFiled={resultsAlreadyFiled}
+              onAlreadyFiledHint={isSingle ? undefined : handleEdit}
             />
             <AdvisorPrompt />
           </div>
@@ -877,6 +928,7 @@
               {deathProbDistribution1}
               {deathProbDistribution2}
               {hasFilingChoice}
+              alreadyFiled={resultsAlreadyFiled}
               bind:displayAsAges
               onselectcell={handleCellSelect}
             />
@@ -898,6 +950,7 @@
             {recipients}
             result={calculationResults.getSelectedCellData()}
             {discountRate}
+            alreadyFiled={resultsAlreadyFiled}
             bind:displayAsAges
             onBack={handleBackToMatrix}
           />

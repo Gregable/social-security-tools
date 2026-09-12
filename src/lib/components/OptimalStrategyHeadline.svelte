@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { benefitAtAge } from "$lib/benefit-calculator";
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import {
@@ -9,6 +10,11 @@
   import { Money } from "$lib/money";
   import type { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
+  import {
+    type AlreadyFiled,
+    isEligibleToHaveFiled,
+    NOT_FILED,
+  } from "$lib/strategy/calculations/already-filed";
   import type {
     FilingAgeResult,
     CoupleFilingAgeResult,
@@ -33,6 +39,10 @@
      * month SSA allows — a month that has already passed, which under a
      * "File in" label reads as a bug rather than as advice.
      *
+     * Also false for a recipient who has already filed. They get the
+     * "Started benefits" card instead, because `alreadyFiled` takes
+     * precedence in the snippet.
+     *
      * Required rather than defaulted: defaulting it to [true, true] would
      * silently reinstate that already-passed date for any caller that forgot
      * to pass it.
@@ -43,6 +53,17 @@
      * date that is still ahead from one that has already passed.
      */
     currentDate: MonthDate;
+    /**
+     * Per recipient, the month benefits actually started, or null. A filed
+     * recipient's card states that as a fact instead of a recommendation.
+     */
+    alreadyFiled?: AlreadyFiled;
+    /**
+     * Called when the viewer clicks "Already receiving benefits?" on the
+     * card of an eligible recipient who was not marked as filed. When
+     * omitted (the calculator card, and single mode), no hint is shown.
+     */
+    onAlreadyFiledHint?: () => void;
   }
 
   let {
@@ -54,6 +75,8 @@
     discountRateAssumption = DEFAULT_DISCOUNT_RATE_ASSUMPTION,
     hasFilingChoice,
     currentDate,
+    alreadyFiled = NOT_FILED,
+    onAlreadyFiledHint,
   }: Props = $props();
 
   /**
@@ -96,10 +119,47 @@
   function formatMoney(cents: number): string {
     return Money.fromCents(Math.round(cents)).wholeDollars();
   }
+
+  /**
+   * The filed recipient's own monthly benefit at their actual filing age, in
+   * today's dollars, so it matches every other amount on the page. Any
+   * spousal top-up is not included. Null for a zero-PIA recipient: what
+   * they receive is a spousal benefit that this card does not compute, and
+   * "about $0 per month" would read as a bug.
+   */
+  function filedAmount(index: number, filedAt: MonthDate): string | null {
+    const age = recipients[index].birthdate.ageAtSsaDate(filedAt);
+    const amount = benefitAtAge(recipients[index], age);
+    return amount.cents() > 0 ? amount.wholeDollars() : null;
+  }
+
+  function filedAge(index: number, filedAt: MonthDate): string {
+    return recipients[index].birthdate.ageAtSsaDate(filedAt).toFullAgeString();
+  }
+
+  function showFiledHint(index: number): boolean {
+    return (
+      onAlreadyFiledHint !== undefined &&
+      alreadyFiled[index] === null &&
+      isEligibleToHaveFiled(recipients[index].birthdate, currentDate)
+    );
+  }
 </script>
 
 {#snippet filingCard(index: number, filingAge: MonthDuration)}
-  {#if isAlreadyPast(index, filingAge)}
+  {@const filedAt = alreadyFiled[index]}
+  {#if filedAt !== null}
+    <div class="prefix">Started benefits</div>
+    <div class="date-big">
+      <span class="date-full">{filedAt.monthFullName()} {filedAt.year()}</span>
+      <span class="date-short">{filedAt.monthName()} {filedAt.year()}</span>
+    </div>
+    {@const amount = filedAmount(index, filedAt)}
+    <div class="age-sub">
+      at age {filedAge(index, filedAt)}{#if amount !== null}, about {amount} per
+        month from your own record, in today's dollars{/if}
+    </div>
+  {:else if isAlreadyPast(index, filingAge)}
     <div class="prefix">File</div>
     <div class="date-big">now</div>
     <div class="age-sub">
@@ -122,6 +182,11 @@
       >
     </div>
     <div class="age-sub">at age {formatAge(filingAge)}</div>
+  {/if}
+  {#if showFiledHint(index)}
+    <button type="button" class="filed-hint" onclick={onAlreadyFiledHint}>
+      Already receiving benefits? Update your details
+    </button>
   {/if}
 {/snippet}
 
@@ -197,6 +262,15 @@
           Maximizes your expected lifetime benefits, weighted by the
           probability of surviving to each age and adjusted for the discount
           rate.
+        {:else if alreadyFiled[0] !== null && alreadyFiled[1] !== null}
+          You are both already receiving benefits, so there is no filing
+          decision left here. The figure is the expected value of what is
+          still to come.
+        {:else if alreadyFiled[0] !== null || alreadyFiled[1] !== null}
+          Maximizes your expected combined lifetime benefits, taking
+          <RecipientName r={recipients[alreadyFiled[0] !== null ? 0 : 1]} />'s
+          filing date as given and weighting by each person's probability of
+          surviving to each age, adjusted for the discount rate.
         {:else}
           Maximizes your expected combined lifetime benefits, weighted by
           each person's probability of surviving to each age and adjusted for
@@ -281,6 +355,18 @@
     font-size: 1rem;
     color: #4b5563;
     font-weight: 500;
+  }
+
+  .filed-hint {
+    margin-top: 0.5rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #3b4a9f;
+    font: inherit;
+    font-size: 0.85rem;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .couple-results {

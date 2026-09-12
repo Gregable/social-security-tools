@@ -47,6 +47,7 @@ import {
 import type { DeathProbability } from '$lib/life-tables';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
+import { type AlreadyFiled, NOT_FILED } from './already-filed';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import {
   calculateMonthlyDiscountRate,
@@ -367,12 +368,18 @@ function survivorCentsCalc(
  * original recipient order (not earner/dependent order) — `filingAges[0]`
  * is for `recipients[0]`. Validated against the exact version by 1,000
  * golden test cases in `expected-npv-couple-goldens.test.ts`.
+ *
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null; a filed
+ *                                      recipient contributes exactly one
+ *                                      filing age.
  */
 export function expectedNPVCoupleOptimized(
   recipients: [Recipient, Recipient],
   currentDate: MonthDate,
   discountRate: number,
-  deathProbDists: [DeathProbability[], DeathProbability[]]
+  deathProbDists: [DeathProbability[], DeathProbability[]],
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): CoupleFilingAgeResult[] {
   if (deathProbDists[0].length === 0 || deathProbDists[1].length === 0)
     return [];
@@ -469,8 +476,12 @@ export function expectedNPVCoupleOptimized(
   // ── Filing ranges ──
   // A recipient with no filing choice left has a single remaining option, so
   // their range collapses to one entry rather than going empty.
-  const eRange = filingAgeRange(earner, currentDate);
-  const dRange = filingAgeRange(dependent, currentDate);
+  const eRange = filingAgeRange(earner, currentDate, alreadyFiled[earnerIndex]);
+  const dRange = filingAgeRange(
+    dependent,
+    currentDate,
+    alreadyFiled[dependentIndex]
+  );
   const eStart = eRange.earliest.asMonths();
   const dStart = dRange.earliest.asMonths();
   const eEnd = eRange.latest.asMonths();
@@ -869,6 +880,10 @@ export function expectedNPVCoupleOptimized(
  *
  * Deaths are assumed independent (standard actuarial assumption).
  *
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null; a filed
+ *                                      recipient contributes exactly one
+ *                                      filing age.
  * @returns Array of {filingAges, expectedNPVCents} sorted descending by
  *          expectedNPVCents. The first element is the optimal filing pair.
  */
@@ -876,14 +891,15 @@ export function expectedNPVCouple(
   recipients: [Recipient, Recipient],
   currentDate: MonthDate,
   discountRate: number,
-  deathProbDists: [DeathProbability[], DeathProbability[]]
+  deathProbDists: [DeathProbability[], DeathProbability[]],
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): CoupleFilingAgeResult[] {
   if (deathProbDists[0].length === 0 || deathProbDists[1].length === 0) {
     return [];
   }
 
-  const range0 = filingAgeRange(recipients[0], currentDate);
-  const range1 = filingAgeRange(recipients[1], currentDate);
+  const range0 = filingAgeRange(recipients[0], currentDate, alreadyFiled[0]);
+  const range1 = filingAgeRange(recipients[1], currentDate, alreadyFiled[1]);
   const startFiling0 = range0.earliest.asMonths();
   const startFiling1 = range1.earliest.asMonths();
   const endFiling0 = range0.latest.asMonths();

@@ -8,6 +8,11 @@ import {
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
+import {
+  type AlreadyFiled,
+  NOT_FILED,
+  validateFiledMonth,
+} from './already-filed';
 import { BenefitPeriod, BenefitType } from './benefit-period.js';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
@@ -353,11 +358,12 @@ export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
 /**
  * The inclusive span of filing ages an optimizer should search over.
  *
- * `hasChoice` is false once `earliest` has reached 70. Because SSA allows
+ * `hasChoice` is false once `earliest` has reached 70, or when the recipient
+ * has already filed (see `filingAgeRange`'s `filedAt`). Because SSA allows
  * filing up to six months retroactively, `earliest` lags the recipient's
  * current age by six months once they are past full retirement age, so the
- * flip happens at age 70y6m rather than at 70y0m. A recipient aged 70y3m
- * still has a real, if narrow, range to search.
+ * age-based flip happens at age 70y6m rather than at 70y0m. A recipient aged
+ * 70y3m still has a real, if narrow, range to search.
  *
  * Past that point exactly one option remains: file as soon as possible,
  * backdated to `earliest` — the most retroactive month SSA allows — so
@@ -365,9 +371,9 @@ export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
  * Callers presenting results to a user should say so rather than implying a
  * decision was made on the recipient's behalf.
  *
- * Note that `latest` is NOT bounded by `MAX_FILING_AGE`: in exactly that case
- * it exceeds it, which is the whole point of the type. The span is always
- * non-empty (`earliest <= latest`).
+ * Note that `latest` is NOT bounded by `MAX_FILING_AGE`: past 70 it exceeds
+ * it, and for a filed recipient both bounds are the actual filing age,
+ * whatever that is. The span is always non-empty (`earliest <= latest`).
  *
  * Model limitation: the NPV functions count payments from the month after
  * `currentDate`, so the retroactive lump sum SSA pays for a backdated claim
@@ -439,11 +445,36 @@ export class NoFilingAgeAvailableError extends Error {
  * typed-array allocations in the fast paths. (Searches that start from
  * `earliestFilingMonth`, the age-62 month, are not affected — see
  * alternative-strategies.ts and ai-export.ts.)
+ *
+ * `filedAt`, when given, is the month the recipient actually started
+ * benefits. The range is then that single filing age with `hasChoice`
+ * false: there is nothing to search. The month must pass
+ * `validateFiledMonth`; the form enforces that, so a failure here is a
+ * programming error and throws rather than silently searching a nonsense
+ * age.
  */
 export function filingAgeRange(
   recipient: Recipient,
-  currentDate: MonthDate
+  currentDate: MonthDate,
+  filedAt: MonthDate | null = null
 ): FilingAgeRange {
+  if (filedAt !== null) {
+    const problem = validateFiledMonth(
+      recipient.birthdate,
+      filedAt,
+      currentDate
+    );
+    if (problem !== null) {
+      throw new Error(`invalid filed month: ${problem}`);
+    }
+    const filedAge = recipient.birthdate.ageAtSsaDate(filedAt);
+    return {
+      earliest: filedAge,
+      latest: new MonthDuration(filedAge.asMonths()),
+      hasChoice: false,
+    };
+  }
+
   const earliest = earliestFiling(recipient, currentDate);
   const hasChoice = earliest.lessThan(MAX_FILING_AGE);
   return {
@@ -758,12 +789,19 @@ export function strategySumPeriodsOptimized(
  * If the brute-force optimizer recorded a dependent filing age earlier than
  * the earner's, every such pair produces the same NPV as the (matching-earner)
  * pair, so the reported dependent age would be misleading. Bump it forward.
+ *
+ * A dependent recorded in `alreadyFiled` is left alone: their filing month is
+ * a fact the user entered, not a tie-break the optimizer chose, and the
+ * expected-NPV path reports it unchanged. Bumping it here would make the two
+ * surfaces disagree about when that person filed.
  */
 function clampZeroPiaDepStrategy(
   recipients: [Recipient, Recipient],
-  best: [MonthDuration, MonthDuration, number]
+  best: [MonthDuration, MonthDuration, number],
+  alreadyFiled: AlreadyFiled
 ): [MonthDuration, MonthDuration, number] {
   const { earnerIndex, dependentIndex } = classifyEarnerDependent(recipients);
+  if (alreadyFiled[dependentIndex] !== null) return best;
   const dependent = recipients[dependentIndex];
   if (dependent.pia().primaryInsuranceAmount().cents() !== 0) return best;
 
@@ -805,6 +843,10 @@ function clampZeroPiaDepStrategy(
  * @param {MonthDate} currentDate - Today's date.
  * @param {number} discountRate - Rate used for present value calculation. 0
  *                                means no discount.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null. A filed
+ *                                      recipient is searched at that single
+ *                                      age.
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
@@ -812,7 +854,8 @@ export function optimalStrategyCouple(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
-  discountRate: number
+  discountRate: number,
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): [MonthDuration, MonthDuration, number] {
   let bestStrategy: [MonthDuration, MonthDuration, number] = [
     new MonthDuration(0),
@@ -820,8 +863,8 @@ export function optimalStrategyCouple(
     -1,
   ];
 
-  const range0 = filingAgeRange(recipients[0], currentDate);
-  const range1 = filingAgeRange(recipients[1], currentDate);
+  const range0 = filingAgeRange(recipients[0], currentDate, alreadyFiled[0]);
+  const range1 = filingAgeRange(recipients[1], currentDate, alreadyFiled[1]);
   const startFilingDate0: number = range0.earliest.asMonths();
   const startFilingDate1: number = range1.earliest.asMonths();
   const endFilingAge0: number = range0.latest.asMonths();
@@ -847,7 +890,7 @@ export function optimalStrategyCouple(
     }
   }
 
-  return clampZeroPiaDepStrategy(recipients, bestStrategy);
+  return clampZeroPiaDepStrategy(recipients, bestStrategy, alreadyFiled);
 }
 
 /**
@@ -863,6 +906,10 @@ export function optimalStrategyCouple(
  * @param {MonthDate} currentDate - Today's date.
  * @param {number} discountRate - Rate used for present value calculation. 0
  *                                means no discount.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null. A filed
+ *                                      recipient is searched at that single
+ *                                      age.
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
@@ -870,7 +917,8 @@ export function optimalStrategyCoupleOptimized(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
-  discountRate: number
+  discountRate: number,
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): [MonthDuration, MonthDuration, number] {
   let bestStrategy: [MonthDuration, MonthDuration, number] = [
     new MonthDuration(0),
@@ -889,14 +937,10 @@ export function optimalStrategyCoupleOptimized(
     monthlyDiscountRate
   );
 
-  const startFilingDate0: number = earliestFiling(
-    recipients[0],
-    currentDate
-  ).asMonths();
-  const startFilingDate1: number = earliestFiling(
-    recipients[1],
-    currentDate
-  ).asMonths();
+  const range0 = filingAgeRange(recipients[0], currentDate, alreadyFiled[0]);
+  const range1 = filingAgeRange(recipients[1], currentDate, alreadyFiled[1]);
+  const startFilingDate0: number = range0.earliest.asMonths();
+  const startFilingDate1: number = range1.earliest.asMonths();
 
   // Pre-compute final loop bounds to avoid expensive calculations in loops.
   // filingAgeRange, not a literal 70: a recipient past 70 has a single
@@ -906,14 +950,14 @@ export function optimalStrategyCoupleOptimized(
   const endFilingAge0: number = Math.max(
     startFilingDate0,
     Math.min(
-      filingAgeRange(recipients[0], currentDate).latest.asMonths(),
+      range0.latest.asMonths(),
       recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths()
     )
   );
   const endFilingAge1: number = Math.max(
     startFilingDate1,
     Math.min(
-      filingAgeRange(recipients[1], currentDate).latest.asMonths(),
+      range1.latest.asMonths(),
       recipients[1].birthdate.ageAtSsaDate(finalDates[1]).asMonths()
     )
   );
@@ -939,7 +983,7 @@ export function optimalStrategyCoupleOptimized(
     }
   }
 
-  return clampZeroPiaDepStrategy(recipients, bestStrategy);
+  return clampZeroPiaDepStrategy(recipients, bestStrategy, alreadyFiled);
 }
 
 /**
