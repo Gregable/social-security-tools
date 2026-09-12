@@ -12,6 +12,8 @@
  * server-side processing and maintain client-side privacy.
  */
 
+import { MonthDate } from '$lib/month-time';
+
 export type Gender = 'male' | 'female' | 'blended';
 
 /**
@@ -51,6 +53,20 @@ export class UrlParams {
     if (!value) return null;
     const parsed = parseInt(value, 10);
     return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  /**
+   * Parses a `YYYY-MM` month. The format is fixed-width and regular, so a
+   * pattern is an exact parser for it. Anything else yields null.
+   */
+  private static parseMonthOrNull(value: string | null): MonthDate | null {
+    if (!value) return null;
+    const match = value.match(/^(\d{4})-(\d{2})$/);
+    if (!match) return null;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    if (month < 1 || month > 12) return null;
+    return MonthDate.initFromYearsMonths({ years: year, months: month - 1 });
   }
 
   /**
@@ -276,6 +292,19 @@ export class UrlParams {
     return UrlParams.parseGender(this.params.get('gender2'));
   }
 
+  /**
+   * Month recipient (person 1) started benefits, or null when absent or
+   * malformed. Format: YYYY-MM. Example: #filed1=2024-03
+   */
+  getRecipientFiledMonth(): MonthDate | null {
+    return UrlParams.parseMonthOrNull(this.params.get('filed1'));
+  }
+
+  /** Month spouse (person 2) started benefits, or null. Example: #filed2=2025-11 */
+  getSpouseFiledMonth(): MonthDate | null {
+    return UrlParams.parseMonthOrNull(this.params.get('filed2'));
+  }
+
   private static parseGender(value: string | null): Gender {
     if (value === 'male' || value === 'female' || value === 'blended') {
       return value;
@@ -292,29 +321,39 @@ export class UrlParams {
   }
 }
 
+/** Formats a month as `YYYY-MM` for the share URL. */
+export function formatFiledMonth(date: MonthDate): string {
+  return `${date.year()}-${String(date.monthIndex() + 1).padStart(2, '0')}`;
+}
+
 export interface StrategyHashParams {
   isSingle: boolean;
   pia1: number;
   dob1: string;
   name1?: string;
   gender1?: Gender;
+  filed1?: MonthDate | null;
   pia2?: number;
   dob2?: string;
   name2?: string;
   gender2?: Gender;
+  filed2?: MonthDate | null;
 }
 
-// Omits gender params when blended (the default) to keep URLs short.
+// Omits gender params when blended (the default) to keep URLs short. Filed
+// months are couple-only: single mode never offers the input.
 export function buildStrategyHash(p: StrategyHashParams): string {
   const parts: string[] = [`pia1=${Math.round(p.pia1)}`, `dob1=${p.dob1}`];
   if (p.name1) parts.push(`name1=${encodeURIComponent(p.name1)}`);
   if (p.gender1 && p.gender1 !== 'blended') parts.push(`gender1=${p.gender1}`);
 
   if (!p.isSingle && p.pia2 !== undefined && p.dob2) {
+    if (p.filed1) parts.push(`filed1=${formatFiledMonth(p.filed1)}`);
     parts.push(`pia2=${Math.round(p.pia2)}`, `dob2=${p.dob2}`);
     if (p.name2) parts.push(`name2=${encodeURIComponent(p.name2)}`);
     if (p.gender2 && p.gender2 !== 'blended')
       parts.push(`gender2=${p.gender2}`);
+    if (p.filed2) parts.push(`filed2=${formatFiledMonth(p.filed2)}`);
   }
 
   return `#${parts.join('&')}`;

@@ -3,9 +3,16 @@
   import BirthdateInput from "$lib/components/BirthdateInput.svelte";
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
+  import { currentMonthDate } from "$lib/components/recommended-filing-card";
   import { Money } from "$lib/money";
+  import type { MonthDate } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
+  import { isEligibleToHaveFiled } from "$lib/strategy/calculations/already-filed";
   import { onMount } from "svelte";
+  import FiledMonthInput from "./FiledMonthInput.svelte";
+
+  /** Bounds for any four-digit year typed into this form. */
+  const YEAR_INPUT_RANGE = { min: 1900, max: 2100 };
 
   export let recipients: [Recipient, Recipient];
   export let piaValues: [number | null, number | null];
@@ -13,6 +20,11 @@
   export let isSingle: boolean = false;
   export let continueDisabled: boolean = true;
   export let errorMessage: string | null = null;
+  /**
+   * Per recipient, the month benefits actually started, or null. Couple mode
+   * only; the control never renders in single mode.
+   */
+  export let alreadyFiled: [MonthDate | null, MonthDate | null] = [null, null];
 
   export let onUpdate: (() => void) | undefined = undefined;
   export let onValidityChange: ((isValid: boolean) => void) | undefined =
@@ -26,12 +38,21 @@
   let piaValidity: boolean[] = [false, false];
   let piaErrors: string[] = ["", ""];
 
+  const currentDate = currentMonthDate();
+
+  // Per recipient, whether the "already receives benefits" answer is
+  // complete. Reported by FiledMonthInput: false while its box is ticked with
+  // no valid month, which blocks Continue the same way an empty PIA does.
+  let filedValid: [boolean, boolean] = [true, true];
+
   $: isValid = isSingle
     ? birthdateValidity[0] && piaValidity[0]
     : birthdateValidity[0] &&
       birthdateValidity[1] &&
       piaValidity[0] &&
-      piaValidity[1];
+      piaValidity[1] &&
+      filedValid[0] &&
+      filedValid[1];
 
   $: onValidityChange?.(isValid);
 
@@ -46,8 +67,8 @@
       // out-of-range values (e.g. year < 1900), which would otherwise
       // surface as an unhandled exception inside onMount.
       if (
-        year >= 1900 &&
-        year <= 2100 &&
+        year >= YEAR_INPUT_RANGE.min &&
+        year <= YEAR_INPUT_RANGE.max &&
         month >= 1 &&
         month <= 12 &&
         day >= 1 &&
@@ -68,8 +89,23 @@
       birthdateInputs = [...birthdateInputs];
       recipients[index].birthdate = newBirthdate;
       recipients = [...recipients];
+      // A birthdate that makes the person too young to have filed unmounts
+      // their FiledMonthInput, so its last published value and validity must
+      // be reset here; nothing else will. An eligible birthdate change is
+      // handled by the child, which re-validates against its new prop.
+      if (!isEligibleToHaveFiled(newBirthdate, currentDate)) {
+        alreadyFiled[index] = null;
+        alreadyFiled = [...alreadyFiled];
+        filedValid[index] = true;
+        filedValid = [...filedValid];
+      }
       onUpdate?.();
     }
+  }
+
+  function handleFiledValidityChange(index: number, isValid: boolean) {
+    filedValid[index] = isValid;
+    filedValid = [...filedValid];
   }
 
   function handlePiaChange(index: number, value: number | null) {
@@ -173,6 +209,7 @@
   <div class="input-grid" class:single={isSingle}>
     {#each recipients as recipient, i}
       {#if !isSingle || i === 0}
+        {@const birthdate = birthdates[i]}
         <div class="recipient-column">
         {#if !isSingle}
           <div class="input-pair">
@@ -245,6 +282,23 @@
             inputId={`birthdate${i}`}
           />
         </div>
+        <!-- Directly under the birthdate, because the birthdate is what makes
+             it appear: only someone who is at least 62 this month could have
+             filed, so nobody younger ever sees the control. It also comes
+             before PIA so the PIA field can react to the answer. Couple mode
+             only. -->
+        {#if !isSingle && birthdate !== null && isEligibleToHaveFiled(birthdate, currentDate)}
+          <FiledMonthInput
+            {recipient}
+            {birthdate}
+            {currentDate}
+            inputId={`filed${i}`}
+            yearRange={YEAR_INPUT_RANGE}
+            bind:value={alreadyFiled[i]}
+            onchange={() => onUpdate?.()}
+            onvaliditychange={(isValid) => handleFiledValidityChange(i, isValid)}
+          />
+        {/if}
         <div class="input-group">
           <label for="pia{i}">
             <RecipientName r={recipient} apos>Your</RecipientName> Primary Insurance
@@ -267,6 +321,16 @@
           </div>
           {#if piaValues[i] !== null && !piaValidity[i] && piaErrors[i]}
             <span class="error-message">{piaErrors[i]}</span>
+          {/if}
+          {#if alreadyFiled[i] !== null || !filedValid[i]}
+            <!-- Someone already receiving benefits has a reduced or increased
+                 monthly check in hand, and that is the number they are most
+                 likely to type here. Shown as soon as the box is ticked, before
+                 the month is filled in, so it is read before the PIA is. -->
+            <p class="pia-note">
+              Enter the PIA from your Social Security statement, not the
+              monthly amount you receive.
+            </p>
           {/if}
           <a class="pia-helper" href="/calculator" tabindex="-1">
             <span>Don't know your PIA? Start here first</span>
@@ -457,6 +521,12 @@
   .input-group input.pia-input {
     width: 100%;
     padding-left: 1.75rem;
+  }
+  .pia-note {
+    margin: 0.35rem 0 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #444;
   }
   .pia-helper {
     margin-top: 0.45rem;

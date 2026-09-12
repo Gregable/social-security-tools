@@ -8,6 +8,11 @@ import {
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
+import {
+  type AlreadyFiled,
+  NOT_FILED,
+  validateFiledMonth,
+} from './already-filed';
 import { BenefitPeriod, BenefitType } from './benefit-period.js';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import { PersonalBenefitPeriods } from './recipient-personal-benefits.js';
@@ -439,11 +444,36 @@ export class NoFilingAgeAvailableError extends Error {
  * typed-array allocations in the fast paths. (Searches that start from
  * `earliestFilingMonth`, the age-62 month, are not affected — see
  * alternative-strategies.ts and ai-export.ts.)
+ *
+ * `filedAt`, when given, is the month the recipient actually started
+ * benefits. The range is then that single filing age with `hasChoice`
+ * false: there is nothing to search. The month must pass
+ * `validateFiledMonth`; the form enforces that, so a failure here is a
+ * programming error and throws rather than silently searching a nonsense
+ * age.
  */
 export function filingAgeRange(
   recipient: Recipient,
-  currentDate: MonthDate
+  currentDate: MonthDate,
+  filedAt: MonthDate | null = null
 ): FilingAgeRange {
+  if (filedAt !== null) {
+    const problem = validateFiledMonth(
+      recipient.birthdate,
+      filedAt,
+      currentDate
+    );
+    if (problem !== null) {
+      throw new Error(`invalid filed month: ${problem}`);
+    }
+    const filedAge = recipient.birthdate.ageAtSsaDate(filedAt);
+    return {
+      earliest: filedAge,
+      latest: new MonthDuration(filedAge.asMonths()),
+      hasChoice: false,
+    };
+  }
+
   const earliest = earliestFiling(recipient, currentDate);
   const hasChoice = earliest.lessThan(MAX_FILING_AGE);
   return {
@@ -805,6 +835,9 @@ function clampZeroPiaDepStrategy(
  * @param {MonthDate} currentDate - Today's date.
  * @param {number} discountRate - Rate used for present value calculation. 0
  *                                means no discount.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits actually started,
+ *                       or null. A filed recipient is searched at that single
+ *                       age.
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
@@ -812,7 +845,8 @@ export function optimalStrategyCouple(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
-  discountRate: number
+  discountRate: number,
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): [MonthDuration, MonthDuration, number] {
   let bestStrategy: [MonthDuration, MonthDuration, number] = [
     new MonthDuration(0),
@@ -820,8 +854,8 @@ export function optimalStrategyCouple(
     -1,
   ];
 
-  const range0 = filingAgeRange(recipients[0], currentDate);
-  const range1 = filingAgeRange(recipients[1], currentDate);
+  const range0 = filingAgeRange(recipients[0], currentDate, alreadyFiled[0]);
+  const range1 = filingAgeRange(recipients[1], currentDate, alreadyFiled[1]);
   const startFilingDate0: number = range0.earliest.asMonths();
   const startFilingDate1: number = range1.earliest.asMonths();
   const endFilingAge0: number = range0.latest.asMonths();
@@ -863,6 +897,9 @@ export function optimalStrategyCouple(
  * @param {MonthDate} currentDate - Today's date.
  * @param {number} discountRate - Rate used for present value calculation. 0
  *                                means no discount.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits actually started,
+ *                       or null. A filed recipient is searched at that single
+ *                       age.
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
@@ -870,7 +907,8 @@ export function optimalStrategyCoupleOptimized(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
-  discountRate: number
+  discountRate: number,
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): [MonthDuration, MonthDuration, number] {
   let bestStrategy: [MonthDuration, MonthDuration, number] = [
     new MonthDuration(0),
@@ -889,14 +927,10 @@ export function optimalStrategyCoupleOptimized(
     monthlyDiscountRate
   );
 
-  const startFilingDate0: number = earliestFiling(
-    recipients[0],
-    currentDate
-  ).asMonths();
-  const startFilingDate1: number = earliestFiling(
-    recipients[1],
-    currentDate
-  ).asMonths();
+  const range0 = filingAgeRange(recipients[0], currentDate, alreadyFiled[0]);
+  const range1 = filingAgeRange(recipients[1], currentDate, alreadyFiled[1]);
+  const startFilingDate0: number = range0.earliest.asMonths();
+  const startFilingDate1: number = range1.earliest.asMonths();
 
   // Pre-compute final loop bounds to avoid expensive calculations in loops.
   // filingAgeRange, not a literal 70: a recipient past 70 has a single
@@ -906,14 +940,14 @@ export function optimalStrategyCoupleOptimized(
   const endFilingAge0: number = Math.max(
     startFilingDate0,
     Math.min(
-      filingAgeRange(recipients[0], currentDate).latest.asMonths(),
+      range0.latest.asMonths(),
       recipients[0].birthdate.ageAtSsaDate(finalDates[0]).asMonths()
     )
   );
   const endFilingAge1: number = Math.max(
     startFilingDate1,
     Math.min(
-      filingAgeRange(recipients[1], currentDate).latest.asMonths(),
+      range1.latest.asMonths(),
       recipients[1].birthdate.ageAtSsaDate(finalDates[1]).asMonths()
     )
   );

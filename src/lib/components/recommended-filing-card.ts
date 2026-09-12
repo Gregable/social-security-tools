@@ -2,6 +2,10 @@ import type { DeathProbability } from '$lib/life-tables';
 import { getDeathProbabilityDistribution } from '$lib/life-tables';
 import { MonthDate } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
+import {
+  type AlreadyFiled,
+  NOT_FILED,
+} from '$lib/strategy/calculations/already-filed';
 import type {
   CoupleFilingAgeResult,
   FilingAgeResult,
@@ -110,10 +114,11 @@ export function currentMonthDate(now: Date = new Date()): MonthDate {
 /**
  * Whether each recipient still has a filing age to choose, as of `currentDate`.
  *
- * False once a recipient is past 70: delayed retirement credits have stopped,
- * so filing now is their only remaining option and presenting a filing date
- * would imply a decision they no longer have. Index 1 is always true when
- * there is no second recipient, so single-recipient callers can ignore it.
+ * False once a recipient is past 70 (delayed retirement credits have stopped,
+ * so filing now is their only remaining option) or once they have already
+ * filed (`alreadyFiled`), since presenting a filing date to either would
+ * imply a decision they no longer have. Index 1 is always true when there is
+ * no second recipient, so single-recipient callers can ignore it.
  *
  * Shared so the two surfaces that render a recommendation — the strategy page
  * and the calculator's card — cannot disagree about who still has a choice.
@@ -121,11 +126,14 @@ export function currentMonthDate(now: Date = new Date()): MonthDate {
 export function filingChoices(
   recipient: Recipient,
   spouse: Recipient | null,
-  currentDate: MonthDate = currentMonthDate()
+  currentDate: MonthDate = currentMonthDate(),
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): [boolean, boolean] {
   return [
-    filingAgeRange(recipient, currentDate).hasChoice,
-    spouse ? filingAgeRange(spouse, currentDate).hasChoice : true,
+    filingAgeRange(recipient, currentDate, alreadyFiled[0]).hasChoice,
+    spouse
+      ? filingAgeRange(spouse, currentDate, alreadyFiled[1]).hasChoice
+      : true,
   ];
 }
 

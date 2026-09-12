@@ -4,6 +4,10 @@
   import { MonthDurationRange } from "$lib/month-duration-range";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
+  import {
+    type AlreadyFiled,
+    NOT_FILED,
+  } from "$lib/strategy/calculations/already-filed";
   import { strategySumCentsCouple } from "$lib/strategy/calculations/strategy-calc";
 
   export let recipients: [Recipient, Recipient];
@@ -13,6 +17,11 @@
   export let optimalNPV: Money;
   export let optimalFilingAges: [MonthDuration, MonthDuration];
   export let displayAsAges: boolean = false;
+  /**
+   * Per recipient, the month benefits started, or null. A filed recipient's
+   * axis collapses to their actual filing age.
+   */
+  export let alreadyFiled: AlreadyFiled = NOT_FILED;
 
   interface AlternativeResult {
     filingAge1: MonthDuration;
@@ -28,6 +37,26 @@
   let isCalculating: boolean = false;
   const currentDate: MonthDate = MonthDate.initFromNow();
 
+  // One axis collapses to a single filing age when that recipient has already
+  // filed. At the normal cell size a lone row or column is illegible, and the
+  // axis labels, which span the cell tracks, have nowhere to go. That case
+  // gets larger cells, drops the in-grid axis labels (their tracks go to
+  // zero), and says in a note above the grid which axis varies. The two-axis
+  // layout is untouched.
+  const CELL_PX = 8;
+  const COLLAPSED_CELL_PX = 16;
+  const AXIS_LABEL_PX = 20;
+
+  /** Index of the recipient whose axis is a single row or column, if any. */
+  function collapsedAxisOf(
+    range1Length: number,
+    range2Length: number
+  ): 0 | 1 | null {
+    if (range1Length === 1) return 0;
+    if (range2Length === 1) return 1;
+    return null;
+  }
+
   let hoveredRowIndex: number = -1;
   let hoveredColIndex: number = -1;
   let hoveredResult: AlternativeResult | null = null;
@@ -39,8 +68,15 @@
 
   function createFilingAgeRange(
     recipient: Recipient,
-    deathAge: MonthDuration
+    deathAge: MonthDuration,
+    filedAt: MonthDate | null
   ): MonthDurationRange {
+    // Already filed: the only "alternative" is what happened. One instance
+    // serves as both bounds; MonthDurationRange only reads them.
+    if (filedAt !== null) {
+      const filedAge = recipient.birthdate.ageAtSsaDate(filedAt);
+      return new MonthDurationRange(filedAge, filedAge);
+    }
     const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
     const earliestFiling = recipient.birthdate.earliestFilingMonth();
     const startingAge = currentAge.greaterThan(earliestFiling)
@@ -124,8 +160,16 @@
     isCalculating = true;
 
     try {
-      filingAgeRange1 = createFilingAgeRange(recipients[0], deathAge1);
-      filingAgeRange2 = createFilingAgeRange(recipients[1], deathAge2);
+      filingAgeRange1 = createFilingAgeRange(
+        recipients[0],
+        deathAge1,
+        alreadyFiled[0]
+      );
+      filingAgeRange2 = createFilingAgeRange(
+        recipients[1],
+        deathAge2,
+        alreadyFiled[1]
+      );
 
       const finalDates: [MonthDate, MonthDate] = [
         recipients[0].birthdate.dateAtLayAge(deathAge1),
@@ -301,6 +345,9 @@
       : generateDateHeaders(filingAgeRange2Array, recipients[1])}
     {@const range1Length = filingAgeRange1.getLength()}
     {@const range2Length = filingAgeRange2.getLength()}
+    {@const collapsedAxis = collapsedAxisOf(range1Length, range2Length)}
+    {@const cellPx = collapsedAxis === null ? CELL_PX : COLLAPSED_CELL_PX}
+    {@const axisLabelPx = collapsedAxis === null ? AXIS_LABEL_PX : 0}
 
     <div class="info-panel" class:is-pinned={isPinned}>
       <div class="info-panel-header">
@@ -346,10 +393,22 @@
       {/if}
     </div>
 
+    {#if collapsedAxis !== null}
+      {@const filedAt = alreadyFiled[collapsedAxis]}
+      <p class="collapsed-note">
+        <RecipientName r={recipients[collapsedAxis]} apos /> filing date is
+        fixed{filedAt
+          ? ` at ${filedAt.monthFullName()} ${filedAt.year()}`
+          : ""}; each cell varies
+        <RecipientName r={recipients[collapsedAxis === 0 ? 1 : 0]} apos />
+        filing {displayAsAges ? "age" : "date"}.
+      </p>
+    {/if}
+
     <div
       class="grid-wrapper"
-      style:grid-template-columns="20px 25px repeat({range2Length}, 8px)"
-      style:grid-template-rows="20px 20px repeat({range1Length}, 8px)"
+      style:grid-template-columns="{axisLabelPx}px 25px repeat({range2Length}, {cellPx}px)"
+      style:grid-template-rows="{axisLabelPx}px 20px repeat({range1Length}, {cellPx}px)"
       on:mouseleave={handleGridMouseLeave}
       role="grid"
       tabindex="0"
@@ -359,26 +418,30 @@
       <div class="corner-cell" style:grid-column="1" style:grid-row="2"></div>
       <div class="corner-cell" style:grid-column="2" style:grid-row="2"></div>
 
-      <div
-        class="recipient-header recipient-header-column"
-        style:grid-column="3 / {range2Length + 3}"
-        style:grid-row="1"
-      >
-        <RecipientName r={recipients[1]} apos />&nbsp;Filing {displayAsAges
-          ? "Age"
-          : "Date"}
-      </div>
-      <div
-        class="recipient-header recipient-header-row"
-        style:grid-column="1"
-        style:grid-row="3 / {range1Length + 3}"
-      >
-        <span class="recipient-text"
-          ><RecipientName r={recipients[0]} apos /> Filing {displayAsAges
-            ? "Age"
-            : "Date"}</span
+      {#if collapsedAxis === null}
+        <div
+          class="recipient-header recipient-header-column"
+          style:grid-column="3 / {range2Length + 3}"
+          style:grid-row="1"
         >
-      </div>
+          <RecipientName r={recipients[1]} apos />&nbsp;Filing {displayAsAges
+            ? "Age"
+            : "Date"}
+        </div>
+      {/if}
+      {#if collapsedAxis === null}
+        <div
+          class="recipient-header recipient-header-row"
+          style:grid-column="1"
+          style:grid-row="3 / {range1Length + 3}"
+        >
+          <span class="recipient-text"
+            ><RecipientName r={recipients[0]} apos /> Filing {displayAsAges
+              ? "Age"
+              : "Date"}</span
+          >
+        </div>
+      {/if}
 
       {#each yearHeaders2 as yearHeader, headerIndex}
         {@const colOffset = 3}
@@ -664,6 +727,13 @@
     font-weight: bold;
     font-size: 0.8rem;
     color: #333;
+  }
+
+  .collapsed-note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.5;
   }
 
   .recipient-header-row {
