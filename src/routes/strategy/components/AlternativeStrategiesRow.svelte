@@ -9,7 +9,7 @@
     getStrategyColor,
     type YearGroup,
   } from "$lib/strategy/calculations/alternative-strategies";
-  import { NEVER_FILES_LABEL } from "$lib/strategy/ui";
+  import { NEVER_FILES_DETAIL, NEVER_FILES_LABEL } from "$lib/strategy/ui";
 
   export let recipient: Recipient;
   export let deathAge: MonthDuration;
@@ -34,11 +34,15 @@
     return getStrategyColor(percentOfOptimal, isOptimal);
   }
 
-  function formatFilingAge(filingAge: MonthDuration): string {
-    // The last box is the death month itself: the "never files" strategy.
+  // The last box is the death month itself: the "never files" strategy.
+  function neverFiles(filingAge: MonthDuration): boolean {
     const filingDate = recipient.birthdate.dateAtSsaAge(filingAge);
     const deathDate = recipient.birthdate.dateAtLayAge(deathAge);
-    if (!filedBeforeDeath(filingDate, deathDate)) {
+    return !filedBeforeDeath(filingDate, deathDate);
+  }
+
+  function formatFilingAge(filingAge: MonthDuration): string {
+    if (neverFiles(filingAge)) {
       return NEVER_FILES_LABEL;
     }
     return formatFilingAgeDisplay(
@@ -75,16 +79,20 @@
                 <div class="placeholder-text">N/A</div>
               </div>
             {:else}
+              {@const npvText = result.isOptimal
+                ? `Optimal · ${result.npv.wholeDollars()}`
+                : `${formatDelta(result.npv)} vs optimal · ${result.npv.wholeDollars()} (${result.percentOfOptimal.toFixed(1)}%)`}
               <div
                 class="strategy-box"
                 class:optimal={result.isOptimal}
+                class:never-files={neverFiles(result.filingAge)}
                 style="background-color: {getColor(
                   result.percentOfOptimal,
                   result.isOptimal
                 )};"
-                title={result.isOptimal
-                  ? `Optimal · ${result.npv.wholeDollars()}`
-                  : `${formatDelta(result.npv)} vs optimal · ${result.npv.wholeDollars()} (${result.percentOfOptimal.toFixed(1)}%)`}
+                title={neverFiles(result.filingAge)
+                  ? `${NEVER_FILES_DETAIL} · ${npvText}`
+                  : npvText}
               >
                 <div class="filing-label">
                   {formatFilingAge(result.filingAge)}
@@ -219,6 +227,17 @@
     font-weight: bold;
     font-size: 0.72rem;
     margin-bottom: 0.15rem;
+  }
+
+  /* The label is wider than a date; let this one box grow to fit rather
+     than wrap the label onto two lines. */
+  .strategy-box.never-files {
+    width: auto;
+    min-width: 70px;
+  }
+
+  .strategy-box.never-files .filing-label {
+    white-space: nowrap;
   }
 
   .delta-value {
