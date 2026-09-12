@@ -3,10 +3,14 @@ import { guideSlugFromPath } from './guide-slug';
 export type GuideCTAType = 'calculator' | 'sponsor';
 
 /**
- * The CTA each guide shows. The privacy and integrations guides are absent
- * on purpose: they carry no inline CTA at all, because an ad for a third
- * party sits badly on a page promising your data goes nowhere, and on a
- * page recommending planning tools a sponsor pitch has to talk down.
+ * The CTA each guide shows. 'sponsor' means the guide carries the sponsor
+ * card, not that it carries only that: a long guide may run the calculator
+ * card beside the mechanics and the sponsor card beside the decision.
+ *
+ * The privacy and integrations guides are absent on purpose: they carry no
+ * inline CTA at all, because an ad for a third party sits badly on a page
+ * promising your data goes nowhere, and on a page recommending planning
+ * tools a sponsor pitch has to talk down.
  */
 export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   // Calculator: guides where reader can immediately use the calculator

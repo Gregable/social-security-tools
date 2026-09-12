@@ -6,11 +6,11 @@
 
   const sponsorCopy: SponsorCopy = {
     intro:
-      "Whether to claim while you keep working turns on more than the withholding table. You can weigh it with a Social Security specialist at",
+      "Whether to claim while you keep working depends on more than the earnings limits. You can weigh it with a Social Security specialist at",
     outro: "before you settle on a date.",
     bullets: [
-      "They set the months withheld against your tax bracket, your pension, and how long you expect to draw the benefit.",
-      "Claiming early also fixes the survivor benefit your spouse would inherit, which the earnings test itself says nothing about.",
+      "They weigh the months withheld against your tax bracket, your pension, and how long you expect to draw the benefit.",
+      "Your filing date also moves things this test doesn't touch, like Medicare premiums and when your spouse should file.",
       "The first call is free, and you pick the time.",
     ],
   };

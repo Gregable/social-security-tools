@@ -4,7 +4,7 @@ import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
 
-const title ='Extra rules for those born on the 1st or 2nd of the month';
+const title = 'Extra rules for those born on the 1st or 2nd of the month';
 const description =
   'Learn more about how Social Security law is affected by the day of the month one was born in.';
 const publishDate = new Date('2022-06-05T00:00:00+00:00');
