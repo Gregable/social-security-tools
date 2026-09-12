@@ -2,6 +2,18 @@
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
+  import type { SponsorCopy } from "$lib/sponsor";
+
+  const sponsorCopy: SponsorCopy = {
+    intro:
+      "Whether to claim while you keep working turns on more than the withholding table. You can weigh it with a Social Security specialist at",
+    outro: "before you settle on a date.",
+    bullets: [
+      "They set the months withheld against your tax bracket, your pension, and how long you expect to draw the benefit.",
+      "Claiming early also fixes the survivor benefit your spouse would inherit, which the earnings test itself says nothing about.",
+      "The first call is free, and you pick the time.",
+    ],
+  };
 
   const title =
     "Working While Receiving Social Security: The Earnings Test Explained";
@@ -312,6 +324,8 @@
     first year if you retire mid-year, and earnings after your FRA birthday
     month don't count at all.
   </p>
+
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Calculate Your Benefits</h2>
 

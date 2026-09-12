@@ -3,19 +3,8 @@ import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
-import type { SponsorCopy } from '$lib/sponsor';
 
-const sponsorCopy: SponsorCopy = {
-  intro: "Rules that turn on a single day are easy to get wrong. You can check yours with a Social Security specialist at",
-  outro: "before you settle on a filing month.",
-  bullets: [
-    "They confirm the dates that actually apply to your birthday, rather than the ones a form assumes.",
-    "They also cover what this guide doesn't, like taxes, pensions, and health.",
-    "The first call is free, and you pick the time.",
-  ],
-};
-
-const title = 'Extra rules for those born on the 1st or 2nd of the month';
+const title ='Extra rules for those born on the 1st or 2nd of the month';
 const description =
   'Learn more about how Social Security law is affected by the day of the month one was born in.';
 const publishDate = new Date('2022-06-05T00:00:00+00:00');
@@ -142,7 +131,7 @@ schema.tags = [
     </li>
   </ul>
 
-  <InlineCTA type="sponsor" {sponsorCopy} />
+  <InlineCTA type="calculator" />
 
   <h2>Benefit Payment Date</h2>
   In most cases, the date of payment is also based on the day of the month you were
