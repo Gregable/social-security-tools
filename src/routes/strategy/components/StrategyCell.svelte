@@ -7,7 +7,6 @@ import type { CellPosition, StrategyResult } from '$lib/strategy/ui';
 import {
   getFilingAge,
   getFilingDate,
-  getNeverFilesLabel,
   NEVER_FILES_DETAIL,
   NEVER_FILES_LABEL,
 } from '$lib/strategy/ui';
@@ -184,8 +183,12 @@ function getCellContentReactive(
   // Default to a larger size to show full format until actual dimensions are available
   const effectiveCellWidth = cellWidth || 100;
 
+  // One label at every width. Unlike a date, which can be abbreviated
+  // without changing meaning, a different word here would read as a
+  // different outcome. The cell truncates with an ellipsis; the hover
+  // overlay spells it out.
   if (!filesInCell(calculationResult, recipients, recipientIndex)) {
-    return getNeverFilesLabel(effectiveCellWidth);
+    return NEVER_FILES_LABEL;
   }
 
   if (displayAsAges) {

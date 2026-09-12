@@ -6,7 +6,6 @@ import {
   createBorderRemovalFunctions,
   getFilingAge,
   getFilingDate,
-  getNeverFilesLabel,
 } from '$lib/strategy/ui/formatting';
 
 /**
@@ -229,23 +228,6 @@ describe('formatting', () => {
         expect(funcs.left(0, 0)).toBe(false);
         expect(funcs.top(0, 0)).toBe(false);
       });
-    });
-  });
-
-  describe('getNeverFilesLabel', () => {
-    it('uses a dash where a date would not fit', () => {
-      expect(getNeverFilesLabel(30)).toBe('—');
-      expect(getNeverFilesLabel(49)).toBe('—');
-    });
-
-    it('uses a short word in medium cells', () => {
-      expect(getNeverFilesLabel(50)).toBe('None');
-      expect(getNeverFilesLabel(79)).toBe('None');
-    });
-
-    it('spells it out in large cells', () => {
-      expect(getNeverFilesLabel(80)).toBe('Does not file');
-      expect(getNeverFilesLabel(200)).toBe('Does not file');
     });
   });
 });

@@ -153,21 +153,6 @@ export const NEVER_FILES_LABEL = 'Does not file';
 export const NEVER_FILES_DETAIL = 'Dies before filing';
 
 /**
- * Get the "never files" label sized to a matrix cell, mirroring the width
- * breakpoints of getFilingDate so the two read consistently side by side.
- * @param cellWidth The computed width of the cell in pixels
- */
-export function getNeverFilesLabel(cellWidth: number = 0): string {
-  if (cellWidth < 50) {
-    return '—';
-  } else if (cellWidth < 80) {
-    return 'None';
-  } else {
-    return NEVER_FILES_LABEL;
-  }
-}
-
-/**
  * Factory function to create border removal functions
  * @param valueExtractor Function that extracts the value to compare
  * @returns Object with functions for each border direction
