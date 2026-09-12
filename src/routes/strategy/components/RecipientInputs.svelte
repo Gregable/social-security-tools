@@ -5,9 +5,11 @@
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { currentMonthDate } from "$lib/components/recommended-filing-card";
   import { Money } from "$lib/money";
-  import type { MonthDate } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
-  import { isEligibleToHaveFiled } from "$lib/strategy/calculations/already-filed";
+  import {
+    type AlreadyFiledInput,
+    isEligibleToHaveFiled,
+  } from "$lib/strategy/calculations/already-filed";
   import { onMount } from "svelte";
   import FiledMonthInput from "./FiledMonthInput.svelte";
 
@@ -24,7 +26,7 @@
    * Per recipient, the month benefits actually started, or null. Couple mode
    * only; the control never renders in single mode.
    */
-  export let alreadyFiled: [MonthDate | null, MonthDate | null] = [null, null];
+  export let alreadyFiled: AlreadyFiledInput = [null, null];
 
   export let onUpdate: (() => void) | undefined = undefined;
   export let onValidityChange: ((isValid: boolean) => void) | undefined =

@@ -38,16 +38,21 @@
   const currentDate: MonthDate = MonthDate.initFromNow();
 
   // One axis collapses to a single filing age when that recipient has already
-  // filed. At the normal cell size a lone row or column is illegible, and the
-  // axis labels, which span the cell tracks, have nowhere to go. That case
-  // gets larger cells, drops the in-grid axis labels (their tracks go to
-  // zero), and says in a note above the grid which axis varies. The two-axis
-  // layout is untouched.
+  // filed, or is past 70 or dies before 70 (see createFilingAgeRange); this
+  // keys on the range length, not on the reason for it. At the normal cell
+  // size a lone row or column is illegible, and the axis labels, which span
+  // the cell tracks, have nowhere to go. That case gets larger cells, drops
+  // the in-grid axis labels (their tracks go to zero), and says in a note
+  // above the grid which axis varies. The two-axis layout is untouched.
   const CELL_PX = 8;
   const COLLAPSED_CELL_PX = 16;
   const AXIS_LABEL_PX = 20;
 
-  /** Index of the recipient whose axis is a single row or column, if any. */
+  /**
+   * Index of the recipient whose axis is a single row or column, if any.
+   * Only called when at least one axis has more than one entry: no grid is
+   * drawn when neither person has a choice.
+   */
   function collapsedAxisOf(
     range1Length: number,
     range2Length: number
@@ -428,8 +433,6 @@
             ? "Age"
             : "Date"}
         </div>
-      {/if}
-      {#if collapsedAxis === null}
         <div
           class="recipient-header recipient-header-row"
           style:grid-column="1"

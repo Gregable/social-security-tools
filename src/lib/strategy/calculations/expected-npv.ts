@@ -369,9 +369,10 @@ function survivorCentsCalc(
  * is for `recipients[0]`. Validated against the exact version by 1,000
  * golden test cases in `expected-npv-couple-goldens.test.ts`.
  *
- * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits actually started,
- *                       or null; a filed recipient contributes exactly one
- *                       filing age.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null; a filed
+ *                                      recipient contributes exactly one
+ *                                      filing age.
  */
 export function expectedNPVCoupleOptimized(
   recipients: [Recipient, Recipient],
@@ -879,9 +880,10 @@ export function expectedNPVCoupleOptimized(
  *
  * Deaths are assumed independent (standard actuarial assumption).
  *
- * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits actually started,
- *                       or null; a filed recipient contributes exactly one
- *                       filing age.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null; a filed
+ *                                      recipient contributes exactly one
+ *                                      filing age.
  * @returns Array of {filingAges, expectedNPVCents} sorted descending by
  *          expectedNPVCents. The first element is the optimal filing pair.
  */

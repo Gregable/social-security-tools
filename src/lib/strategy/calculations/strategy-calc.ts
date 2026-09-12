@@ -358,11 +358,12 @@ export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
 /**
  * The inclusive span of filing ages an optimizer should search over.
  *
- * `hasChoice` is false once `earliest` has reached 70. Because SSA allows
+ * `hasChoice` is false once `earliest` has reached 70, or when the recipient
+ * has already filed (see `filingAgeRange`'s `filedAt`). Because SSA allows
  * filing up to six months retroactively, `earliest` lags the recipient's
  * current age by six months once they are past full retirement age, so the
- * flip happens at age 70y6m rather than at 70y0m. A recipient aged 70y3m
- * still has a real, if narrow, range to search.
+ * age-based flip happens at age 70y6m rather than at 70y0m. A recipient aged
+ * 70y3m still has a real, if narrow, range to search.
  *
  * Past that point exactly one option remains: file as soon as possible,
  * backdated to `earliest` — the most retroactive month SSA allows — so
@@ -370,9 +371,9 @@ export const MAX_FILING_AGE: MonthDuration = new MonthDuration(
  * Callers presenting results to a user should say so rather than implying a
  * decision was made on the recipient's behalf.
  *
- * Note that `latest` is NOT bounded by `MAX_FILING_AGE`: in exactly that case
- * it exceeds it, which is the whole point of the type. The span is always
- * non-empty (`earliest <= latest`).
+ * Note that `latest` is NOT bounded by `MAX_FILING_AGE`: past 70 it exceeds
+ * it, and for a filed recipient both bounds are the actual filing age,
+ * whatever that is. The span is always non-empty (`earliest <= latest`).
  *
  * Model limitation: the NPV functions count payments from the month after
  * `currentDate`, so the retroactive lump sum SSA pays for a backdated claim
@@ -788,12 +789,19 @@ export function strategySumPeriodsOptimized(
  * If the brute-force optimizer recorded a dependent filing age earlier than
  * the earner's, every such pair produces the same NPV as the (matching-earner)
  * pair, so the reported dependent age would be misleading. Bump it forward.
+ *
+ * A dependent recorded in `alreadyFiled` is left alone: their filing month is
+ * a fact the user entered, not a tie-break the optimizer chose, and the
+ * expected-NPV path reports it unchanged. Bumping it here would make the two
+ * surfaces disagree about when that person filed.
  */
 function clampZeroPiaDepStrategy(
   recipients: [Recipient, Recipient],
-  best: [MonthDuration, MonthDuration, number]
+  best: [MonthDuration, MonthDuration, number],
+  alreadyFiled: AlreadyFiled
 ): [MonthDuration, MonthDuration, number] {
   const { earnerIndex, dependentIndex } = classifyEarnerDependent(recipients);
+  if (alreadyFiled[dependentIndex] !== null) return best;
   const dependent = recipients[dependentIndex];
   if (dependent.pia().primaryInsuranceAmount().cents() !== 0) return best;
 
@@ -835,9 +843,10 @@ function clampZeroPiaDepStrategy(
  * @param {MonthDate} currentDate - Today's date.
  * @param {number} discountRate - Rate used for present value calculation. 0
  *                                means no discount.
- * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits actually started,
- *                       or null. A filed recipient is searched at that single
- *                       age.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null. A filed
+ *                                      recipient is searched at that single
+ *                                      age.
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
@@ -881,7 +890,7 @@ export function optimalStrategyCouple(
     }
   }
 
-  return clampZeroPiaDepStrategy(recipients, bestStrategy);
+  return clampZeroPiaDepStrategy(recipients, bestStrategy, alreadyFiled);
 }
 
 /**
@@ -897,9 +906,10 @@ export function optimalStrategyCouple(
  * @param {MonthDate} currentDate - Today's date.
  * @param {number} discountRate - Rate used for present value calculation. 0
  *                                means no discount.
- * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits actually started,
- *                       or null. A filed recipient is searched at that single
- *                       age.
+ * @param {AlreadyFiled} alreadyFiled - Per recipient, the month benefits
+ *                                      actually started, or null. A filed
+ *                                      recipient is searched at that single
+ *                                      age.
  * @returns {[MonthDuration, MonthDuration]} An array containing the optimal
  *                                           filing ages for each recipient.
  */
@@ -973,7 +983,7 @@ export function optimalStrategyCoupleOptimized(
     }
   }
 
-  return clampZeroPiaDepStrategy(recipients, bestStrategy);
+  return clampZeroPiaDepStrategy(recipients, bestStrategy, alreadyFiled);
 }
 
 /**

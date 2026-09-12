@@ -121,6 +121,17 @@ describe('isEligibleToHaveFiled', () => {
     const first = birthdate(1964, 2, 1);
     expect(isEligibleToHaveFiled(first, monthDate(2026, 2))).toBe(true);
   });
+
+  it('draws the boundary between the 2nd and the 3rd of the month', () => {
+    // SSA treats a birthday on the 1st or 2nd as attained in the previous
+    // month, so the 2nd is eligible in the birthday month and the 3rd is not.
+    expect(
+      isEligibleToHaveFiled(birthdate(1964, 2, 2), monthDate(2026, 2))
+    ).toBe(true);
+    expect(
+      isEligibleToHaveFiled(birthdate(1964, 2, 3), monthDate(2026, 2))
+    ).toBe(false);
+  });
 });
 
 describe('validateFiledMonth', () => {
@@ -143,6 +154,19 @@ describe('validateFiledMonth', () => {
 
   it('rejects next month', () => {
     expect(validateFiledMonth(bd, monthDate(2030, 6), now)).toMatch(/future/);
+  });
+
+  it('accepts the birthday month for the 1st and 2nd but not the 3rd', () => {
+    const birthdayMonth = monthDate(2026, 2);
+    expect(
+      validateFiledMonth(birthdate(1964, 2, 1), birthdayMonth, now)
+    ).toBeNull();
+    expect(
+      validateFiledMonth(birthdate(1964, 2, 2), birthdayMonth, now)
+    ).toBeNull();
+    expect(
+      validateFiledMonth(birthdate(1964, 2, 3), birthdayMonth, now)
+    ).toMatch(/April 2026/);
   });
 });
 
@@ -206,6 +230,13 @@ describe('filingChoices with a filed spouse', () => {
 
   it('defaults to nobody filed', () => {
     expect(filingChoices(a, b, now)).toEqual([true, true]);
+  });
+
+  it('honours the filed month with no spouse', () => {
+    expect(filingChoices(a, null, now, [monthDate(2024, 8), null])).toEqual([
+      false,
+      true,
+    ]);
   });
 });
 
@@ -309,15 +340,241 @@ describe('couple optimizers with a filed spouse', () => {
       ),
       finalDates[1],
     ];
-    const [a, , cents] = optimalStrategyCoupleFast(
+    for (const optimize of [
+      optimalStrategyCouple,
+      optimalStrategyCoupleOptimized,
+      optimalStrategyCoupleFast,
+    ]) {
+      const [a, , cents] = optimize(
+        recipients,
+        early,
+        now,
+        discountRate,
+        alreadyFiled
+      );
+      expect(a.asMonths()).toBe(aliceFiledAge.asMonths());
+      expect(cents).toBeGreaterThan(0);
+    }
+  });
+
+  it('filed exactly in the current month agrees with brute force', () => {
+    const nowAge = alice.birthdate.ageAtSsaDate(now);
+    const want = bruteForcePinned(
       recipients,
-      early,
+      finalDates,
+      now,
+      discountRate,
+      0,
+      nowAge
+    );
+    for (const optimize of [
+      optimalStrategyCouple,
+      optimalStrategyCoupleOptimized,
+      optimalStrategyCoupleFast,
+    ]) {
+      const [a, b, cents] = optimize(
+        recipients,
+        finalDates,
+        now,
+        discountRate,
+        [now, null]
+      );
+      expect(a.asMonths()).toBe(nowAge.asMonths());
+      expect(b.asMonths()).toBe(want[1].asMonths());
+      expect(Math.abs(cents - want[2])).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('both filed reduces to a single strategy sum', () => {
+    const bobFiledAt = monthDate(2025, 5);
+    const bobFiledAge = bob.birthdate.ageAtSsaDate(bobFiledAt);
+    const bothFiled = [filedAt, bobFiledAt] as const;
+    const want = strategySumCentsCouple(
+      recipients,
+      finalDates,
+      now,
+      discountRate,
+      [aliceFiledAge, bobFiledAge]
+    );
+    for (const optimize of [
+      optimalStrategyCouple,
+      optimalStrategyCoupleOptimized,
+      optimalStrategyCoupleFast,
+    ]) {
+      const [a, b, cents] = optimize(
+        recipients,
+        finalDates,
+        now,
+        discountRate,
+        bothFiled
+      );
+      expect(a.asMonths()).toBe(aliceFiledAge.asMonths());
+      expect(b.asMonths()).toBe(bobFiledAge.asMonths());
+      expect(Math.abs(cents - want)).toBeLessThanOrEqual(1);
+    }
+    const results = expectedNPVCoupleOptimized(
+      recipients,
+      now,
+      discountRate,
+      [flatDeathDistribution(66), flatDeathDistribution(63)],
+      bothFiled
+    );
+    expect(results.length).toBe(1);
+    expect(results[0].filingAges[0].asMonths()).toBe(aliceFiledAge.asMonths());
+    expect(results[0].filingAges[1].asMonths()).toBe(bobFiledAge.asMonths());
+  });
+});
+
+describe('a zero-PIA dependent who has already filed', () => {
+  // Alice has no record of her own and filed at 64y3m (September 2024),
+  // before Bob, the earner, has filed. The optimizers normally bump a
+  // zero-PIA dependent's reported age up to the earner's filing month, since
+  // every earlier age scores the same; a recorded month must stay put.
+  const alice = makeRecipient(0, 1960, 5);
+  const bob = makeRecipient(2600, 1963, 2);
+  const recipients: [Recipient, Recipient] = [alice, bob];
+  const now = monthDate(2026, 8);
+  const filedAt = monthDate(2024, 8);
+  const aliceFiledAge = alice.birthdate.ageAtSsaDate(filedAt);
+  const alreadyFiled = [filedAt, null] as const;
+  const finalDates: [MonthDate, MonthDate] = [
+    alice.birthdate.dateAtLayAge(
+      MonthDuration.initFromYearsMonths({ years: 84, months: 6 })
+    ),
+    bob.birthdate.dateAtLayAge(
+      MonthDuration.initFromYearsMonths({ years: 88, months: 6 })
+    ),
+  ];
+  const discountRate = 0.025;
+  const want = bruteForcePinned(
+    recipients,
+    finalDates,
+    now,
+    discountRate,
+    0,
+    aliceFiledAge
+  );
+
+  it.each([
+    ['optimalStrategyCouple', optimalStrategyCouple],
+    ['optimalStrategyCoupleOptimized', optimalStrategyCoupleOptimized],
+    ['optimalStrategyCoupleFast', optimalStrategyCoupleFast],
+  ])('%s reports the recorded filing age', (_name, optimize) => {
+    const [a, b, cents] = optimize(
+      recipients,
+      finalDates,
       now,
       discountRate,
       alreadyFiled
     );
     expect(a.asMonths()).toBe(aliceFiledAge.asMonths());
-    expect(cents).toBeGreaterThan(0);
+    expect(b.asMonths()).toBe(want[1].asMonths());
+    expect(Math.abs(cents - want[2])).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('a spouse who filed past 70', () => {
+  // Carol, born June 1954, filed at 71y0m (June 2025). Delayed credits stop
+  // at 70, so her benefit is the age-70 amount; the optimizers must report
+  // her actual filing age, not 70.
+  const carol = makeRecipient(2000, 1954, 5);
+  const bob = makeRecipient(2600, 1963, 2);
+  const recipients: [Recipient, Recipient] = [carol, bob];
+  const now = monthDate(2026, 8);
+  const age71 = MonthDuration.initFromYearsMonths({ years: 71, months: 0 });
+  const age70 = MonthDuration.initFromYearsMonths({ years: 70, months: 0 });
+  const filedAt = carol.birthdate.dateAtSsaAge(age71);
+  const alreadyFiled = [filedAt, null] as const;
+  const finalDates: [MonthDate, MonthDate] = [
+    carol.birthdate.dateAtLayAge(
+      MonthDuration.initFromYearsMonths({ years: 88, months: 6 })
+    ),
+    bob.birthdate.dateAtLayAge(
+      MonthDuration.initFromYearsMonths({ years: 88, months: 6 })
+    ),
+  ];
+  const discountRate = 0.025;
+
+  it('collapses the filing range to 852 months', () => {
+    const range = filingAgeRange(carol, now, filedAt);
+    expect(range.earliest.asMonths()).toBe(852);
+    expect(range.latest.asMonths()).toBe(852);
+    expect(range.hasChoice).toBe(false);
+  });
+
+  it('every optimizer reports 852 and scores it as filing at 70', () => {
+    const want = bruteForcePinned(
+      recipients,
+      finalDates,
+      now,
+      discountRate,
+      0,
+      age70
+    );
+    for (const optimize of [
+      optimalStrategyCouple,
+      optimalStrategyCoupleOptimized,
+      optimalStrategyCoupleFast,
+    ]) {
+      const [a, b, cents] = optimize(
+        recipients,
+        finalDates,
+        now,
+        discountRate,
+        alreadyFiled
+      );
+      expect(a.asMonths()).toBe(852);
+      expect(b.asMonths()).toBe(want[1].asMonths());
+      expect(Math.abs(cents - want[2])).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('expected NPV reports 852 for every pair', () => {
+    const results = expectedNPVCoupleOptimized(
+      recipients,
+      now,
+      discountRate,
+      [flatDeathDistribution(73), flatDeathDistribution(64)],
+      alreadyFiled
+    );
+    expect(results.length).toBeGreaterThan(0);
+    for (const r of results) {
+      expect(r.filingAges[0].asMonths()).toBe(852);
+    }
+  });
+});
+
+describe('one spouse filed and the other past 70y6m', () => {
+  // Dan, born January 1955, is 71y8m in September 2026 and has not filed;
+  // his range collapses on its own. Alice filed in September 2024.
+  const alice = makeRecipient(2000, 1960, 5);
+  const dan = makeRecipient(2600, 1955, 0);
+  const recipients: [Recipient, Recipient] = [alice, dan];
+  const now = monthDate(2026, 8);
+  const filedAt = monthDate(2024, 8);
+  const alreadyFiled = [filedAt, null] as const;
+
+  it('both ranges collapse and expected NPV has exactly one result', () => {
+    const aliceRange = filingAgeRange(alice, now, filedAt);
+    const danRange = filingAgeRange(dan, now, null);
+    expect(aliceRange.hasChoice).toBe(false);
+    expect(danRange.hasChoice).toBe(false);
+    expect(danRange.earliest.asMonths()).toBe(danRange.latest.asMonths());
+
+    const results = expectedNPVCoupleOptimized(
+      recipients,
+      now,
+      0.025,
+      [flatDeathDistribution(67), flatDeathDistribution(72)],
+      alreadyFiled
+    );
+    expect(results.length).toBe(1);
+    expect(results[0].filingAges[0].asMonths()).toBe(
+      aliceRange.earliest.asMonths()
+    );
+    expect(results[0].filingAges[1].asMonths()).toBe(
+      danRange.earliest.asMonths()
+    );
   });
 });
 
@@ -370,6 +627,38 @@ describe('expected NPV with a filed spouse', () => {
       ])
     );
     for (const r of fast) {
+      const want = slowByKey.get(key(r.filingAges[0], r.filingAges[1]));
+      expect(want).toBeDefined();
+      expect(
+        Math.abs(r.expectedNPVCents - (want as number))
+      ).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('optimized matches the exact reference with the earner pinned', () => {
+    const bobFiledAt = monthDate(2025, 5);
+    const earnerPinned = [null, bobFiledAt] as const;
+    const fast = expectedNPVCoupleOptimized(
+      recipients,
+      now,
+      0.025,
+      dists,
+      earnerPinned
+    );
+    const slow = expectedNPVCouple(recipients, now, 0.025, dists, earnerPinned);
+    expect(fast.length).toBe(slow.length);
+    expect(fast.length).toBeGreaterThan(0);
+    const key = (a: MonthDuration, b: MonthDuration) =>
+      `${a.asMonths()}:${b.asMonths()}`;
+    const slowByKey = new Map(
+      slow.map((r) => [
+        key(r.filingAges[0], r.filingAges[1]),
+        r.expectedNPVCents,
+      ])
+    );
+    const bobFiledAge = bob.birthdate.ageAtSsaDate(bobFiledAt);
+    for (const r of fast) {
+      expect(r.filingAges[1].asMonths()).toBe(bobFiledAge.asMonths());
       const want = slowByKey.get(key(r.filingAges[0], r.filingAges[1]));
       expect(want).toBeDefined();
       expect(

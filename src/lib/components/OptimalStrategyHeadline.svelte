@@ -39,6 +39,10 @@
      * month SSA allows — a month that has already passed, which under a
      * "File in" label reads as a bug rather than as advice.
      *
+     * Also false for a recipient who has already filed. They get the
+     * "Started benefits" card instead, because `alreadyFiled` takes
+     * precedence in the snippet.
+     *
      * Required rather than defaulted: defaulting it to [true, true] would
      * silently reinstate that already-passed date for any caller that forgot
      * to pass it.
@@ -57,7 +61,7 @@
     /**
      * Called when the viewer clicks "Already receiving benefits?" on the
      * card of an eligible recipient who was not marked as filed. When
-     * omitted (the calculator card), no hint is shown.
+     * omitted (the calculator card, and single mode), no hint is shown.
      */
     onAlreadyFiledHint?: () => void;
   }
@@ -118,9 +122,10 @@
 
   /**
    * The filed recipient's own monthly benefit at their actual filing age, in
-   * today's dollars, so it matches every other amount on the page. Null for
-   * a zero-PIA recipient: what they receive is a spousal benefit that this
-   * card does not compute, and "about $0 per month" would read as a bug.
+   * today's dollars, so it matches every other amount on the page. Any
+   * spousal top-up is not included. Null for a zero-PIA recipient: what
+   * they receive is a spousal benefit that this card does not compute, and
+   * "about $0 per month" would read as a bug.
    */
   function filedAmount(index: number, filedAt: MonthDate): string | null {
     const age = recipients[index].birthdate.ageAtSsaDate(filedAt);
@@ -152,7 +157,7 @@
     {@const amount = filedAmount(index, filedAt)}
     <div class="age-sub">
       at age {filedAge(index, filedAt)}{#if amount !== null}, about {amount} per
-        month in today's dollars{/if}
+        month from your own record, in today's dollars{/if}
     </div>
   {:else if isAlreadyPast(index, filingAge)}
     <div class="prefix">File</div>

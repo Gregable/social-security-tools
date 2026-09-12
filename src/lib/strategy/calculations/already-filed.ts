@@ -20,6 +20,13 @@ import type { MonthDate } from '$lib/month-time';
  */
 export type AlreadyFiled = readonly [MonthDate | null, MonthDate | null];
 
+/**
+ * The mutable form-state shape the strategy page binds into its inputs.
+ * Snapshot it into an `AlreadyFiled` before handing it to a calculation, so
+ * results describe one set of inputs even if the form changes mid-run.
+ */
+export type AlreadyFiledInput = [MonthDate | null, MonthDate | null];
+
 /** Nobody has filed. The default for every optimizer entry point. */
 export const NOT_FILED: AlreadyFiled = [null, null];
 

@@ -820,6 +820,26 @@ describe('UrlParams', () => {
       expect(back.getSpouseFiledMonth()).toBeNull();
     });
 
+    it('orders filed1 before pia2 and filed2 last', () => {
+      const hash = buildStrategyHash({
+        isSingle: false,
+        pia1: 2000,
+        dob1: '1960-06-15',
+        pia2: 2600,
+        dob2: '1963-03-15',
+        name2: 'Bob',
+        gender2: 'male',
+        filed1: MonthDate.initFromYearsMonths({ years: 2024, months: 8 }),
+        filed2: MonthDate.initFromYearsMonths({ years: 2025, months: 5 }),
+      });
+      const parts = hash.slice(1).split('&');
+      expect(parts.indexOf('filed1=2024-09')).toBeGreaterThan(-1);
+      expect(parts.indexOf('filed1=2024-09')).toBeLessThan(
+        parts.indexOf('pia2=2600')
+      );
+      expect(parts[parts.length - 1]).toBe('filed2=2025-06');
+    });
+
     it('omits filed params in single mode', () => {
       const hash = buildStrategyHash({
         isSingle: true,

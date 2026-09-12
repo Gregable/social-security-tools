@@ -120,8 +120,8 @@ export function currentMonthDate(now: Date = new Date()): MonthDate {
  * imply a decision they no longer have. Index 1 is always true when there is
  * no second recipient, so single-recipient callers can ignore it.
  *
- * Shared so the two surfaces that render a recommendation — the strategy page
- * and the calculator's card — cannot disagree about who still has a choice.
+ * Shared so the two surfaces that render a recommendation, the strategy page
+ * and the calculator's card, cannot disagree about who still has a choice.
  */
 export function filingChoices(
   recipient: Recipient,

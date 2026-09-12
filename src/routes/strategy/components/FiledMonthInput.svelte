@@ -171,7 +171,7 @@
         />
       </div>
       {#if error}
-        <span class="error-message" id={errorId}>{error}</span>
+        <span class="error-message" id={errorId} role="alert">{error}</span>
       {/if}
     </fieldset>
   {/if}

@@ -25,9 +25,8 @@ export let recipients: [Recipient, Recipient];
 export let displayAsAges: boolean;
 /**
  * Per recipient: false once they are past 70 or have already filed. A
- * recipient with no choice left
- * has the same filing age in every cell, so their grid carries no
- * information and is not drawn at all.
+ * recipient with no choice left has the same filing age in every cell, so
+ * their grid carries no information and is not drawn at all.
  */
 export let hasFilingChoice: [boolean, boolean] = [true, true];
 /** Per recipient, the month benefits started, or null. Changes copy only. */
@@ -154,7 +153,7 @@ function handleHoverCell(detail: CellPosition | null) {
     {#if calculationResults.status() === CalculationStatus.Complete}
       {#if skippedIndex !== undefined}
         <div class="result-content">
-          <p class="past-70-note">
+          <p class="no-choice-note">
             {#if alreadyFiled[skippedIndex] !== null}
               <RecipientName r={recipients[skippedIndex]} /> already receives
               benefits, so there is no grid for them: that filing date is
@@ -197,7 +196,7 @@ function handleHoverCell(detail: CellPosition | null) {
     margin-top: 0.75rem;
   }
 
-  .past-70-note {
+  .no-choice-note {
     margin: 0 0 1rem;
     padding: 0.75rem 1rem;
     background: #f7f8fd;

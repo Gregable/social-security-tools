@@ -10,6 +10,7 @@
   import { Recipient } from "$lib/recipient";
   import {
     type AlreadyFiled,
+    type AlreadyFiledInput,
     isEligibleToHaveFiled,
     NOT_FILED,
   } from "$lib/strategy/calculations/already-filed";
@@ -163,7 +164,7 @@
   // Per recipient, the month benefits actually started, or null. Couple mode
   // only. Kept with the other form inputs rather than on Recipient: the
   // calculator's filing-date stores mean "what if", this means "what happened".
-  let alreadyFiled: [MonthDate | null, MonthDate | null] = [null, null];
+  let alreadyFiled: AlreadyFiledInput = [null, null];
   let discountRatePercent: number = 2.5;
 
   let recipientInputsValid = false;
@@ -317,7 +318,9 @@
           // The form re-validates a restored month only for someone old
           // enough to show the control. A hand-edited link can mark an
           // under-62 person as filed; drop that here so it never reaches the
-          // optimizer, which refuses it.
+          // optimizer, which refuses it. Restore always lands on the form
+          // stage, where FiledMonthInput re-validates the month on mount;
+          // that is what completes validation before any calculation runs.
           const restoredNow = currentMonthDate();
           const restored = [
             params.getRecipientFiledMonth(),
@@ -350,7 +353,8 @@
 
   $: formIsValid = recipientInputsValid && discountRateValid;
 
-  // A recipient with no filing choice left has only one option: file now.
+  // A recipient with no filing choice left, because they are past 70 or have
+  // already filed, has nothing to decide.
   // The headline and the grids need to know so they do not present that as a
   // decision. Assigned inside calculateStrategyMatrix from the same
   // currentDate as the results it describes — deriving it reactively from

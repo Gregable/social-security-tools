@@ -530,7 +530,11 @@ export function optimalStrategyCoupleFast(
   // dependent filing ages below earner's produce identical NPV. The loop's
   // tie-break picks the earliest, which displays a misleading "62y1m". Bump
   // the reported dep age to match the earner's filing whenever needed.
-  if (depZeroPia) {
+  //
+  // Not when the dependent is recorded in `alreadyFiled`: that month is a
+  // fact the user entered, not a tie-break, and expectedNPVCoupleOptimized
+  // reports it unchanged. Bumping it here would make the surfaces disagree.
+  if (depZeroPia && alreadyFiled[dependentIndex] === null) {
     const bestFE = earnerIndex === 0 ? bestF0 : bestF1;
     const earnerFileEpoch = eSsaBirth + bestFE;
     let bestFD = earnerIndex === 0 ? bestF1 : bestF0;

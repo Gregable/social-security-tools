@@ -56,8 +56,8 @@ export class UrlParams {
   }
 
   /**
-   * Parses a `YYYY-MM` month. The format is fixed-width and regular, so a
-   * pattern is an exact parser for it. Anything else yields null.
+   * Parses a `YYYY-MM` month. The pattern captures the fixed-width shape;
+   * the month range is checked separately. Anything else yields null.
    */
   private static parseMonthOrNull(value: string | null): MonthDate | null {
     if (!value) return null;
