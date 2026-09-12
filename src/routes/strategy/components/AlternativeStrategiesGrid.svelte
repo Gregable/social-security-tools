@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { Money } from "$lib/money";
   import { MonthDurationRange } from "$lib/month-duration-range";
@@ -9,6 +10,7 @@
     NOT_FILED,
   } from "$lib/strategy/calculations/already-filed";
   import { strategySumCentsCouple } from "$lib/strategy/calculations/strategy-calc";
+  import { NEVER_FILES_LABEL } from "$lib/strategy/ui";
 
   export let recipients: [Recipient, Recipient];
   export let deathAge1: MonthDuration;
@@ -91,7 +93,14 @@
       years: 70,
       months: 0,
     });
-    const cap = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
+    // Cap by the SSA age at the death date, as the optimizers do, rather than
+    // by the death age itself: for a recipient born on the 1st the two differ
+    // by a month, and the last column must be the death month so that the
+    // "never files" strategy (see filedBeforeDeath) has a cell.
+    const deathAgeSsa = recipient.birthdate.ageAtSsaDate(
+      recipient.birthdate.dateAtLayAge(deathAge)
+    );
+    const cap = maxAge70.lessThan(deathAgeSsa) ? maxAge70 : deathAgeSsa;
     // A recipient already past 70 (or one who dies before reaching it) has a
     // starting age beyond that cap. Collapse the range to that single
     // remaining age rather than letting it invert: MonthDurationRange has no
@@ -323,6 +332,16 @@
     duration: MonthDuration,
     recipientIndex: number = 0
   ): string {
+    // The last row/column is the death month itself. Filing then is the
+    // "never files" strategy, not a filing month: say so.
+    const recipient = recipients[recipientIndex];
+    const filingDate = recipient.birthdate.dateAtSsaAge(duration);
+    const deathDate = recipient.birthdate.dateAtLayAge(
+      recipientIndex === 0 ? deathAge1 : deathAge2
+    );
+    if (!filedBeforeDeath(filingDate, deathDate)) {
+      return NEVER_FILES_LABEL;
+    }
     if (displayAsAges) {
       const years = duration.years();
       const months = duration.modMonths();
@@ -330,8 +349,6 @@
       if (months === 1) return `Age ${years} and 1 month`;
       return `Age ${years} and ${months} months`;
     }
-    const filingDate =
-      recipients[recipientIndex].birthdate.dateAtSsaAge(duration);
     return `${filingDate.monthName()} ${filingDate.year()}`;
   }
 </script>

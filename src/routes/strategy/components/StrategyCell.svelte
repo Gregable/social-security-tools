@@ -1,8 +1,15 @@
 <script lang="ts">
+import { filedBeforeDeath } from '$lib/benefit-calculator';
 import RecipientName from '$lib/components/RecipientName.svelte';
+import type { MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
-import type { CellPosition } from '$lib/strategy/ui';
-import { getFilingAge, getFilingDate } from '$lib/strategy/ui';
+import type { CellPosition, StrategyResult } from '$lib/strategy/ui';
+import {
+  getFilingAge,
+  getFilingDate,
+  NEVER_FILES_DETAIL,
+  NEVER_FILES_LABEL,
+} from '$lib/strategy/ui';
 
 // Props
 export let rowIndex: number;
@@ -28,11 +35,68 @@ export let onselect: ((position: CellPosition) => void) | undefined =
 let cellHoverInfo: {
   x: number;
   y: number;
-  filingDate1: string;
-  filingDate2: string;
-  filingAge1: string;
-  filingAge2: string;
+  filing1: string;
+  filing2: string;
 } | null = null;
+
+/**
+ * The per-recipient half of a couple result. StrategyResult declares the
+ * second recipient's fields optional because the same shape serves single
+ * results; this cell is couple-only, and reading the fields through here
+ * makes a missing half a visible error rather than a property read on
+ * undefined.
+ */
+interface RecipientStrategy {
+  readonly filingAge: MonthDuration;
+  readonly deathAge: MonthDuration;
+}
+
+function recipientStrategy(
+  result: StrategyResult,
+  recipientIndex: number
+): RecipientStrategy {
+  if (recipientIndex === 0) {
+    return { filingAge: result.filingAge1, deathAge: result.bucket1.expectedAge };
+  }
+  if (result.filingAge2 === undefined || result.bucket2 === undefined) {
+    throw new Error('StrategyCell requires a couple result');
+  }
+  return { filingAge: result.filingAge2, deathAge: result.bucket2.expectedAge };
+}
+
+/**
+ * Whether this cell's strategy has the recipient filing before their death
+ * month. The optimizer's search runs up to the death month (or, for a
+ * recipient who dies before they could file, the one age past death that is
+ * left), and a filing then is the "never files" strategy rather than a filing.
+ */
+function filesInCell(
+  result: StrategyResult,
+  recipients: [Recipient, Recipient],
+  recipientIndex: number
+): boolean {
+  const recipient = recipients[recipientIndex];
+  const { filingAge, deathAge } = recipientStrategy(result, recipientIndex);
+  return filedBeforeDeath(
+    recipient.birthdate.dateAtSsaAge(filingAge),
+    recipient.birthdate.dateAtLayAge(deathAge)
+  );
+}
+
+function describeFiling(
+  result: StrategyResult,
+  recipients: [Recipient, Recipient],
+  recipientIndex: number
+): string {
+  if (!filesInCell(result, recipients, recipientIndex)) {
+    return `${NEVER_FILES_LABEL} (${NEVER_FILES_DETAIL.toLowerCase()})`;
+  }
+  const { filingAge } = recipientStrategy(result, recipientIndex);
+  const filingDate = recipients[recipientIndex].birthdate.dateAtSsaAge(
+    filingAge
+  );
+  return `${filingAge.years()}y ${filingAge.modMonths()}m (${filingDate.toString()})`;
+}
 
 // Calculate conditional CSS classes
 $: isHighlightedCell =
@@ -55,26 +119,11 @@ function handleMouseOver(event: MouseEvent) {
   onhover?.({ rowIndex, colIndex });
 
   if (calculationResult) {
-    // Calculate filing dates for both recipients
-    const {
-      filingAge1Years,
-      filingAge1Months,
-      filingAge2Years,
-      filingAge2Months,
-      filingAge1,
-      filingAge2,
-    } = calculationResult;
-
-    const filingDate1 = recipients[0].birthdate.dateAtSsaAge(filingAge1);
-    const filingDate2 = recipients[1].birthdate.dateAtSsaAge(filingAge2);
-
     cellHoverInfo = {
       x: event.clientX,
       y: event.clientY,
-      filingDate1: filingDate1.toString(),
-      filingDate2: filingDate2.toString(),
-      filingAge1: `${filingAge1Years}y ${filingAge1Months}m`,
-      filingAge2: `${filingAge2Years}y ${filingAge2Months}m`,
+      filing1: describeFiling(calculationResult, recipients, 0),
+      filing2: describeFiling(calculationResult, recipients, 1),
     };
   }
 }
@@ -134,6 +183,14 @@ function getCellContentReactive(
   // Default to a larger size to show full format until actual dimensions are available
   const effectiveCellWidth = cellWidth || 100;
 
+  // One label at every width. Unlike a date, which can be abbreviated
+  // without changing meaning, a different word here would read as a
+  // different outcome. The cell truncates with an ellipsis; the hover
+  // overlay spells it out.
+  if (!filesInCell(calculationResult, recipients, recipientIndex)) {
+    return NEVER_FILES_LABEL;
+  }
+
   if (displayAsAges) {
     return getFilingAge(
       filingAgeYears,
@@ -186,11 +243,11 @@ function getCellContentReactive(
     <div class="overlay-content">
       <div class="overlay-section">
         <strong><RecipientName r={recipients[0]} />:</strong>
-        {cellHoverInfo.filingAge1} ({cellHoverInfo.filingDate1})
+        {cellHoverInfo.filing1}
       </div>
       <div class="overlay-section">
         <strong><RecipientName r={recipients[1]} />:</strong>
-        {cellHoverInfo.filingAge2} ({cellHoverInfo.filingDate2})
+        {cellHoverInfo.filing2}
       </div>
       <div class="overlay-footer">Click for full details</div>
     </div>

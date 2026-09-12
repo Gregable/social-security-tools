@@ -1,10 +1,15 @@
 <script lang="ts">
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
   import { BenefitType } from "$lib/strategy/calculations/benefit-period";
   import { strategySumPeriodsCouple } from "$lib/strategy/calculations/strategy-calc";
-  import type { StrategyResult } from "$lib/strategy/ui";
+  import {
+    NEVER_FILES_DETAIL,
+    NEVER_FILES_LABEL,
+    type StrategyResult,
+  } from "$lib/strategy/ui";
 
   // Props
   export let recipients: [Recipient, Recipient];
@@ -35,6 +40,12 @@
     result && expectedAge2
       ? recipients[1].birthdate.dateAtLayAge(expectedAge2)
       : null;
+  // A filing month in or after the death month is the "never files"
+  // strategy, not a filing; name it as such rather than showing a date.
+  $: files1 =
+    filingDate1 && deathDate1 ? filedBeforeDeath(filingDate1, deathDate1) : true;
+  $: files2 =
+    filingDate2 && deathDate2 ? filedBeforeDeath(filingDate2, deathDate2) : true;
 
   // Calculate the benefit periods for the selected strategy
   // Use expectedAge (probability-weighted) so the timeline matches the death
@@ -124,13 +135,37 @@
         <tbody>
           <tr>
             <td class="row-label">Filing Age</td>
-            <td>{result.filingAge1Years}y {result.filingAge1Months}m</td>
-            <td>{result.filingAge2Years}y {result.filingAge2Months}m</td>
+            <td>
+              {#if files1}
+                {result.filingAge1Years}y {result.filingAge1Months}m
+              {:else}
+                {NEVER_FILES_LABEL}
+              {/if}
+            </td>
+            <td>
+              {#if files2}
+                {result.filingAge2Years}y {result.filingAge2Months}m
+              {:else}
+                {NEVER_FILES_LABEL}
+              {/if}
+            </td>
           </tr>
           <tr>
             <td class="row-label">Filing Date</td>
-            <td>{filingDate1?.toString() || "N/A"}</td>
-            <td>{filingDate2?.toString() || "N/A"}</td>
+            <td>
+              {#if files1}
+                {filingDate1?.toString() || "N/A"}
+              {:else}
+                {NEVER_FILES_DETAIL}
+              {/if}
+            </td>
+            <td>
+              {#if files2}
+                {filingDate2?.toString() || "N/A"}
+              {:else}
+                {NEVER_FILES_DETAIL}
+              {/if}
+            </td>
           </tr>
           <tr>
             <td class="row-label">Death Age</td>

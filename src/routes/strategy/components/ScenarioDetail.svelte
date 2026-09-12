@@ -7,9 +7,14 @@
     type AlreadyFiled,
     NOT_FILED,
   } from "$lib/strategy/calculations/already-filed";
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import { BenefitType } from "$lib/strategy/calculations/benefit-period";
   import { strategySumPeriodsCouple } from "$lib/strategy/calculations/strategy-calc";
-  import type { StrategyResult } from "$lib/strategy/ui";
+  import {
+    NEVER_FILES_DETAIL,
+    NEVER_FILES_LABEL,
+    type StrategyResult,
+  } from "$lib/strategy/ui";
   import AlternativeStrategiesGrid from "./AlternativeStrategiesGrid.svelte";
 
   export let recipients: [Recipient, Recipient];
@@ -44,6 +49,10 @@
   $: expectedAge2 = result.bucket2.expectedAge;
   $: deathDate1 = recipients[0].birthdate.dateAtLayAge(expectedAge1);
   $: deathDate2 = recipients[1].birthdate.dateAtLayAge(expectedAge2);
+  // A filing month at or after death is the "never files" strategy, not a
+  // filing; name it as such rather than showing the death month as a date.
+  $: files1 = filedBeforeDeath(filingDate1, deathDate1);
+  $: files2 = filedBeforeDeath(filingDate2, deathDate2);
 
   // Use expectedAge (probability-weighted) so the timeline matches the death
   // dates the optimizer used to compute totalBenefit and choose filingAge1/2.
@@ -133,13 +142,23 @@
       <div class="filing-summary">
         <div class="filing-person">
           <p class="person-name"><RecipientName r={recipients[0]} /></p>
-          <p class="filing-age">{result.filingAge1.toFullAgeString()}</p>
-          <p class="filing-date">{filingDate1.toString()}</p>
+          {#if files1}
+            <p class="filing-age">{result.filingAge1.toFullAgeString()}</p>
+            <p class="filing-date">{filingDate1.toString()}</p>
+          {:else}
+            <p class="filing-age">{NEVER_FILES_LABEL}</p>
+            <p class="filing-date">{NEVER_FILES_DETAIL}</p>
+          {/if}
         </div>
         <div class="filing-person">
           <p class="person-name"><RecipientName r={recipients[1]} /></p>
-          <p class="filing-age">{result.filingAge2.toFullAgeString()}</p>
-          <p class="filing-date">{filingDate2.toString()}</p>
+          {#if files2}
+            <p class="filing-age">{result.filingAge2.toFullAgeString()}</p>
+            <p class="filing-date">{filingDate2.toString()}</p>
+          {:else}
+            <p class="filing-age">{NEVER_FILES_LABEL}</p>
+            <p class="filing-date">{NEVER_FILES_DETAIL}</p>
+          {/if}
         </div>
       </div>
       <div class="npv-card">
