@@ -95,7 +95,7 @@ const faqs: FAQItem[] = [
     Usually not. Social Security's own
     <a href="https://www.ssa.gov/pubs/EN-05-10084.pdf#page=9"
       >survivors booklet</a
-    > puts it plainly on page 9: "Apply for survivors benefits promptly
+    > puts it plainly: "Apply for survivors benefits promptly
     because, for some claims, we'll pay benefits from the time you apply and
     not from the time the worker died." Whether you fall into that group
     depends on two things: your age
