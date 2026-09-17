@@ -248,20 +248,30 @@ const faqs: FAQItem[] = [
   <h2>Your Filing Date Is the Day You First Call</h2>
 
   <p>
-    You cannot apply for survivor benefits online. You apply by phone at
-    1-800-772-1213 or at a local office, and appointments can be weeks out.
-    That delay does not have to cost you months of benefits. When you call
-    and tell Social Security you intend to file for survivor benefits, the
-    representative records a written statement, and that date becomes your
-    filing date as long as you complete the application within six months of
-    the notice they send you.
+    <a href="https://www.ssa.gov/faqs/en/questions/KA-02083.html"
+      >You cannot apply for survivor benefits online</a
+    >. You apply by phone at 1-800-772-1213 or at a local office. Since
+    2025, saying "Survivor" when you call routes you to a dedicated team
+    that can often take the application on the spot; otherwise they
+    schedule an appointment. Either way, the delay does not have to cost
+    you months of benefits. When you tell Social Security you intend to
+    file for survivor benefits, the representative records a written
+    statement, and that date becomes your filing date as long as you
+    complete the application within six months of the notice they send you.
+    This is called a protective filing date, and the rule is in
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0200204010"
+      >POMS GN 00204.010</a
+    >.
   </p>
 
   <p>
     So the practical rule is: call as soon as you can, say that you want to
     file for survivor benefits, and note the date. The paperwork can follow.
-    Reporting the death alone is not enough; funeral homes usually do that,
-    and it does not establish a claim. You have to express an intent to file.
+    Reporting the death alone is not enough;
+    <a href="https://www.ssa.gov/personal-record/when-someone-dies"
+      >funeral homes usually do that</a
+    >, and it does not establish a claim. You have to express an intent to
+    file.
   </p>
 
   <h2>Three Examples</h2>
@@ -314,9 +324,17 @@ const faqs: FAQItem[] = [
   <h2>If You Are Switching Between Your Own Benefit and the Survivor Benefit</h2>
 
   <p>
-    Survivor benefits are not subject to deemed filing, so you can take one
-    benefit first and switch to the other later. Retroactivity interacts with
-    that switch in two directions.
+    Survivor benefits are
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0200204035"
+      >not subject to deemed filing</a
+    >, so you can take one benefit first and switch to the other later. An
+    <a
+      href="https://oig.ssa.gov/news-releases/2026-04-23-report-ssa-needs-to-take-steps-to-ensure-widow-er-s-are-appropriately-paid-and-well-informed-regarding-benefit-options/"
+      >April 2026 inspector general report</a
+    > found that Social Security staff did not consistently tell widows and
+    widowers they could file for the survivor benefit alone and let their
+    own benefit keep growing, so it is worth asking for that option by name.
+    Retroactivity interacts with the switch in two directions.
   </p>
 
   <p>
@@ -330,20 +348,28 @@ const faqs: FAQItem[] = [
 
   <p>
     If you are collecting the survivor benefit and plan to switch to your
-    own benefit at 70, retroactivity is a small bonus. Delayed retirement
-    credits stop at 70, so if you file at 70 and four months, Social Security
-    can backdate your own benefit to the month you turned 70 at no cost. Do
-    not take retroactive months before 70, though: each one gives up
-    two-thirds of a percent in permanent credits.
+    own benefit at 70, retroactivity is a small bonus.
+    <a href="https://www.ecfr.gov/current/title-20/section-404.313"
+      >Delayed retirement credits stop at 70</a
+    >, so if you file at 70 and four months, Social Security can backdate
+    your own benefit to the month you turned 70 at no cost. Do not take
+    retroactive months before 70, though: credits are earned only for months
+    in which you receive no retirement benefit, so each retroactive month
+    gives up two-thirds of a percent for good.
   </p>
 
   <h2>Working and Taxes</h2>
 
   <p>
-    Retroactive months before full retirement age are subject to the
-    <a href="/guides/earnings-test">earnings test</a>. If you were working in
-    those months, some or all of the back pay may be withheld, which can make
-    a retroactive start month worth less than it looks.
+    Retroactive months are subject to the
+    <a href="/guides/earnings-test">earnings test</a> like any other month.
+    One detail catches survivors: the test
+    <a
+      href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html"
+      >uses your full retirement age for retirement benefits</a
+    >, which is a few months later than your survivor full retirement age.
+    So even a widow or widower past survivor full retirement age can have
+    back pay withheld if they were still working in those months.
   </p>
 
   <p>
@@ -351,9 +377,11 @@ const faqs: FAQItem[] = [
     and it counts in the year you receive it, which can push more of your
     benefits into the
     <a href="/guides/federal-taxes">taxable range</a>. Your SSA-1099 breaks
-    out how much of the payment was for each earlier year, and IRS
-    Publication 915 describes a lump-sum election that lets you figure the
-    taxable part as if you had received each year's share in that year.
+    out how much of the payment was for each earlier year, and
+    <a href="https://www.irs.gov/publications/p915">IRS Publication 915</a>
+    describes a lump-sum election that lets you figure the taxable part of
+    the earlier year's share using that year's income, without amending the
+    earlier return. You use it only if it lowers your tax.
   </p>
 
   <h2>The $255 Lump-Sum Death Payment Has a Real Deadline</h2>
@@ -379,9 +407,10 @@ const faqs: FAQItem[] = [
 
   <ol>
     <li>
-      Call 1-800-772-1213 today and say you want to file for survivor
-      benefits. Write down the date. That protects your filing date even if
-      the appointment is weeks away.
+      Call 1-800-772-1213 today, say "Survivor" when prompted, and tell the
+      representative you want to file for survivor benefits. Write down the
+      date. That protects your filing date even if the application itself
+      happens at a later appointment.
     </li>
     <li>
       If your spouse died last month and you are at least 60, say that you
