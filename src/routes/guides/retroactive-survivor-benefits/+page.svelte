@@ -92,10 +92,13 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    Usually not. Social Security's own survivors booklet puts it plainly:
-    "Apply for survivors benefits promptly because, for some claims, we'll
-    pay benefits from the time you apply and not from the time the worker
-    died." Whether you fall into that group depends on two things: your age
+    Usually not. Social Security's own
+    <a href="https://www.ssa.gov/pubs/EN-05-10084.pdf#page=9"
+      >survivors booklet</a
+    > puts it plainly on page 9: "Apply for survivors benefits promptly
+    because, for some claims, we'll pay benefits from the time you apply and
+    not from the time the worker died." Whether you fall into that group
+    depends on two things: your age
     when you apply, and whether your late spouse had claimed their own
     benefit early.
   </p>
@@ -108,6 +111,8 @@ const faqs: FAQItem[] = [
     calculated, see our
     <a href="/guides/survivor-benefits">survivor benefits guide</a>.
   </p>
+
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>The General Rule: Six Months, Never Before Full Retirement Age</h2>
 
@@ -318,8 +323,6 @@ const faqs: FAQItem[] = [
     $11,880. The early claim that lowered Dana's monthly amount is the same
     fact that unlocks her back pay.
   </p>
-
-  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>If You Are Switching Between Your Own Benefit and the Survivor Benefit</h2>
 
