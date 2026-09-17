@@ -48,6 +48,7 @@ import {
 } from '$lib/benefit-calculator';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
+import { type AlreadyFiled, NOT_FILED } from './already-filed';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import {
   calculateMonthlyDiscountRate,
@@ -222,12 +223,16 @@ function survivorCentsCalc(
  * Every return value is a real strategy. A recipient who dies before they
  * could file is searched at their single earliest age, where their personal
  * NPV is zero, rather than emptying the range — see the clamp below.
+ *
+ * A recipient recorded in `alreadyFiled` is searched at their actual filing
+ * age only.
  */
 export function optimalStrategyCoupleFast(
   recipients: [Recipient, Recipient],
   finalDates: [MonthDate, MonthDate],
   currentDate: MonthDate,
-  discountRate: number
+  discountRate: number,
+  alreadyFiled: AlreadyFiled = NOT_FILED
 ): [MonthDuration, MonthDuration, number] {
   // ── Classify earner/dependent ──
   const { earner, dependent, earnerIndex, dependentIndex } =
@@ -283,8 +288,12 @@ export function optimalStrategyCoupleFast(
   // ── Filing ranges ──
   // A recipient with no filing choice left has one option, so their range
   // collapses to a single entry rather than going empty.
-  const eRange = filingAgeRange(earner, currentDate);
-  const dRange = filingAgeRange(dependent, currentDate);
+  const eRange = filingAgeRange(earner, currentDate, alreadyFiled[earnerIndex]);
+  const dRange = filingAgeRange(
+    dependent,
+    currentDate,
+    alreadyFiled[dependentIndex]
+  );
   const eStart = eRange.earliest.asMonths();
   const dStart = dRange.earliest.asMonths();
   // Clamped to the death date, but never below the start: one recipient dying
@@ -521,7 +530,11 @@ export function optimalStrategyCoupleFast(
   // dependent filing ages below earner's produce identical NPV. The loop's
   // tie-break picks the earliest, which displays a misleading "62y1m". Bump
   // the reported dep age to match the earner's filing whenever needed.
-  if (depZeroPia) {
+  //
+  // Not when the dependent is recorded in `alreadyFiled`: that month is a
+  // fact the user entered, not a tie-break, and expectedNPVCoupleOptimized
+  // reports it unchanged. Bumping it here would make the surfaces disagree.
+  if (depZeroPia && alreadyFiled[dependentIndex] === null) {
     const bestFE = earnerIndex === 0 ? bestF0 : bestF1;
     const earnerFileEpoch = eSsaBirth + bestFE;
     let bestFD = earnerIndex === 0 ? bestF1 : bestF0;

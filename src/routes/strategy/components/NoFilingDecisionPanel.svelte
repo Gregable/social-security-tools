@@ -3,37 +3,71 @@
   @name NoFilingDecisionPanel
   @description
     Shown in place of the death-age chart when nobody in the scenario has a
-    filing age left to choose. Past 70 there is no lifespan trade-off left to
-    draw: delayed retirement credits have stopped, so the chart would be a
-    single repeated value.
+    filing age left to choose, either because they are past 70 (delayed
+    retirement credits have stopped, so the chart would be a single repeated
+    value) or because they have already filed (the date is a fact).
 -->
 
 <script lang="ts">
-export let bothPastSeventy: boolean = false;
+/**
+ * Why nobody in the scenario has a filing age left to choose. Each
+ * variant gets copy that names the actual reason.
+ */
+export let variant:
+  | "past-seventy"
+  | "both-past-seventy"
+  | "both-filed"
+  | "filed-and-past-seventy" = "past-seventy";
 </script>
 
 <div class="no-decision-note">
   <h2>There is no filing age left to choose</h2>
-  {#if bothPastSeventy}
+  {#if variant === "both-filed"}
+    <p>
+      These charts normally show how the best filing ages shift with how long
+      each of you lives. You are both already receiving benefits, so those
+      dates are settled and there is nothing left to optimize here. The
+      expected lifetime benefit above is the value of what is still to come.
+    </p>
+  {:else if variant === "filed-and-past-seventy"}
+    <p>
+      These charts normally show how the best filing ages shift with how long
+      each of you lives. One of you already receives benefits, and the other
+      is past 70, where delayed retirement credits stop accruing. Waiting
+      longer no longer raises that monthly amount. It only skips payments that
+      could already be collected.
+    </p>
+    <p>
+      Whoever has not yet filed should file as soon as possible and ask SSA
+      to backdate the claim. Once past full retirement age, SSA can pay up to
+      six months of benefits retroactively.
+    </p>
+  {:else if variant === "both-past-seventy"}
     <p>
       These charts normally show how the best filing ages shift with how long
       each of you lives. You are both past 70, so that trade-off is settled:
       delayed retirement credits stop accruing at 70, so waiting longer no
-      longer raises either monthly amount — it only skips payments you could
+      longer raises either monthly amount. It only skips payments you could
       already be collecting.
+    </p>
+    <p>
+      File as soon as you can, and ask SSA to backdate the claim. Once past
+      full retirement age they can pay up to six months of benefits
+      retroactively.
     </p>
   {:else}
     <p>
       This chart normally shows how the best filing age shifts with how long
       you live. Past 70 that trade-off is settled: delayed retirement credits
       stop accruing at 70, so waiting longer no longer raises the monthly
-      amount — it only skips payments you could already be collecting.
+      amount. It only skips payments you could already be collecting.
+    </p>
+    <p>
+      File as soon as you can, and ask SSA to backdate the claim. Once past
+      full retirement age they can pay up to six months of benefits
+      retroactively.
     </p>
   {/if}
-  <p>
-    File as soon as you can, and ask SSA to backdate the claim. Once past full
-    retirement age they can pay up to six months of benefits retroactively.
-  </p>
 </div>
 
 <style>

@@ -1,7 +1,12 @@
 <script lang="ts">
+import type { ComponentProps } from 'svelte';
 import HowToReadChart from '$lib/components/HowToReadChart.svelte';
 import RecipientName from '$lib/components/RecipientName.svelte';
 import type { Recipient } from '$lib/recipient';
+import {
+  type AlreadyFiled,
+  NOT_FILED,
+} from '$lib/strategy/calculations/already-filed';
 import NoFilingDecisionPanel from './NoFilingDecisionPanel.svelte';
 import type {
   CalculationResults,
@@ -11,15 +16,21 @@ import type {
 import { CalculationStatus } from '$lib/strategy/ui';
 import StrategyMatrix from './StrategyMatrix.svelte';
 
+type NoChoiceVariant = NonNullable<
+  ComponentProps<NoFilingDecisionPanel>['variant']
+>;
+
 // Props
 export let recipients: [Recipient, Recipient];
 export let displayAsAges: boolean;
 /**
- * Per recipient: false once they are past 70. A recipient with no choice left
- * has the same filing age in every cell, so their grid carries no
- * information and is not drawn at all.
+ * Per recipient: false once they are past 70 or have already filed. A
+ * recipient with no choice left has the same filing age in every cell, so
+ * their grid carries no information and is not drawn at all.
  */
 export let hasFilingChoice: [boolean, boolean] = [true, true];
+/** Per recipient, the month benefits started, or null. Changes copy only. */
+export let alreadyFiled: AlreadyFiled = NOT_FILED;
 
 // Callback props for events
 export let onselectcell:
@@ -32,6 +43,18 @@ export let deathProbDistribution2: { age: number; probability: number }[];
 // Only recipients who still have a filing decision get a grid.
 $: gridIndexes = [0, 1].filter((i) => hasFilingChoice[i]);
 $: skippedIndex = [0, 1].find((i) => !hasFilingChoice[i]);
+
+// When nobody has a grid, name the actual reason. A single filed spouse can
+// only reach this state if the other is past 70.
+$: noChoiceVariant = noChoiceVariantFor(
+  alreadyFiled.filter((f) => f !== null).length
+);
+
+function noChoiceVariantFor(filedCount: number): NoChoiceVariant {
+  if (filedCount === 2) return 'both-filed';
+  if (filedCount === 1) return 'filed-and-past-seventy';
+  return 'both-past-seventy';
+}
 
 // Shared state for matrix hovering
 let hoveredCell: CellPosition | null = null;
@@ -48,7 +71,7 @@ function handleHoverCell(detail: CellPosition | null) {
          flash while a calculation is still running. -->
     {#if calculationResults.status() === CalculationStatus.Complete}
       <div class="result-content">
-        <NoFilingDecisionPanel bothPastSeventy={true} />
+        <NoFilingDecisionPanel variant={noChoiceVariant} />
       </div>
     {/if}
   {:else}
@@ -130,11 +153,17 @@ function handleHoverCell(detail: CellPosition | null) {
     {#if calculationResults.status() === CalculationStatus.Complete}
       {#if skippedIndex !== undefined}
         <div class="result-content">
-          <p class="past-70-note">
-            <RecipientName r={recipients[skippedIndex]} /> is past 70, so there
-            is no grid for them: delayed retirement credits have stopped and
-            filing now is their only remaining option. The lifespan trade-off
-            below is <RecipientName
+          <p class="no-choice-note">
+            {#if alreadyFiled[skippedIndex] !== null}
+              <RecipientName r={recipients[skippedIndex]} /> already receives
+              benefits, so there is no grid for them: that filing date is
+              settled.
+            {:else}
+              <RecipientName r={recipients[skippedIndex]} /> is past 70, so
+              there is no grid for them: delayed retirement credits have
+              stopped and filing now is their only remaining option.
+            {/if}
+            The lifespan trade-off below is <RecipientName
               r={recipients[skippedIndex === 0 ? 1 : 0]}
             />'s alone.
           </p>
@@ -167,7 +196,7 @@ function handleHoverCell(detail: CellPosition | null) {
     margin-top: 0.75rem;
   }
 
-  .past-70-note {
+  .no-choice-note {
     margin: 0 0 1rem;
     padding: 0.75rem 1rem;
     background: #f7f8fd;

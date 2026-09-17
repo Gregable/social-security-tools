@@ -3,6 +3,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { MonthDate } from '$lib/month-time';
 import { buildStrategyHash, UrlParams } from '$lib/url-params';
 
 describe('UrlParams', () => {
@@ -766,6 +767,87 @@ describe('UrlParams', () => {
       expect(params.getSpouseDob()).toBe('1962-07-22');
       expect(params.getSpouseName()).toBe('Casey');
       expect(params.getSpouseGender()).toBe('female');
+    });
+  });
+
+  describe('filed month params', () => {
+    it('parses filed1 and filed2 as MonthDate', () => {
+      const params = new UrlParams('#filed1=2024-03&filed2=2025-11');
+      expect(params.getRecipientFiledMonth()?.year()).toBe(2024);
+      expect(params.getRecipientFiledMonth()?.monthIndex()).toBe(2);
+      expect(params.getSpouseFiledMonth()?.year()).toBe(2025);
+      expect(params.getSpouseFiledMonth()?.monthIndex()).toBe(10);
+    });
+
+    it('returns null when absent', () => {
+      const params = new UrlParams('#pia1=3000&dob1=1965-09-21');
+      expect(params.getRecipientFiledMonth()).toBeNull();
+      expect(params.getSpouseFiledMonth()).toBeNull();
+    });
+
+    it('ignores malformed values', () => {
+      for (const bad of [
+        '2024',
+        '2024-13',
+        '2024-00',
+        'March-2024',
+        '24-03',
+        '2024-3',
+      ]) {
+        const params = new UrlParams(`#filed1=${bad}`);
+        expect(params.getRecipientFiledMonth(), bad).toBeNull();
+      }
+    });
+
+    it('round-trips through buildStrategyHash', () => {
+      const hash = buildStrategyHash({
+        isSingle: false,
+        pia1: 2000,
+        dob1: '1960-06-15',
+        pia2: 2600,
+        dob2: '1963-03-15',
+        filed1: MonthDate.initFromYearsMonths({ years: 2024, months: 8 }),
+      });
+      expect(hash).toContain('filed1=2024-09');
+      expect(hash).not.toContain('filed2');
+      const back = new UrlParams(hash);
+      expect(back.getRecipientFiledMonth()?.monthsSinceEpoch()).toBe(
+        MonthDate.initFromYearsMonths({
+          years: 2024,
+          months: 8,
+        }).monthsSinceEpoch()
+      );
+      expect(back.getSpouseFiledMonth()).toBeNull();
+    });
+
+    it('orders filed1 before pia2 and filed2 last', () => {
+      const hash = buildStrategyHash({
+        isSingle: false,
+        pia1: 2000,
+        dob1: '1960-06-15',
+        pia2: 2600,
+        dob2: '1963-03-15',
+        name2: 'Bob',
+        gender2: 'male',
+        filed1: MonthDate.initFromYearsMonths({ years: 2024, months: 8 }),
+        filed2: MonthDate.initFromYearsMonths({ years: 2025, months: 5 }),
+      });
+      const parts = hash.slice(1).split('&');
+      expect(parts.indexOf('filed1=2024-09')).toBeGreaterThan(-1);
+      expect(parts.indexOf('filed1=2024-09')).toBeLessThan(
+        parts.indexOf('pia2=2600')
+      );
+      expect(parts[parts.length - 1]).toBe('filed2=2025-06');
+    });
+
+    it('omits filed params in single mode', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 2000,
+        dob1: '1960-06-15',
+        filed1: MonthDate.initFromYearsMonths({ years: 2024, months: 8 }),
+      });
+      expect(hash).not.toContain('filed1');
     });
   });
 });

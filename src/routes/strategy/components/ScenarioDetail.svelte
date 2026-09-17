@@ -3,6 +3,10 @@
   import RecipientName from "$lib/components/RecipientName.svelte";
   import type { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
+  import {
+    type AlreadyFiled,
+    NOT_FILED,
+  } from "$lib/strategy/calculations/already-filed";
   import { filedBeforeDeath } from "$lib/benefit-calculator";
   import { BenefitType } from "$lib/strategy/calculations/benefit-period";
   import { strategySumPeriodsCouple } from "$lib/strategy/calculations/strategy-calc";
@@ -18,6 +22,8 @@
   export let discountRate: number;
   export let displayAsAges: boolean = false;
   export let onBack: () => void;
+  /** Per recipient, the month benefits started, or null. */
+  export let alreadyFiled: AlreadyFiled = NOT_FILED;
 
   function formatProbability(prob: number | null | undefined): string {
     if (prob === null || prob === undefined) return "";
@@ -239,6 +245,7 @@
       optimalNPV={result.totalBenefit}
       optimalFilingAges={[result.filingAge1, result.filingAge2]}
       {displayAsAges}
+      {alreadyFiled}
     />
   </section>
 </div>
