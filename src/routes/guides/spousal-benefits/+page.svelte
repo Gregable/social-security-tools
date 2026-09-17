@@ -19,7 +19,7 @@ const title =
 const description =
   'Can you get Social Security from your spouse? Learn who qualifies for spousal benefits, how the 50% rule really works, how filing age changes the amount, and whether you can claim if you never worked.';
 const publishDate = new Date('2026-09-09T00:00:00+00:00');
-const updateDate = new Date('2026-09-09T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/spousal-benefits';
@@ -360,7 +360,11 @@ const faqs: FAQItem[] = [
     If you apply after Normal Retirement Age, you can request up to six
     months of retroactive benefits. No retroactive benefits are paid for
     months before Normal Retirement Age, because those months would have
-    carried an early-claiming reduction.
+    carried an early-claiming reduction. Survivor benefits follow a similar
+    rule with a few exceptions; see our guide to
+    <a href="/guides/retroactive-survivor-benefits"
+      >retroactive survivor benefits</a
+    >.
   </p>
 
   <h2>Frequently Asked Questions</h2>

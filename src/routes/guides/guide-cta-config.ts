@@ -46,6 +46,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'government-shutdown': 'sponsor',
   'international-agreements': 'sponsor',
   mortality: 'sponsor',
+  'retroactive-survivor-benefits': 'sponsor',
   'spousal-benefits': 'sponsor',
   'state-taxes': 'sponsor',
   'survivor-benefits': 'sponsor',
