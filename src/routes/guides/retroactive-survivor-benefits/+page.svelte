@@ -54,7 +54,7 @@ const faqs: FAQItem[] = [
   {
     question: 'Does taking survivor back pay lower my monthly benefit?',
     answer:
-      'Not if you are past survivor full retirement age, because survivor benefits stop growing at that age. Below it, Social Security will not pay a retroactive month at all unless doing so leaves your monthly amount unchanged, so the back pay it does offer never costs you anything.',
+      'Not if you are past survivor full retirement age, because survivor benefits stop growing at that age. Below it, the back pay Social Security offers when your benefit is capped by your spouse\'s early claim, or when you are a disabled widow or widower, costs nothing, because your amount is the same either way. The one exception is choosing to start in the month of death: that adds one more month of early-claiming reduction to your ongoing benefit.',
   },
   {
     question: 'Is there a deadline to apply for survivor benefits?',
@@ -209,7 +209,7 @@ const faqs: FAQItem[] = [
     This exception is the one that surprises people, and it can be worth
     several thousand dollars. If your late spouse claimed their own retirement
     benefit before their full retirement age, your survivor benefit is capped
-    at the larger of what they were receiving and 82.5% of their
+    at the larger of roughly what they were receiving and 82.5% of their
     <a href="/guides/pia">primary insurance amount</a>. Social Security calls
     this the retirement insurance benefit limitation, or RIB-LIM.
   </p>
@@ -239,15 +239,15 @@ const faqs: FAQItem[] = [
     The deceased's own retirement benefit stops: no benefit is payable for the
     month of death, even if the person died on the last day of it, and a
     payment that arrives for that month has to be returned. At the same time,
-    the survivor can be entitled for that very month. Survivor benefits do not
-    require you to meet every condition for the whole month, so the month of
-    death is a month you qualify.
+    the survivor can be entitled for that very month. The regulation says a
+    widow or widower who applies the month after the death "can be entitled
+    beginning with the month the insured person died," and the six-month
+    window past full retirement age reaches that month too.
   </p>
 
   <p>
-    That matters for the retroactive window. If you are past survivor full
-    retirement age and apply within six months of the death, your back pay
-    reaches the month of death itself. The same rule means a widow or widower
+    A related rule helps at the other end. Survivor benefits do not require
+    you to meet every condition for the whole month, so a widow or widower
     can be entitled in the month they turn 60, even if the birthday falls on
     the 31st.
   </p>
@@ -371,8 +371,7 @@ const faqs: FAQItem[] = [
     Retroactive months are subject to the
     <a href="/guides/earnings-test">earnings test</a> like any other month.
     One detail catches survivors: the test
-    <a
-      href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html"
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0302501021"
       >uses your full retirement age for retirement benefits</a
     >. For anyone born from 1957 to 1961, that is a few months later than
     their survivor full retirement age, so a widow or widower in that group
