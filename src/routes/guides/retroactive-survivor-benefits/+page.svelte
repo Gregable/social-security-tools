@@ -7,7 +7,7 @@ import type { SponsorCopy } from '$lib/sponsor';
 const sponsorCopy: SponsorCopy = {
   intro:
     'Whether to take the back pay, and in which month to start, is a decision you make once and cannot undo. You can talk it through with a Social Security specialist at',
-  outro: 'before you settle on a start month with Social Security.',
+  outro: 'before you settle on a start month.',
   bullets: [
     'They can tell you whether your survivor benefit is capped by your spouse\'s early claim, which is what decides if back pay costs you anything.',
     'They look at your own retirement benefit alongside the survivor benefit, so a lump sum today does not cost you a larger check later.',
@@ -126,17 +126,19 @@ const faqs: FAQItem[] = [
 
   <p>
     Survivor benefits are reduced for every month you claim before your
-    survivor full retirement age, which runs from 66 to 67 depending on your
-    birth year and is a few months earlier than the
+    survivor full retirement age, which is 66 to 67 for anyone claiming
+    today. It is the same as the
     <a href="/guides/nra">normal retirement age</a>
-    for your own benefit. So the two rules combine into a simple pattern:
+    for your own benefit if you were born in 1962 or later, and a few months
+    earlier if you were born from 1957 to 1961. So the two rules combine
+    into a simple pattern:
   </p>
 
   <table class="rule-table">
     <thead>
       <tr>
-        <th>Your age when you apply</th>
-        <th>Back pay available</th>
+        <th scope="col">Your age when you apply</th>
+        <th scope="col">Back pay available</th>
       </tr>
     </thead>
     <tbody>
@@ -152,7 +154,7 @@ const faqs: FAQItem[] = [
         <td>None, except in the three situations below</td>
       </tr>
       <tr>
-        <td>Disabled widow or widower, age 50 to 59</td>
+        <td>Disabled widow or widower, filing before age 61</td>
         <td>Up to 12 months</td>
       </tr>
     </tbody>
@@ -255,10 +257,12 @@ const faqs: FAQItem[] = [
   <p>
     <a href="https://www.ssa.gov/faqs/en/questions/KA-02083.html"
       >You cannot apply for survivor benefits online</a
-    >. You apply by phone at 1-800-772-1213 or at a local office. Since
-    2025, saying "Survivor" when you call routes you to a dedicated team
-    that can often take the application on the spot; otherwise they
-    schedule an appointment. Either way, the delay does not have to cost
+    >. You apply by phone at 1-800-772-1213 or at a local office.
+    <a href="https://www.ssa.gov/apply?benefits=survivor_adult&age=adult"
+      >Saying "Survivor" when you call</a
+    > routes you to a dedicated team that can often take the application on
+    the spot; otherwise they schedule an appointment. Either way, the delay
+    does not have to cost
     you months of benefits. When you tell Social Security you intend to
     file for survivor benefits, the representative records a written
     statement, and that date becomes your filing date as long as you
@@ -370,9 +374,10 @@ const faqs: FAQItem[] = [
     <a
       href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html"
       >uses your full retirement age for retirement benefits</a
-    >, which is a few months later than your survivor full retirement age.
-    So even a widow or widower past survivor full retirement age can have
-    back pay withheld if they were still working in those months.
+    >. For anyone born from 1957 to 1961, that is a few months later than
+    their survivor full retirement age, so a widow or widower in that group
+    can be past survivor full retirement age and still have back pay
+    withheld if they were working in those months.
   </p>
 
   <p>
@@ -403,7 +408,10 @@ const faqs: FAQItem[] = [
   <p>
     The payment goes to a spouse who was living with the deceased, or
     otherwise to a spouse or child entitled to benefits on the record for the
-    month of death. A surviving divorced spouse cannot receive it.
+    month of death. A surviving divorced spouse
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300210001"
+      >cannot receive it</a
+    >.
   </p>
 
   <h2>What to Do Now</h2>
