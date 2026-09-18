@@ -1,5 +1,10 @@
 <script lang="ts">
-import { MAX_YEAR, MAXIMUM_EARNINGS, SSA_EARNINGS_YEARS } from '$lib/constants';
+import {
+  ALL_MONTHS_FULL,
+  MAX_YEAR,
+  MAXIMUM_EARNINGS,
+  SSA_EARNINGS_YEARS,
+} from '$lib/constants';
 import { Money } from '$lib/money';
 import {
   exampleWorker,
@@ -65,21 +70,11 @@ const lowYear = recomputationExample({
 
 const worker = exampleWorker();
 const fra = worker.normalRetirementAge();
-const monthsFraTo70 = 70 * 12 - fra.asMonths();
-const drcAt70Percent = (worker.delayedRetirementIncrease() / 12) * monthsFraTo70 * 100;
-// Early-claiming reduction: 5/9 of 1% for each of the first 36 months, then
-// 5/12 of 1% for each month beyond that.
-const monthsEarlyAt62 = fra.asMonths() - 62 * 12;
-const reductionAt62Percent =
-  Math.min(36, monthsEarlyAt62) * (5 / 9) +
-  Math.max(0, monthsEarlyAt62 - 36) * (5 / 12);
-
-const raiseIfClaimedAt62 = fullCareer.monthlyIncrease.times(
-  1 - reductionAt62Percent / 100
-);
-const raiseIfClaimedAt70 = fullCareer.monthlyIncrease.times(
-  1 + drcAt70Percent / 100
-);
+const fraDate = worker.normalRetirementDate();
+const fraMonth = ALL_MONTHS_FULL[fraDate.monthIndex()];
+// Delayed credits accrue from full retirement age to 70.
+const drcAt70Percent =
+  (worker.delayedRetirementIncrease() / 12) * (70 * 12 - fra.asMonths()) * 100;
 
 const percent = (value: number): string => `${value.toFixed(1)}%`;
 
@@ -234,8 +229,9 @@ const faqs: FAQItem[] = [
 
   <p>
     Take a worker born in {fullCareer.birthYear}, whose full retirement age
-    is {fra.years()} and {fra.modMonths()} months. They reached it late last
-    year and are working through {fullCareer.extraYear} earning
+    is {fra.years()} and {fra.modMonths()} months. They reached it in
+    {fraMonth}
+    {fraDate.year()} and are working through {fullCareer.extraYear} earning
     {wage.wholeDollars()}. What does that one year do to a monthly
     benefit, for a few different work histories?
   </p>
@@ -257,7 +253,9 @@ const faqs: FAQItem[] = [
         <td>{fullCareer.monthlyIncrease.string()}</td>
       </tr>
       <tr>
-        <td>22 years, rising to {wage.wholeDollars()}</td>
+        <td>
+          {shortCareer.careerYears} years, rising to {wage.wholeDollars()}
+        </td>
         <td>{shortCareer.piaBefore.string()}</td>
         <td>{shortCareer.piaAfter.string()}</td>
         <td>{shortCareer.monthlyIncrease.string()}</td>
@@ -290,16 +288,21 @@ const faqs: FAQItem[] = [
   <p>
     The first row is the common case. The {fullCareer.extraYear} year
     displaces the lowest counted year, which after wage adjustment was worth
-    about {fullCareer.lowestCountedYear.wholeDollars()}. The difference
-    is spread across {SSA_EARNINGS_YEARS} years of months and then run
-    through a formula that keeps only 32 cents of each extra dollar at this
-    income, so the raise is {fullCareer.monthlyIncrease.string()} a month.
-    Real, permanent, and inflation-adjusted from then on, but small.
+    about {fullCareer.displacedYear?.wholeDollars()}. That difference is
+    spread across {SSA_EARNINGS_YEARS} years of months, which raises the
+    average by about {fullCareer.aimeIncrease.string()} a month, and the benefit
+    formula keeps 32 cents of each of those dollars at this income. Every
+    cost-of-living adjustment since the worker turned 62 then applies to the
+    result, which is why the raise reaches
+    {fullCareer.monthlyIncrease.string()} a month rather than the
+    {fullCareer.unadjustedIncrease.string()} the formula alone produces. Real,
+    permanent, and inflation-adjusted from then on, but small.
   </p>
 
   <p>
-    The second row is the case where working late pays best. With 22 years
-    on record, the new year replaces a zero rather than a low year, and the
+    The second row is the case where working late pays best. With
+    {shortCareer.careerYears} years on record, the new year replaces a zero
+    rather than a low year, and the
     raise is {shortCareer.monthlyIncrease.string()} a month. Anyone who
     took years out of the workforce, immigrated mid-career, or spent time
     in work not covered by Social Security is in this position.
@@ -323,12 +326,12 @@ const faqs: FAQItem[] = [
   <p>
     Those figures assume a claim at full retirement age. The same
     {fullCareer.monthlyIncrease.string()} raise in the Primary Insurance
-    Amount would show up as about {raiseIfClaimedAt62.roundToDollar().string()}
-    for this worker if they had claimed at 62 (a
-    {percent(reductionAt62Percent)} reduction), and about
-    {raiseIfClaimedAt70.roundToDollar().string()} if they wait until 70 (a
-    {percent(drcAt70Percent)} increase). The recomputation changes the base;
-    the claiming adjustment does what it always did.
+    Amount reaches the check as
+    {fullCareer.increaseIfClaimedAt62.string()} for this worker if they had
+    claimed at 62, and {fullCareer.increaseIfClaimedAt70.string()} if they
+    wait until 70, where delayed credits have added
+    {percent(drcAt70Percent)}. The recomputation changes the base; the
+    claiming adjustment does what it always did.
   </p>
 
   <h2>When the Raise Arrives</h2>
