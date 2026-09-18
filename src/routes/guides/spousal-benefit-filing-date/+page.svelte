@@ -12,7 +12,7 @@
   const description =
     "Spousal benefits aren't always half of your spouse's benefit. Learn how filing dates affect spousal benefits, why early filing reduces them more than personal benefits, and why delayed credits don't increase spousal benefits.";
   const publishDate = new Date("2023-09-06T00:00:00+00:00");
-  const updateDate = new Date("2023-09-06T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/spousal-benefit-filing-date";
@@ -112,7 +112,10 @@
   <ul>
     <li>Alex has a $1,000/mo Primary Insurance Amount</li>
     <li>Chris has no earnings</li>
-    <li>Alex and Chris both file for benefits at Full Retirement Age</li>
+    <li>
+      Alex and Chris both file for benefits at
+      <a href="https://www.ssa.gov/oact/ProgData/nra.html">Full Retirement Age</a>
+    </li>
   </ul>
 
   <p>In this situation, Chris will receive a spousal benefit of $500/mo.</p>
@@ -162,8 +165,9 @@
       for each additional year filed early
     </li>
     <li>
-      <strong>Spousal benefits:</strong> reduced 8.33% for the first 3 years, 5%
-      for each additional year filed early
+      <strong>Spousal benefits:</strong>
+      <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0410.htm">reduced 8.33% for the first 3 years</a>, 5% for each
+      additional year filed early
     </li>
   </ul>
 
@@ -191,14 +195,16 @@
   </p>
 
   <p>
-    Alex's benefit would be increased by 8% for each year filed late, making the
+    Alex's benefit would be
+    <a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">increased by 8% for each year filed late</a>, making the
     final benefit $1,240/mo.
   </p>
 
   <p>
     However, <strong>Chris's spousal benefit would remain at $500/mo</strong>.
-    Unlike personal benefits, spousal benefits do not increase from delayed
-    retirement credits for filing after Full Retirement Age.
+    Unlike personal benefits, spousal benefits
+    <a href="https://www.ssa.gov/oact/quickcalc/spouse.html">do not increase from delayed retirement credits</a>
+    for filing after Full Retirement Age.
   </p>
 
   <br class="clear" />
@@ -320,14 +326,15 @@
   <p>Is Chris's spousal benefit amount affected by when Alex files?</p>
 
   <p>
-    <strong>No.</strong> The spousal benefit is based on Alex's Primary Insurance
-    Amount, not their actual benefit amount. So, in this scenario, Chris's spousal
+    <strong>No.</strong> The spousal benefit is
+    <a href="https://www.ssa.gov/oact/quickcalc/spouse.html">based on Alex's Primary Insurance Amount</a>, not
+    their actual benefit amount. So, in this scenario, Chris's spousal
     benefit is always based on $1,000/mo (Alex's PIA), regardless of when Alex files.
   </p>
 
   <p>
-    However, Chris cannot file for spousal benefits until Alex has filed for
-    their own benefits. So, in some sense, Alex's filing date does affect
+    However, Chris <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0330.htm">cannot file for spousal benefits until
+    Alex has filed</a> for their own benefits. So, in some sense, Alex's filing date does affect
     Chris's spousal benefit because it determines when Chris can begin receiving
     spousal benefits.
   </p>
@@ -337,7 +344,8 @@
   <p>
     In the case of divorced couples where one is eligible for benefits on an
     ex-spouse's record, the filing date of the primary earner does not affect
-    the spousal benefit amount. If you were married for at least 10 years and
+    the spousal benefit amount. If you were married for
+    <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0331.htm">at least 10 years</a> and
     are now divorced, see our <a href="/guides/divorced-spouse">divorced spouse
     benefits guide</a> for the complete eligibility rules, including how to
     claim even if your ex hasn't filed yet.
@@ -386,6 +394,17 @@
     Use the <a href="/calculator">SSA.tools calculator</a> to explore how different
     filing dates affect spousal benefits for your specific situation.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0330.htm">20 CFR 404.330: Who is entitled to wife's or husband's benefits</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0331.htm">20 CFR 404.331: Who is entitled to wife's or husband's benefits as a divorced spouse</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0410.htm">20 CFR 404.410: How does SSA reduce my benefits when my entitlement begins before full retirement age</a></li>
+    <li><a href="https://www.ssa.gov/oact/quickcalc/spouse.html">Social Security Administration: Benefits for Spouses</a></li>
+    <li><a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">Social Security Administration: Early or delayed retirement</a></li>
+    <li><a href="https://www.ssa.gov/oact/ProgData/nra.html">Social Security Administration: Normal retirement age</a></li>
+  </ul>
 
   <GuideFooter />
 </div>

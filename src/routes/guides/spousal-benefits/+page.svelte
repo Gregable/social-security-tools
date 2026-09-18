@@ -102,14 +102,15 @@ const faqs: FAQItem[] = [
     <h3>The Three Requirements</h3>
     <ol>
       <li>
-        Married at least one year: Your marriage must have lasted at least one
-        continuous year before you apply. There are two exceptions. The
+        Married at least one year: Your marriage must have lasted
+        <a href="https://www.ssa.gov/OP_Home/handbook/handbook.03/handbook-0305.html">at least one continuous year</a> before you apply. There are two exceptions. The
         one-year rule is waived if you are the parent of your spouse's child,
         or if you were entitled to certain Social Security benefits in the
         month before you married.
       </li>
       <li>
-        Age 62 or older: You must be at least 62. There is no age requirement
+        Age 62 or older: You must be <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0330.htm">at least 62</a>.
+        There is no age requirement
         if you are caring for your spouse's child who is under 16 or who has
         a disability that began before 22.
       </li>
@@ -130,7 +131,7 @@ const faqs: FAQItem[] = [
   <h2>How Much You Get</h2>
 
   <p>
-    The full spousal benefit is 50% of your spouse's
+    The full spousal benefit is <a href="https://www.ssa.gov/oact/quickcalc/spouse.html">50%</a> of your spouse's
     <a href="/guides/pia">Primary Insurance Amount (PIA)</a>. The PIA is the
     monthly benefit your spouse would receive at their
     <a href="/guides/nra">Normal Retirement Age</a>, which is 67 for anyone
@@ -173,8 +174,9 @@ const faqs: FAQItem[] = [
 
   <p>
     Most people qualify for a retirement benefit on their own record. In that
-    case Social Security does not pay you both benefits in full. It pays your
-    own benefit first, then adds a spousal top-up only if half of your
+    case Social Security does not pay you both benefits in full. It
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615020">pays your own benefit first</a>, then adds a
+    spousal top-up only if half of your
     spouse's PIA is more than your own PIA.
   </p>
 
@@ -207,8 +209,9 @@ const faqs: FAQItem[] = [
   <p>
     The 50% figure applies only if you claim at your Normal Retirement Age.
     Claiming earlier permanently reduces the spousal benefit. The reduction
-    is 25/36 of 1% for each of the first 36 months before your Normal
-    Retirement Age, and 5/12 of 1% for each month beyond that. That is
+    is <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0410.htm">25/36 of 1%</a> for each of the first 36 months
+    before your Normal Retirement Age, and 5/12 of 1% for each month beyond
+    that. That is
     steeper than the reduction on your own retirement benefit.
   </p>
 
@@ -255,14 +258,16 @@ const faqs: FAQItem[] = [
   <p>
     You cannot claim a spousal benefit now and switch to your own larger
     benefit later. When you file for either benefit, Social Security treats
-    you as filing for both. This rule, called deemed filing, applies to
+    you as filing for both. This rule, called
+    <a href="https://www.ssa.gov/benefits/retirement/planner/claiming.html">deemed filing</a>, applies to
     everyone born on or after January 2, 1954. Earlier birth years could file
     a restricted application for spousal benefits only, but everyone in that
     group is now past 70, so the strategy no longer exists in practice.
   </p>
 
   <p>
-    Deemed filing does not apply if you receive spousal benefits because you
+    Deemed filing <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0623.htm">does not apply</a> if you receive
+    spousal benefits because you
     are caring for a child, or if you receive Social Security disability
     benefits on your own record.
   </p>
@@ -271,8 +276,8 @@ const faqs: FAQItem[] = [
 
   <p>
     If you are under Normal Retirement Age and still working, the
-    <a href="/guides/earnings-test">earnings test</a> applies to spousal
-    benefits the same way it applies to retirement benefits. Earnings above
+    <a href="/guides/earnings-test">earnings test</a>
+    <a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">applies to spousal benefits</a> the same way it applies to retirement benefits. Earnings above
     the annual limit cause some of your benefit to be withheld until you
     reach Normal Retirement Age.
   </p>
@@ -280,7 +285,8 @@ const faqs: FAQItem[] = [
   <p>
     The test also works in the other direction. If the spouse whose record
     you are claiming on is under Normal Retirement Age and earns above the
-    limit, Social Security withholds benefits paid on their record, including
+    limit, Social Security
+    <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0415.htm">withholds benefits paid on their record</a>, including
     yours.
   </p>
 
@@ -315,14 +321,16 @@ const faqs: FAQItem[] = [
   <h3>Same-Sex and Common-Law Marriages</h3>
   <p>
     Social Security recognizes same-sex marriages in every state. Common-law
-    marriages count if they were valid under the law of the state where they
+    marriages count if they were
+    <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0345.htm">valid under the law of the state</a> where they
     were established.
   </p>
 
   <h3>Family Maximum</h3>
   <p>
     Total benefits paid on one worker's record, including spousal and
-    children's benefits, are capped by the family maximum, which is between
+    children's benefits, are capped by the
+    <a href="https://www.ssa.gov/oact/cola/familymax.html">family maximum</a>, which is between
     150% and 188% of the worker's PIA. If children are also collecting, the
     spousal benefit may be reduced to stay under the cap. The worker's own
     benefit is never reduced.
@@ -357,8 +365,8 @@ const faqs: FAQItem[] = [
   </ul>
 
   <p>
-    If you apply after Normal Retirement Age, you can request up to six
-    months of retroactive benefits. No retroactive benefits are paid for
+    If you apply after Normal Retirement Age, you can request
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0200204030">up to six months of retroactive benefits</a>. No retroactive benefits are paid for
     months before Normal Retirement Age, because those months would have
     carried an early-claiming reduction. Survivor benefits follow a similar
     rule with a few exceptions; see our guide to
@@ -385,6 +393,23 @@ const faqs: FAQItem[] = [
     dates that maximizes your expected lifetime benefits, including the
     survivor benefit that depends on the higher earner's choice.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0330.htm">20 CFR 404.330: Who is entitled to wife's or husband's benefits</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0345.htm">20 CFR 404.345: Your relationship as wife, husband, widow, or widower under State law</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0410.htm">20 CFR 404.410: How does SSA reduce my benefits when my entitlement begins before full retirement age</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0415.htm">20 CFR 404.415: Deductions because of excess earnings</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0623.htm">20 CFR 404.623: Am I required to file for all benefits if I am eligible for old-age and husband's or wife's benefits</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/handbook/handbook.03/handbook-0305.html">Social Security Administration: SSA Handbook 305</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615020">SSA POMS RS 00615.020: Dual Entitlement Overview</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0200204030">SSA POMS GN 00204.030: Retroactivity for Title II Benefits</a></li>
+    <li><a href="https://www.ssa.gov/oact/quickcalc/spouse.html">Social Security Administration: Benefits for Spouses</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/claiming.html">Social Security Administration: Filing Rules for Retirement and Spouses Benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">Social Security Administration: Receiving Benefits While Working</a></li>
+    <li><a href="https://www.ssa.gov/oact/cola/familymax.html">Social Security Administration: Family maximum</a></li>
+  </ul>
 
   <GuideFooter />
 </div>

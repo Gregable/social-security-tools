@@ -87,7 +87,10 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
     alt="Earnings table screenshot"
   />
   <p>
-    From this table, Social Security will calculate your AIME or Average Indexed
+    From this table, Social Security will
+    <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+      >calculate your AIME</a
+    > or Average Indexed
     Monthly Earnings. If you have 35 vaules, it's really just the average of all
     of the values in the "Indexed Earnings" column divided by 12 to get from
     annual to monthly. The calculation is a little further down the page:
@@ -108,7 +111,10 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
   </p>
   <p>
     These multipliers are only estimates until a person turns 62. In the year
-    one turns 62, the final multipliers are calculated for all years up to and
+    one turns 62, the
+    <a href="https://www.ssa.gov/oact/cola/awifactors.html"
+      >final multipliers are calculated</a
+    > for all years up to and
     including age 60. All later years, the multiplier will always be 1.0. For
     the years up to and including age 60, the multipler for a given year will be
     the Average Wage Index (AWI) in the year you turned 60 divided by the AWI of
@@ -157,13 +163,17 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
   </table>
   <p>
     We can also see why calculations are made 2-years "late". The AWI for a
-    given year is not known until taxes are filed the following year. So the AWI
+    given year is
+    <a href="https://www.ssa.gov/oact/cola/awidevelop.html"
+      >not known until taxes are filed</a
+    > the following year. So the AWI
     for 2020 won't be known until late in 2021. By the start of 2022, we will
     know the AWI correctly.
   </p>
   <p>
-    Typically multipliers only increase every year, because typically AWI only
-    increases every year, but this is not guaranteed. In fact, you can see the
+    Typically multipliers only increase every year, because typically
+    <a href="https://www.ssa.gov/oact/cola/AWI.html">AWI only increases</a>
+    every year, but this is not guaranteed. In fact, you can see the
     2008 multiplier is slightly lower than the 2009 multiplier (1.31 vs 1.33)
     because of the 2008 recession.
   </p>
@@ -179,13 +189,18 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
   <p>
     The morningstar article suggest that AWI could be 9.1% less than expected
     (or 5.9% less than 2019 depending on what you are comparing it to). This is
-    based on the Social Security Trustees report, so it is probably a good
+    based on the
+    <a href="https://www.ssa.gov/oact/TR/2020/index.html"
+      >Social Security Trustees report</a
+    >, so it is probably a good
     estimate.
   </p>
   <p>
     The number one really cares about is the Primary Insurance Amount (PIA), not
     AIME, since PIA is the number that benefits are based on. However, since the
-    bend points in the PIA formula are also adjusted by AWI, the effect on PIA
+    <a href="https://www.ssa.gov/oact/cola/bendpoints.html"
+      >bend points in the PIA formula</a
+    > are also adjusted by AWI, the effect on PIA
     is also very close to the same as on AIME. The calculator provides no easy
     means for manually modifying bend points to demonstrate easily, but we can
     do so manually for this example.
@@ -214,9 +229,49 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
     Going from $1,977.60 to $1,798.40 is a 9.06% drop, very similar to the 9.1% number
     we started with. In conclusion, a significant drop in AWI in a single year can
     have an similarly outsized effect on the Social Security benefits for those who
-    turn 60 in that year. In the history of the Social Security program, there has
+    turn 60 in that year. In the
+    <a href="https://www.ssa.gov/oact/cola/AWI.html"
+      >history of the Social Security program</a
+    >, there has
     not been such a dramatic drop in AWI from one year to the next like Covid appears
     to have produced, so this has never been much of an issue until now.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html"
+        >Social Security Administration: Indexing Factors for Earnings</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+        >Social Security Administration: Social Security Retirement Benefit
+        Calculation</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/awidevelop.html"
+        >Social Security Administration: Average Wage Index (AWI)</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/AWI.html"
+        >Social Security Administration: National Average Wage Index</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/TR/2020/index.html"
+        >Social Security Administration: The 2020 OASDI Trustees Report</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/bendpoints.html"
+        >Social Security Administration: Benefit Formula Bend Points</a
+      >
+    </li>
+  </ul>
+
   <GuideFooter />
 </div>

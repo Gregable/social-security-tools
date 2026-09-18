@@ -9,7 +9,7 @@ const title = 'How much Social Security will I get if I make $100,000 / year?';
 const description =
   'Understand how your Social Security benefits are calculated if you consistently earn $100,000 per year.';
 const publishDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
-const updateDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/100k-income';
@@ -67,7 +67,10 @@ schema.tags = [
   </p>
   <ul>
     <li>
-      You have 35 years of income at the equivalent value of today's
+      You have
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+        >35 years of income</a
+      > at the equivalent value of today's
       <strong>$100,000</strong> per year.
     </li>
     <li>
@@ -82,9 +85,12 @@ schema.tags = [
   <p>
     Your <strong>Primary Insurance Amount (PIA)</strong> is the benefit you
     would receive if you start collecting Social Security at your
-    <strong>Normal Retirement Age</strong>. It's calculated using a formula that
-    applies "<strong>bend points</strong>" to your AIME. For 2025, the bend
-    points are <strong>$1,226</strong> and <strong>$7,391</strong>.
+    <a href="https://www.ssa.gov/oact/progdata/nra.html"
+      ><strong>Normal Retirement Age</strong></a
+    >. It's calculated using a
+    <a href="https://www.ssa.gov/oact/cola/piaformula.html">formula</a> that
+    applies "<strong>bend points</strong>" to your AIME. For 2025, the
+    <a href="https://www.ssa.gov/oact/COLA/bendpoints.html">bend points</a> are <strong>$1,226</strong> and <strong>$7,391</strong>.
   </p>
   <p>Here's how the calculation works for an AIME of $8,333.33:</p>
   <ul>
@@ -123,14 +129,19 @@ schema.tags = [
       <strong>Starting Early:</strong> If you start benefits before your
       <strong>Normal Retirement Age</strong>
       (as early as age 62), your monthly benefit will be
-      <strong>permanently reduced</strong>.
+      <a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html"
+        ><strong>permanently reduced</strong></a
+      >.
     </li>
     <li>
       <strong>Starting Later:</strong> If you delay starting benefits past your
       <strong>Normal Retirement Age</strong>
       (up to age 70), your monthly benefit will be
       <strong>permanently increased</strong>
-      through <strong>delayed retirement credits</strong>.
+      through
+      <a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html"
+        ><strong>delayed retirement credits</strong></a
+      >.
     </li>
   </ul>
 
@@ -142,6 +153,43 @@ schema.tags = [
       >ssa.tools</a
     >.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+        >Social Security Administration: Social Security Retirement Benefit
+        Calculation</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/piaformula.html"
+        >Social Security Administration: Primary Insurance Amount</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/COLA/bendpoints.html"
+        >Social Security Administration: Benefit Formula Bend Points</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/nra.html"
+        >Social Security Administration: Normal Retirement Age (NRA)</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html"
+        >Social Security Administration: Retirement Age and Benefit
+        Reduction</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html"
+        >Social Security Administration: Delayed Retirement Credits</a
+      >
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>

@@ -8,7 +8,7 @@
   const description =
     "Learn how Delayed Retirement Credits (DRCs) increase your Social Security benefit by 8% per year for each year you wait past Full Retirement Age, up to age 70. Includes breakeven analysis, survivor benefit rules, and COLA interactions.";
   const publishDate = new Date("2026-02-18T00:00:00+00:00");
-  const updateDate = new Date("2026-02-18T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/delayed-retirement-credits";
@@ -83,8 +83,8 @@
   </p>
 
   <p>
-    The rule itself is simple: your benefit grows by 2/3 of 1% for every month
-    you wait, or 8% per year. But there are a few details worth understanding,
+    The rule itself is simple: your benefit grows by
+    <a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">2/3 of 1% for every month you wait, or 8% per year</a>. But there are a few details worth understanding,
     especially around spousal and survivor benefits.
   </p>
 
@@ -100,22 +100,23 @@
 
   <p>
     The credit rate is 2/3 of 1% per month, which equals exactly 8% per year.
-    This rate applies to everyone born in 1943 or later. People born before
+    This rate applies to <a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">everyone born in 1943 or later</a>. People born before
     1943 had lower credit rates of 3% to 7% per year, but that cohort is now
     past age 82 and largely retired.
   </p>
 
   <p>
-    DRCs accumulate from the month after your FRA birthday month until the
-    earlier of: the month you claim benefits, or the month you turn 70.
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615690">DRCs accumulate</a> from the month after your
+    FRA birthday month until the earlier of: the month you claim benefits, or
+    the month you turn 70.
     Claiming after 70 provides no additional increase.
   </p>
 
   <h2>How Much Can DRCs Increase Your Benefit?</h2>
 
   <p>
-    The size of the maximum possible increase depends on your birth year, which
-    determines your FRA. A later FRA means fewer years available to earn DRCs
+    The size of the maximum possible increase depends on
+    <a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">your birth year, which determines your FRA</a>. A later FRA means fewer years available to earn DRCs
     before age 70.
   </p>
 
@@ -177,7 +178,8 @@
   <h2>Month-by-Month Calculation</h2>
 
   <p>
-    Because DRCs are calculated monthly (not annually), delaying even a partial
+    Because DRCs are <a href="https://www.ssa.gov/oact/quickcalc/early_late.html">calculated monthly</a> (not annually),
+    delaying even a partial
     year earns proportional credit.
   </p>
 
@@ -204,8 +206,9 @@
   <p>
     DRCs apply only to your own worker benefit, the retirement benefit
     calculated from your own earnings record. If you collect a spousal benefit
-    based on your spouse's work record, that benefit is capped at 50% of your
-    spouse's PIA no matter how old you are. Your own DRCs have no effect on it.
+    based on your spouse's work record, that benefit is
+    <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">capped at 50% of your spouse's PIA</a> no matter
+    how old you are. Your own DRCs have no effect on it.
     Disability benefits are similar: SSDI converts to a retirement benefit at
     FRA, and there is no option to delay SSDI to earn DRCs.
   </p>
@@ -220,7 +223,8 @@
 
   <p>
     There's a second reason to delay that many people miss: survivor benefits.
-    When you die, your surviving spouse can receive up to 100% of what you were
+    When you die, your surviving spouse can receive
+    <a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">up to 100%</a> of what you were
     actually receiving, including the delayed credits.
   </p>
 
@@ -288,7 +292,8 @@
   </p>
 
   <p>
-    This is because SSA applies DRCs earned in a given year on a January basis.
+    This is because SSA
+    <a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">applies DRCs earned in a given year on a January basis</a>.
     The practical effect is a small initial underpayment followed by a corrected
     higher amount in January. See our detailed guide on the
     <a href="/guides/delayed-january-bump">delayed January bump</a> for the
@@ -336,6 +341,17 @@
       <a href="/guides/inflation">COLA and Inflation</a>: how your enhanced
       benefit grows over time
     </li>
+  </ul>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">Social Security Administration: Delayed Retirement Credits</a></li>
+    <li><a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">Social Security Administration: Early or Delayed Retirement</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615690">SSA POMS RS 00615.690: Delayed Retirement Credits</a></li>
+    <li><a href="https://www.ssa.gov/oact/quickcalc/early_late.html">Social Security Administration: Early or Late Retirement</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">Social Security Administration: Family Benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">Social Security Administration: What You Could Get from Survivor Benefits</a></li>
   </ul>
 
   <GuideFooter />

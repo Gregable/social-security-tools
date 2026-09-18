@@ -19,7 +19,7 @@ const title = 'Mortality Tables and Health Adjustments';
 const description =
   'How SSA cohort life tables are used, how q(x) death probabilities are derived, gender blending, and how the health multiplier adjusts mortality.';
 const publishDate = new Date('2025-08-08T00:00:00+00:00');
-const updateDate = publishDate; // Update when content changes
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/mortality';
@@ -58,7 +58,9 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
   <h2>Data Sources</h2>
   <p>
     The default mortality inputs come from the U.S. Social Security
-    Administration (SSA) cohort life tables (Alternative 2 / Best Estimate).
+    Administration (SSA) cohort life tables (Alternative 2 / Best Estimate,
+    from the
+    <a href="https://www.ssa.gov/oact/TR/2026/index.html">Trustees Report</a>).
     Source: <a
       href="https://www.ssa.gov/OACT/Downloadables/CY/index.html"
       target="_blank"
@@ -69,12 +71,18 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
   <h3>Cohort vs. Period Life Tables</h3>
   <ul>
     <li>
-      <strong>Period tables</strong> apply one year’s observed mortality rates to
-      all future ages for a hypothetical person; they freeze longevity improvement.
+      <strong>Period tables</strong> apply
+      <a href="https://www.ssa.gov/oact/STATS/table4c6.html"
+        >one year’s observed mortality rates</a
+      > to all future ages for a hypothetical person; they freeze longevity
+      improvement.
     </li>
     <li>
-      <strong>Cohort (generation) tables</strong> follow an actual birth cohort across
-      time, blending historical experience with projected future mortality improvement.
+      <strong>Cohort (generation) tables</strong>
+      <a href="https://www.ssa.gov/oact/NOTES/as120/LifeTables_Body.html"
+        >follow an actual birth cohort across time</a
+      >, blending historical experience with projected future mortality
+      improvement.
     </li>
   </ul>
   <p>
@@ -85,8 +93,11 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
 
   <h2>Using the SSA Cohort Tables</h2>
   <p>
-    The tables provide <code>q(x)</code>: the probability that someone alive at
-    exact age <code>x</code> dies before reaching age <code>x+1</code>. For each
+    The tables provide <code>q(x)</code>: the
+    <a href="https://www.ssa.gov/oact/STATS/table4c6.html"
+      >probability that someone alive at exact age <code>x</code> dies before
+      reaching age <code>x+1</code></a
+    >. For each
     recipient we load the cohort file for their birth year and extract the
     sequence of <code>q(x)</code> values beginning at their current age.
   </p>
@@ -289,6 +300,22 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
         rel="noopener"
         >SSA Office of the Chief Actuary: Cohort Life Tables (Alt 2)</a
       >.
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/STATS/table4c6.html"
+        >Social Security Administration: Actuarial Life Table</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/NOTES/as120/LifeTables_Body.html"
+        >Social Security Administration: Life Tables (Actuarial Study No.
+        120)</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/TR/2026/index.html"
+        >Social Security Administration: The 2026 OASDI Trustees Report</a
+      >
     </li>
   </ul>
 

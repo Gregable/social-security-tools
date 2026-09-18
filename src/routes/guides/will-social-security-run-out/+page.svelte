@@ -8,7 +8,7 @@ const sponsorCopy: SponsorCopy = {
   intro: "Nobody can tell you what Congress will do, but you can plan around the range. You can do that with a Social Security specialist at",
   outro: "rather than planning around headlines.",
   bullets: [
-    "They can show what a 26% reduction would do to your own benefit, and what it would take to absorb it.",
+    "They can show what a 17% reduction would do to your own benefit, and what it would take to absorb it.",
     "Claiming early to get ahead of a cut carries its own permanent reduction, and the two are worth comparing directly.",
     "The first call is free, and you pick the time.",
   ],
@@ -18,7 +18,7 @@ const title = 'Will Social Security Run Out of Money?';
 const description =
   "Social Security's trust fund is projected to be depleted by 2034, but benefits won't disappear. Learn what happens when the fund runs out, how much benefits might be reduced, and what Congress could do to fix it.";
 const publishDate = new Date('2023-08-11T00:00:00+00:00');
-const updateDate = new Date('2023-08-11T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/will-social-security-run-out';
@@ -42,12 +42,12 @@ const faqs: FAQItem[] = [
   {
     question: 'Will Social Security run out of money?',
     answer:
-      "The Social Security trust fund is projected to be depleted by 2034, but Social Security will not disappear. Even after the trust fund runs out, payroll taxes will continue to fund about 74% of scheduled benefits. Benefits would only stop entirely if Congress eliminated the payroll tax.",
+      "The Social Security trust fund is projected to be depleted by 2034, but Social Security will not disappear. Even after the trust fund runs out, payroll taxes will continue to fund about 83% of scheduled benefits. Benefits would only stop entirely if Congress eliminated the payroll tax.",
   },
   {
     question: 'What happens when the Social Security trust fund runs out?',
     answer:
-      "Once the trust fund surplus runs out, Social Security will only be able to pay benefits from current payroll tax collections. This would cover approximately 74% of scheduled benefits. Without Congressional action, benefits could be reduced by about 26%.",
+      "Once the trust fund surplus runs out, Social Security will only be able to pay benefits from current payroll tax collections. This would cover approximately 83% of scheduled benefits. Without Congressional action, benefits could be reduced by about 17%.",
   },
   {
     question: 'Will Social Security be there when I retire?',
@@ -79,8 +79,8 @@ const faqs: FAQItem[] = [
     <h3>The Short Answer</h3>
     <ul>
       <li><strong>Social Security will not disappear</strong> — even if the trust fund is depleted, payroll taxes will continue funding benefits</li>
-      <li><strong>Current projection: 2034</strong> — the trust fund surplus is expected to run out</li>
-      <li><strong>Worst case: 26% reduction</strong> — if nothing changes, benefits could be reduced by about 26%</li>
+      <li><strong>Current projection: 2034</strong> — the trust fund surplus is <a href="https://www.ssa.gov/oact/TRSUM/index.html">expected to run out</a></li>
+      <li><strong>Worst case: 17% reduction</strong> — if nothing changes, benefits could be <a href="https://www.ssa.gov/oact/TRSUM/index.html">reduced by about 17%</a></li>
       <li><strong>Congress has options</strong> — multiple legislative solutions exist to prevent or minimize cuts</li>
     </ul>
   </div>
@@ -91,24 +91,27 @@ const faqs: FAQItem[] = [
     This is technically true, but only part of the story. Social Security is
     both paying out money to retirees and also collecting money from workers at
     the same time. Over its 80-year history, the program has collected more
-    money than it has paid out. The current surplus is $3 trillion. However, in
-    recent years the program is paying out more than it is collecting, and so
-    the fund is shrinking. Current estimates are that the fund will run out in
-    2034.
+    money than it has paid out. The
+    <a href="https://www.ssa.gov/oact/progdata/assets.html"
+      >current surplus is $3 trillion</a
+    >. However, in recent years the program is paying out more than it is
+    collecting, and so the fund is shrinking. Current estimates are that the
+    fund will run out in 2034.
   </p>
 
   <h2>What Happens When the Trust Fund Is Depleted?</h2>
   <p>
     Once the surplus runs out, the program will still be collecting money, and
-    those collections will cover all but 26% of the current payments. So, if
-    nothing changes by 2034, the calculated benefit may be reduced by 26%,
-    but the payments will still continue. This is probably the "worst case"
-    scenario.
+    those collections will cover
+    <a href="https://www.ssa.gov/oact/TRSUM/index.html"
+      >all but 17% of the current payments</a
+    >. So, if nothing changes by 2034, the calculated benefit may be reduced by
+    17%, but the payments will still continue. This is probably the "worst
+    case" scenario.
   </p>
   <p>
-    More information: <a
-      href="https://www.ssa.gov/policy/docs/ssb/v70n3/v70n3p111.html"
-      >The Future Financial Status of the Social Security Program</a
+    More information: <a href="https://www.ssa.gov/oact/TRSUM/index.html"
+      >Trustees Report Summary</a
     >
   </p>
 
@@ -170,6 +173,34 @@ const faqs: FAQItem[] = [
     <li>
       <a href="/guides/maximum">Maximum Benefit</a> — The highest monthly benefit
       you could receive today
+    </li>
+  </ul>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/oact/TRSUM/index.html"
+        >Social Security Administration: Trustees Report Summary</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/assets.html"
+        >Social Security Administration: Social Security Income, Cost, and
+        Asset Reserves</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/history/1983amend.html"
+        >Social Security Administration: Social Security History, the 1983
+        Amendments</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/solvency/provisions/index.html"
+        >Social Security Administration: Individual Changes Modifying Social
+        Security</a
+      >
     </li>
   </ul>
 

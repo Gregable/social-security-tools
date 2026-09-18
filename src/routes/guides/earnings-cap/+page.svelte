@@ -11,7 +11,7 @@ const title = 'Social Security Earnings Cap: How Much Counts Toward Benefits?';
 const description =
   `The Social Security earnings cap limits how much of your income is taxed and counted toward benefits. In ${currentYear}, the cap is ${currentYearCap.wholeDollars()}. See the complete history of earnings caps since 1937.`;
 const publishDate = new Date('2020-11-28T00:00:00+00:00');
-const updateDate = new Date('2024-02-26T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/earnings-cap';
@@ -61,13 +61,20 @@ schema.tags = [
     There is an annual limit on the amount of personal earnings subject to
     payroll (Social Security) tax. Above that amount, payroll taxes are no
     longer applied to your earnings. This same limit determines how much of
-    your earnings count toward your benefit calculation.
+    your earnings
+    <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+      >count toward your benefit calculation</a
+    >.
   </p>
 
   <p>
-    In {currentYear}, this limit is <strong>{currentYearCap.wholeDollars()}</strong>.
-    Earnings above that amount are not subject to the 6.2% Social Security payroll
-    tax and do not affect your <a href="/guides/pia"><abbr title="Primary Insurance Amount">PIA</abbr></a> or
+    In {currentYear}, this
+    <a href="https://www.ssa.gov/oact/cola/cbb.html">limit</a> is
+    <strong>{currentYearCap.wholeDollars()}</strong>.
+    Earnings above that amount are not subject to the
+    <a href="https://www.ssa.gov/oact/progdata/oasdiRates.html"
+      >6.2% Social Security payroll tax</a
+    > and do not affect your <a href="/guides/pia"><abbr title="Primary Insurance Amount">PIA</abbr></a> or
     <a href="/guides/aime"><abbr title="Average Indexed Monthly Earnings">AIME</abbr></a>.
   </p>
 
@@ -77,14 +84,19 @@ schema.tags = [
       If you earn $200,000 in {currentYear}, only {currentYearCap.wholeDollars()} is subject to
       Social Security tax. You pay 6.2% on {currentYearCap.wholeDollars()}, and the remaining
       ${(200000 - currentYearCap.value()).toLocaleString()} is not taxed for Social Security
-      (though it is still subject to Medicare tax, which has no cap).
+      (though it is still subject to
+      <a href="https://www.ssa.gov/oact/progdata/oasdiRates.html"
+        >Medicare tax</a
+      >, which has no cap).
     </p>
   </div>
 
   <h2>How Is the Cap Determined?</h2>
 
   <p>
-    The cap is updated every year to keep pace with wage growth, using the
+    The cap is
+    <a href="https://www.ssa.gov/oact/cola/cbbdet.html">updated every year</a>
+    to keep pace with wage growth, using the
     National Average Wage Index (AWI):
   </p>
 
@@ -100,7 +112,8 @@ schema.tags = [
   <p>
     Why X − 2? The AWI for any given year isn't published until the following
     fall. Since the cap for year X must be announced in the fall of year X − 1,
-    the most recent finalized AWI available is from year X − 2.
+    the most recent finalized AWI available is from
+    <a href="https://www.ssa.gov/oact/cola/cbbdet.html">year X − 2</a>.
   </p>
 
   <p>
@@ -114,7 +127,10 @@ schema.tags = [
   <h2>Earnings Cap by Year</h2>
 
   <p>
-    The following table shows the earnings cap for every year since 1937:
+    The following table shows the
+    <a href="https://www.ssa.gov/oact/cola/cbb.html"
+      >earnings cap for every year since 1937</a
+    >:
   </p>
 
   <div class="earnings-container">
@@ -166,6 +182,14 @@ schema.tags = [
     <li>
       <a href="https://www.ssa.gov/oact/cola/AWI.html">
         Average Wage Index since 1951</a> [ssa.gov]
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/oasdiRates.html">
+        Social Security Tax Rates</a> [ssa.gov]
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html">
+        Social Security Retirement Benefit Calculation</a> [ssa.gov]
     </li>
   </ul>
 

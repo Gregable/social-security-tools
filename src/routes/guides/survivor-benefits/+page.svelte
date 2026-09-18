@@ -103,7 +103,7 @@ const sponsorCopy: SponsorCopy = {
 
     <h4>Widows and Widowers</h4>
     <ul>
-      <li>Age 60 or older (or age 50 if disabled)</li>
+      <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0335.htm">Age 60 or older</a> (or age 50 if disabled)</li>
       <li>Marriage lasted at least 9 months (with exceptions)</li>
       <li>Currently unmarried, or remarried after age 60</li>
     </ul>
@@ -125,12 +125,15 @@ const sponsorCopy: SponsorCopy = {
       <li>Unmarried and under age 18</li>
       <li>OR age 18-19 and still attending high school full-time</li>
       <li>OR any age if disabled before age 22</li>
-      <li>Can receive up to 75% of deceased's benefit</li>
+      <li>Can receive <a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">up to 75%</a> of deceased's benefit</li>
     </ul>
 
     <h4>Dependent Parents (Age 62+)</h4>
     <ul>
-      <li>Must have received at least half their support from the deceased</li>
+      <li>
+        Must have received <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0370.htm">at least half their support</a>
+        from the deceased
+      </li>
       <li>One parent: up to 82.5% of deceased's benefit</li>
       <li>Two parents: up to 75% each</li>
     </ul>
@@ -140,7 +143,8 @@ const sponsorCopy: SponsorCopy = {
 
   <p>
     To qualify for survivor benefits as a widow or widower, your marriage
-    generally must have lasted at least 9 months before your spouse's death.
+    generally must have lasted <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0335.htm">at least 9 months</a>
+    before your spouse's death.
     There are exceptions, though. The 9-month rule doesn't apply if the death
     was accidental, if it occurred in the line of military duty, if you and
     your spouse were previously married, divorced, and then remarried, or if
@@ -188,8 +192,8 @@ const sponsorCopy: SponsorCopy = {
 
   <p>
     What if your spouse claimed early and was receiving a reduced amount? You
-    have some protection: your survivor benefit will be at least 82.5% of
-    their PIA, even if they were receiving less than that due to early
+    have some protection: your survivor benefit will be
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615301">at least 82.5% of their PIA</a>, even if they were receiving less than that due to early
     claiming.
   </p>
 
@@ -199,7 +203,8 @@ const sponsorCopy: SponsorCopy = {
 
   <p>
     Survivor benefits have their own full retirement age schedule, which is
-    different from the regular retirement age. The survivor NRA determines
+    different from the regular retirement age. The
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615301">survivor NRA</a> determines
     when you can receive 100% of the survivor benefit without reduction.
   </p>
 
@@ -262,7 +267,8 @@ const sponsorCopy: SponsorCopy = {
   <p class="table-note">
     *Exact percentages vary based on your birth year and corresponding survivor
     NRA. The reduction is approximately 28.5% spread evenly over 84 months from
-    age 60 to 67.
+    age 60 to 67 (see SSA's
+    <a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">survivor benefit chart</a>).
   </p>
 
   <p>
@@ -275,7 +281,7 @@ const sponsorCopy: SponsorCopy = {
 
   <p>
     Here's the part most people miss: you can claim one benefit first and
-    switch to the other later. That's not allowed with spousal benefits, but
+    <a href="https://www.ssa.gov/benefits/retirement/planner/claiming.html">switch to the other later</a>. That's not allowed with spousal benefits, but
     it is with survivor benefits.
   </p>
 
@@ -309,7 +315,8 @@ const sponsorCopy: SponsorCopy = {
   <h2>Remarriage and Survivor Benefits</h2>
 
   <p>
-    If you remarry before age 60 (or 50 if disabled), you generally cannot
+    If you <a href="https://secure.ssa.gov/poms.nsf/lnx/0300207003">remarry before age 60</a> (or 50 if
+    disabled), you generally cannot
     receive survivor benefits from your deceased spouse while you remain
     married. If that marriage ends, you may regain eligibility.
   </p>
@@ -325,22 +332,24 @@ const sponsorCopy: SponsorCopy = {
   <p>
     For survivors to receive benefits, the deceased worker must have earned
     enough <a href="/guides/work-credits">work credits</a>. The number required
-    depends on the worker's age at death: generally 6 credits for workers under
+    <a href="https://www.ssa.gov/OP_Home/handbook/handbook.02/handbook-0203.html">depends on the worker's age at death</a>: generally 6 credits for workers under
     age 28, and 1 credit for each year after age 21 for older workers, up to a
     maximum of 40.
   </p>
 
   <p>
     There's also a special rule: if a worker dies leaving a spouse with
-    children, benefits may be payable if the worker had at least 6 credits in
-    the 3 years before death, regardless of total credits earned.
+    children, benefits may be payable if the worker had
+    <a href="https://www.ssa.gov/OP_Home/handbook/handbook.02/handbook-0206.html">at least 6 credits within the 13 calendar quarters
+    ending with the quarter of death</a> (roughly the three years before
+    death), regardless of total credits earned.
   </p>
 
   <h2>The Lump Sum Death Benefit</h2>
 
   <p>
     In addition to monthly survivor benefits, Social Security pays a one-time
-    lump sum death benefit of $255 to:
+    lump sum death benefit of <a href="https://www.ssa.gov/OP_Home/handbook/handbook.04/handbook-0428.html">$255</a> to:
   </p>
 
   <ul>
@@ -350,7 +359,8 @@ const sponsorCopy: SponsorCopy = {
   </ul>
 
   <p>
-    You must apply for this benefit within two years of the worker's death.
+    You must apply for this benefit
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300210001">within two years</a> of the worker's death.
     Note: This amount has not been increased since 1954.
   </p>
 
@@ -369,7 +379,8 @@ const sponsorCopy: SponsorCopy = {
   <p>
     Prior to January 2025, the Government Pension Offset (GPO) reduced survivor
     benefits for those receiving government pensions from work not covered by
-    Social Security. The Social Security Fairness Act of 2025 repealed this
+    Social Security. The
+    <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html">Social Security Fairness Act of 2025</a> repealed this
     provision.
   </p>
 
@@ -479,6 +490,22 @@ const sponsorCopy: SponsorCopy = {
       >spousal benefits and filing dates</a
     >, and <a href="/guides/nra">Normal Retirement Age</a>.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0335.htm">20 CFR 404.335: How do I become entitled to widow's or widower's benefits</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0370.htm">20 CFR 404.370: Who is entitled to parent's benefits</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615301">SSA POMS RS 00615.301: Reduced Widow(er)'s Benefits</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300207003">SSA POMS RS 00207.003: How Remarriage Affects Widow(er)'s Benefits</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300210001">SSA POMS RS 00210.001: Requirements for the Lump-Sum Death Payment</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/handbook/handbook.02/handbook-0203.html">Social Security Administration: SSA Handbook 203</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/handbook/handbook.02/handbook-0206.html">Social Security Administration: SSA Handbook 206</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/handbook/handbook.04/handbook-0428.html">Social Security Administration: SSA Handbook 428</a></li>
+    <li><a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">Social Security Administration: What you could get from Survivor benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/claiming.html">Social Security Administration: Filing Rules for Retirement and Spouses Benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html">Social Security Administration: Social Security Fairness Act</a></li>
+  </ul>
 
   <GuideFooter />
 </div>

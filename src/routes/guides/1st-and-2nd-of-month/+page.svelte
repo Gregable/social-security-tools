@@ -8,7 +8,7 @@ const title = 'Extra rules for those born on the 1st or 2nd of the month';
 const description =
   'Learn more about how Social Security law is affected by the day of the month one was born in.';
 const publishDate = new Date('2022-06-05T00:00:00+00:00');
-const updateDate = new Date('2023-01-07T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/1st-and-2nd-of-month';
@@ -65,12 +65,12 @@ schema.tags = [
   <ol>
     <li>
       Social Security is based on English Common Law which states that you
-      "attain" a particular age on the day before your birthday. So, if you are
-      born on May 1, you will attain age 62 on April 30.
+      <a href="https://secure.ssa.gov/poms.nsf/lnx/0200302400">"attain" a particular age on the day before your birthday</a>.
+      So, if you are born on May 1, you will attain age 62 on April 30.
     </li>
     <li>
-      You are eligible for a benefit on the first month that you are a
-      particular age through the entire month.
+      You are eligible for a benefit on the
+      <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615015">first month that you are a particular age through the entire month</a>.
     </li>
   </ol>
   <br style:clear="all" />
@@ -102,12 +102,12 @@ schema.tags = [
     Retirement Age, is the age at which if you file to start benefits, your
     benefit will equal your Primary Insurance Amount with no reductions from
     starting early or delayed credit increases for delaying benefits. NRA
-    varies by year of birth. Currently anyone born in 1960 or later has an NRA
-    of 67.
+    varies by year of birth. Currently
+    <a href="https://www.ssa.gov/oact/ProgData/nra.html">anyone born in 1960 or later has an NRA of 67</a>.
   </p>
   <p>
-    The month of your normal retirement age is the month that you attain that
-    age. Just like eligibility, Social Security is based on English Common Law
+    The month of your normal retirement age is the
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615003">month that you attain that age</a>. Just like eligibility, Social Security is based on English Common Law
     which states that you "attain" a particular age on the day before your
     birthday. So, if you are born on May 1, you will attain age 67 on April 30.
   </p>
@@ -134,8 +134,8 @@ schema.tags = [
   <InlineCTA type="calculator" />
 
   <h2>Benefit Payment Date</h2>
-  In most cases, the date of payment is also based on the day of the month you were
-  born:
+  In most cases, the <a href="https://secure.ssa.gov/poms.nsf/lnx/0202401001">date of payment</a> is also based on the day
+  of the month you were born:
   <ul>
     <li>
       If you were born on the 1st through the 10th of the month, you’ll be paid
@@ -152,8 +152,8 @@ schema.tags = [
   </ul>
   <p>
     There are some exceptions though. If you receive a benefit based on someone
-    else's work record, such as a spousal benefit, this will be paid the same
-    day as the primary beneficiary.
+    else's work record, such as a spousal benefit, this will be
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0202401001">paid the same day as the primary beneficiary</a>.
   </p>
   <p>
     There are also certain recipients who may receive payment on the 3rd of the
@@ -170,12 +170,10 @@ schema.tags = [
     weekday immediately preceding the scheduled date.
   </p>
   <p>
-    Another way to view the payment date is the <a
-      href="https://www.ssa.gov/pubs/EN-05-10031-2023.pdf"
-      >Schedule of Social Security Benefit Payments 2023</a
-    >:
+    Another way to view the payment date is the
+    <a href="https://www.ssa.gov/pubs/calendar.htm">Schedule of Social Security Payments</a>:
   </p>
-  <a href="https://www.ssa.gov/pubs/EN-05-10031-2023.pdf">
+  <a href="https://www.ssa.gov/pubs/calendar.htm">
     <img
       src="/PaymentSchedule2023.png"
       alt="Social Security Payment Schedule 2023"
@@ -184,5 +182,16 @@ schema.tags = [
       loading="lazy"
     />
   </a>
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0200302400">SSA POMS GN 00302.400: Point at Which a Particular Age is Attained</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615015">SSA POMS RS 00615.015: How the Day of Birth Affects Benefits</a></li>
+    <li><a href="https://www.ssa.gov/oact/ProgData/nra.html">Social Security Administration: Normal Retirement Age</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615003">SSA POMS RS 00615.003: Full Retirement Age</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0202401001">SSA POMS GN 02401.001: General Information on Title II Checks</a></li>
+    <li><a href="https://www.ssa.gov/pubs/calendar.htm">Social Security Administration: Schedule of Social Security Payments</a></li>
+  </ul>
+
   <GuideFooter />
 </div>

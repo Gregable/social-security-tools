@@ -8,7 +8,7 @@ const title = 'Normal Retirement Age (NRA): What It Means for Your Benefits';
 const description =
   'Learn about Normal Retirement Age (NRA), also called Full Retirement Age (FRA), how it varies by birth year, and why it matters for calculating your Social Security benefits.';
 const publishDate = new Date('2026-01-17T00:00:00+00:00');
-const updateDate = new Date('2026-01-17T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/nra';
@@ -95,8 +95,9 @@ fraTable.push({
   <h2>NRA by Birth Year</h2>
 
   <p>
-    Your Normal Retirement Age depends entirely on when you were born. Congress
-    gradually increased NRA from 65 to 67 through legislation passed in 1983,
+    Your <a href="https://www.ssa.gov/oact/ProgData/nra.html">Normal Retirement Age depends entirely on when you were born</a>. Congress
+    gradually increased NRA from 65 to 67 through
+    <a href="https://www.ssa.gov/history/1983amend.html">legislation passed in 1983</a>,
     affecting those born in 1938 and later.
   </p>
 
@@ -127,7 +128,8 @@ fraTable.push({
   </div>
 
   <p>
-    For those born in 1960 or later, NRA is 67. This has been stable since 1983
+    For those <a href="https://www.ssa.gov/benefits/retirement/planner/1960.html">born in 1960 or later, NRA is 67</a>.
+    This has been stable since 1983
     and there are no currently scheduled changes, though future legislation
     could adjust this.
   </p>
@@ -137,7 +139,8 @@ fraTable.push({
   <h2>Filing Before Normal Retirement Age</h2>
 
   <p>
-    You can file for Social Security retirement benefits as early as age 62, but
+    You can file for Social Security retirement benefits as early as
+    <a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html">age 62</a>, but
     doing so permanently reduces your monthly benefit. The reduction is
     calculated based on how many months early you file:
   </p>
@@ -145,15 +148,19 @@ fraTable.push({
   <div class="formula-box">
     <h3>Early Filing Reduction Formula</h3>
     <p>
-      For the first 36 months before NRA, your benefit is reduced by 5/9 of 1%
-      per month (6.67% per year). For each month beyond 36, the reduction is
+      For the first 36 months before NRA, your benefit is
+      <a href="https://www.ssa.gov/oact/quickcalc/earlyretire.html">reduced by 5/9 of 1% per month</a>
+      (6.67% per year). For each month beyond 36, the reduction is
       5/12 of 1% per month (5% per year).
     </p>
   </div>
 
   <h3>Example: Filing at 62 with NRA of 67</h3>
 
-  <p>If your NRA is 67 and you file at exactly 62, you're filing 60 months early:</p>
+  <p>
+    If your NRA is 67 and you file at exactly 62, you're
+    <a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html">filing 60 months early</a>:
+  </p>
 
   <div class="calculation-example">
     <table>
@@ -194,8 +201,9 @@ fraTable.push({
   <div class="formula-box">
     <h3>Delayed Retirement Credits</h3>
     <p>
-      For those born in 1943 or later, the credit is 8% per year (2/3 of 1% per
-      month) for each year you delay past NRA, up to age 70.
+      For those born in 1943 or later, the credit is
+      <a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">8% per year (2/3 of 1% per month)</a> for
+      each year you delay past NRA, up to age 70.
     </p>
   </div>
 
@@ -221,8 +229,8 @@ fraTable.push({
 
   <p>
     One quirk: if you're already receiving benefits and delay past NRA, your
-    delayed credits are applied in January of the following year, not
-    immediately. See our guide on the
+    delayed credits are <a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">applied in January of the following year</a>,
+    not immediately. See our guide on the
     <a href="/guides/delayed-january-bump">delayed January bump</a> for more
     details.
   </p>
@@ -235,8 +243,8 @@ fraTable.push({
   <p>
     <a href="/guides/spousal-benefit-filing-date">Spousal benefits</a> are also
     reduced if filed before your NRA. However, unlike personal benefits, spousal
-    benefits do <em>not</em> increase if you delay past NRA. There are no delayed
-    credits for spousal benefits. The same rules apply to
+    benefits do <em>not</em> increase if you delay past NRA. There are
+    <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">no delayed credits for spousal benefits</a>. The same rules apply to
     <a href="/guides/divorced-spouse">divorced spouse benefits</a>.
   </p>
 
@@ -244,7 +252,8 @@ fraTable.push({
   <p>
     <a href="/guides/survivor-benefits">Survivor benefits</a> have a different
     NRA schedule (typically 2 years earlier than retirement NRA for the same
-    birth year). Survivor benefits can be filed as early as age 60 (or 50 if
+    birth year). Survivor benefits can be filed
+    <a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">as early as age 60</a> (or 50 if
     disabled), with corresponding reductions. Unlike your own benefit, survivor
     benefits do not increase past survivor NRA.
   </p>
@@ -254,7 +263,7 @@ fraTable.push({
     If you work while receiving benefits before NRA, your benefits may be
     temporarily reduced due to the <a href="/guides/earnings-test">earnings test</a>.
     In 2026, if you earn more than $24,480 while receiving benefits before NRA,
-    $1 is withheld for every $2 over the limit. This reduction ends once you
+    <a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">$1 is withheld for every $2</a> over the limit. This reduction ends once you
     reach NRA, and any withheld benefits are returned to you through higher
     monthly payments.
   </p>
@@ -325,6 +334,21 @@ fraTable.push({
       <a href="/guides/earnings-test">Working While Receiving Benefits</a> – How
       the earnings test affects benefits before NRA
     </li>
+  </ul>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/oact/ProgData/nra.html">Social Security Administration: Normal Retirement Age</a></li>
+    <li><a href="https://www.ssa.gov/history/1983amend.html">Social Security Administration: Social Security Amendments of 1983</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/1960.html">Social Security Administration: Born in 1960 or Later</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html">Social Security Administration: Retirement Age and Benefit Reduction</a></li>
+    <li><a href="https://www.ssa.gov/oact/quickcalc/earlyretire.html">Social Security Administration: Benefit Reduction for Early Retirement</a></li>
+    <li><a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">Social Security Administration: Early or Delayed Retirement</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">Social Security Administration: Delayed Retirement Credits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">Social Security Administration: Family Benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">Social Security Administration: What You Could Get from Survivor Benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">Social Security Administration: Receiving Benefits While Working</a></li>
   </ul>
 
   <GuideFooter />

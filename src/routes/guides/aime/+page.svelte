@@ -67,7 +67,7 @@
   const description =
     "Learn how AIME (Average Indexed Monthly Earnings) is calculated and why it matters for your Social Security benefits. Comprehensive guide with examples.";
   const publishDate = new Date("2025-09-19T00:00:00+00:00");
-  const updateDate = new Date("2025-09-19T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/aime";
@@ -151,7 +151,9 @@
     Social Security doesn't use your raw earnings from each year. Instead, it
     applies <strong>wage indexing multipliers</strong> to adjust your historical
     earnings to reflect wage growth. These multipliers scale your earnings from each
-    year to be equivalent to wages in the year you turn 60.
+    year to be equivalent to wages in the <a
+      href="https://www.ssa.gov/oact/cola/awifactors.html">year you turn 60</a
+    >.
   </p>
 
   <p>
@@ -212,7 +214,9 @@
   <p>
     It's important to note that your earnings in any given year are also subject
     to the <strong>annual earnings cap</strong>. Only earnings up to this cap
-    count toward your Social Security benefits. For detailed information about
+    (SSA's <a href="https://www.ssa.gov/oact/cola/cbb.html"
+      >contribution and benefit base</a
+    >) count toward your Social Security benefits. For detailed information about
     how these caps work and their historical values, see our
     <a href="/guides/earnings-cap">Earnings Cap guide</a>.
   </p>
@@ -220,8 +224,10 @@
   <h3>Step 2: Select Your Top {SSA_EARNINGS_YEARS} Years</h3>
 
   <p>
-    Once all your earnings are indexed, Social Security takes your highest {SSA_EARNINGS_YEARS}
-    years of indexed earnings. If you have fewer than {SSA_EARNINGS_YEARS} years
+    Once all your earnings are indexed, Social Security takes your <a
+      href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+      >highest {SSA_EARNINGS_YEARS} years</a
+    > of indexed earnings. If you have fewer than {SSA_EARNINGS_YEARS} years
     of earnings, zeros are used for the missing years.
   </p>
 
@@ -249,7 +255,10 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
   <p>
     Your AIME is calculated by summing your top {SSA_EARNINGS_YEARS} years of indexed
     earnings and dividing by {totalMonths} months ({SSA_EARNINGS_YEARS} years × 12
-    months). The formula is straightforward:
+    months), as described in SSA's <a
+      href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+      >benefit calculation overview</a
+    >. The formula is straightforward:
   </p>
 
   <div class="formula-box">
@@ -260,7 +269,10 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
   </div>
 
   <p>
-    The result is always rounded down to the nearest dollar. For example, if
+    The result is always <a
+      href="https://www.ssa.gov/OP_Home/cfr20/404/404-0211.htm"
+      >rounded down to the nearest dollar</a
+    >. For example, if
     your calculation yields $3,847.83, your AIME would be $3,847.
   </p>
 
@@ -271,7 +283,9 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
   <p>
     Your AIME directly determines your <a href="/guides/pia"
       >Primary Insurance Amount (PIA)</a
-    > through a progressive benefit formula. The Social Security Administration applies
+    > through a progressive <a
+      href="https://www.ssa.gov/oact/cola/piaformula.html">benefit formula</a
+    >. The Social Security Administration applies
     different percentage rates to different portions of your AIME:
   </p>
 
@@ -327,7 +341,10 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
     For someone who consistently earned at or above the <a
       href="/guides/earnings-cap">earnings cap</a
     >
-    for {SSA_EARNINGS_YEARS} years, the maximum AIME in {currentYear} is {maxAIME.wholeDollars()}.
+    for {SSA_EARNINGS_YEARS} years, the maximum AIME in {currentYear} is {maxAIME.wholeDollars()}
+    (see SSA's <a href="https://www.ssa.gov/oact/cola/examplemax.html"
+      >maximum-taxable examples</a
+    >).
     This maximum AIME leads to the <a href="/guides/maximum">maximum Social Security benefit</a>.
   </p>
 
@@ -410,8 +427,9 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
   <h3>"Working Past Age 60 Doesn't Affect Indexing"</h3>
 
   <p>
-    While it's true that earnings after age 60 aren't indexed (they use a 1.0
-    multiplier), they can still improve your AIME if they're higher than your
+    While it's true that earnings after age 60 aren't indexed (they use a <a
+      href="https://www.ssa.gov/oact/cola/awifactors.html">1.0 multiplier</a
+    >), they can still improve your AIME if they're higher than your
     lowest earning years in your top {SSA_EARNINGS_YEARS}.
   </p>
 
@@ -479,6 +497,42 @@ The calculator also shows you the "cutoff" indexed earnings amount: the
     <li>
       <a href="/guides/maximum">Maximum Benefit</a> — What happens when you
       maximize your AIME by earning at the cap for {SSA_EARNINGS_YEARS} years
+    </li>
+  </ul>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+        >Social Security Administration: Social Security Retirement Benefit
+        Calculation</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html"
+        >Social Security Administration: Indexing Factors for Earnings</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/cbb.html"
+        >Social Security Administration: Contribution and Benefit Base</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/piaformula.html"
+        >Social Security Administration: Primary Insurance Amount formula</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/examplemax.html"
+        >Social Security Administration: Maximum-taxable benefit examples</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0211.htm"
+        >Social Security Administration: Code of Federal Regulations 404.211</a
+      >
     </li>
   </ul>
 

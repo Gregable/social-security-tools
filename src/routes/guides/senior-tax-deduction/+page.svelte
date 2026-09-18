@@ -9,7 +9,7 @@
   const description =
     "The One Big Beautiful Bill Act created a new $6,000 tax deduction for seniors 65+. Learn who qualifies, income phase-outs, how it interacts with Social Security benefit taxation, and planning strategies for 2025-2028.";
   const publishDate = new Date("2026-02-02T00:00:00+00:00");
-  const updateDate = new Date("2026-02-02T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/senior-tax-deduction";
@@ -160,9 +160,13 @@
   <p>
     Does this mean Social Security is no longer taxed? Not exactly. The
     <a href="/guides/federal-taxes">provisional income formula</a> that decides
-    how much of your benefit is taxable hasn't changed at all. Up to 85% of
-    benefits can still be included in taxable income under the same rules that
-    have been in place since 1993.
+    how much of your benefit is taxable hasn't changed at all.
+    <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+      >Up to 85% of benefits</a
+    > can still be included in taxable income under the same rules that
+    <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+      >have been in place since 1993</a
+    >.
   </p>
 
   <p>
@@ -182,8 +186,10 @@
   <p>
     Consider Bob, single, age 68, in 2026, with $20,000 in Social Security
     benefits and $15,000 in pension income. His provisional income is $15,000
-    + ($20,000 / 2) = $25,000, which is at the threshold for single filers, so
-    none of his Social Security is taxable. That leaves an AGI of $15,000
+    + ($20,000 / 2) = $25,000, which is at the
+    <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+      >threshold for single filers</a
+    >, so none of his Social Security is taxable. That leaves an AGI of $15,000
     against roughly $24,150 in total deductions. His taxable income is $0, and
     he owes no federal tax.
   </p>
@@ -238,6 +244,23 @@
     To see what your own benefit would be, try the
     <a href="/calculator">ssa.tools calculator</a> with your earnings record.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+        >Social Security Administration: Must I pay taxes on Social Security
+        benefits?</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+        >Social Security Administration: Social Security History, Taxation of
+        Benefits</a
+      >
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>

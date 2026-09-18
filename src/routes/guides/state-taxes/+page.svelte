@@ -20,7 +20,7 @@ const sponsorCopy: SponsorCopy = {
   const description =
     "Most states don't tax Social Security benefits. Learn which 8 states still tax benefits in 2026, exemption thresholds, recent changes, and planning strategies.";
   const publishDate = new Date("2026-02-15T00:00:00+00:00");
-  const updateDate = new Date("2026-02-15T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/state-taxes";
@@ -328,10 +328,14 @@ const sponsorCopy: SponsorCopy = {
 
   <p>
     State and federal taxation of Social Security are completely independent.
-    At the federal level, up to 85% of your benefits may be taxable, depending
-    on your "provisional income" (AGI + tax-exempt interest + half of your
-    Social Security benefits). The federal thresholds have not changed since
-    1993.
+    At the federal level,
+    <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+      >up to 85% of your benefits may be taxable</a
+    >, depending on your "provisional income" (AGI + tax-exempt interest + half
+    of your Social Security benefits). The federal thresholds
+    <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+      >have not changed since 1993</a
+    >.
   </p>
 
   <p>
@@ -407,6 +411,23 @@ const sponsorCopy: SponsorCopy = {
     To see what your own benefit would be, try the
     <a href="/calculator">ssa.tools calculator</a> with your earnings record.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+        >Social Security Administration: Must I pay taxes on Social Security
+        benefits?</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+        >Social Security Administration: Social Security History, Taxation of
+        Benefits</a
+      >
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>

@@ -83,7 +83,7 @@
   const title = "Primary Insurance Amount (PIA)";
   const description = `Learn how Social Security calculates your Primary Insurance Amount (PIA) in ${currentYear}. Understand the bendpoint formula (${firstBendPoint.wholeDollars()} and ${secondBendPoint.wholeDollars()}), calculate your monthly benefit, and discover strategies to maximize your PIA.`;
   const publishDate = new Date("2025-09-19T00:00:00+00:00");
-  const updateDate = new Date("2025-09-19T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/pia";
@@ -193,8 +193,9 @@
   <h2>The Bendpoint Formula</h2>
 
   <p>
-    Social Security uses a three-tiered progressive formula to calculate your
-    PIA from your AIME. This formula uses two "bendpoints" that divide your AIME
+    Social Security uses a three-tiered progressive <a
+      href="https://www.ssa.gov/oact/cola/piaformula.html">PIA formula</a
+    > to calculate your PIA from your AIME. This formula uses two "bendpoints" that divide your AIME
     into three brackets, each with its own replacement rate:
   </p>
 
@@ -218,7 +219,9 @@
   <p>
     These bendpoints are adjusted annually for <a href="/guides/inflation"
       >wage inflation</a
-    >, ensuring they maintain their purchasing power over time. The percentages
+    >, ensuring they maintain their purchasing power over time (see SSA's <a
+      href="https://www.ssa.gov/oact/cola/bendpoints.html">bend point table</a
+    >). The percentages
     ({firstBracketPercent}%, {secondBracketPercent}%, {thirdBracketPercent}%)
     have remained constant since 1979.
   </p>
@@ -265,9 +268,9 @@
   </div>
 
   <p>
-    The final step is rounding: Social Security rounds the PIA <strong
-      >down</strong
-    >
+    The final step is rounding: Social Security <a
+      href="https://www.ssa.gov/oact/cola/piaformula.html">rounds the PIA</a
+    > <strong>down</strong>
     to the nearest dime, so this would become {examplePIA.string()} per month.
   </p>
 
@@ -427,7 +430,10 @@
 
   <ul>
     <li>
-      Are applied every December based on the Consumer Price Index (CPI-W)
+      Are applied every December based on the Consumer Price Index (CPI-W), as
+      announced in SSA's <a
+        href="https://www.ssa.gov/oact/cola/latestCOLA.html">latest COLA notice</a
+      >
     </li>
     <li>Continue even after you start collecting benefits</li>
     <li>
@@ -447,7 +453,12 @@
       <strong><a href="/guides/spousal-benefit-filing-date">Spousal benefits</a>:</strong>
       Up to 50% of your PIA (not 50% of your actual benefit if you delay past FRA)
     </li>
-    <li><strong>Survivor benefits:</strong> Up to 100% of your PIA</li>
+    <li>
+      <strong>Survivor benefits:</strong> Up to 100% of your PIA (see SSA's
+      <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html"
+        >family benefits</a
+      > page)
+    </li>
     <li>
       <strong>Disability benefits:</strong> Your PIA without age adjustments
     </li>
@@ -457,14 +468,19 @@
 
   <p>
     First, ensure you have enough <a href="/guides/work-credits">work credits</a>
-    to qualify—you need 40 credits (about 10 years of work). Then focus on maximizing
+    to qualify—you need <a
+      href="https://www.ssa.gov/benefits/retirement/planner/credits.html"
+      >40 credits</a
+    > (about 10 years of work). Then focus on maximizing
     your PIA:
   </p>
 
   <ol>
     <li>
       <strong>Work for {SSA_EARNINGS_YEARS} years:</strong> PIA is based on your
-      highest {SSA_EARNINGS_YEARS} years, so each year of work can potentially replace
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+        >highest {SSA_EARNINGS_YEARS} years</a
+      >, so each year of work can potentially replace
       a zero-earning year
     </li>
     <li>
@@ -510,7 +526,10 @@
       A "good" PIA depends on your income needs and lifestyle expectations. A
       PIA above $2,500 puts you in the upper tier of beneficiaries, while the
       <a href="/guides/maximum">maximum PIA</a> requires earning at or above the
-      taxable maximum for {SSA_EARNINGS_YEARS} years. Most financial planners suggest
+      taxable maximum for {SSA_EARNINGS_YEARS} years (see SSA's <a
+        href="https://www.ssa.gov/oact/cola/examplemax.html"
+        >maximum-taxable examples</a
+      >). Most financial planners suggest
       Social Security should replace about 40% of pre-retirement income for average
       earners.
     </p>
@@ -521,7 +540,10 @@
       Age. If you claim early (as young as 62), your benefit is permanently reduced—up
       to 30% less than your PIA. If you delay past FRA (up to age 70), you earn delayed
       retirement credits that increase your benefit by 8% per year, potentially receiving
-      up to 124-132% of your PIA.
+      up to 124-132% of your PIA (see SSA's <a
+        href="https://www.ssa.gov/oact/quickcalc/early_late.html"
+        >early or late retirement</a
+      > page).
     </p>
 
     <h3>Does my PIA change after I start receiving benefits?</h3>
@@ -568,6 +590,53 @@
     <li>
       <a href="/guides/filing-date-chart">Filing Date Chart Guide</a> — How to
       read the interactive chart showing benefits at different filing ages
+    </li>
+  </ul>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/piaformula.html"
+        >Social Security Administration: Primary Insurance Amount formula</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/bendpoints.html"
+        >Social Security Administration: Benefit Formula Bend Points</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+        >Social Security Administration: Social Security Retirement Benefit
+        Calculation</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/latestCOLA.html"
+        >Social Security Administration: Latest Cost-of-Living Adjustment</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/quickcalc/early_late.html"
+        >Social Security Administration: Early or Late Retirement</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html"
+        >Social Security Administration: Family benefits</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html"
+        >Social Security Administration: Social Security Credits and Benefit
+        Eligibility</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/examplemax.html"
+        >Social Security Administration: Maximum-taxable benefit examples</a
+      >
     </li>
   </ul>
 

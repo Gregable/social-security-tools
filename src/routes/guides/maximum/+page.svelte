@@ -135,7 +135,7 @@
   const title = `Maximum Social Security Benefit ${currentYear}`;
   const description = `The maximum Social Security benefit in ${currentYear} is ${maxBenefitAt70.wholeDollars()}/month at age 70. Learn what it takes to reach the maximum, how filing age affects your benefit, and the requirements for the highest possible payment.`;
   const publishDate = new Date("2019-08-03T00:00:00+00:00");
-  const updateDate = new Date("2026-01-16T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/maximum";
@@ -180,7 +180,7 @@
   <div class="max-benefit-box">
     <h3>{currentYear} Maximum Monthly Benefit</h3>
     <p class="max-amount">{maxBenefitAt70.wholeDollars()} / month</p>
-    <p class="max-note">For someone filing at age 70</p>
+    <p class="max-note">For someone <a href="https://www.ssa.gov/faqs/en/questions/KA-01897.html">filing at age 70</a></p>
   </div>
 
   <h2>Requirements to Reach the Maximum</h2>
@@ -190,14 +190,16 @@
   <ol>
     <li>
       <strong>Wait until age 70 to claim benefits.</strong> Filing at 70
-      maximizes your delayed retirement credits, increasing your benefit by {delayedIncreasePercent *
+      maximizes your <a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">delayed retirement credits</a>,
+      increasing your benefit by {delayedIncreasePercent *
         3}% compared to claiming at Full Retirement Age.
     </li>
     <li>
       <strong
         >Earn at or above the earnings cap for at least {SSA_EARNINGS_YEARS} years.</strong
       >
-      Your benefit is based on your highest {SSA_EARNINGS_YEARS} years of earnings.
+      Your benefit is based on your
+      <a href="https://www.ssa.gov/oact/ProgData/retirebenefit1.html">highest {SSA_EARNINGS_YEARS} years of earnings</a>.
       Each year must be at or above the
       <a href="/guides/earnings-cap">maximum taxable earnings</a> to contribute
       to the maximum <a href="/guides/aime">AIME</a>.
@@ -208,7 +210,7 @@
 
   <p>
     Your filing age dramatically affects your maximum possible benefit. Here's
-    how the {currentYear} maximum breaks down:
+    how the {currentYear} <a href="https://www.ssa.gov/oact/cola/examplemax.html">maximum breaks down</a>:
   </p>
 
   <div class="filing-age-table">
@@ -248,13 +250,14 @@
 
   <ul>
     <li>
-      <strong>Earnings cap increases:</strong> The maximum taxable earnings
-      rises annually (it's {earningsCap.wholeDollars()} in {currentYear}),
+      <strong>Earnings cap increases:</strong> The
+      <a href="https://www.ssa.gov/oact/cola/cbb.html">maximum taxable earnings</a> rises annually (it's {earningsCap.wholeDollars()} in {currentYear}),
       allowing future retirees to have higher indexed earnings.
     </li>
     <li>
       <strong>Bend point adjustments:</strong> The
-      <a href="/guides/pia">PIA formula bend points</a> increase with average wages,
+      <a href="/guides/pia">PIA formula bend points</a>
+      <a href="https://www.ssa.gov/oact/cola/bendpoints.html">increase with average wages</a>,
       gradually raising the maximum possible PIA.
     </li>
   </ul>
@@ -285,7 +288,7 @@
   <h2>Spousal and Family Benefits</h2>
 
   <p>
-    A spouse can receive up to 50% of the primary earner's
+    A spouse can receive <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">up to 50%</a> of the primary earner's
     <a href="/guides/pia">Primary Insurance Amount (PIA)</a>—not 50% of their
     actual benefit. This distinction matters when the primary earner delays past
     Full Retirement Age. See our <a href="/guides/spousal-benefit-filing-date">spousal
@@ -323,12 +326,12 @@
     Very few retirees actually receive the maximum benefit. To qualify, you'd
     need to have earned at or above the earnings cap for {SSA_EARNINGS_YEARS} years—a
     feat that requires consistently high income throughout your career. (Of course,
-    you also need the <a href="/guides/work-credits">40 work credits</a> required
-    to qualify for any retirement benefits, but that's easily achieved by anyone
+    you also need the <a href="/guides/work-credits">40 work credits</a>
+    <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html">required to qualify for any retirement benefits</a>, but that's easily achieved by anyone
     earning at the cap.)
   </p>
 
-  <p>Consider that the earnings cap in various years was:</p>
+  <p>Consider that the <a href="https://www.ssa.gov/oact/cola/cbb.html">earnings cap in various years</a> was:</p>
 
   <ul>
     {#each historicalCaps as item}
@@ -374,6 +377,19 @@
       <a href="/guides/filing-date-chart">Filing Date Chart Guide</a> — How to
       read the interactive chart showing benefits at different filing ages
     </li>
+  </ul>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/faqs/en/questions/KA-01897.html">Social Security Administration: What Is the Maximum Social Security Retirement Benefit Payable?</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">Social Security Administration: Delayed Retirement Credits</a></li>
+    <li><a href="https://www.ssa.gov/oact/ProgData/retirebenefit1.html">Social Security Administration: Social Security Retirement Benefit Calculation</a></li>
+    <li><a href="https://www.ssa.gov/oact/cola/examplemax.html">Social Security Administration: Maximum-Taxable Benefit Examples</a></li>
+    <li><a href="https://www.ssa.gov/oact/cola/cbb.html">Social Security Administration: Contribution and Benefit Base</a></li>
+    <li><a href="https://www.ssa.gov/oact/cola/bendpoints.html">Social Security Administration: Benefit Formula Bend Points</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">Social Security Administration: Family Benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/credits.html">Social Security Administration: Social Security Credits and Benefit Eligibility</a></li>
   </ul>
 
   <GuideFooter />

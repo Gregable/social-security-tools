@@ -12,7 +12,7 @@ const title = 'Social Security Work Credits: How Many Do You Need?';
 const description =
   `Learn how Social Security work credits work and how many you need to qualify for benefits. In ${currentYear}, you need ${currentYearCredit.wholeDollars()} in earnings per credit, and ${requiredCredits} total credits (about 10 years of work) for retirement benefits.`;
 const publishDate = new Date('2024-02-26T00:00:00+00:00');
-const updateDate = new Date('2024-02-26T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/work-credits';
@@ -96,7 +96,10 @@ const faqs: FAQItem[] = [
 
   <h3>For Retirement Benefits</h3>
   <p>
-    <strong>You need {requiredCredits} work credits to qualify for retirement benefits.</strong>
+    <strong>You need <a
+        href="https://www.ssa.gov/benefits/retirement/planner/credits.html"
+        >{requiredCredits} work credits</a
+      > to qualify for retirement benefits.</strong>
     Since you can earn a maximum of 4 credits per year, this typically requires
     at least 10 years of work.
   </p>
@@ -105,7 +108,10 @@ const faqs: FAQItem[] = [
   <p>
     The number of work credits required for your family to qualify for
     <a href="/guides/survivor-benefits">survivor's benefits</a> depends on your
-    age at the time of death:
+    <a
+      href="https://www.ssa.gov/OP_Home/handbook/handbook.02/handbook-0203.html"
+      >age at the time of death</a
+    >:
   </p>
   <ul>
     <li>Younger individuals need fewer credits</li>
@@ -127,7 +133,13 @@ const faqs: FAQItem[] = [
   <h3>Current Rules ({currentYear})</h3>
   <ul>
     <li>Work credits are earned by working and paying Social Security taxes</li>
-    <li>You can earn up to <strong>4 work credits per calendar year</strong></li>
+    <li>
+      You can earn up to <strong
+        ><a href="https://www.ssa.gov/oact/cola/QC.html"
+          >4 work credits per calendar year</a
+        ></strong
+      >
+    </li>
     <li>In {currentYear}, you earn 1 credit for each <strong>{currentYearCredit.wholeDollars()}</strong> of earnings</li>
     <li>Partial credits cannot be earned — you need the full amount for each credit</li>
   </ul>
@@ -135,7 +147,8 @@ const faqs: FAQItem[] = [
   <h3>Historical Background</h3>
   <p>
     Before 1978, one work credit was earned for each calendar quarter with at
-    least $50 in wages. These were called "quarters of coverage" (QCs). The
+    least <a href="https://www.ssa.gov/oact/cola/QC.html">$50 in wages</a>.
+    These were called "quarters of coverage" (QCs). The
     system changed to a yearly earnings-based approach starting in 1978.
   </p>
 
@@ -172,7 +185,9 @@ const faqs: FAQItem[] = [
 
   <p>
     <strong>Important:</strong> To receive <a href="/guides/spousal-benefit-filing-date">spousal benefits</a>,
-    you don't need to have earned work credits yourself. You only need to be
+    you <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html"
+      >don't need to have earned work credits yourself</a
+    >. You only need to be
     married to someone who has earned enough work credits. This also applies to
     <a href="/guides/divorced-spouse">divorced spouses</a> who were married for
     at least 10 years.
@@ -229,6 +244,16 @@ const faqs: FAQItem[] = [
     <li>
       <a href="https://www.ssa.gov/oact/cola/QC.html"
         >Social Security Administration: Quarters of Coverage</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/OP_Home/handbook/handbook.02/handbook-0203.html"
+        >Social Security Administration: SSA Handbook 203</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html"
+        >Social Security Administration: Family benefits</a
       >
     </li>
   </ul>
