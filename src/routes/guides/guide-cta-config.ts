@@ -52,6 +52,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'survivor-benefits': 'sponsor',
   wep: 'sponsor',
   'will-social-security-run-out': 'sponsor',
+  'working-past-full-retirement-age': 'sponsor',
 };
 
 export function getGuideCTAType(pathname: string): GuideCTAType {

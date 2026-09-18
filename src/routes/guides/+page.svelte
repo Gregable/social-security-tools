@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Sep 18, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/working-past-full-retirement-age">
+            Working Past Full Retirement Age: Will Your Social Security
+            Benefit Go Up?
+          </a>
+        </h3>
+        <p class="description">
+          The two ways working at or after full retirement age raises your
+          benefit, how much one more year is worth for different work
+          histories, when the automatic recalculation shows up in your check,
+          and why the earnings test no longer applies.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 17, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/retroactive-survivor-benefits">

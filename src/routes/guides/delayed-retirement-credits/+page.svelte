@@ -333,6 +333,11 @@
       interacts with DRCs
     </li>
     <li>
+      <a href="/guides/working-past-full-retirement-age"
+        >Working Past Full Retirement Age</a
+      >: how new earnings and DRCs stack while you wait
+    </li>
+    <li>
       <a href="/guides/inflation">COLA and Inflation</a>: how your enhanced
       benefit grows over time
     </li>
