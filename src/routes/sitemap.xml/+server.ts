@@ -71,6 +71,11 @@ const pages = [
     priority: '0.7',
     changefreq: 'yearly',
   },
+  {
+    path: '/guides/working-past-full-retirement-age',
+    priority: '0.7',
+    changefreq: 'yearly',
+  },
   { path: '/guides/spousal-benefits', priority: '0.7', changefreq: 'yearly' },
   { path: '/guides/cola', priority: '0.7', changefreq: 'yearly' },
   { path: '/guides/earnings-test', priority: '0.7', changefreq: 'yearly' },

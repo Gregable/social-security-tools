@@ -402,6 +402,10 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
     If you already have {SSA_EARNINGS_YEARS} years of earnings, additional years
     can still help if your current earnings exceed your lowest indexed earning years.
     Each high-earning year can replace a lower earning year in your top {SSA_EARNINGS_YEARS}.
+    For worked examples of what one more year is worth, see
+    <a href="/guides/working-past-full-retirement-age"
+      >working past full retirement age</a
+    >.
   </p>
 
   <h3>Maximize Earnings Within the Cap</h3>

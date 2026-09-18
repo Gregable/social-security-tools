@@ -302,7 +302,11 @@
     self-employment income count. Investment income, pensions, retirement
     account withdrawals, and other passive income don't trigger the earnings
     test at all. And once you reach full retirement age, the test simply stops
-    applying — you can earn any amount without affecting your benefits.
+    applying — you can earn any amount without affecting your benefits. From
+    that point, working can only raise your benefit; see
+    <a href="/guides/working-past-full-retirement-age"
+      >working past full retirement age</a
+    > for how much.
   </p>
 
   <p>
