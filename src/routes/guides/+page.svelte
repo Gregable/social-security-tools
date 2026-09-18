@@ -27,6 +27,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Sep 17, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/retroactive-survivor-benefits">
+            Retroactive Survivor Benefits: How Far Back Social Security Pays
+          </a>
+        </h3>
+        <p class="description">
+          How many months of back pay a widow or widower can receive after
+          applying late, the three exceptions for those under full retirement
+          age, how a phone call protects your filing date, and the two-year
+          deadline for the lump-sum death payment.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 10, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/cola">

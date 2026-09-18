@@ -19,7 +19,7 @@ const sponsorCopy: SponsorCopy = {
   const description =
     "Learn about Social Security survivor benefits for widows, widowers, and children. Understand eligibility at age 60, benefit amounts up to 100% of spouse's benefit, and claiming strategies.";
   const publishDate = new Date("2026-01-19T00:00:00+00:00");
-  const updateDate = new Date("2026-01-19T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/survivor-benefits";
@@ -354,6 +354,16 @@ const sponsorCopy: SponsorCopy = {
     Note: This amount has not been increased since 1954.
   </p>
 
+  <p>
+    Monthly survivor benefits have no such deadline, but applying late can
+    still cost you months of payments. How far back Social Security will pay
+    depends on your age and on whether your spouse had claimed early; see our
+    guide to
+    <a href="/guides/retroactive-survivor-benefits"
+      >retroactive survivor benefits</a
+    >.
+  </p>
+
   <h2>Government Pension Offset (GPO) - Now Repealed</h2>
 
   <p>
@@ -422,6 +432,17 @@ const sponsorCopy: SponsorCopy = {
     claims.
   </p>
 
+  <p>
+    Call as soon as you can, even if you do not have the documents yet. The
+    date you first tell Social Security you intend to file becomes your
+    filing date, and for many widows and widowers under full retirement age,
+    benefits start with that month rather than the month of death. Our
+    <a href="/guides/retroactive-survivor-benefits"
+      >retroactive survivor benefits guide</a
+    > explains how much back pay you can receive and how to protect your
+    filing date.
+  </p>
+
   <p>You'll need:</p>
 
   <ul>
@@ -449,6 +470,9 @@ const sponsorCopy: SponsorCopy = {
 
   <p>
     For more information on related topics, see our guides on
+    <a href="/guides/retroactive-survivor-benefits"
+      >retroactive survivor benefits</a
+    >,
     <a href="/guides/spousal-benefits">spousal benefits</a>,
     <a href="/guides/divorced-spouse">divorced spouse benefits</a>,
     <a href="/guides/spousal-benefit-filing-date"
