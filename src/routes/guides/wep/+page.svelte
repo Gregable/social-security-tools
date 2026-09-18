@@ -18,7 +18,7 @@ const title = 'Windfall Elimination Provision (WEP): What It Was and Why It No L
 const description =
   'Was WEP repealed? Yes! Learn about the Windfall Elimination Provision, the Social Security rule that reduced benefits for teachers and public employees for 42 years before its repeal in January 2025.';
 const publishDate = new Date('2026-01-16T00:00:00+00:00');
-const updateDate = new Date('2026-01-16T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/wep';
@@ -79,7 +79,10 @@ schema.tags = [
   <h2>Was WEP Repealed?</h2>
 
   <p>
-    Yes. The Social Security Fairness Act (H.R. 82) eliminated the Windfall
+    Yes. The
+    <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
+      >Social Security Fairness Act</a
+    > (H.R. 82) eliminated the Windfall
     Elimination Provision effective January 2024 (retroactively). The law was
     signed on January 5, 2025. WEP is no longer in effect, and the WEP
     reduction no longer applies to any Social Security beneficiary.
@@ -88,7 +91,10 @@ schema.tags = [
   <p>
     If you're searching for a "WEP calculator" to estimate your benefit reduction,
     you no longer need one. Your Social Security benefits are now calculated using
-    the standard formula that applies to all workers.
+    the standard formula that applies to all workers, as SSA explains on its
+    <a href="https://www.ssa.gov/benefits/retirement/planner/wep.html"
+      >pensions and work abroad</a
+    > page.
   </p>
 
   <h2>What Was the Windfall Elimination Provision?</h2>
@@ -128,7 +134,10 @@ schema.tags = [
   <h2>The 30 Years of Substantial Earnings Rule</h2>
 
   <p>
-    Workers with 30 or more years of substantial earnings under Social Security
+    Workers with
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300605362"
+      >30 or more years of substantial earnings</a
+    > under Social Security
     were always exempt from WEP. Their benefits were never reduced.
     "Substantial earnings" meant earning above a threshold amount that increased
     each year (about $31,275 in 2024).
@@ -137,7 +146,8 @@ schema.tags = [
   <p>
     Workers with 20 or fewer years of substantial covered employment faced the
     maximum WEP reduction, which reached $587 per month in 2024. Workers with
-    21-29 years received graduated relief:
+    21-29 years received
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300605362">graduated relief</a>:
   </p>
 
   <table class="wep-table">
@@ -166,8 +176,9 @@ schema.tags = [
 
   <p>
     WEP affected approximately 2.1 million beneficiaries at its peak, about 4%
-    of all retired-worker beneficiaries. The provision applied to workers who
-    received a pension from employment where they didn't pay Social Security
+    of all retired-worker beneficiaries. The provision
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300605360">applied to workers</a>
+    who received a pension from employment where they didn't pay Social Security
     taxes:
   </p>
 
@@ -203,7 +214,10 @@ schema.tags = [
   <h2>What's the Difference Between WEP and GPO?</h2>
 
   <p>
-    Working alongside WEP was the Government Pension Offset (GPO), enacted even
+    Working alongside WEP was the
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0202608100"
+      >Government Pension Offset</a
+    > (GPO), enacted even
     earlier in 1977. While WEP reduced a worker's <em>own</em> retirement
     benefits, GPO targeted <em>spousal and survivor benefits</em>, reducing
     them by two-thirds of the recipient's government pension.
@@ -250,7 +264,10 @@ schema.tags = [
   <p>
     If you were already receiving reduced benefits due to WEP or GPO, you don't
     need to do anything. The Social Security Administration automatically
-    recalculated benefits and issued retroactive lump-sum payments.
+    recalculated benefits and
+    <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
+      >issued retroactive lump-sum payments</a
+    >.
   </p>
 
   <p>
@@ -355,7 +372,10 @@ schema.tags = [
     <h3>I have a teacher pension, CSRS pension, or foreign pension. Will my Social Security be reduced?</h3>
     <p>
       No. All of these non-covered pensions used to trigger WEP, but since the
-      repeal they no longer affect your Social Security calculation.
+      repeal they no longer affect your Social Security calculation (see SSA's
+      <a href="https://www.ssa.gov/benefits/retirement/planner/gpo-wep.html"
+        >information for government employees</a
+      >).
     </p>
 
     <h3>Will I get back pay for WEP?</h3>
@@ -377,6 +397,45 @@ schema.tags = [
     teachers, government employees, and anyone who previously would have been
     subject to WEP.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
+        >Social Security Administration: Social Security Fairness Act</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/wep.html"
+        >Social Security Administration: Pensions and work abroad won't reduce
+        benefits</a
+      >
+    </li>
+    <li>
+      <a href="https://secure.ssa.gov/poms.nsf/lnx/0300605362"
+        >Social Security Administration: POMS RS 00605.362 Windfall Elimination
+        Provision Exceptions</a
+      >
+    </li>
+    <li>
+      <a href="https://secure.ssa.gov/poms.nsf/lnx/0202608100"
+        >Social Security Administration: POMS GN 02608.100 Government Pension
+        Offset (GPO) Provision</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/gpo-wep.html"
+        >Social Security Administration: Information for Government Employees</a
+      >
+    </li>
+    <li>
+      <a href="https://secure.ssa.gov/poms.nsf/lnx/0300605360"
+        >Social Security Administration: POMS RS 00605.360 Windfall Elimination
+        Provision</a
+      >
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>

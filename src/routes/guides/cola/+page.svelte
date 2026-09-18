@@ -78,7 +78,7 @@ const sponsorCopy: SponsorCopy = {
 const title = `Social Security COLA ${headline.paymentYear}: What the ${percentText(headline)} Increase Means`;
 const description = `Social Security benefits ${isBeingPaid ? 'rose' : 'will rise'} ${percentText(headline)} in ${headline.paymentYear}. Learn how the cost-of-living adjustment is calculated, when it reaches your check, whether you receive it before you file, and what else changes in January.`;
 const publishDate = new Date('2026-09-10T00:00:00+00:00');
-const updateDate = new Date('2026-09-10T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/cola';
@@ -169,16 +169,20 @@ const faqs: FAQItem[] = [
 
   <p>
     The adjustment is tied to the Consumer Price Index for Urban Wage Earners
-    and Clerical Workers, known as CPI-W. Social Security averages that index
-    for July, August, and September, then compares it with the same three
-    months of the last year in which a COLA took effect. The percentage change,
-    rounded to the nearest tenth of a percent, becomes the COLA.
+    and Clerical Workers, known as CPI-W. Social Security
+    <a href="https://www.ssa.gov/oact/cola/latestCOLA.html"
+      >averages that index for July, August, and September</a
+    >, then compares it with the same three months of the last year in which a
+    COLA took effect. The percentage change, rounded to the nearest tenth of a
+    percent, becomes the COLA.
   </p>
 
   <p>
     In most years the comparison is simply against the year before. After a
-    year with no increase the comparison reaches further back, to the last year
-    that produced one, so no inflation is skipped.
+    year with no increase the comparison
+    <a href="https://www.ssa.gov/oact/cola/latestCOLA.html"
+      >reaches further back</a
+    >, to the last year that produced one, so no inflation is skipped.
   </p>
 
   <p>
@@ -196,18 +200,21 @@ const faqs: FAQItem[] = [
   <h2>When It Reaches Your Check</h2>
 
   <p>
-    The adjustment officially applies to benefits for December, and Social
-    Security pays December benefits in January. So the first larger payment
-    {isBeingPaid ? 'arrived' : 'arrives'} in January {headline.paymentYear}.
+    The adjustment officially
+    <a href="https://www.ssa.gov/cola/">applies to benefits for December</a>,
+    and Social Security pays December benefits in January. So the first larger
+    payment {isBeingPaid ? 'arrived' : 'arrives'} in January
+    {headline.paymentYear}.
     Supplemental Security Income works slightly differently. The increase
     applies to the January payment, and January SSI is always issued on the last
     business day of December because the first of the month is a holiday.
   </p>
 
   <p>
-    Social Security posts a personalized COLA notice in the message center of
-    your my Social Security account in late November, along with your new
-    Medicare premium. Paper notices are mailed starting in early December to
+    Social Security posts a
+    <a href="https://www.ssa.gov/cola/">personalized COLA notice</a> in the
+    message center of your my Social Security account in late November, along
+    with your new Medicare premium. Paper notices are mailed starting in early December to
     people who have not opted out of them.
   </p>
 
@@ -323,8 +330,9 @@ const faqs: FAQItem[] = [
   {/if}
 
   <p>
-    A rule known as hold harmless protects most beneficiaries from going
-    backwards. If your dollar COLA is smaller than the increase in your Part B
+    A rule known as
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0601001004">hold harmless</a>
+    protects most beneficiaries from going backwards. If your dollar COLA is smaller than the increase in your Part B
     premium, the premium increase is limited so your net payment does not fall
     below the previous year. It does not cover everyone. People paying
     income-related surcharges, those new to Medicare that year, those not yet
@@ -336,18 +344,24 @@ const faqs: FAQItem[] = [
   <p>
     Two figures change most Januarys but are driven by average wage growth
     rather than the COLA, so they rise by a different percentage. The first is
-    the <a href="/guides/earnings-cap">taxable maximum</a>, the ceiling on
-    earnings that count toward Social Security. The second is the
-    <a href="/guides/earnings-test">earnings test</a> limit, which affects
-    people who work while collecting before Normal Retirement Age. Neither one
-    rises in a year when no COLA is payable.
+    the <a href="/guides/earnings-cap">taxable maximum</a>, the
+    <a href="https://www.ssa.gov/oact/cola/cbb.html"
+      >ceiling on earnings that count toward Social Security</a
+    >. The second is the
+    <a href="/guides/earnings-test">earnings test</a> limit, which
+    <a href="https://www.ssa.gov/oact/cola/rtea.html"
+      >affects people who work while collecting</a
+    > before Normal Retirement Age. Neither one rises in a year when no COLA is
+    payable.
   </p>
 
   <h3>Tax Thresholds That Never Change</h3>
   <p>
     The income thresholds that determine how much of your benefit is subject to
-    federal income tax are not indexed at all. They have been fixed since the
-    1984 and 1994 tax years. Each COLA therefore pushes a few more people over
+    federal income tax are not indexed at all. They have been
+    <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+      >fixed since the 1984 and 1994 tax years</a
+    >. Each COLA therefore pushes a few more people over
     them, which is why the share of beneficiaries owing tax on benefits keeps
     growing. See our guide on
     <a href="/guides/federal-taxes">federal taxation of benefits</a>.
@@ -386,6 +400,50 @@ const faqs: FAQItem[] = [
     ssa.gov and it will show your benefit at every possible filing date, in
     today's dollars.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/latestCOLA.html"
+        >Social Security Administration: Latest Cost-of-Living Adjustment</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/cola/"
+        >Social Security Administration: Cost-of-Living Adjustment (COLA)
+        Information</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/colaseries.html"
+        >Social Security Administration: Cost-Of-Living Adjustments</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/cbb.html"
+        >Social Security Administration: Contribution and Benefit Base</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/rtea.html"
+        >Social Security Administration: Exempt Amounts Under the Earnings
+        Test</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+        >Social Security Administration: Social Security History, Taxation of
+        Benefits</a
+      >
+    </li>
+    <li>
+      <a href="https://secure.ssa.gov/poms.nsf/lnx/0601001004"
+        >Social Security Administration: POMS HI 01001.004, The Variable
+        Supplementary Medical Insurance (VSMI) Premium</a
+      >
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>

@@ -18,7 +18,7 @@ const title = 'Social Security Benefits for Divorced Spouses: Eligibility, Rules
 const description =
   'Can you collect Social Security from your ex-spouse? Learn the divorced spouse benefit rules, including the 10-year marriage requirement, how benefits are calculated, and whether your ex needs to know.';
 const publishDate = new Date('2026-01-18T00:00:00+00:00');
-const updateDate = new Date('2026-01-18T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/divorced-spouse';
@@ -101,12 +101,14 @@ const faqs = [
     <h3>The Five Requirements</h3>
     <ol>
       <li>
-        10-year marriage: Your marriage must have lasted at least 10 years,
+        10-year marriage: Your marriage must have lasted
+        <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0331.htm">at least 10 years</a>,
         measured from the date of marriage to the date the divorce was
         finalized, even if you were separated before then.
       </li>
       <li>
-        Currently unmarried: You must be currently unmarried. If you remarried
+        Currently unmarried: You must be
+        <a href="https://secure.ssa.gov/poms.nsf/lnx/0300202045">currently unmarried</a>. If you remarried
         but that marriage ended (through divorce, annulment, or death), you may
         regain eligibility.
       </li>
@@ -157,9 +159,10 @@ const faqs = [
     The divorced spouse benefit is based on your ex-spouse's
     <a href="/guides/pia">Primary Insurance Amount (PIA)</a>, which is the benefit
     they would receive at their <a href="/guides/nra">Normal Retirement Age (NRA)</a>.
-    The maximum divorced spouse benefit is 50% of your ex-spouse's PIA, which
+    The maximum divorced spouse benefit is
+    <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0333.htm">50% of your ex-spouse's PIA</a>, which
     you'd receive if you claim at your own full retirement age. Claiming
-    earlier reduces your benefit:
+    earlier <a href="https://www.ssa.gov/oact/quickcalc/spouse.html">reduces your benefit</a>:
   </p>
 
   <table class="benefit-table">
@@ -184,8 +187,9 @@ const faqs = [
   </p>
 
   <p>
-    Unlike your own retirement benefit, divorced spouse benefits do not
-    increase if you wait past your full retirement age. The maximum is always
+    Unlike your own retirement benefit, divorced spouse benefits
+    <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">do not increase</a> if you wait past your full
+    retirement age. The maximum is always
     50% of your ex-spouse's PIA, so there's no advantage to delaying past your
     NRA.
   </p>
@@ -206,8 +210,8 @@ const faqs = [
   <h2>Does My Ex-Spouse Know If I Claim Benefits?</h2>
 
   <p>
-    Worried your ex will find out? They won't. Social Security doesn't notify
-    them, doesn't need their consent, and doesn't touch their benefit. Your ex
+    Worried your ex will find out? They won't. Social Security doesn't notify them, doesn't need their consent,
+    and doesn't touch their benefit. Your ex
     can't block or prevent your claim.
   </p>
 
@@ -220,7 +224,8 @@ const faqs = [
   <h2>What If My Ex-Spouse Hasn't Filed Yet?</h2>
 
   <p>
-    Under the independently entitled divorced spouse rule, you can claim
+    Under the <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0331.htm">independently entitled divorced spouse
+    rule</a>, you can claim
     benefits even if your ex-spouse hasn't filed for their own benefits, as
     long as:
   </p>
@@ -243,8 +248,9 @@ const faqs = [
     Your ex-spouse's current marital status has no effect on your eligibility.
     You can claim even if they've remarried, even if their current spouse is
     also claiming spousal benefits, and even if other ex-spouses from 10+ year
-    marriages are claiming too. Social Security allows unlimited divorced
-    spouse beneficiaries on one worker's record. Each person's benefit is
+    marriages are claiming too. Social Security allows
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300202005">unlimited divorced spouse beneficiaries</a> on one
+    worker's record. Each person's benefit is
     calculated independently, and none affects the others.
   </p>
 
@@ -253,10 +259,11 @@ const faqs = [
   <p>
     Generally, remarriage ends your eligibility for divorced spouse benefits,
     but there are exceptions. If your subsequent marriage ended through
-    divorce, annulment, or your spouse's death, you may regain eligibility for
+    divorce, annulment, or your spouse's death, you may
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300202045">regain eligibility</a> for
     benefits from your first ex-spouse (assuming the 10-year requirement was
-    met). And if you remarry after age 60 (or age 50 if disabled), you can
-    still receive divorced spouse <em>survivor</em> benefits if your ex-spouse
+    met). And if you <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0335.htm">remarry after age 60</a> (or age 50 if
+    disabled), you can still receive divorced spouse <em>survivor</em> benefits if your ex-spouse
     has died.
   </p>
 
@@ -280,7 +287,7 @@ const faqs = [
   <p>
     Survivor benefits can be claimed as early as age 60, though claiming before
     your full retirement age results in a reduction. At age 60, you'd receive
-    approximately 71.5% of the full survivor benefit.
+    <a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">approximately 71.5%</a> of the full survivor benefit.
   </p>
 
   <p>
@@ -373,6 +380,19 @@ const faqs = [
     <a href="/guides/spousal-benefits">Spousal Benefits</a>, and
     <a href="/guides/spousal-benefit-filing-date">Spousal Benefits and Filing Dates</a>.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0331.htm">20 CFR 404.331: Who is entitled to wife's or husband's benefits as a divorced spouse</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0333.htm">20 CFR 404.333: Wife's and husband's benefit amounts</a></li>
+    <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0335.htm">20 CFR 404.335: How do I become entitled to widow's or widower's benefits</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300202045">SSA POMS RS 00202.045: Remarriage of a Divorced Spouse</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300202005">SSA POMS RS 00202.005: Divorced Spouse</a></li>
+    <li><a href="https://www.ssa.gov/oact/quickcalc/spouse.html">Social Security Administration: Benefits for Spouses</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">Social Security Administration: Family benefits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">Social Security Administration: What you could get from Survivor benefits</a></li>
+  </ul>
 
   <GuideFooter />
 </div>
