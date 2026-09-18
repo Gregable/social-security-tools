@@ -90,7 +90,7 @@ schema.tags = [
     >. It's calculated using a
     <a href="https://www.ssa.gov/oact/cola/piaformula.html">formula</a> that
     applies "<strong>bend points</strong>" to your AIME. For 2025, the
-    <a href="https://www.ssa.gov/oact/COLA/bendpoints.html">bend points</a> are <strong>$1,226</strong> and <strong>$7,391</strong>.
+    <a href="https://www.ssa.gov/oact/cola/bendpoints.html">bend points</a> are <strong>$1,226</strong> and <strong>$7,391</strong>.
   </p>
   <p>Here's how the calculation works for an AIME of $5,000.00:</p>
   <ul>
@@ -169,7 +169,7 @@ schema.tags = [
       >
     </li>
     <li>
-      <a href="https://www.ssa.gov/oact/COLA/bendpoints.html"
+      <a href="https://www.ssa.gov/oact/cola/bendpoints.html"
         >Social Security Administration: Benefit Formula Bend Points</a
       >
     </li>

@@ -191,7 +191,7 @@ const faqs: FAQItem[] = [
     <p>
       Consider this simplified earnings record for someone who turned 60 in
       {indexingYear}. Each multiplier is the
-      <a href="https://www.ssa.gov/oact/COLA/awifactors.html"
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html"
         >indexing factor</a
       > for that year:
     </p>
@@ -410,7 +410,7 @@ const faqs: FAQItem[] = [
       >
     </li>
     <li>
-      <a href="https://www.ssa.gov/oact/COLA/awifactors.html"
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html"
         >Social Security Administration: Indexing Factors for Earnings</a
       >
     </li>

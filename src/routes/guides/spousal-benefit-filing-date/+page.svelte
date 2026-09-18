@@ -114,7 +114,7 @@
     <li>Chris has no earnings</li>
     <li>
       Alex and Chris both file for benefits at
-      <a href="https://www.ssa.gov/oact/ProgData/nra.html">Full Retirement Age</a>
+      <a href="https://www.ssa.gov/oact/progdata/nra.html">Full Retirement Age</a>
     </li>
   </ul>
 
@@ -403,7 +403,7 @@
     <li><a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0410.htm">20 CFR 404.410: How does SSA reduce my benefits when my entitlement begins before full retirement age</a></li>
     <li><a href="https://www.ssa.gov/oact/quickcalc/spouse.html">Social Security Administration: Benefits for Spouses</a></li>
     <li><a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">Social Security Administration: Early or delayed retirement</a></li>
-    <li><a href="https://www.ssa.gov/oact/ProgData/nra.html">Social Security Administration: Normal retirement age</a></li>
+    <li><a href="https://www.ssa.gov/oact/progdata/nra.html">Social Security Administration: Normal retirement age</a></li>
   </ul>
 
   <GuideFooter />

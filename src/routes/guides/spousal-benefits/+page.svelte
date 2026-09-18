@@ -131,7 +131,7 @@ const faqs: FAQItem[] = [
   <h2>How Much You Get</h2>
 
   <p>
-    The full spousal benefit is <a href="https://www.ssa.gov/oact/quickcalc/spouse.html">50%</a> of your spouse's
+    <a href="https://www.ssa.gov/oact/quickcalc/spouse.html">The full spousal benefit</a> is 50% of your spouse's
     <a href="/guides/pia">Primary Insurance Amount (PIA)</a>. The PIA is the
     monthly benefit your spouse would receive at their
     <a href="/guides/nra">Normal Retirement Age</a>, which is 67 for anyone
@@ -209,7 +209,7 @@ const faqs: FAQItem[] = [
   <p>
     The 50% figure applies only if you claim at your Normal Retirement Age.
     Claiming earlier permanently reduces the spousal benefit. The reduction
-    is <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0410.htm">25/36 of 1%</a> for each of the first 36 months
+    is <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0410.htm">25/36 of 1% for each of the first 36 months</a>
     before your Normal Retirement Age, and 5/12 of 1% for each month beyond
     that. That is
     steeper than the reduction on your own retirement benefit.
@@ -276,7 +276,7 @@ const faqs: FAQItem[] = [
 
   <p>
     If you are under Normal Retirement Age and still working, the
-    <a href="/guides/earnings-test">earnings test</a>
+    <a href="/guides/earnings-test">earnings test</a> still
     <a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">applies to spousal benefits</a> the same way it applies to retirement benefits. Earnings above
     the annual limit cause some of your benefit to be withheld until you
     reach Normal Retirement Age.

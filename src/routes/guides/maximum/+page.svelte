@@ -199,7 +199,7 @@
         >Earn at or above the earnings cap for at least {SSA_EARNINGS_YEARS} years.</strong
       >
       Your benefit is based on your
-      <a href="https://www.ssa.gov/oact/ProgData/retirebenefit1.html">highest {SSA_EARNINGS_YEARS} years of earnings</a>.
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html">highest {SSA_EARNINGS_YEARS} years of earnings</a>.
       Each year must be at or above the
       <a href="/guides/earnings-cap">maximum taxable earnings</a> to contribute
       to the maximum <a href="/guides/aime">AIME</a>.
@@ -256,8 +256,8 @@
     </li>
     <li>
       <strong>Bend point adjustments:</strong> The
-      <a href="/guides/pia">PIA formula bend points</a>
-      <a href="https://www.ssa.gov/oact/cola/bendpoints.html">increase with average wages</a>,
+      <a href="/guides/pia">PIA formula bend points</a> are
+      <a href="https://www.ssa.gov/oact/cola/bendpoints.html">indexed to average wages</a>,
       gradually raising the maximum possible PIA.
     </li>
   </ul>
@@ -326,8 +326,8 @@
     Very few retirees actually receive the maximum benefit. To qualify, you'd
     need to have earned at or above the earnings cap for {SSA_EARNINGS_YEARS} years—a
     feat that requires consistently high income throughout your career. (Of course,
-    you also need the <a href="/guides/work-credits">40 work credits</a>
-    <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html">required to qualify for any retirement benefits</a>, but that's easily achieved by anyone
+    you also need the <a href="/guides/work-credits">40 work credits</a> that SSA
+    <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html">requires for any retirement benefit</a>, but that's easily achieved by anyone
     earning at the cap.)
   </p>
 
@@ -384,7 +384,7 @@
   <ul>
     <li><a href="https://www.ssa.gov/faqs/en/questions/KA-01897.html">Social Security Administration: What Is the Maximum Social Security Retirement Benefit Payable?</a></li>
     <li><a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">Social Security Administration: Delayed Retirement Credits</a></li>
-    <li><a href="https://www.ssa.gov/oact/ProgData/retirebenefit1.html">Social Security Administration: Social Security Retirement Benefit Calculation</a></li>
+    <li><a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html">Social Security Administration: Social Security Retirement Benefit Calculation</a></li>
     <li><a href="https://www.ssa.gov/oact/cola/examplemax.html">Social Security Administration: Maximum-Taxable Benefit Examples</a></li>
     <li><a href="https://www.ssa.gov/oact/cola/cbb.html">Social Security Administration: Contribution and Benefit Base</a></li>
     <li><a href="https://www.ssa.gov/oact/cola/bendpoints.html">Social Security Administration: Benefit Formula Bend Points</a></li>

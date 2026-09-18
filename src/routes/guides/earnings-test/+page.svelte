@@ -291,8 +291,8 @@
   <h2>Common Misconceptions</h2>
 
   <p>
-    Does working permanently reduce your Social Security? <a href="https://www.ssa.gov/faqs/en/questions/KA-01921.html">No</a>. Benefits withheld
-    by the earnings test are credited back to you at full retirement age
+    Does working permanently reduce your Social Security? No. <a href="https://www.ssa.gov/faqs/en/questions/KA-01921.html">Benefits withheld
+    by the earnings test are credited back</a> to you at full retirement age
     through higher monthly payments, so you eventually recover the withheld
     amounts.
   </p>

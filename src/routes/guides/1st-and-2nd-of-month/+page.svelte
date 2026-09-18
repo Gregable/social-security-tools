@@ -103,7 +103,7 @@ schema.tags = [
     benefit will equal your Primary Insurance Amount with no reductions from
     starting early or delayed credit increases for delaying benefits. NRA
     varies by year of birth. Currently
-    <a href="https://www.ssa.gov/oact/ProgData/nra.html">anyone born in 1960 or later has an NRA of 67</a>.
+    <a href="https://www.ssa.gov/oact/progdata/nra.html">anyone born in 1960 or later has an NRA of 67</a>.
   </p>
   <p>
     The month of your normal retirement age is the
@@ -175,19 +175,20 @@ schema.tags = [
   </p>
   <a href="https://www.ssa.gov/pubs/calendar.htm">
     <img
-      src="/PaymentSchedule2023.png"
-      alt="Social Security Payment Schedule 2023"
+      src="/PaymentSchedule2024.png"
+      alt="Social Security Payment Schedule 2024"
       width="781"
       height="1023"
       loading="lazy"
     />
   </a>
+
   <h2>Additional Resources</h2>
 
   <ul>
     <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0200302400">SSA POMS GN 00302.400: Point at Which a Particular Age is Attained</a></li>
     <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615015">SSA POMS RS 00615.015: How the Day of Birth Affects Benefits</a></li>
-    <li><a href="https://www.ssa.gov/oact/ProgData/nra.html">Social Security Administration: Normal Retirement Age</a></li>
+    <li><a href="https://www.ssa.gov/oact/progdata/nra.html">Social Security Administration: Normal Retirement Age</a></li>
     <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615003">SSA POMS RS 00615.003: Full Retirement Age</a></li>
     <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0202401001">SSA POMS GN 02401.001: General Information on Title II Checks</a></li>
     <li><a href="https://www.ssa.gov/pubs/calendar.htm">Social Security Administration: Schedule of Social Security Payments</a></li>

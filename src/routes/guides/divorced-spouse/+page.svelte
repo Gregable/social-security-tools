@@ -210,8 +210,7 @@ const faqs = [
   <h2>Does My Ex-Spouse Know If I Claim Benefits?</h2>
 
   <p>
-    Worried your ex will find out? They won't. Social Security
-    <a href="https://www.ssa.gov/benefits/retirement/planner/applying7.html">doesn't notify them</a>, doesn't need their consent,
+    Worried your ex will find out? They won't. Social Security doesn't notify them, doesn't need their consent,
     and doesn't touch their benefit. Your ex
     can't block or prevent your claim.
   </p>

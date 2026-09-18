@@ -60,7 +60,7 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
     The default mortality inputs come from the U.S. Social Security
     Administration (SSA) cohort life tables (Alternative 2 / Best Estimate,
     from the
-    <a href="https://www.ssa.gov/oact/TR/2026/index.html">Trustees Report</a>).
+    <a href="https://www.ssa.gov/oact/TR/2025/index.html">2025 Trustees Report</a>).
     Source: <a
       href="https://www.ssa.gov/OACT/Downloadables/CY/index.html"
       target="_blank"
@@ -313,8 +313,8 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
       >
     </li>
     <li>
-      <a href="https://www.ssa.gov/oact/TR/2026/index.html"
-        >Social Security Administration: The 2026 OASDI Trustees Report</a
+      <a href="https://www.ssa.gov/oact/TR/2025/index.html"
+        >Social Security Administration: The 2025 OASDI Trustees Report</a
       >
     </li>
   </ul>

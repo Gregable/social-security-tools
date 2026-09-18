@@ -224,7 +224,7 @@ schema.tags = [
 
   <p>
     Any provisional income above $44,000 is federally taxable at 85%. If your
-    total provisional income is above $34,000 these two points, calculate the
+    total provisional income is above $44,000 these two points, calculate the
     federally taxable amount as (PI - $44,000) x 0.85 + $6,000. The $6,000
     number is 50% of the the provisional income between $32,000 and $44,000.
   </p>

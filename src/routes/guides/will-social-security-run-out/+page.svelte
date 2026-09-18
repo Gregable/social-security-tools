@@ -93,7 +93,7 @@ const faqs: FAQItem[] = [
     the same time. Over its 80-year history, the program has collected more
     money than it has paid out. The
     <a href="https://www.ssa.gov/oact/progdata/assets.html"
-      >current surplus is $3 trillion</a
+      >reserves stood at about $2.6 trillion at the end of 2025</a
     >. However, in recent years the program is paying out more than it is
     collecting, and so the fund is shrinking. Current estimates are that the
     fund will run out in 2034.

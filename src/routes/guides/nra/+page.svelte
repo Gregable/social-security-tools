@@ -95,7 +95,7 @@ fraTable.push({
   <h2>NRA by Birth Year</h2>
 
   <p>
-    Your <a href="https://www.ssa.gov/oact/ProgData/nra.html">Normal Retirement Age depends entirely on when you were born</a>. Congress
+    Your <a href="https://www.ssa.gov/oact/progdata/nra.html">Normal Retirement Age depends entirely on when you were born</a>. Congress
     gradually increased NRA from 65 to 67 through
     <a href="https://www.ssa.gov/history/1983amend.html">legislation passed in 1983</a>,
     affecting those born in 1938 and later.
@@ -339,7 +339,7 @@ fraTable.push({
   <h2>Additional Resources</h2>
 
   <ul>
-    <li><a href="https://www.ssa.gov/oact/ProgData/nra.html">Social Security Administration: Normal Retirement Age</a></li>
+    <li><a href="https://www.ssa.gov/oact/progdata/nra.html">Social Security Administration: Normal Retirement Age</a></li>
     <li><a href="https://www.ssa.gov/history/1983amend.html">Social Security Administration: Social Security Amendments of 1983</a></li>
     <li><a href="https://www.ssa.gov/benefits/retirement/planner/1960.html">Social Security Administration: Born in 1960 or Later</a></li>
     <li><a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html">Social Security Administration: Retirement Age and Benefit Reduction</a></li>

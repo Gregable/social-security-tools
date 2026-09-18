@@ -79,9 +79,8 @@ schema.tags = [
   <InlineCTA type="sponsor" {sponsorCopy} />
 
   <p>
-    These agreements allow earned income credits to be earned overseas and
-    still <a href="https://www.ssa.gov/international/agreement_descriptions.html"
-      >count towards</a
+    These agreements allow earned income <a href="https://www.ssa.gov/international/agreement_descriptions.html"
+      >credits to be earned overseas and still count towards</a
     > the
     <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html"
       >minimum of 40 credits</a
