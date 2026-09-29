@@ -61,8 +61,6 @@ onMount(() => {
   {@html websiteSchema.render()}
   {@html organizationSchema.render()}
 
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
-
   <!-- Google tag (gtag.js) -->
   <script
     async
@@ -293,10 +291,15 @@ onMount(() => {
   }
 
   .hero-sub {
-    color: #4b4b4b;
     line-height: 1.4;
     margin: 0;
-    white-space: nowrap;
+  }
+
+  /* One line when the hero column is wide enough to hold it. */
+  @media (min-width: 1000px) {
+    .hero-sub {
+      white-space: nowrap;
+    }
   }
 
   .hero-tagline {
@@ -307,12 +310,14 @@ onMount(() => {
 
   .features-intro {
     width: 85%;
-    margin: 3vw auto 0;
+    margin: 3vw auto 0.5rem;
   }
 
-  /* The photo has a wide white band above the laptop; crop it so the
-     choice cards below sit higher on the first screen. */
-  img.hero-image {
+  /* The photo (1134x882) has a ~180px white band above the laptop. Show
+     721px of its height, trimming mostly from the top (object-position
+     87%), so the choice cards below sit higher on the first screen.
+     Recompute if the image changes. */
+  .hero-image {
     aspect-ratio: 1134 / 721;
     object-fit: cover;
     object-position: 50% 87%;
@@ -434,11 +439,11 @@ onMount(() => {
       line-height: 6.5vw;
     }
 
-    .jumbotron-grid .hero-sub {
-      font-size: 1.6vw;
+    .hero-sub {
+      font-size: max(1rem, 1.6vw);
     }
 
-    .jumbotron-grid .hero-tagline {
+    .hero-tagline {
       font-size: max(0.85rem, 1.3vw);
     }
 
@@ -482,11 +487,11 @@ onMount(() => {
       margin: 0.2rem 0 1rem;
     }
 
-    .jumbotron-grid .hero-sub {
+    .hero-sub {
       font-size: 4.2vw;
     }
 
-    .jumbotron-grid .hero-tagline {
+    .hero-tagline {
       font-size: 3.8vw;
     }
 

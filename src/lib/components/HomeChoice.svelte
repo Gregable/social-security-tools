@@ -2,39 +2,45 @@
 import posthog from 'posthog-js';
 import { browser } from '$app/environment';
 import { outboundImpression, trackOutboundClick } from '$lib/analytics/outbound';
+import { activeIntegration } from '$lib/integrations/context';
 import { SPONSOR } from '$lib/sponsor';
 
 const PLACEMENT = 'homepage-choice';
 
-function trackDiyClick(path: 'calculator' | 'strategy') {
+// Partner-integration visitors never see the sponsor, matching the
+// calculator and strategy pages.
+$: showSponsor = !$activeIntegration;
+
+function trackDiyClick(path: 'calculator' | 'strategy'): void {
   if (!browser) return;
   posthog.capture('Homepage Choice: Clicked', { path });
 }
 
-function handleProClick() {
+function handleProClick(): void {
   trackOutboundClick(SPONSOR.destination, PLACEMENT);
 }
 </script>
 
-<section class="choice" aria-labelledby="choice-heading">
-  <h2 id="choice-heading" class="choice-label">Two ways to plan</h2>
-  <div class="cards">
+<section class="choice" aria-label="Ways to plan">
+  {#if showSponsor}
+    <h2 class="choice-label">Two ways to plan</h2>
+  {/if}
+  <div class="cards" class:solo={!showSponsor}>
     <!-- Not an <a> like the sponsor card: it holds a second link, and links
-         cannot nest. The title link stretches over the card instead. -->
+         cannot nest. The button link stretches over the card instead. -->
     <div class="card diy">
       <p class="kicker">Do it yourself</p>
-      <h3 class="card-title">
-        <a
-          href="/calculator"
-          class="stretched-link"
-          on:click={() => trackDiyClick('calculator')}>Use the free calculator</a
-        >
-      </h3>
+      <h3 class="card-title">Use the free calculator</h3>
       <p class="card-body">
         Paste in your earnings record from SSA.gov and see your benefit at every
         filing age. Free, and your data never leaves your browser.
       </p>
-      <span class="card-button" aria-hidden="true">Calculate My Benefits &rarr;</span>
+      <a
+        href="/calculator"
+        class="card-button stretched-link"
+        on:click={() => trackDiyClick('calculator')}
+        >Calculate My Benefits &rarr;</a
+      >
       <p class="card-footnote">
         Already know your Primary Insurance Amount?
         <a
@@ -46,23 +52,25 @@ function handleProClick() {
       </p>
     </div>
 
-    <a
-      href={SPONSOR.url}
-      class="card pro"
-      target="_blank"
-      rel="noopener"
-      on:click={handleProClick}
-      use:outboundImpression={{ destination: SPONSOR.destination, placement: PLACEMENT }}
-    >
-      <p class="kicker">Get expert help <span class="badge">Sponsor</span></p>
-      <h3 class="card-title">Talk to a professional</h3>
-      <p class="card-body">
-        Prefer to talk it through? {SPONSOR.name} offers a free call with a
-        Social Security specialist.
-      </p>
-      <span class="card-button">Schedule a Free Call &rarr;</span>
-      <p class="card-footnote">Opens the scheduling calendar in a new tab.</p>
-    </a>
+    {#if showSponsor}
+      <a
+        href={SPONSOR.url}
+        class="card pro"
+        target="_blank"
+        rel="noopener"
+        on:click={handleProClick}
+        use:outboundImpression={{ destination: SPONSOR.destination, placement: PLACEMENT }}
+      >
+        <p class="kicker">Get expert help <span class="badge">Sponsor</span></p>
+        <h3 class="card-title">Talk to a professional</h3>
+        <p class="card-body">
+          Prefer to talk it through? {SPONSOR.name} offers a free call with a
+          Social Security specialist.
+        </p>
+        <span class="card-button">Schedule a Free Call &rarr;</span>
+        <p class="card-footnote">Opens the scheduling calendar in a new tab.</p>
+      </a>
+    {/if}
   </div>
 </section>
 
@@ -88,9 +96,14 @@ function handleProClick() {
     gap: 1.5rem;
   }
 
-  /* Each card spans five shared rows (kicker, title, body, button,
-     footnote) so the buttons line up even when the footnotes wrap
-     differently. */
+  .cards.solo {
+    grid-template-columns: 1fr;
+  }
+
+  /* Each card spans five rows shared through subgrid (kicker, title, body,
+     button, footnote), so titles, bodies and buttons line up across both
+     cards whatever their text length. Keep the span in sync with the
+     number of children. */
   .card {
     position: relative;
     display: grid;
@@ -101,7 +114,6 @@ function handleProClick() {
     padding: clamp(1.25rem, 2vw, 2.25rem);
     border: 2px solid;
     border-radius: 8px;
-    text-decoration: none;
     color: inherit;
     transition:
       transform 0.2s ease,
@@ -113,26 +125,30 @@ function handleProClick() {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
   }
 
-  .card:focus-visible,
-  .card:has(.stretched-link:focus-visible) {
+  .card:focus-visible {
     outline: 2px solid #081d88;
     outline-offset: 4px;
   }
 
-  .stretched-link {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .stretched-link:focus-visible {
-    outline: none;
-  }
-
-  /* Makes the whole card a click target for the calculator link. */
+  /* Makes the whole card a click target for the calculator link. The
+     overlay is positioned against .card, so the link itself must not be
+     positioned. */
   .stretched-link::after {
     content: '';
     position: absolute;
     inset: 0;
+    border-radius: 8px;
+  }
+
+  /* Draw the focus ring around the whole card (the overlay) rather than
+     around the button. */
+  .stretched-link:focus-visible {
+    outline: none;
+  }
+
+  .stretched-link:focus-visible::after {
+    outline: 2px solid #081d88;
+    outline-offset: 4px;
   }
 
   .diy {
@@ -162,7 +178,7 @@ function handleProClick() {
     margin-left: 0.5rem;
     padding: 2px 6px;
     border-radius: 3px;
-    background: #337ab7;
+    background: var(--accent);
     color: #fff;
     font-size: 0.8em;
     letter-spacing: 0.04em;
@@ -222,7 +238,6 @@ function handleProClick() {
   }
 
   .card-footnote {
-    align-self: start;
     margin: 0.9rem 0 0;
     color: #555;
     font-size: clamp(0.9rem, 1vw, 1.15rem);

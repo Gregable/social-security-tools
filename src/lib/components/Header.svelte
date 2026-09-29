@@ -13,10 +13,6 @@ const mainNav = [
 ];
 </script>
 
-<svelte:head>
-  <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet" />
-</svelte:head>
-
 <div class="header">
   <h3><a href="/">SSA<span class="wordmark-tools">.tools</span></a></h3>
 
@@ -63,8 +59,9 @@ const mainNav = [
     grid-template-columns: 1fr auto;
     align-items: center;
     width: 100%;
-    box-sizing: border-box;
-    /* Match the homepage's centered 85%-wide content column. */
+    /* 7.5vw each side = the homepage's centered 85% content column
+       (.jumbotron-grid / .grid-container in routes/+page.svelte and .choice
+       in HomeChoice.svelte). Update together. */
     padding: 0 7.5vw;
     border-bottom: 1px solid #c5c5c5;
     margin-bottom: 1.5em;
@@ -74,7 +71,6 @@ const mainNav = [
   h3 {
     margin: 0;
     color: #333;
-    font-family: inherit;
     font-weight: 700;
     font-size: 28px;
     white-space: nowrap;
@@ -162,6 +158,7 @@ const mainNav = [
     .header {
       grid-template-columns: 1fr;
       justify-items: center;
+      /* Stacked and centered: no side padding needed. */
       padding: 0;
       margin-bottom: 10px;
     }
