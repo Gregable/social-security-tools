@@ -75,6 +75,18 @@ afterNavigate(({ to }) => {
 });
 </script>
 
+<svelte:head>
+  <!-- Lato is the site font (header on every page, plus the homepage and
+       strategy page). Loaded once here; swap keeps text visible while it
+       downloads. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap"
+    rel="stylesheet"
+  />
+</svelte:head>
+
 <slot></slot>
 
 <!-- Global styles moved to src/app.css -->

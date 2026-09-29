@@ -2,12 +2,15 @@
 import type { ComponentType, SvelteComponent } from 'svelte';
 import { onMount } from 'svelte';
 import Header from '$lib/components/Header.svelte';
+import HomeChoice from '$lib/components/HomeChoice.svelte';
 import { loadIntroBanner } from '$lib/integrations/config';
 import { activeIntegration } from '$lib/integrations/context';
 import CombinedDemoMp4 from '$lib/videos/combined-demo.mp4';
 import CombinedDemoPoster from '$lib/videos/combined-demo-poster.jpg';
 import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
 import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
+import StrategyDemoMp4 from '$lib/videos/strategy-demo.mp4';
+import StrategyDemoPoster from '$lib/videos/strategy-demo-poster.jpg';
 import {
   WebSiteSchema,
   OrganizationSchema,
@@ -58,8 +61,6 @@ onMount(() => {
   {@html websiteSchema.render()}
   {@html organizationSchema.render()}
 
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
-
   <!-- Google tag (gtag.js) -->
   <script
     async
@@ -87,19 +88,16 @@ onMount(() => {
   <div class="jumbotron-grid">
     <div>
       <h1><span id="understand">Understand</span> Social Security</h1>
-      <div class="bigbtn">
-        <a class="bigbtn" href="calculator" role="button"
-          ><span>Get Started</span>
-          <div class="freebadge">Free</div></a
-        >
-      </div>
+      <p class="hero-sub">Estimate your benefit and decide when to file.</p>
+      <p class="hero-tagline">Free, private, no sign-up.</p>
     </div>
     <div>
       <div>
         <img
+          class="hero-image"
           src="/laptop-piggybank.jpg"
           width="1134"
-          height="712"
+          height="882"
           alt="Social Security retirement benefits calculator showing estimated monthly payments"
           title="Social Security benefits calculator"
         />
@@ -107,23 +105,24 @@ onMount(() => {
     </div>
   </div>
 
-  <hr />
+  <HomeChoice />
+
+  <h2 class="section-label features-intro">Inside the DIY calculator</h2>
 
   <article class="grid-container">
     <section>
-      <h2 class="section-label">Quick Data Entry</h2>
-      <h3 class="section-title">Import Your Earnings History from SSA.gov</h3>
+      <h2 class="section-label">Your earnings</h2>
+      <h3 class="section-title">Copy and paste your earnings record</h3>
       <p>
-        Painless entry of your earnings records directly from your my Social Security
-        account at ssa.gov. Copy and paste your entire earnings history directly into
-        the calculator in a single quick step. Runs entirely in your browser,
-        making the process secure and private.
+        Sign in to your my Social Security account at ssa.gov, copy your
+        earnings history, and paste it in. That's the whole setup. Everything
+        runs in your browser, so your earnings never leave your device.
       </p>
     </section>
     <div>
       <div class="shadow">
         <video
-          id="pia_vid"
+          id="copypaste_vid"
           autoplay
           playsinline
           loop
@@ -140,12 +139,12 @@ onMount(() => {
     </div>
 
     <section>
-      <h2 class="section-label">Highly Interactive</h2>
-      <h3 class="section-title">Plan Your Retirement Age</h3>
+      <h2 class="section-label">Future work</h2>
+      <h3 class="section-title">See what more years of work are worth</h3>
       <p>
-        Working more years can impact your benefit. Use the retirement age
-        calculator to estimate how working until your full retirement age (or
-        beyond) affects your AIME, PIA, and monthly benefit payments.
+        Your benefit is based on your highest 35 years of earnings. Tell the
+        calculator how much longer you plan to work and roughly what you'll
+        earn, and watch your monthly benefit update.
       </p>
     </section>
     <div>
@@ -170,12 +169,13 @@ onMount(() => {
     </div>
 
     <section>
-      <h2 class="section-label">Visual Charts</h2>
-      <h3 class="section-title">Estimate Your Benefits</h3>
+      <h2 class="section-label">The formula</h2>
+      <h3 class="section-title">See how your benefit is calculated</h3>
       <p>
-        Visualize how your Average Indexed Monthly Earnings (AIME) affects your
-        Primary Insurance Amount (PIA). The calculator shows how your earnings
-        fit into the Social Security bendpoints that determine your benefit.
+        Social Security averages your top 35 years of earnings, adjusted for
+        wage growth. It pays back 90% of the first part of that average, 32% of
+        the next, and 15% of the rest. The chart shows where your earnings fall
+        and what that means for your monthly check.
       </p>
     </section>
     <div>
@@ -199,14 +199,12 @@ onMount(() => {
     </div>
 
     <section>
-      <h2 class="section-label">When to Claim</h2>
-      <h3 class="section-title">Find Your Optimal Filing Age</h3>
+      <h2 class="section-label">When to claim</h2>
+      <h3 class="section-title">Try different filing ages</h3>
       <p>
-        Should you claim at 62, wait until 70, or somewhere in between?
-        Interactive charts show how early retirement reduces benefits and how
-        delayed retirement credits can help maximize your Social Security. See
-        the impact on both your benefits and your spouse's spousal and survivor
-        benefits.
+        Claim at 62 and your check is smaller for life. Wait until 70 and it's
+        larger for life. Drag the start date to see how your monthly benefit
+        changes, along with your spouse's spousal and survivor benefits.
       </p>
     </section>
     <div>
@@ -227,28 +225,54 @@ onMount(() => {
         </video>
       </div>
     </div>
+
+    <section>
+      <h2 class="section-label">Filing strategy</h2>
+      <h3 class="section-title">Let the optimizer pick your filing ages</h3>
+      <p>
+        Not sure which age is best? The <a href="/strategy">strategy optimizer</a>
+        tries every combination of filing dates for you (and your spouse, if
+        you're married), weighs each by how long you're likely to live, and
+        recommends the best one. Adjust for your health and watch the answer
+        change.
+      </p>
+    </section>
+    <div>
+      <div class="shadow">
+        <video
+          id="strategy_vid"
+          autoplay
+          playsinline
+          loop
+          muted
+          disableRemotePlayback
+          width="840"
+          height="800"
+          poster={StrategyDemoPoster}
+          title="Animation showing the optimal filing age for each combination of death ages changing as a health slider moves."
+        >
+          <source src={StrategyDemoMp4} type="video/mp4" />
+        </video>
+      </div>
+    </div>
   </article>
 
   <footer id="footer">
     <div id="footer-container">
       <h2 class="section-label">What next</h2>
-      <h3 class="section-title">Ready to estimate your Social Security benefits?</h3>
+      <h3 class="section-title">Ready to see your numbers?</h3>
       <p>
-        Great, <a href="/calculator">get started here</a>. Updated for 2026
-        with the latest bend points and COLA (cost-of-living adjustment).
+        Start the <a href="/calculator">free calculator</a>. It's up to date for
+        2026, including this year's cost-of-living adjustment.
       </p>
-      <h3 class="section-title">Save for later?</h3>
-      <p>Here are some easy ways to remember:</p>
-      <ol>
-        <li>Leave this tab open. Get back to it later.</li>
-        <li>Bookmark this in your browser.</li>
-        <li>
-          <a
-            href="mailto:?subject=Read%20later%3A%20Social%20Security%20Calculator%20(ssa.tools)&body=Here's%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator"
-            >Send yourself an email</a
-          >.
-        </li>
-      </ol>
+      <h3 class="section-title">Not ready yet?</h3>
+      <p>
+        Leave this tab open, bookmark the page, or
+        <a
+          href="mailto:?subject=Read%20later%3A%20Social%20Security%20Calculator%20(ssa.tools)&body=Here's%20that%20link%3A%20https%3A%2F%2Fssa.tools%2F%0ANote%20to%20self%3A%20The%20social%20security%20calculator"
+          >send yourself an email</a
+        > so you can come back later.
+      </p>
     </div>
   </footer>
 </main>
@@ -266,71 +290,37 @@ onMount(() => {
     color: #337ab7;
   }
 
-  .bigbtn {
-    position: relative;
+  .hero-sub {
+    line-height: 1.4;
+    margin: 0;
   }
 
-  .bigbtn a {
-    background-color: #5cb85c;
-    border-color: #4cae4c;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    cursor: pointer;
-    color: #fff;
-    white-space: nowrap;
-    padding: 14px 24px;
-    font-weight: 400;
-    text-decoration: none;
-    display: flex;
-    box-shadow:
-      0 0 0 1px #5cb85c,
-      0 1px 2px 0 rgba(31, 42, 55, 0.4);
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease-out;
-    width: min-content;
-    margin: auto;
-  }
-
-  .bigbtn a:hover {
-    background-color: #449d44;
-    border-color: #398439;
-  }
-
-  .bigbtn .freebadge {
-    background: #fd6054;
-    border-radius: 4px;
-    margin-left: 10px;
-    padding: 3px 5px;
-  }
-
-  @media (min-width: 921px) {
-    .bigbtn a {
-      font-size: 21px;
-      line-height: 1.3;
+  /* One line when the hero column is wide enough to hold it. */
+  @media (min-width: 1000px) {
+    .hero-sub {
+      white-space: nowrap;
     }
   }
 
-  @media (max-width: 920px) and (min-width: 701px) {
-    .bigbtn a {
-      font-size: 20px;
-      line-height: 1.3;
-    }
+  .hero-tagline {
+    margin: 0.4em 0 0;
+    color: #449d44;
+    font-weight: 700;
   }
 
-  @media (max-width: 700px) and (min-width: 520px) {
-    .bigbtn a {
-      font-size: 16px;
-      line-height: 1.2;
-    }
+  .features-intro {
+    width: 85%;
+    margin: 3vw auto 0.5rem;
   }
 
-  @media (max-width: 520px) {
-    .bigbtn a {
-      font-size: 16px;
-      line-height: 1;
-      padding: 7px 12px;
-    }
+  /* The photo (1134x882) has a ~180px white band above the laptop. Show
+     721px of its height, trimming mostly from the top (object-position
+     87%), so the choice cards below sit higher on the first screen.
+     Recompute if the image changes. */
+  .hero-image {
+    aspect-ratio: 1134 / 721;
+    object-fit: cover;
+    object-position: 50% 87%;
   }
 
   .grid-container {
@@ -370,7 +360,7 @@ onMount(() => {
 
   .section-title {
     color: #060606;
-    margin-bottom: 2.8rem;
+    margin-bottom: 1.2rem;
     font-weight: 700;
   }
 
@@ -389,14 +379,6 @@ onMount(() => {
     display: inline-block;
     padding: 1px;
     filter: drop-shadow(4px 4px 8px #000);
-  }
-
-  hr {
-    background: linear-gradient(90deg, #fff, #687d88, #fff);
-    clear: both;
-    border: 0;
-    height: 1px;
-    margin: 0 10vw;
   }
 
   img {
@@ -430,17 +412,16 @@ onMount(() => {
     color: #888;
   }
 
-  #footer p,
-  #footer li {
+  #footer p {
     color: #ccc;
   }
 
   @media screen and (min-width: 421px) {
     .grid-container {
       grid-column-gap: 6vw;
-      grid-row-gap: 10vw;
+      grid-row-gap: 5vw;
       grid-template-columns: auto auto;
-      margin: 5vw auto;
+      margin: 3vw auto 5vw;
       grid-auto-flow: dense;
     }
 
@@ -458,17 +439,24 @@ onMount(() => {
       line-height: 6.5vw;
     }
 
-    .section-title,
+    .hero-sub {
+      font-size: max(1rem, 1.6vw);
+    }
+
+    .hero-tagline {
+      font-size: max(0.85rem, 1.3vw);
+    }
+
+    .section-title {
+      font-size: max(1.25rem, 2.2vw);
+    }
+
     p {
-      font-size: 1.8vw;
+      font-size: max(1rem, 1.35vw);
     }
 
     #footer-container {
       width: 50%;
-    }
-
-    #footer li {
-      font-size: 1.8vw;
     }
 
     #footer p {
@@ -483,7 +471,7 @@ onMount(() => {
   @media (max-width: 420px) {
     .grid-container {
       grid-column-gap: 6vw;
-      grid-row-gap: 10vw;
+      grid-row-gap: 8vw;
       grid-template-columns: auto;
       margin: 5vw auto;
     }
@@ -499,8 +487,12 @@ onMount(() => {
       margin: 0.2rem 0 1rem;
     }
 
-    hr {
-      display: none;
+    .hero-sub {
+      font-size: 4.2vw;
+    }
+
+    .hero-tagline {
+      font-size: 3.8vw;
     }
 
     span#understand {
@@ -508,9 +500,12 @@ onMount(() => {
       letter-spacing: 0.4rem;
     }
 
-    .section-title,
+    .section-title {
+      font-size: 4.8vw;
+    }
+
     p {
-      font-size: 3.6vw;
+      font-size: 3.8vw;
     }
 
     #footer-container {
@@ -519,10 +514,6 @@ onMount(() => {
 
     #footer p {
       margin-bottom: 1.5rem; /* Reduced margin for better spacing */
-    }
-
-    #footer li {
-      font-size: 3.6vw;
     }
 
     .section-label {
