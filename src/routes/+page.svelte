@@ -416,7 +416,7 @@ onMount(() => {
     color: #ccc;
   }
 
-  @media screen and (min-width: 421px) {
+  @media screen and (width > 700px) {
     .grid-container {
       grid-column-gap: 6vw;
       grid-row-gap: 5vw;
@@ -464,11 +464,14 @@ onMount(() => {
     }
 
     .section-label {
-      font-size: 1.2vw;
+      font-size: max(0.75rem, 1.2vw);
     }
   }
 
-  @media (max-width: 420px) {
+  /* Phones, including large ones (430-440px), and small tablets in
+     portrait get the stacked layout. Sizes scale with the width but are
+     capped so text stays proportionate up to 700px. */
+  @media (max-width: 700px) {
     .grid-container {
       grid-column-gap: 6vw;
       grid-row-gap: 8vw;
@@ -482,30 +485,30 @@ onMount(() => {
     }
 
     .jumbotron-grid h1 {
-      font-size: 11vw;
-      line-height: 13vw;
+      font-size: min(11vw, 4.5rem);
+      line-height: 1.18;
       margin: 0.2rem 0 1rem;
     }
 
     .hero-sub {
-      font-size: 4.2vw;
+      font-size: clamp(1rem, 4.2vw, 1.25rem);
     }
 
     .hero-tagline {
-      font-size: 3.8vw;
+      font-size: clamp(0.9rem, 3.8vw, 1.1rem);
     }
 
     span#understand {
-      font-size: 12vw;
+      font-size: min(12vw, 4.9rem);
       letter-spacing: 0.4rem;
     }
 
     .section-title {
-      font-size: 4.8vw;
+      font-size: clamp(1.15rem, 4.8vw, 1.6rem);
     }
 
     p {
-      font-size: 3.8vw;
+      font-size: clamp(0.95rem, 3.8vw, 1.1rem);
     }
 
     #footer-container {
@@ -517,7 +520,7 @@ onMount(() => {
     }
 
     .section-label {
-      font-size: 2.4vw;
+      font-size: clamp(0.75rem, 2.4vw, 0.9rem);
     }
   }
 </style>
