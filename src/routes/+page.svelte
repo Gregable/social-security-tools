@@ -416,7 +416,7 @@ onMount(() => {
     color: #ccc;
   }
 
-  @media screen and (min-width: 701px) {
+  @media screen and (width > 700px) {
     .grid-container {
       grid-column-gap: 6vw;
       grid-row-gap: 5vw;
@@ -485,7 +485,7 @@ onMount(() => {
     }
 
     .jumbotron-grid h1 {
-      font-size: clamp(2.5rem, 11vw, 4.5rem);
+      font-size: min(11vw, 4.5rem);
       line-height: 1.18;
       margin: 0.2rem 0 1rem;
     }
@@ -499,7 +499,7 @@ onMount(() => {
     }
 
     span#understand {
-      font-size: clamp(2.7rem, 12vw, 4.9rem);
+      font-size: min(12vw, 4.9rem);
       letter-spacing: 0.4rem;
     }
 
