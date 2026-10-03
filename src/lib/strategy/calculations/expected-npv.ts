@@ -272,15 +272,18 @@ function spousalCentsForPair(
 /**
  * Survivor benefit in cents. Replicates survivorBenefit (benefit-calculator.ts).
  *
- * Cases:
- *   1. Earner died before filing and before NRA: survivor base = earner's PIA.
- *   2. Earner died before filing but after NRA: base = benefit as if earner
+ * Base (what the survivor's age reduction applies to):
+ *   1. Earner died before filing and before NRA: the earner's PIA.
+ *   2. Earner died before filing but after NRA: benefit as if the earner
  *      filed at min(death age, 70).
- *   3. Earner filed before death: base = max(82.5% of PIA, earner's actual
- *      benefit at filing).
+ *   3. Earner filed at or after NRA: the earner's benefit at filing.
+ *   4. Earner filed before NRA: the earner's PIA.
  *
- * The base is then reduced if the survivor starts collecting before their
- * own survivor-NRA (minimum 71.5% ratio at age 60, linearly to 100% at NRA).
+ * The base is reduced if the survivor starts collecting before their own
+ * survivor-NRA (71.5% at age 60, linearly to 100% at NRA). In case 4 the
+ * result is then capped at the widow(er)'s limit, max(82.5% of PIA, the
+ * earner's reduced benefit); the cap applies after the age reduction, never
+ * before it.
  */
 function survivorCentsCalc(
   earnerPiaRaw: number,
@@ -297,6 +300,7 @@ function survivorCentsCalc(
   depSsaBirth: number
 ): number {
   let base: number;
+  let limit = Number.POSITIVE_INFINITY;
   if (earnerFilingEpoch >= earnerDeathEpoch) {
     if (earnerDeathEpoch < earnerNraEpoch) {
       base = earnerPiaRaw;
@@ -310,27 +314,33 @@ function survivorCentsCalc(
       );
     }
   } else {
-    const pct825 = Math.round(earnerPiaRaw * 0.825);
     const eBenefit = benefitCentsAtAge(
       earnerPiaDollar,
       earnerNra,
       earnerDelayedRetirementIncrease,
       earnerFilingEpoch - earnerSsaBirth
     );
-    base = Math.floor(Math.max(pct825, eBenefit));
+    if (earnerFilingEpoch < earnerNraEpoch) {
+      base = earnerPiaRaw;
+      limit = Math.max(Math.round(earnerPiaRaw * 0.825), eBenefit);
+    } else {
+      base = eBenefit;
+    }
   }
 
   const survAge = survStartEpoch - depSsaBirth;
-  if (survAge >= depSurvNra) return Math.floor(base / 100) * 100;
-
-  const m60toNRA = depSurvNra - 720;
-  const m60toAge = survAge - 720;
-  // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
-  // literal, which is a different double and rounds half-cents differently.
-  const ratio =
-    MIN_SURVIVOR_BENEFIT_RATIO +
-    (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
-  return Math.floor(Math.round(base * ratio) / 100) * 100;
+  let reduced = base;
+  if (survAge < depSurvNra) {
+    const m60toNRA = depSurvNra - 720;
+    const m60toAge = survAge - 720;
+    // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
+    // literal, which is a different double and rounds half-cents differently.
+    const ratio =
+      MIN_SURVIVOR_BENEFIT_RATIO +
+      (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
+    reduced = Math.round(base * ratio);
+  }
+  return Math.floor(Math.min(reduced, limit) / 100) * 100;
 }
 
 /**

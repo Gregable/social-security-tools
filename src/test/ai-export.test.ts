@@ -452,6 +452,18 @@ describe('buildCoupleCalculatorAiExport', () => {
     expect(md).toMatch(/switch/i);
   });
 
+  it('orders the survivor age reduction before the widow(er)s limit', () => {
+    // Act 202(e)(2)(D): the limit caps the benefit after the age reduction,
+    // which applies to the full PIA. Reducing the capped amount instead is a
+    // common mistake, so the export spells out the order.
+    const md = buildCoupleCalculatorAiExport(
+      eligibleRecipient('Alex'),
+      lowerEarner('Jordan')
+    );
+    expect(md).toMatch(/age\s+reduction[\s\S]*applied\s+to\s+100%\s+of/i);
+    expect(md).toMatch(/then\s+capped\s+at\s+the\s+larger\s+of/i);
+  });
+
   it('includes the couple deep link and couple + per-person embeds with names', () => {
     const md = buildCoupleCalculatorAiExport(
       eligibleRecipient('Alex'),

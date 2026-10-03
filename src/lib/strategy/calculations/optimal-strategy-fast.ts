@@ -175,6 +175,7 @@ function survivorCentsCalc(
   depSsaBirth: number
 ): number {
   let base: number;
+  let limit = Number.POSITIVE_INFINITY;
   if (earnerFilingEpoch >= earnerDeathEpoch) {
     if (earnerDeathEpoch < earnerNraEpoch) {
       base = earnerPiaRaw;
@@ -188,27 +189,33 @@ function survivorCentsCalc(
       );
     }
   } else {
-    const pct825 = Math.round(earnerPiaRaw * 0.825);
     const eBenefit = benefitCentsAtAge(
       earnerPiaDollar,
       earnerNra,
       earnerDelayedRetirementIncrease,
       earnerFilingEpoch - earnerSsaBirth
     );
-    base = Math.floor(Math.max(pct825, eBenefit));
+    if (earnerFilingEpoch < earnerNraEpoch) {
+      base = earnerPiaRaw;
+      limit = Math.max(Math.round(earnerPiaRaw * 0.825), eBenefit);
+    } else {
+      base = eBenefit;
+    }
   }
 
   const survAge = survStartEpoch - depSsaBirth;
-  if (survAge >= depSurvNra) return Math.floor(base / 100) * 100;
-
-  const m60toNRA = depSurvNra - 720;
-  const m60toAge = survAge - 720;
-  // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
-  // literal, which is a different double and rounds half-cents differently.
-  const ratio =
-    MIN_SURVIVOR_BENEFIT_RATIO +
-    (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
-  return Math.floor(Math.round(base * ratio) / 100) * 100;
+  let reduced = base;
+  if (survAge < depSurvNra) {
+    const m60toNRA = depSurvNra - 720;
+    const m60toAge = survAge - 720;
+    // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
+    // literal, which is a different double and rounds half-cents differently.
+    const ratio =
+      MIN_SURVIVOR_BENEFIT_RATIO +
+      (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
+    reduced = Math.round(base * ratio);
+  }
+  return Math.floor(Math.min(reduced, limit) / 100) * 100;
 }
 
 // ─────────────────────────────────────────────────────────────────────────

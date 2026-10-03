@@ -19,7 +19,7 @@ const sponsorCopy: SponsorCopy = {
   const description =
     "Learn about Social Security survivor benefits for widows, widowers, and children. Understand eligibility at age 60, benefit amounts up to 100% of spouse's benefit, and claiming strategies.";
   const publishDate = new Date("2026-01-19T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const updateDate = new Date("2026-10-03T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/survivor-benefits";
@@ -172,12 +172,15 @@ const sponsorCopy: SponsorCopy = {
     </thead>
     <tbody>
       <tr>
-        <td>Spouse was receiving benefits</td>
+        <td>Spouse claimed before <a href="/guides/nra">NRA</a></td>
         <td
-          >The greater of: their benefit at death, or 82.5% of their <a
-            href="/guides/pia">PIA</a
-          ></td
+          >100% of their <a href="/guides/pia">PIA</a>, capped at the greater of
+          their benefit at death or 82.5% of their PIA</td
         >
+      </tr>
+      <tr>
+        <td>Spouse claimed at or after NRA</td>
+        <td>Their benefit at death, including delayed retirement credits</td>
       </tr>
       <tr>
         <td>Spouse died after <a href="/guides/nra">NRA</a> without filing</td>
@@ -191,10 +194,16 @@ const sponsorCopy: SponsorCopy = {
   </table>
 
   <p>
-    What if your spouse claimed early and was receiving a reduced amount? You
-    have some protection: your survivor benefit will be
-    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615301">at least 82.5% of their PIA</a>, even if they were receiving less than that due to early
-    claiming.
+    What if your spouse claimed early and was receiving a reduced amount? Your
+    survivor benefit still starts from 100% of their PIA and is reduced only for
+    your own age if you claim before your survivor full retirement age. It is
+    then capped at the larger of what they were receiving and 82.5% of their
+    PIA, a rule called the
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615320">widow(er)'s limit</a>.
+    So once you wait long enough, you get at least 82.5% of their PIA even if
+    they were receiving less. The cap also means your survivor benefit stops
+    growing before your survivor full retirement age, and waiting past that
+    point gains nothing.
   </p>
 
   <InlineCTA type="sponsor" {sponsorCopy} />
