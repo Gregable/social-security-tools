@@ -321,6 +321,15 @@ const sponsorCopy: SponsorCopy = {
     expectancy all factor in.
   </p>
 
+  <p>
+    The <a href="/strategy">strategy optimizer</a> has a widowed mode that
+    works this out for you. It weighs every combination of start dates for the
+    two benefits against how long you might live, and it accounts for a spouse
+    who claimed early. When you apply for the first benefit, ask SSA to limit
+    the application to that benefit; otherwise it may be treated as an
+    application for both.
+  </p>
+
   <h2>Remarriage and Survivor Benefits</h2>
 
   <p>

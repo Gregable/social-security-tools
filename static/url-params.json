@@ -180,6 +180,50 @@
           "default": "blended",
           "description": "Mortality table for recipient 2 (spouse).",
           "example": "female"
+        },
+        {
+          "name": "filed1",
+          "type": "string",
+          "format": "YYYY-MM",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "required": false,
+          "description": "Month recipient 1's own retirement benefits started, if they already receive them. Couple and widowed modes; that start month is then taken as given.",
+          "example": "2025-08"
+        },
+        {
+          "name": "filed2",
+          "type": "string",
+          "format": "YYYY-MM",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "required": false,
+          "description": "Month recipient 2's retirement benefits started. In widowed mode, a month before they died.",
+          "example": "2022-01"
+        },
+        {
+          "name": "died2",
+          "type": "string",
+          "format": "YYYY-MM",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "required": false,
+          "description": "Month recipient 2 died. With pia2 and dob2 it switches the optimizer to widowed mode, which plans when recipient 1 should start the survivor benefit and their own retirement benefit.",
+          "example": "2025-06"
+        },
+        {
+          "name": "disabled2",
+          "type": "integer",
+          "enum": [1],
+          "required": false,
+          "description": "Widowed mode: 1 if recipient 2 was receiving disability benefits when they died.",
+          "example": 1
+        },
+        {
+          "name": "survfiled1",
+          "type": "string",
+          "format": "YYYY-MM",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "required": false,
+          "description": "Widowed mode: month recipient 1 started survivor benefits, if they already receive them.",
+          "example": "2025-08"
         }
       ],
       "examples": [
@@ -194,6 +238,10 @@
         {
           "label": "Couple with default (blended) mortality",
           "url": "https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22"
+        },
+        {
+          "label": "Widow or widower whose spouse claimed early",
+          "url": "https://ssa.tools/strategy#pia1=1200&dob1=1964-03-15&pia2=2600&dob2=1960-01-02&filed2=2022-01&died2=2025-06"
         }
       ]
     },

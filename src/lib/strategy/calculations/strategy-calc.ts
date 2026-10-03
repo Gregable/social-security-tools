@@ -237,6 +237,52 @@ function calculatePeriodNPV(
 }
 
 /**
+ * The net present value, in cents, of a set of benefit periods as of
+ * `currentDate`.
+ *
+ * Payments are assumed to be received at the end of each month for that
+ * month's benefit, so a period's first payment arrives the month after it
+ * starts. Payments on or before `currentDate` are already in the past and
+ * do not count.
+ */
+export function benefitPeriodsNPVCents(
+  periods: BenefitPeriod[],
+  currentDate: MonthDate,
+  monthlyDiscountRate: number
+): number {
+  let totalNPVCents = 0;
+
+  for (const period of periods) {
+    const firstPaymentDate = period.startDate.addDuration(new MonthDuration(1));
+    const lastPaymentDate = period.endDate.addDuration(new MonthDuration(1));
+    const effectiveStartPaymentDate = MonthDate.max(
+      currentDate.addDuration(new MonthDuration(1)),
+      firstPaymentDate
+    );
+    if (effectiveStartPaymentDate.greaterThan(lastPaymentDate)) {
+      continue;
+    }
+
+    const numberOfPayments =
+      lastPaymentDate.monthsSinceEpoch() -
+      effectiveStartPaymentDate.monthsSinceEpoch() +
+      1;
+    const monthsToFirstPayment =
+      effectiveStartPaymentDate.monthsSinceEpoch() -
+      currentDate.monthsSinceEpoch();
+
+    totalNPVCents += calculatePeriodNPV(
+      period.amount.cents(),
+      numberOfPayments,
+      monthsToFirstPayment,
+      monthlyDiscountRate
+    );
+  }
+
+  return totalNPVCents;
+}
+
+/**
  * Calculates the net present value of all benefit periods.
  *
  * This function calls strategySumPeriods to get an array of benefit periods,

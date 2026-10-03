@@ -26,6 +26,13 @@ export interface StrategyResult {
   filingAge2Months?: number;
   deathProb1?: number;
   deathProb2?: number;
+  /**
+   * Widowed mode only: the age recipient 1's survivor benefit starts.
+   * `filingAge1` is then the age their own retirement benefit starts.
+   */
+  survivorFilingAge?: MonthDuration;
+  /** Widowed mode only: which of the two benefits ever pays. */
+  benefitUse?: { readonly survivor: boolean; readonly own: boolean };
 }
 
 export enum CalculationStatus {

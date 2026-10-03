@@ -17,12 +17,26 @@ export let variant:
   | "past-seventy"
   | "both-past-seventy"
   | "both-filed"
-  | "filed-and-past-seventy" = "past-seventy";
+  | "filed-and-past-seventy"
+  | "widowed" = "past-seventy";
 </script>
 
 <div class="no-decision-note">
   <h2>There is no filing age left to choose</h2>
-  {#if variant === "both-filed"}
+  {#if variant === "widowed"}
+    <p>
+      This chart normally shows how the best start dates for your survivor
+      benefit and your own retirement benefit shift with how long you live.
+      Each of yours has either started already or stopped growing: survivor
+      benefits stop growing at survivor full retirement age, or sooner when
+      your spouse claimed early, and retirement benefits at 70.
+    </p>
+    <p>
+      Claim anything you have not yet started as soon as you can, and ask SSA
+      to backdate it. Once a benefit has stopped growing, SSA can pay up to six
+      months of it retroactively.
+    </p>
+  {:else if variant === "both-filed"}
     <p>
       These charts normally show how the best filing ages shift with how long
       each of you lives. You are both already receiving benefits, so those

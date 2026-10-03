@@ -34,7 +34,8 @@ Default.args = {
   onstartover: action('onstartover'),
 };
 
-// Single mode: Only show one recipient column
+// Single mode: Only show one recipient column, with the hint that sends a
+// widow(er) to widowed mode
 export const SingleMode = Template.bind({});
 SingleMode.args = {
   recipients: createRecipientPair(),
@@ -47,6 +48,7 @@ SingleMode.args = {
   onValidityChange: action('onValidityChange'),
   oncontinue: action('oncontinue'),
   onstartover: action('onstartover'),
+  onswitchtowidowed: action('onswitchtowidowed'),
 };
 
 // Blank PIA: Fields empty, Continue disabled

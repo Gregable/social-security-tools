@@ -1,12 +1,14 @@
 <script lang="ts">
-  export let onselect: (isSingle: boolean) => void;
+  import type { StrategyMode } from "$lib/strategy/ui";
+
+  export let onselect: (mode: StrategyMode) => void;
 </script>
 
 <section class="mode-picker">
   <h2>Who are we calculating for?</h2>
   <p class="hint">Pick one to continue.</p>
   <div class="choices">
-    <button type="button" class="choice" on:click={() => onselect(true)}>
+    <button type="button" class="choice" on:click={() => onselect("single")}>
       <svg
         class="icon"
         viewBox="0 0 24 24"
@@ -23,7 +25,7 @@
       <span class="title">Just me</span>
       <span class="sub">Single filer</span>
     </button>
-    <button type="button" class="choice" on:click={() => onselect(false)}>
+    <button type="button" class="choice" on:click={() => onselect("couple")}>
       <svg
         class="icon"
         viewBox="0 0 24 24"
@@ -42,12 +44,34 @@
       <span class="title">Married couple</span>
       <span class="sub">Two filers</span>
     </button>
+    <button type="button" class="choice" on:click={() => onselect("widowed")}>
+      <!-- The late spouse is drawn in a dashed outline beside the survivor. -->
+      <svg
+        class="icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="8" cy="9" r="3" />
+        <path d="M2 20a5 5 0 0 1 10 0" />
+        <g class="late" stroke-dasharray="1.6 1.9">
+          <circle cx="16" cy="9" r="3" />
+          <path d="M12 20a5 5 0 0 1 10 0" />
+        </g>
+      </svg>
+      <span class="title">Widowed</span>
+      <span class="sub">Surviving spouse</span>
+    </button>
   </div>
 </section>
 
 <style>
   .mode-picker {
-    max-width: 720px;
+    max-width: 860px;
     margin: 0 auto;
     padding: 1.5rem;
     text-align: center;
@@ -67,7 +91,7 @@
     flex-wrap: wrap;
   }
   .choice {
-    flex: 1 1 220px;
+    flex: 1 1 200px;
     min-height: 160px;
     padding: 1.5rem 1rem 1.25rem;
     background: white;
@@ -100,6 +124,9 @@
     height: 44px;
     margin-bottom: 0.5rem;
     flex-shrink: 0;
+  }
+  .late {
+    opacity: 0.6;
   }
   .title {
     font-weight: bold;

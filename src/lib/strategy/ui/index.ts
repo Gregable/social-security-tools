@@ -30,3 +30,4 @@ export {
   generateOneYearBuckets,
   generateThreeYearBuckets,
 } from './grid-sizing.js';
+export type { StrategyMode } from './strategy-mode.js';
