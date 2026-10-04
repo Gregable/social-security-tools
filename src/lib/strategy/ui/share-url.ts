@@ -1,8 +1,60 @@
+import type { Birthdate } from '$lib/birthday';
 import type { MonthDate } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
-import type { WidowedInput } from '$lib/strategy/calculations/late-spouse';
-import { buildStrategyHash } from '$lib/url-params';
+import {
+  type AlreadyFiled,
+  isEligibleToHaveFiled,
+} from '$lib/strategy/calculations/already-filed';
+import {
+  isEligibleToHaveFiledForSurvivor,
+  type WidowedInput,
+} from '$lib/strategy/calculations/late-spouse';
+import { buildStrategyHash, type UrlParams } from '$lib/url-params';
 import type { StrategyMode } from './strategy-mode.js';
+
+/**
+ * The widowed form a share link describes, for a survivor born
+ * `survivorBirthdate`. It reads back what `strategyShareUrl` writes.
+ *
+ * A link can also be written by hand, so this settles what the form could
+ * not have produced. A retirement start month (`filed2`) wins over
+ * `disabled2`. A started benefit is dropped when the form would not show its
+ * control as of `currentDate`: the survivor too young to have claimed it, or,
+ * for survivor benefits, no death month to check it against. Months are not
+ * otherwise checked here; the form re-validates every month it shows.
+ */
+export function widowedInputFromParams(
+  params: UrlParams,
+  survivorBirthdate: Birthdate,
+  currentDate: MonthDate
+): WidowedInput {
+  const deathMonth = params.getSpouseDeathMonth();
+  const retirementStartedAt = params.getSpouseFiledMonth();
+  const survivorFiledAt = params.getRecipientSurvivorFiledMonth();
+  const ownFiledAt = params.getRecipientFiledMonth();
+  return {
+    deathMonth,
+    claimKind:
+      retirementStartedAt !== null
+        ? 'retirement'
+        : params.getSpouseDisabled()
+          ? 'disability'
+          : 'none',
+    retirementStartedAt,
+    survivorFiledAt:
+      deathMonth !== null &&
+      isEligibleToHaveFiledForSurvivor(
+        survivorBirthdate,
+        deathMonth,
+        currentDate
+      )
+        ? survivorFiledAt
+        : null,
+    ownFiledAt: isEligibleToHaveFiled(survivorBirthdate, currentDate)
+      ? ownFiledAt
+      : null,
+  };
+}
 
 /** The strategy form's state, as the share link needs it. */
 export interface StrategyShareInputs {
@@ -12,9 +64,9 @@ export interface StrategyShareInputs {
   /** YYYY-MM-DD, or '' while not entered. */
   readonly birthdateInputs: readonly [string, string];
   /** Couple mode: the months each spouse's benefits started. */
-  readonly alreadyFiled: readonly [MonthDate | null, MonthDate | null];
+  readonly alreadyFiled: AlreadyFiled;
   /** Widowed mode: the late spouse and the survivor's started benefits. */
-  readonly widowed: WidowedInput;
+  readonly widowed: Readonly<WidowedInput>;
 }
 
 /**

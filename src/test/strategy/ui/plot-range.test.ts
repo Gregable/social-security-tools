@@ -48,6 +48,19 @@ describe('deathAgeAxisRange', () => {
     });
   });
 
+  it('frames a line that rises and falls back, from its first change to its last', () => {
+    // The widowed own-benefit line can do this: 62 for short lives, 70 in
+    // the middle, and back to 62 once the survivor benefit is worth waiting
+    // for and the own benefit only bridges to it.
+    const points: PlotPoint[] = [];
+    for (let deathAge = 62; deathAge <= 100; deathAge++) {
+      const filingAgeMonths =
+        deathAge > 70 && deathAge <= 85 ? 70 * 12 : 62 * 12;
+      points.push({ deathAge, filingAgeMonths });
+    }
+    expect(deathAgeAxisRange([points], 62, 100)).toEqual({ min: 65, max: 91 });
+  });
+
   it('skips gaps, where a line has no point', () => {
     const gappy: PlotPoint[] = [
       { deathAge: 70, filingAgeMonths: 62 * 12 },

@@ -5,22 +5,27 @@ import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
 import { earliestFilingDate } from '$lib/strategy/calculations/already-filed';
+import { BenefitType } from '$lib/strategy/calculations/benefit-period';
+import { expectedNPVSingle } from '$lib/strategy/calculations/expected-npv';
 import {
   earliestSurvivorBenefitDate,
   type LateSpouse,
   type LateSpouseClaim,
+  NOT_FILED_WIDOWED,
+  type WidowedFiled,
 } from '$lib/strategy/calculations/late-spouse';
+import { optimalStrategySingle } from '$lib/strategy/calculations/strategy-calc';
 import {
   strategySumCentsWidowed,
+  strategySumPeriodsWidowed,
   type WidowedStrategy,
 } from '$lib/strategy/calculations/widowed-benefits';
 import {
   createWidowedContext,
   expectedNPVWidowed,
-  NOT_FILED_WIDOWED,
   optimalStrategyWidowed,
   type WidowedContext,
-  type WidowedFiled,
+  widowedAmounts,
   widowedBenefitUse,
   widowedExpectedNPVCents,
   widowedNPVCents,
@@ -68,7 +73,7 @@ function randomScenario(rng: () => number): Scenario {
     lo + Math.floor(rng() * (hi - lo + 1));
   const survivor = makeRecipient(
     rng() < 0.15 ? 0 : int(300, 3500),
-    int(1952, 1975),
+    int(1935, 1975),
     int(0, 11),
     int(1, 28)
   );
@@ -214,7 +219,7 @@ describe('widowedNPVCents', () => {
 describe('optimalStrategyWidowed', () => {
   it('finds the best strategy that brute force over the slow NPV finds', () => {
     const rng = mulberry32(11);
-    for (let n = 0; n < 8; n++) {
+    for (let n = 0; n < 16; n++) {
       const s = randomScenario(rng);
       const context = contextFor(s);
       const finalDate = deathDateFor(s.survivor, 62 + Math.floor(rng() * 40));
@@ -291,6 +296,84 @@ describe('optimalStrategyWidowed', () => {
   });
 });
 
+describe('own benefits already started', () => {
+  // Own benefits since April 2024 at 62y1m: $704 on a $1,000 PIA. The
+  // survivor benefit on the late spouse's $2,000 PIA is $1,803 now, at
+  // 64y7m (9.84% reduced), and $2,000 from survivor FRA, 67.
+  const survivor = makeRecipient(1000, 1962, 2, 15);
+  const contextAt = (discountRate: number) =>
+    createWidowedContext(
+      survivor,
+      {
+        recipient: makeRecipient(2000, 1961, 2, 15),
+        deathDate: month(2025, 10),
+        claim: { kind: 'none' },
+      },
+      currentDate,
+      discountRate,
+      { survivor: null, own: month(2024, 3) }
+    );
+
+  it('waits for the full survivor benefit over a long, undiscounted life', () => {
+    const context = contextAt(0);
+    const best = optimalStrategyWidowed(context, deathDateFor(survivor, 95));
+    expect(best.strategy.ownStart.asMonths()).toBe(age(62, 1).asMonths());
+    expect(best.strategy.survivorStart.asMonths()).toBe(age(67, 0).asMonths());
+    expect(widowedAmounts(context, best.strategy).survivor.value()).toBe(2000);
+  });
+
+  it('takes the survivor benefit now over a short, discounted life', () => {
+    const context = contextAt(0.05);
+    const best = optimalStrategyWidowed(context, deathDateFor(survivor, 75));
+    expect(best.strategy.survivorStart.asMonths()).toBe(age(64, 7).asMonths());
+    expect(widowedAmounts(context, best.strategy).survivor.value()).toBe(1803);
+  });
+});
+
+describe('with no survivor benefit to plan around', () => {
+  // A late spouse with a $0 PIA leaves only the survivor's own benefit, so
+  // widowed mode must agree with single mode: the same start ages and the
+  // same values. Both paths share the payment timing and the treatment of
+  // the death month, so a drift in either shows up here.
+  const survivor = makeRecipient(2000, 1968, 2, 15);
+  const context = createWidowedContext(
+    survivor,
+    {
+      recipient: makeRecipient(0, 1966, 4, 10),
+      deathDate: month(2025, 10),
+      claim: { kind: 'none' },
+    },
+    currentDate,
+    0.025,
+    NOT_FILED_WIDOWED
+  );
+
+  it('picks the single-mode filing age and NPV for each death age', () => {
+    for (let deathAge = 63; deathAge <= 100; deathAge += 3) {
+      const finalDate = deathDateFor(survivor, deathAge);
+      const [singleAge, singleNPV] = optimalStrategySingle(
+        survivor,
+        finalDate,
+        currentDate,
+        0.025
+      );
+      const widowed = optimalStrategyWidowed(context, finalDate);
+      expect(widowed.strategy.ownStart.asMonths()).toBe(singleAge.asMonths());
+      closeTo(widowed.npvCents, singleNPV);
+    }
+  });
+
+  it('picks the single-mode filing age and expected NPV', () => {
+    const dist = syntheticDistribution(58);
+    const [single] = expectedNPVSingle(survivor, currentDate, 0.025, dist);
+    const widowed = expectedNPVWidowed(context, dist);
+    expect(widowed.strategy.ownStart.asMonths()).toBe(
+      single.filingAge.asMonths()
+    );
+    closeTo(widowed.npvCents, single.expectedNPVCents);
+  });
+});
+
 describe('expectedNPVWidowed', () => {
   it('matches the probability-weighted slow NPV of the strategies it scores', () => {
     const rng = mulberry32(23);
@@ -312,7 +395,7 @@ describe('expectedNPVWidowed', () => {
 
   it('returns the strategy with the highest expected NPV', () => {
     const rng = mulberry32(31);
-    for (let n = 0; n < 10; n++) {
+    for (let n = 0; n < 20; n++) {
       const s = randomScenario(rng);
       const context = contextFor(s);
       const dist = syntheticDistribution(60);
@@ -356,6 +439,42 @@ describe('createWidowedContext', () => {
     );
     expect(context.ownRange.hasChoice).toBe(true);
   });
+
+  // The form checks these, but a plan built from them anyway would look
+  // plausible, so the calculation refuses them too.
+  it('refuses a late spouse who died in the future', () => {
+    const lateSpouse: LateSpouse = {
+      recipient: makeRecipient(2400, 1960, 5, 10),
+      deathDate: month(2027, 0),
+      claim: { kind: 'none' },
+    };
+    expect(() =>
+      createWidowedContext(
+        makeRecipient(1200, 1962, 2, 15),
+        lateSpouse,
+        currentDate,
+        0.025,
+        NOT_FILED_WIDOWED
+      )
+    ).toThrow(/future/);
+  });
+
+  it('refuses a retirement claim that started after the death', () => {
+    const lateSpouse: LateSpouse = {
+      recipient: makeRecipient(2400, 1960, 5, 10),
+      deathDate: month(2024, 3),
+      claim: { kind: 'retirement', startedAt: month(2024, 6) },
+    };
+    expect(() =>
+      createWidowedContext(
+        makeRecipient(1200, 1962, 2, 15),
+        lateSpouse,
+        currentDate,
+        0.025,
+        NOT_FILED_WIDOWED
+      )
+    ).toThrow(/before the month they died/);
+  });
 });
 
 describe('widowedBenefitUse', () => {
@@ -389,6 +508,81 @@ describe('widowedBenefitUse', () => {
     expect(
       use(600, { survivorStart: age(60, 0), ownStart: age(70, 0) })
     ).toEqual({ survivor: true, own: false });
+  });
+
+  it('counts a benefit already started as used, even once the other pays more', () => {
+    // Survivor benefits since June 2024 at 62y3m: $1,209 on a $1,500 PIA.
+    // Own benefit from now, 64y7m, on a $2,500 PIA: $2,097, so the survivor
+    // benefit pays nothing more from here on. It has still started.
+    const survivor = makeRecipient(2500, 1962, 2, 15);
+    const context = createWidowedContext(
+      survivor,
+      {
+        recipient: makeRecipient(1500, 1960, 4, 10),
+        deathDate: month(2024, 3),
+        claim: { kind: 'none' },
+      },
+      currentDate,
+      0.025,
+      { survivor: month(2024, 5), own: null }
+    );
+    expect(
+      widowedBenefitUse(
+        context,
+        { survivorStart: context.survivorRange.earliest, ownStart: age(64, 7) },
+        deathDateFor(survivor, 66)
+      )
+    ).toEqual({ survivor: true, own: true });
+  });
+
+  it('does not use an own benefit that would start after the death', () => {
+    // Dies at 61y6m, before the own benefit's 62y1m start.
+    const survivor = survivorFor(2500);
+    const context = createWidowedContext(
+      survivor,
+      lateSpouse,
+      currentDate,
+      0.025,
+      NOT_FILED_WIDOWED
+    );
+    expect(
+      widowedBenefitUse(
+        context,
+        { survivorStart: age(60, 0), ownStart: age(62, 1) },
+        survivor.birthdate.dateAtLayAge(age(61, 6))
+      )
+    ).toEqual({ survivor: true, own: false });
+  });
+
+  it('agrees with the payment timeline for random plans and deaths', () => {
+    // A benefit is used if it had already started, or if the timeline pays
+    // it in some month from now through the death.
+    const rng = mulberry32(41);
+    for (let n = 0; n < 300; n++) {
+      const s = randomScenario(rng);
+      const context = contextFor(s);
+      const strategies = allStrategies(context);
+      const strategy = strategies[Math.floor(rng() * strategies.length)];
+      const finalDate = deathDateFor(s.survivor, 55 + Math.floor(rng() * 50));
+      const periods = strategySumPeriodsWidowed(
+        s.survivor,
+        s.lateSpouse,
+        finalDate,
+        strategy
+      );
+      const paysFromNow = (type: BenefitType) =>
+        periods.some(
+          (p) =>
+            p.benefitType === type &&
+            !p.endDate.lessThan(currentDate) &&
+            !p.startDate.greaterThan(finalDate)
+        );
+      expect(widowedBenefitUse(context, strategy, finalDate)).toEqual({
+        survivor:
+          s.filed.survivor !== null || paysFromNow(BenefitType.Survivor),
+        own: s.filed.own !== null || paysFromNow(BenefitType.Personal),
+      });
+    }
   });
 
   it('does not use a survivor benefit that starts after a larger own benefit', () => {

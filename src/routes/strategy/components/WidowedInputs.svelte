@@ -59,9 +59,7 @@
   let piaValidity: [boolean, boolean] = [false, false];
   let piaErrors: [string, string] = ["", ""];
 
-  // Reported by the month inputs. The optional ones are valid while hidden.
-  let deathMonthValid = false;
-  let retirementValid = false;
+  // Reported by the "already receiving" controls; see isValid.
   let survivorFiledValid = true;
   let ownFiledValid = true;
 
@@ -81,32 +79,22 @@
   $: showRetirementStart =
     widowedInput.claimKind === "retirement" && spouseBirthdate !== null;
 
-  // A control that unmounts can no longer report, and its last month must
-  // not reach the optimizer, so reset both here.
-  $: if (!showSurvivorFiled) clearSurvivorFiled();
-  $: if (!showOwnFiled) clearOwnFiled();
-
-  function clearSurvivorFiled() {
-    survivorFiledValid = true;
-    if (widowedInput.survivorFiledAt !== null) {
-      widowedInput.survivorFiledAt = null;
-    }
-  }
-
-  function clearOwnFiled() {
-    ownFiledValid = true;
-    if (widowedInput.ownFiledAt !== null) widowedInput.ownFiledAt = null;
-  }
-
+  // The month inputs publish null for anything incomplete or invalid, so a
+  // required month is valid once it is set. An "already receiving" control
+  // that is hidden cannot report, so its last report counts only while it
+  // shows. A control hides while a birthdate or the death month is being
+  // retyped, and its answer is kept for when it reappears; nothing here
+  // clears it (see dropImpossibleStarts).
   $: isValid =
     birthdateValidity[0] &&
     birthdateValidity[1] &&
     piaValidity[0] &&
     piaValidity[1] &&
-    deathMonthValid &&
-    (widowedInput.claimKind !== "retirement" || retirementValid) &&
-    survivorFiledValid &&
-    ownFiledValid;
+    widowedInput.deathMonth !== null &&
+    (widowedInput.claimKind !== "retirement" ||
+      widowedInput.retirementStartedAt !== null) &&
+    (!showSurvivorFiled || survivorFiledValid) &&
+    (!showOwnFiled || ownFiledValid);
 
   $: onValidityChange?.(isValid);
 
@@ -161,7 +149,28 @@
     birthdateInputs = [...birthdateInputs];
     recipients[index].birthdate = birthdate;
     recipients = [...recipients];
+    if (index === 0) dropImpossibleStarts(birthdate);
     onUpdate?.();
+  }
+
+  /**
+   * A new birthdate can make a started benefit impossible (survivor benefits
+   * before 60, retirement benefits before 62), and its control then
+   * disappears. Drop the month rather than keep an answer nobody can see.
+   * This runs only for a complete birthdate: emptying the field mid-edit
+   * hides the controls too, and must not cost the answers in them.
+   */
+  function dropImpossibleStarts(birthdate: Birthdate) {
+    const { deathMonth } = widowedInput;
+    if (
+      deathMonth !== null &&
+      !isEligibleToHaveFiledForSurvivor(birthdate, deathMonth, currentDate)
+    ) {
+      widowedInput.survivorFiledAt = null;
+    }
+    if (!isEligibleToHaveFiled(birthdate, currentDate)) {
+      widowedInput.ownFiledAt = null;
+    }
   }
 
   function handleGenderChange(event: Event) {
@@ -173,10 +182,7 @@
 
   function handleClaimKindChange(kind: LateSpouseClaimKind) {
     widowedInput.claimKind = kind;
-    if (kind !== "retirement") {
-      widowedInput.retirementStartedAt = null;
-      retirementValid = false;
-    }
+    if (kind !== "retirement") widowedInput.retirementStartedAt = null;
     onUpdate?.();
   }
 
@@ -396,7 +402,6 @@
               : null}
         revalidateKey={spouseKey}
         onchange={() => onUpdate?.()}
-        onvaliditychange={(valid) => (deathMonthValid = valid)}
       />
       <fieldset class="claim-choice">
         <legend class="claim-legend">
@@ -446,7 +451,6 @@
                     )}
               revalidateKey={`${spouseKey}|${deathKey}`}
               onchange={() => onUpdate?.()}
-              onvaliditychange={(valid) => (retirementValid = valid)}
             />
           </div>
         {/if}
@@ -492,8 +496,10 @@
   </div>
 
   <p class="scope-note">
-    This assumes you did not remarry before age 60 and are not caring for
-    their child under 16; either changes which benefits you can get.
+    This assumes you did not remarry before age 60, are not caring for their
+    child under 16, and are not a disabled widow(er) under 60, and that no
+    children also receive benefits on their record, where the family maximum
+    could reduce yours. Any of these changes the benefits you can get.
   </p>
 
   {#if errorMessage}

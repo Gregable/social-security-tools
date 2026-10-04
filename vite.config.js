@@ -32,15 +32,37 @@ const config = {
     exclude: ['posthog-js'],
   },
   test: {
-    include: ['src/**/*.{test,spec}.{js,ts}'],
-    // Disable the fuzz test except for manual runs:
-    // To run the fuzz test manually, use:
-    //   npm test src/test/strategy/fuzz.test.ts
-    exclude: [
-      'src/test/strategy/fuzz.test.ts',
-      'src/test/strategy/generate-goldens.test.ts',
-      'src/test/strategy/generate-grid-goldens.test.ts',
-      'src/test/strategy/grid-benchmark.test.ts',
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['src/**/*.{test,spec}.{js,ts}'],
+          // Disable the fuzz test except for manual runs:
+          // To run the fuzz test manually, use:
+          //   npm test src/test/strategy/fuzz.test.ts
+          exclude: [
+            'src/**/*.svelte.test.ts',
+            'src/test/strategy/fuzz.test.ts',
+            'src/test/strategy/generate-goldens.test.ts',
+            'src/test/strategy/generate-grid-goldens.test.ts',
+            'src/test/strategy/grid-benchmark.test.ts',
+          ],
+        },
+      },
+      {
+        // Mounts Svelte components in a simulated browser, for behavior
+        // that lives in a component's reactivity rather than in a module.
+        // The browser condition loads Svelte's client runtime, which `mount`
+        // needs; the unit project keeps the default resolution.
+        extends: true,
+        resolve: { conditions: ['browser'] },
+        test: {
+          name: 'component',
+          include: ['src/**/*.svelte.test.ts'],
+          environment: 'happy-dom',
+        },
+      },
     ],
     coverage: {
       provider: 'v8',

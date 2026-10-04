@@ -5,8 +5,9 @@
     A checkbox for "already receives this benefit" that reveals a month and
     year for when it started. The checkbox label is the default slot.
     Publishes a validated MonthDate (or null) through `bind:value`, and
-    reports through `onvaliditychange` whether the answer is complete, so the
-    parent can hold Continue while the box is ticked with no valid month.
+    reports through `onvaliditychange` whether the answer is complete
+    (unticked, or ticked with a valid month), so the parent can hold Continue
+    while the box is ticked with no valid month.
 -->
 
 <script lang="ts">
@@ -36,10 +37,10 @@
     undefined;
 
   let checked = false;
-  // Reported by the month inputs while they are shown.
-  let monthValid = false;
 
-  $: onvaliditychange?.(!checked || monthValid);
+  // The month inputs publish null for anything incomplete or invalid, so the
+  // bound value alone says whether a ticked box has a usable month.
+  $: onvaliditychange?.(!checked || value !== null);
 
   // A restored share URL or the Edit button remounts this with a month
   // already entered; show it ticked so the month inputs re-validate it.
@@ -49,10 +50,7 @@
 
   function handleToggle(event: Event) {
     checked = (event.target as HTMLInputElement).checked;
-    if (!checked) {
-      value = null;
-      monthValid = false;
-    }
+    if (!checked) value = null;
     onchange?.();
   }
 </script>
@@ -79,7 +77,6 @@
         {validate}
         {revalidateKey}
         {onchange}
-        onvaliditychange={(isValid) => (monthValid = isValid)}
       />
     </div>
   {/if}
@@ -107,9 +104,13 @@
   }
   .receiving-when {
     margin: 0 0 0 1.6rem;
-    padding: 0 0 0 0.75rem;
-    border-left: 2px solid #d8dbe6;
     min-width: 0;
+  }
+  /* The rule goes on the month inputs' fieldset, as it did before they were
+     shared, so it starts level with the middle of their legend. */
+  .receiving-when :global(.month-year) {
+    padding-left: 0.75rem;
+    border-left: 2px solid #d8dbe6;
   }
 
   /* Draws the eye whenever the control appears: when it first becomes

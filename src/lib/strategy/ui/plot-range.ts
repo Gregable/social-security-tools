@@ -10,12 +10,13 @@ export interface PlotPoint {
 /**
  * The death-age range a filing-age chart should show.
  *
- * Optimal filing ages typically sit at their minimum for early deaths and
- * climb to their maximum for late ones, so the interesting part of the chart
- * is between the last death age where a line is at its minimum and the
- * first where it reaches its maximum. This frames that span for every line
- * that changes, plus `padding` years either side, within the buckets. When
- * no line changes, there is nothing to frame and every bucket is shown.
+ * The interesting part of the chart is where the lines change: from the last
+ * death age before any line first changes to the death age of the last
+ * change in any line. A single-mode line typically climbs once, from its
+ * minimum for early deaths to its maximum for late ones; a widowed-mode own
+ * benefit line can climb and then fall back. This frames that span, plus
+ * `padding` years either side, within the buckets. Gaps are skipped. When no
+ * line changes, there is nothing to frame and every bucket is shown.
  */
 export function deathAgeAxisRange(
   series: readonly (readonly PlotPoint[])[],
@@ -27,26 +28,18 @@ export function deathAgeAxisRange(
   let max = Number.NEGATIVE_INFINITY;
 
   for (const line of series) {
-    const points = line.filter(
-      (p): p is { deathAge: number; filingAgeMonths: number } =>
-        p.filingAgeMonths !== null
-    );
-    if (points.length === 0) continue;
-    const ages = points.map((p) => p.filingAgeMonths);
-    const lowest = Math.min(...ages);
-    const highest = Math.max(...ages);
-    if (lowest === highest) continue;
-
-    let lastAtLowest = points[0].deathAge;
-    for (const p of points) {
-      if (p.filingAgeMonths === lowest) lastAtLowest = p.deathAge;
+    let previous: PlotPoint | null = null;
+    for (const point of line) {
+      if (point.filingAgeMonths === null) continue;
+      if (
+        previous !== null &&
+        point.filingAgeMonths !== previous.filingAgeMonths
+      ) {
+        min = Math.min(min, previous.deathAge - padding);
+        max = Math.max(max, point.deathAge + padding);
+      }
+      previous = point;
     }
-    const firstAtHighest =
-      points.find((p) => p.filingAgeMonths === highest)?.deathAge ??
-      points[points.length - 1].deathAge;
-
-    min = Math.min(min, lastAtLowest - padding);
-    max = Math.max(max, firstAtHighest + padding);
   }
 
   if (min === Number.POSITIVE_INFINITY)

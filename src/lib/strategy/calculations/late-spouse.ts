@@ -9,6 +9,7 @@
  * use them before any `Recipient` exists.
  */
 
+import { assertNever } from '$lib/assert-never';
 import {
   type SurvivorBenefitBasis,
   survivorBenefitBasis,
@@ -16,7 +17,7 @@ import {
 import type { Birthdate } from '$lib/birthday';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
-import { earliestFilingDate } from './already-filed';
+import { earliestFilingDate, validateFiledMonth } from './already-filed';
 
 /** What the late spouse was receiving on their own record when they died. */
 export type LateSpouseClaim =
@@ -34,6 +35,18 @@ export interface LateSpouse {
   readonly deathDate: MonthDate;
   readonly claim: LateSpouseClaim;
 }
+
+/**
+ * The months each of the survivor's two benefits actually started, for a
+ * widow(er) already receiving it, or null.
+ */
+export interface WidowedFiled {
+  readonly survivor: MonthDate | null;
+  readonly own: MonthDate | null;
+}
+
+/** Neither benefit has started. */
+export const NOT_FILED_WIDOWED: WidowedFiled = { survivor: null, own: null };
 
 function formatMonth(date: MonthDate): string {
   return `${date.monthFullName()} ${date.year()}`;
@@ -81,6 +94,29 @@ export function validateLateSpouseFiledMonth(
     return 'Benefits must have started before the month they died.';
   }
   return null;
+}
+
+/**
+ * Why `lateSpouse` cannot be planned around as of `currentDate`, or null:
+ * the checks the form makes, for a description that did not come through it.
+ */
+export function lateSpouseProblem(
+  lateSpouse: LateSpouse,
+  currentDate: MonthDate
+): string | null {
+  const { recipient, deathDate, claim } = lateSpouse;
+  const deathProblem = validateDeathMonth(
+    recipient.birthdate,
+    deathDate,
+    currentDate
+  );
+  if (deathProblem !== null) return deathProblem;
+  if (claim.kind !== 'retirement') return null;
+  return validateLateSpouseFiledMonth(
+    recipient.birthdate,
+    claim.startedAt,
+    deathDate
+  );
 }
 
 /**
@@ -165,14 +201,15 @@ export function lateSpouseSurvivorBasis(
       // A filing month at or after death is how survivorBenefitBasis spells
       // "never filed".
       return survivorBenefitBasis(recipient, deathDate, deathDate);
+    default:
+      return assertNever(claim);
   }
 }
 
 /**
  * The widowed-mode form state the page binds into its inputs: what is known
  * about the late spouse, and which of the survivor's own benefits have
- * already started. Snapshot it with `lateSpouseFrom` before a calculation,
- * so results describe one set of inputs even if the form changes mid-run.
+ * already started. Take a `widowedSnapshot` of it before a calculation.
  */
 export interface WidowedInput {
   /** The month the spouse died. */
@@ -197,15 +234,37 @@ export function emptyWidowedInput(): WidowedInput {
   };
 }
 
+/** What a widowed-mode calculation runs on. */
+export interface WidowedSnapshot {
+  readonly lateSpouse: LateSpouse;
+  /** Benefits that had already started, which pin their start ages. */
+  readonly filed: WidowedFiled;
+}
+
+/** A snapshot, or the first reason the form's answers cannot make one. */
+export type WidowedSnapshotResult =
+  | { readonly kind: 'ok'; readonly snapshot: WidowedSnapshot }
+  | { readonly kind: 'problem'; readonly problem: string };
+
 /**
- * The late spouse the form describes, with `recipient` holding their
- * birthdate and PIA, or null while the form is incomplete.
+ * The calculation inputs the widowed form describes, with
+ * `lateSpouseRecipient` holding the late spouse's birthdate and PIA.
+ *
+ * Every month is checked again rather than trusted. The form checks each one
+ * as it is entered, but a share link restores months it has not yet seen,
+ * and a month that was fine can stop being fine when another answer changes.
+ * A problem comes back as a message for the person filling in the form.
  */
-export function lateSpouseFrom(
-  recipient: Recipient,
-  input: WidowedInput
-): LateSpouse | null {
-  if (input.deathMonth === null) return null;
+export function widowedSnapshot(
+  survivor: Recipient,
+  lateSpouseRecipient: Recipient,
+  input: WidowedInput,
+  currentDate: MonthDate
+): WidowedSnapshotResult {
+  const { deathMonth, survivorFiledAt, ownFiledAt } = input;
+  if (deathMonth === null) {
+    return { kind: 'problem', problem: 'Enter the month your spouse died.' };
+  }
   let claim: LateSpouseClaim;
   switch (input.claimKind) {
     case 'none':
@@ -215,9 +274,43 @@ export function lateSpouseFrom(
       claim = { kind: 'disability' };
       break;
     case 'retirement':
-      if (input.retirementStartedAt === null) return null;
+      if (input.retirementStartedAt === null) {
+        return {
+          kind: 'problem',
+          problem: 'Enter the month their retirement benefits started.',
+        };
+      }
       claim = { kind: 'retirement', startedAt: input.retirementStartedAt };
       break;
+    default:
+      return assertNever(input.claimKind);
   }
-  return { recipient, deathDate: input.deathMonth, claim };
+  const lateSpouse: LateSpouse = {
+    recipient: lateSpouseRecipient,
+    deathDate: deathMonth,
+    claim,
+  };
+
+  const birthdate = survivor.birthdate;
+  const problem =
+    lateSpouseProblem(lateSpouse, currentDate) ??
+    (survivorFiledAt === null
+      ? null
+      : validateSurvivorFiledMonth(
+          birthdate,
+          survivorFiledAt,
+          deathMonth,
+          currentDate
+        )) ??
+    (ownFiledAt === null
+      ? null
+      : validateFiledMonth(birthdate, ownFiledAt, currentDate));
+  if (problem !== null) return { kind: 'problem', problem };
+  return {
+    kind: 'ok',
+    snapshot: {
+      lateSpouse,
+      filed: { survivor: survivorFiledAt, own: ownFiledAt },
+    },
+  };
 }

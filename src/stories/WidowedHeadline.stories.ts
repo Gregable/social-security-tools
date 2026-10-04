@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
-import { MonthDate } from '../lib/month-time';
 import WidowedHeadline from '../routes/strategy/components/WidowedHeadline.svelte';
 import {
+  HEADLINE_SCENARIOS,
   widowedContextFor,
   widowedRecommendationFor,
 } from '../test/helpers/widowed-mocks';
@@ -18,20 +18,17 @@ const meta: Meta<WidowedHeadline> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Every story is computed by the real optimizer, as of October 2026.
+// Every story is computed by the real optimizer, as of October 2026, and
+// widowed-story-scenarios.test.ts checks that each still shows what its
+// description says.
+function recommendationFor(scenario: keyof typeof HEADLINE_SCENARIOS) {
+  return widowedRecommendationFor(
+    widowedContextFor(HEADLINE_SCENARIOS[scenario])
+  );
+}
 
 export const SurvivorFirstThenOwn: Story = {
-  args: {
-    recommendation: widowedRecommendationFor(
-      widowedContextFor({
-        ownPia: 2500,
-        born: [1968, 3, 15],
-        spousePia: 1500,
-        spouseBorn: [1964, 5, 10],
-        died: [2025, 11],
-      })
-    ),
-  },
+  args: { recommendation: recommendationFor('survivorFirstThenOwn') },
 };
 SurvivorFirstThenOwn.parameters = {
   docs: {
@@ -43,17 +40,7 @@ SurvivorFirstThenOwn.parameters = {
 };
 
 export const OwnFirstThenSurvivor: Story = {
-  args: {
-    recommendation: widowedRecommendationFor(
-      widowedContextFor({
-        ownPia: 1200,
-        born: [1964, 3, 15],
-        spousePia: 2600,
-        spouseBorn: [1961, 3, 15],
-        died: [2025, 11],
-      })
-    ),
-  },
+  args: { recommendation: recommendationFor('ownFirstThenSurvivor') },
 };
 OwnFirstThenSurvivor.parameters = {
   docs: {
@@ -65,21 +52,7 @@ OwnFirstThenSurvivor.parameters = {
 };
 
 export const OwnNotNeeded: Story = {
-  args: {
-    recommendation: widowedRecommendationFor(
-      widowedContextFor({
-        ownPia: 500,
-        born: [1968, 3, 15],
-        spousePia: 2000,
-        spouseBorn: [1960, 1, 2],
-        died: [2026, 6],
-        claim: {
-          kind: 'retirement',
-          startedAt: MonthDate.initFromYearsMonths({ years: 2022, months: 0 }),
-        },
-      })
-    ),
-  },
+  args: { recommendation: recommendationFor('ownNotNeeded') },
 };
 OwnNotNeeded.parameters = {
   docs: {
@@ -91,17 +64,7 @@ OwnNotNeeded.parameters = {
 };
 
 export const FileNowBackdated: Story = {
-  args: {
-    recommendation: widowedRecommendationFor(
-      widowedContextFor({
-        ownPia: 1500,
-        born: [1950, 5, 10],
-        spousePia: 2500,
-        spouseBorn: [1948, 2, 10],
-        died: [2025, 3],
-      })
-    ),
-  },
+  args: { recommendation: recommendationFor('fileNowBackdated') },
 };
 FileNowBackdated.parameters = {
   docs: {
@@ -113,25 +76,7 @@ FileNowBackdated.parameters = {
 };
 
 export const AlreadyReceivingSurvivor: Story = {
-  args: {
-    recommendation: widowedRecommendationFor(
-      widowedContextFor({
-        ownPia: 1800,
-        born: [1963, 7, 20],
-        spousePia: 2400,
-        spouseBorn: [1961, 9, 5],
-        died: [2024, 2],
-        claim: {
-          kind: 'retirement',
-          startedAt: MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
-        },
-        filed: {
-          survivor: MonthDate.initFromYearsMonths({ years: 2024, months: 3 }),
-          own: null,
-        },
-      })
-    ),
-  },
+  args: { recommendation: recommendationFor('alreadyReceivingSurvivor') },
 };
 AlreadyReceivingSurvivor.parameters = {
   docs: {

@@ -3,10 +3,13 @@
 export type {
   CellSelectionDetail,
   StrategyResult,
+  WidowedPlan,
+  WidowedStrategyResult,
 } from './calculation-results.js';
 export {
   CalculationResults,
   CalculationStatus,
+  isWidowedResult,
 } from './calculation-results.js';
 export { getMonthYearColor } from './colors.js';
 export {

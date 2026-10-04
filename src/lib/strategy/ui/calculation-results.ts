@@ -1,5 +1,7 @@
 import type { Money } from '$lib/money';
 import type { MonthDate, MonthDuration } from '$lib/month-time';
+import type { WidowedStrategy } from '$lib/strategy/calculations/widowed-benefits';
+import type { WidowedBenefitUse } from '$lib/strategy/calculations/widowed-optimizer';
 import type { DeathAgeBucket } from './grid-sizing.js';
 
 export interface CellSelectionDetail {
@@ -27,12 +29,27 @@ export interface StrategyResult {
   deathProb1?: number;
   deathProb2?: number;
   /**
-   * Widowed mode only: the age recipient 1's survivor benefit starts.
-   * `filingAge1` is then the age their own retirement benefit starts.
+   * Widowed mode only: the best plan for this death age. `filingAge1` then
+   * repeats its own-benefit start, for code shared with single mode.
    */
-  survivorFilingAge?: MonthDuration;
-  /** Widowed mode only: which of the two benefits ever pays. */
-  benefitUse?: { readonly survivor: boolean; readonly own: boolean };
+  widowed?: WidowedPlan;
+}
+
+/** Widowed mode: the best plan for one death age, and the benefits it uses. */
+export interface WidowedPlan {
+  readonly strategy: WidowedStrategy;
+  readonly use: WidowedBenefitUse;
+}
+
+/** A row from a widowed-mode run, which always carries its plan. */
+export type WidowedStrategyResult = StrategyResult & {
+  readonly widowed: WidowedPlan;
+};
+
+export function isWidowedResult(
+  result: StrategyResult
+): result is WidowedStrategyResult {
+  return result.widowed !== undefined;
 }
 
 export enum CalculationStatus {

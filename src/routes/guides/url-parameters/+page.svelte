@@ -402,7 +402,8 @@ schema.tags = [
   <ul>
     <li>
       <code>filed1</code> - Month recipient 1's own retirement benefits started,
-      in YYYY-MM format, if they already receive them
+      in YYYY-MM format, if they already receive them. Used in couple and
+      widowed modes; ignored for a single person.
     </li>
     <li>
       <code>filed2</code> - Month the spouse's retirement benefits started, in
@@ -419,10 +420,13 @@ schema.tags = [
       widowed mode, which plans when recipient 1 should start the survivor
       benefit and their own retirement benefit. <code>filed2</code> is then the
       month the late spouse's retirement benefits started, before they died.
+      Any <code>died2</code> selects widowed mode; a value that is not a valid
+      month is left blank for you to enter. <code>name2</code> and
+      <code>gender2</code> are ignored for a late spouse.
     </li>
     <li>
       <code>disabled2</code> - <code>1</code> if the late spouse was receiving
-      disability benefits
+      disability benefits. Ignored when <code>filed2</code> is present.
     </li>
     <li>
       <code>survfiled1</code> - Month recipient 1 started survivor benefits, in

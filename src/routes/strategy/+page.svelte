@@ -16,17 +16,18 @@
   } from "$lib/strategy/calculations/already-filed";
   import {
     emptyWidowedInput,
-    isEligibleToHaveFiledForSurvivor,
-    lateSpouseFrom,
     type WidowedInput,
+    widowedSnapshot,
   } from "$lib/strategy/calculations/late-spouse";
   import {
     createWidowedContext,
     earliestModelableDeathAgeWidowed,
-    expectedNPVWidowed,
     type WidowedContext,
   } from "$lib/strategy/calculations/widowed-optimizer";
-  import { strategyShareUrl } from "$lib/strategy/ui/share-url";
+  import {
+    strategyShareUrl,
+    widowedInputFromParams,
+  } from "$lib/strategy/ui/share-url";
   import type { StrategyMode } from "$lib/strategy/ui/strategy-mode";
   import {
     type WidowedRecommendation,
@@ -52,6 +53,7 @@
     type DeathAgeBucket,
     generateMonthlyBuckets,
     generateThreeYearBuckets,
+    isWidowedResult,
   } from "$lib/strategy/ui";
   import { writable } from "svelte/store";
   import posthog from "posthog-js";
@@ -101,7 +103,7 @@
     description:
       "Pre-populate the SSA.tools strategy optimizer from URL hash parameters. Finds the claim age(s) that maximize expected lifetime benefits. Supplying both pia2 and dob2 switches the optimizer to couple mode; adding died2 makes recipient 2 a late spouse and switches it to widowed mode.",
     urlTemplate:
-      "https://ssa.tools/strategy#pia1={pia1}&dob1={dob1}&name1={name1?}&gender1={gender1?}&pia2={pia2?}&dob2={dob2?}&name2={name2?}&gender2={gender2?}&filed2={filed2?}&died2={died2?}&disabled2={disabled2?}",
+      "https://ssa.tools/strategy#pia1={pia1}&dob1={dob1}&name1={name1?}&gender1={gender1?}&filed1={filed1?}&pia2={pia2?}&dob2={dob2?}&name2={name2?}&gender2={gender2?}&filed2={filed2?}&died2={died2?}&disabled2={disabled2?}&survfiled1={survfiled1?}",
     targetUrl: pageUrl,
     parameters: [
       {
@@ -130,9 +132,16 @@
         valuePattern: "^(male|female|blended)$",
       },
       {
+        name: "filed1",
+        description:
+          "Month recipient 1's own retirement benefits started, YYYY-MM, if they already receive them. Couple and widowed modes only.",
+        required: false,
+        valuePattern: "^\\d{4}-\\d{2}$",
+      },
+      {
         name: "pia2",
         description:
-          "Spouse's Primary Insurance Amount in whole US dollars (couple mode).",
+          "Spouse's Primary Insurance Amount in whole US dollars (couple mode, or widowed mode with died2).",
         required: false,
         valuePattern: "^\\d+$",
       },
@@ -144,36 +153,43 @@
       },
       {
         name: "name2",
-        description: "Spouse's display name.",
+        description: "Spouse's display name. Ignored in widowed mode.",
         required: false,
       },
       {
         name: "gender2",
         description:
-          "Mortality table for spouse: male, female, or blended (default).",
+          "Mortality table for spouse: male, female, or blended (default). Ignored in widowed mode.",
         required: false,
         valuePattern: "^(male|female|blended)$",
       },
       {
         name: "filed2",
         description:
-          "Month the spouse started retirement benefits, YYYY-MM. In widowed mode, a month before they died.",
+          "Month the spouse started retirement benefits, YYYY-MM. In widowed mode, a month before they died; it takes precedence over disabled2.",
         required: false,
         valuePattern: "^\\d{4}-\\d{2}$",
       },
       {
         name: "died2",
         description:
-          "Month the spouse died, YYYY-MM. Switches the optimizer to widowed mode, which plans when to start survivor benefits and recipient 1's own benefit.",
+          "Month the spouse died, YYYY-MM. Switches the optimizer to widowed mode, which plans when to start survivor benefits and recipient 1's own benefit. Any died2 selects widowed mode; a value that is not a valid month is left for the user to enter.",
         required: false,
         valuePattern: "^\\d{4}-\\d{2}$",
       },
       {
         name: "disabled2",
         description:
-          "Widowed mode: 1 if the late spouse was receiving disability benefits.",
+          "Widowed mode: 1 if the late spouse was receiving disability benefits. Ignored when filed2 is present.",
         required: false,
         valuePattern: "^1$",
+      },
+      {
+        name: "survfiled1",
+        description:
+          "Widowed mode: month recipient 1's survivor benefits started, YYYY-MM, if they already receive them.",
+        required: false,
+        valuePattern: "^\\d{4}-\\d{2}$",
       },
     ],
   });
@@ -344,8 +360,11 @@
 
       const hasSpouse =
         params.getSpousePia() !== null && params.getSpouseDob() !== null;
-      const deathMonth = params.getSpouseDeathMonth();
-      mode = !hasSpouse ? "single" : deathMonth !== null ? "widowed" : "couple";
+      mode = !hasSpouse
+        ? "single"
+        : params.hasSpouseDeathMonth()
+          ? "widowed"
+          : "couple";
 
       // Mirror handleModeSelect: couple mode needs markFirst/markSecond so
       // RecipientName renders colored names.
@@ -377,31 +396,11 @@
           // enough to show the control. A hand-edited link can mark an
           // under-62 person as filed; drop that here so it never reaches the
           // optimizer, which refuses it. Restore always lands on the form
-          // stage, where the month inputs re-validate on mount; that is what
-          // completes validation before any calculation runs.
+          // stage, where the month inputs re-validate on mount, and widowed
+          // mode checks its whole snapshot again on Continue.
           const restoredNow = currentMonthDate();
-          if (mode === "widowed" && deathMonth !== null) {
-            const spouseFiled = params.getSpouseFiledMonth();
-            const survivorFiled = params.getRecipientSurvivorFiledMonth();
-            widowedInput = {
-              deathMonth,
-              claimKind: spouseFiled
-                ? "retirement"
-                : params.getSpouseDisabled()
-                  ? "disability"
-                  : "none",
-              retirementStartedAt: spouseFiled,
-              survivorFiledAt: isEligibleToHaveFiledForSurvivor(
-                bd1,
-                deathMonth,
-                restoredNow
-              )
-                ? survivorFiled
-                : null,
-              ownFiledAt: isEligibleToHaveFiled(bd1, restoredNow)
-                ? params.getRecipientFiledMonth()
-                : null,
-            };
+          if (mode === "widowed") {
+            widowedInput = widowedInputFromParams(params, bd1, restoredNow);
           } else {
             if (params.getSpouseName()) recipients[1].name = params.getSpouseName()!;
             recipients[1].gender = params.getSpouseGender();
@@ -421,8 +420,12 @@
       piaValues = [...piaValues];
       recipients = [...recipients];
       stage = "form";
-    } catch {
-      // Invalid URL params — leave the page at the mode-picker stage
+    } catch (error) {
+      // A link this page wrote always restores; a hand-edited one might
+      // not. Start over at the mode picker rather than leave the form half
+      // filled in.
+      console.warn("Could not restore the form from this link:", error);
+      handleStartOver();
     }
   }
 
@@ -628,6 +631,21 @@
   async function handleContinue() {
     formErrorMessage = null;
     recomputeErrorMessage = null;
+    // The form checks each answer as it is entered. This catches what it
+    // could not see, such as a month restored from a hand-edited link, and
+    // names the problem rather than reporting a failure on our end.
+    if (mode === "widowed") {
+      const result = widowedSnapshot(
+        recipients[0],
+        recipients[1],
+        widowedInput,
+        currentMonthDate()
+      );
+      if (result.kind === "problem") {
+        formErrorMessage = result.problem;
+        return;
+      }
+    }
     try {
       await calculateStrategyMatrix();
       if (calculationResults.status() === CalculationStatus.Complete) {
@@ -834,17 +852,24 @@
     currentDate: MonthDate,
     prevSelected: { rowLabel: string; colLabel: string } | null
   ) {
-    const lateSpouse = lateSpouseFrom(recipients[1], widowedInput);
-    if (lateSpouse === null) {
-      // The form holds Continue until these are filled in.
-      throw new Error("widowed-mode inputs are incomplete");
+    const result = widowedSnapshot(
+      recipients[0],
+      recipients[1],
+      widowedInput,
+      currentDate
+    );
+    if (result.kind === "problem") {
+      // handleContinue checks the same snapshot first, so reaching here is a
+      // bug rather than bad input.
+      throw new Error(`widowed-mode inputs rejected: ${result.problem}`);
     }
+    const { lateSpouse, filed } = result.snapshot;
     const context = createWidowedContext(
       recipients[0],
       lateSpouse,
       currentDate,
       discountRate,
-      { survivor: widowedInput.survivorFiledAt, own: widowedInput.ownFiledAt }
+      filed
     );
     // Before the first month a benefit could start nothing is paid, so
     // there is no plan to find; the buckets start there.
@@ -855,7 +880,7 @@
     const next = widowedResultsByDeathAge(context, buckets);
     const recommendation = widowedRecommendation(
       context,
-      expectedNPVWidowed(context, deathProbDistribution1)
+      deathProbDistribution1
     );
     if (prevSelected) {
       next.setSelectedByLabels(prevSelected.rowLabel, prevSelected.colLabel);
@@ -1140,15 +1165,18 @@
           />
         {/key}
       {/if}
-      {#if calculationResults.getSelectedCellData() && isWidowed && resultsWidowedContext}
-        {#key calculationResults.getSelectedCellData()}
-          <ScenarioDetailWidowed
-            context={resultsWidowedContext}
-            result={calculationResults.getSelectedCellData()}
-            bind:displayAsAges
-            onBack={handleBackToMatrix}
-          />
-        {/key}
+      {#if isWidowed && resultsWidowedContext}
+        {@const selected = calculationResults.getSelectedCellData()}
+        {#if selected && isWidowedResult(selected)}
+          {#key selected}
+            <ScenarioDetailWidowed
+              context={resultsWidowedContext}
+              result={selected}
+              bind:displayAsAges
+              onBack={handleBackToMatrix}
+            />
+          {/key}
+        {/if}
       {/if}
     </section>
   {/if}

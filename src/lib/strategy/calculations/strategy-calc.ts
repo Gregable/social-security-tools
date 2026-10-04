@@ -240,10 +240,13 @@ function calculatePeriodNPV(
  * The net present value, in cents, of a set of benefit periods as of
  * `currentDate`.
  *
- * Payments are assumed to be received at the end of each month for that
- * month's benefit, so a period's first payment arrives the month after it
- * starts. Payments on or before `currentDate` are already in the past and
- * do not count.
+ * The benefit for month t is paid in month t + 1, as SSA pays it, and a
+ * payment dated on or before `currentDate` is in the past and does not
+ * count, so benefits count from the current month on. `calculatePeriodNPV`
+ * values each run of payments as an annuity paid at the end of each month,
+ * which discounts the first payment one month past its date: the benefit
+ * for month t is discounted (t + 2 - now) months in all. The widowed
+ * optimizer matches this; see PAYMENT_DISCOUNT_LAG there.
  */
 export function benefitPeriodsNPVCents(
   periods: BenefitPeriod[],

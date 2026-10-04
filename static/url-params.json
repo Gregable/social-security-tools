@@ -113,7 +113,7 @@
     {
       "path": "/strategy",
       "url": "https://ssa.tools/strategy",
-      "description": "Filing-age optimizer. Finds the claim age(s) maximizing expected lifetime benefits given a discount rate and life-expectancy assumption. Couple mode runs when recipient-2 PIA and DOB are both present.",
+      "description": "Filing-age optimizer. Finds the claim age(s) maximizing expected lifetime benefits given a discount rate and life-expectancy assumption. Couple mode runs when recipient-2 PIA and DOB are both present; widowed mode runs when died2 is present too.",
       "parameters": [
         {
           "name": "pia1",
@@ -153,7 +153,7 @@
           "type": "integer",
           "required": false,
           "unit": "USD per month",
-          "description": "Primary Insurance Amount in whole US dollars for recipient 2 (spouse). Supplying both pia2 and dob2 switches the optimizer to couple mode.",
+          "description": "Primary Insurance Amount in whole US dollars for recipient 2 (spouse). Supplying both pia2 and dob2 switches the optimizer to couple mode, or to widowed mode when died2 is also present.",
           "example": 1800
         },
         {
@@ -169,7 +169,7 @@
           "name": "name2",
           "type": "string",
           "required": false,
-          "description": "Display name for recipient 2 (spouse).",
+          "description": "Display name for recipient 2 (spouse). Ignored in widowed mode.",
           "example": "Casey"
         },
         {
@@ -178,7 +178,7 @@
           "enum": ["male", "female", "blended"],
           "required": false,
           "default": "blended",
-          "description": "Mortality table for recipient 2 (spouse).",
+          "description": "Mortality table for recipient 2 (spouse). Ignored in widowed mode.",
           "example": "female"
         },
         {
@@ -187,7 +187,7 @@
           "format": "YYYY-MM",
           "pattern": "^\\d{4}-\\d{2}$",
           "required": false,
-          "description": "Month recipient 1's own retirement benefits started, if they already receive them. Couple and widowed modes; that start month is then taken as given.",
+          "description": "Month recipient 1's own retirement benefits started, if they already receive them. Couple and widowed modes only (ignored for a single person); that start month is then taken as given.",
           "example": "2025-08"
         },
         {
@@ -196,7 +196,7 @@
           "format": "YYYY-MM",
           "pattern": "^\\d{4}-\\d{2}$",
           "required": false,
-          "description": "Month recipient 2's retirement benefits started. In widowed mode, a month before they died.",
+          "description": "Month recipient 2's retirement benefits started. In widowed mode, a month before they died; it takes precedence over disabled2.",
           "example": "2022-01"
         },
         {
@@ -205,7 +205,7 @@
           "format": "YYYY-MM",
           "pattern": "^\\d{4}-\\d{2}$",
           "required": false,
-          "description": "Month recipient 2 died. With pia2 and dob2 it switches the optimizer to widowed mode, which plans when recipient 1 should start the survivor benefit and their own retirement benefit.",
+          "description": "Month recipient 2 died. With pia2 and dob2 it switches the optimizer to widowed mode, which plans when recipient 1 should start the survivor benefit and their own retirement benefit. Any died2 selects widowed mode; a value that is not a valid YYYY-MM is left for the user to enter.",
           "example": "2025-06"
         },
         {
@@ -213,7 +213,7 @@
           "type": "integer",
           "enum": [1],
           "required": false,
-          "description": "Widowed mode: 1 if recipient 2 was receiving disability benefits when they died.",
+          "description": "Widowed mode: 1 if recipient 2 was receiving disability benefits when they died. Ignored when filed2 is present.",
           "example": 1
         },
         {

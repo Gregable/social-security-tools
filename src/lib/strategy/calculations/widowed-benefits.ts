@@ -39,6 +39,15 @@ export interface WidowedStrategy {
 /** The furthest back SSA pays a new claim (20 CFR 404.621(a)(2)). */
 const MAX_RETROACTIVE_MONTHS = 6;
 
+/** Start ages from `earliest` to `latest` months; a choice if more than one. */
+function startAgeRange(earliest: number, latest: number): FilingAgeRange {
+  return {
+    earliest: new MonthDuration(earliest),
+    latest: new MonthDuration(latest),
+    hasChoice: earliest < latest,
+  };
+}
+
 /**
  * The monthly survivor benefit for a claim starting in `startDate`, in
  * today's dollars.
@@ -85,14 +94,21 @@ function firstMaximumAgeMonths(
 /**
  * The survivor-benefit start ages still available as of `currentDate`.
  *
- * The range opens at the first month a survivor benefit is possible (see
- * `earliestSurvivorBenefitDate`) and closes where the benefit stops growing.
- * Once the survivor is past that point, the only option left is to claim
- * now, backdated as far as SSA allows (20 CFR 404.621; POMS GN 00204.030):
- * up to six months, but never into a month that would add age reduction.
- * In practice that means no earlier than survivor full retirement age, or
- * than the month the widow(er)'s limit started to cap the benefit. Before
- * that point no backdating is allowed at all.
+ * The range closes where the benefit stops growing: survivor full
+ * retirement age, or earlier where the widow(er)'s limit caps it. It opens
+ * at the first month a survivor benefit is possible (see
+ * `earliestSurvivorBenefitDate`) if that month is still to come, and
+ * otherwise now: before the benefit stops growing, a backdated start would
+ * add age reduction, which SSA does not allow (20 CFR 404.621; POMS
+ * GN 00204.030). Past that point the only option left is to claim now,
+ * backdated up to six months but never into a month that would add
+ * reduction, so no earlier than survivor full retirement age or the month
+ * the limit started to cap the benefit.
+ *
+ * One exception is left out: someone who applies the month after the death
+ * can be paid for the month of death even with the added reduction (20 CFR
+ * 404.621(a)(4)(ii)). Retroactive months are not valued here, so taking it
+ * could only lower the benefit, and the range does not offer it.
  *
  * `filedAt`, when given, is the month survivor benefits actually started.
  * It must pass `validateSurvivorFiledMonth`; the form enforces that, so a
@@ -115,12 +131,8 @@ export function survivorFilingRange(
     if (problem !== null) {
       throw new Error(`invalid survivor start month: ${problem}`);
     }
-    const filedAge = birthdate.ageAtSsaDate(filedAt);
-    return {
-      earliest: filedAge,
-      latest: new MonthDuration(filedAge.asMonths()),
-      hasChoice: false,
-    };
+    const filedAge = birthdate.ageAtSsaDate(filedAt).asMonths();
+    return startAgeRange(filedAge, filedAge);
   }
 
   const firstPossible = birthdate
@@ -141,12 +153,7 @@ export function survivorFilingRange(
   } else {
     earliest = current;
   }
-  const latest = Math.max(earliest, maximumFrom);
-  return {
-    earliest: new MonthDuration(earliest),
-    latest: new MonthDuration(latest),
-    hasChoice: earliest < latest,
-  };
+  return startAgeRange(earliest, Math.max(earliest, maximumFrom));
 }
 
 /**
@@ -161,11 +168,8 @@ export function ownFilingRange(
 ): FilingAgeRange {
   const range = filingAgeRange(survivor, currentDate, filedAt);
   if (survivor.pia().primaryInsuranceAmount().cents() > 0) return range;
-  return {
-    earliest: range.earliest,
-    latest: new MonthDuration(range.earliest.asMonths()),
-    hasChoice: false,
-  };
+  const earliest = range.earliest.asMonths();
+  return startAgeRange(earliest, earliest);
 }
 
 /**

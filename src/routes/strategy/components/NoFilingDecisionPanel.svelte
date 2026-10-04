@@ -3,9 +3,10 @@
   @name NoFilingDecisionPanel
   @description
     Shown in place of the death-age chart when nobody in the scenario has a
-    filing age left to choose, either because they are past 70 (delayed
-    retirement credits have stopped, so the chart would be a single repeated
-    value) or because they have already filed (the date is a fact).
+    filing age left to choose: they are past 70 (delayed retirement credits
+    have stopped, so the chart would be a single repeated value), they have
+    already filed (the date is a fact), or, for a widow(er), each benefit has
+    started, stopped growing, or does not exist.
 -->
 
 <script lang="ts">
@@ -27,9 +28,11 @@ export let variant:
     <p>
       This chart normally shows how the best start dates for your survivor
       benefit and your own retirement benefit shift with how long you live.
-      Each of yours has either started already or stopped growing: survivor
-      benefits stop growing at survivor full retirement age, or sooner when
-      your spouse claimed early, and retirement benefits at 70.
+      Here there is nothing left to choose: each benefit has started already,
+      has stopped growing, or, with no retirement benefit on your own record,
+      does not exist. Survivor benefits stop growing at survivor full
+      retirement age, or sooner when your spouse claimed early, and retirement
+      benefits at 70.
     </p>
     <p>
       Claim anything you have not yet started as soon as you can, and ask SSA

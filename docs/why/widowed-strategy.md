@@ -30,8 +30,8 @@ next to the code that applies them.
 - If the late spouse claimed early, the reduced amount is then capped at the
   larger of their reduced benefit and 82.5% of their PIA (the widow(er)'s
   limit, or RIB-LIM). The cap applies after the age reduction, so the
-  benefit stops growing before survivor full retirement age, and waiting
-  past that point gains nothing.
+  benefit can stop growing before survivor full retirement age: once the
+  reduced amount reaches the cap, waiting longer gains nothing.
 - Once both benefits are being paid, SSA pays the larger.
 - An application covers both benefits unless it is restricted, so the page
   tells people to restrict it.
@@ -62,7 +62,18 @@ lived.
 - **"Not needed" instead of a tie-break date.** Many plans pay identical
   streams, for example any survivor start once a larger own benefit is being
   paid. Rather than show whichever date the search happened to keep, the
-  page says the benefit is not needed.
+  page says the benefit is not needed. A benefit that has already started is
+  a fact, so it is never "not needed", even once the other pays more.
+- **Every answer is checked again before a calculation.** The form checks
+  each month as it is entered, but a share link restores months it has not
+  seen, and one answer can make another impossible. Continue checks them
+  all again and names the problem in the form, and the optimizer refuses an
+  impossible late spouse rather than produce a plausible-looking plan.
+- **Answers survive a hidden control.** The "already receiving" controls
+  hide while a birthdate or the death month is being retyped, and when the
+  form remounts for Edit or a share link. Their answers are kept rather than
+  cleared, so a started benefit is never silently dropped; only a complete
+  new birthdate that rules a start out removes it.
 
 ## Limits
 

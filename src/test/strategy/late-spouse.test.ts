@@ -8,11 +8,14 @@ import {
   emptyWidowedInput,
   isEligibleToHaveFiledForSurvivor,
   type LateSpouse,
-  lateSpouseFrom,
+  lateSpouseProblem,
   lateSpouseSurvivorBasis,
   validateDeathMonth,
   validateLateSpouseFiledMonth,
   validateSurvivorFiledMonth,
+  type WidowedInput,
+  type WidowedSnapshot,
+  widowedSnapshot,
 } from '$lib/strategy/calculations/late-spouse';
 
 const month = (years: number, monthIndex: number) =>
@@ -168,45 +171,168 @@ describe('validateSurvivorFiledMonth', () => {
   });
 });
 
-describe('lateSpouseFrom', () => {
-  const recipient = makeRecipient(2000, 1960, 0, 2);
+describe('widowedSnapshot', () => {
+  /** Born 15 March 1960: 66 now, 62 in April 2022's first full month. */
+  const survivor = makeRecipient(1200, 1960, 2, 15);
+  /** Born 2 January 1960: first full month at 62 is January 2022. */
+  const spouse = makeRecipient(2000, 1960, 0, 2);
+
+  function input(fields: Partial<WidowedInput>): WidowedInput {
+    return { ...emptyWidowedInput(), deathMonth: month(2024, 2), ...fields };
+  }
+
+  function snapshotOf(fields: Partial<WidowedInput>): WidowedSnapshot {
+    const result = widowedSnapshot(
+      survivor,
+      spouse,
+      input(fields),
+      currentDate
+    );
+    if (result.kind === 'problem') {
+      throw new Error(`unexpected problem: ${result.problem}`);
+    }
+    return result.snapshot;
+  }
+
+  function problemOf(fields: Partial<WidowedInput>): string {
+    const result = widowedSnapshot(
+      survivor,
+      spouse,
+      input(fields),
+      currentDate
+    );
+    if (result.kind === 'ok') throw new Error('expected a problem');
+    return result.problem;
+  }
 
   it('describes a spouse who never claimed', () => {
-    const input = emptyWidowedInput();
-    input.deathMonth = month(2024, 2);
-    expect(lateSpouseFrom(recipient, input)).toEqual({
-      recipient,
-      deathDate: month(2024, 2),
-      claim: { kind: 'none' },
+    expect(snapshotOf({})).toEqual({
+      lateSpouse: {
+        recipient: spouse,
+        deathDate: month(2024, 2),
+        claim: { kind: 'none' },
+      },
+      filed: { survivor: null, own: null },
     });
   });
 
   it('carries the start month of a retirement claim', () => {
-    const input = emptyWidowedInput();
-    input.deathMonth = month(2024, 2);
-    input.claimKind = 'retirement';
-    input.retirementStartedAt = month(2022, 0);
-    expect(lateSpouseFrom(recipient, input)?.claim).toEqual({
-      kind: 'retirement',
-      startedAt: month(2022, 0),
-    });
+    expect(
+      snapshotOf({
+        claimKind: 'retirement',
+        retirementStartedAt: month(2022, 0),
+      }).lateSpouse.claim
+    ).toEqual({ kind: 'retirement', startedAt: month(2022, 0) });
   });
 
-  it('is null until the death month is known', () => {
-    expect(lateSpouseFrom(recipient, emptyWidowedInput())).toBe(null);
+  it('describes a disability claim, ignoring a start month left from retirement', () => {
+    expect(
+      snapshotOf({
+        claimKind: 'disability',
+        retirementStartedAt: month(2022, 0),
+      }).lateSpouse.claim
+    ).toEqual({ kind: 'disability' });
   });
 
-  it('is null for a retirement claim with no start month', () => {
-    const input = emptyWidowedInput();
-    input.deathMonth = month(2024, 2);
-    input.claimKind = 'retirement';
-    expect(lateSpouseFrom(recipient, input)).toBe(null);
+  it('ignores a start month left from retirement when they never claimed', () => {
+    expect(
+      snapshotOf({ claimKind: 'none', retirementStartedAt: month(2022, 0) })
+        .lateSpouse.claim
+    ).toEqual({ kind: 'none' });
+  });
+
+  it('carries the benefits the survivor has already started', () => {
+    expect(
+      snapshotOf({
+        survivorFiledAt: month(2024, 5),
+        ownFiledAt: month(2024, 8),
+      }).filed
+    ).toEqual({ survivor: month(2024, 5), own: month(2024, 8) });
+  });
+
+  it('needs the death month', () => {
+    expect(problemOf({ deathMonth: null })).toMatch(/month .* died/);
+  });
+
+  it('needs the start month of a retirement claim', () => {
+    expect(problemOf({ claimKind: 'retirement' })).toMatch(/started/);
+  });
+
+  // A share link restores months the form has not yet checked.
+  it('rejects a death month in the future', () => {
+    expect(problemOf({ deathMonth: month(2026, 10) })).toMatch(/future/);
+  });
+
+  it('rejects a death month before they were born', () => {
+    expect(problemOf({ deathMonth: month(1959, 0) })).toMatch(/born/);
+  });
+
+  it('rejects a retirement start in the month of death', () => {
+    expect(
+      problemOf({
+        claimKind: 'retirement',
+        retirementStartedAt: month(2024, 2),
+      })
+    ).toMatch(/before the month they died/);
+  });
+
+  it('rejects survivor benefits that started before the death', () => {
+    expect(problemOf({ survivorFiledAt: month(2024, 1) })).toMatch(
+      /before the month of death/
+    );
+  });
+
+  it('rejects own benefits that started before 62', () => {
+    expect(problemOf({ ownFiledAt: month(2022, 2) })).toMatch(/April 2022/);
   });
 
   it('starts each form fresh', () => {
     const a = emptyWidowedInput();
     a.deathMonth = month(2024, 2);
     expect(emptyWidowedInput().deathMonth).toBe(null);
+  });
+});
+
+describe('lateSpouseProblem', () => {
+  const spouse = makeRecipient(2000, 1960, 0, 2);
+
+  it('accepts a spouse who died after claiming', () => {
+    expect(
+      lateSpouseProblem(
+        {
+          recipient: spouse,
+          deathDate: month(2024, 2),
+          claim: { kind: 'retirement', startedAt: month(2022, 0) },
+        },
+        currentDate
+      )
+    ).toBe(null);
+  });
+
+  it('rejects a death in the future', () => {
+    expect(
+      lateSpouseProblem(
+        {
+          recipient: spouse,
+          deathDate: month(2027, 0),
+          claim: { kind: 'none' },
+        },
+        currentDate
+      )
+    ).toMatch(/future/);
+  });
+
+  it('rejects a retirement claim that starts after the death', () => {
+    expect(
+      lateSpouseProblem(
+        {
+          recipient: spouse,
+          deathDate: month(2024, 2),
+          claim: { kind: 'retirement', startedAt: month(2024, 5) },
+        },
+        currentDate
+      )
+    ).toMatch(/before the month they died/);
   });
 });
 

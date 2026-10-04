@@ -5,8 +5,10 @@
     A month select and a four-digit year input for one calendar month, with a
     legend and an inline error. Publishes the month through `bind:value` only
     when it is complete and passes `validate`; anything else publishes null,
-    so the parent never sees a month the calculation would reject.
-    `onvaliditychange` reports whether the entry is complete and valid.
+    so the parent never sees a month the calculation would reject, and can
+    tell whether the entry is complete and valid from `value !== null`.
+    (A validity callback fired from a reactive statement here would go stale
+    whenever a later statement re-validated.)
 
     Re-validation is keyed on `revalidateKey`, a primitive the parent changes
     whenever the rule behind `validate` changes (a new birthdate, say).
@@ -41,9 +43,6 @@
   export let revalidateKey: string | number = "";
   /** Fires on any change, so the parent can refresh derived state. */
   export let onchange: (() => void) | undefined = undefined;
-  /** False until a complete, valid month has been entered. */
-  export let onvaliditychange: ((isValid: boolean) => void) | undefined =
-    undefined;
 
   let monthIndex: number | null = null;
   let year: number | null = null;
@@ -51,7 +50,6 @@
   let mounted = false;
 
   $: errorId = `${inputId}-error`;
-  $: onvaliditychange?.(value !== null && error === "");
   $: revalidate(revalidateKey);
 
   function revalidate(_key: string | number) {

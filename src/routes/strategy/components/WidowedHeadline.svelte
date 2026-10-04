@@ -10,9 +10,10 @@
 <script lang="ts">
   import InfoTip from "$lib/components/InfoTip.svelte";
   import { Money } from "$lib/money";
-  import type {
-    WidowedClaimAdvice,
-    WidowedRecommendation,
+  import {
+    isClaimToMake,
+    type OwnClaimAdvice,
+    type WidowedRecommendation,
   } from "$lib/strategy/ui/widowed-advice";
 
   interface Props {
@@ -23,7 +24,7 @@
 
   interface Card {
     readonly title: string;
-    readonly advice: WidowedClaimAdvice;
+    readonly advice: OwnClaimAdvice;
     readonly otherIsLarger: string;
   }
 
@@ -46,9 +47,11 @@
   const switches = $derived(
     recommendation.first === "survivor" || recommendation.first === "own"
   );
+  // Nothing left to decide: each benefit has started, is not needed, or
+  // does not exist.
   const decided = $derived(
-    !["file-in", "file-now"].includes(recommendation.survivor.kind) &&
-      !["file-in", "file-now"].includes(recommendation.own.kind)
+    !isClaimToMake(recommendation.survivor) &&
+      !isClaimToMake(recommendation.own)
   );
 
   function formatMonthFull(card: Card): string {
@@ -102,7 +105,7 @@
   {:else if a.kind === "not-needed"}
     <div class="date-big quiet">Not needed</div>
     <div class="age-sub">{c.otherIsLarger}</div>
-  {:else}
+  {:else if a.kind === "no-benefit"}
     <div class="date-big quiet">None</div>
     <div class="age-sub">There is no retirement benefit on your own record.</div>
   {/if}
@@ -153,11 +156,12 @@
     </div>
     <p class="explanation">
       {#if decided}
-        Neither benefit has a start date left to choose. The figure is the
-        expected value of what is still to come.
+        There is no start date left to decide: each benefit has either started
+        or would not change your payments. The figure is the expected value of
+        what is still to come.
       {:else if switches}
         Survivor benefits are exempt from deemed filing, so you can take one
-        benefit now and switch to the other later. When you apply for the first
+        benefit first and switch to the other later. When you apply for the first
         one, ask SSA to restrict the application to that benefit, or it may be
         treated as an application for both. Once both are being paid, SSA pays
         whichever is larger.

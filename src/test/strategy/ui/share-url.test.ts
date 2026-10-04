@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Birthdate } from '$lib/birthday';
 import { MonthDate } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
 import {
@@ -8,6 +9,7 @@ import {
 import {
   type StrategyShareInputs,
   strategyShareUrl,
+  widowedInputFromParams,
 } from '$lib/strategy/ui/share-url';
 import { UrlParams } from '$lib/url-params';
 
@@ -133,5 +135,74 @@ describe('strategyShareUrl', () => {
       )
     );
     expect(params.getSpousePia()).toBe(null);
+  });
+});
+
+describe('widowedInputFromParams', () => {
+  /** Person 1 in `inputs`: born 20 July 1963, 63 in October 2026. */
+  const survivorBirthdate = Birthdate.FromYMD(1963, 6, 20);
+  const now = month(2026, 9);
+
+  function roundTrip(widowed: WidowedInput): WidowedInput {
+    const url = strategyShareUrl(inputs({ mode: 'widowed', widowed }));
+    return widowedInputFromParams(parsed(url), survivorBirthdate, now);
+  }
+
+  it.each([
+    ['never claimed', widowedWith({})],
+    [
+      'claimed retirement, with both of the survivor’s benefits started',
+      widowedWith({
+        claimKind: 'retirement',
+        retirementStartedAt: month(2023, 9),
+        survivorFiledAt: month(2024, 3),
+        ownFiledAt: month(2025, 7),
+      }),
+    ],
+    [
+      'was on disability',
+      widowedWith({ claimKind: 'disability', survivorFiledAt: month(2024, 3) }),
+    ],
+  ])('round-trips a late spouse who %s', (_, widowed) => {
+    expect(roundTrip(widowed)).toEqual(widowed);
+  });
+
+  it('reads a retirement start month over disability when a link has both', () => {
+    const restored = widowedInputFromParams(
+      new UrlParams(
+        '#pia1=1800&dob1=1963-07-20&pia2=2400&dob2=1961-09-05' +
+          '&died2=2024-02&filed2=2023-10&disabled2=1'
+      ),
+      survivorBirthdate,
+      now
+    );
+    expect(restored.claimKind).toBe('retirement');
+    expect(restored.retirementStartedAt).toEqual(month(2023, 9));
+  });
+
+  it('drops benefits the survivor is too young to have started', () => {
+    const restored = widowedInputFromParams(
+      new UrlParams(
+        '#pia1=1800&dob1=1970-01-15&pia2=2400&dob2=1961-09-05' +
+          '&died2=2024-02&survfiled1=2024-04&filed1=2025-08'
+      ),
+      Birthdate.FromYMD(1970, 0, 15),
+      now
+    );
+    expect(restored.survivorFiledAt).toBe(null);
+    expect(restored.ownFiledAt).toBe(null);
+  });
+
+  it('leaves a death month that does not parse for the form to ask for', () => {
+    const params = new UrlParams(
+      '#pia1=1800&dob1=1963-07-20&pia2=2400&dob2=1961-09-05&died2=2024-3' +
+        '&survfiled1=2024-04'
+    );
+    expect(params.hasSpouseDeathMonth()).toBe(true);
+    const restored = widowedInputFromParams(params, survivorBirthdate, now);
+    expect(restored.deathMonth).toBe(null);
+    // Without a death month there is no knowing when survivor benefits could
+    // start, so a started one cannot be checked; it is dropped.
+    expect(restored.survivorFiledAt).toBe(null);
   });
 });

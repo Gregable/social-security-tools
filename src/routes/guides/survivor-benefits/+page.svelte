@@ -174,8 +174,9 @@ const sponsorCopy: SponsorCopy = {
       <tr>
         <td>Spouse claimed before <a href="/guides/nra">NRA</a></td>
         <td
-          >100% of their <a href="/guides/pia">PIA</a>, capped at the greater of
-          their benefit at death or 82.5% of their PIA</td
+          >100% of their <a href="/guides/pia">PIA</a>; after any reduction for
+          your age, capped at the greater of their benefit at death or 82.5% of
+          their PIA</td
         >
       </tr>
       <tr>
@@ -201,9 +202,9 @@ const sponsorCopy: SponsorCopy = {
     PIA, a rule called the
     <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615320">widow(er)'s limit</a>.
     So once you wait long enough, you get at least 82.5% of their PIA even if
-    they were receiving less. The cap also means your survivor benefit stops
-    growing before your survivor full retirement age, and waiting past that
-    point gains nothing.
+    they were receiving less. The cap also means your survivor benefit can stop
+    growing before your survivor full retirement age: once your reduced amount
+    reaches the cap, waiting longer gains nothing.
   </p>
 
   <InlineCTA type="sponsor" {sponsorCopy} />
@@ -282,7 +283,8 @@ const sponsorCopy: SponsorCopy = {
 
   <p>
     Note that survivor benefits do not earn delayed retirement credits. The
-    maximum is reached at your survivor full retirement age; waiting until 70
+    maximum is reached at your survivor full retirement age, or earlier if your
+    spouse claimed early and the widow(er)'s limit caps it; waiting until 70
     provides no additional increase.
   </p>
 

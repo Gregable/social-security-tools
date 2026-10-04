@@ -102,7 +102,47 @@ describe('survivorFilingRange', () => {
     expect(range.hasChoice).toBe(false);
   });
 
-  it('backdates up to six months, not before FRA, past survivor FRA', () => {
+  it('backdates no earlier than survivor FRA, even within six months', () => {
+    // Born 15 Jan 1960: survivor FRA 66y8m, 66y9m now. Six months back would
+    // be 66y3m, but a month before FRA would add age reduction, so SSA
+    // backdates only to 66y8m (GN 00204.030), when the benefit is the full
+    // $2,000.
+    const survivor = makeRecipient(1500, 1960, 0, 15);
+    const spouse: LateSpouse = {
+      recipient: makeRecipient(2000, 1958, 4, 10),
+      deathDate: month(2020, 5),
+      claim: { kind: 'none' },
+    };
+    const range = survivorFilingRange(survivor, spouse, currentDate, null);
+    expectAge(range.earliest, age(66, 8));
+    expectAge(range.latest, age(66, 8));
+    expect(range.hasChoice).toBe(false);
+    expect(
+      widowedSurvivorBenefit(
+        survivor,
+        spouse,
+        survivor.birthdate.dateAtSsaAge(age(66, 8))
+      ).value()
+    ).toBe(2000);
+  });
+
+  it('backdates no earlier than where the limit starts to cap the benefit', () => {
+    // Born 15 Dec 1963: 62y10m now. The limit caps the benefit at $1,650
+    // from 62y9m, the first month $2,000 x (0.715 + 0.285 x m/84) reaches
+    // it (m = 33); before that, backdating would add reduction. So 62y9m,
+    // not six months back at 62y4m.
+    const survivor = makeRecipient(1500, 1963, 11, 15);
+    const spouse: LateSpouse = {
+      ...claimedAt62,
+      deathDate: month(2023, 5),
+    };
+    const range = survivorFilingRange(survivor, spouse, currentDate, null);
+    expectAge(range.earliest, age(62, 9));
+    expectAge(range.latest, age(62, 9));
+    expect(range.hasChoice).toBe(false);
+  });
+
+  it('backdates six months past survivor FRA when that is the binding limit', () => {
     // Born 15 Mar 1957: survivor FRA 66y2m; 69y7m now. Spouse died January
     // 2026 (68y10m), so six months back (69y1m) is the binding limit.
     const survivor = makeRecipient(1500, 1957, 2, 15);

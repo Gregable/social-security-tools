@@ -582,8 +582,9 @@ $: {
         <p class="pia-note">
           Why age {breakEvenAge.years()}y {breakEvenAge.modMonths()}m? If <RName r={higherEarner} />
           files before this age, the benefit is reduced below 82.5% of PIA.
-          The survivor benefit has a floor of 82.5% of PIA, so filing earlier than
-          this doesn't further reduce the survivor benefit.
+          The cap on the survivor benefit (the widow(er)'s limit) never falls
+          below 82.5% of PIA, so filing earlier than this doesn't lower the
+          survivor benefit any further.
         </p>
 
         <h4>Early Filing Reductions for <RName r={lowerEarner} /></h4>

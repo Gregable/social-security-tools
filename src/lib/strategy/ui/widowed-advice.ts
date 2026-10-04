@@ -1,17 +1,19 @@
 /**
  * Turns widowed-mode optimizer results into what the page says about each
  * benefit: start it in a given month, start it now and backdate, it has
- * already started, or it is not needed. Kept out of the components so the
- * rules can be tested.
+ * already started, it is not needed, or, for the own benefit, there is none
+ * on the survivor's record. Kept out of the components so the rules can be
+ * tested.
  */
 
+import type { DeathProbability } from '$lib/life-tables';
 import type { Money } from '$lib/money';
 import type { MonthDate, MonthDuration } from '$lib/month-time';
 import type { WidowedStrategy } from '$lib/strategy/calculations/widowed-benefits';
 import {
+  expectedNPVWidowed,
   type WidowedBenefitUse,
   type WidowedContext,
-  type WidowedResult,
   widowedAmounts,
   widowedBenefitUse,
   widowedHorizon,
@@ -43,18 +45,41 @@ export type WidowedClaimAdvice =
       readonly amount: Money;
     }
   /** It is never the larger benefit in this plan, so it changes nothing. */
-  | { readonly kind: 'not-needed' }
-  /** Own benefit only: there is no retirement benefit on their record. */
+  | { readonly kind: 'not-needed' };
+
+/**
+ * What to do about the survivor's own retirement benefit, which, unlike the
+ * survivor benefit, may not exist.
+ */
+export type OwnClaimAdvice =
+  | WidowedClaimAdvice
+  /** There is no retirement benefit on their record. */
   | { readonly kind: 'no-benefit' };
 
-export interface WidowedRecommendation {
+/** A claim still to make, as opposed to a settled fact. */
+export type ClaimToMake = Extract<
+  WidowedClaimAdvice,
+  { readonly kind: 'file-in' | 'file-now' }
+>;
+
+export function isClaimToMake(advice: OwnClaimAdvice): advice is ClaimToMake {
+  return advice.kind === 'file-in' || advice.kind === 'file-now';
+}
+
+/** What the page says about each benefit in one plan. */
+export interface WidowedAdvice {
   readonly survivor: WidowedClaimAdvice;
-  readonly own: WidowedClaimAdvice;
+  readonly own: OwnClaimAdvice;
   /**
    * Which benefit starts first when the plan uses both, so the page can say
    * "then switch"; null when it uses only one.
    */
   readonly first: 'survivor' | 'own' | 'together' | null;
+}
+
+/** The plan the page recommends, with its expected value. */
+export interface WidowedRecommendation extends WidowedAdvice {
+  /** The plan's expected NPV across the death distribution, in cents. */
   readonly expectedNPVCents: number;
 }
 
@@ -78,15 +103,11 @@ function adviceFor(
   return { kind: 'file-in', month, age: startAge, amount };
 }
 
-/**
- * What the page recommends for `result`, the best strategy across the
- * widow(er)'s death distribution.
- */
-export function widowedRecommendation(
+/** What the page says about each benefit for a widow(er) following `strategy`. */
+export function widowedAdvice(
   context: WidowedContext,
-  result: WidowedResult
-): WidowedRecommendation {
-  const { strategy } = result;
+  strategy: WidowedStrategy
+): WidowedAdvice {
   const amounts = widowedAmounts(context, strategy);
   const use = widowedBenefitUse(context, strategy, widowedHorizon(context));
   const hasOwnRecord =
@@ -99,7 +120,7 @@ export function widowedRecommendation(
     context.filed.survivor,
     use.survivor
   );
-  const own: WidowedClaimAdvice = hasOwnRecord
+  const own: OwnClaimAdvice = hasOwnRecord
     ? adviceFor(
         context,
         strategy.ownStart,
@@ -109,13 +130,28 @@ export function widowedRecommendation(
       )
     : { kind: 'no-benefit' };
 
-  let first: WidowedRecommendation['first'] = null;
+  let first: WidowedAdvice['first'] = null;
   if (use.survivor && use.own && hasOwnRecord) {
     const s = strategy.survivorStart.asMonths();
     const o = strategy.ownStart.asMonths();
     first = s < o ? 'survivor' : o < s ? 'own' : 'together';
   }
-  return { survivor, own, first, expectedNPVCents: result.npvCents };
+  return { survivor, own, first };
+}
+
+/**
+ * The plan the page recommends: the strategy with the highest expected NPV
+ * across `deathProbDist`, with what to do about each benefit.
+ */
+export function widowedRecommendation(
+  context: WidowedContext,
+  deathProbDist: readonly DeathProbability[]
+): WidowedRecommendation {
+  const best = expectedNPVWidowed(context, deathProbDist);
+  return {
+    ...widowedAdvice(context, best.strategy),
+    expectedNPVCents: best.npvCents,
+  };
 }
 
 /** One of the common approaches, valued for a single death month. */
@@ -138,7 +174,7 @@ export interface WidowedAlternative {
 export function widowedAlternatives(
   context: WidowedContext,
   finalDate: MonthDate
-): WidowedAlternative[] {
+): readonly WidowedAlternative[] {
   const { survivorRange, ownRange } = context;
   const candidates: WidowedStrategy[] = [
     { survivorStart: survivorRange.earliest, ownStart: ownRange.latest },

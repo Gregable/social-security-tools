@@ -9,17 +9,16 @@ import type { DeathProbability } from '$lib/life-tables';
 import { Money } from '$lib/money';
 import { MonthDate } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
-import type {
-  LateSpouse,
-  LateSpouseClaim,
+import {
+  type LateSpouse,
+  type LateSpouseClaim,
+  NOT_FILED_WIDOWED,
+  type WidowedFiled,
 } from '$lib/strategy/calculations/late-spouse';
 import {
   createWidowedContext,
   earliestModelableDeathAgeWidowed,
-  expectedNPVWidowed,
-  NOT_FILED_WIDOWED,
   type WidowedContext,
-  type WidowedFiled,
 } from '$lib/strategy/calculations/widowed-optimizer';
 import type { CalculationResults } from '$lib/strategy/ui/calculation-results';
 import { generateMonthlyBuckets } from '$lib/strategy/ui/grid-sizing';
@@ -48,6 +47,64 @@ export interface WidowedScenarioOptions {
   readonly filed?: WidowedFiled;
   readonly discountRate?: number;
 }
+
+/**
+ * The scenarios the headline stories show. widowed-story-scenarios.test.ts
+ * checks that each still gives the advice its story describes.
+ */
+export const HEADLINE_SCENARIOS = {
+  /** A larger own benefit: survivor benefit first, own benefit at 70. */
+  survivorFirstThenOwn: {
+    ownPia: 2500,
+    born: [1968, 3, 15],
+    spousePia: 1500,
+    spouseBorn: [1964, 5, 10],
+    died: [2025, 11],
+  },
+  /** A larger survivor benefit: own benefit first, survivor benefit later. */
+  ownFirstThenSurvivor: {
+    ownPia: 1200,
+    born: [1964, 3, 15],
+    spousePia: 2600,
+    spouseBorn: [1961, 3, 15],
+    died: [2025, 11],
+  },
+  /**
+   * Past 62, with an own benefit that never catches up: the survivor
+   * benefit starts now, so there is no gap for the own benefit to bridge.
+   */
+  ownNotNeeded: {
+    ownPia: 300,
+    born: [1962, 9, 15],
+    spousePia: 2400,
+    spouseBorn: [1960, 3, 15],
+    died: [2025, 11],
+  },
+  /** Past survivor full retirement age: claim now and backdate. */
+  fileNowBackdated: {
+    ownPia: 1500,
+    born: [1950, 5, 10],
+    spousePia: 2500,
+    spouseBorn: [1948, 2, 10],
+    died: [2025, 3],
+  },
+  /** Survivor benefits already started; only the own benefit is planned. */
+  alreadyReceivingSurvivor: {
+    ownPia: 1800,
+    born: [1963, 7, 20],
+    spousePia: 2400,
+    spouseBorn: [1961, 9, 5],
+    died: [2024, 2],
+    claim: {
+      kind: 'retirement',
+      startedAt: MonthDate.initFromYearsMonths({ years: 2024, months: 0 }),
+    },
+    filed: {
+      survivor: MonthDate.initFromYearsMonths({ years: 2024, months: 3 }),
+      own: null,
+    },
+  },
+} as const satisfies Record<string, WidowedScenarioOptions>;
 
 function recipientFor(
   pia: number,
@@ -106,10 +163,7 @@ function distributionFor(context: WidowedContext): DeathProbability[] {
 export function widowedRecommendationFor(
   context: WidowedContext
 ): WidowedRecommendation {
-  return widowedRecommendation(
-    context,
-    expectedNPVWidowed(context, distributionFor(context))
-  );
+  return widowedRecommendation(context, distributionFor(context));
 }
 
 /** The per-death-age results the chart plots, as the page would compute them. */

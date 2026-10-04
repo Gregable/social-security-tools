@@ -333,7 +333,7 @@ function survivorCentsCalc(
   if (survAge < depSurvNra) {
     const m60toNRA = depSurvNra - 720;
     const m60toAge = survAge - 720;
-    // Computed exactly as survivorBenefit does: (1 - ratio), not a 0.285
+    // Computed exactly as reducedSurvivorBenefit does: (1 - ratio), not a 0.285
     // literal, which is a different double and rounds half-cents differently.
     const ratio =
       MIN_SURVIVOR_BENEFIT_RATIO +

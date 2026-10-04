@@ -314,6 +314,15 @@ export class UrlParams {
   }
 
   /**
+   * Whether the link names a death month for spouse (person 2) at all, even
+   * one that does not parse. Such a link is still a widowed link: reading it
+   * as a couple would plan around the late spouse as if they were alive.
+   */
+  hasSpouseDeathMonth(): boolean {
+    return this.params.has('died2');
+  }
+
+  /**
    * Whether the late spouse (person 2) was receiving disability benefits.
    * Only the exact value `1` counts. Example: #disabled2=1
    */

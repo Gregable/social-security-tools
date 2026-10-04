@@ -12,16 +12,13 @@
   import { Money } from "$lib/money";
   import type { MonthDuration } from "$lib/month-time";
   import { BenefitType } from "$lib/strategy/calculations/benefit-period";
-  import {
-    strategySumPeriodsWidowed,
-    type WidowedStrategy,
-  } from "$lib/strategy/calculations/widowed-benefits";
+  import { strategySumPeriodsWidowed } from "$lib/strategy/calculations/widowed-benefits";
   import type { WidowedContext } from "$lib/strategy/calculations/widowed-optimizer";
-  import type { StrategyResult } from "$lib/strategy/ui";
+  import type { WidowedStrategyResult } from "$lib/strategy/ui";
   import { widowedAlternatives } from "$lib/strategy/ui/widowed-advice";
 
   export let context: WidowedContext;
-  export let result: StrategyResult;
+  export let result: WidowedStrategyResult;
   export let displayAsAges: boolean = false;
   export let onBack: () => void;
 
@@ -32,13 +29,11 @@
 
   $: survivor = context.survivor;
   $: expectedAge = result.bucket1.expectedAge;
-  // Use expectedAge (probability-weighted) so the timeline matches the death
-  // date the optimizer used to compute totalBenefit and choose the plan.
+  // The bucket's death age as a month: the death date the optimizer chose
+  // and valued this plan for, so the timeline matches totalBenefit.
   $: deathDate = survivor.birthdate.dateAtLayAge(expectedAge);
-  $: strategy = {
-    survivorStart: result.survivorFilingAge ?? context.survivorRange.earliest,
-    ownStart: result.filingAge1,
-  } as WidowedStrategy;
+  $: strategy = result.widowed.strategy;
+  $: use = result.widowed.use;
   $: hasOwnRecord = survivor.pia().primaryInsuranceAmount().cents() > 0;
 
   $: periods = strategySumPeriodsWidowed(
@@ -69,12 +64,21 @@
     return `${date.monthName()} ${date.year()}`;
   }
 
-  /** How a plan treats one benefit, in a few words. */
+  /**
+   * How a plan treats one benefit, in a few words. A benefit already
+   * started is pinned to its real start age, so `age` is when it started.
+   */
   function describe(
     used: boolean,
     age: MonthDuration,
+    started: boolean,
     isOwn: boolean
   ): string {
+    if (started) {
+      return displayAsAges
+        ? `Started at ${age.toFullAgeString()}`
+        : `Started ${formatStart(age)}`;
+    }
     if (isOwn && !hasOwnRecord) return "None on your record";
     if (survivor.birthdate.dateAtSsaAge(age).greaterThan(deathDate)) {
       return `${formatStart(age)}, not reached`;
@@ -131,8 +135,9 @@
           <dt>Survivor benefit</dt>
           <dd>
             {describe(
-              result.benefitUse?.survivor ?? true,
+              use.survivor,
               strategy.survivorStart,
+              context.filed.survivor !== null,
               false
             )}
           </dd>
@@ -140,14 +145,19 @@
         <div class="filing-row">
           <dt>Your retirement benefit</dt>
           <dd>
-            {describe(result.benefitUse?.own ?? true, strategy.ownStart, true)}
+            {describe(
+              use.own,
+              strategy.ownStart,
+              context.filed.own !== null,
+              true
+            )}
           </dd>
         </div>
       </dl>
       <div class="npv-card">
         <span class="npv-label">
           Net Present Value
-          <InfoTip label="About expected NPV">
+          <InfoTip label="About net present value">
             This scenario's lifetime benefits expressed in today's dollars,
             using the discount rate above. A dollar in 10 years is worth less
             than a dollar today, and the discount rate captures that gap.
@@ -208,6 +218,7 @@
                 {describe(
                   alternative.use.survivor,
                   alternative.strategy.survivorStart,
+                  context.filed.survivor !== null,
                   false
                 )}
               </td>
@@ -215,6 +226,7 @@
                 {describe(
                   alternative.use.own,
                   alternative.strategy.ownStart,
+                  context.filed.own !== null,
                   true
                 )}
               </td>

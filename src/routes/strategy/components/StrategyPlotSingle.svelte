@@ -39,7 +39,7 @@
    * The lines to draw. Single mode draws one, the optimal filing age;
    * widowed mode draws one per benefit and gets a legend.
    */
-  export let series: PlotSeries[] = [OWN_FILING_SERIES];
+  export let series: readonly PlotSeries[] = [OWN_FILING_SERIES];
   /** The youngest filing age the y-axis must show, in months. */
   export let minFilingAgeMonths: number = 62 * 12;
   /** Widowed mode: explain the two lines rather than the one. */

@@ -1,5 +1,6 @@
 <script lang="ts">
   import posthog from "posthog-js";
+  import { assertNever } from "$lib/assert-never";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import type { Recipient } from "$lib/recipient";
   import type { LateSpouse } from "$lib/strategy/calculations/late-spouse";
@@ -71,6 +72,8 @@
         return "Disability benefits";
       case "retirement":
         return `Retirement benefits from ${spouse.claim.startedAt.monthName()} ${spouse.claim.startedAt.year()}`;
+      default:
+        return assertNever(spouse.claim);
     }
   }
 </script>
