@@ -14,7 +14,7 @@ const mainNav = [
 </script>
 
 <div class="header">
-  <h3><a href="/">SSA.tools</a></h3>
+  <h3><a href="/">SSA<span class="wordmark-tools">.tools</span></a></h3>
 
   <nav class="navpills noprint">
     <div class="flow-group">
@@ -59,21 +59,28 @@ const mainNav = [
     grid-template-columns: 1fr auto;
     align-items: center;
     width: 100%;
+    /* 7.5vw each side = the homepage's centered 85% content column
+       (.jumbotron-grid / .grid-container in routes/+page.svelte and .choice
+       in HomeChoice.svelte). Update together. */
+    padding: 0 7.5vw;
     border-bottom: 1px solid #c5c5c5;
     margin-bottom: 1.5em;
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   h3 {
     margin: 0;
     color: #333;
-    font-weight: 500;
+    font-weight: 700;
     font-size: 28px;
-    padding-left: 1em;
     white-space: nowrap;
   }
   h3 a {
     color: #333;
     text-decoration: none;
+  }
+  .wordmark-tools {
+    color: #081d88;
   }
 
   .printurl {
@@ -94,8 +101,8 @@ const mainNav = [
     display: flex;
     align-items: center;
     gap: 4px;
-    margin: 0.5em 1em;
-    font-size: 14px;
+    margin: 0.5em 0;
+    font-size: 16px;
   }
 
   .flow-group {
@@ -125,7 +132,7 @@ const mainNav = [
   .pill a {
     text-align: center;
     border-radius: 4px;
-    padding: 10px 15px;
+    padding: 10px 14px;
     text-decoration: none;
     vertical-align: middle;
     color: inherit;
@@ -139,15 +146,27 @@ const mainNav = [
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
 
+  /* Below this width the column-aligned padding leaves no room for the
+     wordmark beside the full nav. */
+  @media screen and (max-width: 740px) {
+    .header {
+      padding: 0 16px;
+    }
+  }
+
   @media screen and (max-width: 675px) {
     .header {
       grid-template-columns: 1fr;
       justify-items: center;
+      /* Stacked and centered: no side padding needed. */
+      padding: 0;
       margin-bottom: 10px;
     }
+    .navpills {
+      font-size: 14px;
+    }
     h3 {
-      padding-left: 0px;
-      font-size: 20px;
+      font-size: 22px;
       line-height: 30px;
     }
     .pill a {

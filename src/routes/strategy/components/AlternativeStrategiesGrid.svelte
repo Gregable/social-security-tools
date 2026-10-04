@@ -1,10 +1,16 @@
 <script lang="ts">
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import { Money } from "$lib/money";
   import { MonthDurationRange } from "$lib/month-duration-range";
   import { MonthDate, MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
+  import {
+    type AlreadyFiled,
+    NOT_FILED,
+  } from "$lib/strategy/calculations/already-filed";
   import { strategySumCentsCouple } from "$lib/strategy/calculations/strategy-calc";
+  import { NEVER_FILES_LABEL } from "$lib/strategy/ui";
 
   export let recipients: [Recipient, Recipient];
   export let deathAge1: MonthDuration;
@@ -13,6 +19,11 @@
   export let optimalNPV: Money;
   export let optimalFilingAges: [MonthDuration, MonthDuration];
   export let displayAsAges: boolean = false;
+  /**
+   * Per recipient, the month benefits started, or null. A filed recipient's
+   * axis collapses to their actual filing age.
+   */
+  export let alreadyFiled: AlreadyFiled = NOT_FILED;
 
   interface AlternativeResult {
     filingAge1: MonthDuration;
@@ -28,6 +39,31 @@
   let isCalculating: boolean = false;
   const currentDate: MonthDate = MonthDate.initFromNow();
 
+  // One axis collapses to a single filing age when that recipient has already
+  // filed, or is past 70 or dies before 70 (see createFilingAgeRange); this
+  // keys on the range length, not on the reason for it. At the normal cell
+  // size a lone row or column is illegible, and the axis labels, which span
+  // the cell tracks, have nowhere to go. That case gets larger cells, drops
+  // the in-grid axis labels (their tracks go to zero), and says in a note
+  // above the grid which axis varies. The two-axis layout is untouched.
+  const CELL_PX = 8;
+  const COLLAPSED_CELL_PX = 16;
+  const AXIS_LABEL_PX = 20;
+
+  /**
+   * Index of the recipient whose axis is a single row or column, if any.
+   * Only called when at least one axis has more than one entry: no grid is
+   * drawn when neither person has a choice.
+   */
+  function collapsedAxisOf(
+    range1Length: number,
+    range2Length: number
+  ): 0 | 1 | null {
+    if (range1Length === 1) return 0;
+    if (range2Length === 1) return 1;
+    return null;
+  }
+
   let hoveredRowIndex: number = -1;
   let hoveredColIndex: number = -1;
   let hoveredResult: AlternativeResult | null = null;
@@ -39,8 +75,15 @@
 
   function createFilingAgeRange(
     recipient: Recipient,
-    deathAge: MonthDuration
+    deathAge: MonthDuration,
+    filedAt: MonthDate | null
   ): MonthDurationRange {
+    // Already filed: the only "alternative" is what happened. One instance
+    // serves as both bounds; MonthDurationRange only reads them.
+    if (filedAt !== null) {
+      const filedAge = recipient.birthdate.ageAtSsaDate(filedAt);
+      return new MonthDurationRange(filedAge, filedAge);
+    }
     const currentAge = recipient.birthdate.ageAtSsaDate(currentDate);
     const earliestFiling = recipient.birthdate.earliestFilingMonth();
     const startingAge = currentAge.greaterThan(earliestFiling)
@@ -50,7 +93,20 @@
       years: 70,
       months: 0,
     });
-    const end = maxAge70.lessThan(deathAge) ? maxAge70 : deathAge;
+    // Cap by the SSA age at the death date, as the optimizers do, rather than
+    // by the death age itself: for a recipient born on the 1st the two differ
+    // by a month, and the last column must be the death month so that the
+    // "never files" strategy (see filedBeforeDeath) has a cell.
+    const deathAgeSsa = recipient.birthdate.ageAtSsaDate(
+      recipient.birthdate.dateAtLayAge(deathAge)
+    );
+    const cap = maxAge70.lessThan(deathAgeSsa) ? maxAge70 : deathAgeSsa;
+    // A recipient already past 70 (or one who dies before reaching it) has a
+    // starting age beyond that cap. Collapse the range to that single
+    // remaining age rather than letting it invert: MonthDurationRange has no
+    // notion of an empty range, so end < start yields a negative getLength()
+    // and Array(negative) throws.
+    const end = cap.lessThan(startingAge) ? startingAge : cap;
     return new MonthDurationRange(startingAge, end);
   }
 
@@ -118,8 +174,16 @@
     isCalculating = true;
 
     try {
-      filingAgeRange1 = createFilingAgeRange(recipients[0], deathAge1);
-      filingAgeRange2 = createFilingAgeRange(recipients[1], deathAge2);
+      filingAgeRange1 = createFilingAgeRange(
+        recipients[0],
+        deathAge1,
+        alreadyFiled[0]
+      );
+      filingAgeRange2 = createFilingAgeRange(
+        recipients[1],
+        deathAge2,
+        alreadyFiled[1]
+      );
 
       const finalDates: [MonthDate, MonthDate] = [
         recipients[0].birthdate.dateAtLayAge(deathAge1),
@@ -268,6 +332,16 @@
     duration: MonthDuration,
     recipientIndex: number = 0
   ): string {
+    // The last row/column is the death month itself. Filing then is the
+    // "never files" strategy, not a filing month: say so.
+    const recipient = recipients[recipientIndex];
+    const filingDate = recipient.birthdate.dateAtSsaAge(duration);
+    const deathDate = recipient.birthdate.dateAtLayAge(
+      recipientIndex === 0 ? deathAge1 : deathAge2
+    );
+    if (!filedBeforeDeath(filingDate, deathDate)) {
+      return NEVER_FILES_LABEL;
+    }
     if (displayAsAges) {
       const years = duration.years();
       const months = duration.modMonths();
@@ -275,8 +349,6 @@
       if (months === 1) return `Age ${years} and 1 month`;
       return `Age ${years} and ${months} months`;
     }
-    const filingDate =
-      recipients[recipientIndex].birthdate.dateAtSsaAge(duration);
     return `${filingDate.monthName()} ${filingDate.year()}`;
   }
 </script>
@@ -295,6 +367,9 @@
       : generateDateHeaders(filingAgeRange2Array, recipients[1])}
     {@const range1Length = filingAgeRange1.getLength()}
     {@const range2Length = filingAgeRange2.getLength()}
+    {@const collapsedAxis = collapsedAxisOf(range1Length, range2Length)}
+    {@const cellPx = collapsedAxis === null ? CELL_PX : COLLAPSED_CELL_PX}
+    {@const axisLabelPx = collapsedAxis === null ? AXIS_LABEL_PX : 0}
 
     <div class="info-panel" class:is-pinned={isPinned}>
       <div class="info-panel-header">
@@ -340,10 +415,22 @@
       {/if}
     </div>
 
+    {#if collapsedAxis !== null}
+      {@const filedAt = alreadyFiled[collapsedAxis]}
+      <p class="collapsed-note">
+        <RecipientName r={recipients[collapsedAxis]} apos /> filing date is
+        fixed{filedAt
+          ? ` at ${filedAt.monthFullName()} ${filedAt.year()}`
+          : ""}; each cell varies
+        <RecipientName r={recipients[collapsedAxis === 0 ? 1 : 0]} apos />
+        filing {displayAsAges ? "age" : "date"}.
+      </p>
+    {/if}
+
     <div
       class="grid-wrapper"
-      style:grid-template-columns="20px 25px repeat({range2Length}, 8px)"
-      style:grid-template-rows="20px 20px repeat({range1Length}, 8px)"
+      style:grid-template-columns="{axisLabelPx}px 25px repeat({range2Length}, {cellPx}px)"
+      style:grid-template-rows="{axisLabelPx}px 20px repeat({range1Length}, {cellPx}px)"
       on:mouseleave={handleGridMouseLeave}
       role="grid"
       tabindex="0"
@@ -353,26 +440,28 @@
       <div class="corner-cell" style:grid-column="1" style:grid-row="2"></div>
       <div class="corner-cell" style:grid-column="2" style:grid-row="2"></div>
 
-      <div
-        class="recipient-header recipient-header-column"
-        style:grid-column="3 / {range2Length + 3}"
-        style:grid-row="1"
-      >
-        <RecipientName r={recipients[1]} apos />&nbsp;Filing {displayAsAges
-          ? "Age"
-          : "Date"}
-      </div>
-      <div
-        class="recipient-header recipient-header-row"
-        style:grid-column="1"
-        style:grid-row="3 / {range1Length + 3}"
-      >
-        <span class="recipient-text"
-          ><RecipientName r={recipients[0]} apos /> Filing {displayAsAges
-            ? "Age"
-            : "Date"}</span
+      {#if collapsedAxis === null}
+        <div
+          class="recipient-header recipient-header-column"
+          style:grid-column="3 / {range2Length + 3}"
+          style:grid-row="1"
         >
-      </div>
+          <RecipientName r={recipients[1]} apos />&nbsp;Filing {displayAsAges
+            ? "Age"
+            : "Date"}
+        </div>
+        <div
+          class="recipient-header recipient-header-row"
+          style:grid-column="1"
+          style:grid-row="3 / {range1Length + 3}"
+        >
+          <span class="recipient-text"
+            ><RecipientName r={recipients[0]} apos /> Filing {displayAsAges
+              ? "Age"
+              : "Date"}</span
+          >
+        </div>
+      {/if}
 
       {#each yearHeaders2 as yearHeader, headerIndex}
         {@const colOffset = 3}
@@ -658,6 +747,13 @@
     font-weight: bold;
     font-size: 0.8rem;
     color: #333;
+  }
+
+  .collapsed-note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.5;
   }
 
   .recipient-header-row {

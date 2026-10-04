@@ -2,13 +2,25 @@
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
+  import type { SponsorCopy } from "$lib/sponsor";
+
+  const sponsorCopy: SponsorCopy = {
+    intro:
+      "Whether to claim while you keep working depends on more than the earnings limits. You can weigh it with a Social Security specialist at",
+    outro: "before you settle on a date.",
+    bullets: [
+      "They weigh the months withheld against your tax bracket, your pension, and how long you expect to draw the benefit.",
+      "Your filing date also moves things this test doesn't touch, like Medicare premiums and when your spouse should file.",
+      "The first call is free, and you pick the time.",
+    ],
+  };
 
   const title =
     "Working While Receiving Social Security: The Earnings Test Explained";
   const description =
     "Can you work while collecting Social Security? Learn about the earnings test, 2025 and 2026 income limits, how benefits are reduced, and why withheld benefits are returned at full retirement age.";
   const publishDate = new Date("2026-01-26T00:00:00+00:00");
-  const updateDate = new Date("2026-01-26T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/earnings-test";
@@ -56,8 +68,9 @@
   <h2>2025 and 2026 Earnings Limits</h2>
 
   <p>
-    The Social Security Administration adjusts the earnings limits annually
-    based on changes in national average wages.
+    The Social Security Administration adjusts the
+    <a href="https://www.ssa.gov/oact/cola/rtea.html">earnings limits</a> annually based on
+    changes in national average wages.
   </p>
 
   <table class="benefit-table">
@@ -97,15 +110,17 @@
 
   <p>
     If you won't reach FRA at any point during the year, Social Security
-    deducts $1 from your benefits for every $2 you earn above the annual limit.
+    <a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">deducts $1 from your benefits for every $2</a>
+    you earn above the annual limit.
   </p>
 
   <p>
     Take Sarah, age 63, with a benefit of $1,500 per month ($18,000 per year).
     She earns $34,480 in 2026 — that's $10,000 over the $24,480 limit. Half of
     the excess, $5,000, is withheld from her benefits, so she receives $13,000
-    for the year instead of $18,000. In practice, Social Security withholds
-    whole checks starting in January until the $5,000 is recovered: Sarah gets
+    for the year instead of $18,000. In practice, Social Security
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0302501095">withholds whole checks starting in January</a>
+    until the $5,000 is recovered: Sarah gets
     no checks for the first 3-4 months, then full checks the rest of the year.
   </p>
 
@@ -113,8 +128,9 @@
 
   <p>
     In the year you turn FRA, the rules are more generous. Social Security
-    only counts earnings from months before your birthday month, and deducts
-    just $1 for every $3 over a higher limit.
+    only counts earnings from months before your birthday month, and
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0302501021">deducts just $1 for every $3</a> over a
+    higher limit.
   </p>
 
   <p>
@@ -126,8 +142,8 @@
   </p>
 
   <p>
-    And once you're at full retirement age or older, the earnings test
-    disappears entirely. You can earn any amount from working without any
+    And once you're at full retirement age or older,
+    <a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">the earnings test disappears entirely</a>. You can earn any amount from working without any
     reduction to your benefits.
   </p>
 
@@ -137,7 +153,8 @@
 
   <p>
     So what happens to the money that was withheld? You get it back. When you
-    reach full retirement age, Social Security recalculates your benefit as if
+    reach full retirement age, Social Security
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615482">recalculates your benefit</a> as if
     you had claimed later than you actually did, giving you credit for the
     months when benefits were withheld.
   </p>
@@ -160,8 +177,8 @@
   <h2>What Counts as "Earnings"?</h2>
 
   <p>
-    Not all income counts. The earnings test only looks at money you earn from
-    working.
+    Not all income counts. The earnings test only looks at
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0302505045">money you earn from working</a>.
   </p>
 
   <div class="two-column">
@@ -204,7 +221,7 @@
 
   <p>
     In your first year of receiving benefits, Social Security offers an
-    alternative monthly test. This helps people who retire mid-year after
+    alternative <a href="https://www.ssa.gov/benefits/retirement/planner/rule.html">monthly test</a>. This helps people who retire mid-year after
     earning a lot earlier in the year.
   </p>
 
@@ -247,7 +264,7 @@
   <p>
     If you're self-employed, Social Security counts your net earnings
     (profit after business expenses). In your first year of retirement, they may
-    also apply a "services test" - if you work more than 45 hours per month in your
+    also apply a <a href="https://www.ssa.gov/benefits/retirement/planner/rule.html">"services test"</a> - if you work more than 45 hours per month in your
     business (or 15-45 hours in a highly skilled occupation), you may not be considered
     retired for that month regardless of income.
   </p>
@@ -255,7 +272,8 @@
   <h3>Working Outside the United States</h3>
 
   <p>
-    Different rules apply if you work outside the U.S. The "foreign work test"
+    Different rules apply if you work outside the U.S. The
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0302605001">"foreign work test"</a>
     may suspend benefits for any month you work more than 45 hours, regardless
     of earnings amount. See our
     <a href="/guides/international-agreements">international agreements guide</a>
@@ -273,8 +291,8 @@
   <h2>Common Misconceptions</h2>
 
   <p>
-    Does working permanently reduce your Social Security? No. Benefits withheld
-    by the earnings test are credited back to you at full retirement age
+    Does working permanently reduce your Social Security? No. <a href="https://www.ssa.gov/faqs/en/questions/KA-01921.html">Benefits withheld
+    by the earnings test are credited back</a> to you at full retirement age
     through higher monthly payments, so you eventually recover the withheld
     amounts.
   </p>
@@ -284,7 +302,11 @@
     self-employment income count. Investment income, pensions, retirement
     account withdrawals, and other passive income don't trigger the earnings
     test at all. And once you reach full retirement age, the test simply stops
-    applying — you can earn any amount without affecting your benefits.
+    applying — you can earn any amount without affecting your benefits. From
+    that point, working can only raise your benefit; see
+    <a href="/guides/working-past-full-retirement-age"
+      >working past full retirement age</a
+    > for how much.
   </p>
 
   <p>
@@ -313,6 +335,8 @@
     month don't count at all.
   </p>
 
+  <InlineCTA type="sponsor" {sponsorCopy} />
+
   <h2>Calculate Your Benefits</h2>
 
   <p>
@@ -326,6 +350,20 @@
     <a href="/guides/federal-taxes">federal taxation of benefits</a>, and
     <a href="/guides/pia">Primary Insurance Amount</a>.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">Social Security Administration: Receiving Benefits While Working</a></li>
+    <li><a href="https://www.ssa.gov/oact/cola/rtea.html">Social Security Administration: Exempt Amounts Under the Earnings Test</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/rule.html">Social Security Administration: Special Earnings Limit Rule</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0302501021">SSA POMS RS 02501.021: The Earnings Test</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0302501095">SSA POMS RS 02501.095: Charging Excess Earnings</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615482">SSA POMS RS 00615.482: Requirements for ARF Crediting Months</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0302505045">SSA POMS RS 02505.045: Income That Is Not Wages for Earnings Test Purposes</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0302605001">SSA POMS RS 02605.001: The Work Tests Outside the U.S.</a></li>
+    <li><a href="https://www.ssa.gov/faqs/en/questions/KA-01921.html">Social Security Administration: What Happens If I Work and Get Social Security Retirement Benefits?</a></li>
+  </ul>
 
   <GuideFooter />
 </div>

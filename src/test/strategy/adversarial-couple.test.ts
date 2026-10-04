@@ -650,36 +650,31 @@ describe('Three-way comparison: couple NPV vs sum of singles', () => {
 // 11. Filing age past 70y0m
 // ==========================================================================
 describe('Filing age past 70y0m', () => {
-  it('filing at 70y1m: strategySumCentsCouple still produces a result', () => {
-    // 70y1m = 841 months. The system should either clamp or handle gracefully.
+  it('filing at 70y1m: delayed credits are capped, so only payments are lost', () => {
+    // 70y1m = 841 months. Delayed credits stop accruing at 70, so filing a
+    // month later buys nothing and forgoes one month of benefits.
     const r1 = makeRecipientDec15(2000, 1960);
     const r2 = makeRecipientDec15(500, 1960);
     const fd1 = finalDateAtAge(r1, 85);
     const fd2 = finalDateAtAge(r2, 85);
 
-    // This might throw or might produce a result. Either is acceptable,
-    // but it should not crash with an unhandled exception.
-    let threw = false;
-    let npv = 0;
-    try {
-      npv = strategySumCentsCouple(
-        [r1, r2],
-        [fd1, fd2],
-        FAR_PAST,
-        NO_DISCOUNT,
-        [filingAge(70, 1), filingAge(67)]
-      );
-    } catch {
-      threw = true;
-    }
+    const npvAt70y1m = strategySumCentsCouple(
+      [r1, r2],
+      [fd1, fd2],
+      FAR_PAST,
+      NO_DISCOUNT,
+      [filingAge(70, 1), filingAge(67)]
+    );
+    const npvAt70 = strategySumCentsCouple(
+      [r1, r2],
+      [fd1, fd2],
+      FAR_PAST,
+      NO_DISCOUNT,
+      [filingAge(70), filingAge(67)]
+    );
 
-    // If it did not throw, NPV should still be non-negative
-    if (!threw) {
-      expect(npv).toBeGreaterThanOrEqual(0);
-    }
-    // If it threw, that's also a valid response to invalid input.
-    // The test passes either way -- we're checking for no unhandled crash.
-    expect(true).toBe(true);
+    expect(npvAt70y1m).toBeGreaterThan(0);
+    expect(npvAt70y1m).toBeLessThan(npvAt70);
   });
 
   it('filing at exactly 70y0m is valid and produces maximum delayed credits', () => {

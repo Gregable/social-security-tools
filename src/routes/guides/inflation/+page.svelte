@@ -50,7 +50,7 @@ const title = "How Inflation Affects Your Social Security Benefits: AWI and COLA
 const description =
   "Discover how Social Security protects your benefits from inflation through wage indexing (AWI) during your working years and Cost of Living Adjustments (COLA) after retirement.";
 const publishDate = new Date('2018-11-23T00:00:00+00:00');
-const updateDate = new Date('2026-01-21T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/inflation';
@@ -79,7 +79,7 @@ const faqs: FAQItem[] = [
   {
     question: 'What is COLA and when does it apply?',
     answer:
-      "COLA stands for Cost of Living Adjustment. It's an annual increase to your Social Security benefit based on the Consumer Price Index (CPI-W). COLA is applied starting the January after you begin receiving benefits, and continues every year thereafter.",
+      "COLA stands for Cost of Living Adjustment. It's an annual increase to your Social Security benefit based on the Consumer Price Index (CPI-W). COLA is applied starting with the year you turn 62, whether or not you have filed, and continues every year thereafter.",
   },
   {
     question: "Why is my estimated benefit shown in 'today's dollars'?",
@@ -171,8 +171,10 @@ const faqs: FAQItem[] = [
   <h2>Wage Indexing (AWI) — During Your Working Years</h2>
 
   <p>
-    When Social Security calculates your benefit, it doesn't simply add up your
-    lifetime earnings. Instead, it adjusts your historical earnings using the
+    When Social Security calculates your benefit, it
+    <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+      >doesn't simply add up your lifetime earnings</a
+    >. Instead, it adjusts your historical earnings using the
     <a href="https://www.ssa.gov/oact/cola/awidevelop.html"
       >Average Wage Index (AWI)</a
     >.
@@ -186,7 +188,13 @@ const faqs: FAQItem[] = [
 
   <div class="example-box">
     <h4>Wage Indexing in Action</h4>
-    <p>Consider this simplified earnings record for someone who turned 60 in {indexingYear}:</p>
+    <p>
+      Consider this simplified earnings record for someone who turned 60 in
+      {indexingYear}. Each multiplier is the
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html"
+        >indexing factor</a
+      > for that year:
+    </p>
     <table class="earnings-table">
       <thead>
         <tr>
@@ -228,8 +236,10 @@ const faqs: FAQItem[] = [
 
   <p>
     <strong>When does wage indexing stop?</strong> Your earnings are indexed using
-    the AWI from the year you turn 60. After that, any additional earnings are counted
-    at face value with no indexing adjustment. For more details, see our
+    the <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+      >AWI from the year you turn 60</a
+    >. After that, any additional earnings are counted at face value with no
+    indexing adjustment. For more details, see our
     <a href="/guides/indexing-factors">Wage Indexing Guide</a>.
   </p>
 
@@ -254,7 +264,10 @@ const faqs: FAQItem[] = [
   <div class="highlight-box">
     <p>
       <strong>COLA can never be negative.</strong> Even if prices decrease (deflation),
-      your benefit stays the same rather than decreasing. This one-way protection
+      your benefit
+      <a href="https://www.ssa.gov/oact/cola/latestCOLA.html"
+        >stays the same rather than decreasing</a
+      >. This one-way protection
       ensures your benefit never loses ground.
     </p>
   </div>
@@ -278,7 +291,7 @@ const faqs: FAQItem[] = [
       <tr>
         <td><strong>When it applies</strong></td>
         <td>During your working years (until age 60)</td>
-        <td>After you start receiving benefits</td>
+        <td>From the year you turn 62 onward</td>
       </tr>
       <tr>
         <td><strong>What it measures</strong></td>
@@ -341,6 +354,10 @@ const faqs: FAQItem[] = [
 
   <ul>
     <li>
+      <a href="/guides/cola">Social Security COLA</a> — This year's adjustment,
+      the full history since 1975, and what else changes each January
+    </li>
+    <li>
       <a href="/guides/indexing-factors">Wage Indexing Guide</a> — Detailed explanation
       of how indexing factors are calculated and why they matter
     </li>
@@ -385,6 +402,22 @@ const faqs: FAQItem[] = [
       <a href="https://www.ssa.gov/oact/cola/colaseries.html">
         COLA History Since 1975</a
       > [ssa.gov]
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/progdata/retirebenefit1.html"
+        >Social Security Administration: Social Security Retirement Benefit
+        Calculation</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/awifactors.html"
+        >Social Security Administration: Indexing Factors for Earnings</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/oact/cola/latestCOLA.html"
+        >Social Security Administration: Latest Cost-of-Living Adjustment</a
+      >
     </li>
   </ul>
 

@@ -126,7 +126,9 @@ WithErrorBanner.args = {
   birthdateInputs: ['1965-03-15', '1967-07-22'] as [string, string],
   isSingle: false,
   continueDisabled: false,
-  errorMessage: 'Could not compute results. Check your inputs and try again.',
+  errorMessage:
+    'Something went wrong while working out your results. This looks like a ' +
+    'problem on our end, not with what you entered.',
   onUpdate: action('onUpdate'),
   onValidityChange: action('onValidityChange'),
   oncontinue: action('oncontinue'),

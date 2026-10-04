@@ -27,6 +27,51 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Sep 18, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/working-past-full-retirement-age">
+            Working Past Full Retirement Age: Will Your Social Security
+            Benefit Go Up?
+          </a>
+        </h3>
+        <p class="description">
+          The two ways working at or after full retirement age raises your
+          benefit, how much one more year is worth for different work
+          histories, when the automatic recalculation shows up in your check,
+          and why the earnings test no longer applies.
+        </p>
+      </li>
+
+      <li>
+        <span class="postdate">Sep 17, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/retroactive-survivor-benefits">
+            Retroactive Survivor Benefits: How Far Back Social Security Pays
+          </a>
+        </h3>
+        <p class="description">
+          How many months of back pay a widow or widower can receive after
+          applying late, the three exceptions for those under full retirement
+          age, how a phone call protects your filing date, and the two-year
+          deadline for the lump-sum death payment.
+        </p>
+      </li>
+
+      <li>
+        <span class="postdate">Sep 10, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/cola">
+            Social Security COLA: How the Annual Increase Works
+          </a>
+        </h3>
+        <p class="description">
+          How the cost-of-living adjustment is calculated from the CPI-W, when
+          it reaches your check, why you receive it even before you file, the
+          full history since 1975, and what else changes each January.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 9, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/spousal-benefits">

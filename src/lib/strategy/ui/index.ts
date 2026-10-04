@@ -16,6 +16,8 @@ export {
   formatBirthdate,
   getFilingAge,
   getFilingDate,
+  NEVER_FILES_DETAIL,
+  NEVER_FILES_LABEL,
   parseBirthdate,
 } from './formatting.js';
 export type { CellPosition, DeathAgeBucket } from './grid-sizing.js';

@@ -3,6 +3,17 @@ import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Longer waits and in-person identity checks make small mistakes expensive to fix. You can get help from a Social Security specialist at",
+  outro: "before you take this on yourself.",
+  bullets: [
+    "They deal with SSA regularly and know which requests still need a field office visit and which do not.",
+    "Getting an application right the first time matters more when corrections take months.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Navigating Social Security During Administrative Changes';
 const description =
@@ -134,7 +145,7 @@ schema.tags = [
     people visiting field offices weekly.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h3>3. Communication Changes</h3>
   <p>

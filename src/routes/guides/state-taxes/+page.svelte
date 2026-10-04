@@ -3,13 +3,24 @@
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
   import HeroImage from "./state-taxes.jpg";
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Keeping your income under a state threshold takes planning several years ahead. You can map that out with a Social Security specialist at",
+  outro: "before your next round of withdrawals.",
+  bullets: [
+    "They look at how withdrawal timing and Roth conversions interact with your state's exemption cutoff.",
+    "Federal taxation of your benefit follows its own rules, and the two have to be planned together.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
   const title =
     "State Taxes on Social Security Benefits: Which States Tax Your Benefits?";
   const description =
     "Most states don't tax Social Security benefits. Learn which 8 states still tax benefits in 2026, exemption thresholds, recent changes, and planning strategies.";
   const publishDate = new Date("2026-02-15T00:00:00+00:00");
-  const updateDate = new Date("2026-02-15T00:00:00+00:00");
+  const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/state-taxes";
@@ -317,10 +328,14 @@
 
   <p>
     State and federal taxation of Social Security are completely independent.
-    At the federal level, up to 85% of your benefits may be taxable, depending
-    on your "provisional income" (AGI + tax-exempt interest + half of your
-    Social Security benefits). The federal thresholds have not changed since
-    1993.
+    At the federal level,
+    <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+      >up to 85% of your benefits may be taxable</a
+    >, depending on your "provisional income" (AGI + tax-exempt interest + half
+    of your Social Security benefits). The federal thresholds
+    <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+      >have not changed since 1993</a
+    >.
   </p>
 
   <p>
@@ -361,7 +376,7 @@
     Connecticut, New Mexico, and Vermont with clear AGI cutoffs.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>Frequently Asked Questions</h2>
 
@@ -396,6 +411,23 @@
     To see what your own benefit would be, try the
     <a href="/calculator">ssa.tools calculator</a> with your earnings record.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+        >Social Security Administration: Must I pay taxes on Social Security
+        benefits?</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+        >Social Security Administration: Social Security History, Taxation of
+        Benefits</a
+      >
+    </li>
+  </ul>
 
   <GuideFooter />
 </div>

@@ -1,9 +1,14 @@
 <script lang="ts">
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import type { Recipient } from "$lib/recipient";
   import { strategySumPeriodsSingle } from "$lib/strategy/calculations/strategy-calc";
-  import type { StrategyResult } from "$lib/strategy/ui";
+  import {
+    NEVER_FILES_DETAIL,
+    NEVER_FILES_LABEL,
+    type StrategyResult,
+  } from "$lib/strategy/ui";
   import AlternativeStrategiesRow from "./AlternativeStrategiesRow.svelte";
 
   export let recipient: Recipient;
@@ -20,6 +25,9 @@
   $: filingDate = recipient.birthdate.dateAtSsaAge(result.filingAge1);
   $: expectedAge = result.bucket1.expectedAge;
   $: deathDate = recipient.birthdate.dateAtLayAge(expectedAge);
+  // A filing month at or after death is the "never files" strategy, not a
+  // filing; name it as such rather than showing the death month as a date.
+  $: files = filedBeforeDeath(filingDate, deathDate);
 
   // Use expectedAge (probability-weighted) so the timeline matches the death
   // date the optimizer used to compute totalBenefit and choose filingAge1.
@@ -77,8 +85,13 @@
     <h3 class="section-title">Optimal filing in this scenario</h3>
     <div class="filing-grid">
       <div class="filing-summary">
-        <p class="filing-age">{result.filingAge1.toFullAgeString()}</p>
-        <p class="filing-date">{filingDate.toString()}</p>
+        {#if files}
+          <p class="filing-age">{result.filingAge1.toFullAgeString()}</p>
+          <p class="filing-date">{filingDate.toString()}</p>
+        {:else}
+          <p class="filing-age">{NEVER_FILES_LABEL}</p>
+          <p class="filing-date">{NEVER_FILES_DETAIL}</p>
+        {/if}
       </div>
       <div class="npv-card">
         <span class="npv-label">

@@ -141,6 +141,18 @@ export function getFilingAge(
 }
 
 /**
+ * Label for a strategy in which the recipient dies before their filing month,
+ * so they never file. See `filedBeforeDeath` in benefit-calculator.ts.
+ */
+export const NEVER_FILES_LABEL = 'Does not file';
+
+/**
+ * Secondary line shown under NEVER_FILES_LABEL where a filing date would
+ * otherwise appear.
+ */
+export const NEVER_FILES_DETAIL = 'Dies before filing';
+
+/**
  * Factory function to create border removal functions
  * @param valueExtractor Function that extracts the value to compare
  * @returns Object with functions for each border direction

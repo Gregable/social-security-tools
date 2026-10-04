@@ -1,8 +1,13 @@
 <script lang="ts">
+  import { filedBeforeDeath } from "$lib/benefit-calculator";
   import HowToReadChart from "$lib/components/HowToReadChart.svelte";
   import { MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
-  import type { CalculationResults } from "$lib/strategy/ui";
+  import {
+    type CalculationResults,
+    NEVER_FILES_LABEL,
+    type StrategyResult,
+  } from "$lib/strategy/ui";
   import { onMount } from "svelte";
 
   /** The recipient for whom the strategy is calculated. */
@@ -40,8 +45,6 @@
   const width = 800;
   const height = 400;
   const padding = { top: 20, right: 60, bottom: 50, left: 100 };
-  // Actual earliest filing age (for filtering invalid results)
-  $: earliestFilingAge = recipient.birthdate.earliestFilingMonth().asMonths();
   // Y-axis display range with padding above and below
   const minFilingAge = 61 * 12 + 11; // 61 years 11 months
   const maxFilingAge = 70 * 12 + 1; // 70 years 1 month
@@ -60,8 +63,12 @@
     .map((_, i) => {
       const result = calculationResults.get(i, 0);
       if (!result) return null;
-      // Filter out invalid results where no filing strategy was found (e.g. death before earliest filing age)
-      if (result.filingAge1.asMonths() < earliestFilingAge) return null;
+      // No filtering on filing age here. This used to drop any point below
+      // the earliest filing age, which silently swallowed the optimizer's
+      // "file at age 0" sentinel and left the chart blank with no error.
+      // Buckets now start at the first death age that admits a filing, and
+      // the optimizer throws rather than inventing an answer, so any point
+      // reaching here is real.
       return {
         deathAge: result.bucket1.startAge,
         filingAgeMonths: result.filingAge1.asMonths(),
@@ -195,6 +202,28 @@
     const date = recipient.birthdate.dateAtSsaAge(new MonthDuration(months));
     const d = new Date(date.year(), date.monthIndex());
     return d.toLocaleString("default", { month: "short", year: "numeric" });
+  }
+
+  /**
+   * Axis label for a point's filing age. A filing month in or after the
+   * death month is the "never files" strategy, not a filing month.
+   */
+  function formatFiling(point: {
+    filingAgeMonths: number;
+    result: StrategyResult;
+  }): string {
+    const filingDate = recipient.birthdate.dateAtSsaAge(
+      new MonthDuration(point.filingAgeMonths)
+    );
+    const deathDate = recipient.birthdate.dateAtLayAge(
+      point.result.bucket1.expectedAge
+    );
+    if (!filedBeforeDeath(filingDate, deathDate)) {
+      return NEVER_FILES_LABEL;
+    }
+    return displayAsAges
+      ? formatAge(point.filingAgeMonths)
+      : formatDate(point.filingAgeMonths);
   }
 
   // Draw Loop
@@ -523,9 +552,7 @@
       ctx.fillText(label, x, height - padding.bottom + 20);
 
       // Y Axis Label Highlight
-      const yLabel = displayAsAges
-        ? formatAge(hoveredPoint.filingAgeMonths)
-        : formatDate(hoveredPoint.filingAgeMonths);
+      const yLabel = formatFiling(hoveredPoint);
 
       ctx.textAlign = "right";
       const textWidth = ctx.measureText(yLabel).width;

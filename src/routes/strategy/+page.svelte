@@ -8,8 +8,21 @@
   import { Money } from "$lib/money";
   import { MonthDate } from "$lib/month-time";
   import { Recipient } from "$lib/recipient";
+  import {
+    type AlreadyFiled,
+    type AlreadyFiledInput,
+    isEligibleToHaveFiled,
+    NOT_FILED,
+  } from "$lib/strategy/calculations/already-filed";
   import { optimalStrategyCoupleFast } from "$lib/strategy/calculations/optimal-strategy-fast";
-  import { optimalStrategySingle } from "$lib/strategy/calculations/strategy-calc";
+  import {
+    earliestModelableDeathAge,
+    optimalStrategySingle,
+  } from "$lib/strategy/calculations/strategy-calc";
+  import {
+    currentMonthDate,
+    filingChoices,
+  } from "$lib/components/recommended-filing-card";
   import {
     CalculationResults,
     CalculationStatus,
@@ -23,6 +36,7 @@
   import { UrlParams, buildStrategyHash } from "$lib/url-params";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
+  import NoFilingDecisionPanel from "./components/NoFilingDecisionPanel.svelte";
   import RecipientInputs from "./components/RecipientInputs.svelte";
   import ScenarioDetail from "./components/ScenarioDetail.svelte";
   import ScenarioDetailSingle from "./components/ScenarioDetailSingle.svelte";
@@ -120,6 +134,9 @@
 
   const MIN_FILING_AGE = 62;
   const REACTIVE_DEBOUNCE_MS = 200;
+  const STALE_RESULTS_MESSAGE =
+    "These figures are out of date — we could not recompute them for your " +
+    "latest changes.";
 
   type Stage = "mode" | "form" | "results";
   let stage: Stage = "mode";
@@ -144,11 +161,18 @@
   let isSingle: boolean = false;
   let birthdateInputs: [string, string] = ["", ""];
   let piaValues: [number | null, number | null] = [null, null];
+  // Per recipient, the month benefits actually started, or null. Couple mode
+  // only. Kept with the other form inputs rather than on Recipient: the
+  // calculator's filing-date stores mean "what if", this means "what happened".
+  let alreadyFiled: AlreadyFiledInput = [null, null];
   let discountRatePercent: number = 2.5;
 
   let recipientInputsValid = false;
   let discountRateValid = true;
   let formErrorMessage: string | null = null;
+  // Set when a recompute triggered from the results stage fails. The form's
+  // banner is not mounted there, so the results stage needs its own.
+  let recomputeErrorMessage: string | null = null;
 
   let rerunPending = false;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -291,6 +315,21 @@
           recipients[1].birthdate = bd2;
           if (params.getSpouseName()) recipients[1].name = params.getSpouseName()!;
           recipients[1].gender = params.getSpouseGender();
+          // The form re-validates a restored month only for someone old
+          // enough to show the control. A hand-edited link can mark an
+          // under-62 person as filed; drop that here so it never reaches the
+          // optimizer, which refuses it. Restore always lands on the form
+          // stage, where FiledMonthInput re-validates the month on mount;
+          // that is what completes validation before any calculation runs.
+          const restoredNow = currentMonthDate();
+          const restored = [
+            params.getRecipientFiledMonth(),
+            params.getSpouseFiledMonth(),
+          ];
+          alreadyFiled = [
+            isEligibleToHaveFiled(bd1, restoredNow) ? restored[0] : null,
+            isEligibleToHaveFiled(bd2, restoredNow) ? restored[1] : null,
+          ];
         }
       }
 
@@ -313,14 +352,33 @@
   });
 
   $: formIsValid = recipientInputsValid && discountRateValid;
+
+  // A recipient with no filing choice left, because they are past 70 or have
+  // already filed, has nothing to decide.
+  // The headline and the grids need to know so they do not present that as a
+  // decision. Assigned inside calculateStrategyMatrix from the same
+  // currentDate as the results it describes — deriving it reactively from
+  // live form state would let it flip a card to "File now" while the figures
+  // beside it still belong to the previous birthdate.
+  let hasFilingChoice: [boolean, boolean] = [true, true];
+  // The filed months the current results were computed with; see
+  // hasFilingChoice for why this is not derived reactively from the form.
+  let resultsAlreadyFiled: AlreadyFiled = NOT_FILED;
   $: discountRate = discountRatePercent / 100;
-  $: shareUrl = buildShareUrl(recipients, isSingle, piaValues, birthdateInputs);
+  $: shareUrl = buildShareUrl(
+    recipients,
+    isSingle,
+    piaValues,
+    birthdateInputs,
+    alreadyFiled
+  );
 
   function buildShareUrl(
     rs: [typeof recipients[0], typeof recipients[1]],
     single: boolean,
     pias: [number | null, number | null],
-    dobs: [string, string]
+    dobs: [string, string],
+    filed: [MonthDate | null, MonthDate | null]
   ): string {
     if (!dobs[0] || pias[0] === null) return "";
     const hash = buildStrategyHash({
@@ -329,6 +387,7 @@
       dob1: dobs[0],
       name1: rs[0].name && rs[0].name !== "Self" ? rs[0].name : undefined,
       gender1: rs[0].gender,
+      filed1: filed[0],
       ...(
         !single && pias[1] !== null && dobs[1]
           ? {
@@ -336,6 +395,7 @@
               dob2: dobs[1],
               name2: rs[1].name && rs[1].name !== "Spouse" ? rs[1].name : undefined,
               gender2: rs[1].gender,
+              filed2: filed[1],
             }
           : {}
       ),
@@ -365,52 +425,90 @@
     if (debounceTimer !== null) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       debounceTimer = null;
-      // Reactive path has no banner; log and leave prior results visible.
-      calculateStrategyMatrix().catch((err) => {
-        console.error("Reactive recompute failed:", err);
-      });
+      calculateStrategyMatrix()
+        .then(() => {
+          recomputeErrorMessage = null;
+        })
+        .catch((err) => {
+          console.error("Reactive recompute failed:", err);
+          // The figures still on screen were computed for the previous
+          // inputs. Leaving them unlabelled is worse than showing nothing:
+          // they look like an answer to what the user just typed.
+          recomputeErrorMessage = STALE_RESULTS_MESSAGE;
+        });
     }, REACTIVE_DEBOUNCE_MS);
   }
 
   let recipients: [Recipient, Recipient] = initializeRecipients();
 
   function handleRecipientUpdate() {
-    try {
-      recipients = [...recipients];
-      updateDeathProbabilityDistributions();
-    } catch (error) {
-      console.warn("Error updating form data:", error);
-    }
+    recipients = [...recipients];
+    // A speculative refresh while the user is still typing. Failures here are
+    // not worth interrupting them for: calculateStrategyMatrix awaits the
+    // same function on Continue, and surfaces the error then.
+    updateDeathProbabilityDistributions().catch((error) => {
+      console.warn("Error updating death probability distributions:", error);
+    });
   }
 
+  /**
+   * Loads mortality data and rebuilds the death-age buckets.
+   *
+   * Throws rather than swallowing. Returning quietly on failure leaves the
+   * buckets empty, and an empty bucket list still runs to "Complete" with
+   * nothing in it — which is exactly how the over-70 bug stayed invisible.
+   */
   async function updateDeathProbabilityDistributions() {
-    try {
-      const currentYear = new Date().getFullYear();
-      [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
-        getDeathProbabilityDistribution(recipients[0], currentYear),
-        getDeathProbabilityDistribution(recipients[1], currentYear),
-      ]);
-      deathProbDistribution1 = [...deathProbDistribution1];
-      deathProbDistribution2 = [...deathProbDistribution2];
+    const currentYear = new Date().getFullYear();
+    [deathProbDistribution1, deathProbDistribution2] = await Promise.all([
+      getDeathProbabilityDistribution(recipients[0], currentYear),
+      getDeathProbabilityDistribution(recipients[1], currentYear),
+    ]);
+    deathProbDistribution1 = [...deathProbDistribution1];
+    deathProbDistribution2 = [...deathProbDistribution2];
 
-      const startAge1 = Math.max(
-        MIN_FILING_AGE,
-        recipients[0].birthdate.currentAge()
-      );
-      const startAge2 = Math.max(
-        MIN_FILING_AGE,
-        recipients[1].birthdate.currentAge()
-      );
+    // Monthly buckets start at the first death age that admits any filing at
+    // all: the later of "now" and the earliest month the recipient could file.
+    // A death age below that leaves the optimizer nothing to search — it is
+    // not a scenario worth modelling, and asking about it is what produced
+    // the "file at age 0" result. currentAge() is whole years, so the month
+    // precision has to come from earliestFiling.
+    // No MIN_FILING_AGE floor needed: earliestFiling is never below 62.
+    const currentDate = currentMonthDate();
+    const startAgeMonths1 = earliestModelableDeathAge(
+      recipients[0],
+      currentDate
+    ).asMonths();
 
-      deathAgeBuckets1 = isSingle
-        ? generateMonthlyBuckets(startAge1, deathProbDistribution1)
-        : generateThreeYearBuckets(startAge1, deathProbDistribution1);
-      deathAgeBuckets2 = generateThreeYearBuckets(
-        startAge2,
-        deathProbDistribution2
+    // Three-year buckets represent each bucket by its midpoint (start + 18
+    // months), so they clear the earliest filing age without this adjustment.
+    const startAge1Years = Math.max(
+      MIN_FILING_AGE,
+      recipients[0].birthdate.currentAge()
+    );
+    const startAge2Years = Math.max(
+      MIN_FILING_AGE,
+      recipients[1].birthdate.currentAge()
+    );
+
+    deathAgeBuckets1 = isSingle
+      ? generateMonthlyBuckets(startAgeMonths1, deathProbDistribution1)
+      : generateThreeYearBuckets(startAge1Years, deathProbDistribution1);
+    deathAgeBuckets2 = generateThreeYearBuckets(
+      startAge2Years,
+      deathProbDistribution2
+    );
+
+    // A run over no mortality data is a failure, not a result. (The bucket
+    // generators always emit a final open-ended bucket, so bucket count is
+    // not the thing to check; an empty distribution is.)
+    if (
+      deathProbDistribution1.length === 0 ||
+      (!isSingle && deathProbDistribution2.length === 0)
+    ) {
+      throw new Error(
+        "empty mortality distribution; life-table data is missing or unusable"
       );
-    } catch (error) {
-      console.warn("Error updating death probability distributions:", error);
     }
   }
 
@@ -445,6 +543,7 @@
 
   async function handleContinue() {
     formErrorMessage = null;
+    recomputeErrorMessage = null;
     try {
       await calculateStrategyMatrix();
       if (calculationResults.status() === CalculationStatus.Complete) {
@@ -455,8 +554,13 @@
       }
     } catch (error) {
       console.error("Continue failed:", error);
+      // Every input the form accepts should produce a result, so reaching
+      // here means a bug on our side rather than bad data. Say so: telling
+      // people to "check your inputs" sends them hunting for a mistake they
+      // did not make.
       formErrorMessage =
-        "Could not compute results. Check your inputs and try again.";
+        "Something went wrong while working out your results. This looks " +
+        "like a problem on our end, not with what you entered.";
     }
   }
 
@@ -466,11 +570,13 @@
 
   function handleStartOver() {
     formErrorMessage = null;
+    recomputeErrorMessage = null;
     // Preserve health tunings across Start over — they're exploration state,
     // not identity data.
     const prevHealth = snapshotHealthMultipliers();
     birthdateInputs = ["", ""];
     piaValues = [null, null];
+    alreadyFiled = [null, null];
     recipients = initializeRecipients();
     recipients[0].healthMultiplier = prevHealth[0];
     recipients[1].healthMultiplier = prevHealth[1];
@@ -496,11 +602,22 @@
       );
       next.beginRun();
 
-      const now = new Date();
-      const currentDate = MonthDate.initFromYearsMonths({
-        years: now.getFullYear(),
-        months: now.getMonth(),
-      });
+      const currentDate = currentMonthDate();
+      // Snapshot: single mode never has a filed spouse, and the results must
+      // describe one set of inputs even if the form changes mid-run.
+      const filedSnapshot: AlreadyFiled = isSingle
+        ? NOT_FILED
+        : [alreadyFiled[0], alreadyFiled[1]];
+      // Computed here but assigned only once the run has fully succeeded,
+      // together with the results it describes. If a loop below throws, the
+      // store keeps the previous results, and this flag must keep describing
+      // those — not the inputs that just failed.
+      const nextFilingChoice = filingChoices(
+        recipients[0],
+        isSingle ? null : recipients[1],
+        currentDate,
+        filedSnapshot
+      );
 
       if (isSingle) {
         for (let i = 0; i < deathAgeBuckets1.length; i++) {
@@ -542,7 +659,8 @@
                 recipients,
                 finalDates,
                 currentDate,
-                discountRate
+                discountRate,
+                filedSnapshot
               );
 
             next.set(i, j, {
@@ -563,6 +681,8 @@
       }
       next.completeRun();
 
+      let nextSingleResult: FilingAgeResult | undefined;
+      let nextCoupleResult: CoupleFilingAgeResult | undefined;
       if (isSingle) {
         const singleResults = expectedNPVSingle(
           recipients[0],
@@ -570,25 +690,31 @@
           discountRate,
           deathProbDistribution1
         );
-        optimalSingleResult =
+        nextSingleResult =
           singleResults.length > 0 ? singleResults[0] : undefined;
-        optimalCoupleResult = undefined;
       } else {
         const coupleResults = expectedNPVCoupleOptimized(
           recipients,
           currentDate,
           discountRate,
-          [deathProbDistribution1, deathProbDistribution2]
+          [deathProbDistribution1, deathProbDistribution2],
+          filedSnapshot
         );
-        optimalCoupleResult =
+        nextCoupleResult =
           coupleResults.length > 0 ? coupleResults[0] : undefined;
-        optimalSingleResult = undefined;
       }
 
       if (prevSelected) {
         next.setSelectedByLabels(prevSelected.rowLabel, prevSelected.colLabel);
       }
 
+      // Everything the results stage renders changes in one step, so the
+      // headline, the grids and the flag that re-skins them always describe
+      // the same run.
+      hasFilingChoice = nextFilingChoice;
+      resultsAlreadyFiled = filedSnapshot;
+      optimalSingleResult = nextSingleResult;
+      optimalCoupleResult = nextCoupleResult;
       calculationResultsStore.set(next);
     } catch (error) {
       console.error("Calculation error:", error);
@@ -597,9 +723,14 @@
       isRunning = false;
       if (rerunPending) {
         rerunPending = false;
-        calculateStrategyMatrix().catch((err) => {
-          console.error("Queued reactive rerun failed:", err);
-        });
+        calculateStrategyMatrix()
+          .then(() => {
+            recomputeErrorMessage = null;
+          })
+          .catch((err) => {
+            console.error("Queued reactive rerun failed:", err);
+            recomputeErrorMessage = STALE_RESULTS_MESSAGE;
+          });
       }
     }
   }
@@ -656,11 +787,6 @@
   <!-- Structured Data -->
   {@html webAppSchema.render()}
   {@html strategyActionJsonLd}
-
-  <link
-    href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap"
-    rel="stylesheet"
-  />
 </svelte:head>
 
 <Header active="Strategy" />
@@ -703,6 +829,7 @@
           {isSingle}
           bind:piaValues
           bind:birthdateInputs
+          bind:alreadyFiled
           continueDisabled={!formIsValid}
           errorMessage={formErrorMessage}
           onUpdate={handleRecipientUpdate}
@@ -752,14 +879,23 @@
     </div>
 
     <section class="calculation-section">
-      {#if calculationResults.status() === CalculationStatus.Complete}
+      {#if recomputeErrorMessage}
         <div class="limited-width">
+          <p class="stale-banner" role="alert">{recomputeErrorMessage}</p>
+        </div>
+      {/if}
+      {#if calculationResults.status() === CalculationStatus.Complete}
+        <div class="limited-width" class:is-stale={recomputeErrorMessage}>
           <div class="hero-row">
             <OptimalStrategyHeadline
               {isSingle}
               singleResult={optimalSingleResult}
               coupleResult={optimalCoupleResult}
               {recipients}
+              {hasFilingChoice}
+              currentDate={currentMonthDate()}
+              alreadyFiled={resultsAlreadyFiled}
+              onAlreadyFiledHint={isSingle ? undefined : handleEdit}
             />
             <AdvisorPrompt />
           </div>
@@ -768,7 +904,11 @@
           class="widget-anchor"
           bind:this={widgetAnchorEl}
         >
-          {#if isSingle}
+          {#if isSingle && !hasFilingChoice[0]}
+            <div class="limited-width">
+              <NoFilingDecisionPanel />
+            </div>
+          {:else if isSingle}
             <StrategyPlotSingle
               recipient={recipients[0]}
               {calculationResults}
@@ -782,6 +922,8 @@
               {calculationResults}
               {deathProbDistribution1}
               {deathProbDistribution2}
+              {hasFilingChoice}
+              alreadyFiled={resultsAlreadyFiled}
               bind:displayAsAges
               onselectcell={handleCellSelect}
             />
@@ -803,6 +945,7 @@
             {recipients}
             result={calculationResults.getSelectedCellData()}
             {discountRate}
+            alreadyFiled={resultsAlreadyFiled}
             bind:displayAsAges
             onBack={handleBackToMatrix}
           />
@@ -834,6 +977,22 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0.5rem;
+  }
+
+  .stale-banner {
+    margin: 0.75rem auto;
+    padding: 0.7rem 0.95rem;
+    background: #fef8ec;
+    border: 1px solid #e8cf9a;
+    color: #7a5606;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
+  /* Dim figures that no longer match the inputs on screen, so they are not
+     read as the answer to what the user just changed. */
+  .limited-width.is-stale {
+    opacity: 0.55;
   }
 
   .page-hero {

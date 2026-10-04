@@ -4,11 +4,34 @@ import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 
 /**
+ * The oldest age at which filing still changes the benefit amount. Delayed
+ * retirement credits stop accruing the month a recipient turns 70, so waiting
+ * beyond it only forgoes payments.
+ */
+export const MAX_BENEFIT_AGE_MONTHS = 70 * 12;
+
+/**
+ * A survivor benefit claimed at age 60 is reduced to this fraction of the
+ * base amount, scaling linearly to 100% at survivor full retirement age.
+ *
+ * Shared with the fast paths in strategy/calculations so all three copies of
+ * the survivor formula multiply by the same floating-point value. They must
+ * agree to the last rounding step, and `1 - 0.715` is not `0.285` in IEEE
+ * arithmetic — a literal 0.285 in one copy rounded a half-cent case the other
+ * way, giving a $1/month survivor benefit the grid-cell NPV and the scenario
+ * detail then disagreed on.
+ */
+export const MIN_SURVIVOR_BENEFIT_RATIO = 0.715;
+
+/**
  * Returns benefit multiplier at a given age relative to normal retirement age.
  *
  * The early retirement reduction factor changes from 6.67%/yr for years
  * earlier than 3 years before normal retirement age to 5%/yr for the 3 years
  * immediately before normal retirement age.
+ *
+ * Delayed credits are capped at age 70; an age past 70 yields the same
+ * multiplier as age 70 exactly.
  */
 function benefitMultiplierAtAge(
   nra: MonthDuration,
@@ -24,9 +47,10 @@ function benefitMultiplierAtAge(
         (Math.max(0, before.asMonths() - 36) * 5) / 1200)
     );
   } else {
-    // Increased benefits due to taking benefits late.
-    const after = age.subtract(nra);
-    return (delayedRetirementIncrease / 12) * after.asMonths();
+    // Increased benefits due to taking benefits late, up to age 70.
+    const creditedMonths = Math.min(age.asMonths(), MAX_BENEFIT_AGE_MONTHS);
+    const after = creditedMonths - nra.asMonths();
+    return (delayedRetirementIncrease / 12) * after;
   }
 }
 
@@ -430,6 +454,30 @@ export function allBenefitsOnDateNominal(
 }
 
 /**
+ * Whether a filing month means the recipient actually filed before dying.
+ *
+ * SSA pays no retirement benefit for the month of death, so a claim effective
+ * in that month or later is no claim at all. The survivor rules below treat
+ * such a worker as never having filed, and the UI labels the strategy "does
+ * not file" rather than naming a filing month.
+ *
+ * The optimizers do not model a separate "never file" choice. They cap the
+ * search at the death month (or, for a recipient who dies before they could
+ * file, at the one age left), so a filing age in or past the death month is
+ * how that strategy is represented.
+ *
+ * Model limitation: the benefit-period generators still count the death
+ * month inclusive, so a death-month filing earns one month of personal
+ * benefit in the NPV even though SSA would not pay it.
+ */
+export function filedBeforeDeath(
+  filingDate: MonthDate,
+  deathDate: MonthDate
+): boolean {
+  return filingDate.lessThan(deathDate);
+}
+
+/**
  * Determines the survivor benefit for a recipient.
  * @param survivor The surviving recipient.
  * @param deceased The deceased recipient.
@@ -440,6 +488,7 @@ export function allBenefitsOnDateNominal(
  * @param survivorFilingDate The date the survivor recipient filed for
  * survivor benefits.
  */
+
 export function survivorBenefit(
   survivor: Recipient,
   deceased: Recipient,
@@ -457,7 +506,15 @@ export function survivorBenefit(
     );
   }
 
-  if (deceasedFilingDate.greaterThanOrEqual(deceasedDeathDate)) {
+  // The base amount is read at a date late enough that every delayed credit
+  // has taken effect. A year after filing always qualifies (delayed credits
+  // land the January after filing at the latest). A fixed age-71 date does
+  // not: someone who files past 71 would be read *before* they filed, and
+  // benefitOnDate returns $0 for a date before filing.
+  const afterAllCredits = (filingDate: MonthDate): MonthDate =>
+    filingDate.addDuration(MonthDuration.OneYear());
+
+  if (!filedBeforeDeath(deceasedFilingDate, deceasedDeathDate)) {
     // If the deceased recipient did not file for benefits before death:
     if (deceasedDeathDate.lessThan(deceased.normalRetirementDate())) {
       // If the deceased died before Normal Retirement Age, the survivor
@@ -475,9 +532,7 @@ export function survivorBenefit(
       baseSurvivorBenefit = benefitOnDate(
         deceased,
         effectiveFilingDate,
-        deceased.birthdate.dateAtSsaAge(
-          MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
-        )
+        afterAllCredits(effectiveFilingDate)
       );
     }
   } else {
@@ -489,9 +544,7 @@ export function survivorBenefit(
       benefitOnDate(
         deceased,
         deceasedFilingDate,
-        deceased.birthdate.dateAtSsaAge(
-          MonthDuration.initFromYearsMonths({ years: 71, months: 0 })
-        )
+        afterAllCredits(deceasedFilingDate)
       )
     );
     baseSurvivorBenefit = Money.fromCents(
@@ -527,9 +580,9 @@ export function survivorBenefit(
       0,
       monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
     );
-    const minSurvivorBenefitRatio = 0.715;
     const result = baseSurvivorBenefit.times(
-      minSurvivorBenefitRatio + (1 - minSurvivorBenefitRatio) * reductionRatio
+      MIN_SURVIVOR_BENEFIT_RATIO +
+        (1 - MIN_SURVIVOR_BENEFIT_RATIO) * reductionRatio
     );
     return result.floorToDollar();
   }

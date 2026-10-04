@@ -9,7 +9,7 @@ const title = 'Bump in delayed Social Security benefits after January';
 const description =
   'For those starting benefits after Normal Retirement Age, there is a small delay in some of the delayed credits until the following January.';
 const publishDate = new Date('2023-12-29T00:00:00+00:00');
-const updateDate = new Date('2023-04-29T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/delayed-january-bump';
@@ -65,13 +65,15 @@ schema.tags = [
 
   <p>
     When someone chooses to delay collecting social security past the Normal
-    Retirement Age, they earn delayed credits that increase their benefit by 8%
-    per year (0.67% per month) in exchange for waiting a little longer.
+    Retirement Age, they earn delayed credits that
+    <a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">increase their benefit by 8% per year (0.67% per month)</a>
+    in exchange for waiting a little longer.
   </p>
 
   <p>
     However, due to a little known quirk in the way the credits work, you only
-    earn credits based on the months delayed in the previous calendar year.
+    earn credits based on the
+    <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615690">months delayed in the previous calendar year</a>.
   </p>
 
   <p>
@@ -89,16 +91,17 @@ schema.tags = [
   <ol>
     <li>
       <u>Early Benefit Reductions</u>: This rule only affects credits from
-      delaying after Normal Retirement age, it does not affect reductions from
-      starting benefits early.
+      delaying after Normal Retirement age, it does not affect
+      <a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html">reductions from starting benefits early</a>.
     </li>
     <li>
       <u>Age 70</u>: If the recipient starts the benefit at age 70, even if that
-      is in the middle of the year, the full credits are applied.
+      is in the middle of the year, the <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615690">full credits are applied</a>.
     </li>
     <li>
-      <u>Spousal Benefits</u>: Spousal benefits are not affected by delayed
-      credits and so are unaffected by this rule.
+      <u>Spousal Benefits</u>:
+      <a href="https://secure.ssa.gov/poms.nsf/lnx/0300202001">Spousal benefits are not affected by delayed credits</a>
+      and so are unaffected by this rule.
     </li>
   </ol>
 
@@ -128,5 +131,15 @@ schema.tags = [
       the credits earned in the year of your 69th birthday.
     </p>
   </blockquote>
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/delayret.html">Social Security Administration: Delayed Retirement Credits</a></li>
+    <li><a href="https://www.ssa.gov/oact/ProgData/ar_drc.html">Social Security Administration: Early or Delayed Retirement</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300615690">SSA POMS RS 00615.690: Delayed Retirement Credits</a></li>
+    <li><a href="https://www.ssa.gov/benefits/retirement/planner/agereduction.html">Social Security Administration: Retirement Age and Benefit Reduction</a></li>
+    <li><a href="https://secure.ssa.gov/poms.nsf/lnx/0300202001">SSA POMS RS 00202.001: Definitions and Requirements for Spouse Benefits</a></li>
+  </ul>
+
   <GuideFooter />
 </div>

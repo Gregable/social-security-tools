@@ -4,12 +4,23 @@ import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 import HeroImage from './taxes.jpg';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "Provisional income is something you can steer, and your filing date is one of the levers. You can work through it with a Social Security specialist at",
+  outro: "to find the years this tax actually bites.",
+  bullets: [
+    "They look at how filing age, IRA withdrawals, and Roth conversions move you across the break points above.",
+    "State tax and the new senior deduction stack on top of this, and the arithmetic differs by household.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Federal Taxation of Social Security Benefits';
 const description =
   'A Comprehensive Guide to Calculating the Taxability of Social Security Benefits Based on AGI.';
 const publishDate = new Date('2022-12-04T00:00:00+00:00');
-const updateDate = new Date('2026-02-15T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/federal-taxes';
@@ -138,8 +149,10 @@ schema.tags = [
   <p>
     The first step is to calculate a number called "Provisional Income" (PI).
     Provisional Income is your AGI (less taxable Social Security) with a few
-    things added back in. Add to the AGI any Tax-exempt interest and 1/2 of your
-    total Social Security Benefits.
+    things added back in. Add to the AGI any Tax-exempt interest and
+    <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+      >1/2 of your total Social Security Benefits</a
+    >.
   </p>
 
   <pre>
@@ -156,7 +169,12 @@ schema.tags = [
 
   <h3>Single Filer Calculation</h3>
 
-  <p>For a single filer, use break points of $25,000 and $34,000.</p>
+  <p>
+    For a single filer, use
+    <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+      >break points of $25,000 and $34,000</a
+    >.
+  </p>
 
   <p>
     If your provisional income is less than the first break point, $25,000, none
@@ -166,25 +184,32 @@ schema.tags = [
   <p>
     Any provisional income between $25,000 and $34,000 is federally taxable at
     50%. If your total provisional income is between these two points, calculate
-    the federally taxable amount as (PI - $25,0000) x 0.5.
+    the federally taxable amount as (PI - $25,000) x 0.5.
   </p>
 
   <p>
     Any provisional income above $34,000 is federally taxable at 85%. If your
     total provisional income is above $34,000 these two points, calculate the
-    federally taxable amount as (PI - $34,0000) x 0.85 + $4,500. The $4,500
+    federally taxable amount as (PI - $34,000) x 0.85 + $4,500. The $4,500
     number is 50% of the the provisional income between $25,000 and $34,000.
   </p>
 
   <p>
-    At most 85% of your Social Security Benefits are taxable, so if the above
-    formula produces a result that is greater than 85% of your Social Security
-    Benefits, then exactly 85% of your Social Security benefits are taxable.
+    <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+      >At most 85% of your Social Security Benefits are taxable</a
+    >, so if the above formula produces a result that is greater than 85% of
+    your Social Security Benefits, then exactly 85% of your Social Security
+    benefits are taxable.
   </p>
 
   <h3>Joint Filer Calculation</h3>
 
-  <p>For a joint filer, use break points of $32,000 and $44,000.</p>
+  <p>
+    For a joint filer, use
+    <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+      >break points of $32,000 and $44,000</a
+    >.
+  </p>
 
   <p>
     If your provisional income is less than the first break point, $32,000, none
@@ -194,13 +219,13 @@ schema.tags = [
   <p>
     Any provisional income between $32,000 and $44,000 is federally taxable at
     50%. If your total provisional income is between these two points, calculate
-    the federally taxable amount as (PI - $32,0000) x 0.5.
+    the federally taxable amount as (PI - $32,000) x 0.5.
   </p>
 
   <p>
     Any provisional income above $44,000 is federally taxable at 85%. If your
-    total provisional income is above $34,000 these two points, calculate the
-    federally taxable amount as (PI - $44,0000) x 0.85 + $6,000. The $6,000
+    total provisional income is above $44,000 these two points, calculate the
+    federally taxable amount as (PI - $44,000) x 0.85 + $6,000. The $6,000
     number is 50% of the the provisional income between $32,000 and $44,000.
   </p>
 
@@ -210,7 +235,7 @@ schema.tags = [
     Benefits, then exactly 85% of your Social Security benefits are taxable.
   </p>
 
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h3>Last word</h3>
 
@@ -234,5 +259,22 @@ schema.tags = [
     consult with a tax professional or the Social Security Administration for
     more information and assistance.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/faqs/en/questions/KA-02471.html"
+        >Social Security Administration: Must I pay taxes on Social Security
+        benefits?</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/history/taxationofbenefits.html"
+        >Social Security Administration: Social Security History, Taxation of
+        Benefits</a
+      >
+    </li>
+  </ul>
   <GuideFooter />
 </div>

@@ -31,6 +31,9 @@ export let copy: SponsorCopy = DEFAULT_SPONSOR_COPY;
         <h3 class="mobile-title">
           {SPONSOR.name} <span class="mobile-sponsor-badge">Sponsor</span>
         </h3>
+        <!-- The line breaks between these three are the only thing putting
+             spaces around the sponsor name: the copy fragments are stored
+             trimmed. Do not collapse this onto one line. -->
         <p>
           {copy.intro}
           <span class="inline-link">{SPONSOR.name}</span>

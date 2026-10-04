@@ -4,6 +4,7 @@ import {
   GUIDE_CTA_TYPES,
   getGuideCTAType,
 } from '../routes/guides/guide-cta-config';
+import { guideSlugFromPath } from '../routes/guides/guide-slug';
 
 describe('SPONSOR config', () => {
   it('links to an https URL with a non-empty name', () => {
@@ -17,10 +18,24 @@ describe('SPONSOR config', () => {
 });
 
 describe('DEFAULT_SPONSOR_COPY', () => {
-  it('has a two-part pitch sentence and at least one bullet', () => {
-    expect(DEFAULT_SPONSOR_COPY.intro.length).toBeGreaterThan(0);
-    expect(DEFAULT_SPONSOR_COPY.outro.length).toBeGreaterThan(0);
+  // Guides write their own pitch, but this one still renders on the
+  // calculator's sponsor box, so it is held to the same rules. The guide
+  // pitches are checked in invariants/guide-sponsor-copy-sync.test.ts.
+  it('reads as one sentence built around the sponsor name', () => {
+    expect(DEFAULT_SPONSOR_COPY.intro).toBe(DEFAULT_SPONSOR_COPY.intro.trim());
+    expect(DEFAULT_SPONSOR_COPY.outro).toBe(DEFAULT_SPONSOR_COPY.outro.trim());
+    expect(DEFAULT_SPONSOR_COPY.intro.endsWith(' at')).toBe(true);
+    expect(DEFAULT_SPONSOR_COPY.outro).toMatch(/^[a-z]/);
+    expect(DEFAULT_SPONSOR_COPY.outro.endsWith('.')).toBe(true);
+  });
+
+  it('has bullets that never repeat the sponsor name', () => {
     expect(DEFAULT_SPONSOR_COPY.bullets.length).toBeGreaterThan(0);
+    for (const bullet of DEFAULT_SPONSOR_COPY.bullets) {
+      expect(bullet).toBe(bullet.trim());
+      expect(bullet.endsWith('.')).toBe(true);
+      expect(bullet).not.toContain(SPONSOR.name);
+    }
   });
 });
 
@@ -44,5 +59,22 @@ describe('guide CTA types', () => {
     for (const type of Object.values(GUIDE_CTA_TYPES)) {
       expect(['calculator', 'sponsor']).toContain(type);
     }
+  });
+});
+
+describe('guide slugs', () => {
+  it('reads the slug out of a guide pathname either way it is written', () => {
+    expect(guideSlugFromPath('/guides/wep')).toBe('wep');
+    expect(guideSlugFromPath('/guides/wep/')).toBe('wep');
+  });
+
+  it('has no slug for pathnames outside a guide', () => {
+    expect(guideSlugFromPath('/guides/')).toBe('');
+    expect(guideSlugFromPath('/calculator')).toBe('');
+    expect(guideSlugFromPath('')).toBe('');
+  });
+
+  it('only strips a leading /guides/, not one appearing later', () => {
+    expect(guideSlugFromPath('/other/guides/wep')).toBe('');
   });
 });

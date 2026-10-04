@@ -9,7 +9,7 @@ const title = 'Social Security Wage Indexing: How Your Earnings Are Adjusted';
 const description =
   "Learn how Social Security uses wage indexing to adjust your earnings for inflation. Understand indexing factors, the AWI formula, and why your benefit is shown in today's dollars.";
 const publishDate = new Date('2020-12-28T00:00:00+00:00');
-const updateDate = new Date('2026-01-21T00:00:00+00:00');
+const updateDate = new Date('2026-09-17T00:00:00+00:00');
 
 // Calculate example indexing factor
 const exampleYear = 1990;
@@ -141,7 +141,9 @@ const faqs: FAQItem[] = [
   <h2>How the Indexing Formula Works</h2>
 
   <p>
-    The indexing factor for any year is calculated using a simple formula based
+    The indexing factor for any year is calculated using a
+    <a href="https://www.ssa.gov/oact/cola/awifactors.html">simple formula</a>
+    based
     on the <a href="https://www.ssa.gov/oact/cola/awidevelop.html"
       >Average Wage Index (AWI)</a
     >:
@@ -163,7 +165,10 @@ const faqs: FAQItem[] = [
 
   <p>
     The AWI is the average of all wages reported to Social Security in a given
-    year. As of {MAX_WAGE_INDEX_YEAR}, the AWI was {WAGE_INDICES[MAX_WAGE_INDEX_YEAR]?.wholeDollars() ?? 'not yet published'}.
+    year. As of {MAX_WAGE_INDEX_YEAR}, the AWI was {WAGE_INDICES[MAX_WAGE_INDEX_YEAR]?.wholeDollars() ?? 'not yet published'}
+    (see SSA's <a href="https://www.ssa.gov/oact/cola/AWI.html"
+      >national average wage index</a
+    > table).
   </p>
 
   <InlineCTA type="calculator" />
@@ -197,12 +202,18 @@ const faqs: FAQItem[] = [
 
   <p>
     Your indexing factors are determined—and permanently locked in—in the year
-    you turn 62. However, the formula uses the AWI from the year you turned 60.
+    you turn 62. However, the formula uses the
+    <a href="https://www.ssa.gov/oact/cola/awifactors.html"
+      >AWI from the year you turned 60</a
+    >.
     Why?
   </p>
 
   <p>
-    The AWI for any given year isn't published until the following fall. Since
+    The AWI for any given year
+    <a href="https://www.ssa.gov/oact/cola/awidevelop.html"
+      >isn't published until the following fall</a
+    >. Since
     your benefit calculation must be finalized when you turn 62, the most recent
     available AWI is from two years prior (when you were 60).
   </p>

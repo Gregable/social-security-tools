@@ -3,6 +3,17 @@ import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
+import type { SponsorCopy } from '$lib/sponsor';
+
+const sponsorCopy: SponsorCopy = {
+  intro: "A career split across countries is exactly the case this calculator can't finish. You can hand the details to a Social Security specialist at",
+  outro: "and get an estimate that counts your overseas work.",
+  bullets: [
+    "A totalization claim runs through two systems and needs records from both, and mistakes are slow to unwind.",
+    "They also cover what this guide doesn't, like taxes, pensions, and health.",
+    "The first call is free, and you pick the time.",
+  ],
+};
 
 const title = 'Social Security International Agreements';
 const description = 'How does working abroad affect social security?';
@@ -50,9 +61,11 @@ schema.tags = [
     be insufficient to estimate one's benefit.
   </p>
   <p>
-    Since the late 1970's, the United States has established a network of
-    bilateral Social Security agreements that coordinate the U.S. Social
-    Security program with the comparable programs of other countries.
+    Since the late 1970's, the United States has established a
+    <a href="https://www.ssa.gov/international/agreement_descriptions.html"
+      >network of bilateral Social Security agreements</a
+    > that coordinate the U.S. Social Security program with the comparable
+    programs of other countries.
     International Social Security agreements, often called "Totalization
     agreements", help fill gaps in benefit protection for workers who have
     divided their careers between the United States and another country.
@@ -63,18 +76,42 @@ schema.tags = [
       >Totalization Agreements</a
     >.
   </p>
-  <InlineCTA type="sponsor" />
+  <InlineCTA type="sponsor" {sponsorCopy} />
 
   <p>
-    These agreements allow earned income credits to be earned overseas and still
-    count towards the minimum of 40 credits required for benefits in the US.
-    They also allow for an adjusted benefit based on the amount of time employed
-    in each location.
+    These agreements allow earned income <a href="https://www.ssa.gov/international/agreement_descriptions.html"
+      >credits to be earned overseas and still count towards</a
+    > the
+    <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html"
+      >minimum of 40 credits</a
+    > required for benefits in the US. They also allow for an adjusted benefit
+    based on the amount of time employed in each location.
   </p>
   <p>
     This website does not provide a way to directly enter overseas earnings nor
     to compute the related benefits. It should be used as a starting point, but
     not the final answer, in a case of a multinational career.
   </p>
+
+  <h2>Additional Resources</h2>
+
+  <ul>
+    <li>
+      <a href="https://www.ssa.gov/international/agreements_overview.html"
+        >Social Security Administration: U.S. International SSA Agreements</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/international/agreement_descriptions.html"
+        >Social Security Administration: International Agreements</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ssa.gov/benefits/retirement/planner/credits.html"
+        >Social Security Administration: Social Security Credits and Benefit
+        Eligibility</a
+      >
+    </li>
+  </ul>
   <GuideFooter />
 </div>
