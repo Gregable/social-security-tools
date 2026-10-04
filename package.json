@@ -34,7 +34,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
     "@types/node": "^24.5.2",
     "@typescript-eslint/types": "^8.57.0",
-    "@vitest/coverage-v8": "^4.1.8",
+    "@vitest/coverage-v8": "^4.1.11",
     "chromatic": "^13.3.5",
     "posthog-js": "^1.77.0",
     "react": "^19.1.1",
