@@ -6,6 +6,9 @@ import { activeIntegration } from '$lib/integrations/context';
 import { SPONSOR } from '$lib/sponsor';
 
 const PLACEMENT = 'homepage-choice';
+// Phones get a one-line text link instead of the card (see the 700px
+// media query); its own placement keeps the two comparable in PostHog.
+const MOBILE_PLACEMENT = 'homepage-mobile-link';
 
 // Partner-integration visitors never see the sponsor, matching the
 // calculator and strategy pages.
@@ -18,6 +21,10 @@ function trackDiyClick(path: 'calculator' | 'strategy'): void {
 
 function handleProClick(): void {
   trackOutboundClick(SPONSOR.destination, PLACEMENT);
+}
+
+function handleProLinkClick(): void {
+  trackOutboundClick(SPONSOR.destination, MOBILE_PLACEMENT);
 }
 </script>
 
@@ -72,6 +79,27 @@ function handleProClick(): void {
       </a>
     {/if}
   </div>
+
+  {#if showSponsor}
+    <!-- Only one of the card and this line is displayed at a time, and a
+         display:none element never intersects, so impressions are not
+         double counted. -->
+    <p class="pro-line">
+      <span class="pro-lead"
+        >Prefer to talk it through? <span class="badge">Sponsor</span></span
+      >
+      <a
+        href={SPONSOR.url}
+        target="_blank"
+        rel="noopener"
+        on:click={handleProLinkClick}
+        use:outboundImpression={{
+          destination: SPONSOR.destination,
+          placement: MOBILE_PLACEMENT,
+        }}>Free call with {SPONSOR.name}&nbsp;&rarr;</a
+      >
+    </p>
+  {/if}
 </section>
 
 <style>
@@ -271,10 +299,55 @@ function handleProClick(): void {
     }
   }
 
+  .pro-line {
+    display: none;
+    margin: 1rem 0 0;
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5;
+    /* Card padding plus its 2px border, so the text lines up with the
+       calculator card's content above it. */
+    padding: 0 calc(clamp(1.25rem, 2vw, 2.25rem) + 2px);
+    --accent: #337ab7;
+  }
+
+  /* Lead-in and sponsor label on the first line, the link on the second. */
+  .pro-lead {
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+
+  .pro-line a {
+    color: #23527c;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .pro-line .badge {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .pro-line a:focus-visible {
+    outline: 2px solid #081d88;
+    outline-offset: 2px;
+  }
+
   @media (max-width: 700px) {
     .choice {
       width: 90%;
       margin: 1.5rem auto 2rem;
+    }
+
+    /* On phones the sponsor card filled a whole screen yet drew almost no
+       clicks, so it becomes a single text line under the calculator card. */
+    .pro {
+      display: none;
+    }
+
+    .pro-line {
+      display: block;
     }
   }
 </style>
