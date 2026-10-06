@@ -6,7 +6,7 @@ import { activeIntegration } from '$lib/integrations/context';
 import { SPONSOR } from '$lib/sponsor';
 
 const PLACEMENT = 'homepage-choice';
-// Phones get a one-line text link instead of the card (see the 700px
+// Phones get a short text link instead of the card (see the 700px
 // media query); its own placement keeps the two comparable in PostHog.
 const MOBILE_PLACEMENT = 'homepage-mobile-link';
 
@@ -96,7 +96,10 @@ function handleProLinkClick(): void {
         use:outboundImpression={{
           destination: SPONSOR.destination,
           placement: MOBILE_PLACEMENT,
-        }}>Free call with {SPONSOR.name}&nbsp;&rarr;</a
+        }}
+        >Free call with {SPONSOR.name}&nbsp;&rarr;<span class="sr-only"
+          >{' '}(sponsor, opens in a new tab)</span
+        ></a
       >
     </p>
   {/if}
@@ -311,6 +314,20 @@ function handleProLinkClick(): void {
     --accent: #337ab7;
   }
 
+  /* Read by screen readers but not shown: the Sponsor label sits outside
+     the link, and the card's new-tab notice has no visible twin here. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* Lead-in and sponsor label on the first line, the link on the second. */
   .pro-lead {
     display: block;
@@ -341,7 +358,7 @@ function handleProLinkClick(): void {
     }
 
     /* On phones the sponsor card filled a whole screen yet drew almost no
-       clicks, so it becomes a single text line under the calculator card. */
+       clicks, so it becomes a short text link under the calculator card. */
     .pro {
       display: none;
     }
