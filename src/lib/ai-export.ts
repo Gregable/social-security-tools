@@ -742,7 +742,7 @@ function spousalSection(higher: Recipient, lower: Recipient): string {
 }
 
 /**
- * Survivor benefits: the up-to-100% rule, the widow(er)'s-limit (82.5%) floor,
+ * Survivor benefits: the up-to-100% rule, the widow(er)'s limit (82.5%) cap,
  * the separate survivor FRA, the 71.5%-at-60 reduction, switching strategies,
  * and an illustrative computed amount.
  */
@@ -782,11 +782,12 @@ function survivorSection(higher: Recipient, lower: Recipient): string {
     `  actually receiving, INCLUDING any delayed retirement credits ${higherName}`,
     `  earned by waiting past FRA. So delaying the higher earner's own filing also`,
     '  raises the survivor benefit — often the most valuable reason to delay.',
-    `- If ${higherName} had already filed at death, the survivor benefit is the`,
-    `  larger of ${higherName}'s own benefit or 82.5% of ${higherName}'s PIA (the`,
-    `  "widow(er)'s limit", or RIB-LIM). This 82.5% floor only matters when`,
-    `  ${higherName} had reduced their benefit by filing early. For ${higherName},`,
-    `  82.5% of PIA = ${higherPia.times(0.825).wholeDollars()}.`,
+    `- If ${higherName} had filed early (before their FRA), the survivor's age`,
+    `  reduction (below) is applied to 100% of ${higherName}'s PIA, which is`,
+    `  then capped at the larger of ${higherName}'s reduced benefit or 82.5% of`,
+    `  ${higherName}'s PIA (the "widow(er)'s limit", or RIB-LIM). Waiting past`,
+    '  the month the reduced amount reaches that cap gains nothing. For',
+    `  ${higherName}, 82.5% of PIA = ${higherPia.times(0.825).wholeDollars()}.`,
     `- Survivor benefits use a separate survivor full retirement age`,
     `  (${lowerName}'s is ${survivorFra.toFullAgeString()}), which can be earlier than the`,
     '  retirement FRA. Claiming before it reduces the benefit proportionally, down',

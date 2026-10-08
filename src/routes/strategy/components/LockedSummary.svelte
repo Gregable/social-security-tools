@@ -1,12 +1,19 @@
 <script lang="ts">
   import posthog from "posthog-js";
+  import { assertNever } from "$lib/assert-never";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import type { Recipient } from "$lib/recipient";
+  import type { LateSpouse } from "$lib/strategy/calculations/late-spouse";
+  import type { StrategyMode } from "$lib/strategy/ui";
 
   export let recipients: [Recipient, Recipient];
-  export let isSingle: boolean;
+  export let mode: StrategyMode;
+  /** Widowed mode: the late spouse the results describe. */
+  export let lateSpouse: LateSpouse | null = null;
   export let shareUrl: string = "";
   export let onedit: () => void;
+
+  $: isSingle = mode === "single";
 
   let copied = false;
   let copyError = false;
@@ -28,7 +35,7 @@
       return;
     }
     try {
-      posthog.capture("Strategy: Share URL Copied", { mode: isSingle ? "single" : "couple" });
+      posthog.capture("Strategy: Share URL Copied", { mode });
     } catch {
       // analytics must not affect copy UX
     }
@@ -56,6 +63,19 @@
   function formatPia(recipient: Recipient): string {
     return recipient.pia().primaryInsuranceAmount().wholeDollars();
   }
+
+  function formatClaim(spouse: LateSpouse): string {
+    switch (spouse.claim.kind) {
+      case "none":
+        return "No benefits yet";
+      case "disability":
+        return "Disability benefits";
+      case "retirement":
+        return `Retirement benefits from ${spouse.claim.startedAt.monthName()} ${spouse.claim.startedAt.year()}`;
+      default:
+        return assertNever(spouse.claim);
+    }
+  }
 </script>
 
 <section class="locked">
@@ -81,20 +101,39 @@
   </header>
 
   <div class="rows" class:single={isSingle}>
-    {#each recipients as recipient, i}
-      {#if !isSingle || i === 0}
-        <div class="row">
-          {#if !recipient.only}
-            <span class="name"><RecipientName r={recipient} /></span>
-          {/if}
-          <span class="details">
-            Born {formatBirthdate(recipient)} · {formatGender(recipient)} · PIA {formatPia(
-              recipient
-            )}
-          </span>
-        </div>
-      {/if}
-    {/each}
+    {#if mode === "widowed" && lateSpouse !== null}
+      <div class="row">
+        <span class="name">You</span>
+        <span class="details">
+          Born {formatBirthdate(recipients[0])} · {formatGender(recipients[0])} ·
+          PIA {formatPia(recipients[0])}
+        </span>
+      </div>
+      <div class="row">
+        <span class="name">Late spouse</span>
+        <span class="details">
+          Born {formatBirthdate(lateSpouse.recipient)} · Died {lateSpouse.deathDate.monthName()}
+          {lateSpouse.deathDate.year()} · {formatClaim(lateSpouse)} · PIA {formatPia(
+            lateSpouse.recipient
+          )}
+        </span>
+      </div>
+    {:else}
+      {#each recipients as recipient, i}
+        {#if !isSingle || i === 0}
+          <div class="row">
+            {#if !recipient.only}
+              <span class="name"><RecipientName r={recipient} /></span>
+            {/if}
+            <span class="details">
+              Born {formatBirthdate(recipient)} · {formatGender(recipient)} · PIA {formatPia(
+                recipient
+              )}
+            </span>
+          </div>
+        {/if}
+      {/each}
+    {/if}
   </div>
 
   {#if shareUrl}

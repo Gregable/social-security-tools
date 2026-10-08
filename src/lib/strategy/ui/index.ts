@@ -3,10 +3,13 @@
 export type {
   CellSelectionDetail,
   StrategyResult,
+  WidowedPlan,
+  WidowedStrategyResult,
 } from './calculation-results.js';
 export {
   CalculationResults,
   CalculationStatus,
+  isWidowedResult,
 } from './calculation-results.js';
 export { getMonthYearColor } from './colors.js';
 export {
@@ -30,3 +33,4 @@ export {
   generateOneYearBuckets,
   generateThreeYearBuckets,
 } from './grid-sizing.js';
+export type { StrategyMode } from './strategy-mode.js';

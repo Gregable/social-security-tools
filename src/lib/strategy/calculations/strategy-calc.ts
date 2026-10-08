@@ -237,6 +237,55 @@ function calculatePeriodNPV(
 }
 
 /**
+ * The net present value, in cents, of a set of benefit periods as of
+ * `currentDate`.
+ *
+ * The benefit for month t is paid in month t + 1, as SSA pays it, and a
+ * payment dated on or before `currentDate` is in the past and does not
+ * count, so benefits count from the current month on. `calculatePeriodNPV`
+ * values each run of payments as an annuity paid at the end of each month,
+ * which discounts the first payment one month past its date: the benefit
+ * for month t is discounted (t + 2 - now) months in all. The widowed
+ * optimizer matches this; see PAYMENT_DISCOUNT_LAG there.
+ */
+export function benefitPeriodsNPVCents(
+  periods: BenefitPeriod[],
+  currentDate: MonthDate,
+  monthlyDiscountRate: number
+): number {
+  let totalNPVCents = 0;
+
+  for (const period of periods) {
+    const firstPaymentDate = period.startDate.addDuration(new MonthDuration(1));
+    const lastPaymentDate = period.endDate.addDuration(new MonthDuration(1));
+    const effectiveStartPaymentDate = MonthDate.max(
+      currentDate.addDuration(new MonthDuration(1)),
+      firstPaymentDate
+    );
+    if (effectiveStartPaymentDate.greaterThan(lastPaymentDate)) {
+      continue;
+    }
+
+    const numberOfPayments =
+      lastPaymentDate.monthsSinceEpoch() -
+      effectiveStartPaymentDate.monthsSinceEpoch() +
+      1;
+    const monthsToFirstPayment =
+      effectiveStartPaymentDate.monthsSinceEpoch() -
+      currentDate.monthsSinceEpoch();
+
+    totalNPVCents += calculatePeriodNPV(
+      period.amount.cents(),
+      numberOfPayments,
+      monthsToFirstPayment,
+      monthlyDiscountRate
+    );
+  }
+
+  return totalNPVCents;
+}
+
+/**
  * Calculates the net present value of all benefit periods.
  *
  * This function calls strategySumPeriods to get an array of benefit periods,

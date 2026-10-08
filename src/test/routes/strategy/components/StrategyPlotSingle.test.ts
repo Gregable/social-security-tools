@@ -3,6 +3,7 @@ import { Money } from '$lib/money';
 import { MonthDuration } from '$lib/month-time';
 import type { DeathAgeBucket } from '$lib/strategy/ui';
 import { CalculationResults } from '$lib/strategy/ui/calculation-results';
+import { deathAgeAxisRange, type PlotPoint } from '$lib/strategy/ui/plot-range';
 
 /**
  * Tests for StrategyPlotSingle component logic.
@@ -43,74 +44,34 @@ function createCalculationResults(
 }
 
 /**
- * Replicates the x-axis range calculation logic from StrategyPlotSingle.
- * This allows us to test the logic in isolation.
+ * The x-axis range StrategyPlotSingle shows for these results, via the shared
+ * helper the component uses.
  */
 function calculateXAxisRange(
   results: CalculationResults,
-  earliestFilingAge: number,
   xAxisPadding: number = 5
 ): { min: number; max: number } {
   const rowBuckets = results.rowBuckets();
   const bucketMin = rowBuckets[0]?.startAge ?? 62;
   const bucketMax = rowBuckets[rowBuckets.length - 1]?.startAge ?? 100;
-
-  // Filter strategy points (same logic as component)
-  const strategyPoints: { deathAge: number; filingAgeMonths: number }[] = [];
+  const points: PlotPoint[] = [];
   for (let i = 0; i < results.rows(); i++) {
     const result = results.get(i, 0);
     if (!result) continue;
-    if (result.filingAge1.asMonths() < earliestFilingAge) continue;
-    strategyPoints.push({
+    points.push({
       deathAge: result.bucket1.startAge,
       filingAgeMonths: result.filingAge1.asMonths(),
     });
   }
-
-  if (strategyPoints.length === 0) {
-    return { min: bucketMin, max: bucketMax };
-  }
-
-  const filingAges = strategyPoints.map((p) => p.filingAgeMonths);
-  const minFiling = Math.min(...filingAges);
-  const maxFiling = Math.max(...filingAges);
-
-  // If filing age is constant (flat line), show full range
-  if (minFiling === maxFiling) {
-    return { min: bucketMin, max: bucketMax };
-  }
-
-  // Find the last death age where filing age is at minimum
-  let minFilingDeathAge = strategyPoints[0].deathAge;
-  for (const p of strategyPoints) {
-    if (p.filingAgeMonths === minFiling) {
-      minFilingDeathAge = p.deathAge;
-    }
-  }
-
-  // Find the first death age where filing age reaches maximum
-  let maxFilingDeathAge = strategyPoints[strategyPoints.length - 1].deathAge;
-  for (const p of strategyPoints) {
-    if (p.filingAgeMonths === maxFiling) {
-      maxFilingDeathAge = p.deathAge;
-      break;
-    }
-  }
-
-  return {
-    min: Math.max(bucketMin, minFilingDeathAge - xAxisPadding),
-    max: Math.min(bucketMax, maxFilingDeathAge + xAxisPadding),
-  };
+  return deathAgeAxisRange([points], bucketMin, bucketMax, xAxisPadding);
 }
 
 describe('StrategyPlotSingle', () => {
   describe('X-axis range calculation', () => {
-    const earliestFilingAge = 62 * 12; // 62 years in months
-
     it('should return full range when no strategy points exist', () => {
       const results = new CalculationResults(0, 0);
       // With empty results, rowBuckets will be empty, so we test the fallback
-      const range = calculateXAxisRange(results, earliestFilingAge);
+      const range = calculateXAxisRange(results);
       // Empty results should fall back to defaults
       expect(range.min).toBeDefined();
       expect(range.max).toBeDefined();
@@ -123,7 +84,7 @@ describe('StrategyPlotSingle', () => {
         data.push({ deathAge: age, filingAgeMonths: 62 * 12 });
       }
       const results = createCalculationResults(data);
-      const range = calculateXAxisRange(results, earliestFilingAge);
+      const range = calculateXAxisRange(results);
 
       expect(range.min).toBe(62);
       expect(range.max).toBe(100);
@@ -146,7 +107,7 @@ describe('StrategyPlotSingle', () => {
         data.push({ deathAge: age, filingAgeMonths });
       }
       const results = createCalculationResults(data);
-      const range = calculateXAxisRange(results, earliestFilingAge);
+      const range = calculateXAxisRange(results);
 
       // Last death age with minimum filing age is 75
       // First death age with maximum filing age is 85
@@ -165,7 +126,7 @@ describe('StrategyPlotSingle', () => {
         { deathAge: 66, filingAgeMonths: 70 * 12 },
       ];
       const results = createCalculationResults(data);
-      const range = calculateXAxisRange(results, earliestFilingAge);
+      const range = calculateXAxisRange(results);
 
       // Last death age with min filing (62) is 63
       // First death age with max filing (70) is 65
@@ -182,7 +143,7 @@ describe('StrategyPlotSingle', () => {
         data.push({ deathAge: age, filingAgeMonths });
       }
       const results = createCalculationResults(data);
-      const range = calculateXAxisRange(results, earliestFilingAge);
+      const range = calculateXAxisRange(results);
 
       // Last death age with min filing (62) is 79
       // First death age with max filing (70) is 80

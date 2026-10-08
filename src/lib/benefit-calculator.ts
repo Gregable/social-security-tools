@@ -478,96 +478,111 @@ export function filedBeforeDeath(
 }
 
 /**
- * Determines the survivor benefit for a recipient.
- * @param survivor The surviving recipient.
+ * A survivor benefit before the survivor's own age reduction.
+ *
+ * `base` is the amount the age reduction applies to (SSA's "original
+ * benefit"): the deceased's PIA, or their benefit including delayed
+ * retirement credits when they earned any.
+ *
+ * `limit` is the widow(er)'s limit, often called RIB-LIM, or null when it
+ * does not apply. It applies when the deceased took a reduced retirement
+ * benefit, and caps the survivor benefit *after* the age reduction at the
+ * larger of that reduced benefit and 82.5% of the deceased's PIA (Act
+ * 202(e)(2)(D); POMS RS 00615.320). Reducing the capped amount for age
+ * instead would understate any survivor benefit claimed before survivor full
+ * retirement age.
+ */
+export interface SurvivorBenefitBasis {
+  readonly base: Money;
+  readonly limit: Money | null;
+}
+
+/**
+ * Determines the survivor benefit basis from the deceased's record.
+ *
  * @param deceased The deceased recipient.
  * @param deceasedFilingDate The date the deceased recipient filed for
  * benefits. If the deceased recipient did not file for benefits, use the
  * date of death or any date later.
  * @param deceasedDeathDate The date of death of the deceased recipient.
- * @param survivorFilingDate The date the survivor recipient filed for
- * survivor benefits.
  */
-
-export function survivorBenefit(
-  survivor: Recipient,
+export function survivorBenefitBasis(
   deceased: Recipient,
   deceasedFilingDate: MonthDate,
-  deceasedDeathDate: MonthDate,
-  survivorFilingDate: MonthDate
-): Money {
-  // First calculate the base survivor benefit. There are two situations based
-  // on if the deceased recipient filed for benefits before death or not.
-  let baseSurvivorBenefit: Money;
+  deceasedDeathDate: MonthDate
+): SurvivorBenefitBasis {
+  const pia = deceased.pia().primaryInsuranceAmount();
 
-  if (survivorFilingDate.lessThanOrEqual(deceasedDeathDate)) {
-    throw new Error(
-      `Cannot file for survivor benefits before spouse died: ${survivorFilingDate.toString()} <= ${deceasedDeathDate.toString()}`
-    );
-  }
-
-  // The base amount is read at a date late enough that every delayed credit
-  // has taken effect. A year after filing always qualifies (delayed credits
-  // land the January after filing at the latest). A fixed age-71 date does
-  // not: someone who files past 71 would be read *before* they filed, and
-  // benefitOnDate returns $0 for a date before filing.
+  // The deceased's benefit is read at a date late enough that every delayed
+  // credit has taken effect. A year after filing always qualifies (delayed
+  // credits land the January after filing at the latest). A fixed age-71 date
+  // does not: someone who files past 71 would be read *before* they filed,
+  // and benefitOnDate returns $0 for a date before filing.
   const afterAllCredits = (filingDate: MonthDate): MonthDate =>
     filingDate.addDuration(MonthDuration.OneYear());
 
   if (!filedBeforeDeath(deceasedFilingDate, deceasedDeathDate)) {
-    // If the deceased recipient did not file for benefits before death:
+    // Died before filing, and before full retirement age: 100% of the PIA.
     if (deceasedDeathDate.lessThan(deceased.normalRetirementDate())) {
-      // If the deceased died before Normal Retirement Age, the survivor
-      // benefit is based on the deceased recipient's PIA.
-      baseSurvivorBenefit = deceased.pia().primaryInsuranceAmount();
-    } else {
-      // If the deceased died after Normal Retirement Age, the survivor
-      // benefit is based on the deceased recipient's benefit as though they
-      // filed for benefits on the date of death. Delayed retirement credits
-      // stop accruing at age 70, so cap the effective filing date there.
-      const age70Date = deceased.birthdate.dateAtSsaAge(
-        MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-      );
-      const effectiveFilingDate = MonthDate.min(deceasedDeathDate, age70Date);
-      baseSurvivorBenefit = benefitOnDate(
+      return { base: pia, limit: null };
+    }
+    // Died before filing but after full retirement age: their benefit as
+    // though they had filed in the month of death, which credits every
+    // month up to but not including it (20 CFR 404.313(e)(1)). Delayed
+    // credits stop accruing at age 70, so cap the effective filing date
+    // there.
+    const age70Date = deceased.birthdate.dateAtSsaAge(
+      MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
+    );
+    const effectiveFilingDate = MonthDate.min(deceasedDeathDate, age70Date);
+    return {
+      base: benefitOnDate(
         deceased,
         effectiveFilingDate,
         afterAllCredits(effectiveFilingDate)
-      );
-    }
-  } else {
-    // If the deceased recipient filed for benefits before death, then the base
-    // survivor benefit is the greater of the deceased recipient's benefit at
-    // the time of death or 82.5% of the deceased recipient's PIA.
-    baseSurvivorBenefit = Money.max(
-      deceased.pia().primaryInsuranceAmount().times(0.825),
-      benefitOnDate(
-        deceased,
-        deceasedFilingDate,
-        afterAllCredits(deceasedFilingDate)
-      )
-    );
-    baseSurvivorBenefit = Money.fromCents(
-      Math.floor(baseSurvivorBenefit.cents())
-    );
+      ),
+      limit: null,
+    };
   }
 
-  // Next, calculate the survivor benefit for the recipient based on the
-  // survivor's age. If the survivor is at or above Full Retirement Age,
-  // the survivor benefit is the base survivor benefit. If the survivor is
-  // below Full Retirement Age, the survivor benefit is reduced based on the
-  // survivor's age, adjusted proportionally between 71.5% and 100% of the
-  // base amount based on the survivor's age between 60 and Full Retirement
-  // Age.
+  const ownBenefit = benefitOnDate(
+    deceased,
+    deceasedFilingDate,
+    afterAllCredits(deceasedFilingDate)
+  );
+  // Filed at or after full retirement age: the benefit they received,
+  // including any delayed retirement credits.
+  if (!deceasedFilingDate.lessThan(deceased.normalRetirementDate())) {
+    return { base: ownBenefit, limit: null };
+  }
+  // Filed early: the age reduction starts from 100% of the PIA, and the
+  // widow(er)'s limit caps the result.
+  return { base: pia, limit: Money.max(pia.times(0.825), ownBenefit) };
+}
+
+/**
+ * Applies the survivor's age reduction to a survivor benefit basis, then the
+ * widow(er)'s limit.
+ *
+ * At or past survivor full retirement age there is no reduction. Before it,
+ * the base is reduced linearly from 100% at survivor full retirement age to
+ * 71.5% at 60. Survivor full retirement age has its own table, so it can
+ * differ from the survivor's own retirement full retirement age.
+ *
+ * @param survivor The surviving recipient.
+ * @param basis The basis from `survivorBenefitBasis` (or, for a deceased
+ * who received disability benefits, 100% of their PIA with no limit).
+ * @param survivorFilingDate The month survivor benefits start.
+ */
+export function reducedSurvivorBenefit(
+  survivor: Recipient,
+  basis: SurvivorBenefitBasis,
+  survivorFilingDate: MonthDate
+): Money {
   const survivorAgeAtFiling =
     survivor.birthdate.ageAtSsaDate(survivorFilingDate);
-  if (
-    survivorAgeAtFiling.greaterThanOrEqual(
-      survivor.survivorNormalRetirementAge()
-    )
-  ) {
-    return baseSurvivorBenefit.floorToDollar();
-  } else {
+  let reduced = basis.base;
+  if (survivorAgeAtFiling.lessThan(survivor.survivorNormalRetirementAge())) {
     const monthsBetween60AndNRA = survivor
       .survivorNormalRetirementAge()
       .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
@@ -580,10 +595,44 @@ export function survivorBenefit(
       0,
       monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
     );
-    const result = baseSurvivorBenefit.times(
+    reduced = basis.base.times(
       MIN_SURVIVOR_BENEFIT_RATIO +
         (1 - MIN_SURVIVOR_BENEFIT_RATIO) * reductionRatio
     );
-    return result.floorToDollar();
   }
+  const limited =
+    basis.limit !== null && reduced.greaterThan(basis.limit)
+      ? basis.limit
+      : reduced;
+  return limited.floorToDollar();
+}
+
+/**
+ * Determines the survivor benefit for a recipient.
+ * @param survivor The surviving recipient.
+ * @param deceased The deceased recipient.
+ * @param deceasedFilingDate The date the deceased recipient filed for
+ * benefits. If the deceased recipient did not file for benefits, use the
+ * date of death or any date later.
+ * @param deceasedDeathDate The date of death of the deceased recipient.
+ * @param survivorFilingDate The date the survivor recipient filed for
+ * survivor benefits.
+ */
+export function survivorBenefit(
+  survivor: Recipient,
+  deceased: Recipient,
+  deceasedFilingDate: MonthDate,
+  deceasedDeathDate: MonthDate,
+  survivorFilingDate: MonthDate
+): Money {
+  if (survivorFilingDate.lessThanOrEqual(deceasedDeathDate)) {
+    throw new Error(
+      `Cannot file for survivor benefits before spouse died: ${survivorFilingDate.toString()} <= ${deceasedDeathDate.toString()}`
+    );
+  }
+  return reducedSurvivorBenefit(
+    survivor,
+    survivorBenefitBasis(deceased, deceasedFilingDate, deceasedDeathDate),
+    survivorFilingDate
+  );
 }

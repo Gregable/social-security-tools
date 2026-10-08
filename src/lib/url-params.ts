@@ -305,6 +305,39 @@ export class UrlParams {
     return UrlParams.parseMonthOrNull(this.params.get('filed2'));
   }
 
+  /**
+   * Month spouse (person 2) died, or null. Its presence is what puts the
+   * strategy page in widowed mode. Example: #died2=2024-03
+   */
+  getSpouseDeathMonth(): MonthDate | null {
+    return UrlParams.parseMonthOrNull(this.params.get('died2'));
+  }
+
+  /**
+   * Whether the link names a death month for spouse (person 2) at all, even
+   * one that does not parse. Such a link is still a widowed link: reading it
+   * as a couple would plan around the late spouse as if they were alive.
+   */
+  hasSpouseDeathMonth(): boolean {
+    return this.params.has('died2');
+  }
+
+  /**
+   * Whether the late spouse (person 2) was receiving disability benefits.
+   * Only the exact value `1` counts. Example: #disabled2=1
+   */
+  getSpouseDisabled(): boolean {
+    return this.params.get('disabled2') === '1';
+  }
+
+  /**
+   * Month recipient (person 1) started survivor benefits, or null. Widowed
+   * mode only. Example: #survfiled1=2025-01
+   */
+  getRecipientSurvivorFiledMonth(): MonthDate | null {
+    return UrlParams.parseMonthOrNull(this.params.get('survfiled1'));
+  }
+
   private static parseGender(value: string | null): Gender {
     if (value === 'male' || value === 'female' || value === 'blended') {
       return value;
@@ -327,33 +360,48 @@ export function formatFiledMonth(date: MonthDate): string {
 }
 
 export interface StrategyHashParams {
+  /** True when only person 1's record is involved (single mode). */
   isSingle: boolean;
   pia1: number;
   dob1: string;
   name1?: string;
   gender1?: Gender;
   filed1?: MonthDate | null;
+  /** Widowed mode: the month person 1 started survivor benefits. */
+  survivorFiled1?: MonthDate | null;
   pia2?: number;
   dob2?: string;
   name2?: string;
   gender2?: Gender;
   filed2?: MonthDate | null;
+  /** Widowed mode: person 2 was receiving disability benefits. */
+  disabled2?: boolean;
+  /**
+   * The month person 2 died. Setting it makes this a widowed-mode link, the
+   * only mode that writes `survivorFiled1` and `disabled2`.
+   */
+  died2?: MonthDate | null;
 }
 
 // Omits gender params when blended (the default) to keep URLs short. Filed
-// months are couple-only: single mode never offers the input.
+// months need a second person: single mode never offers the input.
 export function buildStrategyHash(p: StrategyHashParams): string {
   const parts: string[] = [`pia1=${Math.round(p.pia1)}`, `dob1=${p.dob1}`];
   if (p.name1) parts.push(`name1=${encodeURIComponent(p.name1)}`);
   if (p.gender1 && p.gender1 !== 'blended') parts.push(`gender1=${p.gender1}`);
 
   if (!p.isSingle && p.pia2 !== undefined && p.dob2) {
+    const widowed = Boolean(p.died2);
     if (p.filed1) parts.push(`filed1=${formatFiledMonth(p.filed1)}`);
+    if (widowed && p.survivorFiled1)
+      parts.push(`survfiled1=${formatFiledMonth(p.survivorFiled1)}`);
     parts.push(`pia2=${Math.round(p.pia2)}`, `dob2=${p.dob2}`);
     if (p.name2) parts.push(`name2=${encodeURIComponent(p.name2)}`);
     if (p.gender2 && p.gender2 !== 'blended')
       parts.push(`gender2=${p.gender2}`);
     if (p.filed2) parts.push(`filed2=${formatFiledMonth(p.filed2)}`);
+    if (widowed && p.disabled2) parts.push('disabled2=1');
+    if (p.died2) parts.push(`died2=${formatFiledMonth(p.died2)}`);
   }
 
   return `#${parts.join('&')}`;

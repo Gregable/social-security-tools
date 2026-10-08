@@ -34,13 +34,15 @@ function age(years: number, months: number): MonthDuration {
 }
 
 /**
- * Computes the base survivor benefit by hand, matching the logic in
- * survivorBenefit for the RIB-LIM case (deceased filed before death).
+ * Computes the widow(er)'s limit (RIB-LIM) by hand, for a deceased who filed
+ * before full retirement age.
  *
- * base = max(floor(PIA * 0.825), benefitOnDate(deceased, filingDate, age71date))
- * The result is then floored to cents via Math.floor on the max.
+ * limit = max(round(PIA * 0.825), benefitOnDate(deceased, filingDate, age71date))
+ *
+ * The limit caps the survivor benefit *after* the survivor's age reduction,
+ * which applies to 100% of the PIA (see survivor-rib-lim.test.ts).
  */
-function handRibLimBase(deceased: Recipient, filingDate: MonthDate): number {
+function handRibLim(deceased: Recipient, filingDate: MonthDate): number {
   const piaCents = deceased.pia().primaryInsuranceAmount().cents();
   // 82.5% of PIA: Money.from(pia).times(0.825) = Math.round(piaCents * 0.825)
   const ribLimCents = Math.round(piaCents * 0.825);
@@ -49,8 +51,12 @@ function handRibLimBase(deceased: Recipient, filingDate: MonthDate): number {
   const actualBenefit = benefitOnDate(deceased, filingDate, age71date);
   const actualCents = actualBenefit.cents();
 
-  // Money.max picks the larger, then floor the result to cents
-  return Math.floor(Math.max(ribLimCents, actualCents));
+  return Math.max(ribLimCents, actualCents);
+}
+
+/** Floors cents to whole dollars, as the benefit functions do last. */
+function floorToDollarCents(cents: number): number {
+  return Math.floor(cents / 100) * 100;
 }
 
 /**
@@ -905,13 +911,16 @@ describe('Survivor benefit with non-round PIAs', () => {
     // Actual at 64: multiplier = -(36*5/900) = -0.2
     //   round(98700 * 0.8) = round(78960) = 78960
     //   floor(78960/100)*100 = 78900
-    // max(81428, 78900) = 81428
-    // floor(81428) = 81428
-    const baseCents = handRibLimBase(deceased, filingDate);
+    // limit = max(81428, 78900) = 81428
+    const limitCents = handRibLim(deceased, filingDate);
 
-    // Survivor at 62y0m = 744 months
-    const expected = handSurvivorReduction(baseCents, 744, SURVIVOR_NRA_MONTHS);
-    expect(result.value()).toBe(expected / 100);
+    // Survivor at 62y0m = 744 months. The age reduction applies to the full
+    // PIA: 98700 * 223/280 = 78607.5, under the limit, so $786.
+    const reducedCents = handSurvivorReduction(98700, 744, SURVIVOR_NRA_MONTHS);
+    expect(result.value()).toBe(
+      Math.min(reducedCents, floorToDollarCents(limitCents)) / 100
+    );
+    expect(result.value()).toBe(786);
   });
 });
 
@@ -943,15 +952,24 @@ describe('Combined scenarios', () => {
     // multiplier = -(0.2 + 0.05) = -0.25
     // round(200000 * 0.75) = 150000, floor = 150000
     // 82.5%: round(200000 * 0.825) = 165000
-    // max(165000, 150000) = 165000, floor = 165000
-    const baseCents = handRibLimBase(deceased, filingDate);
-    expect(baseCents).toBe(165000);
+    // limit = max(165000, 150000) = 165000
+    const limitCents = handRibLim(deceased, filingDate);
+    expect(limitCents).toBe(165000);
 
     // Survivor at 61y0m = 732 months
     // ratio = 12/84 = 1/7
     // factor = 0.715 + 0.285/7 = 0.715 + 0.04071... = 0.75571...
-    const expected = handSurvivorReduction(baseCents, 732, SURVIVOR_NRA_MONTHS);
-    expect(result.value()).toBe(expected / 100);
+    // The reduction applies to the full PIA: 200000 * 0.75571 = 151143,
+    // under the limit, so $1,511.
+    const reducedCents = handSurvivorReduction(
+      200000,
+      732,
+      SURVIVOR_NRA_MONTHS
+    );
+    expect(result.value()).toBe(
+      Math.min(reducedCents, floorToDollarCents(limitCents)) / 100
+    );
+    expect(result.value()).toBe(1511);
   });
 
   it('deceased died at NRA exactly (never filed), survivor at 60y1m', () => {
@@ -1006,13 +1024,14 @@ describe('Combined scenarios', () => {
       survivorFilingDate
     );
 
-    // Deceased filed at 68: actual = benefitOnDate(deceased, 68y0m, age71)
+    // Deceased filed at 68, after full retirement age, so no limit applies:
+    // the base is their benefit with delayed credits.
+    // actual = benefitOnDate(deceased, 68y0m, age71)
     // filingDate.year() < age71date.year() so returns benefitAtAge(68y0m)
     // multiplier = (0.08/12)*12 = 0.08
     // round(150000 * 1.08) = 162000, floor = 162000
-    // 82.5%: round(150000 * 0.825) = 123750
-    // max(162000, 123750) = 162000, floor = 162000
-    const baseCents = handRibLimBase(deceased, filingDate);
+    const baseCents = benefitAtAge(deceased, age(68, 0)).cents();
+    expect(baseCents).toBe(162000);
 
     // Survivor at 64y2m = 770 months
     const expected = handSurvivorReduction(baseCents, 770, SURVIVOR_NRA_MONTHS);

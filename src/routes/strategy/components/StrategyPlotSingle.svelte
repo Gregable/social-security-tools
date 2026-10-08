@@ -8,7 +8,18 @@
     NEVER_FILES_LABEL,
     type StrategyResult,
   } from "$lib/strategy/ui";
+  import {
+    deathAgeAxisRange,
+    type PlotSeries,
+  } from "$lib/strategy/ui/plot-range";
   import { onMount } from "svelte";
+
+  /** The single mode line: the optimal filing age. */
+  const OWN_FILING_SERIES: PlotSeries = {
+    label: "Optimal filing",
+    color: "#005ea5",
+    filingAgeOf: (result) => result.filingAge1,
+  };
 
   /** The recipient for whom the strategy is calculated. */
   export let recipient: Recipient;
@@ -24,10 +35,19 @@
   export let onselectpoint:
     | ((detail: { rowIndex: number }) => void)
     | undefined = undefined;
+  /**
+   * The lines to draw. Single mode draws one, the optimal filing age;
+   * widowed mode draws one per benefit and gets a legend.
+   */
+  export let series: readonly PlotSeries[] = [OWN_FILING_SERIES];
+  /** The youngest filing age the y-axis must show, in months. */
+  export let minFilingAgeMonths: number = 62 * 12;
+  /** Widowed mode: explain the two lines rather than the one. */
+  export let widowed: boolean = false;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D | null = null;
-  let hoveredPoint: any = null;
+  let hoveredIndex: number | null = null;
   let selectedRowIndex: number | null = null;
 
   // Sync local crosshair selection with parent selection so external
@@ -45,8 +65,8 @@
   const width = 800;
   const height = 400;
   const padding = { top: 20, right: 60, bottom: 50, left: 100 };
-  // Y-axis display range with padding above and below
-  const minFilingAge = 61 * 12 + 11; // 61 years 11 months
+  // Y-axis display range, with a month of padding below and above.
+  $: minFilingAge = minFilingAgeMonths - 1;
   const maxFilingAge = 70 * 12 + 1; // 70 years 1 month
 
   // Reactive Data
@@ -56,70 +76,35 @@
   const xAxisPadding = 5;
 
   /**
-   * The data points to plot. Each point represents a death age bucket and the
-   * corresponding optimal filing age.
+   * One row per death age bucket. No filtering on filing age here: this
+   * used to drop any point below the earliest filing age, which silently
+   * swallowed the optimizer's "file at age 0" sentinel and left the chart
+   * blank with no error. Buckets now start at the first death age that
+   * admits a filing, and the optimizer throws rather than inventing an
+   * answer, so any row reaching here is real.
    */
-  $: strategyPoints = Array.from({ length: calculationResults.rows() })
-    .map((_, i) => {
-      const result = calculationResults.get(i, 0);
-      if (!result) return null;
-      // No filtering on filing age here. This used to drop any point below
-      // the earliest filing age, which silently swallowed the optimizer's
-      // "file at age 0" sentinel and left the chart blank with no error.
-      // Buckets now start at the first death age that admits a filing, and
-      // the optimizer throws rather than inventing an answer, so any point
-      // reaching here is real.
-      return {
-        deathAge: result.bucket1.startAge,
-        filingAgeMonths: result.filingAge1.asMonths(),
-        result,
-      };
-    })
-    .filter((d): d is NonNullable<typeof d> => d !== null);
+  $: rows = Array.from({ length: calculationResults.rows() })
+    .map((_, i) => calculationResults.get(i, 0))
+    .filter((result): result is StrategyResult => result !== undefined)
+    .map((result) => ({ deathAge: result.bucket1.startAge, result }));
 
-  // Compute x-axis range based on where filing age varies
-  $: xAxisRange = (() => {
-    const bucketMin = rowBuckets[0].startAge;
-    const bucketMax = rowBuckets[rowBuckets.length - 1].startAge;
+  /** Per series, the filing age in months at each row, or null for a gap. */
+  $: seriesPoints = series.map((s) =>
+    rows.map(({ deathAge, result }) => ({
+      deathAge,
+      filingAgeMonths: s.filingAgeOf(result)?.asMonths() ?? null,
+    }))
+  );
 
-    if (strategyPoints.length === 0) {
-      return { min: bucketMin, max: bucketMax };
-    }
-
-    // Find the minimum and maximum filing ages in the data
-    const filingAges = strategyPoints.map((p) => p.filingAgeMonths);
-    const minFiling = Math.min(...filingAges);
-    const maxFiling = Math.max(...filingAges);
-
-    // If filing age is constant (flat line), show full range
-    if (minFiling === maxFiling) {
-      return { min: bucketMin, max: bucketMax };
-    }
-
-    // Find the last death age where filing age is at minimum
-    // (filing age typically stays at minimum for early death ages, then increases)
-    let minFilingDeathAge = strategyPoints[0].deathAge;
-    for (const p of strategyPoints) {
-      if (p.filingAgeMonths === minFiling) {
-        minFilingDeathAge = p.deathAge;
-      }
-    }
-
-    // Find the first death age where filing age reaches maximum
-    let maxFilingDeathAge = strategyPoints[strategyPoints.length - 1].deathAge;
-    for (const p of strategyPoints) {
-      if (p.filingAgeMonths === maxFiling) {
-        maxFilingDeathAge = p.deathAge;
-        break;
-      }
-    }
-
-    // Add padding and clamp to valid bucket range
-    return {
-      min: Math.max(bucketMin, minFilingDeathAge - xAxisPadding),
-      max: Math.min(bucketMax, maxFilingDeathAge + xAxisPadding),
-    };
-  })();
+  $: xAxisRange =
+    rowBuckets.length === 0
+      ? { min: 62, max: 100 }
+      : deathAgeAxisRange(
+          seriesPoints,
+          rowBuckets[0].startAge,
+          rowBuckets[rowBuckets.length - 1].startAge,
+          xAxisPadding
+        );
 
   $: minDeathAge = xAxisRange.min;
   $: maxDeathAge = xAxisRange.max;
@@ -128,7 +113,7 @@
     if (deathProbDistribution.length === 0) return [];
 
     const currentAge = deathProbDistribution[0].age;
-    const startAge = Math.max(currentAge, 62);
+    const startAge = Math.max(currentAge, Math.floor(minFilingAgeMonths / 12));
 
     // Filter to relevant ages
     const relevantDist = deathProbDistribution.filter((d) => d.age >= startAge);
@@ -205,25 +190,47 @@
   }
 
   /**
-   * Axis label for a point's filing age. A filing month in or after the
+   * Axis label for a filing age at one row. A filing month in or after the
    * death month is the "never files" strategy, not a filing month.
    */
-  function formatFiling(point: {
-    filingAgeMonths: number;
-    result: StrategyResult;
-  }): string {
+  function formatFiling(filingAgeMonths: number, result: StrategyResult): string {
     const filingDate = recipient.birthdate.dateAtSsaAge(
-      new MonthDuration(point.filingAgeMonths)
+      new MonthDuration(filingAgeMonths)
     );
     const deathDate = recipient.birthdate.dateAtLayAge(
-      point.result.bucket1.expectedAge
+      result.bucket1.expectedAge
     );
     if (!filedBeforeDeath(filingDate, deathDate)) {
       return NEVER_FILES_LABEL;
     }
     return displayAsAges
-      ? formatAge(point.filingAgeMonths)
-      : formatDate(point.filingAgeMonths);
+      ? formatAge(filingAgeMonths)
+      : formatDate(filingAgeMonths);
+  }
+
+  /** The cumulative death probability at a death age, interpolated. */
+  function cumulativeProbabilityAt(deathAge: number): number | null {
+    const p1 = mortalityPoints.find((d) => d.age === Math.floor(deathAge));
+    const p2 = mortalityPoints.find((d) => d.age === Math.ceil(deathAge));
+    if (p1 && p2) {
+      if (p1.age === p2.age) return p1.cumulativeProb;
+      const ratio = (deathAge - p1.age) / (p2.age - p1.age);
+      return p1.cumulativeProb + ratio * (p2.cumulativeProb - p1.cumulativeProb);
+    }
+    if (p1) return p1.cumulativeProb;
+    if (p2) return p2.cumulativeProb;
+    return null;
+  }
+
+  /** The y positions of every series with a point at `index`. */
+  function pointsAt(index: number): { y: number; color: string; filingAgeMonths: number }[] {
+    const out: { y: number; color: string; filingAgeMonths: number }[] = [];
+    seriesPoints.forEach((points, s) => {
+      const filingAgeMonths = points[index]?.filingAgeMonths;
+      if (filingAgeMonths === null || filingAgeMonths === undefined) return;
+      out.push({ y: yScale(filingAgeMonths), color: series[s].color, filingAgeMonths });
+    });
+    return out;
   }
 
   // Draw Loop
@@ -244,7 +251,7 @@
     ctx.textBaseline = "middle";
 
     // Y Axis Ticks
-    const yTicks = [62, 63, 64, 65, 66, 67, 68, 69, 70]
+    const yTicks = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70]
       .map((y) => y * 12)
       .filter((m) => m >= minFilingAge);
     ctx.strokeStyle = "#e0e0e0";
@@ -306,7 +313,11 @@
     ctx.save();
     ctx.translate(15, height / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText(`Optimal Filing ${displayAsAges ? "Age" : "Date"}`, 0, 0);
+    ctx.fillText(
+      `${widowed ? "Start" : "Optimal Filing"} ${displayAsAges ? "Age" : "Date"}`,
+      0,
+      0
+    );
     ctx.restore();
 
     // Right Y Axis (Cumulative Probability)
@@ -372,55 +383,41 @@
       ctx.stroke();
     }
 
-    if (strategyPoints.length > 0) {
-      ctx.strokeStyle = "#005ea5";
+    // One line per series, broken wherever the series has no point.
+    seriesPoints.forEach((points, s) => {
+      ctx.strokeStyle = series[s].color;
       ctx.lineWidth = 3;
       ctx.setLineDash([]);
       ctx.beginPath();
-      strategyPoints.forEach((d, i) => {
-        const x = xScale(d.deathAge);
-        const y = yScale(d.filingAgeMonths);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
+      let penDown = false;
+      for (const p of points) {
+        if (p.filingAgeMonths === null) {
+          penDown = false;
+          continue;
+        }
+        const x = xScale(p.deathAge);
+        const y = yScale(p.filingAgeMonths);
+        if (penDown) ctx.lineTo(x, y);
+        else ctx.moveTo(x, y);
+        penDown = true;
+      }
       ctx.stroke();
-
-    }
+    });
     ctx.restore();
 
     // Draw selected point (if any) with distinct "pinned" styling
-    if (selectedRowIndex !== null && strategyPoints[selectedRowIndex]) {
-      const selectedPoint = strategyPoints[selectedRowIndex];
-      const sx = xScale(selectedPoint.deathAge);
-      const sy = yScale(selectedPoint.filingAgeMonths);
+    const selectedRow =
+      selectedRowIndex !== null ? rows[selectedRowIndex] : undefined;
+    if (selectedRowIndex !== null && selectedRow) {
+      const sx = xScale(selectedRow.deathAge);
+      const marks = pointsAt(selectedRowIndex);
+      const selectedProb = cumulativeProbabilityAt(selectedRow.deathAge);
 
-      // Interpolate cumulative probability for selected point
-      let selectedProb: number | null = null;
-      const floorAge = Math.floor(selectedPoint.deathAge);
-      const ceilAge = Math.ceil(selectedPoint.deathAge);
-
-      const p1 = mortalityPoints.find((d) => d.age === floorAge);
-      const p2 = mortalityPoints.find((d) => d.age === ceilAge);
-
-      if (p1 && p2) {
-        if (p1.age === p2.age) {
-          selectedProb = p1.cumulativeProb;
-        } else {
-          const ratio = (selectedPoint.deathAge - p1.age) / (p2.age - p1.age);
-          selectedProb =
-            p1.cumulativeProb + ratio * (p2.cumulativeProb - p1.cumulativeProb);
-        }
-      } else if (p1) {
-        selectedProb = p1.cumulativeProb;
-      } else if (p2) {
-        selectedProb = p2.cumulativeProb;
-      }
-
-      let topY = sy;
+      let topY = marks.length > 0 ? Math.min(...marks.map((m) => m.y)) : height - padding.bottom;
       let probY = 0;
       if (selectedProb !== null) {
         probY = yScaleRight(selectedProb);
-        topY = Math.min(sy, probY);
+        topY = Math.min(topY, probY);
       }
 
       // Draw persistent crosshairs for selected point
@@ -434,14 +431,16 @@
       ctx.lineTo(sx, height - padding.bottom);
       ctx.stroke();
 
-      // Horizontal line for filing age (left axis to point)
-      ctx.beginPath();
-      ctx.moveTo(padding.left, sy);
-      ctx.lineTo(sx, sy);
-      ctx.stroke();
+      // Horizontal line for each filing age (left axis to point)
+      for (const mark of marks) {
+        ctx.beginPath();
+        ctx.moveTo(padding.left, mark.y);
+        ctx.lineTo(sx, mark.y);
+        ctx.stroke();
+      }
 
       // Horizontal line for cumulative probability (point to right axis)
-      if (selectedProb !== null && selectedPoint.deathAge <= 100) {
+      if (selectedProb !== null && selectedRow.deathAge <= 100) {
         ctx.beginPath();
         ctx.moveTo(sx, probY);
         ctx.lineTo(width - padding.right, probY);
@@ -463,53 +462,35 @@
         ctx.fill();
       }
 
-      // Draw selected point circle with golden glow
-      ctx.fillStyle = "#fff8dc";
-      ctx.strokeStyle = "#d4a000";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(sx, sy, 8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      // Draw selected point circles with golden glow
+      for (const mark of marks) {
+        ctx.fillStyle = "#fff8dc";
+        ctx.strokeStyle = "#d4a000";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(sx, mark.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
 
-      // Inner circle
-      ctx.fillStyle = "#005ea5";
-      ctx.beginPath();
-      ctx.arc(sx, sy, 4, 0, Math.PI * 2);
-      ctx.fill();
+        // Inner circle
+        ctx.fillStyle = mark.color;
+        ctx.beginPath();
+        ctx.arc(sx, mark.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
-    if (hoveredPoint) {
-      const x = xScale(hoveredPoint.deathAge);
-      const y = yScale(hoveredPoint.filingAgeMonths);
+    const hoveredRow = hoveredIndex !== null ? rows[hoveredIndex] : undefined;
+    if (hoveredIndex !== null && hoveredRow) {
+      const x = xScale(hoveredRow.deathAge);
+      const marks = pointsAt(hoveredIndex);
+      const interpolatedProb = cumulativeProbabilityAt(hoveredRow.deathAge);
 
-      // Interpolate cumulative probability
-      let interpolatedProb: number | null = null;
-      const floorAge = Math.floor(hoveredPoint.deathAge);
-      const ceilAge = Math.ceil(hoveredPoint.deathAge);
-
-      const p1 = mortalityPoints.find((d) => d.age === floorAge);
-      const p2 = mortalityPoints.find((d) => d.age === ceilAge);
-
-      if (p1 && p2) {
-        if (p1.age === p2.age) {
-          interpolatedProb = p1.cumulativeProb;
-        } else {
-          const ratio = (hoveredPoint.deathAge - p1.age) / (p2.age - p1.age);
-          interpolatedProb =
-            p1.cumulativeProb + ratio * (p2.cumulativeProb - p1.cumulativeProb);
-        }
-      } else if (p1) {
-        interpolatedProb = p1.cumulativeProb;
-      } else if (p2) {
-        interpolatedProb = p2.cumulativeProb;
-      }
-
-      let topY = y;
+      let topY = marks.length > 0 ? Math.min(...marks.map((m) => m.y)) : height - padding.bottom;
       let probY = 0;
       if (interpolatedProb !== null) {
         probY = yScaleRight(interpolatedProb);
-        topY = Math.min(y, probY);
+        topY = Math.min(topY, probY);
       }
 
       ctx.strokeStyle = "#333";
@@ -522,20 +503,24 @@
       ctx.lineTo(x, height - padding.bottom);
       ctx.stroke();
 
-      // Horizontal line for filing age
-      ctx.beginPath();
-      ctx.moveTo(padding.left, y);
-      ctx.lineTo(x, y);
-      ctx.stroke();
+      // Horizontal line for each filing age
+      for (const mark of marks) {
+        ctx.beginPath();
+        ctx.moveTo(padding.left, mark.y);
+        ctx.lineTo(x, mark.y);
+        ctx.stroke();
+      }
 
-      ctx.fillStyle = "white";
-      ctx.strokeStyle = "#005ea5";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([]);
-      ctx.beginPath();
-      ctx.arc(x, y, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      for (const mark of marks) {
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = mark.color;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(x, mark.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
 
       ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
       ctx.fillRect(x - 25, height - padding.bottom + 10, 50, 20);
@@ -545,28 +530,34 @@
       ctx.textAlign = "center";
 
       // Format death age for display (e.g. 85y5m)
-      const years = Math.floor(hoveredPoint.deathAge);
-      const months = Math.round((hoveredPoint.deathAge - years) * 12);
+      const years = Math.floor(hoveredRow.deathAge);
+      const months = Math.round((hoveredRow.deathAge - years) * 12);
       const label = months === 0 ? `${years}` : `${years}y${months}m`;
 
       ctx.fillText(label, x, height - padding.bottom + 20);
 
-      // Y Axis Label Highlight
-      const yLabel = formatFiling(hoveredPoint);
-
+      // Y Axis Label Highlight, one per line
       ctx.textAlign = "right";
-      const textWidth = ctx.measureText(yLabel).width;
+      for (const mark of marks) {
+        const yLabel = formatFiling(mark.filingAgeMonths, hoveredRow.result);
+        const textWidth = ctx.measureText(yLabel).width;
 
-      // Background
-      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-      ctx.fillRect(padding.left - textWidth - 15, y - 10, textWidth + 10, 20);
+        // Background
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.fillRect(
+          padding.left - textWidth - 15,
+          mark.y - 10,
+          textWidth + 10,
+          20
+        );
 
-      // Text
-      ctx.fillStyle = "#000";
-      ctx.fillText(yLabel, padding.left - 10, y);
+        // Text; the colored marker on the line carries which one it is.
+        ctx.fillStyle = "#000";
+        ctx.fillText(yLabel, padding.left - 10, mark.y);
+      }
 
       // Cumulative Probability Crosshair
-      if (interpolatedProb !== null && hoveredPoint.deathAge <= 100) {
+      if (interpolatedProb !== null && hoveredRow.deathAge <= 100) {
         ctx.strokeStyle = "#333";
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
@@ -606,55 +597,47 @@
 
   $: {
     if (
-      strategyPoints &&
+      seriesPoints &&
       mortalityPoints &&
       displayAsAges !== undefined &&
+      minFilingAge !== undefined &&
       ctx
     ) {
       draw();
     }
   }
 
-  function handleMouseMove(e: MouseEvent) {
+  /** The row whose death age is closest to the pointer. */
+  function closestRowIndex(e: MouseEvent): number | null {
+    if (rows.length === 0) return null;
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) * (width / rect.width);
     const age = invertXScale(x);
+    let closestIndex = 0;
+    let closestDist = Infinity;
+    rows.forEach((row, i) => {
+      const dist = Math.abs(row.deathAge - age);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestIndex = i;
+      }
+    });
+    return closestIndex;
+  }
 
-    if (strategyPoints.length > 0) {
-      const closest = strategyPoints.reduce((prev, curr) => {
-        return Math.abs(curr.deathAge - age) < Math.abs(prev.deathAge - age)
-          ? curr
-          : prev;
-      });
-      hoveredPoint = closest;
-    } else {
-      hoveredPoint = null;
-    }
+  function handleMouseMove(e: MouseEvent) {
+    hoveredIndex = closestRowIndex(e);
     requestAnimationFrame(draw);
   }
 
   function handleMouseLeave() {
-    hoveredPoint = null;
+    hoveredIndex = null;
     requestAnimationFrame(draw);
   }
 
   function handleClick(e: MouseEvent) {
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (width / rect.width);
-    const age = invertXScale(x);
-
-    if (strategyPoints.length > 0) {
-      // Find closest point
-      let closestIndex = 0;
-      let closestDist = Infinity;
-      strategyPoints.forEach((p, i) => {
-        const dist = Math.abs(p.deathAge - age);
-        if (dist < closestDist) {
-          closestDist = dist;
-          closestIndex = i;
-        }
-      });
-
+    const closestIndex = closestRowIndex(e);
+    if (closestIndex !== null) {
       // Toggle selection: if clicking on already selected, deselect
       if (selectedRowIndex === closestIndex) {
         selectedRowIndex = null;
@@ -677,31 +660,57 @@
   <header class="section-header">
     <p class="section-kicker">How death age shapes the strategy</p>
   </header>
-  <p class="lede">
-    Every death age has its own optimal filing. The
-    <strong>Recommended Filing</strong> above picks a single strategy that
-    works well across all of them; below, see what would be optimal at each
-    specific age.
-  </p>
-  <p class="caption">
-    The blue line shows the optimal filing {displayAsAges
-      ? "age"
-      : "date"} for each possible death age; the red line shows your cumulative
-    probability of dying by that age.
-    <strong class="hint">Click the chart</strong> to see the full filing
-    breakdown for a specific death age.
-  </p>
+  {#if widowed}
+    <p class="lede">
+      Every death age has its own best timing for your two benefits. The
+      <strong>Recommended filing</strong> above picks the plan that works best
+      across all of them; below, see what would be best at each specific age.
+    </p>
+    <p class="caption">
+      Each colored line shows when to start one benefit for each possible
+      death age. A gap means that benefit is never the larger one, so it is
+      not needed at that age. The red line shows your cumulative probability
+      of dying by that age.
+      <strong class="hint">Click the chart</strong> to see the full plan for a
+      specific death age.
+    </p>
+  {:else}
+    <p class="lede">
+      Every death age has its own optimal filing. The
+      <strong>Recommended Filing</strong> above picks a single strategy that
+      works well across all of them; below, see what would be optimal at each
+      specific age.
+    </p>
+    <p class="caption">
+      The blue line shows the optimal filing {displayAsAges
+        ? "age"
+        : "date"} for each possible death age; the red line shows your cumulative
+      probability of dying by that age.
+      <strong class="hint">Click the chart</strong> to see the full filing
+      breakdown for a specific death age.
+    </p>
+  {/if}
   <HowToReadChart>
     <ul>
       <li>
         <strong>X-axis (Death Age):</strong> a hypothetical age you live to.
       </li>
-      <li>
-        <strong>Blue line (left axis):</strong> the filing {displayAsAges
-          ? "age"
-          : "date"} that would have maximized your lifetime benefits
-        <em>if</em> you knew you'd live exactly to that death age.
-      </li>
+      {#if widowed}
+        {#each series as s}
+          <li>
+            <strong style:color={s.color}>{s.label} (left axis):</strong> when
+            to start it to maximize your lifetime benefits <em>if</em> you knew
+            you'd live exactly to that death age.
+          </li>
+        {/each}
+      {:else}
+        <li>
+          <strong>Blue line (left axis):</strong> the filing {displayAsAges
+            ? "age"
+            : "date"} that would have maximized your lifetime benefits
+          <em>if</em> you knew you'd live exactly to that death age.
+        </li>
+      {/if}
       <li>
         <strong>Red line (right axis):</strong> cumulative probability
         you've died by that age. Steeper means a larger fraction of
@@ -717,16 +726,35 @@
         >
       </li>
     </ul>
-    <p>
-      <strong>Takeaway:</strong> short lifespans favor filing early; long
-      lifespans favor delaying. The Recommended Filing picks the best
-      single date across the whole distribution, weighted by how likely
-      each lifespan is.
-    </p>
+    {#if widowed}
+      <p>
+        <strong>Takeaway:</strong> a short life favors starting benefits
+        early; a long one favors letting the benefit you will end on grow.
+        The Recommended filing picks the best plan across the whole
+        distribution, weighted by how likely each lifespan is.
+      </p>
+    {:else}
+      <p>
+        <strong>Takeaway:</strong> short lifespans favor filing early; long
+        lifespans favor delaying. The Recommended Filing picks the best
+        single date across the whole distribution, weighted by how likely
+        each lifespan is.
+      </p>
+    {/if}
   </HowToReadChart>
 
   <div class="chart-block">
     <div class="chart-toolbar">
+      {#if series.length > 1}
+        <ul class="legend" aria-label="Chart lines">
+          {#each series as s}
+            <li>
+              <span class="swatch" style:background-color={s.color}></span>
+              {s.label}
+            </li>
+          {/each}
+        </ul>
+      {/if}
       <span class="toolbar-label">Display filing as</span>
       <div class="segmented" role="group" aria-label="Display filing as">
         <button
@@ -820,9 +848,34 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 0.65rem;
     padding: 0.5rem 0;
     border-bottom: 1px solid #e5e7eb;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    margin: 0 auto 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+    color: #1f2937;
+  }
+
+  .legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 18px;
+    height: 4px;
+    border-radius: 2px;
   }
 
   .toolbar-label {
