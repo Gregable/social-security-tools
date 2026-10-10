@@ -2,17 +2,33 @@
   @component
   @name PastePrompt
   @description
-    A component that prompts the user to paste their earnings record.
+    Walks the user through copying their earnings record from ssa.gov and
+    pasting it, with copy instructions for touch screens or keyboards (Cmd+A
+    or Ctrl+A). Also offers PIA entry and, for a spouse, a skip option.
+    Sends "Paste Flow:" link, help and parse-failure events
+    (see $lib/analytics/paste-flow).
 
   @example
-    <PastePrompt on:paste={handlePaste} />
+    <PastePrompt onpaste={handlePaste} isSpouse={false} name="" />
 
-  @events
-    paste: Fired when the user pastes their earnings record. The event detail
-      contains { recipient: Recipient } with the parsed earnings record.
+  @prop onpaste - Called with { recipient: Recipient } after a successful
+    paste, a PIA entry, or a skip (PIA = $0).
+  @prop copyInstructions - 'auto' (default) picks touch or keyboard copy
+    instructions in CSS; 'touch' or 'keyboard' force one, for stories.
 -->
 
 <script lang="ts">
+import posthog from 'posthog-js';
+import { onMount } from 'svelte';
+import { browser } from '$app/environment';
+import {
+  failedPasteProperties,
+  nextFailureState,
+  PASTE_FLOW_EVENTS,
+  type PasteFlowHelpSection,
+  type PasteFlowLink,
+  selectAllShortcut,
+} from '$lib/analytics/paste-flow';
 import Expando from '$lib/components/Expando.svelte';
 import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
 import { Money } from '$lib/money';
@@ -21,32 +37,65 @@ import { parsePaste } from '$lib/ssa-parse';
 import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
 import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
 
-// Callback prop for paste event
+// Called with the new Recipient after a successful paste, a PIA entry, or a
+// skip.
 export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
   undefined;
 
-// Whether we're entering data for a spouse (shows skip option)
+// Whether we're entering data for a spouse: shows the skip option and tags
+// analytics events with is_spouse_entry.
 export let isSpouse: boolean = false;
 
 // Name of the person we're entering data for (used in headings when isSpouse is true)
 export let name: string = '';
 
+// Which copy instructions to show; see the @prop note above.
+export let copyInstructions: 'auto' | 'touch' | 'keyboard' = 'auto';
+
 let pasteContents: string = '';
 let pasteError: boolean = false;
+let failureReported: boolean = false;
 
-// Detect Mac for platform-specific keyboard shortcut
-import { browser } from '$app/environment';
-$: selectAllShortcut = browser && navigator.platform.toLowerCase().includes('mac')
-  ? 'Cmd+A'
-  : 'Ctrl+A';
+// Touch vs keyboard instructions are chosen in CSS so they are right on first
+// paint. Only the Cmd/Ctrl label needs the browser, which prerendering lacks,
+// so it starts as Ctrl+A and is refined on mount (a same-length swap).
+let shortcut: 'Cmd+A' | 'Ctrl+A' = 'Ctrl+A';
+onMount(() => {
+  shortcut = selectAllShortcut(navigator.platform);
+});
+
+function trackLink(link: PasteFlowLink) {
+  if (!browser) return;
+  posthog.capture(PASTE_FLOW_EVENTS.linkClicked, { link, is_spouse_entry: isSpouse });
+}
+
+function trackHelp(section: PasteFlowHelpSection, expanded: boolean) {
+  if (!browser || !expanded) return;
+  posthog.capture(PASTE_FLOW_EVENTS.helpExpanded, { section, is_spouse_entry: isSpouse });
+}
+
+function reportOutcome(outcome: 'empty' | 'failed' | 'parsed', contents: string) {
+  // Parsing reruns on every edit; nextFailureState reports only the first
+  // failure of each attempt.
+  const next = nextFailureState(failureReported, outcome);
+  failureReported = next.reported;
+  if (next.report && browser) {
+    posthog.capture(
+      PASTE_FLOW_EVENTS.parseFailed,
+      failedPasteProperties(contents, isSpouse)
+    );
+  }
+}
 
 function parsePasteContents(contents: string) {
   if (contents === '') {
     pasteError = false;
+    reportOutcome('empty', contents);
     return;
   }
   const records = parsePaste(contents);
   if (records.length > 0) {
+    reportOutcome('parsed', contents);
     let recipient: Recipient = new Recipient();
     recipient.earningsRecords = records;
 
@@ -54,6 +103,7 @@ function parsePasteContents(contents: string) {
       recipient: recipient,
     });
   } else {
+    reportOutcome('failed', contents);
     pasteError = true;
   }
 }
@@ -83,26 +133,36 @@ function skipEarnings() {
 }
 </script>
 
-<div class="pastePrompt">
+<div
+  class="pastePrompt"
+  class:forceTouch={copyInstructions === 'touch'}
+  class:forceKeyboard={copyInstructions === 'keyboard'}
+>
   <div class="pasteCard">
     <h3>{name ? `Use ${name}'s SSA.gov Data` : 'Use Your SSA.gov Data'}</h3>
     <p class="subtitle">For personalized benefit estimates</p>
     <ol class="steps">
     <li>
       <strong>Sign in</strong> to
-      <a target="_blank" href="https://www.ssa.gov/myaccount/">ssa.gov</a>
+      <a
+        target="_blank"
+        href="https://www.ssa.gov/myaccount/"
+        on:click={() => trackLink('ssa_sign_in')}>ssa.gov</a
+      >
       <span class="muted">({name ? `${name} may need to create an account` : 'you may need to create an account'})</span>
     </li>
     <li>
       <strong>Open {name ? `${name}'s` : 'your'} earnings record</strong> &mdash;
       <a
         href="https://secure.ssa.gov/ec2/eligibility-earnings-ui/earnings-record"
-        target="_blank">direct link</a
+        target="_blank"
+        on:click={() => trackLink('ssa_earnings_record')}>direct link</a
       >
       <Expando
         variant="inline"
         collapsedText="or find it manually"
         expandedText="Hide"
+        ontoggle={(expanded) => trackHelp('find_manually', expanded)}
       >
         <p class="expandoHint">Look for <em>"Review your full earnings record now"</em> under Eligibility and Earnings</p>
         <img
@@ -115,11 +175,16 @@ function skipEarnings() {
       </Expando>
     </li>
     <li>
-      <strong>Copy the table</strong> &mdash; Select All ({selectAllShortcut}) works great
+      <strong>Copy the table</strong> &mdash;
+      <span class="touchOnly"
+        >press and hold on the table, drag the handles to cover every row, then
+        tap Copy</span
+      ><span class="keyboardOnly">Select All ({shortcut}) works great</span>
       <Expando
         variant="inline"
         collapsedText="See example"
         expandedText="Hide"
+        ontoggle={(expanded) => trackHelp('copy_example', expanded)}
       >
         <video
           autoplay
@@ -135,7 +200,9 @@ function skipEarnings() {
       </Expando>
     </li>
     <li>
-      <strong>Paste below</strong>
+      <strong>Come back to this tab and paste below</strong><span
+        class="touchOnly">{' '}&mdash; press and hold the box, then tap Paste</span
+      >
     </li>
   </ol>
   {#if pasteError}
@@ -143,8 +210,10 @@ function skipEarnings() {
       <span class="warningIcon">&#x26A0;</span>
       <p>
         The data you have pasted could not be parsed. Please clear the box and
-        try again. <a href="/guides/earnings-record-paste" target="_blank"
-          >Additional Help</a
+        try again. <a
+          href="/guides/earnings-record-paste"
+          target="_blank"
+          on:click={() => trackLink('paste_help_guide')}>Additional Help</a
         >
       </p>
     </div>
@@ -153,7 +222,7 @@ function skipEarnings() {
     <div>
       <div class="privateDataNotice">
         <span class="lockIcon">&#x1f512;</span>
-        <span>100% private — your data never leaves your computer.</span>
+        <span>100% private — your data never leaves your device.</span>
         <a href="/guides/privacy" class="learnMore">Learn more</a>
       </div>
       <textarea
@@ -181,6 +250,7 @@ function skipEarnings() {
     variant="section"
     collapsedText="Alternative data entry options"
     expandedText="Alternative data entry options"
+    ontoggle={(expanded) => trackHelp('alternatives', expanded)}
   >
     <div class="expandoContents">
       <h4>Enter Primary Insurance Amount (PIA)</h4>
@@ -244,6 +314,30 @@ function skipEarnings() {
   .muted {
     color: #888;
     font-size: 0.9em;
+  }
+
+  /* Touch vs keyboard copy instructions, decided by the primary pointer so
+     the right text is in the prerendered page; the force classes override it
+     for stories. */
+  .touchOnly {
+    display: none;
+  }
+
+  @media (pointer: coarse) {
+    .pastePrompt:not(.forceKeyboard) .touchOnly {
+      display: inline;
+    }
+    .pastePrompt:not(.forceKeyboard) .keyboardOnly {
+      display: none;
+    }
+  }
+
+  .forceTouch .touchOnly {
+    display: inline;
+  }
+
+  .forceTouch .keyboardOnly {
+    display: none;
   }
 
   .fit-image {
@@ -334,7 +428,8 @@ function skipEarnings() {
     border-radius: 8px;
     margin: 0;
     padding: 12px;
-    font-size: 14px;
+    /* 16px or larger stops iOS Safari from zooming in when the box is tapped. */
+    font-size: 16px;
     background: #fff;
     box-sizing: border-box;
   }
