@@ -28,8 +28,8 @@ export let collapsedText = 'Expand';
 export let expandedText = 'Collapse';
 
 /**
- * Called after each user toggle with the new expanded state, e.g. so a parent
- * can record which help sections people open.
+ * Called after each user toggle (click or Enter/Space) with the new expanded
+ * state. Not called for the initial state set by initiallyExpanded.
  */
 export let ontoggle: ((expanded: boolean) => void) | undefined = undefined;
 

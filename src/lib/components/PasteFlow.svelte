@@ -402,8 +402,9 @@ function handleSpouseQuestion(detail: {
     {/if}
     <PastePrompt onpaste={handlePaste} isSpouse={!isRecipient} name={isRecipient ? '' : spouseName} />
     {#if isRecipient}
-      <!-- Below the instructions so the task comes first on phones; the demo
-           stays on top because it shows what the results will look like. -->
+      <!-- After the instructions so the task comes first on phones (the prompt
+           only renders on narrow screens). The demo stays above them as the
+           option for people not ready to fetch their record. -->
       <MobileDesktopPrompt />
     {/if}
   {:else if mode === Mode.PASTE_CONFIRMATION}

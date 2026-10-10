@@ -1,41 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import {
-  copyInstructionPlatform,
   describeFailedPaste,
+  failedPasteProperties,
+  nextFailureState,
+  type PasteOutcome,
+  selectAllShortcut,
 } from '$lib/analytics/paste-flow';
+import { claimOncePerSession } from '$lib/analytics/session-once';
 
-describe('copyInstructionPlatform', () => {
-  it('uses touch instructions for a touch-primary screen', () => {
-    expect(
-      copyInstructionPlatform({ coarsePointer: true, platform: 'iPhone' })
-    ).toBe('touch');
-  });
-
-  it('uses touch instructions for an iPad even though it reports a Mac platform', () => {
-    expect(
-      copyInstructionPlatform({ coarsePointer: true, platform: 'MacIntel' })
-    ).toBe('touch');
-  });
-
-  it('uses Cmd for a Mac with a mouse or trackpad', () => {
-    expect(
-      copyInstructionPlatform({ coarsePointer: false, platform: 'MacIntel' })
-    ).toBe('mac');
+describe('selectAllShortcut', () => {
+  it('uses Cmd on a Mac', () => {
+    expect(selectAllShortcut('MacIntel')).toBe('Cmd+A');
   });
 
   it('uses Ctrl for Windows, Linux and unknown platforms', () => {
-    expect(
-      copyInstructionPlatform({ coarsePointer: false, platform: 'Win32' })
-    ).toBe('ctrl');
-    expect(
-      copyInstructionPlatform({
-        coarsePointer: false,
-        platform: 'Linux x86_64',
-      })
-    ).toBe('ctrl');
-    expect(
-      copyInstructionPlatform({ coarsePointer: false, platform: '' })
-    ).toBe('ctrl');
+    expect(selectAllShortcut('Win32')).toBe('Ctrl+A');
+    expect(selectAllShortcut('Linux x86_64')).toBe('Ctrl+A');
+    expect(selectAllShortcut('')).toBe('Ctrl+A');
   });
 });
 
@@ -59,6 +40,10 @@ describe('describeFailedPaste', () => {
     expect(describeFailedPaste('hello').line_count).toBe(1);
   });
 
+  it('counts a trailing newline as an extra empty line', () => {
+    expect(describeFailedPaste('a\nb\n').line_count).toBe(3);
+  });
+
   it('detects tab characters', () => {
     expect(describeFailedPaste('2010\t$1').has_tabs).toBe(true);
     expect(describeFailedPaste('2010 $1').has_tabs).toBe(false);
@@ -69,7 +54,98 @@ describe('describeFailedPaste', () => {
     expect(summary.year_token_count).toBe(3);
   });
 
+  it('counts one year in a realistic SSA table row', () => {
+    expect(describeFailedPaste('2010\t$45,000\t$45,000').year_token_count).toBe(
+      1
+    );
+  });
+
+  it('does not count digits inside a dollar amount with a comma', () => {
+    expect(describeFailedPaste('$1,999').year_token_count).toBe(0);
+  });
+
   it('reports zero year tokens for unrelated text', () => {
     expect(describeFailedPaste('no data here').year_token_count).toBe(0);
+  });
+});
+
+describe('failedPasteProperties', () => {
+  it('sends exactly the reviewed fields, so new ones need a deliberate change', () => {
+    const props = failedPasteProperties('anything at all', true);
+    expect(Object.keys(props).sort()).toEqual([
+      'char_count',
+      'has_tabs',
+      'is_spouse_entry',
+      'line_count',
+      'year_token_count',
+    ]);
+    expect(props.is_spouse_entry).toBe(true);
+  });
+});
+
+describe('nextFailureState', () => {
+  function run(outcomes: PasteOutcome[]): boolean[] {
+    let reported = false;
+    return outcomes.map((outcome) => {
+      const next = nextFailureState(reported, outcome);
+      reported = next.reported;
+      return next.report;
+    });
+  }
+
+  it('reports the first failure of an attempt only once while edits keep failing', () => {
+    expect(run(['failed', 'failed', 'failed'])).toEqual([true, false, false]);
+  });
+
+  it('starts a new attempt after the box is cleared', () => {
+    expect(run(['failed', 'empty', 'failed'])).toEqual([true, false, true]);
+  });
+
+  it('never reports an empty box', () => {
+    expect(run(['empty', 'empty'])).toEqual([false, false]);
+  });
+
+  it('never reports a successful paste', () => {
+    expect(run(['parsed'])).toEqual([false]);
+  });
+
+  it('starts a new attempt after a success', () => {
+    expect(run(['failed', 'parsed', 'failed'])).toEqual([true, false, true]);
+  });
+});
+
+describe('claimOncePerSession', () => {
+  function fakeStorage(): Pick<Storage, 'getItem' | 'setItem'> {
+    const map = new Map<string, string>();
+    return {
+      getItem: (key) => map.get(key) ?? null,
+      setItem: (key, value) => {
+        map.set(key, value);
+      },
+    };
+  }
+
+  it('returns true the first time and false afterwards', () => {
+    const storage = fakeStorage();
+    expect(claimOncePerSession(storage, 'k')).toBe(true);
+    expect(claimOncePerSession(storage, 'k')).toBe(false);
+  });
+
+  it('tracks keys independently', () => {
+    const storage = fakeStorage();
+    expect(claimOncePerSession(storage, 'a')).toBe(true);
+    expect(claimOncePerSession(storage, 'b')).toBe(true);
+  });
+
+  it('returns true when storage is unavailable rather than throwing', () => {
+    const broken: Pick<Storage, 'getItem' | 'setItem'> = {
+      getItem: () => {
+        throw new Error('blocked');
+      },
+      setItem: () => {
+        throw new Error('blocked');
+      },
+    };
+    expect(claimOncePerSession(broken, 'k')).toBe(true);
   });
 });

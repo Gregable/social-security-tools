@@ -2,14 +2,19 @@
   @component
   @name PastePrompt
   @description
-    A component that prompts the user to paste their earnings record.
+    Walks the user through copying their earnings record from ssa.gov and
+    pasting it, with copy instructions for touch screens or keyboards (Cmd+A
+    or Ctrl+A). Also offers PIA entry and, for a spouse, a skip option.
+    Sends "Paste Flow:" link, help and parse-failure events
+    (see $lib/analytics/paste-flow).
 
   @example
-    <PastePrompt on:paste={handlePaste} />
+    <PastePrompt onpaste={handlePaste} isSpouse={false} name="" />
 
-  @events
-    paste: Fired when the user pastes their earnings record. The event detail
-      contains { recipient: Recipient } with the parsed earnings record.
+  @prop onpaste - Called with { recipient: Recipient } after a successful
+    paste, a PIA entry, or a skip (PIA = $0).
+  @prop copyInstructions - 'auto' (default) picks touch or keyboard copy
+    instructions in CSS; 'touch' or 'keyboard' force one, for stories.
 -->
 
 <script lang="ts">
@@ -17,12 +22,12 @@ import posthog from 'posthog-js';
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
 import {
-  type CopyInstructionPlatform,
-  copyInstructionPlatform,
-  describeFailedPaste,
+  failedPasteProperties,
+  nextFailureState,
   PASTE_FLOW_EVENTS,
   type PasteFlowHelpSection,
   type PasteFlowLink,
+  selectAllShortcut,
 } from '$lib/analytics/paste-flow';
 import Expando from '$lib/components/Expando.svelte';
 import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
@@ -32,27 +37,31 @@ import { parsePaste } from '$lib/ssa-parse';
 import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
 import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
 
-// Callback prop for paste event
+// Called with the new Recipient after a successful paste, a PIA entry, or a
+// skip.
 export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
   undefined;
 
-// Whether we're entering data for a spouse (shows skip option)
+// Whether we're entering data for a spouse: shows the skip option and tags
+// analytics events with is_spouse_entry.
 export let isSpouse: boolean = false;
 
 // Name of the person we're entering data for (used in headings when isSpouse is true)
 export let name: string = '';
 
+// Which copy instructions to show; see the @prop note above.
+export let copyInstructions: 'auto' | 'touch' | 'keyboard' = 'auto';
+
 let pasteContents: string = '';
 let pasteError: boolean = false;
+let failureReported: boolean = false;
 
-// Copy instructions depend on the device. Prerendering happens without a
-// browser, so this starts as the keyboard default and is refined on mount.
-let copyPlatform: CopyInstructionPlatform = 'ctrl';
+// Touch vs keyboard instructions are chosen in CSS so they are right on first
+// paint. Only the Cmd/Ctrl label needs the browser, which prerendering lacks,
+// so it starts as Ctrl+A and is refined on mount (a same-length swap).
+let shortcut: 'Cmd+A' | 'Ctrl+A' = 'Ctrl+A';
 onMount(() => {
-  copyPlatform = copyInstructionPlatform({
-    coarsePointer: window.matchMedia('(pointer: coarse)').matches,
-    platform: navigator.platform,
-  });
+  shortcut = selectAllShortcut(navigator.platform);
 });
 
 function trackLink(link: PasteFlowLink) {
@@ -65,13 +74,28 @@ function trackHelp(section: PasteFlowHelpSection, expanded: boolean) {
   posthog.capture(PASTE_FLOW_EVENTS.helpExpanded, { section, is_spouse_entry: isSpouse });
 }
 
+function reportOutcome(outcome: 'empty' | 'failed' | 'parsed', contents: string) {
+  // Parsing reruns on every edit; nextFailureState reports only the first
+  // failure of each attempt.
+  const next = nextFailureState(failureReported, outcome);
+  failureReported = next.reported;
+  if (next.report && browser) {
+    posthog.capture(
+      PASTE_FLOW_EVENTS.parseFailed,
+      failedPasteProperties(contents, isSpouse)
+    );
+  }
+}
+
 function parsePasteContents(contents: string) {
   if (contents === '') {
     pasteError = false;
+    reportOutcome('empty', contents);
     return;
   }
   const records = parsePaste(contents);
   if (records.length > 0) {
+    reportOutcome('parsed', contents);
     let recipient: Recipient = new Recipient();
     recipient.earningsRecords = records;
 
@@ -79,14 +103,7 @@ function parsePasteContents(contents: string) {
       recipient: recipient,
     });
   } else {
-    // Parsing reruns on every edit; report only the first failure of each
-    // attempt, which ends when the box is cleared or a paste succeeds.
-    if (!pasteError && browser) {
-      posthog.capture(PASTE_FLOW_EVENTS.parseFailed, {
-        ...describeFailedPaste(contents),
-        is_spouse_entry: isSpouse,
-      });
-    }
+    reportOutcome('failed', contents);
     pasteError = true;
   }
 }
@@ -116,7 +133,11 @@ function skipEarnings() {
 }
 </script>
 
-<div class="pastePrompt">
+<div
+  class="pastePrompt"
+  class:forceTouch={copyInstructions === 'touch'}
+  class:forceKeyboard={copyInstructions === 'keyboard'}
+>
   <div class="pasteCard">
     <h3>{name ? `Use ${name}'s SSA.gov Data` : 'Use Your SSA.gov Data'}</h3>
     <p class="subtitle">For personalized benefit estimates</p>
@@ -155,12 +176,10 @@ function skipEarnings() {
     </li>
     <li>
       <strong>Copy the table</strong> &mdash;
-      {#if copyPlatform === 'touch'}
-        press and hold on the table, drag the handles to cover every row, then
-        tap Copy
-      {:else}
-        Select All ({copyPlatform === 'mac' ? 'Cmd+A' : 'Ctrl+A'}) works great
-      {/if}
+      <span class="touchOnly"
+        >press and hold on the table, drag the handles to cover every row, then
+        tap Copy</span
+      ><span class="keyboardOnly">Select All ({shortcut}) works great</span>
       <Expando
         variant="inline"
         collapsedText="See example"
@@ -181,10 +200,9 @@ function skipEarnings() {
       </Expando>
     </li>
     <li>
-      <strong>Come back to this tab and paste below</strong>
-      {#if copyPlatform === 'touch'}
-        &mdash; press and hold the box, then tap Paste
-      {/if}
+      <strong>Come back to this tab and paste below</strong><span
+        class="touchOnly">{' '}&mdash; press and hold the box, then tap Paste</span
+      >
     </li>
   </ol>
   {#if pasteError}
@@ -296,6 +314,30 @@ function skipEarnings() {
   .muted {
     color: #888;
     font-size: 0.9em;
+  }
+
+  /* Touch vs keyboard copy instructions, decided by the primary pointer so
+     the right text is in the prerendered page; the force classes override it
+     for stories. */
+  .touchOnly {
+    display: none;
+  }
+
+  @media (pointer: coarse) {
+    .pastePrompt:not(.forceKeyboard) .touchOnly {
+      display: inline;
+    }
+    .pastePrompt:not(.forceKeyboard) .keyboardOnly {
+      display: none;
+    }
+  }
+
+  .forceTouch .touchOnly {
+    display: inline;
+  }
+
+  .forceTouch .keyboardOnly {
+    display: none;
   }
 
   .fit-image {
