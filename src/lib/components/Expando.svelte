@@ -27,6 +27,12 @@ export let collapsedText = 'Expand';
  */
 export let expandedText = 'Collapse';
 
+/**
+ * Called after each user toggle with the new expanded state, e.g. so a parent
+ * can record which help sections people open.
+ */
+export let ontoggle: ((expanded: boolean) => void) | undefined = undefined;
+
 export let collapsed_background_color: string = '#eee';
 export let collapsed_hover_color: string = '#f5f5f5';
 export let collapsed_tab_color: string = '#ddd';
@@ -78,6 +84,7 @@ function toggle() {
   } else {
     contentsEl.style.maxHeight = null;
   }
+  ontoggle?.(expanded);
 }
 
 function handleKeydown(event: KeyboardEvent) {
