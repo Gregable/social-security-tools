@@ -4,6 +4,9 @@ import { onDestroy, onMount } from 'svelte';
 import { browser } from '$app/environment';
 
 const DISMISS_KEY = 'mobileDesktopPromptDismissed';
+// The prompt remounts whenever the paste step restarts (e.g. after "Try
+// again"), so "Shown" is reported once per session rather than per mount.
+const SHOWN_KEY = 'mobileDesktopPromptShownTracked';
 const SITE_URL = 'https://ssa.tools/calculator';
 
 let isVisible = false;
@@ -70,7 +73,10 @@ onMount(() => {
 
   isVisible = true;
   canShare = typeof navigator.share === 'function';
-  posthog.capture('Mobile: Desktop Reminder Shown');
+  if (sessionStorage.getItem(SHOWN_KEY) !== 'true') {
+    sessionStorage.setItem(SHOWN_KEY, 'true');
+    posthog.capture('Mobile: Desktop Reminder Shown');
+  }
 });
 </script>
 

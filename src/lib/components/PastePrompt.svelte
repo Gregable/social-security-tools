@@ -13,6 +13,17 @@
 -->
 
 <script lang="ts">
+import posthog from 'posthog-js';
+import { onMount } from 'svelte';
+import { browser } from '$app/environment';
+import {
+  type CopyInstructionPlatform,
+  copyInstructionPlatform,
+  describeFailedPaste,
+  PASTE_FLOW_EVENTS,
+  type PasteFlowHelpSection,
+  type PasteFlowLink,
+} from '$lib/analytics/paste-flow';
 import Expando from '$lib/components/Expando.svelte';
 import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
 import { Money } from '$lib/money';
@@ -34,11 +45,25 @@ export let name: string = '';
 let pasteContents: string = '';
 let pasteError: boolean = false;
 
-// Detect Mac for platform-specific keyboard shortcut
-import { browser } from '$app/environment';
-$: selectAllShortcut = browser && navigator.platform.toLowerCase().includes('mac')
-  ? 'Cmd+A'
-  : 'Ctrl+A';
+// Copy instructions depend on the device. Prerendering happens without a
+// browser, so this starts as the keyboard default and is refined on mount.
+let copyPlatform: CopyInstructionPlatform = 'ctrl';
+onMount(() => {
+  copyPlatform = copyInstructionPlatform({
+    coarsePointer: window.matchMedia('(pointer: coarse)').matches,
+    platform: navigator.platform,
+  });
+});
+
+function trackLink(link: PasteFlowLink) {
+  if (!browser) return;
+  posthog.capture(PASTE_FLOW_EVENTS.linkClicked, { link, is_spouse_entry: isSpouse });
+}
+
+function trackHelp(section: PasteFlowHelpSection, expanded: boolean) {
+  if (!browser || !expanded) return;
+  posthog.capture(PASTE_FLOW_EVENTS.helpExpanded, { section, is_spouse_entry: isSpouse });
+}
 
 function parsePasteContents(contents: string) {
   if (contents === '') {
@@ -54,6 +79,14 @@ function parsePasteContents(contents: string) {
       recipient: recipient,
     });
   } else {
+    // Parsing reruns on every edit; report only the first failure of each
+    // attempt, which ends when the box is cleared or a paste succeeds.
+    if (!pasteError && browser) {
+      posthog.capture(PASTE_FLOW_EVENTS.parseFailed, {
+        ...describeFailedPaste(contents),
+        is_spouse_entry: isSpouse,
+      });
+    }
     pasteError = true;
   }
 }
@@ -90,19 +123,25 @@ function skipEarnings() {
     <ol class="steps">
     <li>
       <strong>Sign in</strong> to
-      <a target="_blank" href="https://www.ssa.gov/myaccount/">ssa.gov</a>
+      <a
+        target="_blank"
+        href="https://www.ssa.gov/myaccount/"
+        on:click={() => trackLink('ssa_sign_in')}>ssa.gov</a
+      >
       <span class="muted">({name ? `${name} may need to create an account` : 'you may need to create an account'})</span>
     </li>
     <li>
       <strong>Open {name ? `${name}'s` : 'your'} earnings record</strong> &mdash;
       <a
         href="https://secure.ssa.gov/ec2/eligibility-earnings-ui/earnings-record"
-        target="_blank">direct link</a
+        target="_blank"
+        on:click={() => trackLink('ssa_earnings_record')}>direct link</a
       >
       <Expando
         variant="inline"
         collapsedText="or find it manually"
         expandedText="Hide"
+        ontoggle={(expanded) => trackHelp('find_manually', expanded)}
       >
         <p class="expandoHint">Look for <em>"Review your full earnings record now"</em> under Eligibility and Earnings</p>
         <img
@@ -115,11 +154,18 @@ function skipEarnings() {
       </Expando>
     </li>
     <li>
-      <strong>Copy the table</strong> &mdash; Select All ({selectAllShortcut}) works great
+      <strong>Copy the table</strong> &mdash;
+      {#if copyPlatform === 'touch'}
+        press and hold on the table, drag the handles to cover every row, then
+        tap Copy
+      {:else}
+        Select All ({copyPlatform === 'mac' ? 'Cmd+A' : 'Ctrl+A'}) works great
+      {/if}
       <Expando
         variant="inline"
         collapsedText="See example"
         expandedText="Hide"
+        ontoggle={(expanded) => trackHelp('copy_example', expanded)}
       >
         <video
           autoplay
@@ -135,7 +181,10 @@ function skipEarnings() {
       </Expando>
     </li>
     <li>
-      <strong>Paste below</strong>
+      <strong>Come back to this tab and paste below</strong>
+      {#if copyPlatform === 'touch'}
+        &mdash; press and hold the box, then tap Paste
+      {/if}
     </li>
   </ol>
   {#if pasteError}
@@ -143,8 +192,10 @@ function skipEarnings() {
       <span class="warningIcon">&#x26A0;</span>
       <p>
         The data you have pasted could not be parsed. Please clear the box and
-        try again. <a href="/guides/earnings-record-paste" target="_blank"
-          >Additional Help</a
+        try again. <a
+          href="/guides/earnings-record-paste"
+          target="_blank"
+          on:click={() => trackLink('paste_help_guide')}>Additional Help</a
         >
       </p>
     </div>
@@ -153,7 +204,7 @@ function skipEarnings() {
     <div>
       <div class="privateDataNotice">
         <span class="lockIcon">&#x1f512;</span>
-        <span>100% private — your data never leaves your computer.</span>
+        <span>100% private — your data never leaves your device.</span>
         <a href="/guides/privacy" class="learnMore">Learn more</a>
       </div>
       <textarea
@@ -181,6 +232,7 @@ function skipEarnings() {
     variant="section"
     collapsedText="Alternative data entry options"
     expandedText="Alternative data entry options"
+    ontoggle={(expanded) => trackHelp('alternatives', expanded)}
   >
     <div class="expandoContents">
       <h4>Enter Primary Insurance Amount (PIA)</h4>
@@ -334,7 +386,8 @@ function skipEarnings() {
     border-radius: 8px;
     margin: 0;
     padding: 12px;
-    font-size: 14px;
+    /* 16px or larger stops iOS Safari from zooming in when the box is tapped. */
+    font-size: 16px;
     background: #fff;
     box-sizing: border-box;
   }
