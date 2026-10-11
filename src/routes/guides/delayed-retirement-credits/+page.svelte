@@ -6,7 +6,7 @@
   const title =
     "Delayed Retirement Credits: How Waiting Past Full Retirement Age Increases Your Benefit";
   const description =
-    "Learn how Delayed Retirement Credits (DRCs) increase your Social Security benefit by 8% per year for each year you wait past Full Retirement Age, up to age 70. Includes breakeven analysis, survivor benefit rules, and COLA interactions.";
+    "Learn how Delayed Retirement Credits (DRCs) increase your Social Security benefit by 8% per year for each year you wait past Full Retirement Age, up to age 70. Includes the month-by-month calculation, survivor benefit rules, and COLA interactions.";
   const publishDate = new Date("2026-02-18T00:00:00+00:00");
   const updateDate = new Date("2026-09-17T00:00:00+00:00");
 
@@ -317,6 +317,10 @@
     For more on related topics, see:
   </p>
   <ul>
+    <li>
+      <a href="/guides/break-even-age">Break-Even Age</a>: how long you have
+      to live for the credits to pay off, and why that is not the whole story
+    </li>
     <li>
       <a href="/guides/nra">Normal Retirement Age (FRA)</a>: when your DRC
       window begins

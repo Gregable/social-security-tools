@@ -27,6 +27,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Oct 11, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/break-even-age">
+            Social Security Break-Even Age: Claiming at 62 vs 67 vs 70
+          </a>
+        </h3>
+        <p class="description">
+          How long you have to live for a later claim to pay off. The
+          break-even ages for 62 vs 67, 62 vs 70, and 67 vs 70, a table for
+          every claiming year, how the arithmetic works, and the survivor,
+          longevity, and investment factors it leaves out.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Oct 10, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/child-benefits">
@@ -128,8 +143,8 @@ const pageImageAlt = 'Social Security guides and educational resources';
         <p class="description">
           Learn how Delayed Retirement Credits increase your Social Security
           benefit by 8% per year for each year you wait past Full Retirement
-          Age, up to age 70. Includes breakeven analysis, survivor benefit
-          rules, and COLA interactions.
+          Age, up to age 70. Includes the month-by-month calculation,
+          survivor benefit rules, and COLA interactions.
         </p>
       </li>
 
