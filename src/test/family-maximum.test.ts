@@ -37,6 +37,15 @@ describe('familyMaximum', () => {
     expect(familyMaximum(Money.from(1000), 2024).string()).toBe('$1,500.00');
   });
 
+  it('is exactly 150% of a PIA that lands on the first bend point', () => {
+    expect(familyMaximum(Money.from(1643), 2024).string()).toBe('$2,464.50');
+  });
+
+  it('applies the 272% bracket to a PIA between the first two bend points', () => {
+    // 1.5 * 1643 + 2.72 * (2000 - 1643) = 3435.54
+    expect(familyMaximum(Money.from(2000), 2024).string()).toBe('$3,435.50');
+  });
+
   it('applies the 150%, 272%, and 134% brackets and floors to the dime', () => {
     // 1.5 * 1643 + 2.72 * (2371 - 1643) + 1.34 * (2500 - 2371) = 4617.52
     expect(familyMaximum(Money.from(2500), 2024).string()).toBe('$4,617.50');
@@ -48,6 +57,15 @@ describe('familyMaximum', () => {
   });
 
   it('rejects a PIA that is not positive', () => {
-    expect(() => familyMaximum(Money.from(0), 2024)).toThrow();
+    expect(() => familyMaximum(Money.from(0), 2024)).toThrow(/positive/);
+  });
+
+  it('always exceeds the PIA, so the family pool is never negative', () => {
+    // Every bracket multiplier is above 1. familyPayout relies on this; a
+    // constants edit that broke it should fail here, not print a negative.
+    for (const pia of [1, 1643, 2371, 3093, 5000, 10_000]) {
+      const max = familyMaximum(Money.from(pia), 2024);
+      expect(max.greaterThan(Money.from(pia))).toBe(true);
+    }
   });
 });

@@ -19,6 +19,13 @@ describe('exampleParent', () => {
     expect(fra.modMonths()).toBe(0);
   });
 
+  it('can file in the month they turn 62, as the comparison assumes', () => {
+    // Only someone born on the 1st or 2nd is 62 for the whole birth month.
+    const earliest = exampleParent().birthdate.earliestFilingMonth();
+    expect(earliest.years()).toBe(62);
+    expect(earliest.modMonths()).toBe(0);
+  });
+
   it('carries the example PIA unchanged', () => {
     expect(
       exampleParent().pia().primaryInsuranceAmount().equals(EXAMPLE_PIA)
@@ -57,9 +64,22 @@ describe('familyPayout', () => {
     expect(p.capped).toBe(true);
   });
 
+  it('halves a small PIA between two children with nothing left over', () => {
+    // Below the first bend point the maximum is exactly 150%, so the pool
+    // is half the PIA: one child takes all of it uncapped, two split it.
+    const parent = exampleParent();
+    parent.setPia(Money.from(1000));
+    const one = familyPayout(parent, 1);
+    expect(one.each.string()).toBe('$500.00');
+    expect(one.capped).toBe(false);
+    const two = familyPayout(parent, 2);
+    expect(two.each.string()).toBe('$250.00');
+    expect(two.capped).toBe(true);
+  });
+
   it('rejects a beneficiary count that is not a positive integer', () => {
-    expect(() => familyPayout(exampleParent(), 0)).toThrow();
-    expect(() => familyPayout(exampleParent(), 1.5)).toThrow();
+    expect(() => familyPayout(exampleParent(), 0)).toThrow(/positive/);
+    expect(() => familyPayout(exampleParent(), 1.5)).toThrow(/positive/);
   });
 });
 
@@ -70,12 +90,21 @@ describe('claimAgeComparison', () => {
     expect(c.benefitAt62.string()).toBe('$1,750.00');
     expect(c.benefitAtFra.string()).toBe('$2,500.00');
     expect(c.monthlyReduction.string()).toBe('$750.00');
+    expect(c.timeToFra.asMonths()).toBe(60);
   });
 
   it('pays both children until the older turns 18, then the younger alone', () => {
     // 72 months of $2,117.40 shared, then 36 months of $1,250.00.
     expect(c.childrenTotal.string()).toBe('$197,452.80');
-    expect(c.monthsOfChildBenefits).toBe(108);
+    expect(c.childBenefitSpan.asMonths()).toBe(108);
+    expect(c.oldestChildBenefitSpan.asMonths()).toBe(72);
+  });
+
+  it('reports the parent ages at which each child ages out', () => {
+    expect(c.parentAgeWhenOldestTurns18.years()).toBe(68);
+    expect(c.parentAgeWhenOldestTurns18.modMonths()).toBe(0);
+    expect(c.parentAgeWhenYoungestTurns18.years()).toBe(71);
+    expect(c.parentAgeWhenYoungestTurns18.modMonths()).toBe(0);
   });
 
   it('counts what the family collects before full retirement age', () => {
@@ -86,9 +115,19 @@ describe('claimAgeComparison', () => {
 
   it('finds the age at which the larger check would catch up', () => {
     // $232,044 / $750 a month = 309.4 months after 67.
-    expect(c.monthsToCatchUp).toBe(310);
+    expect(c.timeToCatchUp.asMonths()).toBe(310);
     expect(c.catchUpAge.years()).toBe(92);
     expect(c.catchUpAge.modMonths()).toBe(10);
+  });
+
+  it('comes out close to even for a single child who is already 16', () => {
+    // 24 months of $1,250 plus 60 months of $1,750 = $135,000, which the
+    // $750 difference repays in exactly 180 months. The guide cites this.
+    const teen = claimAgeComparison(exampleParent(), [16]);
+    expect(teen.leadAtFra.string()).toBe('$135,000.00');
+    expect(teen.timeToCatchUp.asMonths()).toBe(180);
+    expect(teen.catchUpAge.years()).toBe(82);
+    expect(teen.catchUpAge.modMonths()).toBe(0);
   });
 
   it('lowers the surviving spouse to the 82.5% floor after an early claim', () => {
@@ -101,19 +140,23 @@ describe('claimAgeComparison', () => {
   it('pays nothing before full retirement age to a child already 18', () => {
     const grown = claimAgeComparison(exampleParent(), [17]);
     // Twelve months only, all before full retirement age.
-    expect(grown.monthsOfChildBenefits).toBe(12);
+    expect(grown.childBenefitSpan.asMonths()).toBe(12);
     expect(grown.childrenBeforeFra.equals(grown.childrenTotal)).toBe(true);
   });
 
-  it('rejects children who are not under 18', () => {
-    expect(() => claimAgeComparison(exampleParent(), [18])).toThrow();
-    expect(() => claimAgeComparison(exampleParent(), [])).toThrow();
-    expect(() => claimAgeComparison(exampleParent(), [-1])).toThrow();
+  it('rejects children who are not whole ages under 18', () => {
+    expect(() => claimAgeComparison(exampleParent(), [18])).toThrow(/under/);
+    expect(() => claimAgeComparison(exampleParent(), [])).toThrow(/child/);
+    expect(() => claimAgeComparison(exampleParent(), [-1])).toThrow(/under/);
+    expect(() => claimAgeComparison(exampleParent(), [9, Number.NaN])).toThrow(
+      /under/
+    );
   });
 
-  it('rejects a parent whose benefit the example cannot reduce', () => {
-    const parent = exampleParent();
-    expect(() => claimAgeComparison(parent, [9, Number.NaN])).toThrow();
-    expect(Money.from(0).lessThan(c.monthlyReduction)).toBe(true);
+  it('does not share the caller’s age array', () => {
+    const ages = [9, 12];
+    const result = claimAgeComparison(exampleParent(), ages);
+    ages.push(3);
+    expect(result.childAges).toEqual([9, 12]);
   });
 });

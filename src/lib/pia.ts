@@ -16,6 +16,25 @@ export interface PiaInput {
 }
 
 /**
+ * The ratio of the average wage in `indexingYear` to the average wage in
+ * 1977, which scales the fixed 1979 bend points of both the PIA formula and
+ * the family maximum formula to the worker's own wage era.
+ *
+ * An indexing year beyond the wage index data is clamped to the latest year
+ * available, so a worker who has not yet turned 60 is indexed on the most
+ * recent index published.
+ */
+export function wageIndexRatio(indexingYear: number): number {
+  const effectiveIndexingYear = Math.min(
+    indexingYear,
+    constants.MAX_WAGE_INDEX_YEAR
+  );
+  return constants.WAGE_INDICES[effectiveIndexingYear].div$(
+    constants.WAGE_INDICES[1977]
+  );
+}
+
+/**
  * A PrimaryInsuranceAmount object manages calculating the user's Primary
  * Insurance Amount (PIA).
  *
@@ -45,15 +64,7 @@ export class PrimaryInsuranceAmount {
    * @returns {number} The wage ratio used for indexing calculations
    */
   private wageRatio(): number {
-    // If the indexing year is beyond the WAGE_INDICES data range, use the
-    // maximum year in the data range.
-    const effectiveIndexingYear = Math.min(
-      this.input_.indexingYear(),
-      constants.MAX_WAGE_INDEX_YEAR
-    );
-    const wage_in_1977: Money = constants.WAGE_INDICES[1977];
-    const wage: Money = constants.WAGE_INDICES[effectiveIndexingYear];
-    return wage.div$(wage_in_1977);
+    return wageIndexRatio(this.input_.indexingYear());
   }
 
   /**

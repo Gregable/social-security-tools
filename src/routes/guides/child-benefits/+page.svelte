@@ -61,8 +61,9 @@ const bends = oneChild.bendPoints;
 // The claim-early comparison follows two of those children.
 const CHILD_AGES = [9, 12] as const;
 const compare = claimAgeComparison(parent, CHILD_AGES);
-const olderChildAgesOutAt = 62 + (18 - Math.max(...CHILD_AGES));
-const youngerChildAgesOutAt = 62 + (18 - Math.min(...CHILD_AGES));
+// The same parent with a single child near the end of eligibility, for the
+// paragraph on how much the children's ages matter.
+const soleTeen = claimAgeComparison(parent, [16]);
 const catchUpYears = compare.catchUpAge.years();
 const catchUpMonths = compare.catchUpAge.modMonths();
 
@@ -86,7 +87,7 @@ const faqs: FAQItem[] = [
   {
     question: 'Can my spouse get benefits for taking care of our child?',
     answer:
-      'Yes. A spouse of any age who is caring for your child under 16, or a disabled child, can receive a spousal benefit of up to half your full benefit with no reduction for the spouse’s own age. It shares the family maximum with the children and ends when the youngest child turns 16, unless the child is disabled.',
+      'Yes. A spouse of any age who is caring for your child under 16, or a disabled child, can receive a spousal benefit of up to half your full benefit with no reduction for the spouse’s own age. It shares the family maximum with the children and ends the month before the youngest child turns 16, unless the child is disabled.',
   },
   {
     question: 'Do my child’s benefits count as my income for taxes?',
@@ -350,7 +351,7 @@ const faqs: FAQItem[] = [
   <p>
     Three catches. The benefit shares the family maximum with the children,
     so as the table above shows, it may add nothing to the family total. It
-    ends the month the youngest child turns 16, two years before the child's
+    ends the month before the youngest child turns 16, two years before the child's
     own benefit does, and the spouse then waits until 62 to claim again, with
     the usual age reduction. And if the spouse is working, their own earnings
     are subject to the
@@ -424,8 +425,9 @@ const faqs: FAQItem[] = [
     The children's row is the same in both columns because a child's benefit
     is based on the full amount regardless of when the parent claims. What
     differs is how many months it is paid. Claiming at 62, the older child
-    collects until age 18 at the parent's {olderChildAgesOutAt} and the
-    younger until the parent's {youngerChildAgesOutAt}, for
+    collects until age 18 at the parent's
+    {compare.parentAgeWhenOldestTurns18.years()} and the younger until the
+    parent's {compare.parentAgeWhenYoungestTurns18.years()}, for
     {compare.childrenTotal.string()} in total. Waiting until {fra.years()}
     forfeits every month before then, which is
     {compare.childrenBeforeFra.string()} of that, plus the parent's own
@@ -436,7 +438,7 @@ const faqs: FAQItem[] = [
     From {fra.years()} on, the children collect the same amounts either way,
     so the only remaining difference is the parent's check:
     {compare.monthlyReduction.string()} a month more for having waited. At
-    that rate the larger check needs {compare.monthsToCatchUp} months to make
+    that rate the larger check needs {compare.timeToCatchUp.asMonths()} months to make
     up the {compare.leadAtFra.string()} lead, which happens at age
     {catchUpYears} and {catchUpMonths} months. Most people will not collect
     that long, and an early claim comes out ahead for this family by a wide
@@ -451,12 +453,15 @@ const faqs: FAQItem[] = [
   <ul>
     <li>
       <strong>The children's ages do most of the work.</strong> Two children
-      with nine and six years of eligibility left are the best case. With one
-      child who is already 16, there is a year or two of child benefits at
-      stake against a lifetime reduction, and the math flips back toward
-      waiting. Run it for your own children's ages; the
-      <a href="/calculator">calculator</a> gives you the Primary Insurance
-      Amount to start from.
+      with {compare.childBenefitSpan.years()} and
+      {compare.oldestChildBenefitSpan.years()} years of eligibility left are
+      a strong case. For the same parent with one child who is already 16,
+      the lead at {fra.years()} shrinks to {soleTeen.leadAtFra.string()}
+      and the larger check catches up at age {soleTeen.catchUpAge.years()},
+      which is close to a coin flip on dollars alone; health, the survivor
+      benefit, and whether you are still working decide it. Run it for your
+      own children's ages; the <a href="/calculator">calculator</a> gives you
+      the Primary Insurance Amount to start from.
     </li>
     <li>
       <strong>Your spouse inherits less.</strong> A survivor benefit is
@@ -605,8 +610,9 @@ const faqs: FAQItem[] = [
   <p>
     Everything above starts from the Primary Insurance Amount. Paste your
     earnings record into the <a href="/calculator">ssa.tools calculator</a>
-    to see yours, then take half of it for each child and compare the total
-    with the family maximum for your figure. If your children are young and
+    to see yours. Half of it is each child's starting point, and the
+    bend-point table above gives the cap on the family total. If your
+    children are young and
     you are no longer working, the comparison in this guide is likely to come
     out the same way for you; if a child is close to 18 or you plan to keep
     working, it may not.

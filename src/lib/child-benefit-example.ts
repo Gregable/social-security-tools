@@ -12,6 +12,9 @@
  * calculator, so the guide's tables follow the annual update. The children's
  * ages, the example PIA, and any sentence in the guide naming a percentage
  * or a ratio between rows are hand-written and still need a read each year.
+ *
+ * The result records below are plain readonly interfaces produced only by
+ * the functions beside them; they are not meant to be constructed by hand.
  */
 
 import { benefitAtAge, survivorBenefit } from './benefit-calculator';
@@ -41,7 +44,11 @@ const CHILD_BENEFIT_END_AGE = MonthDuration.initFromYearsMonths({
   months: 0,
 });
 
-const AGE_62 = MonthDuration.initFromYearsMonths({ years: 62, months: 0 });
+/** The claiming age the comparison tests against full retirement age. */
+const EARLY_CLAIM_AGE = MonthDuration.initFromYearsMonths({
+  years: EXAMPLE_PARENT_AGE,
+  months: 0,
+});
 
 /**
  * An age at which the example parent has died, used only to place the death
@@ -55,17 +62,19 @@ const SURVIVOR_EXAMPLE_DEATH_AGE = MonthDuration.initFromYearsMonths({
 
 /**
  * A parent who turns 62 in the latest year the constants cover, so the
- * family maximum is computed from the latest wage index and no
- * cost-of-living adjustment has yet applied. Born mid-month to keep clear
- * of the day-before-birthday rule. The birth year gives a full retirement
- * age of 67, which the guide states in prose.
+ * family maximum is computed from the latest wage index (this relies on
+ * WAGE_INDICES covering MAX_YEAR - 2) and no cost-of-living adjustment has
+ * yet applied. Born on the 2nd of the month: only someone born on the 1st
+ * or 2nd is 62 for their whole birth month, which the comparison's claim
+ * at exactly 62 requires. The birth year gives a full retirement age of 67,
+ * which the guide states in prose.
  */
 export function exampleParent(): Recipient {
   const parent = new Recipient();
   parent.birthdate = Birthdate.FromYMD(
     constants.MAX_YEAR - EXAMPLE_PARENT_AGE,
     0,
-    15
+    2
   );
   parent.setPia(EXAMPLE_PIA);
   return parent;
@@ -83,8 +92,13 @@ export interface FamilyPayout {
   readonly eachUnlimited: Money;
   /** Each person's benefit after the maximum, rounded down to the dime. */
   readonly each: Money;
-  /** The worker's own benefit plus everyone collecting on the record. */
+  /**
+   * The worker's unreduced PIA plus everyone collecting on the record. The
+   * worker's own early-claim reduction is not applied here; the guide's
+   * table note says so.
+   */
   readonly familyTotal: Money;
+  /** Whether the maximum bound, i.e. `each` is below `eachUnlimited`. */
   readonly capped: boolean;
 }
 
@@ -106,6 +120,11 @@ export function familyPayout(
   const indexingYear = parent.indexingYear();
   const maximum = familyMaximum(pia, indexingYear);
   const auxiliaryPool = maximum.sub(pia);
+  if (auxiliaryPool.lessThan(Money.from(0))) {
+    throw new Error(
+      `family maximum ${maximum.string()} is below the PIA ${pia.string()}`
+    );
+  }
   const eachUnlimited = pia.times(CHILD_BENEFIT_FRACTION).floorToDime();
   const share = auxiliaryPool.div(beneficiaries).floorToDime();
   const capped = share.lessThan(eachUnlimited);
@@ -124,14 +143,20 @@ export function familyPayout(
 }
 
 export interface ClaimAgeComparison {
+  /** The children's ages in whole years at the claim, as given. */
   readonly childAges: readonly number[];
+  readonly fra: MonthDuration;
   readonly benefitAt62: Money;
   readonly benefitAtFra: Money;
   /** The permanent monthly cost of claiming at 62 instead of at FRA. */
   readonly monthlyReduction: Money;
-  readonly monthsToFra: number;
-  /** Months from the claim until the youngest child turns 18. */
-  readonly monthsOfChildBenefits: number;
+  readonly timeToFra: MonthDuration;
+  /** From the claim until the youngest child turns 18. */
+  readonly childBenefitSpan: MonthDuration;
+  /** From the claim until the oldest child turns 18. */
+  readonly oldestChildBenefitSpan: MonthDuration;
+  readonly parentAgeWhenOldestTurns18: MonthDuration;
+  readonly parentAgeWhenYoungestTurns18: MonthDuration;
   /**
    * Everything the children collect if the parent claims at 62, from then
    * until the youngest turns 18. Nominal: no cost-of-living adjustments.
@@ -147,8 +172,8 @@ export interface ClaimAgeComparison {
    * difference from then on is the parent's reduced check.
    */
   readonly leadAtFra: Money;
-  /** Months after FRA for the larger check to make up the lead. */
-  readonly monthsToCatchUp: number;
+  /** Time after FRA for the larger check to make up the lead. */
+  readonly timeToCatchUp: MonthDuration;
   readonly catchUpAge: MonthDuration;
   /** The base survivor benefit a spouse would inherit, by the parent's claim age. */
   readonly survivorIfClaimedAt62: Money;
@@ -172,14 +197,21 @@ function validateChildAges(childAges: readonly number[]): void {
   }
 }
 
-/** The children still under 18 `monthsAfterClaim` months after the claim. */
+function ageInYears(years: number): MonthDuration {
+  return MonthDuration.initFromYearsMonths({ years, months: 0 });
+}
+
+/** How long a child of this age keeps collecting, until they turn 18. */
+function benefitSpan(childAge: number): MonthDuration {
+  return CHILD_BENEFIT_END_AGE.subtract(ageInYears(childAge));
+}
+
+/** The children still under 18 at `elapsed` after the claim. */
 function childrenStillEligible(
   childAges: readonly number[],
-  monthsAfterClaim: number
+  elapsed: MonthDuration
 ): number {
-  return childAges.filter(
-    (age) => age * 12 + monthsAfterClaim < CHILD_BENEFIT_END_AGE.asMonths()
-  ).length;
+  return childAges.filter((age) => elapsed.lessThan(benefitSpan(age))).length;
 }
 
 /**
@@ -209,8 +241,14 @@ export function claimAgeComparison(
   childAges: readonly number[]
 ): ClaimAgeComparison {
   validateChildAges(childAges);
+  const ages = [...childAges];
+  if (parent.birthdate.earliestFilingMonth().greaterThan(EARLY_CLAIM_AGE)) {
+    throw new Error(
+      'the comparison claims at exactly 62, which this parent cannot do'
+    );
+  }
   const fra = parent.normalRetirementAge();
-  const benefitAt62 = benefitAtAge(parent, AGE_62);
+  const benefitAt62 = benefitAtAge(parent, EARLY_CLAIM_AGE);
   const benefitAtFra = benefitAtAge(parent, fra);
   const monthlyReduction = benefitAtFra.sub(benefitAt62);
   if (!monthlyReduction.greaterThan(Money.from(0))) {
@@ -218,44 +256,51 @@ export function claimAgeComparison(
       'the comparison needs a parent whose benefit is reduced at 62'
     );
   }
-  const monthsToFra = fra.subtract(AGE_62).asMonths();
+  const timeToFra = fra.subtract(EARLY_CLAIM_AGE);
 
   // Each child's benefit depends on how many children are still under 18,
   // so the family's monthly payment is recomputed as children age out.
-  const youngest = Math.min(...childAges);
-  const monthsOfChildBenefits =
-    CHILD_BENEFIT_END_AGE.asMonths() - youngest * 12;
+  const childBenefitSpan = benefitSpan(Math.min(...ages));
+  const oldestChildBenefitSpan = benefitSpan(Math.max(...ages));
   let childrenTotal = Money.from(0);
   let childrenBeforeFra = Money.from(0);
-  for (let month = 0; month < monthsOfChildBenefits; month++) {
-    const eligible = childrenStillEligible(childAges, month);
+  for (
+    const elapsed = new MonthDuration(0);
+    elapsed.lessThan(childBenefitSpan);
+    elapsed.increment()
+  ) {
+    const eligible = childrenStillEligible(ages, elapsed);
     const payment = familyPayout(parent, eligible).each.times(eligible);
     childrenTotal = childrenTotal.plus(payment);
-    if (month < monthsToFra) {
+    if (elapsed.lessThan(timeToFra)) {
       childrenBeforeFra = childrenBeforeFra.plus(payment);
     }
   }
 
-  const ownBeforeFra = benefitAt62.times(monthsToFra);
+  const ownBeforeFra = benefitAt62.times(timeToFra.asMonths());
   const leadAtFra = ownBeforeFra.plus(childrenBeforeFra);
-  const monthsToCatchUp = Math.ceil(
-    leadAtFra.cents() / monthlyReduction.cents()
+  const timeToCatchUp = new MonthDuration(
+    Math.ceil(leadAtFra.div$(monthlyReduction))
   );
 
   return {
-    childAges,
+    childAges: ages,
+    fra,
     benefitAt62,
     benefitAtFra,
     monthlyReduction,
-    monthsToFra,
-    monthsOfChildBenefits,
+    timeToFra,
+    childBenefitSpan,
+    oldestChildBenefitSpan,
+    parentAgeWhenOldestTurns18: EARLY_CLAIM_AGE.add(oldestChildBenefitSpan),
+    parentAgeWhenYoungestTurns18: EARLY_CLAIM_AGE.add(childBenefitSpan),
     childrenTotal,
     childrenBeforeFra,
     ownBeforeFra,
     leadAtFra,
-    monthsToCatchUp,
-    catchUpAge: fra.add(new MonthDuration(monthsToCatchUp)),
-    survivorIfClaimedAt62: survivorAfterClaimAt(parent, AGE_62),
+    timeToCatchUp,
+    catchUpAge: fra.add(timeToCatchUp),
+    survivorIfClaimedAt62: survivorAfterClaimAt(parent, EARLY_CLAIM_AGE),
     survivorIfClaimedAtFra: survivorAfterClaimAt(parent, fra),
   };
 }
