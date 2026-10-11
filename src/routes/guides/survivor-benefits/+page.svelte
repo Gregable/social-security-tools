@@ -126,6 +126,11 @@ const sponsorCopy: SponsorCopy = {
       <li>OR age 18-19 and still attending high school full-time</li>
       <li>OR any age if disabled before age 22</li>
       <li>Can receive <a href="https://www.ssa.gov/benefits/survivors/survivorchartred.html">up to 75%</a> of deceased's benefit</li>
+      <li>
+        While the parent is alive and retired, the same children can collect
+        up to 50%; see the
+        <a href="/guides/child-benefits">child benefits guide</a>
+      </li>
     </ul>
 
     <h4>Dependent Parents (Age 62+)</h4>

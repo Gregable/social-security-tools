@@ -285,7 +285,10 @@
   <p>
     If your spouse or children receive benefits on your record, your excess
     earnings can reduce their benefits too - but only up to the maximum family
-    benefit. Their own earnings don't affect your benefit.
+    benefit. Their own earnings don't affect your benefit. This matters most
+    for a parent thinking of claiming early so the children can collect; the
+    <a href="/guides/child-benefits">child benefits guide</a> covers that
+    decision.
   </p>
 
   <h2>Common Misconceptions</h2>

@@ -294,6 +294,28 @@ export const BEFORE_BENDPOINT2_MULTIPLIER: number = 0.32;
 /* PIA formula multiplier after the second bend point. */
 export const AFTER_BENDPOINT2_MULTIPLIER: number = 0.15;
 
+// Values from https://www.ssa.gov/oact/cola/familymax.html
+//
+// The family maximum formula has three bend points. Like the PIA bend
+// points above, they are the 1979 dollar amounts scaled by the ratio of the
+// average wage index in the worker's indexing year to the index in 1977.
+
+/* The first bend in dollars (1979 base, indexed on 1977 wages) for the
+ * family maximum formula. */
+export const FAMILY_MAX_BENDPOINT1_IN_1977: Money = Money.from(230.0);
+/* The second bend for the family maximum formula. */
+export const FAMILY_MAX_BENDPOINT2_IN_1977: Money = Money.from(332.0);
+/* The third bend for the family maximum formula. */
+export const FAMILY_MAX_BENDPOINT3_IN_1977: Money = Money.from(433.0);
+/* Family maximum multiplier on the PIA up to the first bend point. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET1: number = 1.5;
+/* Family maximum multiplier between the first and second bend points. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET2: number = 2.72;
+/* Family maximum multiplier between the second and third bend points. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET3: number = 1.34;
+/* Family maximum multiplier above the third bend point. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET4: number = 1.75;
+
 /**
  * The average wage index for each year, in dollars.
  */

@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Oct 10, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/child-benefits">
+            Social Security Benefits for Children When a Parent Retires: Who
+            Qualifies, How Much, and Whether to Claim Early
+          </a>
+        </h3>
+        <p class="description">
+          Each child under 18 can collect up to half a retired parent's full
+          benefit, and a spouse caring for them can too. How the family
+          maximum caps the total, what claiming at 62 for the children costs
+          and earns, when benefits end, and how to apply.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 18, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/working-past-full-retirement-age">

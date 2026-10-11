@@ -333,7 +333,10 @@ const faqs: FAQItem[] = [
     <a href="https://www.ssa.gov/oact/cola/familymax.html">family maximum</a>, which is between
     150% and 188% of the worker's PIA. If children are also collecting, the
     spousal benefit may be reduced to stay under the cap. The worker's own
-    benefit is never reduced.
+    benefit is never reduced. The
+    <a href="/guides/child-benefits">child benefits guide</a> works through
+    the formula and shows how the cap divides a record among children and a
+    spouse caring for them.
   </p>
 
   <h3>Medicare</h3>
