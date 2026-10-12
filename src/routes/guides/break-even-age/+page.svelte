@@ -79,6 +79,16 @@ const vs6267At = (rate: number) =>
 
 const percent = (rate: number, decimals = 0): string =>
   `${(rate * 100).toFixed(decimals)}%`;
+// A span of time in prose, e.g. "11 years and 8 months" or "5 years".
+const durationText = (d: MonthDuration): string => {
+  const years = d.years();
+  const months = d.modMonths();
+  const yearPart = `${years} ${years === 1 ? 'year' : 'years'}`;
+  const monthPart = `${months} ${months === 1 ? 'month' : 'months'}`;
+  if (months === 0) return yearPart;
+  if (years === 0) return monthPart;
+  return `${yearPart} and ${monthPart}`;
+};
 // An age in prose: whole years alone, otherwise years and months.
 const ageText = (a: MonthDuration): string =>
   a.modMonths() === 0 ? `${a.years()}` : a.toYearsAndMonthsString();
@@ -95,7 +105,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'What is the break-even age for claiming at 62 versus 67?',
-    answer: `About ${ageText(vs6267.breakEvenAge)} for someone whose full retirement age is 67. The 62 claim collects five years of checks at 70% of the full amount; the 67 claim then earns 30% of the full amount more each month, and needs ${vs6267.timeToBreakEven.toYearsAndMonthsString()} to make up the difference.`,
+    answer: `About ${ageText(vs6267.breakEvenAge)} for someone whose full retirement age is 67. The 62 claim collects five years of checks at 70% of the full amount; the 67 claim then earns 30% of the full amount more each month, and needs ${durationText(vs6267.timeToBreakEven)} to make up the difference.`,
   },
   {
     question: 'What is the break-even age for claiming at 62 versus 70?',
@@ -208,7 +218,7 @@ const faqs: FAQItem[] = [
     receives {vs6267.monthlyGain.string()} more every month. Dividing the
     head start by the monthly gain gives
     {vs6267.timeToBreakEven.asMonths()} months, which is
-    {vs6267.timeToBreakEven.toYearsAndMonthsString()} after {fra.years()}:
+    {durationText(vs6267.timeToBreakEven)} after {fra.years()}:
     age {ageText(vs6267.breakEvenAge)}. Live past that and waiting paid more in
     total; die before it and claiming early did.
   </p>
@@ -280,17 +290,17 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    Two things stand out. Every break-even falls between
-    {ageText(earliestBreakEven)} and {ageText(latestBreakEven)}, ages that
-    most people who have already reached 62 will live to see. And the
-    break-evens for waiting past full retirement age land at older ages
-    than the ones for not claiming early. That is not because the credits
-    are a worse deal: measured from the earlier claim, waiting from
-    {fra.years()} to 70 pays back in
-    {vs6770.breakEvenAge.subtract(fra).toYearsAndMonthsString()}, faster
-    than the {vs6267.breakEvenAge.subtract(age(62)).toYearsAndMonthsString()}
-    for waiting from 62 to {fra.years()}. It simply starts five years later,
-    so the finish line is further along too.
+    Two things stand out. The earliest break-even in the table is
+    {ageText(earliestBreakEven)} and the latest is
+    {ageText(latestBreakEven)}, ages that most people who have already
+    reached 62 will live to see. And the break-evens for waiting past full
+    retirement age land at older ages than the ones for not claiming early.
+    That is not because the credits are a worse deal: measured from the
+    earlier claim, waiting from {fra.years()} to 70 pays back in
+    {durationText(vs6770.breakEvenAge.subtract(fra))}, faster than the
+    {durationText(vs6267.breakEvenAge.subtract(age(62)))} for waiting from
+    62 to {fra.years()}. It simply starts five years later, so the finish
+    line is further along too.
   </p>
 
   <h2>What the Break-Even Age Leaves Out</h2>
