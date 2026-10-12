@@ -11,8 +11,8 @@
  *
  * The comparison is nominal: cost-of-living adjustments scale both choices
  * by the same factor, so they move the dollar figures without moving the
- * break-even age. It also ignores the time value of money and mortality;
- * the strategy page handles those.
+ * break-even age. It also ignores mortality; the strategy page handles
+ * that. The discounted variant below accounts for the time value of money.
  *
  * The result records are plain readonly interfaces produced only by the
  * functions beside them; they are not meant to be constructed by hand.
@@ -44,8 +44,9 @@ const LATEST_CLAIM_AGE = MonthDuration.initFromYearsMonths({
 
 /**
  * An age at which the example retiree has died, used only to place the
- * death after every claiming age compared and the spouse past survivor
- * full retirement age, so the survivor figure is the unreduced base amount.
+ * death after every claiming age compared and the same-age spouse past
+ * survivor full retirement age, so the survivor figure is the unreduced
+ * base amount.
  */
 const SURVIVOR_EXAMPLE_DEATH_AGE = MonthDuration.initFromYearsMonths({
   years: 75,
@@ -53,10 +54,12 @@ const SURVIVOR_EXAMPLE_DEATH_AGE = MonthDuration.initFromYearsMonths({
 });
 
 /**
- * A retiree who turns 62 in the latest year the constants cover, so no
- * cost-of-living adjustment has yet applied. Born on the 2nd of the month:
- * only someone born on the 1st or 2nd is 62 for their whole birth month,
- * which a claim at exactly 62 requires. The birth year gives a full
+ * A retiree who turns 62 in the latest year the constants cover, so the
+ * example stays current. The PIA is set directly rather than computed from
+ * earnings, and a set PIA never has cost-of-living adjustments applied, so
+ * the figures are in the guide year's dollars. Born on the 2nd of the
+ * month: only someone born on the 1st or 2nd is 62 for their whole birth
+ * month, which a claim at exactly 62 requires. The birth year gives a full
  * retirement age of 67, which the guide states in prose.
  */
 export function exampleRetiree(): Recipient {
@@ -81,9 +84,21 @@ export interface BreakEven {
   readonly monthlyGain: Money;
   /** Time after the later claim starts for the gain to repay the head start. */
   readonly timeToBreakEven: MonthDuration;
-  /** The first month in which the later claim has collected at least as much. */
+  /**
+   * The age at which the later claim's running total first reaches the
+   * earlier claim's: laterAge plus timeToBreakEven.
+   */
   readonly breakEvenAge: MonthDuration;
-  /** The base survivor benefit a spouse would inherit under each choice. */
+  /**
+   * The delay seen as a purchase: a year of the extra income divided by
+   * the forgone checks that bought it. Comparable to an annuity's payout
+   * rate.
+   */
+  readonly annualPayoutRate: number;
+  /**
+   * The base survivor benefit a same-age spouse, already past survivor
+   * full retirement age, would inherit under each choice.
+   */
   readonly survivorIfEarlier: Money;
   readonly survivorIfLater: Money;
 }
@@ -159,6 +174,7 @@ export function breakEven(
     monthlyGain,
     timeToBreakEven,
     breakEvenAge: later.add(timeToBreakEven),
+    annualPayoutRate: monthlyGain.times(12).div$(headStart),
     survivorIfEarlier: survivorAfterClaimAt(retiree, earlier),
     survivorIfLater: survivorAfterClaimAt(retiree, later),
   };
@@ -170,7 +186,8 @@ export interface ClaimAgeRow {
   /**
    * The break-even against claiming at full retirement age: for an earlier
    * age, when the FRA claim catches up; for a later age, when this claim
-   * catches up with the FRA claim. Null for full retirement age itself.
+   * catches up with the FRA claim. Null only for a row that is full
+   * retirement age itself, which happens when FRA is a whole year.
    */
   readonly versusFra: BreakEven | null;
 }
@@ -204,7 +221,7 @@ export function claimAgeRows(retiree: Recipient): ClaimAgeRow[] {
 export const DISCOUNT_RATES: readonly number[] = [0, 0.02, 0.04, 0.06];
 
 /**
- * Beyond this age a break-even is not worth reporting: almost no one
+ * Past this age a break-even is not worth reporting: almost no one
  * collects that long, so the later claim never pays back in practice.
  */
 export const BREAK_EVEN_HORIZON = MonthDuration.initFromYearsMonths({
@@ -214,9 +231,11 @@ export const BREAK_EVEN_HORIZON = MonthDuration.initFromYearsMonths({
 
 /**
  * The first age at which the present value of the later claim's checks,
- * discounted to the earlier claim at `annualRate`, matches the present
- * value of the earlier claim's. Null when that does not happen before
- * BREAK_EVEN_HORIZON. At a zero rate this equals breakEven().breakEvenAge.
+ * discounted to the earlier claim at `annualRate`, reaches or exceeds the
+ * present value of the earlier claim's. Null when that does not happen at
+ * or before BREAK_EVEN_HORIZON. At a zero rate this equals
+ * breakEven().breakEvenAge; unlike breakEven, a later claim that pays no
+ * more simply never catches up and yields null.
  */
 export function discountedBreakEvenAge(
   retiree: Recipient,
@@ -239,9 +258,10 @@ export function discountedBreakEvenAge(
   let earlierValue = Money.from(0);
   let laterValue = Money.from(0);
   let discount = 1;
-  // `paid` counts checks received since the earlier claim; after `paid`
-  // months both totals are compared, matching breakEven's convention that
-  // the break-even age is when the running totals are equal.
+  // `paid` counts checks received since the earlier claim, and the age
+  // returned is `earlier` plus `paid` months: the age after that many
+  // checks, when the two running totals are compared. This is the same
+  // convention as breakEven, whose answer is later + ceil(headStart/gain).
   for (let paid = 1; paid <= horizon; paid++) {
     earlierValue = earlierValue.plus(earlierBenefit.times(discount));
     if (paid > laterStartsAfter) {
@@ -255,14 +275,23 @@ export function discountedBreakEvenAge(
   return null;
 }
 
+export interface DiscountedBreakEvenCell {
+  readonly rate: number;
+  /** Null when the break-even falls past BREAK_EVEN_HORIZON. */
+  readonly age: MonthDuration | null;
+}
+
 export interface DiscountedBreakEvenRow {
   readonly earlier: MonthDuration;
   readonly later: MonthDuration;
-  /** One entry per DISCOUNT_RATES, in order; null past the horizon. */
-  readonly byRate: readonly (MonthDuration | null)[];
+  /** One cell per DISCOUNT_RATES, in that order. */
+  readonly byRate: readonly DiscountedBreakEvenCell[];
 }
 
-/** The three headline comparisons at every published discount rate. */
+/**
+ * The three headline comparisons, 62 vs FRA, 62 vs 70, and FRA vs 70 in
+ * that order, at every published discount rate.
+ */
 export function discountedBreakEvens(
   retiree: Recipient
 ): DiscountedBreakEvenRow[] {
@@ -275,8 +304,9 @@ export function discountedBreakEvens(
   return pairs.map(([earlier, later]) => ({
     earlier,
     later,
-    byRate: DISCOUNT_RATES.map((rate) =>
-      discountedBreakEvenAge(retiree, earlier, later, rate)
-    ),
+    byRate: DISCOUNT_RATES.map((rate) => ({
+      rate,
+      age: discountedBreakEvenAge(retiree, earlier, later, rate),
+    })),
   }));
 }

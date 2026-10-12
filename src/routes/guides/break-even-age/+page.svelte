@@ -2,7 +2,7 @@
 import {
   breakEven,
   claimAgeRows,
-  DISCOUNT_RATES,
+  discountedBreakEvenAge,
   discountedBreakEvens,
   EXAMPLE_PIA,
   exampleRetiree,
@@ -62,29 +62,31 @@ const vs6267 = breakEven(retiree, age(62), fra);
 const vs6270 = breakEven(retiree, age(62), age(70));
 const vs6770 = breakEven(retiree, fra, age(70));
 const rows = claimAgeRows(retiree);
+const breakEvenAges = rows
+  .map((row) => row.versusFra?.breakEvenAge)
+  .filter((a): a is MonthDuration => a !== undefined);
+const earliestBreakEven = breakEvenAges.reduce((a, b) =>
+  a.lessThan(b) ? a : b
+);
+const latestBreakEven = breakEvenAges.reduce((a, b) =>
+  a.greaterThan(b) ? a : b
+);
 // The same three comparisons with the early checks earning a real return.
 const discounted = discountedBreakEvens(retiree);
-const percent = (rate: number): string => `${(rate * 100).toFixed(0)}%`;
-const RATE_2 = DISCOUNT_RATES.indexOf(0.02);
-const RATE_4 = DISCOUNT_RATES.indexOf(0.04);
-const RATE_6 = DISCOUNT_RATES.indexOf(0.06);
+// The 62 vs FRA comparison at one rate, for sentences that name a rate.
+const vs6267At = (rate: number) =>
+  discountedBreakEvenAge(retiree, age(62), fra, rate);
 
-const ageText = (a: MonthDuration): string => {
-  const months = a.modMonths();
-  if (months === 0) return `${a.years()}`;
-  return `${a.years()} and ${months} ${months === 1 ? 'month' : 'months'}`;
-};
+const percent = (rate: number, decimals = 0): string =>
+  `${(rate * 100).toFixed(decimals)}%`;
+// An age in prose: whole years alone, otherwise years and months.
+const ageText = (a: MonthDuration): string =>
+  a.modMonths() === 0 ? `${a.years()}` : a.toYearsAndMonthsString();
 const ageOrNever = (a: MonthDuration | null): string =>
   a === null ? 'Never' : ageText(a);
-// The 62 vs 67 row, used in prose.
-const d6267 = discounted[0].byRate;
 
-// Delaying is a purchase: the forgone checks are the premium and the larger
-// check is the income it buys. The ratio of annual income gained to the
-// premium is the payout rate a private annuity would have to match.
-const payoutRate = (b: typeof vs6770): string =>
-  `${(b.monthlyGain.times(12).div$(b.headStart) * 100).toFixed(1)}%`;
-
+// Percentages and the "five years" phrasing below are hand-written for a
+// full retirement age of 67; re-read them with the golden test each year.
 const faqs: FAQItem[] = [
   {
     question: 'What is the Social Security break-even age?',
@@ -93,7 +95,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'What is the break-even age for claiming at 62 versus 67?',
-    answer: `About ${ageText(vs6267.breakEvenAge)} for someone whose full retirement age is 67. The 62 claim collects five years of checks at 70% of the full amount; the 67 claim then earns 30% of the full amount more each month, and needs just under twelve years to make up the difference.`,
+    answer: `About ${ageText(vs6267.breakEvenAge)} for someone whose full retirement age is 67. The 62 claim collects five years of checks at 70% of the full amount; the 67 claim then earns 30% of the full amount more each month, and needs ${vs6267.timeToBreakEven.toYearsAndMonthsString()} to make up the difference.`,
   },
   {
     question: 'What is the break-even age for claiming at 62 versus 70?',
@@ -107,7 +109,7 @@ const faqs: FAQItem[] = [
   {
     question:
       'Does investing the early checks change the break-even age?',
-    answer: `Yes, and it is the one factor that favors claiming earlier. If the checks from a claim at 62 earn a 2% real return, the break-even against claiming at 67 moves from ${ageText(vs6267.breakEvenAge)} to ${ageOrNever(d6267[RATE_2])}; at 4% it moves to ${ageOrNever(d6267[RATE_4])}, and at 6% to ${ageOrNever(d6267[RATE_6])}. The same applies if the early checks let you leave savings invested instead of drawing them down.`,
+    answer: `Yes, and it is the one factor that favors claiming earlier. If the checks from a claim at 62 earn a 2% real return, the break-even against claiming at 67 moves from ${ageText(vs6267.breakEvenAge)} to ${ageOrNever(vs6267At(0.02))}; at 4% it moves to ${ageOrNever(vs6267At(0.04))}, and at 6% to ${ageOrNever(vs6267At(0.06))}. The same applies if the early checks let you leave savings invested instead of drawing them down.`,
   },
   {
     question: 'Is the break-even age the right way to decide when to claim?',
@@ -206,9 +208,8 @@ const faqs: FAQItem[] = [
     receives {vs6267.monthlyGain.string()} more every month. Dividing the
     head start by the monthly gain gives
     {vs6267.timeToBreakEven.asMonths()} months, which is
-    {vs6267.timeToBreakEven.years()} years and
-    {vs6267.timeToBreakEven.modMonths()} months after {fra.years()}: age
-    {ageText(vs6267.breakEvenAge)}. Live past that and waiting paid more in
+    {vs6267.timeToBreakEven.toYearsAndMonthsString()} after {fra.years()}:
+    age {ageText(vs6267.breakEvenAge)}. Live past that and waiting paid more in
     total; die before it and claiming early did.
   </p>
 
@@ -279,13 +280,17 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    Two things stand out. The break-even ages all sit in the late 70s to
-    early 80s, a few years short of the average remaining lifespan for
-    someone who has already reached 62. And the break-even for waiting past
-    full retirement age arrives later than the one for not claiming early,
-    because delayed credits accrue at 8% a year while the early reduction
-    runs closer to 6% to 7%. Both facts are why the usual advice is to avoid
-    62 if you can, while the case for 70 depends more on the factors below.
+    Two things stand out. Every break-even falls between
+    {ageText(earliestBreakEven)} and {ageText(latestBreakEven)}, ages that
+    most people who have already reached 62 will live to see. And the
+    break-evens for waiting past full retirement age land at older ages
+    than the ones for not claiming early. That is not because the credits
+    are a worse deal: measured from the earlier claim, waiting from
+    {fra.years()} to 70 pays back in
+    {vs6770.breakEvenAge.subtract(fra).toYearsAndMonthsString()}, faster
+    than the {vs6267.breakEvenAge.subtract(age(62)).toYearsAndMonthsString()}
+    for waiting from 62 to {fra.years()}. It simply starts five years later,
+    so the finish line is further along too.
   </p>
 
   <h2>What the Break-Even Age Leaves Out</h2>
@@ -334,7 +339,8 @@ const faqs: FAQItem[] = [
   <p>
     When a married worker dies, the surviving spouse can step up to the
     worker's benefit, and the worker's claiming age sets how large that is.
-    For this worker, a spouse would inherit {vs6270.survivorIfEarlier.string()}
+    For this worker, a spouse of the same age who has reached their own
+    survivor full retirement age would inherit {vs6270.survivorIfEarlier.string()}
     a month after a claim at 62, which is the
     <a href="https://secure.ssa.gov/poms.nsf/lnx/0300615320"
       >floor of 82.5% of the full amount</a
@@ -379,8 +385,8 @@ const faqs: FAQItem[] = [
     <thead>
       <tr>
         <th>Comparison</th>
-        {#each DISCOUNT_RATES as rate}
-          <th>{percent(rate)} real return</th>
+        {#each discounted[0].byRate as cell}
+          <th>{percent(cell.rate)} real return</th>
         {/each}
       </tr>
     </thead>
@@ -388,8 +394,8 @@ const faqs: FAQItem[] = [
       {#each discounted as row}
         <tr>
           <td>{row.earlier.years()} vs. {row.later.years()}</td>
-          {#each row.byRate as at}
-            <td>{ageOrNever(at)}</td>
+          {#each row.byRate as cell}
+            <td>{ageOrNever(cell.age)}</td>
           {/each}
         </tr>
       {/each}
@@ -403,13 +409,12 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    At the {percent(DISCOUNT_RATES[RATE_2])} real return a cautious
-    portfolio might earn, each break-even slips two to three years. At
-    {percent(DISCOUNT_RATES[RATE_4])} the case for waiting from 62 to 67
-    needs you to reach {ageOrNever(d6267[RATE_4])}, and the case for waiting
-    from 67 to 70 pushes into the late 80s. At
-    {percent(DISCOUNT_RATES[RATE_6])}, a stock-market return with no bad
-    years, waiting barely pays back within a normal lifespan. This is the
+    At the {percent(0.02)} real return a cautious portfolio might earn,
+    each break-even slips two to three years. At {percent(0.04)} the case
+    for waiting from 62 to 67 needs you to reach {ageOrNever(vs6267At(0.04))},
+    and the case for waiting from 67 to 70 pushes into the late 80s. At
+    {percent(0.06)}, a stock-market return with no bad years, waiting does
+    not pay back for most people. This is the
     one factor that leans toward claiming earlier, and it matters most for
     people who do not need the checks to live on. Two cautions: a return
     assumed in advance is not a return earned, and Social Security's larger
@@ -472,9 +477,10 @@ const faqs: FAQItem[] = [
     It also helps to see delaying as a purchase. Waiting from {fra.years()}
     to 70 costs this worker {vs6770.headStart.string()} in forgone checks
     and buys {vs6770.monthlyGain.string()} a month more for life, which is
-    {payoutRate(vs6770)} of the price per year. Waiting from 62 to 70 costs
-    {vs6270.headStart.string()} and buys {vs6270.monthlyGain.string()} a
-    month, {payoutRate(vs6270)} a year. That income is adjusted for
+    {percent(vs6770.annualPayoutRate, 1)} of the price per year. Waiting
+    from 62 to 70 costs {vs6270.headStart.string()} and buys
+    {vs6270.monthlyGain.string()} a month, {percent(vs6270.annualPayoutRate, 1)}
+    a year. That income is adjusted for
     inflation every year, continues as long as you live, and passes to a
     surviving spouse. An insurance company selling an inflation-indexed
     income for life to a healthy 67-year-old charges considerably more for

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Birthdate } from '$lib/birthday';
 import {
   breakEven,
   claimAgeRows,
@@ -10,9 +11,12 @@ import {
 } from '$lib/break-even-example';
 import { MAX_YEAR } from '$lib/constants';
 import { MonthDuration } from '$lib/month-time';
+import { Recipient } from '$lib/recipient';
 
-const age = (years: number) =>
-  MonthDuration.initFromYearsMonths({ years, months: 0 });
+const age = (years: number, months = 0) =>
+  MonthDuration.initFromYearsMonths({ years, months });
+const ym = (d: MonthDuration | null) =>
+  d === null ? null : [d.years(), d.modMonths()];
 
 describe('exampleRetiree', () => {
   it('turns 62 in the latest year the constants cover', () => {
@@ -20,15 +24,13 @@ describe('exampleRetiree', () => {
   });
 
   it('has a full retirement age of exactly 67', () => {
-    const fra = exampleRetiree().normalRetirementAge();
-    expect(fra.years()).toBe(67);
-    expect(fra.modMonths()).toBe(0);
+    expect(ym(exampleRetiree().normalRetirementAge())).toEqual([67, 0]);
   });
 
   it('can file in the month they turn 62', () => {
-    const earliest = exampleRetiree().birthdate.earliestFilingMonth();
-    expect(earliest.years()).toBe(62);
-    expect(earliest.modMonths()).toBe(0);
+    expect(ym(exampleRetiree().birthdate.earliestFilingMonth())).toEqual([
+      62, 0,
+    ]);
   });
 
   it('carries the example PIA unchanged', () => {
@@ -50,39 +52,57 @@ describe('breakEven', () => {
     expect(b.laterBenefit.string()).toBe('$2,500.00');
     expect(b.headStart.string()).toBe('$105,000.00');
     expect(b.monthlyGain.string()).toBe('$750.00');
-    expect(b.breakEvenAge.years()).toBe(78);
-    expect(b.breakEvenAge.modMonths()).toBe(8);
+    expect(b.timeToBreakEven.asMonths()).toBe(140);
+    expect(ym(b.breakEvenAge)).toEqual([78, 8]);
   });
 
   it('finds 80 and 5 months for 62 against 70', () => {
     const b = breakEven(exampleRetiree(), age(62), age(70));
     expect(b.laterBenefit.string()).toBe('$3,100.00');
     expect(b.headStart.string()).toBe('$168,000.00');
-    expect(b.breakEvenAge.years()).toBe(80);
-    expect(b.breakEvenAge.modMonths()).toBe(5);
+    expect(ym(b.breakEvenAge)).toEqual([80, 5]);
   });
 
   it('finds 82 and 6 months for 67 against 70', () => {
     const b = breakEven(exampleRetiree(), age(67), age(70));
     expect(b.headStart.string()).toBe('$90,000.00');
     expect(b.monthlyGain.string()).toBe('$600.00');
-    expect(b.breakEvenAge.years()).toBe(82);
-    expect(b.breakEvenAge.modMonths()).toBe(6);
+    expect(ym(b.breakEvenAge)).toEqual([82, 6]);
+  });
+
+  it('prices the delay as an annual payout on the forgone checks', () => {
+    // 12 x monthly gain / head start. The guide quotes these in prose.
+    expect(
+      breakEven(exampleRetiree(), age(67), age(70)).annualPayoutRate
+    ).toBeCloseTo(0.08, 4);
+    expect(
+      breakEven(exampleRetiree(), age(62), age(70)).annualPayoutRate
+    ).toBeCloseTo(0.0964, 4);
   });
 
   it('reports what a surviving spouse would inherit under each choice', () => {
-    const b = breakEven(exampleRetiree(), age(62), age(70));
     // Claimed at 62: the larger of the reduced check and 82.5% of the PIA.
+    const b = breakEven(exampleRetiree(), age(62), age(70));
     expect(b.survivorIfEarlier.string()).toBe('$2,062.00');
     expect(b.survivorIfLater.string()).toBe('$3,100.00');
+    expect(
+      breakEven(exampleRetiree(), age(62), age(67)).survivorIfLater.string()
+    ).toBe('$2,500.00');
+  });
+
+  it('works to the month, not just whole years', () => {
+    // 59 months early: 36 x 5/9% + 23 x 5/12% = 29.58% off, $1,760 floored.
+    const b = breakEven(exampleRetiree(), age(62, 1), age(67));
+    expect(b.earlierBenefit.string()).toBe('$1,760.00');
+    expect(b.headStart.string()).toBe('$103,840.00');
   });
 
   it('rejects ages that are not in claiming order or range', () => {
     const r = exampleRetiree();
-    expect(() => breakEven(r, age(67), age(62))).toThrow(/before/);
-    expect(() => breakEven(r, age(62), age(62))).toThrow(/before/);
-    expect(() => breakEven(r, age(61), age(67))).toThrow(/62/);
-    expect(() => breakEven(r, age(62), age(71))).toThrow(/70/);
+    expect(() => breakEven(r, age(67), age(62))).toThrow(/before the later/);
+    expect(() => breakEven(r, age(62), age(62))).toThrow(/before the later/);
+    expect(() => breakEven(r, age(61, 11), age(67))).toThrow(/before 62/);
+    expect(() => breakEven(r, age(62), age(70, 1))).toThrow(/past 70/);
   });
 });
 
@@ -95,11 +115,11 @@ describe('discountedBreakEvenAge', () => {
     expect(discounted?.asMonths()).toBe(nominal.asMonths());
   });
 
-  const ym = (d: MonthDuration | null) =>
-    d === null ? null : [d.years(), d.modMonths()];
-
   it('moves the 62 vs 67 break-even later as the rate rises', () => {
-    // Closed form: d^n = (2500 d^60 - 1750) / 750 with d = (1 + rate)^(-1/12).
+    // Closed form, with n the months since the 62 claim and
+    // d = (1 + rate)^(-1/12): d^n = (2500 d^60 - 1750) / 750. The loop
+    // rounds each discounted check to the cent, which can shift a result
+    // that lands within a cent of a month boundary by one month.
     expect(ym(discountedBreakEvenAge(r, age(62), age(67), 0.02))).toEqual([
       81, 1,
     ]);
@@ -132,18 +152,32 @@ describe('discountedBreakEvenAge', () => {
 });
 
 describe('discountedBreakEvens', () => {
+  const table = discountedBreakEvens(exampleRetiree());
+
   it('covers the three headline comparisons at each published rate', () => {
-    const table = discountedBreakEvens(exampleRetiree());
     expect(table.map((t) => [t.earlier.years(), t.later.years()])).toEqual([
       [62, 67],
       [62, 70],
       [67, 70],
     ]);
     for (const row of table) {
-      expect(row.byRate.length).toBe(DISCOUNT_RATES.length);
+      expect(row.byRate.map((cell) => cell.rate)).toEqual(DISCOUNT_RATES);
     }
-    expect(table[1].byRate[0]?.years()).toBe(80);
-    expect(table[1].byRate[0]?.modMonths()).toBe(5);
+    expect(ym(table[1].byRate[0].age)).toEqual([80, 5]);
+  });
+
+  it('never moves a break-even earlier as the rate rises', () => {
+    for (const row of table) {
+      for (let i = 1; i < row.byRate.length; i++) {
+        const previous = row.byRate[i - 1].age;
+        const current = row.byRate[i].age;
+        if (current === null) continue;
+        expect(previous).not.toBeNull();
+        expect(current.greaterThanOrEqual(previous as MonthDuration)).toBe(
+          true
+        );
+      }
+    }
   });
 });
 
@@ -171,10 +205,21 @@ describe('claimAgeRows', () => {
   });
 
   it('compares each age with full retirement age, which has no comparison', () => {
-    const fra = rows[5];
-    expect(fra.age.years()).toBe(67);
-    expect(fra.versusFra).toBeNull();
-    expect(rows[0].versusFra?.breakEvenAge.years()).toBe(78);
-    expect(rows[8].versusFra?.breakEvenAge.years()).toBe(82);
+    const fra = rows.find((r) => r.age.years() === 67);
+    expect(fra?.versusFra).toBeNull();
+    expect(rows.filter((r) => r.versusFra === null).length).toBe(1);
+    expect(ym(rows[0].versusFra?.breakEvenAge ?? null)).toEqual([78, 8]);
+    expect(ym(rows[8].versusFra?.breakEvenAge ?? null)).toEqual([82, 6]);
+  });
+
+  it('compares every row when full retirement age is not a whole year', () => {
+    // Born 1958: full retirement age 66 and 8 months, so no row is FRA.
+    const retiree = new Recipient();
+    retiree.birthdate = Birthdate.FromYMD(1958, 0, 2);
+    retiree.setPia(EXAMPLE_PIA);
+    const partial = claimAgeRows(retiree);
+    expect(partial.every((r) => r.versusFra !== null)).toBe(true);
+    expect(ym(partial[4].versusFra?.laterAge ?? null)).toEqual([66, 8]);
+    expect(ym(partial[5].versusFra?.earlierAge ?? null)).toEqual([66, 8]);
   });
 });
