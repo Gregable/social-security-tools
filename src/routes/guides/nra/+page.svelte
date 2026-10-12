@@ -187,7 +187,9 @@ fraTable.push({
   <p>
     This reduction is permanent. Your benefit will still receive annual
     <a href="/guides/inflation">cost-of-living adjustments (COLA)</a>, but the
-    base amount remains reduced for life.
+    base amount remains reduced for life. How many years it takes for the
+    full benefit to make up for the early checks is covered in the
+    <a href="/guides/break-even-age">break-even age guide</a>.
   </p>
 
   <h2>Filing After Normal Retirement Age</h2>
