@@ -22,7 +22,9 @@ import { PrimaryInsuranceAmount } from './pia';
 export interface PiaBracketLine {
   /** The portion of the AIME that falls in this bracket. */
   readonly base: Money;
-  /** That portion times the bracket's rate. */
+  /** The bracket's replacement rate, e.g. 0.9 for 90%. */
+  readonly rate: number;
+  /** `base` times `rate`. */
   readonly amount: Money;
 }
 
@@ -48,7 +50,7 @@ const ELIGIBILITY_AGE = 62;
 /** Earnings are indexed to the wage level of the year the worker turns 60. */
 const YEARS_FROM_INDEXING_TO_ELIGIBILITY = 2;
 
-function bendPointsForEligibilityYear(year: number): PrimaryInsuranceAmount {
+function piaFormulaForEligibilityYear(year: number): PrimaryInsuranceAmount {
   return new PrimaryInsuranceAmount({
     isPiaOnly: false,
     overridePia: null,
@@ -60,12 +62,17 @@ function bendPointsForEligibilityYear(year: number): PrimaryInsuranceAmount {
 }
 
 function bracket(base: Money, rate: number): PiaBracketLine {
-  return { base, amount: base.times(rate) };
+  return { base, rate, amount: base.times(rate) };
 }
 
 export function incomePiaExample(annualIncome: Money): IncomePiaExample {
+  if (annualIncome.value() < 0) {
+    throw new Error(
+      `annual income cannot be negative: ${annualIncome.string()}`
+    );
+  }
   const eligibilityYear = constants.MAX_YEAR;
-  const formula = bendPointsForEligibilityYear(eligibilityYear);
+  const formula = piaFormulaForEligibilityYear(eligibilityYear);
   const firstBendPoint = formula.firstBendPoint();
   const secondBendPoint = formula.secondBendPoint();
   const aime = annualIncome.div(MONTHS_PER_YEAR);

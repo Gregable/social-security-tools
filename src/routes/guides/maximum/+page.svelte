@@ -55,8 +55,8 @@
       : [...wholeYearAges, fra].sort((a, b) => a.asMonths() - b.asMonths());
 
   const filingData: FilingRow[] = filingAges.map((age) => {
-    // Someone filing at this age in currentYear was born in (currentYear - age.years)
-    // For fractional ages like 66y 10m, we use the rounded year for birth year calculation
+    // maximumBenefitInYear places the worker's birth in
+    // currentYear - age.roundedYears().
     const benefit = maximumBenefitInYear(age, currentYear);
 
     return {

@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_YEAR } from '$lib/constants';
+import { Birthdate } from '$lib/birthday';
+import {
+  AFTER_BENDPOINT2_MULTIPLIER,
+  BEFORE_BENDPOINT1_MULTIPLIER,
+  BEFORE_BENDPOINT2_MULTIPLIER,
+  MAX_YEAR,
+} from '$lib/constants';
 import { incomePiaExample } from '$lib/income-pia-example';
 import { Money } from '$lib/money';
+import { PrimaryInsuranceAmount } from '$lib/pia';
 
 /**
  * The income guides render these exact figures. When a constants update
@@ -67,5 +74,34 @@ describe('incomePiaExample', () => {
     expect(e.firstBracket.base.equals(e.aime)).toBe(true);
     expect(e.secondBracket.base.string()).toBe('$0.00');
     expect(e.thirdBracket.base.string()).toBe('$0.00');
+  });
+
+  it('carries each bracket rate beside its amount', () => {
+    const e = incomePiaExample(Money.from(100_000));
+    expect(e.firstBracket.rate).toBe(BEFORE_BENDPOINT1_MULTIPLIER);
+    expect(e.secondBracket.rate).toBe(BEFORE_BENDPOINT2_MULTIPLIER);
+    expect(e.thirdBracket.rate).toBe(AFTER_BENDPOINT2_MULTIPLIER);
+  });
+
+  it('rejects a negative income', () => {
+    expect(() => incomePiaExample(Money.from(-1))).toThrow(/negative/);
+  });
+
+  it('stays within a dollar of the PIA SSA would compute', () => {
+    // The walkthrough skips SSA's rounding of the AIME down to the dollar
+    // and of the PIA down to the dime; the module says the gap is under a
+    // dollar, so hold it to that.
+    for (const income of [25_000, 40_000, 60_000, 80_000, 100_000]) {
+      const e = incomePiaExample(Money.from(income));
+      const ssa = new PrimaryInsuranceAmount({
+        isPiaOnly: false,
+        overridePia: null,
+        birthdate: Birthdate.FromYMD(MAX_YEAR - 62, 0, 15),
+        indexingYear: () => MAX_YEAR - 2,
+        monthlyIndexedEarnings: () => e.aime,
+        isEligible: () => true,
+      }).primaryInsuranceAmountUnadjusted();
+      expect(Math.abs(e.pia.sub(ssa).value())).toBeLessThan(1);
+    }
   });
 });

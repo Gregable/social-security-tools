@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   buildCalculatorAiExport,
@@ -11,7 +11,7 @@ import {
   eligibleForSpousalBenefit,
 } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
-import { CURRENT_YEAR } from '$lib/constants';
+import { MAX_COLA_YEAR } from '$lib/constants';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
 import { MonthDuration } from '$lib/month-time';
@@ -136,22 +136,62 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     expect(md).toContain('2026-06-18');
   });
 
-  it('names the last COLA year actually applied to the PIA it states', () => {
+  it('labels the bend points with the year the worker turns 62', () => {
+    // Born 1965: turns 60 (the indexing year) in 2025 and 62 in 2027.
+    const md = buildCalculatorAiExport(eligibleRecipient());
+    expect(md).toContain(
+      'Bend points for the eligibility year (2027, indexed on the 2025 wage index)'
+    );
+  });
+
+  it('names the last COLA year actually applied to the PIA it states', async () => {
     // Between SSA's October announcement and January, the newest COLA is in
     // the constants but not yet in anyone's check. The sentence must name the
-    // year the stated PIA was built through, not the newest year on record.
-    const r = eligibleRecipient();
-    r.birthdate = Birthdate.FromYMD(1958, 8, 21);
-    const md = buildCalculatorAiExport(r);
-    const match = md.match(
-      /COLA\) applied through (\d{4}), the\s+final PIA is (\$[\d,]+) \/ month/
-    );
-    expect(match).not.toBeNull();
-    const [, year, stated] = match as RegExpMatchArray;
-    expect(r.pia().primaryInsuranceAmount(Number(year)).wholeDollars()).toBe(
-      stated
-    );
-    expect(Number(year)).toBeLessThan(CURRENT_YEAR);
+    // year the stated PIA was built through, not the newest year on record,
+    // so build the export in that window.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(MAX_COLA_YEAR, 9, 15));
+    vi.resetModules();
+    try {
+      const constants = await import('$lib/constants');
+      expect(constants.CURRENT_YEAR).toBe(MAX_COLA_YEAR);
+      const { buildCalculatorAiExport: build } = await import('$lib/ai-export');
+      const { Recipient: FreshRecipient } = await import('$lib/recipient');
+      const { Birthdate: FreshBirthdate } = await import('$lib/birthday');
+      const { EarningRecord: FreshRecord } = await import(
+        '$lib/earning-record'
+      );
+      const r = new FreshRecipient();
+      r.birthdate = FreshBirthdate.FromYMD(1958, 8, 21);
+      r.earningsRecords = Array.from(
+        { length: 35 },
+        (_, k) =>
+          new FreshRecord({
+            year: 1990 + k,
+            taxedEarnings: Money.from(60000),
+            taxedMedicareEarnings: Money.from(60000),
+          })
+      );
+      const md = build(r);
+      const match = md.match(
+        /COLA\) applied through (\d{4}), the\s+final PIA is (\$[\d,]+) \/ month/
+      );
+      expect(match).not.toBeNull();
+      const [, year, stated] = match as RegExpMatchArray;
+      expect(Number(year)).toBe(MAX_COLA_YEAR - 1);
+      expect(stated).toBe(
+        r
+          .pia()
+          .primaryInsuranceAmount(MAX_COLA_YEAR - 1)
+          .wholeDollars()
+      );
+      expect(stated).not.toBe(
+        r.pia().primaryInsuranceAmount(MAX_COLA_YEAR).wholeDollars()
+      );
+    } finally {
+      vi.useRealTimers();
+      vi.resetModules();
+    }
   });
 
   it('omits the generated-on line when no date is given (no clock read)', () => {

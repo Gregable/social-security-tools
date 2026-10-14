@@ -10,6 +10,44 @@ import {
 const wage = Money.from(60_000);
 const zero = Money.from(0);
 
+/** Every dollar figure the guide shows, as strings, from a fresh module load. */
+async function figuresBuiltOn(date: Date): Promise<{
+  currentYear: number;
+  figures: Record<string, string>[];
+}> {
+  vi.useFakeTimers();
+  vi.setSystemTime(date);
+  vi.resetModules();
+  try {
+    const constants = await import('$lib/constants');
+    const { recomputationExample: build } = await import(
+      '$lib/recomputation-example'
+    );
+    const examples = [
+      build({ careerYears: 35, wage }),
+      build({ careerYears: 22, wage }),
+      build({
+        careerYears: 35,
+        wage: constants.MAXIMUM_EARNINGS[constants.MAX_YEAR],
+        shape: 'flat',
+      }),
+    ];
+    return {
+      currentYear: constants.CURRENT_YEAR,
+      figures: examples.map((e) => ({
+        piaBefore: e.piaBefore.string(),
+        piaAfter: e.piaAfter.string(),
+        monthlyIncrease: e.monthlyIncrease.string(),
+        increaseIfClaimedAt62: e.increaseIfClaimedAt62.string(),
+        increaseIfClaimedAt70: e.increaseIfClaimedAt70.string(),
+      })),
+    };
+  } finally {
+    vi.useRealTimers();
+    vi.resetModules();
+  }
+}
+
 describe('exampleWorker', () => {
   it('reached full retirement age before the extra year began', () => {
     const january = MonthDate.initFromYearsMonths({
@@ -99,23 +137,12 @@ describe('recomputationExample', () => {
     // keeps whatever it saw. Between SSA's October announcement and January
     // the newest COLA is in the constants but not yet the default cutoff, so
     // a figure that leaned on the default would change on the first build of
-    // the new year.
-    const today = recomputationExample({ careerYears: 35, wage });
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date(MAX_YEAR + 1, 0, 15));
-    vi.resetModules();
-    try {
-      const later = await import('$lib/recomputation-example');
-      const next = later.recomputationExample({ careerYears: 35, wage });
-      expect(next.piaBefore.string()).toBe(today.piaBefore.string());
-      expect(next.piaAfter.string()).toBe(today.piaAfter.string());
-      expect(next.increaseIfClaimedAt70.string()).toBe(
-        today.increaseIfClaimedAt70.string()
-      );
-    } finally {
-      vi.useRealTimers();
-      vi.resetModules();
-    }
+    // the new year. Build once on each side of that January and compare.
+    const october = await figuresBuiltOn(new Date(MAX_YEAR - 1, 9, 15));
+    const january = await figuresBuiltOn(new Date(MAX_YEAR, 0, 15));
+    expect(october.currentYear).toBe(MAX_YEAR - 1);
+    expect(january.currentYear).toBe(MAX_YEAR);
+    expect(january.figures).toEqual(october.figures);
   });
 
   it('adds the extra year in the last year the constants cover', () => {

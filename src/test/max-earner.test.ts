@@ -112,9 +112,31 @@ describe('maximumBenefitInYear', () => {
     expect(maximumBenefitInYear(at(70), 2027).wholeDollars()).toBe('$5,358');
   });
 
+  it('follows the cohort a caller names for the full-retirement-age figure', () => {
+    // SSA's fact sheet "maximum benefit, worker retiring at full retirement
+    // age": $4,152 for 2026 and $4,188 for 2027. The maximum guide follows the
+    // cohort born in year - 67, whose FRA is not a whole number of years.
+    const fraOf = (birthYear: number) =>
+      createMaxEarnerForBirthYear(birthYear).normalRetirementAge();
+    expect(maximumBenefitInYear(fraOf(1959), 2026, 1959).wholeDollars()).toBe(
+      '$4,152'
+    );
+    expect(maximumBenefitInYear(fraOf(1960), 2027, 1960).wholeDollars()).toBe(
+      '$4,188'
+    );
+  });
+
   it('matches the published 2026 figures', () => {
     expect(maximumBenefitInYear(at(67), 2026).wholeDollars()).toBe('$4,207');
     expect(maximumBenefitInYear(at(70), 2026).wholeDollars()).toBe('$5,181');
+  });
+
+  it('refuses a year the constants do not cover yet', () => {
+    // Missing COLAs and earnings caps would be skipped, understating the
+    // benefit without any sign that the figure is incomplete.
+    expect(() => maximumBenefitInYear(at(70), MAX_YEAR + 1)).toThrow(
+      /MAX_YEAR/
+    );
   });
 
   it('leaves later COLAs out of past years', () => {
@@ -123,9 +145,10 @@ describe('maximumBenefitInYear', () => {
   });
 
   // benefitAtAge floors the PIA to the dollar before applying delayed
-  // credits; SSA applies them to the dime-rounded PIA ($3,909.60 x 1.3067 =
-  // $5,108.54, not $3,909 x 1.3067 = $5,107.76). When that rounding is fixed
-  // this starts passing and vitest reports it; move it into the test above.
+  // credits; SSA applies them to the dime-rounded PIA. With 46 months of
+  // credits (x 1.306667): $3,909.60 -> $5,108.54, but $3,909 -> $5,107.76.
+  // When that rounding is fixed this starts passing and vitest reports it;
+  // move the assertion into 'leaves later COLAs out of past years'.
   it.fails('matches the published 2025 age-70 figure to the dollar', () => {
     expect(maximumBenefitInYear(at(70), 2025).wholeDollars()).toBe('$5,108');
   });

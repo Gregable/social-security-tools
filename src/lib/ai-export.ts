@@ -261,7 +261,7 @@ function piaSection(recipient: Recipient): string {
     '## Primary Insurance Amount (PIA)',
     '',
     `The PIA applies the SSA bend-point formula to the AIME (${aime.wholeDollars()}).`,
-    `Bend points for the eligibility year (${recipient.indexingYear()}) are ${bend1.wholeDollars()} and ${bend2.wholeDollars()}.`,
+    `Bend points for the eligibility year (${recipient.birthdate.yearTurningSsaAge(62)}, indexed on the ${recipient.indexingYear()} wage index) are ${bend1.wholeDollars()} and ${bend2.wholeDollars()}.`,
     '',
     renderTable(['Bracket', 'Amount'], rows, ['left', 'right']),
     '',

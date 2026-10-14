@@ -12,13 +12,18 @@ import { Money } from './money';
 const ROUNDING_STEP_DOLLARS = 1000;
 
 /**
- * Rows for an AIME-to-PIA table, in whole dollars, ascending and without
- * duplicates. Callers mix round reference values with ones that move every
- * year, such as the bend points, and cannot know their order in advance.
+ * Rows for an AIME-to-PIA table, rounded to whole dollars, ascending and
+ * without duplicates. Callers mix round reference values with ones that move
+ * every year, such as the bend points, and cannot know their order in
+ * advance.
  */
-export function aimeTableRows(aimes: readonly Money[]): number[] {
-  const wholeDollars = aimes.map((aime) => Math.round(aime.value()));
-  return [...new Set(wholeDollars)].sort((a, b) => a - b);
+export function aimeTableRows(aimes: readonly Money[]): readonly Money[] {
+  const byCents = new Map<number, Money>();
+  for (const aime of aimes) {
+    const rounded = aime.roundToDollar();
+    byCents.set(rounded.cents(), rounded);
+  }
+  return [...byCents.values()].sort((a, b) => a.cents() - b.cents());
 }
 
 /**

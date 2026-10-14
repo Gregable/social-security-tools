@@ -285,11 +285,10 @@
       </thead>
       <tbody>
         {#each aimeTableValues as aimeValue}
-          {@const aimeMoney = Money.from(aimeValue)}
-          {@const piaAmount = pia.piaFromAIME(aimeMoney)}
-          {@const replacementRate = Math.round(piaAmount.div$(aimeMoney) * 100)}
+          {@const piaAmount = pia.piaFromAIME(aimeValue)}
+          {@const replacementRate = Math.round(piaAmount.div$(aimeValue) * 100)}
           <tr>
-            <td>${aimeValue.toLocaleString()}</td>
+            <td>{aimeValue.wholeDollars()}</td>
             <td>{piaAmount.wholeDollars()}</td>
             <td>{replacementRate}%</td>
           </tr>

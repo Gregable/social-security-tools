@@ -62,6 +62,11 @@ export function maximumBenefitInYear(
   year: number,
   birthYear: number = year - age.roundedYears()
 ): Money {
+  if (year > MAX_YEAR) {
+    throw new Error(
+      `no SSA figures for ${year} yet; constants run through MAX_YEAR ${MAX_YEAR}`
+    );
+  }
   const recipient = createMaxEarnerForBirthYear(birthYear, year);
   return benefitAtAge(recipient, age, year - 1);
 }

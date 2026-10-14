@@ -1,9 +1,4 @@
 <script lang="ts">
-import {
-  AFTER_BENDPOINT2_MULTIPLIER,
-  BEFORE_BENDPOINT1_MULTIPLIER,
-  BEFORE_BENDPOINT2_MULTIPLIER,
-} from '$lib/constants';
 import { incomePiaExample } from '$lib/income-pia-example';
 import { Money } from '$lib/money';
 
@@ -42,30 +37,30 @@ const factor = (rate: number): string => rate.toFixed(2);
 <ul>
   <li>
     <strong
-      >{percent(BEFORE_BENDPOINT1_MULTIPLIER)} of the first {e.firstBendPoint.wholeDollars()}:</strong
+      >{percent(e.firstBracket.rate)} of the first {e.firstBendPoint.wholeDollars()}:</strong
     >
-    {factor(BEFORE_BENDPOINT1_MULTIPLIER)} * {firstBracketBase} =
+    {factor(e.firstBracket.rate)} * {firstBracketBase} =
     <strong>{e.firstBracket.amount.string()}</strong>
   </li>
   <li>
     <strong
-      >{percent(BEFORE_BENDPOINT2_MULTIPLIER)} of the amount over {e.firstBendPoint.wholeDollars()}
+      >{percent(e.secondBracket.rate)} of the amount over {e.firstBendPoint.wholeDollars()}
       up to {e.secondBendPoint.wholeDollars()}:</strong
     >
     The amount between {e.firstBendPoint.wholeDollars()} and
     {secondBracketTop} is {secondBracketTop} -
     {e.firstBendPoint.wholeDollars()} = {e.secondBracket.base.string()}.
-    {factor(BEFORE_BENDPOINT2_MULTIPLIER)} * {e.secondBracket.base.string()} =
+    {factor(e.secondBracket.rate)} * {e.secondBracket.base.string()} =
     <strong>{e.secondBracket.amount.string()}</strong>
   </li>
   <li>
     <strong
-      >{percent(AFTER_BENDPOINT2_MULTIPLIER)} of the amount over {e.secondBendPoint.wholeDollars()}:</strong
+      >{percent(e.thirdBracket.rate)} of the amount over {e.secondBendPoint.wholeDollars()}:</strong
     >
     {#if reachesThirdBracket}
       The amount over {e.secondBendPoint.wholeDollars()} is {e.aime.string()} -
       {e.secondBendPoint.wholeDollars()} = {e.thirdBracket.base.string()}.
-      {factor(AFTER_BENDPOINT2_MULTIPLIER)} * {e.thirdBracket.base.string()} =
+      {factor(e.thirdBracket.rate)} * {e.thirdBracket.base.string()} =
       <strong>{e.thirdBracket.amount.string()}</strong>
     {:else}
       Since your AIME ({e.aime.string()}) is not over
