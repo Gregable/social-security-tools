@@ -314,6 +314,19 @@ export class PrimaryInsuranceAmount {
     }
     return adjustments;
   }
+
+  /**
+   * The newest COLA when it is announced but not yet paid: from SSA's
+   * October announcement until the following January. Null otherwise.
+   *
+   * Its `start` is the PIA in effect today and its `end` the PIA from
+   * January on, so display code can name both.
+   */
+  pendingColaAdjustment(): ColaAdjustment | null {
+    const adjustments = this.colaAdjustments();
+    const last = adjustments[adjustments.length - 1];
+    return last !== undefined && !last.applied ? last : null;
+  }
 }
 
 /**
