@@ -251,8 +251,7 @@ $: spousalBenefitFraction = spousalBenefitFractionCalc(
             If <RName {r} /> chooses to file for spousal benefits
             <i>earlier</i>
             than <RName {r} apos /> normal retirement age (<b
-              >{recipient.normalRetirementDate().monthFullName()}
-              {recipient.normalRetirementDate().year()}</b
+              >{recipient.normalRetirementDate().toFullString()}</b
             >), the spousal benefit amount will be
             <u>permanently</u> <i>reduced</i>:
           </p>

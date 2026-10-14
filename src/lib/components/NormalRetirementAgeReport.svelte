@@ -42,8 +42,7 @@ $: benefit = benefitOnDateNominal(
       <p>
         The benefit you would have earned by collecting at your
         <u>normal retirement age</u> (NRA) in
-        {recipient.normalRetirementDate().monthFullName()}
-        {recipient.normalRetirementDate().year()} was
+        {recipient.normalRetirementDate().toFullString()} was
         <b>{benefit.wholeDollars()} / month</b>. This is the nominal amount
         payable then; it has since grown with annual
         <u>cost-of-living adjustments</u> (COLAs), so the equivalent in today's
@@ -77,8 +76,7 @@ $: benefit = benefitOnDateNominal(
       {/if}
       This is in
       <b
-        >{recipient.normalRetirementDate().monthFullName()},
-        {recipient.normalRetirementDate().year()}</b
+        >{recipient.normalRetirementDate().toFullString()}</b
       >.
     </p>
 

@@ -104,8 +104,7 @@
     recipient: Recipient,
     age: MonthDuration
   ): string {
-    const date = recipient.birthdate.dateAtSsaAge(age);
-    return `${date.monthFullName()} ${date.year()}`;
+    return recipient.birthdate.dateAtSsaAge(age).toFullString();
   }
 
   function formatFilingDateShort(
@@ -151,7 +150,7 @@
   {#if filedAt !== null}
     <div class="prefix">Started benefits</div>
     <div class="date-big">
-      <span class="date-full">{filedAt.monthFullName()} {filedAt.year()}</span>
+      <span class="date-full">{filedAt.toFullString()}</span>
       <span class="date-short">{filedAt.monthName()} {filedAt.year()}</span>
     </div>
     {@const amount = filedAmount(index, filedAt)}

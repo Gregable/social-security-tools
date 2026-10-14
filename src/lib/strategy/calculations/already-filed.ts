@@ -65,7 +65,7 @@ export function validateFiledMonth(
   if (filedAt.lessThan(earliest)) {
     return (
       `Benefits cannot start before the first full month at age 62, ` +
-      `which is ${earliest.monthFullName()} ${earliest.year()} for this birthdate.`
+      `which is ${earliest.toFullString()} for this birthdate.`
     );
   }
   if (filedAt.greaterThan(currentDate)) {
