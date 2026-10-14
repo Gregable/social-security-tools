@@ -88,7 +88,6 @@ function formatAnnual(amount: Money): string {
   return amount.roundToDollar().wholeDollars();
 }
 
-
 type FICalcIncome = {
   name: string;
   value: number;

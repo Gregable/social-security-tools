@@ -86,7 +86,6 @@ function formatAnnual(amount: Money): string {
 function formatAnnualRaw(amount: Money): string {
   return amount.roundToDollar().value().toFixed(0);
 }
-
 </script>
 
 <div class="pageBreakAvoid">

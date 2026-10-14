@@ -213,7 +213,7 @@ export class MonthDate {
 
   /**
    * Returns the month and year with the month spelled out, such as
-   * "January 2025", for dates in running text.
+   * "January 2025": the spelled-out counterpart of toString().
    */
   toFullString() {
     return `${this.monthFullName()} ${this.year()}`;
