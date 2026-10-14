@@ -225,9 +225,10 @@ export class PrimaryInsuranceAmount {
   /**
    * Returns the last year whose COLA has been applied to benefits.
    * Since a year's COLA takes effect the following January, this is
-   * CURRENT_YEAR - 1.
+   * CURRENT_YEAR - 1. It trails MAX_COLA_YEAR from SSA's October
+   * announcement until January, while the newest COLA is known but unpaid.
    */
-  private lastAppliedColaYear(): number {
+  lastAppliedColaYear(): number {
     return constants.CURRENT_YEAR - 1;
   }
 
@@ -312,6 +313,19 @@ export class PrimaryInsuranceAmount {
       }
     }
     return adjustments;
+  }
+
+  /**
+   * The newest COLA when it is announced but not yet paid: from SSA's
+   * October announcement until the following January. Null otherwise.
+   *
+   * Its `start` is the PIA in effect today and its `end` the PIA from
+   * January on, so display code can name both.
+   */
+  pendingColaAdjustment(): ColaAdjustment | null {
+    const adjustments = this.colaAdjustments();
+    const last = adjustments[adjustments.length - 1];
+    return last !== undefined && !last.applied ? last : null;
   }
 }
 

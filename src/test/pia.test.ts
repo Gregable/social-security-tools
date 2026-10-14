@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
@@ -21,6 +21,22 @@ describe('PrimaryInsuranceAmount with PiaInput', () => {
     const pia = new PrimaryInsuranceAmount(input);
     expect(pia.firstBendPoint().value()).toEqual(926);
     expect(pia.secondBendPoint().value()).toEqual(5583);
+  });
+
+  it('reproduces the 2027 bend points SSA published', () => {
+    // https://www.ssa.gov/oact/cola/bendpoints.html: a worker first eligible
+    // in 2027 indexes on the 2025 wage index.
+    const input: PiaInput = {
+      isPiaOnly: false,
+      overridePia: null,
+      indexingYear: () => 2025,
+      birthdate: Birthdate.FromYMD(1965, 0, 15),
+      monthlyIndexedEarnings: () => Money.from(0),
+      isEligible: () => false,
+    };
+    const pia = new PrimaryInsuranceAmount(input);
+    expect(pia.firstBendPoint().value()).toEqual(1340);
+    expect(pia.secondBendPoint().value()).toEqual(8077);
   });
 
   it('calculates PIA from a plain object with earnings', () => {
@@ -186,5 +202,41 @@ describe('primaryInsuranceAmount COLA cutoff (throughColaYear)', () => {
     const pia = r.pia();
     expect(pia.primaryInsuranceAmount(2019).value()).toEqual(2000);
     expect(pia.primaryInsuranceAmount().value()).toEqual(2000);
+  });
+});
+
+describe('pendingColaAdjustment', () => {
+  /** A worker who turned 62 in 2022, built from modules loaded on `date`. */
+  async function workerOn(date: Date) {
+    vi.useFakeTimers();
+    vi.setSystemTime(date);
+    vi.resetModules();
+    try {
+      const fresh = await import('$lib/max-earner');
+      const constantsNow = await import('$lib/constants');
+      return {
+        currentYear: constantsNow.CURRENT_YEAR,
+        maxColaYear: constantsNow.MAX_COLA_YEAR,
+        pia: fresh.createMaxEarnerForBirthYear(1960).pia(),
+      };
+    } finally {
+      vi.useRealTimers();
+      vi.resetModules();
+    }
+  }
+
+  it('reports the announced COLA that has not reached checks yet', async () => {
+    // Between SSA's October announcement and January.
+    const w = await workerOn(new Date(constants.MAX_COLA_YEAR, 9, 15));
+    expect(w.currentYear).toBe(w.maxColaYear);
+    const pending = w.pia.pendingColaAdjustment();
+    expect(pending?.year).toBe(w.maxColaYear);
+    expect(pending?.start.equals(w.pia.primaryInsuranceAmount())).toBe(true);
+    expect(pending?.end.greaterThan(pending.start)).toBe(true);
+  });
+
+  it('reports nothing once that COLA is being paid', async () => {
+    const w = await workerOn(new Date(constants.MAX_COLA_YEAR + 1, 0, 15));
+    expect(w.pia.pendingColaAdjustment()).toBeNull();
   });
 });

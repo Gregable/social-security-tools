@@ -41,7 +41,7 @@ describe('exampleParent', () => {
 describe('familyPayout', () => {
   it('leaves one child at the full 50% when the maximum does not bind', () => {
     const p = familyPayout(exampleParent(), 1);
-    expect(p.familyMaximum.string()).toBe('$4,617.50');
+    expect(p.familyMaximum.string()).toBe('$4,671.30');
     expect(p.eachUnlimited.string()).toBe('$1,250.00');
     expect(p.each.string()).toBe('$1,250.00');
     expect(p.familyTotal.string()).toBe('$3,750.00');
@@ -50,8 +50,8 @@ describe('familyPayout', () => {
 
   it('splits the pool between two children once the maximum binds', () => {
     const p = familyPayout(exampleParent(), 2);
-    expect(p.each.string()).toBe('$1,058.70');
-    expect(p.familyTotal.string()).toBe('$4,617.40');
+    expect(p.each.string()).toBe('$1,085.60');
+    expect(p.familyTotal.string()).toBe('$4,671.20');
     expect(p.capped).toBe(true);
   });
 
@@ -59,8 +59,8 @@ describe('familyPayout', () => {
     // A third child, or a spouse with a child in care, adds nothing to the
     // family total; it only divides the pool further.
     const p = familyPayout(exampleParent(), 3);
-    expect(p.each.string()).toBe('$705.80');
-    expect(p.familyTotal.string()).toBe('$4,617.40');
+    expect(p.each.string()).toBe('$723.70');
+    expect(p.familyTotal.string()).toBe('$4,671.10');
     expect(p.capped).toBe(true);
   });
 
@@ -94,8 +94,8 @@ describe('claimAgeComparison', () => {
   });
 
   it('pays both children until the older turns 18, then the younger alone', () => {
-    // 72 months of $2,117.40 shared, then 36 months of $1,250.00.
-    expect(c.childrenTotal.string()).toBe('$197,452.80');
+    // 72 months of $2,171.20 shared, then 36 months of $1,250.00.
+    expect(c.childrenTotal.string()).toBe('$201,326.40');
     expect(c.childBenefitSpan.asMonths()).toBe(108);
     expect(c.oldestChildBenefitSpan.asMonths()).toBe(72);
   });
@@ -109,15 +109,15 @@ describe('claimAgeComparison', () => {
 
   it('counts what the family collects before full retirement age', () => {
     expect(c.ownBeforeFra.string()).toBe('$105,000.00');
-    expect(c.childrenBeforeFra.string()).toBe('$127,044.00');
-    expect(c.leadAtFra.string()).toBe('$232,044.00');
+    expect(c.childrenBeforeFra.string()).toBe('$130,272.00');
+    expect(c.leadAtFra.string()).toBe('$235,272.00');
   });
 
   it('finds the age at which the larger check would catch up', () => {
-    // $232,044 / $750 a month = 309.4 months after 67.
-    expect(c.timeToCatchUp.asMonths()).toBe(310);
-    expect(c.catchUpAge.years()).toBe(92);
-    expect(c.catchUpAge.modMonths()).toBe(10);
+    // $235,272 / $750 a month = 313.7 months after 67.
+    expect(c.timeToCatchUp.asMonths()).toBe(314);
+    expect(c.catchUpAge.years()).toBe(93);
+    expect(c.catchUpAge.modMonths()).toBe(2);
   });
 
   it('comes out close to even for a single child who is already 16', () => {

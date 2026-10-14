@@ -7,6 +7,9 @@ import RName from './RecipientName.svelte';
 
 export let recipient: Recipient = new Recipient();
 const r: Recipient = recipient;
+// The newest COLA while it is announced but not yet paid (October through
+// December), so the summary below does not call the upcoming PIA current.
+$: pendingCola = $recipient.pia().pendingColaAdjustment();
 
 function oneSignificantDigit(n: number) {
   return n.toLocaleString(undefined, {
@@ -195,11 +198,21 @@ function oneSignificantDigit(n: number) {
               </div>
             {/if}
 
-            <p>
-              The final value is <RName {r} apos>your</RName>
-              current <u>primary insurance amount (PIA)</u>. It will continue to
-              increase every year.
-            </p>
+            {#if pendingCola}
+              <p>
+                The final value is <RName {r} apos>your</RName>
+                <u>primary insurance amount (PIA)</u> from January
+                {pendingCola.year + 1}. Until then it is
+                <b>{pendingCola.start.string()}</b>. It will continue to
+                increase every year.
+              </p>
+            {:else}
+              <p>
+                The final value is <RName {r} apos>your</RName>
+                current <u>primary insurance amount (PIA)</u>. It will continue to
+                increase every year.
+              </p>
+            {/if}
           </div>
         </Expando>
       {/if}

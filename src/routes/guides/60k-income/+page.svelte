@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import IncomePiaWalkthrough from '../IncomePiaWalkthrough.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 const HeroImage = '/thoughtful_person.png'; // Using a specific image for all guides
@@ -9,7 +10,7 @@ const title = 'How much Social Security will I get if I make $60,000 / year?';
 const description =
   'Understand how your Social Security benefits are calculated if you consistently earn $60,000 per year.';
 const publishDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const updateDate = new Date('2026-10-14T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/60k-income';
@@ -81,40 +82,7 @@ schema.tags = [
     </li>
   </ul>
 
-  <h2>Calculating Your Primary Insurance Amount (PIA)</h2>
-  <p>
-    Your <strong>Primary Insurance Amount (PIA)</strong> is the benefit you
-    would receive if you start collecting Social Security at your
-    <a href="https://www.ssa.gov/oact/progdata/nra.html"
-      ><strong>Normal Retirement Age</strong></a
-    >. It's calculated using a
-    <a href="https://www.ssa.gov/oact/cola/piaformula.html">formula</a> that
-    applies "<strong>bend points</strong>" to your AIME. For 2025, the
-    <a href="https://www.ssa.gov/oact/cola/bendpoints.html">bend points</a> are <strong>$1,226</strong> and <strong>$7,391</strong>.
-  </p>
-  <p>Here's how the calculation works for an AIME of $5,000.00:</p>
-  <ul>
-    <li>
-      <strong>90% of the first $1,226:</strong>
-      0.90 * $1,226 = <strong>$1,103.40</strong>
-    </li>
-    <li>
-      <strong>32% of the amount over $1,226 up to $7,391:</strong>
-      The amount between $1,226 and $5,000.00 is $5,000.00 - $1,226 = $3,774.00.
-      0.32 * $3,774.00 = <strong>$1,207.68</strong>
-    </li>
-    <li>
-      <strong>15% of the amount over $7,391:</strong>
-      Since your AIME ($5,000.00) is not over $7,391, this portion is
-      <strong>$0.00</strong>.
-    </li>
-  </ul>
-  <p>
-    <strong
-      >Your estimated Primary Insurance Amount (PIA) = $1,103.40 + $1,207.68 +
-      $0.00 = $2,311.08 per month.</strong
-    >
-  </p>
+  <IncomePiaWalkthrough annualIncome={60000} />
 
   <InlineCTA type="calculator" />
 

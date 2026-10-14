@@ -43,14 +43,17 @@ describe('Constants synchronization invariants', () => {
   });
 
   describe('MAX_YEAR synchronization', () => {
-    it('MAX_WAGE_INDEX_YEAR should be within 3 years of MAX_YEAR', () => {
-      expect(MAX_WAGE_INDEX_YEAR).toBeGreaterThanOrEqual(MAX_YEAR - 3);
-      expect(MAX_WAGE_INDEX_YEAR).toBeLessThanOrEqual(MAX_YEAR);
+    // SSA publishes these together each October: the year-Y taxable maximum
+    // and quarter of coverage, the COLA effective that December, and the
+    // wage index for two years earlier. Code that pins its COLA cutoff to
+    // MAX_YEAR - 1 or indexes on MAX_YEAR - 2 silently skips a missing entry,
+    // so an update that bumps MAX_YEAR alone must fail here.
+    it('MAX_WAGE_INDEX_YEAR should be MAX_YEAR - 2', () => {
+      expect(MAX_WAGE_INDEX_YEAR).toBe(MAX_YEAR - 2);
     });
 
-    it('MAX_COLA_YEAR should be within 2 years of MAX_YEAR', () => {
-      expect(MAX_COLA_YEAR).toBeGreaterThanOrEqual(MAX_YEAR - 2);
-      expect(MAX_COLA_YEAR).toBeLessThanOrEqual(MAX_YEAR);
+    it('MAX_COLA_YEAR should be MAX_YEAR - 1', () => {
+      expect(MAX_COLA_YEAR).toBe(MAX_YEAR - 1);
     });
 
     it('all tables should have no gaps in year coverage', () => {

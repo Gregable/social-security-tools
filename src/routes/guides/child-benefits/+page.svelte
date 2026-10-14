@@ -27,7 +27,7 @@ const title =
 const description =
   'If you retire while your children are under 18, each child can collect up to half your full benefit, and a spouse caring for them can too. Learn who qualifies, how the family maximum caps the total, when benefits end, and whether claiming at 62 for the kids pays off.';
 const publishDate = new Date('2026-10-10T00:00:00+00:00');
-const updateDate = new Date('2026-10-10T00:00:00+00:00');
+const updateDate = new Date('2026-10-14T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/child-benefits';
