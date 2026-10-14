@@ -205,10 +205,18 @@ export class MonthDate {
   }
 
   /**
-   * Returns a human readable string version of the date
+   * Returns the month and year with a short month name, such as "Jan 2025".
    */
   toString() {
     return `${this.monthName()} ${this.year()}`;
+  }
+
+  /**
+   * Returns the month and year with the month spelled out, such as
+   * "January 2025", for dates in running text.
+   */
+  toFullString() {
+    return `${this.monthFullName()} ${this.year()}`;
   }
 }
 

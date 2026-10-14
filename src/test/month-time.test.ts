@@ -43,6 +43,12 @@ describe('MonthDate', () => {
   it('returns monthFullName', () => {
     expect(testMd.monthFullName()).toBe('October');
   });
+  it('returns the short month and year from toString', () => {
+    expect(testMd.toString()).toBe('Oct 2012');
+  });
+  it('returns the full month and year from toFullString', () => {
+    expect(testMd.toFullString()).toBe('October 2012');
+  });
   it('correctly compares to another MonthDate', () => {
     expect(
       testMd.greaterThan(

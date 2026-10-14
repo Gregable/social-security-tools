@@ -87,9 +87,6 @@ function formatAnnualRaw(amount: Money): string {
   return amount.roundToDollar().value().toFixed(0);
 }
 
-function startLabel(date: MonthDate): string {
-  return `${date.monthFullName()} ${date.year()}`;
-}
 </script>
 
 <div class="pageBreakAvoid">
@@ -230,7 +227,7 @@ function startLabel(date: MonthDate): string {
                     </button>
                   </div>
                   <small class="field-hint"
-                    >({startLabel(recipientEntry.startDate)})</small
+                    >({recipientEntry.startDate.toFullString()})</small
                   >
                 </div>
               </div>
@@ -343,7 +340,7 @@ function startLabel(date: MonthDate): string {
                     </button>
                   </div>
                   <small class="field-hint"
-                    >({startLabel(spouseEntry.startDate)})</small
+                    >({spouseEntry.startDate.toFullString()})</small
                   >
                 </div>
               </div>
@@ -457,7 +454,7 @@ function startLabel(date: MonthDate): string {
                     </button>
                   </div>
                   <small class="field-hint"
-                    >({startLabel(spousalEntry.startDate)})</small
+                    >({spousalEntry.startDate.toFullString()})</small
                   >
                 </div>
               </div>

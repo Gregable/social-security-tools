@@ -88,9 +88,6 @@ function formatAnnual(amount: Money): string {
   return amount.roundToDollar().wholeDollars();
 }
 
-function startLabel(date: MonthDate): string {
-  return `${date.monthFullName()} ${date.year()}`;
-}
 
 type FICalcIncome = {
   name: string;
@@ -223,7 +220,7 @@ $: fiCalcUrl = generateFICalcLink(fiCalcIncomeArray);
                     : `${yearsIntoRetirement(recipientEntry.startDate)} years into retirement`}<br
                   />
                   <small
-                    >Start month: {startLabel(recipientEntry.startDate)}</small
+                    >Start month: {recipientEntry.startDate.toFullString()}</small
                   >
                 </span>
               </div>
@@ -256,7 +253,7 @@ $: fiCalcUrl = generateFICalcLink(fiCalcIncomeArray);
                     ? "0 (already started or starts immediately)"
                     : `${yearsIntoRetirement(spouseEntry.startDate)} years into retirement`}<br
                   />
-                  <small>Start month: {startLabel(spouseEntry.startDate)}</small
+                  <small>Start month: {spouseEntry.startDate.toFullString()}</small
                   >
                 </span>
               </div>
@@ -290,7 +287,7 @@ $: fiCalcUrl = generateFICalcLink(fiCalcIncomeArray);
                     : `${yearsIntoRetirement(spousalEntry.startDate)} years into retirement`}<br
                   />
                   <small
-                    >Start month: {startLabel(spousalEntry.startDate)}</small
+                    >Start month: {spousalEntry.startDate.toFullString()}</small
                   >
                 </span>
               </div>

@@ -48,12 +48,7 @@ function twoSignificantDigits(n: number) {
                 .dateAtSsaAge(
                   MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
                 )
-                .monthFullName()}
-              {recipient.birthdate
-                .dateAtSsaAge(
-                  MonthDuration.initFromYearsMonths({ years: 62, months: 0 })
-                )
-                .year()}</b
+                .toFullString()}</b
             >),
           {:else}
             62 years and 1 month old (<b
@@ -61,12 +56,7 @@ function twoSignificantDigits(n: number) {
                 .dateAtSsaAge(
                   MonthDuration.initFromYearsMonths({ years: 62, months: 1 })
                 )
-                .monthFullName()}
-              {recipient.birthdate
-                .dateAtSsaAge(
-                  MonthDuration.initFromYearsMonths({ years: 62, months: 1 })
-                )
-                .year()}</b
+                .toFullString()}</b
             >),
           {/if}
           wait until as late as 70 years old (<b
@@ -74,12 +64,7 @@ function twoSignificantDigits(n: number) {
               .dateAtSsaAge(
                 MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
               )
-              .monthFullName()}
-            {recipient.birthdate
-              .dateAtSsaAge(
-                MonthDuration.initFromYearsMonths({ years: 70, months: 0 })
-              )
-              .year()}</b
+              .toFullString()}</b
           >), or start any month in between. The longer <RName
             r={recipient}
             suffix=" waits">you wait</RName
@@ -118,8 +103,7 @@ function twoSignificantDigits(n: number) {
               <b>{exampleAge.age}</b>
               throughout the <u>entire</u> month is
               <b
-                >{followingMonth.monthFullName()}
-                {followingMonth.year()}</b
+                >{followingMonth.toFullString()}</b
               >.
             {:else}
               For example, <RName {r} suffix=" was">you were</RName> born on
@@ -128,8 +112,7 @@ function twoSignificantDigits(n: number) {
               <b>{exampleAge.age}</b>
               throughout the <u>entire</u> month is
               <b
-                >{followingMonth.monthFullName()}
-                {followingMonth.year()}</b
+                >{followingMonth.toFullString()}</b
               >.
             {/if}
             <a
@@ -147,8 +130,7 @@ function twoSignificantDigits(n: number) {
           If <RName {r} suffix=" chooses">you choose</RName> to take benefits
           <i>earlier</i>
           than normal retirement age (<b
-            >{recipient.normalRetirementDate().monthFullName()}
-            {recipient.normalRetirementDate().year()}</b
+            >{recipient.normalRetirementDate().toFullString()}</b
           >), <RName {r} apos>your</RName> benefit amount will be
           <u>permanently</u> <i>reduced</i>:
         </p>
@@ -184,8 +166,7 @@ function twoSignificantDigits(n: number) {
           If <RName {r} suffix=" chooses">you choose</RName> to delay until
           <i>later</i>
           than normal retirement age (<b
-            >{recipient.normalRetirementDate().monthFullName()}
-            {recipient.normalRetirementDate().year()}</b
+            >{recipient.normalRetirementDate().toFullString()}</b
           >) to start <RName {r} apos>your</RName> benefit, the amount will be
           <u>permanently</u>
           <i>increased</i>:
