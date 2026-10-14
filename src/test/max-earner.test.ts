@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { benefitAtAge } from '$lib/benefit-calculator';
 import { MAX_YEAR, MAXIMUM_EARNINGS } from '$lib/constants';
-import { createMaxEarnerForBirthYear } from '$lib/max-earner';
+import {
+  createMaxEarnerForBirthYear,
+  maximumBenefitInYear,
+} from '$lib/max-earner';
 import { MonthDuration } from '$lib/month-time';
 
 describe('createMaxEarnerForBirthYear', () => {
@@ -90,5 +93,63 @@ describe('createMaxEarnerForBirthYear', () => {
     // Should not throw and should have some records
     const records = recipient.earningsRecords;
     expect(records.length).toBeGreaterThanOrEqual(0);
+  });
+});
+
+/**
+ * SSA publishes the benefit a maximum earner receives on retiring in January
+ * of each year, "Initial" column of
+ * https://www.ssa.gov/oact/cola/examplemax.html. That figure carries the COLAs
+ * through the prior year only, whatever year the site happens to be built in.
+ */
+describe('maximumBenefitInYear', () => {
+  const at = (years: number, months = 0) =>
+    MonthDuration.initFromYearsMonths({ years, months });
+
+  it('matches the published 2027 figures, including the 3.6% COLA', () => {
+    expect(maximumBenefitInYear(at(62, 1), 2027).wholeDollars()).toBe('$3,094');
+    expect(maximumBenefitInYear(at(67), 2027).wholeDollars()).toBe('$4,188');
+    expect(maximumBenefitInYear(at(70), 2027).wholeDollars()).toBe('$5,358');
+  });
+
+  it('follows the cohort a caller names for the full-retirement-age figure', () => {
+    // SSA's fact sheet "maximum benefit, worker retiring at full retirement
+    // age": $4,152 for 2026 and $4,188 for 2027. The maximum guide follows the
+    // cohort born in year - 67, whose FRA is not a whole number of years.
+    const fraOf = (birthYear: number) =>
+      createMaxEarnerForBirthYear(birthYear).normalRetirementAge();
+    expect(maximumBenefitInYear(fraOf(1959), 2026, 1959).wholeDollars()).toBe(
+      '$4,152'
+    );
+    expect(maximumBenefitInYear(fraOf(1960), 2027, 1960).wholeDollars()).toBe(
+      '$4,188'
+    );
+  });
+
+  it('matches the published 2026 figures', () => {
+    expect(maximumBenefitInYear(at(67), 2026).wholeDollars()).toBe('$4,207');
+    expect(maximumBenefitInYear(at(70), 2026).wholeDollars()).toBe('$5,181');
+  });
+
+  it('refuses a year the constants do not cover yet', () => {
+    // Missing COLAs and earnings caps would be skipped, understating the
+    // benefit without any sign that the figure is incomplete.
+    expect(() => maximumBenefitInYear(at(70), MAX_YEAR + 1)).toThrow(
+      /MAX_YEAR/
+    );
+  });
+
+  it('leaves later COLAs out of past years', () => {
+    expect(maximumBenefitInYear(at(67), 2025).wholeDollars()).toBe('$4,043');
+    expect(maximumBenefitInYear(at(70), 2021).wholeDollars()).toBe('$3,895');
+  });
+
+  // benefitAtAge floors the PIA to the dollar before applying delayed
+  // credits; SSA applies them to the dime-rounded PIA. With 46 months of
+  // credits (x 1.306667): $3,909.60 -> $5,108.54, but $3,909 -> $5,107.76.
+  // When that rounding is fixed this starts passing and vitest reports it;
+  // move the assertion into 'leaves later COLAs out of past years'.
+  it.fails('matches the published 2025 age-70 figure to the dollar', () => {
+    expect(maximumBenefitInYear(at(70), 2025).wholeDollars()).toBe('$5,108');
   });
 });

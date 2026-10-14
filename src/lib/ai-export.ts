@@ -10,7 +10,6 @@ import {
   AFTER_BENDPOINT2_MULTIPLIER,
   BEFORE_BENDPOINT1_MULTIPLIER,
   BEFORE_BENDPOINT2_MULTIPLIER,
-  MAX_COLA_YEAR,
   MAX_WAGE_INDEX_YEAR,
 } from '$lib/constants';
 import type { EarningRecord } from '$lib/earning-record';
@@ -262,11 +261,11 @@ function piaSection(recipient: Recipient): string {
     '## Primary Insurance Amount (PIA)',
     '',
     `The PIA applies the SSA bend-point formula to the AIME (${aime.wholeDollars()}).`,
-    `Bend points for the eligibility year (${recipient.indexingYear()}) are ${bend1.wholeDollars()} and ${bend2.wholeDollars()}.`,
+    `Bend points for the eligibility year (${recipient.birthdate.yearTurningSsaAge(62)}, indexed on the ${recipient.indexingYear()} wage index) are ${bend1.wholeDollars()} and ${bend2.wholeDollars()}.`,
     '',
     renderTable(['Bracket', 'Amount'], rows, ['left', 'right']),
     '',
-    `After cost-of-living adjustments (COLA) applied through ${MAX_COLA_YEAR}, the`,
+    `After cost-of-living adjustments (COLA) applied through ${pia.lastAppliedColaYear()}, the`,
     `final PIA is ${pia.primaryInsuranceAmount().wholeDollars()} / month.`,
     '',
     'Note: the PIA is rounded down to the dime; monthly benefits are rounded',

@@ -2,11 +2,21 @@
 import posthog from 'posthog-js';
 import { onDestroy, onMount } from 'svelte';
 import { browser } from '$app/environment';
+import { claimOncePerSession } from '$lib/analytics/session-once';
 
 const DISMISS_KEY = 'mobileDesktopPromptDismissed';
+// "Shown" is sent when the prompt first scrolls into view, once per tab
+// session (sessionStorage), not per mount: the prompt remounts whenever the
+// paste step restarts (e.g. after "Try again") and sits below the fold.
+const SHOWN_KEY = 'mobileDesktopPromptShownTracked';
+// Where the prompt sits on the page, sent with "Shown" so a later move can be
+// compared.
+const PLACEMENT = 'below_paste';
 const SITE_URL = 'https://ssa.tools/calculator';
 
 let isVisible = false;
+let promptEl: HTMLDivElement | undefined;
+let observer: IntersectionObserver | null = null;
 let canShare = false;
 let isCopied = false;
 let copiedTimer: ReturnType<typeof setTimeout> | null = null;
@@ -49,7 +59,11 @@ function dismiss() {
   isVisible = false;
   posthog.capture('Mobile: Desktop Reminder Dismissed');
   if (browser) {
-    sessionStorage.setItem(DISMISS_KEY, 'true');
+    try {
+      sessionStorage.setItem(DISMISS_KEY, 'true');
+    } catch {
+      // Storage blocked: the prompt may reappear on the next visit.
+    }
   }
 }
 
@@ -57,25 +71,50 @@ onDestroy(() => {
   if (copiedTimer !== null) {
     clearTimeout(copiedTimer);
   }
+  observer?.disconnect();
 });
+
+function reportShownWhenSeen(node: HTMLElement) {
+  if (typeof IntersectionObserver === 'undefined') return;
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer?.disconnect();
+      if (claimOncePerSession(sessionStorage, SHOWN_KEY)) {
+        posthog.capture('Mobile: Desktop Reminder Shown', { placement: PLACEMENT });
+      }
+    },
+    { threshold: 0.5 }
+  );
+  observer.observe(node);
+}
+
+function wasDismissed(): boolean {
+  try {
+    return sessionStorage.getItem(DISMISS_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
 
 onMount(() => {
   if (!browser) return;
 
-  const dismissed = sessionStorage.getItem(DISMISS_KEY) === 'true';
-  if (dismissed) return;
+  if (wasDismissed()) return;
 
   const mq = window.matchMedia('(max-width: 768px)');
   if (!mq.matches) return;
 
   isVisible = true;
   canShare = typeof navigator.share === 'function';
-  posthog.capture('Mobile: Desktop Reminder Shown');
 });
+
+// The element exists only after isVisible renders it.
+$: if (promptEl && !observer) reportShownWhenSeen(promptEl);
 </script>
 
 {#if isVisible}
-  <div class="prompt">
+  <div class="prompt" bind:this={promptEl}>
     <button class="dismiss" on:click={dismiss} aria-label="Dismiss">&times;</button>
     <div class="heading">Easier on a computer</div>
     <p>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { aboveSecondBendExampleAime, aimeTableRows } from "$lib/aime-examples";
   import { Birthdate } from "$lib/birthday";
   import BendpointChart from "$lib/components/BendpointChart.svelte";
   import {
@@ -53,7 +54,7 @@
   // For the late-career earnings examples
   const midBracketAIME = Money.from(6000);
   const midBracketIncrease = Money.from(500);
-  const highBracketAIME = Money.from(8000);
+  const highBracketAIME = aboveSecondBendExampleAime(secondBendPoint);
   const midBracketBenefit = midBracketIncrease.times(
     BEFORE_BENDPOINT2_MULTIPLIER
   );
@@ -62,18 +63,10 @@
   );
 
   // AIME values for the AIME to PIA conversion table
-  const aimeTableValues = [
-    1000,
-    2000,
-    3000,
-    4000,
-    5000,
-    6000,
-    Math.round(secondBendPoint.value()),
-    8000,
-    10000,
-    12500,
-  ];
+  const aimeTableValues = aimeTableRows([
+    ...[1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 12500].map(Money.from),
+    secondBendPoint,
+  ]);
 
   // Create a demo recipient with sample earnings for the bendpoint chart
   const demoRecipient = new Recipient();
@@ -83,7 +76,7 @@
   const title = "Primary Insurance Amount (PIA)";
   const description = `Learn how Social Security calculates your Primary Insurance Amount (PIA) in ${currentYear}. Understand the bendpoint formula (${firstBendPoint.wholeDollars()} and ${secondBendPoint.wholeDollars()}), calculate your monthly benefit, and discover strategies to maximize your PIA.`;
   const publishDate = new Date("2025-09-19T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const updateDate = new Date("2026-10-14T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/pia";
@@ -292,11 +285,10 @@
       </thead>
       <tbody>
         {#each aimeTableValues as aimeValue}
-          {@const aimeMoney = Money.from(aimeValue)}
-          {@const piaAmount = pia.piaFromAIME(aimeMoney)}
-          {@const replacementRate = Math.round(piaAmount.div$(aimeMoney) * 100)}
+          {@const piaAmount = pia.piaFromAIME(aimeValue)}
+          {@const replacementRate = Math.round(piaAmount.div$(aimeValue) * 100)}
           <tr>
-            <td>${aimeValue.toLocaleString()}</td>
+            <td>{aimeValue.wholeDollars()}</td>
             <td>{piaAmount.wholeDollars()}</td>
             <td>{replacementRate}%</td>
           </tr>

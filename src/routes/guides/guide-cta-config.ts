@@ -38,6 +38,8 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   // Sponsor: guides whose reader faces a decision the calculator cannot
   // settle for them.
   'agency-changes': 'sponsor',
+  'break-even-age': 'sponsor',
+  'child-benefits': 'sponsor',
   cola: 'sponsor',
   'covid-awi-drop': 'sponsor',
   'divorced-spouse': 'sponsor',

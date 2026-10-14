@@ -29,3 +29,15 @@ export const SpouseMode = Template.bind({});
 SpouseMode.args = {
   isSpouse: true,
 };
+
+// Copy instructions are chosen by the primary pointer in CSS, and Chromatic's
+// browsers have a mouse, so force each variant to snapshot both.
+export const TouchInstructions = Template.bind({});
+TouchInstructions.args = {
+  copyInstructions: 'touch',
+};
+
+export const KeyboardInstructions = Template.bind({});
+KeyboardInstructions.args = {
+  copyInstructions: 'keyboard',
+};

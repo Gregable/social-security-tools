@@ -18,9 +18,9 @@
   const title =
     "Working While Receiving Social Security: The Earnings Test Explained";
   const description =
-    "Can you work while collecting Social Security? Learn about the earnings test, 2025 and 2026 income limits, how benefits are reduced, and why withheld benefits are returned at full retirement age.";
+    "Can you work while collecting Social Security? Learn about the earnings test, 2026 and 2027 income limits, how benefits are reduced, and why withheld benefits are returned at full retirement age.";
   const publishDate = new Date("2026-01-26T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const updateDate = new Date("2026-10-14T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/earnings-test";
@@ -34,8 +34,8 @@
     "Social Security earnings test",
     "working while on Social Security",
     "Social Security income limit",
-    "earnings limit 2025",
     "earnings limit 2026",
+    "earnings limit 2027",
     "can I work and collect Social Security",
     "Social Security benefit reduction",
     "retirement earnings limit",
@@ -65,7 +65,7 @@
     different.
   </p>
 
-  <h2>2025 and 2026 Earnings Limits</h2>
+  <h2>2026 and 2027 Earnings Limits</h2>
 
   <p>
     The Social Security Administration adjusts the
@@ -77,20 +77,20 @@
     <thead>
       <tr>
         <th>Situation</th>
-        <th>2025 Limit</th>
         <th>2026 Limit</th>
+        <th>2027 Limit</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Under FRA all year</td>
-        <td>$23,400</td>
         <td>$24,480</td>
+        <td>$25,560</td>
       </tr>
       <tr>
         <td>Year you reach FRA</td>
-        <td>$62,160</td>
         <td>$65,160</td>
+        <td>$67,920</td>
       </tr>
       <tr>
         <td>Month you reach FRA and after</td>
@@ -116,7 +116,7 @@
 
   <p>
     Take Sarah, age 63, with a benefit of $1,500 per month ($18,000 per year).
-    She earns $34,480 in 2026 — that's $10,000 over the $24,480 limit. Half of
+    She earns $35,560 in 2027 — that's $10,000 over the $25,560 limit. Half of
     the excess, $5,000, is withheld from her benefits, so she receives $13,000
     for the year instead of $18,000. In practice, Social Security
     <a href="https://secure.ssa.gov/poms.nsf/lnx/0302501095">withholds whole checks starting in January</a>
@@ -134,9 +134,9 @@
   </p>
 
   <p>
-    Say Tom turns 67 — his FRA — in August 2026, and his benefit is $2,000 per
-    month. He earns $70,000 from January through July, which is $4,840 over
-    the $65,160 limit. One third of that, about $1,613, is withheld — roughly
+    Say Tom turns 67 — his FRA — in August 2027, and his benefit is $2,000 per
+    month. He earns $73,000 from January through July, which is $5,080 over
+    the $67,920 limit. One third of that, about $1,693, is withheld — roughly
     one month of benefits. Starting in August, the earnings test no longer
     applies to him at all.
   </p>
@@ -229,29 +229,29 @@
     <thead>
       <tr>
         <th>Situation</th>
-        <th>2025 Monthly Limit</th>
         <th>2026 Monthly Limit</th>
+        <th>2027 Monthly Limit</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Under FRA all year</td>
-        <td>$1,950</td>
         <td>$2,040</td>
+        <td>$2,130</td>
       </tr>
       <tr>
         <td>Year you reach FRA</td>
-        <td>$5,180</td>
         <td>$5,430</td>
+        <td>$5,660</td>
       </tr>
     </tbody>
   </table>
 
   <p>
     Here's how it helps. Mike, age 64, earned $80,000 from January through June
-    2026, then retired and started Social Security in July. Under the annual
-    test, $80,000 is way over the $24,480 limit. But under the monthly test, he
-    earns $0 per month from July through December — well under the $2,040
+    2027, then retired and started Social Security in July. Under the annual
+    test, $80,000 is way over the $25,560 limit. But under the monthly test, he
+    earns $0 per month from July through December — well under the $2,130
     monthly limit — so he receives full benefits for those months. The monthly
     test only applies in the first year you receive benefits; after that, only
     the annual test applies.
@@ -285,7 +285,10 @@
   <p>
     If your spouse or children receive benefits on your record, your excess
     earnings can reduce their benefits too - but only up to the maximum family
-    benefit. Their own earnings don't affect your benefit.
+    benefit. Their own earnings don't affect your benefit. This matters most
+    for a parent thinking of claiming early so the children can collect; the
+    <a href="/guides/child-benefits">child benefits guide</a> covers that
+    decision.
   </p>
 
   <h2>Common Misconceptions</h2>

@@ -16,7 +16,7 @@ export const MAX_CREDITS: number = 40;
  * EARNINGS_PER_CREDIT and MAXIMUM_EARNINGS, have been published.
  * @type {number}
  */
-export const MAX_YEAR: number = 2026;
+export const MAX_YEAR: number = 2027;
 
 /**
  * For years before 1978, an individual was credited with a quarter of coverage
@@ -87,6 +87,7 @@ export const EARNINGS_PER_CREDIT: { [key: number]: Money } = {
   2024: Money.from(1730),
   2025: Money.from(1810),
   2026: Money.from(1890),
+  2027: Money.from(1970),
 };
 
 export const MAX_EARNINGS_PER_CREDIT: number = Math.max(
@@ -188,6 +189,7 @@ export const MAXIMUM_EARNINGS: { [key: number]: Money } = {
   2024: Money.from(168600),
   2025: Money.from(176100),
   2026: Money.from(184500),
+  2027: Money.from(192300),
 };
 /**
  * Earliest Year for which we have data for the maximum earnings.
@@ -278,6 +280,7 @@ export const TAX_RATES: { [key: number]: number } = {
   2024: 0.053,
   2025: 0.053,
   2026: 0.053,
+  2027: 0.053,
 };
 
 // Values from https://www.ssa.gov/oact/cola/piaformula.html
@@ -293,6 +296,28 @@ export const BEFORE_BENDPOINT1_MULTIPLIER: number = 0.9;
 export const BEFORE_BENDPOINT2_MULTIPLIER: number = 0.32;
 /* PIA formula multiplier after the second bend point. */
 export const AFTER_BENDPOINT2_MULTIPLIER: number = 0.15;
+
+// Values from https://www.ssa.gov/oact/cola/familymax.html
+//
+// The family maximum formula has three bend points. Like the PIA bend
+// points above, they are the 1979 dollar amounts scaled by the ratio of the
+// average wage index in the worker's indexing year to the index in 1977.
+
+/* The first bend in dollars (1979 base, indexed on 1977 wages) for the
+ * family maximum formula. */
+export const FAMILY_MAX_BENDPOINT1_IN_1977: Money = Money.from(230.0);
+/* The second bend for the family maximum formula. */
+export const FAMILY_MAX_BENDPOINT2_IN_1977: Money = Money.from(332.0);
+/* The third bend for the family maximum formula. */
+export const FAMILY_MAX_BENDPOINT3_IN_1977: Money = Money.from(433.0);
+/* Family maximum multiplier on the PIA up to the first bend point. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET1: number = 1.5;
+/* Family maximum multiplier between the first and second bend points. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET2: number = 2.72;
+/* Family maximum multiplier between the second and third bend points. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET3: number = 1.34;
+/* Family maximum multiplier above the third bend point. */
+export const FAMILY_MAX_MULTIPLIER_BRACKET4: number = 1.75;
 
 /**
  * The average wage index for each year, in dollars.
@@ -373,6 +398,7 @@ export const WAGE_INDICES: { [key: number]: Money } = {
   2022: Money.from(63795.13),
   2023: Money.from(66621.8),
   2024: Money.from(69846.57),
+  2025: Money.from(72800.33),
 };
 /**
  * The minimum year for which we have wage index data.
@@ -443,6 +469,7 @@ export const COLA: { [key: number]: number } = {
   2023: 3.2,
   2024: 2.5,
   2025: 2.8,
+  2026: 3.6,
 };
 
 /**

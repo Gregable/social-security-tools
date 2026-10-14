@@ -78,7 +78,10 @@
       It should be treated as a useful exploratory tool, but any decisions should
       be made after researching the subject yourself.
     </p>
-    <p>The site was most recently updated on Jan 17, 2026.</p>
+    <p>
+      The site was most recently updated on Oct 14, 2026 with the 3.6% COLA
+      for 2027.
+    </p>
     <h3>Why?</h3>
     <p>
       This site is completely free and contains no advertising. I don't collect

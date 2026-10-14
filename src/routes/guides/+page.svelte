@@ -27,6 +27,37 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Oct 11, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/break-even-age">
+            Social Security Break-Even Age: Claiming at 62 vs 67 vs 70
+          </a>
+        </h3>
+        <p class="description">
+          How long you have to live for a later claim to pay off. The
+          break-even ages for 62 vs 67, 62 vs 70, and 67 vs 70, a table for
+          every claiming year, how the arithmetic works, and the survivor,
+          longevity, and investment factors it leaves out.
+        </p>
+      </li>
+
+      <li>
+        <span class="postdate">Oct 10, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/child-benefits">
+            Social Security Benefits for Children When a Parent Retires: Who
+            Qualifies, How Much, and Whether to Claim Early
+          </a>
+        </h3>
+        <p class="description">
+          Each child under 18 can collect up to half a retired parent's full
+          benefit, and a spouse caring for them can too. How the family
+          maximum caps the total, what claiming at 62 for the children costs
+          and earns, when benefits end, and how to apply.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Sep 18, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/working-past-full-retirement-age">
@@ -112,8 +143,8 @@ const pageImageAlt = 'Social Security guides and educational resources';
         <p class="description">
           Learn how Delayed Retirement Credits increase your Social Security
           benefit by 8% per year for each year you wait past Full Retirement
-          Age, up to age 70. Includes breakeven analysis, survivor benefit
-          rules, and COLA interactions.
+          Age, up to age 70. Includes the month-by-month calculation,
+          survivor benefit rules, and COLA interactions.
         </p>
       </li>
 
@@ -171,7 +202,7 @@ const pageImageAlt = 'Social Security guides and educational resources';
         </h3>
         <p class="description">
           Can you work while collecting Social Security? Learn about the
-          earnings test, 2025 and 2026 income limits, how benefits are reduced
+          earnings test, 2026 and 2027 income limits, how benefits are reduced
           if you earn too much, and why withheld benefits are returned to you
           at full retirement age.
         </p>

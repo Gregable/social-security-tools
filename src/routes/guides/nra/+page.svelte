@@ -8,7 +8,7 @@ const title = 'Normal Retirement Age (NRA): What It Means for Your Benefits';
 const description =
   'Learn about Normal Retirement Age (NRA), also called Full Retirement Age (FRA), how it varies by birth year, and why it matters for calculating your Social Security benefits.';
 const publishDate = new Date('2026-01-17T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const updateDate = new Date('2026-10-14T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/nra';
@@ -187,7 +187,9 @@ fraTable.push({
   <p>
     This reduction is permanent. Your benefit will still receive annual
     <a href="/guides/inflation">cost-of-living adjustments (COLA)</a>, but the
-    base amount remains reduced for life.
+    base amount remains reduced for life. How many years it takes for the
+    full benefit to make up for the early checks is covered in the
+    <a href="/guides/break-even-age">break-even age guide</a>.
   </p>
 
   <h2>Filing After Normal Retirement Age</h2>
@@ -262,7 +264,8 @@ fraTable.push({
   <p>
     If you work while receiving benefits before NRA, your benefits may be
     temporarily reduced due to the <a href="/guides/earnings-test">earnings test</a>.
-    In 2026, if you earn more than $24,480 while receiving benefits before NRA,
+    In 2027, if you earn more than $25,560 (up from $24,480 in 2026) while
+    receiving benefits before NRA,
     <a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">$1 is withheld for every $2</a> over the limit. This reduction ends once you
     reach NRA, and any withheld benefits are returned to you through higher
     monthly payments.

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { aimeTableRows } from "$lib/aime-examples";
   import { Birthdate } from "$lib/birthday";
   import {
     MAX_WAGE_INDEX_YEAR,
@@ -47,18 +48,11 @@
   const exampleEarnings = Money.from(50000);
 
   // AIME values for the AIME to PIA table
-  const aimeTableValues = [
-    1000,
-    2000,
-    3000,
-    4000,
-    5000,
-    6000,
-    Math.round(secondBendPoint.value()),
-    8000,
-    10000,
-    Math.round(maxAIME.value()),
-  ];
+  const aimeTableValues = aimeTableRows([
+    ...[1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000].map(Money.from),
+    secondBendPoint,
+    maxAIME,
+  ]);
 
   // Calculate the total months for AIME calculation
   const totalMonths = SSA_EARNINGS_YEARS * 12;
@@ -67,7 +61,7 @@
   const description =
     "Learn how AIME (Average Indexed Monthly Earnings) is calculated and why it matters for your Social Security benefits. Comprehensive guide with examples.";
   const publishDate = new Date("2025-09-19T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const updateDate = new Date("2026-10-14T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/aime";
@@ -366,11 +360,10 @@ Consider someone with 40 years of earnings. Their top {SSA_EARNINGS_YEARS}
       </thead>
       <tbody>
         {#each aimeTableValues as aimeValue}
-          {@const aimeMoney = Money.from(aimeValue)}
-          {@const piaAmount = pia.piaFromAIME(aimeMoney)}
-          {@const replacementRate = Math.round(piaAmount.div$(aimeMoney) * 100)}
+          {@const piaAmount = pia.piaFromAIME(aimeValue)}
+          {@const replacementRate = Math.round(piaAmount.div$(aimeValue) * 100)}
           <tr>
-            <td>${aimeValue.toLocaleString()}</td>
+            <td>{aimeValue.wholeDollars()}</td>
             <td>{piaAmount.wholeDollars()}</td>
             <td>{replacementRate}%</td>
           </tr>

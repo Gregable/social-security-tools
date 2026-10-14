@@ -399,9 +399,14 @@ function handleSpouseQuestion(detail: {
   {#if mode === Mode.INITIAL}
     {#if isRecipient}
       <DemoData ondemo={handleDemo} />
-      <MobileDesktopPrompt />
     {/if}
     <PastePrompt onpaste={handlePaste} isSpouse={!isRecipient} name={isRecipient ? '' : spouseName} />
+    {#if isRecipient}
+      <!-- After the instructions so the task comes first on phones (the prompt
+           only renders on narrow screens). The demo stays above them as the
+           option for people not ready to fetch their record. -->
+      <MobileDesktopPrompt />
+    {/if}
   {:else if mode === Mode.PASTE_CONFIRMATION}
     <PasteConfirm
       onconfirm={handleConfirm}

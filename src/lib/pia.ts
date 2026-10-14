@@ -16,6 +16,25 @@ export interface PiaInput {
 }
 
 /**
+ * The ratio of the average wage in `indexingYear` to the average wage in
+ * 1977, which scales the fixed 1979 bend points of both the PIA formula and
+ * the family maximum formula to the worker's own wage era.
+ *
+ * An indexing year beyond the wage index data is clamped to the latest year
+ * available, so a worker who has not yet turned 60 is indexed on the most
+ * recent index published.
+ */
+export function wageIndexRatio(indexingYear: number): number {
+  const effectiveIndexingYear = Math.min(
+    indexingYear,
+    constants.MAX_WAGE_INDEX_YEAR
+  );
+  return constants.WAGE_INDICES[effectiveIndexingYear].div$(
+    constants.WAGE_INDICES[1977]
+  );
+}
+
+/**
  * A PrimaryInsuranceAmount object manages calculating the user's Primary
  * Insurance Amount (PIA).
  *
@@ -45,15 +64,7 @@ export class PrimaryInsuranceAmount {
    * @returns {number} The wage ratio used for indexing calculations
    */
   private wageRatio(): number {
-    // If the indexing year is beyond the WAGE_INDICES data range, use the
-    // maximum year in the data range.
-    const effectiveIndexingYear = Math.min(
-      this.input_.indexingYear(),
-      constants.MAX_WAGE_INDEX_YEAR
-    );
-    const wage_in_1977: Money = constants.WAGE_INDICES[1977];
-    const wage: Money = constants.WAGE_INDICES[effectiveIndexingYear];
-    return wage.div$(wage_in_1977);
+    return wageIndexRatio(this.input_.indexingYear());
   }
 
   /**
@@ -214,9 +225,10 @@ export class PrimaryInsuranceAmount {
   /**
    * Returns the last year whose COLA has been applied to benefits.
    * Since a year's COLA takes effect the following January, this is
-   * CURRENT_YEAR - 1.
+   * CURRENT_YEAR - 1. It trails MAX_COLA_YEAR from SSA's October
+   * announcement until January, while the newest COLA is known but unpaid.
    */
-  private lastAppliedColaYear(): number {
+  lastAppliedColaYear(): number {
     return constants.CURRENT_YEAR - 1;
   }
 
@@ -301,6 +313,19 @@ export class PrimaryInsuranceAmount {
       }
     }
     return adjustments;
+  }
+
+  /**
+   * The newest COLA when it is announced but not yet paid: from SSA's
+   * October announcement until the following January. Null otherwise.
+   *
+   * Its `start` is the PIA in effect today and its `end` the PIA from
+   * January on, so display code can name both.
+   */
+  pendingColaAdjustment(): ColaAdjustment | null {
+    const adjustments = this.colaAdjustments();
+    const last = adjustments[adjustments.length - 1];
+    return last !== undefined && !last.applied ? last : null;
   }
 }
 

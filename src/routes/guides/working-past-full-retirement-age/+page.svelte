@@ -31,7 +31,7 @@ const title =
 const description =
   'Still working at or after full retirement age? Learn the two ways your Social Security check can rise, when Social Security recalculates it, why the earnings test no longer applies, and how much one more year of work is really worth.';
 const publishDate = new Date('2026-09-18T00:00:00+00:00');
-const updateDate = new Date('2026-09-18T00:00:00+00:00');
+const updateDate = new Date('2026-10-14T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/working-past-full-retirement-age';

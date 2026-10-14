@@ -78,7 +78,7 @@ const sponsorCopy: SponsorCopy = {
 const title = `Social Security COLA ${headline.paymentYear}: What the ${percentText(headline)} Increase Means`;
 const description = `Social Security benefits ${isBeingPaid ? 'rose' : 'will rise'} ${percentText(headline)} in ${headline.paymentYear}. Learn how the cost-of-living adjustment is calculated, when it reaches your check, whether you receive it before you file, and what else changes in January.`;
 const publishDate = new Date('2026-09-10T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const updateDate = new Date('2026-10-14T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/cola';
