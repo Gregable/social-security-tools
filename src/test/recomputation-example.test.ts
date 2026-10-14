@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MAX_YEAR, MAXIMUM_EARNINGS, SSA_EARNINGS_YEARS } from '$lib/constants';
 import { Money } from '$lib/money';
 import { MonthDate } from '$lib/month-time';
@@ -38,19 +38,19 @@ describe('exampleWorker', () => {
 describe('the figures the guide publishes', () => {
   it('computes the full 35-year career', () => {
     const e = recomputationExample({ careerYears: 35, wage });
-    expect(e.piaBefore.string()).toBe('$2,227.40');
-    expect(e.piaAfter.string()).toBe('$2,256.20');
-    expect(e.monthlyIncrease.string()).toBe('$28.80');
+    expect(e.piaBefore.string()).toBe('$2,304.80');
+    expect(e.piaAfter.string()).toBe('$2,334.50');
+    expect(e.monthlyIncrease.string()).toBe('$29.70');
     expect(e.displacedYear?.string()).toBe('$30,000.00');
-    expect(e.increaseIfClaimedAt62.string()).toBe('$20.00');
-    expect(e.increaseIfClaimedAt70.string()).toBe('$37.00');
+    expect(e.increaseIfClaimedAt62.string()).toBe('$21.00');
+    expect(e.increaseIfClaimedAt70.string()).toBe('$38.00');
   });
 
   it('computes the 22-year career', () => {
     const e = recomputationExample({ careerYears: 22, wage });
-    expect(e.piaBefore.string()).toBe('$1,662.10');
-    expect(e.piaAfter.string()).toBe('$1,720.20');
-    expect(e.monthlyIncrease.string()).toBe('$58.10');
+    expect(e.piaBefore.string()).toBe('$1,727.00');
+    expect(e.piaAfter.string()).toBe('$1,786.20');
+    expect(e.monthlyIncrease.string()).toBe('$59.20');
     expect(e.displacedYear).toBeNull();
   });
 
@@ -60,9 +60,9 @@ describe('the figures the guide publishes', () => {
       wage: MAXIMUM_EARNINGS[MAX_YEAR],
       shape: 'flat',
     });
-    expect(e.piaBefore.string()).toBe('$4,068.80');
-    expect(e.piaAfter.string()).toBe('$4,096.30');
-    expect(e.monthlyIncrease.string()).toBe('$27.50');
+    expect(e.piaBefore.string()).toBe('$4,322.70');
+    expect(e.piaAfter.string()).toBe('$4,352.40');
+    expect(e.monthlyIncrease.string()).toBe('$29.70');
   });
 
   it('computes the low extra year', () => {
@@ -94,6 +94,30 @@ describe('the figures the guide publishes', () => {
 });
 
 describe('recomputationExample', () => {
+  it('gives the same figures whatever year the site is built in', async () => {
+    // CURRENT_YEAR is fixed when constants.ts loads, and a prerendered page
+    // keeps whatever it saw. Between SSA's October announcement and January
+    // the newest COLA is in the constants but not yet the default cutoff, so
+    // a figure that leaned on the default would change on the first build of
+    // the new year.
+    const today = recomputationExample({ careerYears: 35, wage });
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(MAX_YEAR + 1, 0, 15));
+    vi.resetModules();
+    try {
+      const later = await import('$lib/recomputation-example');
+      const next = later.recomputationExample({ careerYears: 35, wage });
+      expect(next.piaBefore.string()).toBe(today.piaBefore.string());
+      expect(next.piaAfter.string()).toBe(today.piaAfter.string());
+      expect(next.increaseIfClaimedAt70.string()).toBe(
+        today.increaseIfClaimedAt70.string()
+      );
+    } finally {
+      vi.useRealTimers();
+      vi.resetModules();
+    }
+  });
+
   it('adds the extra year in the last year the constants cover', () => {
     expect(recomputationExample({ careerYears: 35, wage }).extraYear).toBe(
       MAX_YEAR

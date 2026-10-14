@@ -10,7 +10,6 @@ import {
   AFTER_BENDPOINT2_MULTIPLIER,
   BEFORE_BENDPOINT1_MULTIPLIER,
   BEFORE_BENDPOINT2_MULTIPLIER,
-  MAX_COLA_YEAR,
   MAX_WAGE_INDEX_YEAR,
 } from '$lib/constants';
 import type { EarningRecord } from '$lib/earning-record';
@@ -266,7 +265,7 @@ function piaSection(recipient: Recipient): string {
     '',
     renderTable(['Bracket', 'Amount'], rows, ['left', 'right']),
     '',
-    `After cost-of-living adjustments (COLA) applied through ${MAX_COLA_YEAR}, the`,
+    `After cost-of-living adjustments (COLA) applied through ${pia.lastAppliedColaYear()}, the`,
     `final PIA is ${pia.primaryInsuranceAmount().wholeDollars()} / month.`,
     '',
     'Note: the PIA is rounded down to the dime; monthly benefits are rounded',

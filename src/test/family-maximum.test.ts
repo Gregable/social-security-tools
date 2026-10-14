@@ -6,7 +6,8 @@ import { Money } from '$lib/money';
 /**
  * The published bend points come from https://www.ssa.gov/oact/cola/familymax.html.
  * A worker first eligible in year Y uses the wage index from Y - 2, so the
- * 2025 figures index on 2023 and the 2026 figures on 2024.
+ * 2025 figures index on 2023, the 2026 figures on 2024, and the 2027 figures
+ * on 2025.
  */
 describe('familyMaximumBendPoints', () => {
   it('reproduces the 2025 bend points SSA published', () => {
@@ -21,6 +22,13 @@ describe('familyMaximumBendPoints', () => {
     expect(bends.first.string()).toBe('$1,643.00');
     expect(bends.second.string()).toBe('$2,371.00');
     expect(bends.third.string()).toBe('$3,093.00');
+  });
+
+  it('reproduces the 2027 bend points SSA published', () => {
+    const bends = familyMaximumBendPoints(2025);
+    expect(bends.first.string()).toBe('$1,712.00');
+    expect(bends.second.string()).toBe('$2,471.00');
+    expect(bends.third.string()).toBe('$3,223.00');
   });
 
   it('holds the latest known bend points for indexing years past the data', () => {

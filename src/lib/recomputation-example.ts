@@ -256,8 +256,13 @@ export function recomputationExample(
     );
   }
 
-  const piaBefore = before.pia().primaryInsuranceAmount();
-  const piaAfter = after.pia().primaryInsuranceAmount();
+  // The COLAs in effect during the extra year, pinned rather than taken from
+  // today's date: from SSA's October announcement until January the newest
+  // COLA is in the constants but not yet the default cutoff, and a
+  // prerendered guide would otherwise change on the first build of the year.
+  const colaYear = constants.MAX_YEAR - 1;
+  const piaBefore = before.pia().primaryInsuranceAmount(colaYear);
+  const piaAfter = after.pia().primaryInsuranceAmount(colaYear);
   const age = (years: number) =>
     MonthDuration.initFromYearsMonths({ years, months: 0 });
   const aime = before.monthlyIndexedEarnings();
@@ -280,11 +285,11 @@ export function recomputationExample(
       input.careerYears < constants.SSA_EARNINGS_YEARS
         ? null
         : before.cutoffIndexedEarnings(),
-    increaseIfClaimedAt62: benefitAtAge(after, age(62)).sub(
-      benefitAtAge(before, age(62))
+    increaseIfClaimedAt62: benefitAtAge(after, age(62), colaYear).sub(
+      benefitAtAge(before, age(62), colaYear)
     ),
-    increaseIfClaimedAt70: benefitAtAge(after, age(70)).sub(
-      benefitAtAge(before, age(70))
+    increaseIfClaimedAt70: benefitAtAge(after, age(70), colaYear).sub(
+      benefitAtAge(before, age(70), colaYear)
     ),
     aimeWithinSecondBracket:
       aime.greaterThan(before.pia().firstBendPoint()) &&

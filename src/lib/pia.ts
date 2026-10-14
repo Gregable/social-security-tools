@@ -225,9 +225,10 @@ export class PrimaryInsuranceAmount {
   /**
    * Returns the last year whose COLA has been applied to benefits.
    * Since a year's COLA takes effect the following January, this is
-   * CURRENT_YEAR - 1.
+   * CURRENT_YEAR - 1. It trails MAX_COLA_YEAR from SSA's October
+   * announcement until January, while the newest COLA is known but unpaid.
    */
-  private lastAppliedColaYear(): number {
+  lastAppliedColaYear(): number {
     return constants.CURRENT_YEAR - 1;
   }
 

@@ -11,6 +11,7 @@ import {
   eligibleForSpousalBenefit,
 } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
+import { CURRENT_YEAR } from '$lib/constants';
 import { EarningRecord } from '$lib/earning-record';
 import { Money } from '$lib/money';
 import { MonthDuration } from '$lib/month-time';
@@ -133,6 +134,24 @@ describe('buildCalculatorAiExport (single, earnings-based)', () => {
     });
     expect(md).toMatch(/^# Social Security benefit summary/m);
     expect(md).toContain('2026-06-18');
+  });
+
+  it('names the last COLA year actually applied to the PIA it states', () => {
+    // Between SSA's October announcement and January, the newest COLA is in
+    // the constants but not yet in anyone's check. The sentence must name the
+    // year the stated PIA was built through, not the newest year on record.
+    const r = eligibleRecipient();
+    r.birthdate = Birthdate.FromYMD(1958, 8, 21);
+    const md = buildCalculatorAiExport(r);
+    const match = md.match(
+      /COLA\) applied through (\d{4}), the\s+final PIA is (\$[\d,]+) \/ month/
+    );
+    expect(match).not.toBeNull();
+    const [, year, stated] = match as RegExpMatchArray;
+    expect(r.pia().primaryInsuranceAmount(Number(year)).wholeDollars()).toBe(
+      stated
+    );
+    expect(Number(year)).toBeLessThan(CURRENT_YEAR);
   });
 
   it('omits the generated-on line when no date is given (no clock read)', () => {

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { benefitAtAge } from '$lib/benefit-calculator';
 import { MAX_YEAR, MAXIMUM_EARNINGS } from '$lib/constants';
-import { createMaxEarnerForBirthYear } from '$lib/max-earner';
+import {
+  createMaxEarnerForBirthYear,
+  maximumBenefitInYear,
+} from '$lib/max-earner';
 import { MonthDuration } from '$lib/month-time';
 
 describe('createMaxEarnerForBirthYear', () => {
@@ -90,5 +93,40 @@ describe('createMaxEarnerForBirthYear', () => {
     // Should not throw and should have some records
     const records = recipient.earningsRecords;
     expect(records.length).toBeGreaterThanOrEqual(0);
+  });
+});
+
+/**
+ * SSA publishes the benefit a maximum earner receives on retiring in January
+ * of each year, "Initial" column of
+ * https://www.ssa.gov/oact/cola/examplemax.html. That figure carries the COLAs
+ * through the prior year only, whatever year the site happens to be built in.
+ */
+describe('maximumBenefitInYear', () => {
+  const at = (years: number, months = 0) =>
+    MonthDuration.initFromYearsMonths({ years, months });
+
+  it('matches the published 2027 figures, including the 3.6% COLA', () => {
+    expect(maximumBenefitInYear(at(62, 1), 2027).wholeDollars()).toBe('$3,094');
+    expect(maximumBenefitInYear(at(67), 2027).wholeDollars()).toBe('$4,188');
+    expect(maximumBenefitInYear(at(70), 2027).wholeDollars()).toBe('$5,358');
+  });
+
+  it('matches the published 2026 figures', () => {
+    expect(maximumBenefitInYear(at(67), 2026).wholeDollars()).toBe('$4,207');
+    expect(maximumBenefitInYear(at(70), 2026).wholeDollars()).toBe('$5,181');
+  });
+
+  it('leaves later COLAs out of past years', () => {
+    expect(maximumBenefitInYear(at(67), 2025).wholeDollars()).toBe('$4,043');
+    expect(maximumBenefitInYear(at(70), 2021).wholeDollars()).toBe('$3,895');
+  });
+
+  // benefitAtAge floors the PIA to the dollar before applying delayed
+  // credits; SSA applies them to the dime-rounded PIA ($3,909.60 x 1.3067 =
+  // $5,108.54, not $3,909 x 1.3067 = $5,107.76). When that rounding is fixed
+  // this starts passing and vitest reports it; move it into the test above.
+  it.fails('matches the published 2025 age-70 figure to the dollar', () => {
+    expect(maximumBenefitInYear(at(70), 2025).wholeDollars()).toBe('$5,108');
   });
 });

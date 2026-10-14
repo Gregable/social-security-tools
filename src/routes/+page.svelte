@@ -3,6 +3,7 @@ import type { ComponentType, SvelteComponent } from 'svelte';
 import { onMount } from 'svelte';
 import Header from '$lib/components/Header.svelte';
 import HomeChoice from '$lib/components/HomeChoice.svelte';
+import { latestAnnouncedCola } from '$lib/cola';
 import { loadIntroBanner } from '$lib/integrations/config';
 import { activeIntegration } from '$lib/integrations/context';
 import CombinedDemoMp4 from '$lib/videos/combined-demo.mp4';
@@ -18,6 +19,7 @@ import {
 } from '$lib/schema-org';
 
 const title = 'SSA.tools: A Social Security Calculator';
+const latestCola = latestAnnouncedCola();
 const description =
   'Free Social Security calculator for 2026. Estimate your retirement benefits, find your optimal filing age (62-70), and see how your AIME and PIA affect your monthly payment.';
 const url = 'https://ssa.tools';
@@ -262,8 +264,9 @@ onMount(() => {
       <h2 class="section-label">What next</h2>
       <h3 class="section-title">Ready to see your numbers?</h3>
       <p>
-        Start the <a href="/calculator">free calculator</a>. It's up to date for
-        2026, including this year's cost-of-living adjustment.
+        Start the <a href="/calculator">free calculator</a>. It's up to date
+        with the {latestCola.percent.toFixed(1)}% cost-of-living adjustment for
+        {latestCola.paymentYear}.
       </p>
       <h3 class="section-title">Not ready yet?</h3>
       <p>

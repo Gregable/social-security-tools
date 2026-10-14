@@ -202,7 +202,7 @@ const pageImageAlt = 'Social Security guides and educational resources';
         </h3>
         <p class="description">
           Can you work while collecting Social Security? Learn about the
-          earnings test, 2025 and 2026 income limits, how benefits are reduced
+          earnings test, 2026 and 2027 income limits, how benefits are reduced
           if you earn too much, and why withheld benefits are returned to you
           at full retirement age.
         </p>

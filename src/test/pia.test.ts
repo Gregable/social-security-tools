@@ -23,6 +23,22 @@ describe('PrimaryInsuranceAmount with PiaInput', () => {
     expect(pia.secondBendPoint().value()).toEqual(5583);
   });
 
+  it('reproduces the 2027 bend points SSA published', () => {
+    // https://www.ssa.gov/oact/cola/bendpoints.html: a worker first eligible
+    // in 2027 indexes on the 2025 wage index.
+    const input: PiaInput = {
+      isPiaOnly: false,
+      overridePia: null,
+      indexingYear: () => 2025,
+      birthdate: Birthdate.FromYMD(1965, 0, 15),
+      monthlyIndexedEarnings: () => Money.from(0),
+      isEligible: () => false,
+    };
+    const pia = new PrimaryInsuranceAmount(input);
+    expect(pia.firstBendPoint().value()).toEqual(1340);
+    expect(pia.secondBendPoint().value()).toEqual(8077);
+  });
+
   it('calculates PIA from a plain object with earnings', () => {
     const input: PiaInput = {
       isPiaOnly: false,

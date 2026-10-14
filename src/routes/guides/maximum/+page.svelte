@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { benefitAtAge } from "$lib/benefit-calculator";
   import {
     MAX_YEAR,
     MAXIMUM_EARNINGS,
     SSA_EARNINGS_YEARS,
   } from "$lib/constants";
-  import { createMaxEarnerForBirthYear } from "$lib/max-earner";
+  import {
+    createMaxEarnerForBirthYear,
+    maximumBenefitInYear,
+  } from "$lib/max-earner";
   import { Money } from "$lib/money";
   import { MonthDuration } from "$lib/month-time";
   import { GuidesSchema } from "$lib/schema-org";
@@ -20,7 +22,8 @@
 
   // Create a maximum earner turning 70 in current year (for PIA and delayed credits)
   const maxEarner = createMaxEarnerForBirthYear(currentYear - 70);
-  const maxPIA = maxEarner.pia().primaryInsuranceAmount();
+  // COLAs through last year: the PIA as it stands in January of currentYear.
+  const maxPIA = maxEarner.pia().primaryInsuranceAmount(currentYear - 1);
 
   // Filing age data for table - each row uses correct birth year for that filing age
   type FilingRow = {
@@ -54,9 +57,7 @@
   const filingData: FilingRow[] = filingAges.map((age) => {
     // Someone filing at this age in currentYear was born in (currentYear - age.years)
     // For fractional ages like 66y 10m, we use the rounded year for birth year calculation
-    const birthYear = currentYear - age.roundedYears();
-    const recipient = createMaxEarnerForBirthYear(birthYear);
-    const benefit = benefitAtAge(recipient, age);
+    const benefit = maximumBenefitInYear(age, currentYear);
 
     return {
       age,
@@ -67,7 +68,7 @@
   });
 
   // Maximum benefit at age 70 (from the person turning 70 in currentYear)
-  const maxBenefitAt70 = benefitAtAge(maxEarner, age70);
+  const maxBenefitAt70 = maximumBenefitInYear(age70, currentYear);
 
   // Spousal benefit (50% of PIA at FRA)
   const maxSpousalBenefit = maxPIA.div(2).floorToDollar();
@@ -103,18 +104,14 @@
     at70: Money;
     atFRA: Money;
   } {
-    // Someone turning 70 in this year
-    const at70BirthYear = year - 70;
-    const at70Recipient = createMaxEarnerForBirthYear(at70BirthYear, year);
-
     // Someone reaching FRA in this year (approximately born year - 67)
     const atFRABirthYear = year - 67;
-    const atFRARecipient = createMaxEarnerForBirthYear(atFRABirthYear, year);
-    const recipientFRA = atFRARecipient.normalRetirementAge();
+    const recipientFRA =
+      createMaxEarnerForBirthYear(atFRABirthYear).normalRetirementAge();
 
     return {
-      at70: benefitAtAge(at70Recipient, age70),
-      atFRA: benefitAtAge(atFRARecipient, recipientFRA),
+      at70: maximumBenefitInYear(age70, year),
+      atFRA: maximumBenefitInYear(recipientFRA, year, atFRABirthYear),
     };
   }
 
@@ -135,7 +132,7 @@
   const title = `Maximum Social Security Benefit ${currentYear}`;
   const description = `The maximum Social Security benefit in ${currentYear} is ${maxBenefitAt70.wholeDollars()}/month at age 70. Learn what it takes to reach the maximum, how filing age affects your benefit, and the requirements for the highest possible payment.`;
   const publishDate = new Date("2019-08-03T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const updateDate = new Date("2026-10-14T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/maximum";
