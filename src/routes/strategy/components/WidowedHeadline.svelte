@@ -57,7 +57,7 @@
   function formatMonthFull(card: Card): string {
     const a = card.advice;
     if (a.kind !== "file-in" && a.kind !== "started") return "";
-    return `${a.month.monthFullName()} ${a.month.year()}`;
+    return a.month.toFullString();
   }
 
   function formatMonthShort(card: Card): string {
@@ -88,8 +88,8 @@
     <div class="prefix">File</div>
     <div class="date-big">now</div>
     <div class="age-sub">
-      Ask SSA to backdate the claim to {a.backdateTo.monthFullName()}
-      {a.backdateTo.year()}; they can pay up to six months retroactively.
+      Ask SSA to backdate the claim to {a.backdateTo.toFullString()};
+      they can pay up to six months retroactively.
       About {a.amount.wholeDollars()} per month.
     </div>
   {:else if a.kind === "file-in"}

@@ -48,10 +48,6 @@ export interface WidowedFiled {
 /** Neither benefit has started. */
 export const NOT_FILED_WIDOWED: WidowedFiled = { survivor: null, own: null };
 
-function formatMonth(date: MonthDate): string {
-  return `${date.monthFullName()} ${date.year()}`;
-}
-
 /**
  * Validates the month the spouse died. Returns null when acceptable,
  * otherwise a message suitable for showing under the input.
@@ -87,7 +83,7 @@ export function validateLateSpouseFiledMonth(
   if (filedAt.lessThan(earliest)) {
     return (
       `Retirement benefits cannot start before the first full month at age ` +
-      `62, which is ${formatMonth(earliest)} for this birthdate.`
+      `62, which is ${earliest.toFullString()} for this birthdate.`
     );
   }
   if (!filedAt.lessThan(deathMonth)) {
@@ -167,8 +163,8 @@ export function validateSurvivorFiledMonth(
   const earliest = earliestSurvivorBenefitDate(survivorBirthdate, deathMonth);
   if (filedAt.lessThan(earliest)) {
     return earliest.monthsSinceEpoch() === deathMonth.monthsSinceEpoch()
-      ? `Survivor benefits cannot start before the month of death, ${formatMonth(earliest)}.`
-      : `Survivor benefits cannot start before ${formatMonth(earliest)}, when you reach age 60.`;
+      ? `Survivor benefits cannot start before the month of death, ${earliest.toFullString()}.`
+      : `Survivor benefits cannot start before ${earliest.toFullString()}, when you reach age 60.`;
   }
   if (filedAt.greaterThan(currentDate)) {
     return 'The start month cannot be in the future.';
