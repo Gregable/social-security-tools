@@ -1,6 +1,5 @@
 <script lang="ts">
 import {
-  ALL_MONTHS_FULL,
   MAX_YEAR,
   MAXIMUM_EARNINGS,
   SSA_EARNINGS_YEARS,
@@ -71,7 +70,6 @@ const lowYear = recomputationExample({
 const worker = exampleWorker();
 const fra = worker.normalRetirementAge();
 const fraDate = worker.normalRetirementDate();
-const fraMonth = ALL_MONTHS_FULL[fraDate.monthIndex()];
 // Delayed credits accrue from full retirement age to 70.
 const drcAt70Percent =
   (worker.delayedRetirementIncrease() / 12) * (70 * 12 - fra.asMonths()) * 100;
@@ -230,8 +228,7 @@ const faqs: FAQItem[] = [
   <p>
     Take a worker born in {fullCareer.birthYear}, whose full retirement age
     is {fra.years()} and {fra.modMonths()} months. They reached it in
-    {fraMonth}
-    {fraDate.year()} and are working through {fullCareer.extraYear} earning
+    {fraDate.toFullString()} and are working through {fullCareer.extraYear} earning
     {wage.wholeDollars()}. What does that one year do to a monthly
     benefit, for a few different work histories?
   </p>

@@ -93,15 +93,11 @@ function hasStarted(date: MonthDate): boolean {
   return date.monthsSinceEpoch() <= today.monthsSinceEpoch();
 }
 
-function monthLabel(date: MonthDate): string {
-  return `${date.monthFullName()} ${date.year()}`;
-}
-
 function startYearNote(date: MonthDate): string {
   if (hasStarted(date)) {
-    return `Already receiving since ${monthLabel(date)}; keeping the start year at ${currentYear} keeps it active immediately.`;
+    return `Already receiving since ${date.toFullString()}; keeping the start year at ${currentYear} keeps it active immediately.`;
   }
-  return `Begins ${monthLabel(date)}.`;
+  return `Begins ${date.toFullString()}.`;
 }
 
 function fieldName(column: ColumnId, base: string): string {

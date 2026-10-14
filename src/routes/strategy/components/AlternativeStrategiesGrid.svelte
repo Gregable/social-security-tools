@@ -420,7 +420,7 @@
       <p class="collapsed-note">
         <RecipientName r={recipients[collapsedAxis]} apos /> filing date is
         fixed{filedAt
-          ? ` at ${filedAt.monthFullName()} ${filedAt.year()}`
+          ? ` at ${filedAt.toFullString()}`
           : ""}; each cell varies
         <RecipientName r={recipients[collapsedAxis === 0 ? 1 : 0]} apos />
         filing {displayAsAges ? "age" : "date"}.
