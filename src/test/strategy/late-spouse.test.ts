@@ -161,7 +161,7 @@ describe('validateSurvivorFiledMonth', () => {
     const young = Birthdate.FromYMD(1964, 5, 15); // attains 60 in June 2024
     expect(
       validateSurvivorFiledMonth(young, month(2024, 4), death, currentDate)
-    ).toMatch(/June 2024/);
+    ).toMatch(/June 2024, when you reach age 60/);
   });
 
   it('rejects a future month', () => {

@@ -327,6 +327,27 @@ describe('strategySumPeriodsWidowed', () => {
     );
     expect(periods.map((p) => p.benefitType)).toEqual([BenefitType.Survivor]);
   });
+
+  it('pays nothing before the own benefit starts when the survivor benefit is $0', () => {
+    // A late spouse with no record of their own leaves a $0 survivor
+    // benefit: the months between its start and the own start pay nothing,
+    // and no period stands for them.
+    const survivor = makeRecipient(1500, 1968, 2, 15);
+    const periods = strategySumPeriodsWidowed(
+      survivor,
+      { ...neverClaimed, recipient: makeRecipient(0, 1964, 4, 10) },
+      finalDate,
+      { survivorStart: age(60, 0), ownStart: age(62, 1) }
+    );
+    expect(periods.length).toBeGreaterThan(0);
+    expect(periods.every((p) => p.amount.cents() > 0)).toBe(true);
+    expect(periods.map((p) => p.benefitType)).toEqual(
+      periods.map(() => BenefitType.Personal)
+    );
+    expect(periods[0].startDate.toString()).toBe(
+      survivor.birthdate.dateAtSsaAge(age(62, 1)).toString()
+    );
+  });
 });
 
 describe('strategySumCentsWidowed', () => {

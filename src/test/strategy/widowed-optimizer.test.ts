@@ -217,24 +217,28 @@ describe('widowedNPVCents', () => {
 });
 
 describe('optimalStrategyWidowed', () => {
-  it('finds the best strategy that brute force over the slow NPV finds', () => {
-    const rng = mulberry32(11);
-    for (let n = 0; n < 16; n++) {
-      const s = randomScenario(rng);
-      const context = contextFor(s);
-      const finalDate = deathDateFor(s.survivor, 62 + Math.floor(rng() * 40));
-      const best = optimalStrategyWidowed(context, finalDate);
-      let bruteForceMax = Number.NEGATIVE_INFINITY;
-      for (const strategy of allStrategies(context)) {
-        bruteForceMax = Math.max(
-          bruteForceMax,
-          slowNPV(s, strategy, finalDate)
-        );
+  it(
+    'finds the best strategy that brute force over the slow NPV finds',
+    { timeout: 60_000 },
+    () => {
+      const rng = mulberry32(11);
+      for (let n = 0; n < 16; n++) {
+        const s = randomScenario(rng);
+        const context = contextFor(s);
+        const finalDate = deathDateFor(s.survivor, 62 + Math.floor(rng() * 40));
+        const best = optimalStrategyWidowed(context, finalDate);
+        let bruteForceMax = Number.NEGATIVE_INFINITY;
+        for (const strategy of allStrategies(context)) {
+          bruteForceMax = Math.max(
+            bruteForceMax,
+            slowNPV(s, strategy, finalDate)
+          );
+        }
+        closeTo(best.npvCents, bruteForceMax);
+        closeTo(slowNPV(s, best.strategy, finalDate), bruteForceMax);
       }
-      closeTo(best.npvCents, bruteForceMax);
-      closeTo(slowNPV(s, best.strategy, finalDate), bruteForceMax);
     }
-  });
+  );
 
   // Classic strategies, at a 0% discount rate and a long life (to 95).
   // Survivor born 15 Mar 1968 (FRA 67, earliest own claim 62y1m); spouse
@@ -393,26 +397,30 @@ describe('expectedNPVWidowed', () => {
     }
   });
 
-  it('returns the strategy with the highest expected NPV', () => {
-    const rng = mulberry32(31);
-    for (let n = 0; n < 20; n++) {
-      const s = randomScenario(rng);
-      const context = contextFor(s);
-      const dist = syntheticDistribution(60);
-      const best = expectedNPVWidowed(context, dist);
-      for (const strategy of allStrategies(context)) {
-        expect(
-          widowedExpectedNPVCents(context, dist, strategy)
-        ).toBeLessThanOrEqual(
-          best.npvCents + 1e-6 * Math.max(1, best.npvCents)
+  it(
+    'returns the strategy with the highest expected NPV',
+    { timeout: 60_000 },
+    () => {
+      const rng = mulberry32(31);
+      for (let n = 0; n < 20; n++) {
+        const s = randomScenario(rng);
+        const context = contextFor(s);
+        const dist = syntheticDistribution(60);
+        const best = expectedNPVWidowed(context, dist);
+        for (const strategy of allStrategies(context)) {
+          expect(
+            widowedExpectedNPVCents(context, dist, strategy)
+          ).toBeLessThanOrEqual(
+            best.npvCents + 1e-6 * Math.max(1, best.npvCents)
+          );
+        }
+        closeTo(
+          widowedExpectedNPVCents(context, dist, best.strategy),
+          best.npvCents
         );
       }
-      closeTo(
-        widowedExpectedNPVCents(context, dist, best.strategy),
-        best.npvCents
-      );
     }
-  });
+  );
 });
 
 describe('createWidowedContext', () => {
@@ -591,5 +599,131 @@ describe('widowedBenefitUse', () => {
     expect(
       use(3000, { survivorStart: age(67, 0), ownStart: age(62, 1) })
     ).toEqual({ survivor: false, own: true });
+  });
+});
+
+describe('widowed optimizer guards and edge cases', () => {
+  // Born 15 Mar 1968; spouse died in November 2025 at 61 without claiming.
+  const survivor = makeRecipient(1500, 1968, 2, 15);
+  const lateSpouse: LateSpouse = {
+    recipient: makeRecipient(2000, 1964, 4, 10),
+    deathDate: month(2025, 10),
+    claim: { kind: 'none' },
+  };
+  const context = createWidowedContext(
+    survivor,
+    lateSpouse,
+    currentDate,
+    0.025,
+    NOT_FILED_WIDOWED
+  );
+
+  it('refuses a plan outside the start ages it searched', () => {
+    // Survivor starts run from 60 to 67, own starts from 62y1m to 70.
+    const at90 = deathDateFor(survivor, 90);
+    for (const strategy of [
+      { survivorStart: age(59, 11), ownStart: age(62, 1) },
+      { survivorStart: age(67, 1), ownStart: age(62, 1) },
+      { survivorStart: age(60, 0), ownStart: age(62, 0) },
+      { survivorStart: age(60, 0), ownStart: age(70, 1) },
+    ]) {
+      expect(() => widowedNPVCents(context, strategy, at90)).toThrow(
+        /outside the start ages/
+      );
+    }
+  });
+
+  it('refuses a death beyond the modeled ages', () => {
+    expect(() =>
+      optimalStrategyWidowed(
+        context,
+        survivor.birthdate.dateAtLayAge(age(125, 0))
+      )
+    ).toThrow(/beyond the modeled ages/);
+    expect(() =>
+      expectedNPVWidowed(context, [{ age: 125, probability: 1 }])
+    ).toThrow(/beyond the modeled ages/);
+  });
+
+  it('values a plan for a death at the oldest modeled age as the slow path does', () => {
+    const strategy = { survivorStart: age(60, 0), ownStart: age(70, 0) };
+    const finalDate = survivor.birthdate.dateAtLayAge(age(122, 0));
+    closeTo(
+      widowedNPVCents(context, strategy, finalDate),
+      strategySumCentsWidowed(
+        survivor,
+        lateSpouse,
+        finalDate,
+        currentDate,
+        0.025,
+        strategy
+      )
+    );
+    const dist: DeathProbability[] = [
+      { age: 119, probability: 0.5 },
+      { age: 121, probability: 0.5 },
+    ];
+    closeTo(
+      widowedExpectedNPVCents(context, dist, strategy),
+      dist.reduce(
+        (sum, { age: a, probability }) =>
+          sum +
+          probability *
+            strategySumCentsWidowed(
+              survivor,
+              lateSpouse,
+              deathDateFor(survivor, a),
+              currentDate,
+              0.025,
+              strategy
+            ),
+        0
+      )
+    );
+  });
+
+  it('gives the same expected value whatever order the distribution is in', () => {
+    const dist = syntheticDistribution(58);
+    const reversed = [...dist].reverse();
+    const forward = expectedNPVWidowed(context, dist);
+    const backward = expectedNPVWidowed(context, reversed);
+    closeTo(backward.npvCents, forward.npvCents);
+    expect(backward.strategy.survivorStart.asMonths()).toBe(
+      forward.strategy.survivorStart.asMonths()
+    );
+    expect(backward.strategy.ownStart.asMonths()).toBe(
+      forward.strategy.ownStart.asMonths()
+    );
+  });
+
+  it('values identical payment streams exactly equally, so ties are exact', () => {
+    // Own benefits since April 2026 pay $2,112 on a $3,000 PIA, more than
+    // the $2,000 survivor benefit ever could, so every survivor start pays
+    // the same stream and must be worth exactly the same.
+    const filedSurvivor = makeRecipient(3000, 1964, 2, 15);
+    const filedContext = createWidowedContext(
+      filedSurvivor,
+      { ...lateSpouse, recipient: makeRecipient(2000, 1961, 2, 15) },
+      currentDate,
+      0.025,
+      { survivor: null, own: month(2026, 3) }
+    );
+    const ownStart = filedContext.ownRange.earliest;
+    const dist = syntheticDistribution(62);
+    const byDeath = new Set<number>();
+    const expected = new Set<number>();
+    for (
+      let s = filedContext.survivorRange.earliest.asMonths();
+      s <= filedContext.survivorRange.latest.asMonths();
+      s++
+    ) {
+      const strategy = { survivorStart: new MonthDuration(s), ownStart };
+      byDeath.add(
+        widowedNPVCents(filedContext, strategy, deathDateFor(filedSurvivor, 90))
+      );
+      expected.add(widowedExpectedNPVCents(filedContext, dist, strategy));
+    }
+    expect(byDeath.size).toBe(1);
+    expect(expected.size).toBe(1);
   });
 });

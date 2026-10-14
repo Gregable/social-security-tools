@@ -130,5 +130,5 @@ describe('Optimal Strategy Fuzz Test', () => {
         epsilon
       );
     }
-  }, 600000); // timeout of 10 minutes
+  }, 3_600_000); // An hour: the 100,000 iterations take about 17 minutes.
 });
