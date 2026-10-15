@@ -2,8 +2,6 @@
 import { page } from '$app/state';
 import Header from '$lib/components/Header.svelte';
 
-// Unknown URLs reach this page through the build's 404.html fallback (see
-// svelte.config.js), which Cloudflare Pages serves with a 404 status.
 const destinations = [
   { href: '/', label: 'Home' },
   { href: '/calculator', label: 'Calculator' },
@@ -11,13 +9,21 @@ const destinations = [
   { href: '/guides', label: 'Guides' },
 ];
 
+// SvelteKit renders this for every error: unknown URLs (in production,
+// Cloudflare Pages serves the 404.html fallback from svelte.config.js and the
+// client router lands here with status 404) and errors thrown while loading
+// or rendering any page.
 const notFound = $derived(page.status === 404);
 const heading = $derived(notFound ? 'Page not found' : 'Something went wrong');
 </script>
 
 <svelte:head>
   <title>{heading} | SSA.tools</title>
-  <meta name="robots" content="noindex" />
+  {#if notFound}
+    <!-- Only for missing pages: a real page that errors once while a crawler
+         renders it should not be dropped from search results. -->
+    <meta name="robots" content="noindex" />
+  {/if}
 </svelte:head>
 
 <Header />

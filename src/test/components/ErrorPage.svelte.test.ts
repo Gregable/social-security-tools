@@ -1,6 +1,8 @@
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+// A plain object, not reactive state: set it before mounting, since changes
+// after mount do not re-render the page.
 const pageState = vi.hoisted(() => ({
   status: 404,
   error: { message: 'Not Found' } as { message: string } | null,
@@ -11,11 +13,10 @@ vi.mock('$app/state', () => ({ page: pageState }));
 const { default: ErrorPage } = await import('../../routes/+error.svelte');
 
 describe('+error.svelte', () => {
-  let cleanup: (() => void) | null = null;
+  const cleanups: Array<() => void> = [];
 
   afterEach(() => {
-    cleanup?.();
-    cleanup = null;
+    for (const cleanup of cleanups.splice(0)) cleanup();
   });
 
   function render(status: number, message: string): HTMLElement {
@@ -24,10 +25,10 @@ describe('+error.svelte', () => {
     const target = document.createElement('div');
     document.body.appendChild(target);
     const component = mount(ErrorPage, { target });
-    cleanup = () => {
+    cleanups.push(() => {
       unmount(component);
       target.remove();
-    };
+    });
     flushSync();
     return target;
   }
@@ -63,9 +64,19 @@ describe('+error.svelte', () => {
     expect(target.textContent).toContain('Internal Error');
   });
 
-  it('keeps error pages out of search results', () => {
+  function robotsMeta(): string | null | undefined {
+    return document.head
+      .querySelector('meta[name="robots"]')
+      ?.getAttribute('content');
+  }
+
+  it('keeps missing pages out of search results', () => {
     render(404, 'Not Found');
-    const robots = document.head.querySelector('meta[name="robots"]');
-    expect(robots?.getAttribute('content')).toBe('noindex');
+    expect(robotsMeta()).toBe('noindex');
+  });
+
+  it('does not deindex a real page over a passing error', () => {
+    render(500, 'Internal Error');
+    expect(robotsMeta()).toBeUndefined();
   });
 });
