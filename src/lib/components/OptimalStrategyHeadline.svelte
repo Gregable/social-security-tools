@@ -7,6 +7,9 @@
     DEFAULT_DISCOUNT_RATE_ASSUMPTION,
     type DiscountRateAssumption,
     formatDiscountRatePercent,
+    type NoChoiceReasons,
+    type OtherSpouseStart,
+    spousalOnlyAdvice,
   } from "$lib/components/recommended-filing-card";
   import { Money } from "$lib/money";
   import type { MonthDate, MonthDuration } from "$lib/month-time";
@@ -34,21 +37,24 @@
      */
     discountRateAssumption?: DiscountRateAssumption;
     /**
-     * Per recipient: false once filing immediately is their only remaining
-     * option. Such a recipient gets a "file now" card rather than a filing
-     * date, because the optimizer's answer for them is the most retroactive
-     * month SSA allows — a month that has already passed, which under a
-     * "File in" label reads as a bug rather than as advice.
+     * Per recipient, why they have no filing age left to choose (see
+     * `noChoiceReason`), or null while they have one, computed with the
+     * results for `currentDate`.
      *
-     * Also false for a recipient who has already filed. They get the
-     * "Started benefits" card instead, because `alreadyFiled` takes
+     * Someone past 70 gets a "File now" card rather than a filing date,
+     * because the optimizer's answer for them is the most retroactive month
+     * SSA allows: a month that has already passed, which under a "File in"
+     * label reads as a bug rather than as advice. A spouse with no benefit of
+     * their own past full retirement age gets a card that follows the other
+     * spouse's start (see `spousalOnlyAdvice`). Someone who has already
+     * filed gets the "Started benefits" card, because `alreadyFiled` takes
      * precedence in the snippet.
      *
-     * Required rather than defaulted: defaulting it to [true, true] would
+     * Required rather than defaulted: defaulting it to no reasons would
      * silently reinstate that already-passed date for any caller that forgot
      * to pass it.
      */
-    hasFilingChoice: [boolean, boolean];
+    noChoiceReasons: NoChoiceReasons;
     /**
      * The month the recommendation was computed for. Used to tell a filing
      * date that is still ahead from one that has already passed.
@@ -74,11 +80,16 @@
     recipients,
     showInfoTip = true,
     discountRateAssumption = DEFAULT_DISCOUNT_RATE_ASSUMPTION,
-    hasFilingChoice,
+    noChoiceReasons,
     currentDate,
     alreadyFiled = NOT_FILED,
     onAlreadyFiledHint,
   }: Props = $props();
+
+  /** Per recipient, whether they still have a filing age to choose. */
+  const hasFilingChoice = $derived(
+    noChoiceReasons.map((reason) => reason === null) as [boolean, boolean]
+  );
 
   /**
    * Whether anyone still has a filing age to choose. Once nobody does, the
@@ -87,6 +98,25 @@
    * change it, and the strategy page hides them on the same rule.
    */
   const hasChoiceLeft = $derived(anyFilingChoice(isSingle, hasFilingChoice));
+
+  /**
+   * When the spouse at `index` starts benefits: the month they started, if
+   * recorded as filed, or else their recommended filing month (which has
+   * passed for a claim to backdate); null without a couple result. A
+   * partner whose reason is `spousal-only` starts their spousal benefit
+   * with it.
+   */
+  function benefitStart(index: number): OtherSpouseStart | null {
+    const filedAt = alreadyFiled[index];
+    if (filedAt !== null) return { month: filedAt, filed: true };
+    if (!coupleResult) return null;
+    return {
+      month: recipients[index].birthdate.dateAtSsaAge(
+        coupleResult.filingAges[index]
+      ),
+      filed: false,
+    };
+  }
 
   /**
    * Whether the recommended filing month has already passed.
@@ -154,6 +184,14 @@
   }
 </script>
 
+{#snippet noChoiceClause(index: number)}
+  <RecipientName r={recipients[index]} />
+  {#if noChoiceReasons[index] === "filed"}already receives benefits{:else if noChoiceReasons[index] === "spousal-only"}has
+    no retirement benefit of their own and has reached full retirement age,
+    where spousal benefits stop growing{:else}is past 70, where delayed retirement
+    credits stop{/if}
+{/snippet}
+
 {#snippet filingCard(index: number, filingAge: MonthDuration)}
   {@const filedAt = alreadyFiled[index]}
   {#if filedAt !== null}
@@ -167,6 +205,47 @@
       at age {filedAge(index, filedAt)}{#if amount !== null}, about {amount} per
         month from your own record, in today's dollars{/if}
     </div>
+  {:else if noChoiceReasons[index] === "spousal-only"}
+    {@const otherStart = benefitStart(1 - index)}
+    {#if otherStart !== null}
+      {@const advice = spousalOnlyAdvice(
+        recipients[index],
+        otherStart,
+        currentDate
+      )}
+      {#if advice.kind === "with-other"}
+        <div class="prefix">File in</div>
+        <div class="date-big">
+          <span class="date-full">{advice.month.toFullString()}</span>
+          <span class="date-short">{advice.month.toString()}</span>
+        </div>
+        <div class="age-sub">
+          when <RecipientName r={recipients[1 - index]} apos /> benefits start:
+          the spousal benefit has stopped growing and starts with theirs.
+        </div>
+      {:else}
+        <div class="prefix">File</div>
+        <div class="date-big">now</div>
+        <div class="age-sub">
+          {#if advice.backdateTo === null && advice.limit === "other-start"}
+            <RecipientName r={recipients[1 - index]} apos /> benefits start this
+            month, and the spousal benefit has stopped growing, so it can start
+            now too.
+          {:else if advice.backdateTo === null}
+            Full retirement age is this month, when the spousal benefit stops
+            growing.
+          {:else}
+            The spousal benefit has stopped growing. Ask SSA to backdate the
+            claim to {advice.backdateTo.toFullString()}{#if advice.limit === "other-start" && otherStart.filed},
+              when <RecipientName r={recipients[1 - index]} apos /> benefits
+              started{:else if advice.limit === "other-start"}, as far back
+              as <RecipientName r={recipients[1 - index]} apos /> own claim{:else if advice.limit === "full-retirement-age"}, the
+              month of full retirement age{:else}; they can pay up to six
+              months retroactively{/if}.
+          {/if}
+        </div>
+      {/if}
+    {/if}
   {:else if isAlreadyPast(index, filingAge)}
     <div class="prefix">File</div>
     <div class="date-big">now</div>
@@ -275,14 +354,14 @@
         {:else if alreadyFiled[0] !== null && alreadyFiled[1] !== null}
           You are both already receiving benefits, so there is no filing
           decision left here.
-        {:else if !hasChoiceLeft && (alreadyFiled[0] !== null || alreadyFiled[1] !== null)}
-          {@const filed = alreadyFiled[0] !== null ? 0 : 1}
-          <RecipientName r={recipients[filed]} /> already receives benefits and
-          <RecipientName r={recipients[1 - filed]} /> is past 70, where delayed
-          retirement credits stop, so there is no filing decision left here.
-        {:else if !hasChoiceLeft}
+        {:else if !hasChoiceLeft && noChoiceReasons[0] === "past-seventy" && noChoiceReasons[1] === "past-seventy"}
           You are both past 70, where delayed retirement credits stop, so there
           is no filing decision left here.
+        {:else if !hasChoiceLeft}
+          {@const first = noChoiceReasons[1] === "filed" ? 1 : 0}
+          {@render noChoiceClause(first)}, and {@render noChoiceClause(
+            1 - first
+          )}, so there is no filing decision left here.
         {:else if alreadyFiled[0] !== null || alreadyFiled[1] !== null}
           Maximizes your expected combined lifetime benefits, taking
           <RecipientName r={recipients[alreadyFiled[0] !== null ? 0 : 1]} />'s

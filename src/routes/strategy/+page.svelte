@@ -29,6 +29,7 @@
     widowedInputFromParams,
   } from "$lib/strategy/ui/share-url";
   import type { StrategyMode } from "$lib/strategy/ui/strategy-mode";
+  import { nothingToPlanProblem } from "$lib/strategy/ui/nothing-to-plan";
   import {
     type WidowedRecommendation,
     widowedRecommendation,
@@ -45,7 +46,8 @@
   import {
     anyChoiceLeft,
     currentMonthDate,
-    filingChoices,
+    type NoChoiceReasons,
+    noChoiceReasons,
   } from "$lib/components/recommended-filing-card";
   import {
     CalculationResults,
@@ -441,16 +443,22 @@
 
   $: formIsValid = recipientInputsValid && discountRateValid;
 
-  // A recipient with no filing choice left, because they are past 70 or have
-  // already filed, has nothing to decide.
-  // The headline and the grids need to know so they do not present that as a
-  // decision. Assigned inside calculateStrategyMatrix from the same
-  // currentDate as the results it describes — deriving it reactively from
+  // Why each recipient has no filing choice left (past 70, already filed, or
+  // with no benefit of their own past full retirement age; see
+  // noChoiceReason), or null while they have one, and the month that was
+  // worked out for. The headline and the grids need to know so they do not
+  // present that as a decision. Assigned inside calculateStrategyMatrix
+  // together with the results it describes — deriving it reactively from
   // live form state would let it flip a card to "File now" while the figures
   // beside it still belong to the previous birthdate.
-  let hasFilingChoice: [boolean, boolean] = [true, true];
+  let resultsNoChoice: NoChoiceReasons = [null, null];
+  let resultsMonth: MonthDate = currentMonthDate();
+  $: hasFilingChoice = resultsNoChoice.map((reason) => reason === null) as [
+    boolean,
+    boolean,
+  ];
   // The filed months the current results were computed with; see
-  // hasFilingChoice for why this is not derived reactively from the form.
+  // resultsNoChoice for why this is not derived reactively from the form.
   let resultsAlreadyFiled: AlreadyFiled = NOT_FILED;
   // Whether the results leave anyone a start date to choose. When nobody
   // has one, the advice is the same however long anyone lives and whatever
@@ -640,8 +648,14 @@
     formErrorMessage = null;
     recomputeErrorMessage = null;
     // The form checks each answer as it is entered. This catches what it
-    // could not see, such as a month restored from a hand-edited link, and
-    // names the problem rather than reporting a failure on our end.
+    // could not see, such as a month restored from a hand-edited link, or
+    // every PIA being $0, and names the problem rather than reporting a
+    // failure on our end or a plan with nothing in it.
+    const nothingToPlan = nothingToPlanProblem(mode, piaValues);
+    if (nothingToPlan !== null) {
+      formErrorMessage = nothingToPlan;
+      return;
+    }
     if (mode === "widowed") {
       const result = widowedSnapshot(
         recipients[0],
@@ -728,7 +742,7 @@
       // together with the results it describes. If a loop below throws, the
       // store keeps the previous results, and this flag must keep describing
       // those — not the inputs that just failed.
-      const nextFilingChoice = filingChoices(
+      const nextNoChoice = noChoiceReasons(
         recipients[0],
         single ? null : recipients[1],
         currentDate,
@@ -827,7 +841,8 @@
       // Everything the results stage renders changes in one step, so the
       // headline, the grids and the flag that re-skins them always describe
       // the same run.
-      hasFilingChoice = nextFilingChoice;
+      resultsNoChoice = nextNoChoice;
+      resultsMonth = currentDate;
       resultsAlreadyFiled = filedSnapshot;
       optimalSingleResult = nextSingleResult;
       optimalCoupleResult = nextCoupleResult;
@@ -1087,8 +1102,8 @@
                 singleResult={optimalSingleResult}
                 coupleResult={optimalCoupleResult}
                 {recipients}
-                {hasFilingChoice}
-                currentDate={currentMonthDate()}
+                noChoiceReasons={resultsNoChoice}
+                currentDate={resultsMonth}
                 alreadyFiled={resultsAlreadyFiled}
                 onAlreadyFiledHint={isSingle ? undefined : handleEdit}
               />
@@ -1135,8 +1150,7 @@
               {calculationResults}
               {deathProbDistribution1}
               {deathProbDistribution2}
-              {hasFilingChoice}
-              alreadyFiled={resultsAlreadyFiled}
+              noChoiceReasons={resultsNoChoice}
               bind:displayAsAges
               onselectcell={handleCellSelect}
             />
@@ -1162,6 +1176,7 @@
             result={calculationResults.getSelectedCellData()}
             {discountRate}
             alreadyFiled={resultsAlreadyFiled}
+            noChoiceReasons={resultsNoChoice}
             bind:displayAsAges
             onBack={handleBackToMatrix}
           />

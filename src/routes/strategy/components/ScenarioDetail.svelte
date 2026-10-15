@@ -1,7 +1,8 @@
 <script lang="ts">
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
-  import type { MonthDate, MonthDuration } from "$lib/month-time";
+  import type { NoChoiceReasons } from "$lib/components/recommended-filing-card";
+  import { MonthDate, type MonthDuration } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
   import {
     type AlreadyFiled,
@@ -24,6 +25,14 @@
   export let onBack: () => void;
   /** Per recipient, the month benefits started, or null. */
   export let alreadyFiled: AlreadyFiled = NOT_FILED;
+  /**
+   * Per recipient, why they have no filing age left to choose (see
+   * `noChoiceReason`), or null. A spouse whose reason is `spousal-only` is
+   * shown filing with the other spouse: their spousal benefit cannot start
+   * before the other's benefits, so this scenario's own filing age for them,
+   * which the model caps at 70, says nothing on its own.
+   */
+  export let noChoiceReasons: NoChoiceReasons = [null, null];
 
   function formatProbability(prob: number | null | undefined): string {
     if (prob === null || prob === undefined) return "";
@@ -51,8 +60,17 @@
   $: deathDate2 = recipients[1].birthdate.dateAtLayAge(expectedAge2);
   // A filing month at or after death is the "never files" strategy, not a
   // filing; name it as such rather than showing the death month as a date.
-  $: files1 = filedBeforeDeath(filingDate1, deathDate1);
-  $: files2 = filedBeforeDeath(filingDate2, deathDate2);
+  // A spousal-only spouse files with the other: the later of the two dates.
+  $: withOther1 = noChoiceReasons[0] === "spousal-only";
+  $: withOther2 = noChoiceReasons[1] === "spousal-only";
+  $: shownDate1 = withOther1
+    ? MonthDate.max(filingDate1, filingDate2)
+    : filingDate1;
+  $: shownDate2 = withOther2
+    ? MonthDate.max(filingDate2, filingDate1)
+    : filingDate2;
+  $: files1 = filedBeforeDeath(shownDate1, deathDate1);
+  $: files2 = filedBeforeDeath(shownDate2, deathDate2);
 
   // Use expectedAge (probability-weighted) so the timeline matches the death
   // dates the optimizer used to compute totalBenefit and choose filingAge1/2.
@@ -143,8 +161,12 @@
         <div class="filing-person">
           <p class="person-name"><RecipientName r={recipients[0]} /></p>
           {#if files1}
-            <p class="filing-age">{result.filingAge1.toFullAgeString()}</p>
-            <p class="filing-date">{filingDate1.toString()}</p>
+            <p class="filing-age">
+              {#if withOther1}With <RecipientName
+                  r={recipients[1]}
+                />{:else}{result.filingAge1.toFullAgeString()}{/if}
+            </p>
+            <p class="filing-date">{shownDate1.toString()}</p>
           {:else}
             <p class="filing-age">{NEVER_FILES_LABEL}</p>
             <p class="filing-date">{NEVER_FILES_DETAIL}</p>
@@ -153,8 +175,12 @@
         <div class="filing-person">
           <p class="person-name"><RecipientName r={recipients[1]} /></p>
           {#if files2}
-            <p class="filing-age">{result.filingAge2.toFullAgeString()}</p>
-            <p class="filing-date">{filingDate2.toString()}</p>
+            <p class="filing-age">
+              {#if withOther2}With <RecipientName
+                  r={recipients[0]}
+                />{:else}{result.filingAge2.toFullAgeString()}{/if}
+            </p>
+            <p class="filing-date">{shownDate2.toString()}</p>
           {:else}
             <p class="filing-age">{NEVER_FILES_LABEL}</p>
             <p class="filing-date">{NEVER_FILES_DETAIL}</p>
