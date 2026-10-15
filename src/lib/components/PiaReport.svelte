@@ -175,9 +175,9 @@ function oneSignificantDigit(n: number) {
                     <li>
                       {#if !adjustment.applied}
                         <!-- Not yet applied, so special case the text: -->
-                        {adjustment.year}: Starting with the <b>December</b> benefit,
+                        {adjustment.year}: Effective with the <b>December</b> benefit,
                         <b>{adjustment.start.string()}</b>
-                        will be increased by {oneSignificantDigit(
+                        increases by {oneSignificantDigit(
                           adjustment.cola
                         )}% =
                         <b>{adjustment.end.string()}</b>
@@ -204,9 +204,9 @@ function oneSignificantDigit(n: number) {
             {#if pendingCola}
               <p>
                 The final value is <RName {r} apos>your</RName>
-                <u>primary insurance amount (PIA)</u> starting in December
-                {pendingCola.year} (paid in January {pendingCola.year + 1}).
-                Until then it is
+                <u>primary insurance amount (PIA)</u> starting with the December
+                {pendingCola.year} benefit, first paid in January
+                {pendingCola.year + 1}. Payments before then are based on
                 <b>{pendingCola.start.string()}</b>. It will continue to
                 increase every year.
               </p>
