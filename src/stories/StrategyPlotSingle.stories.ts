@@ -5,7 +5,12 @@ import { Recipient } from '../lib/recipient';
 import type { DeathAgeBucket } from '../lib/strategy/ui';
 import { parseBirthdate } from '../lib/strategy/ui';
 import { CalculationResults } from '../lib/strategy/ui/calculation-results';
+import { WIDOWED_PLOT_SERIES } from '../lib/strategy/ui/widowed-results';
 import StrategyPlotSingle from '../routes/strategy/components/StrategyPlotSingle.svelte';
+import {
+  widowedContextFor,
+  widowedResultsFor,
+} from '../test/helpers/widowed-mocks';
 
 const meta: Meta<StrategyPlotSingle> = {
   title: 'Strategy/StrategyPlotSingle',
@@ -243,5 +248,29 @@ export const SharpTransition: Story = {
     calculationResults: createSharpTransitionResults(),
     deathProbDistribution: createDeathProbDistribution(),
     displayAsAges: true,
+  },
+};
+
+// Widowed mode: two lines, one per benefit, computed by the real optimizer
+// as of October 2026 (own benefit $1,200; the late spouse's $2,600).
+const widowedContext = widowedContextFor({
+  ownPia: 1200,
+  born: [1964, 3, 15],
+  spousePia: 2600,
+  spouseBorn: [1961, 3, 15],
+  died: [2025, 11],
+});
+const widowed = widowedResultsFor(widowedContext);
+
+export const Widowed: Story = {
+  name: 'Widowed - Survivor and Own Benefit',
+  args: {
+    recipient: widowedContext.survivor,
+    calculationResults: widowed.results,
+    deathProbDistribution: widowed.deathProbDistribution,
+    displayAsAges: true,
+    series: WIDOWED_PLOT_SERIES,
+    minFilingAgeMonths: 60 * 12,
+    widowed: true,
   },
 };

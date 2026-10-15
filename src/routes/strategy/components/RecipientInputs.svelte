@@ -33,6 +33,12 @@
     undefined;
   export let oncontinue: (() => void) | undefined = undefined;
   export let onstartover: (() => void) | undefined = undefined;
+  /**
+   * Single mode: switches to widowed mode, keeping what has been entered.
+   * Offered because a widow(er) who picks "Just me" gets a plan that ignores
+   * survivor benefits.
+   */
+  export let onswitchtowidowed: (() => void) | undefined = undefined;
 
   let birthdates: [Birthdate | null, Birthdate | null] = [null, null];
   let birthdateValidity: boolean[] = [false, false];
@@ -184,6 +190,14 @@
       <p class="form-hint">
         A few quick details to find your optimal filing strategy.
       </p>
+      {#if isSingle && onswitchtowidowed}
+        <p class="form-hint">
+          Widowed? Survivor benefits can change the best strategy.
+          <button type="button" class="link-btn" on:click={onswitchtowidowed}
+            >Plan as a surviving spouse</button
+          >
+        </p>
+      {/if}
     </div>
     <button
       type="button"
@@ -409,6 +423,20 @@
     font-size: 0.95rem;
     color: #6b7280;
     line-height: 1.45;
+  }
+  .link-btn {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #081d88;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .link-btn:hover,
+  .link-btn:focus-visible {
+    color: #05126b;
   }
   .back-btn {
     flex: 0 0 auto;

@@ -159,8 +159,13 @@ describe('the optimizer represents "never files" as a death-month filing', () =>
   const currentDate = MonthDate.initFromYearsMonths({ years: 2026, months: 8 });
 
   it('a high earner dying early before FRA never files, so the survivor keeps full PIA', () => {
+    // The survivor is past survivor full retirement age when the earner
+    // dies, so any early filing caps the survivor benefit at 82.5% of PIA
+    // for the rest of the survivor's life. (A younger survivor would have
+    // their benefit reduced for age first, which can leave it under that
+    // cap anyway, making early filing worth it.)
     const earner = makeRecipient(2500, 1965, 6, 2);
-    const dependent = makeRecipient(300, 1966, 3, 2);
+    const dependent = makeRecipient(300, 1960, 3, 2);
     const recipients: [Recipient, Recipient] = [earner, dependent];
     const finalDates: [MonthDate, MonthDate] = [
       earner.birthdate.dateAtLayAge(age(64, 0)),

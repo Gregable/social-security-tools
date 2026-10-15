@@ -69,6 +69,14 @@ Couple, gender-neutral mortality (defaults applied when `gender1`/`gender2` omit
 https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22
 ```
 
+Widow or widower: `died2` makes person 2 a spouse who has died, and the optimizer plans when person 1 should start the survivor benefit and their own retirement benefit. Here the late spouse started retirement benefits in January 2022 and died in June 2025:
+
+```
+https://ssa.tools/strategy#pia1=1200&dob1=1964-03-15&pia2=2600&dob2=1960-01-02&filed2=2022-01&died2=2025-06
+```
+
+In widowed mode `name2` and `gender2` are ignored, and `filed2` takes precedence over `disabled2`.
+
 ## Parameter quick reference
 
 | Parameter         | Where           | Type   | Notes                                           |
@@ -78,6 +86,10 @@ https://ssa.tools/strategy#pia1=2400&dob1=1960-03-15&pia2=1800&dob2=1962-07-22
 | `name1`, `name2`  | both            | string | Display name (URL-encode if it contains spaces) |
 | `earnings1`, `earnings2` | calculator | string | `year:amount,year:amount,...` (years 1951-2100, non-negative integer dollars) |
 | `gender1`, `gender2` | strategy     | string | `male`, `female`, or `blended` (default)        |
+| `filed1`, `filed2` | strategy       | string | Month that person's retirement benefits started, `YYYY-MM`; couple and widowed modes only |
+| `died2`           | strategy        | string | Month person 2 died, `YYYY-MM`; any `died2` switches to widowed mode |
+| `disabled2`       | strategy        | int    | Widowed mode: `1` if person 2 was receiving disability benefits; ignored when `filed2` is set |
+| `survfiled1`      | strategy        | string | Widowed mode: month person 1 started survivor benefits, `YYYY-MM` |
 
 For `/calculator`, supply **either** `piaN` **or** `earningsN` for each person — earnings unlocks the full report. For `/strategy`, only PIA is accepted (earnings input is not supported on that page).
 

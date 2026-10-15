@@ -3,6 +3,7 @@
   import InfoTip from "$lib/components/InfoTip.svelte";
   import RecipientName from "$lib/components/RecipientName.svelte";
   import {
+    anyFilingChoice,
     DEFAULT_DISCOUNT_RATE_ASSUMPTION,
     type DiscountRateAssumption,
     formatDiscountRatePercent,
@@ -78,6 +79,14 @@
     alreadyFiled = NOT_FILED,
     onAlreadyFiledHint,
   }: Props = $props();
+
+  /**
+   * Whether anyone still has a filing age to choose. Once nobody does, the
+   * card leaves out the expected lifetime benefit and, on the calculator,
+   * the note on the assumptions behind it: only those assumptions would
+   * change it, and the strategy page hides them on the same rule.
+   */
+  const hasChoiceLeft = $derived(anyFilingChoice(isSingle, hasFilingChoice));
 
   /**
    * Whether the recommended filing month has already passed.
@@ -232,6 +241,7 @@
     {/if}
 
     <div class="footer">
+      {#if hasChoiceLeft}
       <div class="npv-line">
         <span class="npv-label">
           Expected {isSingle ? "" : "combined "}lifetime benefit (NPV):
@@ -252,6 +262,7 @@
           </InfoTip>
         {/if}
       </div>
+      {/if}
       <p class="explanation">
         {#if isSingle && !hasFilingChoice[0]}
           Delayed retirement credits stop at 70, so the monthly amount is
@@ -263,8 +274,15 @@
           rate.
         {:else if alreadyFiled[0] !== null && alreadyFiled[1] !== null}
           You are both already receiving benefits, so there is no filing
-          decision left here. The figure is the expected value of what is
-          still to come.
+          decision left here.
+        {:else if !hasChoiceLeft && (alreadyFiled[0] !== null || alreadyFiled[1] !== null)}
+          {@const filed = alreadyFiled[0] !== null ? 0 : 1}
+          <RecipientName r={recipients[filed]} /> already receives benefits and
+          <RecipientName r={recipients[1 - filed]} /> is past 70, where delayed
+          retirement credits stop, so there is no filing decision left here.
+        {:else if !hasChoiceLeft}
+          You are both past 70, where delayed retirement credits stop, so there
+          is no filing decision left here.
         {:else if alreadyFiled[0] !== null || alreadyFiled[1] !== null}
           Maximizes your expected combined lifetime benefits, taking
           <RecipientName r={recipients[alreadyFiled[0] !== null ? 0 : 1]} />'s
@@ -275,7 +293,7 @@
           each person's probability of surviving to each age and adjusted for
           the discount rate.
         {/if}
-        {#if !showInfoTip}
+        {#if !showInfoTip && hasChoiceLeft}
           {#if discountRateAssumption.source === "treasury"}
             Based on the current 20-year Treasury rate ({formatDiscountRatePercent(
               discountRateAssumption.rate

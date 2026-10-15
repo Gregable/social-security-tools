@@ -16,6 +16,7 @@ import {
 } from '$lib/strategy/calculations/expected-npv';
 import { filingAgeRange } from '$lib/strategy/calculations/strategy-calc';
 import { fetchRecommendedDiscountRate } from '$lib/strategy/data';
+import type { StrategyMode } from '$lib/strategy/ui/strategy-mode';
 import { buildStrategyHash } from '$lib/url-params';
 
 /**
@@ -135,6 +136,36 @@ export function filingChoices(
       ? filingAgeRange(spouse, currentDate, alreadyFiled[1]).hasChoice
       : true,
   ];
+}
+
+/**
+ * Whether anyone still has a filing age to choose, from `filingChoices`. A
+ * single person's answer is the first entry alone, since the second is
+ * always true without a second recipient. Once nobody has a choice, the
+ * advice is the same however long anyone lives and whatever the discount
+ * rate, so the surfaces showing it leave out what only those assumptions
+ * would change.
+ */
+export function anyFilingChoice(
+  isSingle: boolean,
+  choices: readonly [boolean, boolean]
+): boolean {
+  return isSingle ? choices[0] : choices[0] || choices[1];
+}
+
+/**
+ * `anyFilingChoice` for the strategy page's results in any mode. In widowed
+ * mode it is the recommendation's `hasChoice` (see `widowedHasChoice`),
+ * taken as true until there is a widowed result, so nothing is hidden
+ * before there is anything to show.
+ */
+export function anyChoiceLeft(
+  mode: StrategyMode,
+  hasFilingChoice: readonly [boolean, boolean],
+  widowed: { readonly hasChoice: boolean } | undefined
+): boolean {
+  if (mode === 'widowed') return widowed?.hasChoice ?? true;
+  return anyFilingChoice(mode === 'single', hasFilingChoice);
 }
 
 /**

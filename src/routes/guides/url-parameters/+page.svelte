@@ -8,7 +8,7 @@ const title = 'Sharing Social Security Scenarios with URL Parameters';
 const description =
   'Learn how to use URL parameters to link directly to the SSA.tools calculator with preloaded scenarios. Perfect for financial advisors, educators, or sharing examples with family and friends.';
 const publishDate = new Date('2025-10-07T00:00:00+00:00');
-const updateDate = new Date('2026-05-01T00:00:00+00:00');
+const updateDate = new Date('2026-10-03T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/url-parameters';
@@ -397,10 +397,48 @@ schema.tags = [
     </li>
   </ul>
 
+  <h4>Benefits already started (optional)</h4>
+
+  <ul>
+    <li>
+      <code>filed1</code> - Month recipient 1's own retirement benefits started,
+      in YYYY-MM format, if they already receive them. Used in couple and
+      widowed modes; ignored for a single person.
+    </li>
+    <li>
+      <code>filed2</code> - Month the spouse's retirement benefits started, in
+      YYYY-MM format
+    </li>
+  </ul>
+
+  <h4>Late spouse (optional — widowed mode)</h4>
+
+  <ul>
+    <li>
+      <code>died2</code> - Month the spouse died, in YYYY-MM format. With
+      <code>pia2</code> and <code>dob2</code>, it switches the optimizer to
+      widowed mode, which plans when recipient 1 should start the survivor
+      benefit and their own retirement benefit. <code>filed2</code> is then the
+      month the late spouse's retirement benefits started, before they died.
+      Any <code>died2</code> selects widowed mode; a value that is not a valid
+      month is left blank for you to enter. <code>name2</code> and
+      <code>gender2</code> are ignored for a late spouse.
+    </li>
+    <li>
+      <code>disabled2</code> - <code>1</code> if the late spouse was receiving
+      disability benefits. Ignored when <code>filed2</code> is present.
+    </li>
+    <li>
+      <code>survfiled1</code> - Month recipient 1 started survivor benefits, in
+      YYYY-MM format, if they already receive them
+    </li>
+  </ul>
+
   <p>
     When both <code>pia2</code> and <code>dob2</code> are present, the optimizer
-    runs in couple mode. When only recipient 1 parameters are provided, it runs
-    in single-person mode.
+    runs in couple mode, or in widowed mode when <code>died2</code> is present
+    too. When only recipient 1 parameters are provided, it runs in
+    single-person mode.
   </p>
 
   <h3>Strategy Examples</h3>
@@ -428,6 +466,24 @@ schema.tags = [
   <p>
     <a
       href="/strategy#pia1=2400&dob1=1960-03-15&name1=Alex&gender1=male&pia2=1800&dob2=1962-07-22&name2=Casey&gender2=female"
+      target="_blank"
+      rel="noopener noreferrer">Try this example →</a
+    >
+  </p>
+
+  <h4>Widow or Widower</h4>
+
+  <p>
+    Born in 1964 with a PIA of $1,200; the late spouse, born in 1960 with a PIA
+    of $2,600, started retirement benefits in January 2022 and died in June
+    2025:
+  </p>
+
+  <pre><code>https://ssa.tools/strategy#pia1=1200&dob1=1964-03-15&pia2=2600&dob2=1960-01-02&filed2=2022-01&died2=2025-06</code></pre>
+
+  <p>
+    <a
+      href="/strategy#pia1=1200&dob1=1964-03-15&pia2=2600&dob2=1960-01-02&filed2=2022-01&died2=2025-06"
       target="_blank"
       rel="noopener noreferrer">Try this example →</a
     >
@@ -527,6 +583,12 @@ schema.tags = [
 
   <pre><code
       >https://ssa.tools/strategy#pia1=&lbrace;PIA1&rbrace;&dob1=&lbrace;DOB1&rbrace;&pia2=&lbrace;PIA2&rbrace;&dob2=&lbrace;DOB2&rbrace;</code
+    ></pre>
+
+  <p>Strategy, widow or widower (person 2 is the late spouse):</p>
+
+  <pre><code
+      >https://ssa.tools/strategy#pia1=&lbrace;PIA1&rbrace;&dob1=&lbrace;DOB1&rbrace;&pia2=&lbrace;PIA2&rbrace;&dob2=&lbrace;DOB2&rbrace;&died2=&lbrace;YYYY-MM&rbrace;</code
     ></pre>
 
   <h3>Worked Scenarios</h3>

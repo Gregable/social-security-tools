@@ -850,4 +850,116 @@ describe('UrlParams', () => {
       expect(hash).not.toContain('filed1');
     });
   });
+
+  describe('widowed params', () => {
+    const month = (years: number, months: number) =>
+      MonthDate.initFromYearsMonths({ years, months });
+
+    it('parses died2 as the month the spouse died', () => {
+      const params = new UrlParams('#died2=2024-03');
+      expect(params.getSpouseDeathMonth()?.monthsSinceEpoch()).toBe(
+        month(2024, 2).monthsSinceEpoch()
+      );
+    });
+
+    it('returns null for an absent or malformed died2', () => {
+      expect(new UrlParams('#pia2=2000').getSpouseDeathMonth()).toBeNull();
+      for (const bad of ['2024', '2024-13', 'March-2024', '2024-3']) {
+        expect(
+          new UrlParams(`#died2=${bad}`).getSpouseDeathMonth(),
+          bad
+        ).toBeNull();
+      }
+    });
+
+    it('reads disabled2=1 as the spouse having received disability benefits', () => {
+      expect(new UrlParams('#disabled2=1').getSpouseDisabled()).toBe(true);
+      expect(new UrlParams('#disabled2=0').getSpouseDisabled()).toBe(false);
+      expect(new UrlParams('#disabled2=yes').getSpouseDisabled()).toBe(false);
+      expect(new UrlParams('#pia2=2000').getSpouseDisabled()).toBe(false);
+    });
+
+    it('parses survfiled1 as the month survivor benefits started', () => {
+      const params = new UrlParams('#survfiled1=2025-11');
+      expect(params.getRecipientSurvivorFiledMonth()?.monthsSinceEpoch()).toBe(
+        month(2025, 10).monthsSinceEpoch()
+      );
+      expect(new UrlParams('#pia1=1').getRecipientSurvivorFiledMonth()).toBe(
+        null
+      );
+    });
+
+    it('round-trips a widowed scenario through buildStrategyHash', () => {
+      const hash = buildStrategyHash({
+        isSingle: false,
+        pia1: 1200,
+        dob1: '1964-06-15',
+        filed1: month(2026, 6),
+        survivorFiled1: month(2025, 0),
+        pia2: 2600,
+        dob2: '1961-03-15',
+        filed2: month(2023, 3),
+        died2: month(2024, 10),
+      });
+      const back = new UrlParams(hash);
+      expect(back.getRecipientPia()).toBe(1200);
+      expect(back.getSpousePia()).toBe(2600);
+      expect(back.getSpouseDob()).toBe('1961-03-15');
+      expect(back.getRecipientFiledMonth()?.monthsSinceEpoch()).toBe(
+        month(2026, 6).monthsSinceEpoch()
+      );
+      expect(back.getRecipientSurvivorFiledMonth()?.monthsSinceEpoch()).toBe(
+        month(2025, 0).monthsSinceEpoch()
+      );
+      expect(back.getSpouseFiledMonth()?.monthsSinceEpoch()).toBe(
+        month(2023, 3).monthsSinceEpoch()
+      );
+      expect(back.getSpouseDeathMonth()?.monthsSinceEpoch()).toBe(
+        month(2024, 10).monthsSinceEpoch()
+      );
+      expect(back.getSpouseDisabled()).toBe(false);
+    });
+
+    it('writes disabled2=1 only when the late spouse was disabled', () => {
+      const base = {
+        isSingle: false,
+        pia1: 1200,
+        dob1: '1964-06-15',
+        pia2: 2600,
+        dob2: '1961-03-15',
+        died2: month(2024, 10),
+      };
+      expect(buildStrategyHash({ ...base, disabled2: true })).toContain(
+        'disabled2=1'
+      );
+      expect(buildStrategyHash(base)).not.toContain('disabled2');
+    });
+
+    it('writes no widowed params without died2', () => {
+      const hash = buildStrategyHash({
+        isSingle: false,
+        pia1: 1200,
+        dob1: '1964-06-15',
+        survivorFiled1: month(2025, 0),
+        pia2: 2600,
+        dob2: '1961-03-15',
+        disabled2: true,
+      });
+      expect(hash).not.toContain('survfiled1');
+      expect(hash).not.toContain('disabled2');
+      expect(hash).not.toContain('died2');
+    });
+
+    it('writes no widowed params in single mode', () => {
+      const hash = buildStrategyHash({
+        isSingle: true,
+        pia1: 1200,
+        dob1: '1964-06-15',
+        survivorFiled1: month(2025, 0),
+        died2: month(2024, 10),
+      });
+      expect(hash).not.toContain('survfiled1');
+      expect(hash).not.toContain('died2');
+    });
+  });
 });
