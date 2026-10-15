@@ -34,6 +34,7 @@ import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
 import { Money } from '$lib/money';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
+import { detectWrongSsaPage, type WrongSsaPage } from '$lib/wrong-ssa-page';
 import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
 import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
 
@@ -54,6 +55,9 @@ export let copyInstructions: 'auto' | 'touch' | 'keyboard' = 'auto';
 
 let pasteContents: string = '';
 let pasteError: boolean = false;
+// Set when a failed paste came from an ssa.gov page other than the earnings
+// record, so the error can say where to go instead.
+let wrongPage: WrongSsaPage | null = null;
 let failureReported: boolean = false;
 
 // Touch vs keyboard instructions are chosen in CSS so they are right on first
@@ -90,6 +94,7 @@ function reportOutcome(outcome: 'empty' | 'failed' | 'parsed', contents: string)
 function parsePasteContents(contents: string) {
   if (contents === '') {
     pasteError = false;
+    wrongPage = null;
     reportOutcome('empty', contents);
     return;
   }
@@ -104,6 +109,7 @@ function parsePasteContents(contents: string) {
     });
   } else {
     reportOutcome('failed', contents);
+    wrongPage = detectWrongSsaPage(contents);
     pasteError = true;
   }
 }
@@ -208,14 +214,29 @@ function skipEarnings() {
   {#if pasteError}
     <div class="pasteError">
       <span class="warningIcon">&#x26A0;</span>
-      <p>
-        The data you have pasted could not be parsed. Please clear the box and
-        try again. <a
-          href="/guides/earnings-record-paste"
-          target="_blank"
-          on:click={() => trackLink('paste_help_guide')}>Additional Help</a
-        >
-      </p>
+      {#if wrongPage === 'my_ssa_home'}
+        <p>
+          This looks like the my Social Security home page, not {name
+            ? `${name}'s`
+            : 'your'} earnings record. Clear the box, open the
+          <a
+            href="https://secure.ssa.gov/ec2/eligibility-earnings-ui/earnings-record"
+            target="_blank"
+            on:click={() => trackLink('wrong_page_earnings_record')}
+            >earnings record</a
+          > (the <em>"Review your full earnings record now"</em> link on that
+          page), and copy that page instead.
+        </p>
+      {:else}
+        <p>
+          The data you have pasted could not be parsed. Please clear the box and
+          try again. <a
+            href="/guides/earnings-record-paste"
+            target="_blank"
+            on:click={() => trackLink('paste_help_guide')}>Additional Help</a
+          >
+        </p>
+      {/if}
     </div>
   {/if}
   <div class="pasteArea">

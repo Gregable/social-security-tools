@@ -8,8 +8,11 @@
  * structural counts. year_token_count roughly tracks how many years a pasted
  * record covers, the same kind of information "Paste Flow: Parse Success"
  * already sends as record_count; we accept that as non-identifying. Do not add
- * fields that could identify a person or reveal an amount.
+ * fields that could identify a person or reveal an amount. wrong_page names
+ * an ssa.gov page by its fixed link text, which is the same for everyone.
  */
+
+import { detectWrongSsaPage, type WrongSsaPage } from '$lib/wrong-ssa-page';
 
 /**
  * The Select All shortcut for keyboard users. Touch screens get separate
@@ -46,6 +49,8 @@ export function describeFailedPaste(contents: string): FailedPasteSummary {
 
 export interface FailedPasteProperties extends FailedPasteSummary {
   readonly is_spouse_entry: boolean;
+  /** An ssa.gov page copied by mistake, recognized by its fixed link text. */
+  readonly wrong_page: WrongSsaPage | null;
 }
 
 /** The full property set for PASTE_FLOW_EVENTS.parseFailed. */
@@ -53,7 +58,11 @@ export function failedPasteProperties(
   contents: string,
   isSpouseEntry: boolean
 ): FailedPasteProperties {
-  return { ...describeFailedPaste(contents), is_spouse_entry: isSpouseEntry };
+  return {
+    ...describeFailedPaste(contents),
+    is_spouse_entry: isSpouseEntry,
+    wrong_page: detectWrongSsaPage(contents),
+  };
 }
 
 /** What parsing the paste box's current contents produced. */
@@ -92,7 +101,9 @@ export const PASTE_FLOW_EVENTS = {
 export type PasteFlowLink =
   | 'ssa_sign_in'
   | 'ssa_earnings_record'
-  | 'paste_help_guide';
+  | 'paste_help_guide'
+  /** The earnings record link in the wrong-page error message. */
+  | 'wrong_page_earnings_record';
 
 /** Expandable help sections on the entry step. */
 export type PasteFlowHelpSection =
