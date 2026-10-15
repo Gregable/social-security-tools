@@ -29,6 +29,7 @@
     widowedInputFromParams,
   } from "$lib/strategy/ui/share-url";
   import type { StrategyMode } from "$lib/strategy/ui/strategy-mode";
+  import { nothingToPlanProblem } from "$lib/strategy/ui/nothing-to-plan";
   import {
     type WidowedRecommendation,
     widowedRecommendation,
@@ -640,8 +641,14 @@
     formErrorMessage = null;
     recomputeErrorMessage = null;
     // The form checks each answer as it is entered. This catches what it
-    // could not see, such as a month restored from a hand-edited link, and
-    // names the problem rather than reporting a failure on our end.
+    // could not see, such as a month restored from a hand-edited link, or
+    // every PIA being $0, and names the problem rather than reporting a
+    // failure on our end or a plan with nothing in it.
+    const nothingToPlan = nothingToPlanProblem(mode, piaValues);
+    if (nothingToPlan !== null) {
+      formErrorMessage = nothingToPlan;
+      return;
+    }
     if (mode === "widowed") {
       const result = widowedSnapshot(
         recipients[0],

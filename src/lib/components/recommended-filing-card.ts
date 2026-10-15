@@ -1,6 +1,6 @@
 import type { DeathProbability } from '$lib/life-tables';
 import { getDeathProbabilityDistribution } from '$lib/life-tables';
-import { MonthDate } from '$lib/month-time';
+import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import {
   type AlreadyFiled,
@@ -113,13 +113,83 @@ export function currentMonthDate(now: Date = new Date()): MonthDate {
 }
 
 /**
- * Whether each recipient still has a filing age to choose, as of `currentDate`.
- *
- * False once a recipient is past 70 (delayed retirement credits have stopped,
- * so filing now is their only remaining option) or once they have already
- * filed (`alreadyFiled`), since presenting a filing date to either would
- * imply a decision they no longer have. Index 1 is always true when there is
- * no second recipient, so single-recipient callers can ignore it.
+ * Why a recipient has no filing age left to choose:
+ * - `filed`: their benefits have already started.
+ * - `spousal-only`: they have no benefit on their own record, so filing only
+ *   starts a spousal benefit on their spouse's, and they are past full
+ *   retirement age, where spousal benefits stop growing.
+ * - `past-seventy`: they are past 70, where delayed retirement credits stop.
+ */
+export type NoChoiceReason = 'filed' | 'spousal-only' | 'past-seventy';
+
+/**
+ * Why `recipient` has no filing age left to choose as of `currentDate`, or
+ * null while they still have one. `filedAt` is the month their benefits
+ * started, or null; it must pass `validateFiledMonth` (see
+ * `filingAgeRange`, which throws otherwise).
+ */
+export function noChoiceReason(
+  recipient: Recipient,
+  spouse: Recipient | null,
+  currentDate: MonthDate,
+  filedAt: MonthDate | null
+): NoChoiceReason | null {
+  const range = filingAgeRange(recipient, currentDate, filedAt);
+  if (filedAt !== null) return 'filed';
+  const hasOwnBenefit = recipient.pia().primaryInsuranceAmount().cents() > 0;
+  const hasSpousalBenefit =
+    spouse !== null && spouse.pia().primaryInsuranceAmount().cents() > 0;
+  if (
+    !hasOwnBenefit &&
+    hasSpousalBenefit &&
+    !currentDate.lessThan(recipient.normalRetirementDate())
+  ) {
+    return 'spousal-only';
+  }
+  return range.hasChoice ? null : 'past-seventy';
+}
+
+/**
+ * When a spouse whose reason is `spousal-only` should file. Their spousal
+ * benefit has stopped growing and can start only once the other spouse's
+ * benefits have, so it starts with them: in the month they start, or, once
+ * that has passed, now, backdated as far as SSA pays (20 CFR 404.621): up to
+ * six months, but not before the other spouse's benefits started or before
+ * their own full retirement age, which would add reduction.
+ */
+export type SpousalOnlyAdvice =
+  | { readonly kind: 'file-in'; readonly month: MonthDate }
+  | { readonly kind: 'file-now'; readonly backdateTo: MonthDate };
+
+const MAX_RETROACTIVE = MonthDuration.initFromYearsMonths({
+  years: 0,
+  months: 6,
+});
+
+/** See `SpousalOnlyAdvice`; `otherStart` is when the other spouse's benefits start. */
+export function spousalOnlyAdvice(
+  recipient: Recipient,
+  otherStart: MonthDate,
+  currentDate: MonthDate
+): SpousalOnlyAdvice {
+  if (!otherStart.lessThan(currentDate)) {
+    return { kind: 'file-in', month: otherStart };
+  }
+  const earliest = MonthDate.max(
+    MonthDate.max(otherStart, currentDate.subtractDuration(MAX_RETROACTIVE)),
+    recipient.normalRetirementDate()
+  );
+  return earliest.lessThan(currentDate)
+    ? { kind: 'file-now', backdateTo: earliest }
+    : { kind: 'file-in', month: currentDate };
+}
+
+/**
+ * Whether each recipient still has a filing age to choose, as of
+ * `currentDate`: false for every reason in `NoChoiceReason`, since
+ * presenting a filing date to them would imply a decision they no longer
+ * have. Index 1 is always true when there is no second recipient, so
+ * single-recipient callers can ignore it.
  *
  * Shared so the two surfaces that render a recommendation, the strategy page
  * and the calculator's card, cannot disagree about who still has a choice.
@@ -131,9 +201,9 @@ export function filingChoices(
   alreadyFiled: AlreadyFiled = NOT_FILED
 ): [boolean, boolean] {
   return [
-    filingAgeRange(recipient, currentDate, alreadyFiled[0]).hasChoice,
+    noChoiceReason(recipient, spouse, currentDate, alreadyFiled[0]) === null,
     spouse
-      ? filingAgeRange(spouse, currentDate, alreadyFiled[1]).hasChoice
+      ? noChoiceReason(spouse, recipient, currentDate, alreadyFiled[1]) === null
       : true,
   ];
 }

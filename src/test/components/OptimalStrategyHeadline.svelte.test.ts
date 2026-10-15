@@ -79,6 +79,16 @@ describe('OptimalStrategyHeadline', () => {
   const young = () => recipient(2000, 1964, 'Alex');
   const old = () => recipient(2000, 1950, 'Alex');
   const oldSpouse = () => recipient(1500, 1952, 'Chris');
+  /** No benefit of their own; full retirement age was September 2024. */
+  const spousalOnly = () => recipient(0, 1958, 'Chris');
+
+  /** The text of the card for the person named `name`. */
+  function card(target: HTMLElement, name: string): string {
+    const cards = Array.from(target.querySelectorAll('.result'), (el) =>
+      (el.textContent ?? '').replace(/\s+/g, ' ')
+    );
+    return cards.find((text) => text.includes(name)) ?? '';
+  }
 
   /** Two recipients, marked the way couple mode marks them. */
   function couple(first: Recipient, second: Recipient): [Recipient, Recipient] {
@@ -130,6 +140,61 @@ describe('OptimalStrategyHeadline', () => {
     expect(explanation(target)).toContain(
       'You are both past 70, where delayed retirement credits stop, so there is no filing decision left here.'
     );
+  });
+
+  it('names a spouse whose spousal benefit has stopped growing, beside one already filed', () => {
+    const target = render({
+      recipients: couple(old(), spousalOnly()),
+      hasFilingChoice: [false, false],
+      alreadyFiled: [month(2015, 1), null],
+    });
+    expect(target.querySelector('.npv-line')).toBeNull();
+    const text = explanation(target);
+    expect(text).toContain('Alex already receives benefits and Chris');
+    expect(text).toContain(
+      'Chris has no retirement benefit of their own and is past full retirement age, when spousal benefits stop growing'
+    );
+    expect(text).toContain('no filing decision left here');
+  });
+
+  it('names a spouse whose spousal benefit has stopped growing, beside one past 70', () => {
+    const target = render({
+      recipients: couple(old(), spousalOnly()),
+      hasFilingChoice: [false, false],
+    });
+    expect(target.querySelector('.npv-line')).toBeNull();
+    const text = explanation(target);
+    expect(text).toContain(
+      'Alex is past 70, where delayed retirement credits stop, and Chris has no retirement benefit of their own'
+    );
+    expect(text).toContain('no filing decision left here');
+  });
+
+  it('has a spouse whose spousal benefit has stopped growing file when the other spouse does', () => {
+    // Alex, born January 1964, is recommended to file at 70, in January
+    // 2034; the spousal benefit cannot start before that.
+    const target = render({
+      recipients: couple(young(), spousalOnly()),
+      hasFilingChoice: [true, false],
+    });
+    const chris = card(target, 'Chris');
+    expect(chris).toContain('January 2034');
+    expect(chris).toContain('when Alex files');
+    expect(chris).not.toContain('Past 70');
+  });
+
+  it('has that spouse file now and backdate once the other spouse has started', () => {
+    // Alex's benefits started long ago, so six months back, April 2026.
+    const target = render({
+      recipients: couple(old(), spousalOnly()),
+      hasFilingChoice: [false, false],
+    });
+    const chris = card(target, 'Chris');
+    expect(chris).toContain(
+      'Past full retirement age, so the spousal benefit has stopped growing'
+    );
+    expect(chris).toContain('backdate the claim to April 2026');
+    expect(chris).not.toContain('Past 70');
   });
 
   it.each([

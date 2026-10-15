@@ -1,7 +1,11 @@
 <script lang="ts">
-import type { ComponentProps } from 'svelte';
 import HowToReadChart from '$lib/components/HowToReadChart.svelte';
 import RecipientName from '$lib/components/RecipientName.svelte';
+import {
+  currentMonthDate,
+  type NoChoiceReason,
+  noChoiceReason,
+} from '$lib/components/recommended-filing-card';
 import type { Recipient } from '$lib/recipient';
 import {
   type AlreadyFiled,
@@ -14,19 +18,17 @@ import type {
   CellSelectionDetail,
 } from '$lib/strategy/ui';
 import { CalculationStatus } from '$lib/strategy/ui';
+import { type NoChoiceVariant, noChoiceVariant } from '$lib/strategy/ui/no-choice';
 import StrategyMatrix from './StrategyMatrix.svelte';
-
-type NoChoiceVariant = NonNullable<
-  ComponentProps<NoFilingDecisionPanel>['variant']
->;
 
 // Props
 export let recipients: [Recipient, Recipient];
 export let displayAsAges: boolean;
 /**
- * Per recipient: false once they are past 70 or have already filed. A
- * recipient with no choice left has the same filing age in every cell, so
- * their grid carries no information and is not drawn at all.
+ * Per recipient: false once they have no filing age left to choose (see
+ * `noChoiceReason`). A recipient with no choice left has the same filing
+ * age in every cell, so their grid carries no information and is not drawn
+ * at all.
  */
 export let hasFilingChoice: [boolean, boolean] = [true, true];
 /** Per recipient, the month benefits started, or null. Changes copy only. */
@@ -44,17 +46,25 @@ export let deathProbDistribution2: { age: number; probability: number }[];
 $: gridIndexes = [0, 1].filter((i) => hasFilingChoice[i]);
 $: skippedIndex = [0, 1].find((i) => !hasFilingChoice[i]);
 
-// When nobody has a grid, name the actual reason. A single filed spouse can
-// only reach this state if the other is past 70.
-$: noChoiceVariant = noChoiceVariantFor(
-  alreadyFiled.filter((f) => f !== null).length
-);
+// Why each recipient without a grid has no choice, so the copy can name
+// it. hasFilingChoice was settled with the results; the fallback only
+// matters if the month has turned since.
+$: reasons = [0, 1].map((i) =>
+  hasFilingChoice[i]
+    ? null
+    : (noChoiceReason(
+        recipients[i],
+        recipients[1 - i],
+        currentMonthDate(),
+        alreadyFiled[i]
+      ) ?? 'past-seventy')
+) as [NoChoiceReason | null, NoChoiceReason | null];
 
-function noChoiceVariantFor(filedCount: number): NoChoiceVariant {
-  if (filedCount === 2) return 'both-filed';
-  if (filedCount === 1) return 'filed-and-past-seventy';
-  return 'both-past-seventy';
-}
+// When nobody has a grid, the panel names both reasons.
+$: panelVariant =
+  reasons[0] !== null && reasons[1] !== null
+    ? noChoiceVariant([reasons[0], reasons[1]])
+    : ('both-past-seventy' satisfies NoChoiceVariant);
 
 // Shared state for matrix hovering
 let hoveredCell: CellPosition | null = null;
@@ -71,7 +81,7 @@ function handleHoverCell(detail: CellPosition | null) {
          flash while a calculation is still running. -->
     {#if calculationResults.status() === CalculationStatus.Complete}
       <div class="result-content">
-        <NoFilingDecisionPanel variant={noChoiceVariant} />
+        <NoFilingDecisionPanel variant={panelVariant} />
       </div>
     {/if}
   {:else}
@@ -154,10 +164,17 @@ function handleHoverCell(detail: CellPosition | null) {
       {#if skippedIndex !== undefined}
         <div class="result-content">
           <p class="no-choice-note">
-            {#if alreadyFiled[skippedIndex] !== null}
+            {#if reasons[skippedIndex] === 'filed'}
               <RecipientName r={recipients[skippedIndex]} /> already receives
               benefits, so there is no grid for them: that filing date is
               settled.
+            {:else if reasons[skippedIndex] === 'spousal-only'}
+              <RecipientName r={recipients[skippedIndex]} /> has no retirement
+              benefit of their own and is past full retirement age, so there is
+              no grid for them: their spousal benefit has stopped growing and
+              starts whenever <RecipientName
+                r={recipients[skippedIndex === 0 ? 1 : 0]}
+              /> files.
             {:else}
               <RecipientName r={recipients[skippedIndex]} /> is past 70, so
               there is no grid for them: delayed retirement credits have

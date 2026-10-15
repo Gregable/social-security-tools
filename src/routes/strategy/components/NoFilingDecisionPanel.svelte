@@ -5,22 +5,21 @@
     Shown in place of the death-age chart when nobody in the scenario has a
     filing age left to choose: they are past 70 (delayed retirement credits
     have stopped, so the chart would be a single repeated value), they have
-    already filed (the date is a fact), or, for a widow(er), each benefit has
+    already filed (the date is a fact), they have no benefit of their own and
+    are past full retirement age (spousal benefits have stopped growing), or,
+    for a widow(er), each benefit has
     started, stopped growing, would never pay more than the other, or does
     not exist.
 -->
 
 <script lang="ts">
+import type { NoChoiceVariant } from "$lib/strategy/ui/no-choice";
+
 /**
  * Why nobody in the scenario has a filing age left to choose. Each
  * variant gets copy that names the actual reason.
  */
-export let variant:
-  | "past-seventy"
-  | "both-past-seventy"
-  | "both-filed"
-  | "filed-and-past-seventy"
-  | "widowed" = "past-seventy";
+export let variant: NoChoiceVariant = "past-seventy";
 </script>
 
 <div class="no-decision-note">
@@ -63,6 +62,33 @@ export let variant:
       Whoever has not yet filed should file as soon as possible and ask SSA
       to backdate the claim. Once past full retirement age, SSA can pay up to
       six months of benefits retroactively.
+    </p>
+  {:else if variant === "filed-and-spousal-only"}
+    <p>
+      These charts normally show how the best filing ages shift with how long
+      each of you lives. One of you already receives benefits. The other has
+      no retirement benefit of their own and is past full retirement age, when
+      spousal benefits stop growing, so waiting longer would only skip spousal
+      payments that could already be collected.
+    </p>
+    <p>
+      File for the spousal benefit as soon as you can and ask SSA to backdate
+      the claim. Once past full retirement age, SSA can pay up to six months
+      of benefits retroactively.
+    </p>
+  {:else if variant === "past-seventy-and-spousal-only"}
+    <p>
+      These charts normally show how the best filing ages shift with how long
+      each of you lives. One of you is past 70, where delayed retirement
+      credits stop accruing. The other has no retirement benefit of their own
+      and is past full retirement age, when spousal benefits stop growing.
+      Waiting longer no longer raises either monthly amount. It only skips
+      payments you could already be collecting.
+    </p>
+    <p>
+      File as soon as you can, and ask SSA to backdate the claims. Once past
+      full retirement age they can pay up to six months of benefits
+      retroactively.
     </p>
   {:else if variant === "both-past-seventy"}
     <p>

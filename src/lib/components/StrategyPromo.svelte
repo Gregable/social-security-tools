@@ -1,12 +1,19 @@
 <script lang="ts">
   import type { Recipient } from "$lib/recipient";
-  import { buildStrategyUrl } from "$lib/components/recommended-filing-card";
+  import {
+    anyFilingChoice,
+    buildStrategyUrl,
+    filingChoices,
+  } from "$lib/components/recommended-filing-card";
   import RecommendedFilingCard from "$lib/components/RecommendedFilingCard.svelte";
 
   export let recipient: Recipient;
   export let spouse: Recipient | null = null;
 
   $: strategyUrl = buildStrategyUrl(recipient, spouse);
+  // The optimizer only shows health and discount-rate controls while someone
+  // still has a filing age to choose, so the promo only offers them then.
+  $: hasChoice = anyFilingChoice(spouse === null, filingChoices(recipient, spouse));
 </script>
 
 <div class="pageBreakAvoid">
@@ -14,12 +21,13 @@
   <p class="promo-intro">
     {#if spouse}
       The Strategy Optimizer finds the filing ages with the highest expected
-      combined lifetime benefit, and lets you explore how the answer shifts as
-      you adjust each person's health and your discount-rate assumptions.
+      combined lifetime benefit{#if hasChoice}, and lets you explore how the
+        answer shifts as you adjust each person's health and your
+        discount-rate assumptions{/if}.
     {:else}
       The Strategy Optimizer finds the filing age with the highest expected
-      lifetime benefit, and lets you explore how the answer shifts as you adjust
-      your health and discount-rate assumptions.
+      lifetime benefit{#if hasChoice}, and lets you explore how the answer
+        shifts as you adjust your health and discount-rate assumptions{/if}.
     {/if}
   </p>
   <RecommendedFilingCard {recipient} {spouse} />
