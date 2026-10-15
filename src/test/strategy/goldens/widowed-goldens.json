@@ -27,7 +27,7 @@
    {
     "deathMonth": 24384,
     "best": {
-     "npvCents": 17082469.06473881,
+     "npvCents": 17088069.87426823,
      "survivorStartMonths": 866,
      "ownStartMonths": 866
     }
@@ -35,7 +35,7 @@
    {
     "deathMonth": 24398,
     "best": {
-     "npvCents": 20262764.925235823,
+     "npvCents": 20269408.45471951,
      "survivorStartMonths": 866,
      "ownStartMonths": 866
     }
@@ -69,7 +69,7 @@
     }
    ],
    "best": {
-    "npvCents": 41717485.68879665,
+    "npvCents": 41731163.55295691,
     "survivorStartMonths": 866,
     "ownStartMonths": 866
    }
@@ -179,7 +179,7 @@
    {
     "deathMonth": 24348,
     "best": {
-     "npvCents": 11861633.834411118,
+     "npvCents": 11864398.139662672,
      "survivorStartMonths": 1091,
      "ownStartMonths": 977
     }
@@ -187,7 +187,7 @@
    {
     "deathMonth": 24398,
     "best": {
-     "npvCents": 32370109.011180986,
+     "npvCents": 32377652.732693724,
      "survivorStartMonths": 1091,
      "ownStartMonths": 977
     }
@@ -221,7 +221,7 @@
     }
    ],
    "best": {
-    "npvCents": 24625138.023018762,
+    "npvCents": 24630876.810719304,
     "survivorStartMonths": 1091,
     "ownStartMonths": 977
    }
@@ -331,7 +331,7 @@
    {
     "deathMonth": 24390,
     "best": {
-     "npvCents": 28966000,
+     "npvCents": 28973000,
      "survivorStartMonths": 984,
      "ownStartMonths": 984
     }
@@ -339,7 +339,7 @@
    {
     "deathMonth": 24428,
     "best": {
-     "npvCents": 44690400,
+     "npvCents": 44701200,
      "survivorStartMonths": 984,
      "ownStartMonths": 984
     }
@@ -373,7 +373,7 @@
     }
    ],
    "best": {
-    "npvCents": 31342394.285714284,
+    "npvCents": 31349968.57142857,
     "survivorStartMonths": 984,
     "ownStartMonths": 984
    }
@@ -712,7 +712,7 @@
    {
     "deathMonth": 24369,
     "best": {
-     "npvCents": 24545011.794475306,
+     "npvCents": 24549807.615458984,
      "survivorStartMonths": 1003,
      "ownStartMonths": 1003
     }
@@ -720,7 +720,7 @@
    {
     "deathMonth": 24444,
     "best": {
-     "npvCents": 60234592.14002179,
+     "npvCents": 60246361.30612966,
      "survivorStartMonths": 1003,
      "ownStartMonths": 1003
     }
@@ -754,7 +754,7 @@
     }
    ],
    "best": {
-    "npvCents": 58688084.87452766,
+    "npvCents": 58699551.8704,
     "survivorStartMonths": 1003,
     "ownStartMonths": 1003
    }
@@ -789,7 +789,7 @@
    {
     "deathMonth": 24499,
     "best": {
-     "npvCents": 13723384.286708524,
+     "npvCents": 13756612.820090385,
      "survivorStartMonths": 993,
      "ownStartMonths": 993
     }
@@ -797,7 +797,7 @@
    {
     "deathMonth": 24451,
     "best": {
-     "npvCents": 10240877.098448245,
+     "npvCents": 10265673.411035288,
      "survivorStartMonths": 993,
      "ownStartMonths": 993
     }
@@ -831,7 +831,7 @@
     }
    ],
    "best": {
-    "npvCents": 7274110.31743497,
+    "npvCents": 7291723.175346434,
     "survivorStartMonths": 993,
     "ownStartMonths": 993
    }
@@ -865,7 +865,7 @@
    {
     "deathMonth": 24430,
     "best": {
-     "npvCents": 37642000,
+     "npvCents": 37653000,
      "survivorStartMonths": 1015,
      "ownStartMonths": 1015
     }
@@ -873,7 +873,7 @@
    {
     "deathMonth": 24417,
     "best": {
-     "npvCents": 33193400,
+     "npvCents": 33203100,
      "survivorStartMonths": 1015,
      "ownStartMonths": 1015
     }
@@ -907,7 +907,7 @@
     }
    ],
    "best": {
-    "npvCents": 28815600,
+    "npvCents": 28824020.689655177,
     "survivorStartMonths": 1015,
     "ownStartMonths": 1015
    }
@@ -1017,7 +1017,7 @@
    {
     "deathMonth": 24409,
     "best": {
-     "npvCents": 42904304.576053046,
+     "npvCents": 42912873.44055794,
      "survivorStartMonths": 1071,
      "ownStartMonths": 1071
     }
@@ -1025,7 +1025,7 @@
    {
     "deathMonth": 24442,
     "best": {
-     "npvCents": 58025036.65820954,
+     "npvCents": 58036625.44124493,
      "survivorStartMonths": 1071,
      "ownStartMonths": 1071
     }
@@ -1059,7 +1059,7 @@
     }
    ],
    "best": {
-    "npvCents": 34891223.20507378,
+    "npvCents": 34898191.693830535,
     "survivorStartMonths": 1071,
     "ownStartMonths": 1071
    }
@@ -1093,7 +1093,7 @@
    {
     "deathMonth": 24644,
     "best": {
-     "npvCents": 72331084.952405,
+     "npvCents": 72354361.4882327,
      "survivorStartMonths": 831,
      "ownStartMonths": 840
     }
@@ -1101,7 +1101,7 @@
    {
     "deathMonth": 24641,
     "best": {
-     "npvCents": 71853622.5312808,
+     "npvCents": 71876745.04697265,
      "survivorStartMonths": 831,
      "ownStartMonths": 840
     }
@@ -1135,7 +1135,7 @@
     }
    ],
    "best": {
-    "npvCents": 27580929.3920463,
+    "npvCents": 27589978.802391335,
     "survivorStartMonths": 831,
     "ownStartMonths": 837
    }
@@ -1322,7 +1322,7 @@
    {
     "deathMonth": 24493,
     "best": {
-     "npvCents": 71414400,
+     "npvCents": 71431700,
      "survivorStartMonths": 949,
      "ownStartMonths": 949
     }
@@ -1330,7 +1330,7 @@
    {
     "deathMonth": 24495,
     "best": {
-     "npvCents": 72240000,
+     "npvCents": 72257500,
      "survivorStartMonths": 949,
      "ownStartMonths": 949
     }
@@ -1364,7 +1364,7 @@
     }
    ],
    "best": {
-    "npvCents": 34365600,
+    "npvCents": 34373925,
     "survivorStartMonths": 949,
     "ownStartMonths": 949
    }
@@ -1398,7 +1398,7 @@
    {
     "deathMonth": 24396,
     "best": {
-     "npvCents": 10135016.0789434,
+     "npvCents": 10142029.930901146,
      "survivorStartMonths": 867,
      "ownStartMonths": 867
     }
@@ -1406,7 +1406,7 @@
    {
     "deathMonth": 24643,
     "best": {
-     "npvCents": 33991393.2968201,
+     "npvCents": 34014916.752388835,
      "survivorStartMonths": 867,
      "ownStartMonths": 867
     }
@@ -1440,7 +1440,7 @@
     }
    ],
    "best": {
-    "npvCents": 15113469.827107383,
+    "npvCents": 15123928.975776661,
     "survivorStartMonths": 867,
     "ownStartMonths": 867
    }
@@ -1702,7 +1702,7 @@
    {
     "deathMonth": 24336,
     "best": {
-     "npvCents": 4195649.793050405,
+     "npvCents": 4197237.250406837,
      "survivorStartMonths": 941,
      "ownStartMonths": 1023
     }
@@ -1710,7 +1710,7 @@
    {
     "deathMonth": 24452,
     "best": {
-     "npvCents": 33005029.08898058,
+     "npvCents": 33017516.803354014,
      "survivorStartMonths": 941,
      "ownStartMonths": 1023
     }
@@ -1744,7 +1744,7 @@
     }
    ],
    "best": {
-    "npvCents": 19016395.54874481,
+    "npvCents": 19023590.55273601,
     "survivorStartMonths": 941,
     "ownStartMonths": 1023
    }
@@ -2159,7 +2159,7 @@
    {
     "deathMonth": 24452,
     "best": {
-     "npvCents": 21802558.407451086,
+     "npvCents": 21814081.9584064,
      "survivorStartMonths": 911,
      "ownStartMonths": 911
     }
@@ -2167,7 +2167,7 @@
    {
     "deathMonth": 24341,
     "best": {
-     "npvCents": 3876593.5950415023,
+     "npvCents": 3878642.534573765,
      "survivorStartMonths": 911,
      "ownStartMonths": 911
     }
@@ -2201,7 +2201,7 @@
     }
    ],
    "best": {
-    "npvCents": 21272139.671347953,
+    "npvCents": 21283382.874134075,
     "survivorStartMonths": 911,
     "ownStartMonths": 911
    }
@@ -2311,7 +2311,7 @@
    {
     "deathMonth": 24623,
     "best": {
-     "npvCents": 32585392.603825897,
+     "npvCents": 32620021.076306056,
      "survivorStartMonths": 846,
      "ownStartMonths": 846
     }
@@ -2319,7 +2319,7 @@
    {
     "deathMonth": 24574,
     "best": {
-     "npvCents": 29626587.082337283,
+     "npvCents": 29658071.234390777,
      "survivorStartMonths": 846,
      "ownStartMonths": 846
     }
@@ -2353,7 +2353,7 @@
     }
    ],
    "best": {
-    "npvCents": 24063046.08631666,
+    "npvCents": 24088617.86749234,
     "survivorStartMonths": 846,
     "ownStartMonths": 846
    }
@@ -2395,7 +2395,7 @@
    {
     "deathMonth": 24844,
     "best": {
-     "npvCents": 100165400,
+     "npvCents": 100171300,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -2429,7 +2429,7 @@
     }
    ],
    "best": {
-    "npvCents": 40677800,
+    "npvCents": 40678320,
     "survivorStartMonths": 752,
     "ownStartMonths": 745
    }
@@ -2692,7 +2692,7 @@
    {
     "deathMonth": 24348,
     "best": {
-     "npvCents": 9926000,
+     "npvCents": 9928800,
      "survivorStartMonths": 867,
      "ownStartMonths": 867
     }
@@ -2700,7 +2700,7 @@
    {
     "deathMonth": 24575,
     "best": {
-     "npvCents": 90397500,
+     "npvCents": 90423000,
      "survivorStartMonths": 867,
      "ownStartMonths": 867
     }
@@ -2734,7 +2734,7 @@
     }
    ],
    "best": {
-    "npvCents": 62564459.45945947,
+    "npvCents": 62582108.10810811,
     "survivorStartMonths": 867,
     "ownStartMonths": 867
    }
@@ -2768,7 +2768,7 @@
    {
     "deathMonth": 24667,
     "best": {
-     "npvCents": 19307522.242011853,
+     "npvCents": 19325240.725106344,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -2776,7 +2776,7 @@
    {
     "deathMonth": 24505,
     "best": {
-     "npvCents": 8461428.001486443,
+     "npvCents": 8468972.881136797,
      "survivorStartMonths": 720,
      "ownStartMonths": 809
     }
@@ -2810,7 +2810,7 @@
     }
    ],
    "best": {
-    "npvCents": 11318387.590510413,
+    "npvCents": 11327280.228216564,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -3377,7 +3377,7 @@
    {
     "deathMonth": 24551,
     "best": {
-     "npvCents": 77802800,
+     "npvCents": 77807800,
      "survivorStartMonths": 804,
      "ownStartMonths": 754
     }
@@ -3385,7 +3385,7 @@
    {
     "deathMonth": 24433,
     "best": {
-     "npvCents": 35846900,
+     "npvCents": 35849600,
      "survivorStartMonths": 754,
      "ownStartMonths": 840
     }
@@ -3419,7 +3419,7 @@
     }
    ],
    "best": {
-    "npvCents": 85888468.96551724,
+    "npvCents": 85892606.89655173,
     "survivorStartMonths": 804,
     "ownStartMonths": 754
    }
@@ -3453,7 +3453,7 @@
    {
     "deathMonth": 24605,
     "best": {
-     "npvCents": 113497312.35609218,
+     "npvCents": 113522663.55384874,
      "survivorStartMonths": 817,
      "ownStartMonths": 817
     }
@@ -3461,7 +3461,7 @@
    {
     "deathMonth": 24371,
     "best": {
-     "npvCents": 22328858.823421393,
+     "npvCents": 22333846.2835115,
      "survivorStartMonths": 817,
      "ownStartMonths": 817
     }
@@ -3495,7 +3495,7 @@
     }
    ],
    "best": {
-    "npvCents": 91155124.8752356,
+    "npvCents": 91175485.63576168,
     "survivorStartMonths": 817,
     "ownStartMonths": 817
    }
@@ -3529,7 +3529,7 @@
    {
     "deathMonth": 24359,
     "best": {
-     "npvCents": 7439549.705891282,
+     "npvCents": 7443382.549634657,
      "survivorStartMonths": 868,
      "ownStartMonths": 912
     }
@@ -3537,7 +3537,7 @@
    {
     "deathMonth": 24336,
     "best": {
-     "npvCents": 3081254.7288349736,
+     "npvCents": 3082842.1861914056,
      "survivorStartMonths": 868,
      "ownStartMonths": 912
     }
@@ -3571,7 +3571,7 @@
     }
    ],
    "best": {
-    "npvCents": 23563254.51374048,
+    "npvCents": 23575394.263618764,
     "survivorStartMonths": 868,
     "ownStartMonths": 912
    }
@@ -3987,7 +3987,7 @@
    {
     "deathMonth": 24366,
     "best": {
-     "npvCents": 6500198.23607621,
+     "npvCents": 6509213.767610297,
      "survivorStartMonths": 899,
      "ownStartMonths": 959
     }
@@ -3995,7 +3995,7 @@
    {
     "deathMonth": 24408,
     "best": {
-     "npvCents": 12222472.160293108,
+     "npvCents": 12239424.271472432,
      "survivorStartMonths": 899,
      "ownStartMonths": 959
     }
@@ -4029,7 +4029,7 @@
     }
    ],
    "best": {
-    "npvCents": 9784175.477847988,
+    "npvCents": 9797745.76283807,
     "survivorStartMonths": 899,
     "ownStartMonths": 959
    }
@@ -4147,7 +4147,7 @@
    {
     "deathMonth": 24570,
     "best": {
-     "npvCents": 10791347.960908372,
+     "npvCents": 10795069.919006042,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -4215,7 +4215,7 @@
    {
     "deathMonth": 24342,
     "best": {
-     "npvCents": 7335475.487643821,
+     "npvCents": 7337652.832698034,
      "survivorStartMonths": 869,
      "ownStartMonths": 869
     }
@@ -4223,7 +4223,7 @@
    {
     "deathMonth": 24366,
     "best": {
-     "npvCents": 15186662.869168345,
+     "npvCents": 15191170.634935388,
      "survivorStartMonths": 869,
      "ownStartMonths": 869
     }
@@ -4257,7 +4257,7 @@
     }
    ],
    "best": {
-    "npvCents": 52302428.09616639,
+    "npvCents": 52317952.71121423,
     "survivorStartMonths": 869,
     "ownStartMonths": 869
    }
@@ -4443,7 +4443,7 @@
    {
     "deathMonth": 24508,
     "best": {
-     "npvCents": 72465996.80058219,
+     "npvCents": 72483383.07620612,
      "survivorStartMonths": 960,
      "ownStartMonths": 960
     }
@@ -4451,7 +4451,7 @@
    {
     "deathMonth": 24384,
     "best": {
-     "npvCents": 25947456.7894485,
+     "npvCents": 25953682.186950766,
      "survivorStartMonths": 960,
      "ownStartMonths": 960
     }
@@ -4485,7 +4485,7 @@
     }
    ],
    "best": {
-    "npvCents": 42701187.82697903,
+    "npvCents": 42711432.83365537,
     "survivorStartMonths": 960,
     "ownStartMonths": 960
    }
@@ -4680,7 +4680,7 @@
    {
     "deathMonth": 24597,
     "best": {
-     "npvCents": 51623524.127921745,
+     "npvCents": 51626580.82000232,
      "survivorStartMonths": 804,
      "ownStartMonths": 773
     }
@@ -4714,7 +4714,7 @@
     }
    ],
    "best": {
-    "npvCents": 42986226.25528202,
+    "npvCents": 42988893.34196744,
     "survivorStartMonths": 804,
     "ownStartMonths": 773
    }
@@ -4900,7 +4900,7 @@
    {
     "deathMonth": 24542,
     "best": {
-     "npvCents": 78098727.98322967,
+     "npvCents": 78116493.8449183,
      "survivorStartMonths": 822,
      "ownStartMonths": 909
     }
@@ -4908,7 +4908,7 @@
    {
     "deathMonth": 24589,
     "best": {
-     "npvCents": 90532182.51339808,
+     "npvCents": 90552776.73144026,
      "survivorStartMonths": 822,
      "ownStartMonths": 909
     }
@@ -4942,7 +4942,7 @@
     }
    ],
    "best": {
-    "npvCents": 53915002.32871945,
+    "npvCents": 53927266.8879389,
     "survivorStartMonths": 822,
     "ownStartMonths": 909
    }
@@ -5052,7 +5052,7 @@
    {
     "deathMonth": 24449,
     "best": {
-     "npvCents": 41679900,
+     "npvCents": 41692800,
      "survivorStartMonths": 919,
      "ownStartMonths": 919
     }
@@ -5060,7 +5060,7 @@
    {
     "deathMonth": 24376,
     "best": {
-     "npvCents": 18093600,
+     "npvCents": 18099200,
      "survivorStartMonths": 919,
      "ownStartMonths": 919
     }
@@ -5094,7 +5094,7 @@
     }
    ],
    "best": {
-    "npvCents": 51466703.225806445,
+    "npvCents": 51482632.25806451,
     "survivorStartMonths": 919,
     "ownStartMonths": 919
    }
@@ -5136,7 +5136,7 @@
    {
     "deathMonth": 24586,
     "best": {
-     "npvCents": 31000224.02631879,
+     "npvCents": 31006556.434881274,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -5170,7 +5170,7 @@
     }
    ],
    "best": {
-    "npvCents": 27601505.951904684,
+    "npvCents": 27608788.571410216,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -5433,7 +5433,7 @@
    {
     "deathMonth": 24386,
     "best": {
-     "npvCents": 22803000,
+     "npvCents": 22809600,
      "survivorStartMonths": 1087,
      "ownStartMonths": 1087
     }
@@ -5441,7 +5441,7 @@
    {
     "deathMonth": 24366,
     "best": {
-     "npvCents": 15893000,
+     "npvCents": 15897600,
      "survivorStartMonths": 1087,
      "ownStartMonths": 1087
     }
@@ -5475,7 +5475,7 @@
     }
    ],
    "best": {
-    "npvCents": 18887333.333333332,
+    "npvCents": 18892800,
     "survivorStartMonths": 1087,
     "ownStartMonths": 1087
    }
@@ -5661,7 +5661,7 @@
    {
     "deathMonth": 24344,
     "best": {
-     "npvCents": 7956000,
+     "npvCents": 7958400,
      "survivorStartMonths": 990,
      "ownStartMonths": 990
     }
@@ -5669,7 +5669,7 @@
    {
     "deathMonth": 24515,
     "best": {
-     "npvCents": 64642500,
+     "npvCents": 64662000,
      "survivorStartMonths": 990,
      "ownStartMonths": 990
     }
@@ -5703,7 +5703,7 @@
     }
    ],
    "best": {
-    "npvCents": 39692763.15789474,
+    "npvCents": 39704736.84210526,
     "survivorStartMonths": 990,
     "ownStartMonths": 990
    }
@@ -5890,7 +5890,7 @@
    {
     "deathMonth": 24392,
     "best": {
-     "npvCents": 29671200,
+     "npvCents": 29685600,
      "survivorStartMonths": 964,
      "ownStartMonths": 964
     }
@@ -5898,7 +5898,7 @@
    {
     "deathMonth": 24476,
     "best": {
-     "npvCents": 64287600,
+     "npvCents": 64318800,
      "survivorStartMonths": 964,
      "ownStartMonths": 964
     }
@@ -5932,7 +5932,7 @@
     }
    ],
    "best": {
-    "npvCents": 51870847.82608695,
+    "npvCents": 51896021.73913044,
     "survivorStartMonths": 964,
     "ownStartMonths": 964
    }
@@ -5967,7 +5967,7 @@
    {
     "deathMonth": 24475,
     "best": {
-     "npvCents": 31257606.732555155,
+     "npvCents": 31269035.473590825,
      "survivorStartMonths": 969,
      "ownStartMonths": 969
     }
@@ -5975,7 +5975,7 @@
    {
     "deathMonth": 24410,
     "best": {
-     "npvCents": 20488555.790285442,
+     "npvCents": 20496047.035546973,
      "survivorStartMonths": 969,
      "ownStartMonths": 969
     }
@@ -6009,7 +6009,7 @@
     }
    ],
    "best": {
-    "npvCents": 18445276.75151886,
+    "npvCents": 18452020.911208633,
     "survivorStartMonths": 969,
     "ownStartMonths": 969
    }
@@ -6348,7 +6348,7 @@
    {
     "deathMonth": 24370,
     "best": {
-     "npvCents": 5185057.42696545,
+     "npvCents": 5189554.441212601,
      "survivorStartMonths": 893,
      "ownStartMonths": 893
     }
@@ -6356,7 +6356,7 @@
    {
     "deathMonth": 24391,
     "best": {
-     "npvCents": 7067415.195124669,
+     "npvCents": 7073544.783325124,
      "survivorStartMonths": 893,
      "ownStartMonths": 893
     }
@@ -6390,7 +6390,7 @@
     }
    ],
    "best": {
-    "npvCents": 11999129.951547563,
+    "npvCents": 12009536.829215862,
     "survivorStartMonths": 893,
     "ownStartMonths": 893
    }
@@ -6424,7 +6424,7 @@
    {
     "deathMonth": 24563,
     "best": {
-     "npvCents": 48230533.846514046,
+     "npvCents": 48249597.29862729,
      "survivorStartMonths": 861,
      "ownStartMonths": 861
     }
@@ -6432,7 +6432,7 @@
    {
     "deathMonth": 24352,
     "best": {
-     "npvCents": 7811058.834477318,
+     "npvCents": 7814146.209510709,
      "survivorStartMonths": 861,
      "ownStartMonths": 861
     }
@@ -6466,7 +6466,7 @@
     }
    ],
    "best": {
-    "npvCents": 39586473.52956733,
+    "npvCents": 39602120.357049376,
     "survivorStartMonths": 861,
     "ownStartMonths": 861
    }
@@ -6653,7 +6653,7 @@
    {
     "deathMonth": 24447,
     "best": {
-     "npvCents": 37848327.72614343,
+     "npvCents": 37859469.41814406,
      "survivorStartMonths": 941,
      "ownStartMonths": 941
     }
@@ -6661,7 +6661,7 @@
    {
     "deathMonth": 24572,
     "best": {
-     "npvCents": 66590118.7586112,
+     "npvCents": 66609721.3840921,
      "survivorStartMonths": 941,
      "ownStartMonths": 941
     }
@@ -6695,7 +6695,7 @@
     }
    ],
    "best": {
-    "npvCents": 36685534.21822735,
+    "npvCents": 36696333.610107906,
     "survivorStartMonths": 941,
     "ownStartMonths": 941
    }
@@ -6813,7 +6813,7 @@
    {
     "deathMonth": 24646,
     "best": {
-     "npvCents": 59710555.20811451,
+     "npvCents": 59729408.51683379,
      "survivorStartMonths": 739,
      "ownStartMonths": 840
     }
@@ -6847,7 +6847,7 @@
     }
    ],
    "best": {
-    "npvCents": 57525275.68780382,
+    "npvCents": 57543614.16969799,
     "survivorStartMonths": 739,
     "ownStartMonths": 840
    }
@@ -6881,17 +6881,17 @@
    {
     "deathMonth": 24476,
     "best": {
-     "npvCents": 33044400,
+     "npvCents": 33046400,
      "survivorStartMonths": 752,
-     "ownStartMonths": 782
+     "ownStartMonths": 783
     }
    },
    {
     "deathMonth": 24476,
     "best": {
-     "npvCents": 33044400,
+     "npvCents": 33046400,
      "survivorStartMonths": 752,
-     "ownStartMonths": 782
+     "ownStartMonths": 783
     }
    }
   ],
@@ -6923,7 +6923,7 @@
     }
    ],
    "best": {
-    "npvCents": 61740023.809523806,
+    "npvCents": 61756435.71428572,
     "survivorStartMonths": 752,
     "ownStartMonths": 840
    }
@@ -6957,7 +6957,7 @@
    {
     "deathMonth": 24564,
     "best": {
-     "npvCents": 49018970.4932054,
+     "npvCents": 49034351.40644456,
      "survivorStartMonths": 941,
      "ownStartMonths": 941
     }
@@ -6965,7 +6965,7 @@
    {
     "deathMonth": 24472,
     "best": {
-     "npvCents": 35914288.88724439,
+     "npvCents": 35925557.882816166,
      "survivorStartMonths": 941,
      "ownStartMonths": 941
     }
@@ -6999,7 +6999,7 @@
     }
    ],
    "best": {
-    "npvCents": 32243807.105873026,
+    "npvCents": 32253924.397089176,
     "survivorStartMonths": 941,
     "ownStartMonths": 941
    }
@@ -7337,7 +7337,7 @@
    {
     "deathMonth": 24388,
     "best": {
-     "npvCents": 22810282.152939454,
+     "npvCents": 22816186.96323014,
      "survivorStartMonths": 1020,
      "ownStartMonths": 1020
     }
@@ -7345,7 +7345,7 @@
    {
     "deathMonth": 24482,
     "best": {
-     "npvCents": 45560181.478841335,
+     "npvCents": 45571975.46835178,
      "survivorStartMonths": 1020,
      "ownStartMonths": 1020
     }
@@ -7379,7 +7379,7 @@
     }
    ],
    "best": {
-    "npvCents": 28089318.54391527,
+    "npvCents": 28096589.91811769,
     "survivorStartMonths": 1020,
     "ownStartMonths": 1020
    }
@@ -7489,7 +7489,7 @@
    {
     "deathMonth": 24610,
     "best": {
-     "npvCents": 51782200,
+     "npvCents": 51792900,
      "survivorStartMonths": 720,
      "ownStartMonths": 815
     }
@@ -7497,7 +7497,7 @@
    {
     "deathMonth": 24763,
     "best": {
-     "npvCents": 115996500,
+     "npvCents": 116020000,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -7531,7 +7531,7 @@
     }
    ],
    "best": {
-    "npvCents": 62093154.54545455,
+    "npvCents": 62104804.54545455,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -7642,7 +7642,7 @@
    {
     "deathMonth": 24450,
     "best": {
-     "npvCents": 44006848.43555087,
+     "npvCents": 44018219.71421639,
      "survivorStartMonths": 871,
      "ownStartMonths": 871
     }
@@ -7650,7 +7650,7 @@
    {
     "deathMonth": 24574,
     "best": {
-     "npvCents": 76320625.28614944,
+     "npvCents": 76340346.37795466,
      "survivorStartMonths": 871,
      "ownStartMonths": 871
     }
@@ -7684,7 +7684,7 @@
     }
    ],
    "best": {
-    "npvCents": 53768004.103,
+    "npvCents": 53781897.64411189,
     "survivorStartMonths": 871,
     "ownStartMonths": 871
    }
@@ -7718,7 +7718,7 @@
    {
     "deathMonth": 24481,
     "best": {
-     "npvCents": 42870536.5345029,
+     "npvCents": 42885589.39143215,
      "survivorStartMonths": 984,
      "ownStartMonths": 984
     }
@@ -7726,7 +7726,7 @@
    {
     "deathMonth": 24419,
     "best": {
-     "npvCents": 27035304.43987775,
+     "npvCents": 27044797.173178267,
      "survivorStartMonths": 984,
      "ownStartMonths": 984
     }
@@ -7760,7 +7760,7 @@
     }
    ],
    "best": {
-    "npvCents": 29030612.19630031,
+    "npvCents": 29040805.529234402,
     "survivorStartMonths": 984,
     "ownStartMonths": 984
    }
@@ -7795,7 +7795,7 @@
    {
     "deathMonth": 24346,
     "best": {
-     "npvCents": 11731200,
+     "npvCents": 11733800,
      "survivorStartMonths": 1088,
      "ownStartMonths": 1088
     }
@@ -7803,7 +7803,7 @@
    {
     "deathMonth": 24354,
     "best": {
-     "npvCents": 15340800,
+     "npvCents": 15344200,
      "survivorStartMonths": 1088,
      "ownStartMonths": 1088
     }
@@ -7837,7 +7837,7 @@
     }
    ],
    "best": {
-    "npvCents": 27743297.56097561,
+    "npvCents": 27749446.341463417,
     "survivorStartMonths": 1088,
     "ownStartMonths": 1088
    }
@@ -7871,7 +7871,7 @@
    {
     "deathMonth": 24673,
     "best": {
-     "npvCents": 78387870.3546087,
+     "npvCents": 78411510.12365904,
      "survivorStartMonths": 820,
      "ownStartMonths": 840
     }
@@ -7879,7 +7879,7 @@
    {
     "deathMonth": 24568,
     "best": {
-     "npvCents": 60518405.1834475,
+     "npvCents": 60536393.63523941,
      "survivorStartMonths": 820,
      "ownStartMonths": 840
     }
@@ -7913,7 +7913,7 @@
     }
    ],
    "best": {
-    "npvCents": 41466200.605535366,
+    "npvCents": 41478366.77961823,
     "survivorStartMonths": 820,
     "ownStartMonths": 840
    }
@@ -8100,7 +8100,7 @@
    {
     "deathMonth": 24482,
     "best": {
-     "npvCents": 31983578.905841205,
+     "npvCents": 31998519.534650818,
      "survivorStartMonths": 832,
      "ownStartMonths": 840
     }
@@ -8108,7 +8108,7 @@
    {
     "deathMonth": 24457,
     "best": {
-     "npvCents": 27282971.988801412,
+     "npvCents": 27295706.79550073,
      "survivorStartMonths": 832,
      "ownStartMonths": 840
     }
@@ -8142,7 +8142,7 @@
     }
    ],
    "best": {
-    "npvCents": 30817770.438789956,
+    "npvCents": 30832173.38818899,
     "survivorStartMonths": 832,
     "ownStartMonths": 840
    }
@@ -8481,7 +8481,7 @@
    {
     "deathMonth": 24635,
     "best": {
-     "npvCents": 46597026.08693429,
+     "npvCents": 46614487.40996484,
      "survivorStartMonths": 731,
      "ownStartMonths": 840
     }
@@ -8489,9 +8489,9 @@
    {
     "deathMonth": 24499,
     "best": {
-     "npvCents": 22317916.035012346,
+     "npvCents": 22327786.143949404,
      "survivorStartMonths": 731,
-     "ownStartMonths": 790
+     "ownStartMonths": 787
     }
    }
   ],
@@ -8523,7 +8523,7 @@
     }
    ],
    "best": {
-    "npvCents": 39615543.387427896,
+    "npvCents": 39630497.00434557,
     "survivorStartMonths": 731,
     "ownStartMonths": 840
    }
@@ -8557,7 +8557,7 @@
    {
     "deathMonth": 24507,
     "best": {
-     "npvCents": 41400769.14188924,
+     "npvCents": 41418069.92297653,
      "survivorStartMonths": 784,
      "ownStartMonths": 780
     }
@@ -8565,7 +8565,7 @@
    {
     "deathMonth": 24557,
     "best": {
-     "npvCents": 51425191.416636996,
+     "npvCents": 51446681.2584325,
      "survivorStartMonths": 784,
      "ownStartMonths": 780
     }
@@ -8599,7 +8599,7 @@
     }
    ],
    "best": {
-    "npvCents": 43746683.60172107,
+    "npvCents": 43764964.706443906,
     "survivorStartMonths": 784,
     "ownStartMonths": 780
    }
@@ -8634,7 +8634,7 @@
    {
     "deathMonth": 24492,
     "best": {
-     "npvCents": 71786314.83779144,
+     "npvCents": 71800755.85868016,
      "survivorStartMonths": 966,
      "ownStartMonths": 968
     }
@@ -8642,7 +8642,7 @@
    {
     "deathMonth": 24343,
     "best": {
-     "npvCents": 11132546.892794399,
+     "npvCents": 11134786.391264083,
      "survivorStartMonths": 966,
      "ownStartMonths": 968
     }
@@ -8676,7 +8676,7 @@
     }
    ],
    "best": {
-    "npvCents": 53899476.888137594,
+    "npvCents": 53910319.67165965,
     "survivorStartMonths": 966,
     "ownStartMonths": 968
    }
@@ -8710,7 +8710,7 @@
    {
     "deathMonth": 24671,
     "best": {
-     "npvCents": 73795200,
+     "npvCents": 73828400,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -8718,7 +8718,7 @@
    {
     "deathMonth": 24800,
     "best": {
-     "npvCents": 125034000,
+     "npvCents": 125093000,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -8752,7 +8752,7 @@
     }
    ],
    "best": {
-    "npvCents": 80320326.92307693,
+    "npvCents": 80357980.76923078,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -8863,7 +8863,7 @@
    {
     "deathMonth": 24526,
     "best": {
-     "npvCents": 45599524.059073664,
+     "npvCents": 45618437.17564732,
      "survivorStartMonths": 948,
      "ownStartMonths": 810
     }
@@ -8871,7 +8871,7 @@
    {
     "deathMonth": 24422,
     "best": {
-     "npvCents": 23551620.619027905,
+     "npvCents": 23561389.022436876,
      "survivorStartMonths": 948,
      "ownStartMonths": 810
     }
@@ -8905,7 +8905,7 @@
     }
    ],
    "best": {
-    "npvCents": 39024567.99301818,
+    "npvCents": 39040754.0436167,
     "survivorStartMonths": 948,
     "ownStartMonths": 810
    }
@@ -9243,9 +9243,9 @@
    {
     "deathMonth": 24485,
     "best": {
-     "npvCents": 19010100,
+     "npvCents": 19014600,
      "survivorStartMonths": 720,
-     "ownStartMonths": 787
+     "ownStartMonths": 786
     }
    },
    {
@@ -9285,7 +9285,7 @@
     }
    ],
    "best": {
-    "npvCents": 43842537.03703703,
+    "npvCents": 43854329.62962963,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -9319,7 +9319,7 @@
    {
     "deathMonth": 24413,
     "best": {
-     "npvCents": 32615100,
+     "npvCents": 32624400,
      "survivorStartMonths": 1022,
      "ownStartMonths": 1022
     }
@@ -9327,7 +9327,7 @@
    {
     "deathMonth": 24469,
     "best": {
-     "npvCents": 52254300,
+     "npvCents": 52269200,
      "survivorStartMonths": 1022,
      "ownStartMonths": 1022
     }
@@ -9361,7 +9361,7 @@
     }
    ],
    "best": {
-    "npvCents": 32825520,
+    "npvCents": 32834880,
     "survivorStartMonths": 1022,
     "ownStartMonths": 1022
    }
@@ -9396,7 +9396,7 @@
    {
     "deathMonth": 24393,
     "best": {
-     "npvCents": 28387346.023060646,
+     "npvCents": 28394103.306093987,
      "survivorStartMonths": 1068,
      "ownStartMonths": 1068
     }
@@ -9404,7 +9404,7 @@
    {
     "deathMonth": 24366,
     "best": {
-     "npvCents": 18381374.984161593,
+     "npvCents": 18385750.46023495,
      "survivorStartMonths": 1068,
      "ownStartMonths": 1068
     }
@@ -9438,7 +9438,7 @@
     }
    ],
    "best": {
-    "npvCents": 22799275.501122292,
+    "npvCents": 22804702.60788285,
     "survivorStartMonths": 1068,
     "ownStartMonths": 1068
    }
@@ -9549,7 +9549,7 @@
    {
     "deathMonth": 24359,
     "best": {
-     "npvCents": 10513564.775983738,
+     "npvCents": 10517149.353132045,
      "survivorStartMonths": 1005,
      "ownStartMonths": 1005
     }
@@ -9557,7 +9557,7 @@
    {
     "deathMonth": 24485,
     "best": {
-     "npvCents": 35041636.89989832,
+     "npvCents": 35053584.27013354,
      "survivorStartMonths": 1005,
      "ownStartMonths": 1005
     }
@@ -9591,7 +9591,7 @@
     }
    ],
    "best": {
-    "npvCents": 15087002.90107394,
+    "npvCents": 15092146.782049416,
     "survivorStartMonths": 1005,
     "ownStartMonths": 1005
    }
@@ -9702,7 +9702,7 @@
    {
     "deathMonth": 24494,
     "best": {
-     "npvCents": 49224395.303980514,
+     "npvCents": 49238975.9897933,
      "survivorStartMonths": 856,
      "ownStartMonths": 922
     }
@@ -9710,7 +9710,7 @@
    {
     "deathMonth": 24508,
     "best": {
-     "npvCents": 52471178.5406608,
+     "npvCents": 52486720.95136598,
      "survivorStartMonths": 856,
      "ownStartMonths": 922
     }
@@ -9744,7 +9744,7 @@
     }
    ],
    "best": {
-    "npvCents": 35511821.438338675,
+    "npvCents": 35522340.34279317,
     "survivorStartMonths": 856,
     "ownStartMonths": 922
    }
@@ -9778,7 +9778,7 @@
    {
     "deathMonth": 24362,
     "best": {
-     "npvCents": 15756484.69945935,
+     "npvCents": 15760607.275257219,
      "survivorStartMonths": 961,
      "ownStartMonths": 1031
     }
@@ -9786,7 +9786,7 @@
    {
     "deathMonth": 24368,
     "best": {
-     "npvCents": 17962949.711188037,
+     "npvCents": 17967649.593373068,
      "survivorStartMonths": 961,
      "ownStartMonths": 1031
     }
@@ -9820,7 +9820,7 @@
     }
    ],
    "best": {
-    "npvCents": 33433010.280633286,
+    "npvCents": 33441757.797713514,
     "survivorStartMonths": 961,
     "ownStartMonths": 1031
    }
@@ -9855,7 +9855,7 @@
    {
     "deathMonth": 24454,
     "best": {
-     "npvCents": 51040600,
+     "npvCents": 51054000,
      "survivorStartMonths": 971,
      "ownStartMonths": 968
     }
@@ -9863,7 +9863,7 @@
    {
     "deathMonth": 24348,
     "best": {
-     "npvCents": 10665200,
+     "npvCents": 10668000,
      "survivorStartMonths": 971,
      "ownStartMonths": 968
     }
@@ -9897,7 +9897,7 @@
     }
    ],
    "best": {
-    "npvCents": 54334264.705882356,
+    "npvCents": 54348529.41176471,
     "survivorStartMonths": 971,
     "ownStartMonths": 968
    }
@@ -10015,7 +10015,7 @@
    {
     "deathMonth": 24824,
     "best": {
-     "npvCents": 67867762.44801009,
+     "npvCents": 67872062.71755919,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -10049,7 +10049,7 @@
     }
    ],
    "best": {
-    "npvCents": 42241328.01857439,
+    "npvCents": 42247972.23093122,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -10311,7 +10311,7 @@
    {
     "deathMonth": 24485,
     "best": {
-     "npvCents": 39416037.16214227,
+     "npvCents": 39429984.80445017,
      "survivorStartMonths": 787,
      "ownStartMonths": 844
     }
@@ -10319,7 +10319,7 @@
    {
     "deathMonth": 24412,
     "best": {
-     "npvCents": 23613458.304979317,
+     "npvCents": 23621814.093480725,
      "survivorStartMonths": 787,
      "ownStartMonths": 844
     }
@@ -10353,7 +10353,7 @@
     }
    ],
    "best": {
-    "npvCents": 38477743.616353884,
+    "npvCents": 38491359.23688337,
     "survivorStartMonths": 787,
     "ownStartMonths": 844
    }
@@ -10692,15 +10692,15 @@
    {
     "deathMonth": 24468,
     "best": {
-     "npvCents": 30077253.03751002,
+     "npvCents": 30086616.330370612,
      "survivorStartMonths": 751,
-     "ownStartMonths": 781
+     "ownStartMonths": 780
     }
    },
    {
     "deathMonth": 24564,
     "best": {
-     "npvCents": 51136493.98535584,
+     "npvCents": 51147676.67039587,
      "survivorStartMonths": 751,
      "ownStartMonths": 838
     }
@@ -10734,7 +10734,7 @@
     }
    ],
    "best": {
-    "npvCents": 47804182.693008654,
+    "npvCents": 47814678.627904564,
     "survivorStartMonths": 751,
     "ownStartMonths": 838
    }
@@ -11225,7 +11225,7 @@
    {
     "deathMonth": 24769,
     "best": {
-     "npvCents": 24229419.42187873,
+     "npvCents": 24267153.02712469,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -11267,7 +11267,7 @@
     }
    ],
    "best": {
-    "npvCents": 16990661.094807595,
+    "npvCents": 17015641.176388495,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -11723,7 +11723,7 @@
     }
    ],
    "best": {
-    "npvCents": 38705143.29403708,
+    "npvCents": 38715826.402568504,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -11833,15 +11833,15 @@
    {
     "deathMonth": 24534,
     "best": {
-     "npvCents": 28298805.56455264,
+     "npvCents": 28306066.97670163,
      "survivorStartMonths": 736,
-     "ownStartMonths": 788
+     "ownStartMonths": 790
     }
    },
    {
     "deathMonth": 24713,
     "best": {
-     "npvCents": 45476337.21825786,
+     "npvCents": 45487407.45725368,
      "survivorStartMonths": 736,
      "ownStartMonths": 840
     }
@@ -11875,7 +11875,7 @@
     }
    ],
    "best": {
-    "npvCents": 25320277.582578987,
+    "npvCents": 25327435.345859755,
     "survivorStartMonths": 736,
     "ownStartMonths": 811
    }
@@ -12070,7 +12070,7 @@
    {
     "deathMonth": 24509,
     "best": {
-     "npvCents": 28530637.338063963,
+     "npvCents": 28534931.31899921,
      "survivorStartMonths": 730,
      "ownStartMonths": 840
     }
@@ -12104,7 +12104,7 @@
     }
    ],
    "best": {
-    "npvCents": 30810159.517562475,
+    "npvCents": 30816073.45717846,
     "survivorStartMonths": 730,
     "ownStartMonths": 840
    }
@@ -12214,7 +12214,7 @@
    {
     "deathMonth": 24360,
     "best": {
-     "npvCents": 19025027.669530287,
+     "npvCents": 19028855.642904438,
      "survivorStartMonths": 948,
      "ownStartMonths": 948
     }
@@ -12222,7 +12222,7 @@
    {
     "deathMonth": 24494,
     "best": {
-     "npvCents": 72466008.48956846,
+     "npvCents": 72480589.17538126,
      "survivorStartMonths": 948,
      "ownStartMonths": 948
     }
@@ -12256,7 +12256,7 @@
     }
    ],
    "best": {
-    "npvCents": 62751452.89760332,
+    "npvCents": 62764078.944464,
     "survivorStartMonths": 948,
     "ownStartMonths": 948
    }
@@ -12374,7 +12374,7 @@
    {
     "deathMonth": 24453,
     "best": {
-     "npvCents": 43791200,
+     "npvCents": 43796900,
      "survivorStartMonths": 764,
      "ownStartMonths": 840
     }
@@ -12442,7 +12442,7 @@
    {
     "deathMonth": 24632,
     "best": {
-     "npvCents": 40628857.99325144,
+     "npvCents": 40639165.02111656,
      "survivorStartMonths": 720,
      "ownStartMonths": 819
     }
@@ -12450,7 +12450,7 @@
    {
     "deathMonth": 24472,
     "best": {
-     "npvCents": 15478639.929484012,
+     "npvCents": 15484980.820327802,
      "survivorStartMonths": 720,
      "ownStartMonths": 744
     }
@@ -12484,9 +12484,9 @@
     }
    ],
    "best": {
-    "npvCents": 23463430.284128074,
+    "npvCents": 23466183.845950384,
     "survivorStartMonths": 720,
-    "ownStartMonths": 753
+    "ownStartMonths": 755
    }
   }
  },
@@ -12595,7 +12595,7 @@
    {
     "deathMonth": 24559,
     "best": {
-     "npvCents": 54184494.83104516,
+     "npvCents": 54203315.426679425,
      "survivorStartMonths": 865,
      "ownStartMonths": 908
     }
@@ -12603,7 +12603,7 @@
    {
     "deathMonth": 24471,
     "best": {
-     "npvCents": 37252265.13596104,
+     "npvCents": 37265204.443059325,
      "survivorStartMonths": 865,
      "ownStartMonths": 908
     }
@@ -12637,7 +12637,7 @@
     }
    ],
    "best": {
-    "npvCents": 27336080.769874286,
+    "npvCents": 27345575.76145813,
     "survivorStartMonths": 865,
     "ownStartMonths": 908
    }
@@ -13052,7 +13052,7 @@
    {
     "deathMonth": 24482,
     "best": {
-     "npvCents": 59865300,
+     "npvCents": 59866600,
      "survivorStartMonths": 798,
      "ownStartMonths": 785
     }
@@ -13060,7 +13060,7 @@
    {
     "deathMonth": 24646,
     "best": {
-     "npvCents": 123960300,
+     "npvCents": 123962000,
      "survivorStartMonths": 802,
      "ownStartMonths": 785
     }
@@ -13094,7 +13094,7 @@
     }
    ],
    "best": {
-    "npvCents": 81773590.24390244,
+    "npvCents": 81775107.31707318,
     "survivorStartMonths": 802,
     "ownStartMonths": 785
    }
@@ -13204,7 +13204,7 @@
    {
     "deathMonth": 24513,
     "best": {
-     "npvCents": 76594552.15737826,
+     "npvCents": 76612364.84392647,
      "survivorStartMonths": 933,
      "ownStartMonths": 933
     }
@@ -13212,7 +13212,7 @@
    {
     "deathMonth": 24457,
     "best": {
-     "npvCents": 55617887.95975346,
+     "npvCents": 55630822.35230224,
      "survivorStartMonths": 933,
      "ownStartMonths": 933
     }
@@ -13246,7 +13246,7 @@
     }
    ],
    "best": {
-    "npvCents": 53774752.63595413,
+    "npvCents": 53787258.3923811,
     "survivorStartMonths": 933,
     "ownStartMonths": 933
    }
@@ -13356,7 +13356,7 @@
    {
     "deathMonth": 24350,
     "best": {
-     "npvCents": 6502500.999960507,
+     "npvCents": 6505401.312627751,
      "survivorStartMonths": 746,
      "ownStartMonths": 746
     }
@@ -13364,7 +13364,7 @@
    {
     "deathMonth": 24765,
     "best": {
-     "npvCents": 65145565.3930899,
+     "npvCents": 65174622.291124284,
      "survivorStartMonths": 746,
      "ownStartMonths": 746
     }
@@ -13398,7 +13398,7 @@
     }
    ],
    "best": {
-    "npvCents": 40885424.01783471,
+    "npvCents": 40903660.157004125,
     "survivorStartMonths": 746,
     "ownStartMonths": 746
    }
@@ -13432,7 +13432,7 @@
    {
     "deathMonth": 24677,
     "best": {
-     "npvCents": 38075936.53378888,
+     "npvCents": 38085340.95600506,
      "survivorStartMonths": 722,
      "ownStartMonths": 840
     }
@@ -13440,7 +13440,7 @@
    {
     "deathMonth": 24402,
     "best": {
-     "npvCents": 10589632.055527598,
+     "npvCents": 10594380.38314088,
      "survivorStartMonths": 722,
      "ownStartMonths": 745
     }
@@ -13474,9 +13474,9 @@
     }
    ],
    "best": {
-    "npvCents": 15949535.282460654,
+    "npvCents": 15952520.750935068,
     "survivorStartMonths": 722,
-    "ownStartMonths": 753
+    "ownStartMonths": 752
    }
   }
  },
@@ -13508,7 +13508,7 @@
    {
     "deathMonth": 24434,
     "best": {
-     "npvCents": 21124200,
+     "npvCents": 21135600,
      "survivorStartMonths": 1023,
      "ownStartMonths": 1023
     }
@@ -13516,7 +13516,7 @@
    {
     "deathMonth": 24403,
     "best": {
-     "npvCents": 15379900,
+     "npvCents": 15388200,
      "survivorStartMonths": 1023,
      "ownStartMonths": 1023
     }
@@ -13550,7 +13550,7 @@
     }
    ],
    "best": {
-    "npvCents": 18200577.777777776,
+    "npvCents": 18210400,
     "survivorStartMonths": 1023,
     "ownStartMonths": 1023
    }
@@ -13661,7 +13661,7 @@
    {
     "deathMonth": 24577,
     "best": {
-     "npvCents": 44640900,
+     "npvCents": 44666600,
      "survivorStartMonths": 741,
      "ownStartMonths": 745
     }
@@ -13669,7 +13669,7 @@
    {
     "deathMonth": 24610,
     "best": {
-     "npvCents": 50373000,
+     "npvCents": 50402000,
      "survivorStartMonths": 741,
      "ownStartMonths": 745
     }
@@ -13703,7 +13703,7 @@
     }
    ],
    "best": {
-    "npvCents": 37141591.30434783,
+    "npvCents": 37162973.91304348,
     "survivorStartMonths": 741,
     "ownStartMonths": 745
    }
@@ -14042,7 +14042,7 @@
    {
     "deathMonth": 24550,
     "best": {
-     "npvCents": 35141800,
+     "npvCents": 35151300,
      "survivorStartMonths": 720,
      "ownStartMonths": 822
     }
@@ -14084,7 +14084,7 @@
     }
    ],
    "best": {
-    "npvCents": 41203634.042553194,
+    "npvCents": 41226046.80851064,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -14194,7 +14194,7 @@
    {
     "deathMonth": 24650,
     "best": {
-     "npvCents": 45403413.86011335,
+     "npvCents": 45425116.88447398,
      "survivorStartMonths": 720,
      "ownStartMonths": 825
     }
@@ -14202,7 +14202,7 @@
    {
     "deathMonth": 24748,
     "best": {
-     "npvCents": 72055412.87814675,
+     "npvCents": 72072148.07850341,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -14236,7 +14236,7 @@
     }
    ],
    "best": {
-    "npvCents": 67774660.01576595,
+    "npvCents": 67790571.27102679,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -14270,7 +14270,7 @@
    {
     "deathMonth": 24786,
     "best": {
-     "npvCents": 84642384.261727,
+     "npvCents": 84647330.37717864,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -14312,7 +14312,7 @@
     }
    ],
    "best": {
-    "npvCents": 55207292.327097185,
+    "npvCents": 55211308.150730945,
     "survivorStartMonths": 802,
     "ownStartMonths": 745
    }
@@ -14423,7 +14423,7 @@
    {
     "deathMonth": 24355,
     "best": {
-     "npvCents": 9182021.625835417,
+     "npvCents": 9185467.037327286,
      "survivorStartMonths": 977,
      "ownStartMonths": 958
     }
@@ -14431,7 +14431,7 @@
    {
     "deathMonth": 24448,
     "best": {
-     "npvCents": 32323881.089721214,
+     "npvCents": 32336010.125777394,
      "survivorStartMonths": 977,
      "ownStartMonths": 958
     }
@@ -14465,7 +14465,7 @@
     }
    ],
    "best": {
-    "npvCents": 36239426.4553515,
+    "npvCents": 36253024.73919967,
     "survivorStartMonths": 977,
     "ownStartMonths": 958
    }
@@ -14499,7 +14499,7 @@
    {
     "deathMonth": 24398,
     "best": {
-     "npvCents": 35903400,
+     "npvCents": 35911200,
      "survivorStartMonths": 854,
      "ownStartMonths": 1083
     }
@@ -14507,7 +14507,7 @@
    {
     "deathMonth": 24365,
     "best": {
-     "npvCents": 20713500,
+     "npvCents": 20718000,
      "survivorStartMonths": 854,
      "ownStartMonths": 1083
     }
@@ -14541,7 +14541,7 @@
     }
    ],
    "best": {
-    "npvCents": 30884645.161290325,
+    "npvCents": 30891354.838709675,
     "survivorStartMonths": 854,
     "ownStartMonths": 1083
    }
@@ -14651,7 +14651,7 @@
    {
     "deathMonth": 24355,
     "best": {
-     "npvCents": 6268477.146006674,
+     "npvCents": 6271843.675086162,
      "survivorStartMonths": 988,
      "ownStartMonths": 988
     }
@@ -14659,7 +14659,7 @@
    {
     "deathMonth": 24454,
     "best": {
-     "npvCents": 21739218.42661734,
+     "npvCents": 21750893.624483403,
      "survivorStartMonths": 988,
      "ownStartMonths": 988
     }
@@ -14693,7 +14693,7 @@
     }
    ],
    "best": {
-    "npvCents": 15389443.191278083,
+    "npvCents": 15397708.19836255,
     "survivorStartMonths": 988,
     "ownStartMonths": 988
    }
@@ -14727,7 +14727,7 @@
    {
     "deathMonth": 24654,
     "best": {
-     "npvCents": 91028598.28620167,
+     "npvCents": 91043507.2256835,
      "survivorStartMonths": 738,
      "ownStartMonths": 840
     }
@@ -14769,7 +14769,7 @@
     }
    ],
    "best": {
-    "npvCents": 61060099.11145421,
+    "npvCents": 61068786.144444734,
     "survivorStartMonths": 738,
     "ownStartMonths": 840
    }
@@ -15183,7 +15183,7 @@
    {
     "deathMonth": 24424,
     "best": {
-     "npvCents": 22961585.922250018,
+     "npvCents": 22978444.64906518,
      "survivorStartMonths": 1001,
      "ownStartMonths": 1001
     }
@@ -15191,7 +15191,7 @@
    {
     "deathMonth": 24507,
     "best": {
-     "npvCents": 35457695.0495274,
+     "npvCents": 35483728.599490345,
      "survivorStartMonths": 1001,
      "ownStartMonths": 1001
     }
@@ -15225,7 +15225,7 @@
     }
    ],
    "best": {
-    "npvCents": 17476314.350627635,
+    "npvCents": 17489145.71211855,
     "survivorStartMonths": 1001,
     "ownStartMonths": 1001
    }
@@ -15259,7 +15259,7 @@
    {
     "deathMonth": 24487,
     "best": {
-     "npvCents": 39397462.73470967,
+     "npvCents": 39401269.48701202,
      "survivorStartMonths": 720,
      "ownStartMonths": 818
     }
@@ -15301,7 +15301,7 @@
     }
    ],
    "best": {
-    "npvCents": 91461721.72538929,
+    "npvCents": 91477116.78279182,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -15488,7 +15488,7 @@
    {
     "deathMonth": 24552,
     "best": {
-     "npvCents": 56247501.48121798,
+     "npvCents": 56262429.16207817,
      "survivorStartMonths": 867,
      "ownStartMonths": 867
     }
@@ -15496,7 +15496,7 @@
    {
     "deathMonth": 24372,
     "best": {
-     "npvCents": 17553499.16400967,
+     "npvCents": 17558157.735974643,
      "survivorStartMonths": 867,
      "ownStartMonths": 867
     }
@@ -15530,7 +15530,7 @@
     }
    ],
    "best": {
-    "npvCents": 49961131.872101806,
+    "npvCents": 49974391.19584705,
     "survivorStartMonths": 867,
     "ownStartMonths": 867
    }
@@ -15564,7 +15564,7 @@
    {
     "deathMonth": 24424,
     "best": {
-     "npvCents": 28132000,
+     "npvCents": 28142400,
      "survivorStartMonths": 1077,
      "ownStartMonths": 1077
     }
@@ -15572,7 +15572,7 @@
    {
     "deathMonth": 24406,
     "best": {
-     "npvCents": 23263000,
+     "npvCents": 23271600,
      "survivorStartMonths": 1077,
      "ownStartMonths": 1077
     }
@@ -15606,7 +15606,7 @@
     }
    ],
    "best": {
-    "npvCents": 19154324.324324325,
+    "npvCents": 19161405.405405406,
     "survivorStartMonths": 1077,
     "ownStartMonths": 1077
    }
@@ -15716,7 +15716,7 @@
    {
     "deathMonth": 24492,
     "best": {
-     "npvCents": 32147717.527158376,
+     "npvCents": 32163727.34664401,
      "survivorStartMonths": 837,
      "ownStartMonths": 840
     }
@@ -15724,7 +15724,7 @@
    {
     "deathMonth": 24512,
     "best": {
-     "npvCents": 35596911.83727211,
+     "npvCents": 35614639.383007795,
      "survivorStartMonths": 837,
      "ownStartMonths": 840
     }
@@ -15758,7 +15758,7 @@
     }
    ],
    "best": {
-    "npvCents": 34072793.87710765,
+    "npvCents": 34089762.39995481,
     "survivorStartMonths": 837,
     "ownStartMonths": 840
    }
@@ -15876,7 +15876,7 @@
    {
     "deathMonth": 24762,
     "best": {
-     "npvCents": 54552000,
+     "npvCents": 54557900,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -15910,7 +15910,7 @@
     }
    ],
    "best": {
-    "npvCents": 35332986.666666664,
+    "npvCents": 35338624.44444445,
     "survivorStartMonths": 804,
     "ownStartMonths": 745
    }
@@ -16020,7 +16020,7 @@
    {
     "deathMonth": 24446,
     "best": {
-     "npvCents": 34389942.314558245,
+     "npvCents": 34401891.56484128,
      "survivorStartMonths": 982,
      "ownStartMonths": 982
     }
@@ -16028,7 +16028,7 @@
    {
     "deathMonth": 24351,
     "best": {
-     "npvCents": 8797159.807890052,
+     "npvCents": 8800216.499970626,
      "survivorStartMonths": 982,
      "ownStartMonths": 982
     }
@@ -16062,7 +16062,7 @@
     }
    ],
    "best": {
-    "npvCents": 32568613.47050309,
+    "npvCents": 32579929.87546157,
     "survivorStartMonths": 982,
     "ownStartMonths": 982
    }
@@ -16096,7 +16096,7 @@
    {
     "deathMonth": 24708,
     "best": {
-     "npvCents": 86090121.95947593,
+     "npvCents": 86095797.01255462,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -16138,7 +16138,7 @@
     }
    ],
    "best": {
-    "npvCents": 46867701.53491166,
+    "npvCents": 46878130.86081448,
     "survivorStartMonths": 729,
     "ownStartMonths": 840
    }
@@ -16173,7 +16173,7 @@
    {
     "deathMonth": 24391,
     "best": {
-     "npvCents": 30246000,
+     "npvCents": 30260200,
      "survivorStartMonths": 817,
      "ownStartMonths": 920
     }
@@ -16181,7 +16181,7 @@
    {
     "deathMonth": 24407,
     "best": {
-     "npvCents": 37062000,
+     "npvCents": 37079400,
      "survivorStartMonths": 817,
      "ownStartMonths": 920
     }
@@ -16215,7 +16215,7 @@
     }
    ],
    "best": {
-    "npvCents": 32233999.999999996,
+    "npvCents": 32249133.333333332,
     "survivorStartMonths": 817,
     "ownStartMonths": 920
    }
@@ -16555,7 +16555,7 @@
    {
     "deathMonth": 24458,
     "best": {
-     "npvCents": 47814761.72099643,
+     "npvCents": 47825258.924447805,
      "survivorStartMonths": 882,
      "ownStartMonths": 882
     }
@@ -16563,7 +16563,7 @@
    {
     "deathMonth": 24545,
     "best": {
-     "npvCents": 66743966.16387889,
+     "npvCents": 66758619.06534187,
      "survivorStartMonths": 882,
      "ownStartMonths": 882
     }
@@ -16597,7 +16597,7 @@
     }
    ],
    "best": {
-    "npvCents": 48544073.088149905,
+    "npvCents": 48554730.4038663,
     "survivorStartMonths": 882,
     "ownStartMonths": 882
    }
@@ -16859,7 +16859,7 @@
    {
     "deathMonth": 24427,
     "best": {
-     "npvCents": 45774600,
+     "npvCents": 45785300,
      "survivorStartMonths": 788,
      "ownStartMonths": 1058
     }
@@ -16867,7 +16867,7 @@
    {
     "deathMonth": 24397,
     "best": {
-     "npvCents": 32940600,
+     "npvCents": 32948300,
      "survivorStartMonths": 788,
      "ownStartMonths": 1058
     }
@@ -16901,7 +16901,7 @@
     }
    ],
    "best": {
-    "npvCents": 38156469.23076923,
+    "npvCents": 38165388.461538464,
     "survivorStartMonths": 788,
     "ownStartMonths": 1058
    }
@@ -17011,7 +17011,7 @@
    {
     "deathMonth": 24727,
     "best": {
-     "npvCents": 48235749.293259345,
+     "npvCents": 48239000.50620747,
      "survivorStartMonths": 804,
      "ownStartMonths": 748
     }
@@ -17019,7 +17019,7 @@
    {
     "deathMonth": 24745,
     "best": {
-     "npvCents": 50090938.800881684,
+     "npvCents": 50094190.01382981,
      "survivorStartMonths": 804,
      "ownStartMonths": 748
     }
@@ -17053,7 +17053,7 @@
     }
    ],
    "best": {
-    "npvCents": 23085264.465464145,
+    "npvCents": 23088093.104787715,
     "survivorStartMonths": 804,
     "ownStartMonths": 748
    }
@@ -17510,7 +17510,7 @@
     }
    ],
    "best": {
-    "npvCents": 72180208.16098097,
+    "npvCents": 72196685.79517011,
     "survivorStartMonths": 740,
     "ownStartMonths": 840
    }
@@ -17544,7 +17544,7 @@
    {
     "deathMonth": 24408,
     "best": {
-     "npvCents": 33052647.4416624,
+     "npvCents": 33060671.876583904,
      "survivorStartMonths": 1026,
      "ownStartMonths": 1026
     }
@@ -17552,7 +17552,7 @@
    {
     "deathMonth": 24449,
     "best": {
-     "npvCents": 46523722.74836986,
+     "npvCents": 46535017.65556781,
      "survivorStartMonths": 1026,
      "ownStartMonths": 1026
     }
@@ -17586,7 +17586,7 @@
     }
    ],
    "best": {
-    "npvCents": 39907110.20600106,
+    "npvCents": 39916798.74938683,
     "survivorStartMonths": 1026,
     "ownStartMonths": 1026
    }
@@ -17924,7 +17924,7 @@
    {
     "deathMonth": 24443,
     "best": {
-     "npvCents": 30766752.22849985,
+     "npvCents": 30777585.591960587,
      "survivorStartMonths": 933,
      "ownStartMonths": 921
     }
@@ -17932,7 +17932,7 @@
    {
     "deathMonth": 24479,
     "best": {
-     "npvCents": 38394110.70577966,
+     "npvCents": 38407629.75884507,
      "survivorStartMonths": 933,
      "ownStartMonths": 921
     }
@@ -17966,7 +17966,7 @@
     }
    ],
    "best": {
-    "npvCents": 29246165.213899955,
+    "npvCents": 29256463.15939781,
     "survivorStartMonths": 933,
     "ownStartMonths": 921
    }
@@ -18000,7 +18000,7 @@
    {
     "deathMonth": 24679,
     "best": {
-     "npvCents": 82739255.51323742,
+     "npvCents": 82765470.71238804,
      "survivorStartMonths": 791,
      "ownStartMonths": 840
     }
@@ -18008,7 +18008,7 @@
    {
     "deathMonth": 24632,
     "best": {
-     "npvCents": 73138811.19643706,
+     "npvCents": 73161471.99191615,
      "survivorStartMonths": 791,
      "ownStartMonths": 840
     }
@@ -18042,7 +18042,7 @@
     }
    ],
    "best": {
-    "npvCents": 37749360.047002345,
+    "npvCents": 37759970.30632902,
     "survivorStartMonths": 791,
     "ownStartMonths": 840
    }
@@ -18229,7 +18229,7 @@
    {
     "deathMonth": 24426,
     "best": {
-     "npvCents": 42375975.99650141,
+     "npvCents": 42384535.070627145,
      "survivorStartMonths": 1008,
      "ownStartMonths": 862
     }
@@ -18237,7 +18237,7 @@
    {
     "deathMonth": 24342,
     "best": {
-     "npvCents": 10355901.137750782,
+     "npvCents": 10357992.816429382,
      "survivorStartMonths": 1008,
      "ownStartMonths": 862
     }
@@ -18271,7 +18271,7 @@
     }
    ],
    "best": {
-    "npvCents": 35947220.085353665,
+    "npvCents": 35954480.68322992,
     "survivorStartMonths": 1008,
     "ownStartMonths": 862
    }
@@ -18457,7 +18457,7 @@
    {
     "deathMonth": 24753,
     "best": {
-     "npvCents": 33491244.257180568,
+     "npvCents": 33499237.660863623,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -18465,7 +18465,7 @@
    {
     "deathMonth": 24803,
     "best": {
-     "npvCents": 35681208.23376967,
+     "npvCents": 35689974.92981735,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -18499,7 +18499,7 @@
     }
    ],
    "best": {
-    "npvCents": 25407920.67912162,
+    "npvCents": 25413426.73899457,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -18609,7 +18609,7 @@
    {
     "deathMonth": 24396,
     "best": {
-     "npvCents": 25552713.128740687,
+     "npvCents": 25559428.826519135,
      "survivorStartMonths": 804,
      "ownStartMonths": 810
     }
@@ -18685,7 +18685,7 @@
    {
     "deathMonth": 24850,
     "best": {
-     "npvCents": 41797662.73994204,
+     "npvCents": 41803017.77001501,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -18693,7 +18693,7 @@
    {
     "deathMonth": 24608,
     "best": {
-     "npvCents": 18979204.276585236,
+     "npvCents": 18982412.549113195,
      "survivorStartMonths": 780,
      "ownStartMonths": 745
     }
@@ -18727,7 +18727,7 @@
     }
    ],
    "best": {
-    "npvCents": 20230694.522809424,
+    "npvCents": 20234991.91482027,
     "survivorStartMonths": 799,
     "ownStartMonths": 745
    }
@@ -18913,7 +18913,7 @@
    {
     "deathMonth": 24522,
     "best": {
-     "npvCents": 20669600,
+     "npvCents": 20677200,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -18921,7 +18921,7 @@
    {
     "deathMonth": 24541,
     "best": {
-     "npvCents": 23341000,
+     "npvCents": 23350500,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -18955,7 +18955,7 @@
     }
    ],
    "best": {
-    "npvCents": 42446136,
+    "npvCents": 42469532,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -19065,7 +19065,7 @@
    {
     "deathMonth": 24525,
     "best": {
-     "npvCents": 31503346.122320037,
+     "npvCents": 31517169.44225085,
      "survivorStartMonths": 960,
      "ownStartMonths": 930
     }
@@ -19073,7 +19073,7 @@
    {
     "deathMonth": 24534,
     "best": {
-     "npvCents": 32373171.865762047,
+     "npvCents": 32387376.855610996,
      "survivorStartMonths": 960,
      "ownStartMonths": 930
     }
@@ -19107,7 +19107,7 @@
     }
    ],
    "best": {
-    "npvCents": 23566830.402435325,
+    "npvCents": 23577171.26702613,
     "survivorStartMonths": 960,
     "ownStartMonths": 930
    }
@@ -19226,9 +19226,9 @@
    {
     "deathMonth": 24577,
     "best": {
-     "npvCents": 36359851.69585296,
+     "npvCents": 36369599.17209677,
      "survivorStartMonths": 720,
-     "ownStartMonths": 794
+     "ownStartMonths": 797
     }
    }
   ],
@@ -19260,7 +19260,7 @@
     }
    ],
    "best": {
-    "npvCents": 56664866.268143624,
+    "npvCents": 56678918.91973503,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -19446,7 +19446,7 @@
    {
     "deathMonth": 24491,
     "best": {
-     "npvCents": 40055586.43289718,
+     "npvCents": 40067835.008613735,
      "survivorStartMonths": 788,
      "ownStartMonths": 839
     }
@@ -19454,7 +19454,7 @@
    {
     "deathMonth": 24667,
     "best": {
-     "npvCents": 65889893.75534546,
+     "npvCents": 65908376.16104174,
      "survivorStartMonths": 788,
      "ownStartMonths": 840
     }
@@ -19488,7 +19488,7 @@
     }
    ],
    "best": {
-    "npvCents": 36098340.28293814,
+    "npvCents": 36109167.20112909,
     "survivorStartMonths": 788,
     "ownStartMonths": 840
    }
@@ -19522,7 +19522,7 @@
    {
     "deathMonth": 24361,
     "best": {
-     "npvCents": 11889009.859752443,
+     "npvCents": 11893035.938269123,
      "survivorStartMonths": 1077,
      "ownStartMonths": 803
     }
@@ -19530,7 +19530,7 @@
    {
     "deathMonth": 24351,
     "best": {
-     "npvCents": 9026411.713933052,
+     "npvCents": 9029468.406013625,
      "survivorStartMonths": 1077,
      "ownStartMonths": 803
     }
@@ -19564,7 +19564,7 @@
     }
    ],
    "best": {
-    "npvCents": 16084457.71436729,
+    "npvCents": 16089904.533776151,
     "survivorStartMonths": 1077,
     "ownStartMonths": 803
    }
@@ -19751,7 +19751,7 @@
    {
     "deathMonth": 24422,
     "best": {
-     "npvCents": 41877145.41425658,
+     "npvCents": 41886913.817665555,
      "survivorStartMonths": 942,
      "ownStartMonths": 942
     }
@@ -19759,7 +19759,7 @@
    {
     "deathMonth": 24549,
     "best": {
-     "npvCents": 89303389.25793347,
+     "npvCents": 89324220.46606454,
      "survivorStartMonths": 942,
      "ownStartMonths": 942
     }
@@ -19793,7 +19793,7 @@
     }
    ],
    "best": {
-    "npvCents": 63174376.061718196,
+    "npvCents": 63189112.32858588,
     "survivorStartMonths": 942,
     "ownStartMonths": 942
    }
@@ -19903,7 +19903,7 @@
    {
     "deathMonth": 24627,
     "best": {
-     "npvCents": 69042394.0264187,
+     "npvCents": 69046478.76577722,
      "survivorStartMonths": 788,
      "ownStartMonths": 745
     }
@@ -19911,7 +19911,7 @@
    {
     "deathMonth": 24662,
     "best": {
-     "npvCents": 78380229.02772434,
+     "npvCents": 78385704.75586697,
      "survivorStartMonths": 803,
      "ownStartMonths": 745
     }
@@ -19945,7 +19945,7 @@
     }
    ],
    "best": {
-    "npvCents": 60782938.57135984,
+    "npvCents": 60786877.81702598,
     "survivorStartMonths": 796,
     "ownStartMonths": 745
    }
@@ -20056,7 +20056,7 @@
    {
     "deathMonth": 24429,
     "best": {
-     "npvCents": 28296758.877116498,
+     "npvCents": 28306492.884298168,
      "survivorStartMonths": 900,
      "ownStartMonths": 900
     }
@@ -20064,7 +20064,7 @@
    {
     "deathMonth": 24412,
     "best": {
-     "npvCents": 24290277.173593372,
+     "npvCents": 24298632.96209478,
      "survivorStartMonths": 900,
      "ownStartMonths": 900
     }
@@ -20098,7 +20098,7 @@
     }
    ],
    "best": {
-    "npvCents": 38307695.46076357,
+    "npvCents": 38320873.20258014,
     "survivorStartMonths": 900,
     "ownStartMonths": 900
    }
@@ -20208,7 +20208,7 @@
    {
     "deathMonth": 24570,
     "best": {
-     "npvCents": 92677800,
+     "npvCents": 92680200,
      "survivorStartMonths": 802,
      "ownStartMonths": 778
     }
@@ -20250,7 +20250,7 @@
     }
    ],
    "best": {
-    "npvCents": 87321711.1111111,
+    "npvCents": 87323666.66666666,
     "survivorStartMonths": 802,
     "ownStartMonths": 778
    }
@@ -20514,7 +20514,7 @@
    {
     "deathMonth": 24382,
     "best": {
-     "npvCents": 19682786.454651825,
+     "npvCents": 19688822.26773206,
      "survivorStartMonths": 909,
      "ownStartMonths": 909
     }
@@ -20522,7 +20522,7 @@
    {
     "deathMonth": 24367,
     "best": {
-     "npvCents": 15013199.85666353,
+     "npvCents": 15017803.720465023,
      "survivorStartMonths": 909,
      "ownStartMonths": 909
     }
@@ -20556,7 +20556,7 @@
     }
    ],
    "best": {
-    "npvCents": 35212555.17301641,
+    "npvCents": 35223353.258012734,
     "survivorStartMonths": 909,
     "ownStartMonths": 909
    }
@@ -20666,7 +20666,7 @@
    {
     "deathMonth": 24351,
     "best": {
-     "npvCents": 4789836.490258413,
+     "npvCents": 4792893.182338987,
      "survivorStartMonths": 759,
      "ownStartMonths": 753
     }
@@ -20674,7 +20674,7 @@
    {
     "deathMonth": 24550,
     "best": {
-     "npvCents": 32771887.730567034,
+     "npvCents": 32792801.50703836,
      "survivorStartMonths": 759,
      "ownStartMonths": 753
     }
@@ -20708,7 +20708,7 @@
     }
    ],
    "best": {
-    "npvCents": 31778399.54932406,
+    "npvCents": 31798679.319298103,
     "survivorStartMonths": 759,
     "ownStartMonths": 753
    }
@@ -20818,7 +20818,7 @@
    {
     "deathMonth": 24461,
     "best": {
-     "npvCents": 32318906.27232484,
+     "npvCents": 32329572.578025274,
      "survivorStartMonths": 793,
      "ownStartMonths": 832
     }
@@ -20826,7 +20826,7 @@
    {
     "deathMonth": 24634,
     "best": {
-     "npvCents": 53407242.816417284,
+     "npvCents": 53424868.96916198,
      "survivorStartMonths": 793,
      "ownStartMonths": 832
     }
@@ -20860,7 +20860,7 @@
     }
    ],
    "best": {
-    "npvCents": 30626352.696044065,
+    "npvCents": 30636460.40320448,
     "survivorStartMonths": 793,
     "ownStartMonths": 832
    }
@@ -21130,7 +21130,7 @@
    {
     "deathMonth": 24468,
     "best": {
-     "npvCents": 3190371.9967718776,
+     "npvCents": 3191491.974401281,
      "survivorStartMonths": 720,
      "ownStartMonths": 745
     }
@@ -21198,7 +21198,7 @@
    {
     "deathMonth": 24432,
     "best": {
-     "npvCents": 24685970.55998005,
+     "npvCents": 24689390.416366242,
      "survivorStartMonths": 731,
      "ownStartMonths": 817
     }
@@ -21206,7 +21206,7 @@
    {
     "deathMonth": 24691,
     "best": {
-     "npvCents": 88083490.99953637,
+     "npvCents": 88105986.85439238,
      "survivorStartMonths": 731,
      "ownStartMonths": 840
     }
@@ -21240,7 +21240,7 @@
     }
    ],
    "best": {
-    "npvCents": 46180743.11579566,
+    "npvCents": 46190750.67733794,
     "survivorStartMonths": 731,
     "ownStartMonths": 840
    }
@@ -21274,7 +21274,7 @@
    {
     "deathMonth": 24567,
     "best": {
-     "npvCents": 72648700,
+     "npvCents": 72663300,
      "survivorStartMonths": 739,
      "ownStartMonths": 840
     }
@@ -21316,7 +21316,7 @@
     }
    ],
    "best": {
-    "npvCents": 81846400,
+    "npvCents": 81864530,
     "survivorStartMonths": 739,
     "ownStartMonths": 840
    }
@@ -21510,7 +21510,7 @@
    {
     "deathMonth": 24585,
     "best": {
-     "npvCents": 15585947.00513608,
+     "npvCents": 15591940.045643572,
      "survivorStartMonths": 720,
      "ownStartMonths": 815
     }
@@ -21885,7 +21885,7 @@
    {
     "deathMonth": 24338,
     "best": {
-     "npvCents": 7626580.164703134,
+     "npvCents": 7628364.577469794,
      "survivorStartMonths": 973,
      "ownStartMonths": 981
     }
@@ -21893,7 +21893,7 @@
    {
     "deathMonth": 24375,
     "best": {
-     "npvCents": 22950466.146320775,
+     "npvCents": 22955835.93250382,
      "survivorStartMonths": 973,
      "ownStartMonths": 981
     }
@@ -21927,7 +21927,7 @@
     }
    ],
    "best": {
-    "npvCents": 42309918.29893297,
+    "npvCents": 42319817.671487704,
     "survivorStartMonths": 973,
     "ownStartMonths": 981
    }
@@ -22113,7 +22113,7 @@
    {
     "deathMonth": 24862,
     "best": {
-     "npvCents": 15350461.422846278,
+     "npvCents": 15358916.104436764,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -22121,7 +22121,7 @@
    {
     "deathMonth": 24746,
     "best": {
-     "npvCents": 13145243.805925122,
+     "npvCents": 13152072.220836462,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -22155,7 +22155,7 @@
     }
    ],
    "best": {
-    "npvCents": 9380654.038454631,
+    "npvCents": 9385037.014854873,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -22645,7 +22645,7 @@
    {
     "deathMonth": 24397,
     "best": {
-     "npvCents": 32296473.86875189,
+     "npvCents": 32303044.870556317,
      "survivorStartMonths": 868,
      "ownStartMonths": 868
     }
@@ -22653,7 +22653,7 @@
    {
     "deathMonth": 24432,
     "best": {
-     "npvCents": 43949621.81048523,
+     "npvCents": 43958563.74778136,
      "survivorStartMonths": 868,
      "ownStartMonths": 868
     }
@@ -22687,7 +22687,7 @@
     }
    ],
    "best": {
-    "npvCents": 42376380.87281902,
+    "npvCents": 42385002.7204025,
     "survivorStartMonths": 868,
     "ownStartMonths": 868
    }
@@ -22721,7 +22721,7 @@
    {
     "deathMonth": 24750,
     "best": {
-     "npvCents": 88919239.28342539,
+     "npvCents": 88924587.67451334,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -22729,7 +22729,7 @@
    {
     "deathMonth": 24765,
     "best": {
-     "npvCents": 91216289.93377459,
+     "npvCents": 91221638.32486254,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -22763,7 +22763,7 @@
     }
    ],
    "best": {
-    "npvCents": 60387004.22854429,
+    "npvCents": 60391918.966300786,
     "survivorStartMonths": 804,
     "ownStartMonths": 745
    }
@@ -22873,7 +22873,7 @@
    {
     "deathMonth": 24804,
     "best": {
-     "npvCents": 91447848.00249398,
+     "npvCents": 91467335.38489653,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -22881,9 +22881,9 @@
    {
     "deathMonth": 24466,
     "best": {
-     "npvCents": 27921842.370208994,
+     "npvCents": 27921944.547474734,
      "survivorStartMonths": 720,
-     "ownStartMonths": 801
+     "ownStartMonths": 803
     }
    }
   ],
@@ -22915,7 +22915,7 @@
     }
    ],
    "best": {
-    "npvCents": 56886354.51433138,
+    "npvCents": 56896799.79604872,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -23102,7 +23102,7 @@
    {
     "deathMonth": 24441,
     "best": {
-     "npvCents": 39249872.85879387,
+     "npvCents": 39259371.85996977,
      "survivorStartMonths": 972,
      "ownStartMonths": 972
     }
@@ -23110,7 +23110,7 @@
    {
     "deathMonth": 24434,
     "best": {
-     "npvCents": 37466896.86538358,
+     "npvCents": 37475964.36220483,
      "survivorStartMonths": 972,
      "ownStartMonths": 972
     }
@@ -23144,7 +23144,7 @@
     }
    ],
    "best": {
-    "npvCents": 34168323.48597485,
+    "npvCents": 34176592.68333351,
     "survivorStartMonths": 972,
     "ownStartMonths": 972
    }
@@ -23254,7 +23254,7 @@
    {
     "deathMonth": 24782,
     "best": {
-     "npvCents": 92229966.50966258,
+     "npvCents": 92253333.6362208,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -23262,7 +23262,7 @@
    {
     "deathMonth": 24597,
     "best": {
-     "npvCents": 52530698.21032168,
+     "npvCents": 52540451.04733965,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -23296,7 +23296,7 @@
     }
    ],
    "best": {
-    "npvCents": 54244298.59731749,
+    "npvCents": 54256659.11317988,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -23406,7 +23406,7 @@
    {
     "deathMonth": 24369,
     "best": {
-     "npvCents": 5884900,
+     "npvCents": 5889800,
      "survivorStartMonths": 755,
      "ownStartMonths": 1058
     }
@@ -23414,7 +23414,7 @@
    {
     "deathMonth": 24444,
     "best": {
-     "npvCents": 14892400,
+     "npvCents": 14904800,
      "survivorStartMonths": 755,
      "ownStartMonths": 1058
     }
@@ -23448,7 +23448,7 @@
     }
    ],
    "best": {
-    "npvCents": 7155958.333333333,
+    "npvCents": 7161916.666666667,
     "survivorStartMonths": 755,
     "ownStartMonths": 1058
    }
@@ -23710,7 +23710,7 @@
    {
     "deathMonth": 24358,
     "best": {
-     "npvCents": 13548262.513048174,
+     "npvCents": 13551906.47822113,
      "survivorStartMonths": 953,
      "ownStartMonths": 953
     }
@@ -23718,7 +23718,7 @@
    {
     "deathMonth": 24355,
     "best": {
-     "npvCents": 12516755.117536418,
+     "npvCents": 12520121.646615906,
      "survivorStartMonths": 953,
      "ownStartMonths": 953
     }
@@ -23752,7 +23752,7 @@
     }
    ],
    "best": {
-    "npvCents": 29428207.036883477,
+    "npvCents": 29436122.100637347,
     "survivorStartMonths": 953,
     "ownStartMonths": 953
    }
@@ -23862,7 +23862,7 @@
    {
     "deathMonth": 24351,
     "best": {
-     "npvCents": 5763334.655288291,
+     "npvCents": 5766328.59536896,
      "survivorStartMonths": 989,
      "ownStartMonths": 989
     }
@@ -23870,7 +23870,7 @@
    {
     "deathMonth": 24445,
     "best": {
-     "npvCents": 21151601.541814715,
+     "npvCents": 21162589.3867715,
      "survivorStartMonths": 989,
      "ownStartMonths": 989
     }
@@ -23904,7 +23904,7 @@
     }
    ],
    "best": {
-    "npvCents": 16566740.11905091,
+    "npvCents": 16575346.217814054,
     "survivorStartMonths": 989,
     "ownStartMonths": 989
    }
@@ -24014,7 +24014,7 @@
    {
     "deathMonth": 24343,
     "best": {
-     "npvCents": 4967100.581791655,
+     "npvCents": 4969282.963418101,
      "survivorStartMonths": 1081,
      "ownStartMonths": 1081
     }
@@ -24022,7 +24022,7 @@
    {
     "deathMonth": 24362,
     "best": {
-     "npvCents": 8734114.254372777,
+     "npvCents": 8737951.738667315,
      "survivorStartMonths": 1081,
      "ownStartMonths": 1081
     }
@@ -24056,7 +24056,7 @@
     }
    ],
    "best": {
-    "npvCents": 10019951.450254768,
+    "npvCents": 10024353.889380539,
     "survivorStartMonths": 1081,
     "ownStartMonths": 1081
    }
@@ -24167,7 +24167,7 @@
    {
     "deathMonth": 24481,
     "best": {
-     "npvCents": 49373370.72793873,
+     "npvCents": 49388423.58486798,
      "survivorStartMonths": 1013,
      "ownStartMonths": 1013
     }
@@ -24175,7 +24175,7 @@
    {
     "deathMonth": 24490,
     "best": {
-     "npvCents": 51943637.66714194,
+     "npvCents": 51959474.142040454,
      "survivorStartMonths": 1013,
      "ownStartMonths": 1013
     }
@@ -24209,7 +24209,7 @@
     }
    ],
    "best": {
-    "npvCents": 33254701.420220263,
+    "npvCents": 33264840.04870204,
     "survivorStartMonths": 1013,
     "ownStartMonths": 1013
    }
@@ -24243,7 +24243,7 @@
    {
     "deathMonth": 24429,
     "best": {
-     "npvCents": 12839155.47262355,
+     "npvCents": 12848889.47980522,
      "survivorStartMonths": 1016,
      "ownStartMonths": 962
     }
@@ -24251,7 +24251,7 @@
    {
     "deathMonth": 24381,
     "best": {
-     "npvCents": 7538113.058270748,
+     "npvCents": 7543828.079543128,
      "survivorStartMonths": 1016,
      "ownStartMonths": 962
     }
@@ -24285,7 +24285,7 @@
     }
    ],
    "best": {
-    "npvCents": 8971660.46152722,
+    "npvCents": 8978462.326926406,
     "survivorStartMonths": 1016,
     "ownStartMonths": 962
    }
@@ -24784,7 +24784,7 @@
    {
     "deathMonth": 24755,
     "best": {
-     "npvCents": 33693957.73313952,
+     "npvCents": 33720754.51744679,
      "survivorStartMonths": 739,
      "ownStartMonths": 840
     }
@@ -24818,7 +24818,7 @@
     }
    ],
    "best": {
-    "npvCents": 21300626.025806844,
+    "npvCents": 21316399.75696485,
     "survivorStartMonths": 739,
     "ownStartMonths": 840
    }
@@ -24853,7 +24853,7 @@
    {
     "deathMonth": 24439,
     "best": {
-     "npvCents": 33644549.764855824,
+     "npvCents": 33653926.72967324,
      "survivorStartMonths": 1053,
      "ownStartMonths": 896
     }
@@ -24861,7 +24861,7 @@
    {
     "deathMonth": 24416,
     "best": {
-     "npvCents": 28344636.79041959,
+     "npvCents": 28352536.633449253,
      "survivorStartMonths": 1053,
      "ownStartMonths": 896
     }
@@ -24895,7 +24895,7 @@
     }
    ],
    "best": {
-    "npvCents": 22699701.84826495,
+    "npvCents": 22706028.409538157,
     "survivorStartMonths": 1053,
     "ownStartMonths": 896
    }
@@ -24929,7 +24929,7 @@
    {
     "deathMonth": 24374,
     "best": {
-     "npvCents": 12304996.749767097,
+     "npvCents": 12310271.0732775,
      "survivorStartMonths": 813,
      "ownStartMonths": 804
     }
@@ -24937,7 +24937,7 @@
    {
     "deathMonth": 24430,
     "best": {
-     "npvCents": 24496919.748952094,
+     "npvCents": 24507419.9288702,
      "survivorStartMonths": 813,
      "ownStartMonths": 804
     }
@@ -24971,7 +24971,7 @@
     }
    ],
    "best": {
-    "npvCents": 21679857.01957576,
+    "npvCents": 21689149.71439769,
     "survivorStartMonths": 813,
     "ownStartMonths": 804
    }
@@ -25005,7 +25005,7 @@
    {
     "deathMonth": 24822,
     "best": {
-     "npvCents": 21066538.876216777,
+     "npvCents": 21075074.62435479,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -25013,7 +25013,7 @@
    {
     "deathMonth": 24618,
     "best": {
-     "npvCents": 13231251.998991858,
+     "npvCents": 13236781.050750963,
      "survivorStartMonths": 720,
      "ownStartMonths": 818
     }
@@ -25047,7 +25047,7 @@
     }
    ],
    "best": {
-    "npvCents": 12187924.644463103,
+    "npvCents": 12192688.55418908,
     "survivorStartMonths": 720,
     "ownStartMonths": 830
    }
@@ -25081,7 +25081,7 @@
    {
     "deathMonth": 24426,
     "best": {
-     "npvCents": 38357900,
+     "npvCents": 38368200,
      "survivorStartMonths": 817,
      "ownStartMonths": 826
     }
@@ -25089,7 +25089,7 @@
    {
     "deathMonth": 24601,
     "best": {
-     "npvCents": 107267500,
+     "npvCents": 107293900,
      "survivorStartMonths": 817,
      "ownStartMonths": 840
     }
@@ -25123,7 +25123,7 @@
     }
    ],
    "best": {
-    "npvCents": 72656000,
+    "npvCents": 72673800,
     "survivorStartMonths": 817,
     "ownStartMonths": 840
    }
@@ -25538,7 +25538,7 @@
    {
     "deathMonth": 24452,
     "best": {
-     "npvCents": 31818696.223504547,
+     "npvCents": 31831183.93787798,
      "survivorStartMonths": 1024,
      "ownStartMonths": 1024
     }
@@ -25546,7 +25546,7 @@
    {
     "deathMonth": 24463,
     "best": {
-     "npvCents": 34316381.356897876,
+     "npvCents": 34329849.32446338,
      "survivorStartMonths": 1024,
      "ownStartMonths": 1024
     }
@@ -25580,7 +25580,7 @@
     }
    ],
    "best": {
-    "npvCents": 23756643.399248008,
+    "npvCents": 23765967.042654306,
     "survivorStartMonths": 1024,
     "ownStartMonths": 1024
    }
@@ -25691,7 +25691,7 @@
    {
     "deathMonth": 24643,
     "best": {
-     "npvCents": 70946741.99530064,
+     "npvCents": 70970265.45086935,
      "survivorStartMonths": 815,
      "ownStartMonths": 811
     }
@@ -25699,7 +25699,7 @@
    {
     "deathMonth": 24703,
     "best": {
-     "npvCents": 79677610.6079867,
+     "npvCents": 79704028.91389123,
      "survivorStartMonths": 815,
      "ownStartMonths": 811
     }
@@ -25733,7 +25733,7 @@
     }
    ],
    "best": {
-    "npvCents": 45741597.24159989,
+    "npvCents": 45756763.55368264,
     "survivorStartMonths": 815,
     "ownStartMonths": 811
    }
@@ -25852,7 +25852,7 @@
    {
     "deathMonth": 24581,
     "best": {
-     "npvCents": 41178407.14706703,
+     "npvCents": 41185514.66692981,
      "survivorStartMonths": 722,
      "ownStartMonths": 833
     }
@@ -25886,7 +25886,7 @@
     }
    ],
    "best": {
-    "npvCents": 28162423.752291445,
+    "npvCents": 28166723.514873706,
     "survivorStartMonths": 722,
     "ownStartMonths": 840
    }
@@ -25997,7 +25997,7 @@
    {
     "deathMonth": 24465,
     "best": {
-     "npvCents": 59986500,
+     "npvCents": 60001000,
      "survivorStartMonths": 841,
      "ownStartMonths": 841
     }
@@ -26005,7 +26005,7 @@
    {
     "deathMonth": 24614,
     "best": {
-     "npvCents": 121627800,
+     "npvCents": 121657200,
      "survivorStartMonths": 841,
      "ownStartMonths": 841
     }
@@ -26039,7 +26039,7 @@
     }
    ],
    "best": {
-    "npvCents": 91565600,
+    "npvCents": 91587733.33333333,
     "survivorStartMonths": 841,
     "ownStartMonths": 841
    }
@@ -26303,7 +26303,7 @@
    {
     "deathMonth": 24605,
     "best": {
-     "npvCents": 48194753.41098886,
+     "npvCents": 48216249.73276004,
      "survivorStartMonths": 888,
      "ownStartMonths": 888
     }
@@ -26311,7 +26311,7 @@
    {
     "deathMonth": 24582,
     "best": {
-     "npvCents": 45266230.33466615,
+     "npvCents": 45286420.44632301,
      "survivorStartMonths": 888,
      "ownStartMonths": 888
     }
@@ -26345,7 +26345,7 @@
     }
    ],
    "best": {
-    "npvCents": 31559488.807845205,
+    "npvCents": 31573565.297054768,
     "survivorStartMonths": 888,
     "ownStartMonths": 888
    }
@@ -26531,7 +26531,7 @@
    {
     "deathMonth": 24610,
     "best": {
-     "npvCents": 14220062.87441101,
+     "npvCents": 14225226.937417783,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -26539,7 +26539,7 @@
    {
     "deathMonth": 24598,
     "best": {
-     "npvCents": 13422463.597485567,
+     "npvCents": 13426960.771464814,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -26573,7 +26573,7 @@
     }
    ],
    "best": {
-    "npvCents": 15504766.30961297,
+    "npvCents": 15512220.011749683,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -26683,7 +26683,7 @@
    {
     "deathMonth": 24455,
     "best": {
-     "npvCents": 35046000,
+     "npvCents": 35059500,
      "survivorStartMonths": 868,
      "ownStartMonths": 868
     }
@@ -26691,7 +26691,7 @@
    {
     "deathMonth": 24527,
     "best": {
-     "npvCents": 53737200,
+     "npvCents": 53757900,
      "survivorStartMonths": 868,
      "ownStartMonths": 868
     }
@@ -26725,7 +26725,7 @@
     }
    ],
    "best": {
-    "npvCents": 35630100,
+    "npvCents": 35643825,
     "survivorStartMonths": 868,
     "ownStartMonths": 868
    }
@@ -26988,7 +26988,7 @@
    {
     "deathMonth": 24856,
     "best": {
-     "npvCents": 51180102.30810273,
+     "npvCents": 51184341.08043296,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -27216,7 +27216,7 @@
    {
     "deathMonth": 24375,
     "best": {
-     "npvCents": 7592452.077491869,
+     "npvCents": 7592772.57875477,
      "survivorStartMonths": 720,
      "ownStartMonths": 769
     }
@@ -27224,7 +27224,7 @@
    {
     "deathMonth": 24518,
     "best": {
-     "npvCents": 25127436.791960947,
+     "npvCents": 25131393.801576614,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -27258,7 +27258,7 @@
     }
    ],
    "best": {
-    "npvCents": 27089969.520900793,
+    "npvCents": 27095337.90733029,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -27292,7 +27292,7 @@
    {
     "deathMonth": 24442,
     "best": {
-     "npvCents": 20751462.4011775,
+     "npvCents": 20753289.150186993,
      "survivorStartMonths": 720,
      "ownStartMonths": 832
     }
@@ -27300,7 +27300,7 @@
    {
     "deathMonth": 24704,
     "best": {
-     "npvCents": 57910658.33404544,
+     "npvCents": 57927547.568763256,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -27334,7 +27334,7 @@
     }
    ],
    "best": {
-    "npvCents": 41820584.58070815,
+    "npvCents": 41831155.529407285,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -27376,7 +27376,7 @@
    {
     "deathMonth": 24479,
     "best": {
-     "npvCents": 9169521.362236686,
+     "npvCents": 9169737.649353435,
      "survivorStartMonths": 720,
      "ownStartMonths": 771
     }
@@ -27520,7 +27520,7 @@
    {
     "deathMonth": 24785,
     "best": {
-     "npvCents": 45502179.61014034,
+     "npvCents": 45510537.97535135,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -27528,7 +27528,7 @@
    {
     "deathMonth": 24744,
     "best": {
-     "npvCents": 42917239.51796383,
+     "npvCents": 42924928.38302146,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -27562,7 +27562,7 @@
     }
    ],
    "best": {
-    "npvCents": 25140381.8628618,
+    "npvCents": 25144483.909242228,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -27672,7 +27672,7 @@
    {
     "deathMonth": 24476,
     "best": {
-     "npvCents": 29519085.58697393,
+     "npvCents": 29530567.144961864,
      "survivorStartMonths": 966,
      "ownStartMonths": 966
     }
@@ -27680,7 +27680,7 @@
    {
     "deathMonth": 24431,
     "best": {
-     "npvCents": 22827326.96366682,
+     "npvCents": 22836205.737281624,
      "survivorStartMonths": 966,
      "ownStartMonths": 966
     }
@@ -27714,7 +27714,7 @@
     }
    ],
    "best": {
-    "npvCents": 24947805.140457332,
+    "npvCents": 24957508.681935534,
     "survivorStartMonths": 966,
     "ownStartMonths": 966
    }
@@ -27901,7 +27901,7 @@
    {
     "deathMonth": 24339,
     "best": {
-     "npvCents": 10026300,
+     "npvCents": 10028200,
      "survivorStartMonths": 1080,
      "ownStartMonths": 1080
     }
@@ -27909,7 +27909,7 @@
    {
     "deathMonth": 24424,
     "best": {
-     "npvCents": 54880800,
+     "npvCents": 54891200,
      "survivorStartMonths": 1080,
      "ownStartMonths": 1080
     }
@@ -27943,7 +27943,7 @@
     }
    ],
    "best": {
-    "npvCents": 30923220,
+    "npvCents": 30929080,
     "survivorStartMonths": 1080,
     "ownStartMonths": 1080
    }
@@ -28206,7 +28206,7 @@
    {
     "deathMonth": 24862,
     "best": {
-     "npvCents": 77664100,
+     "npvCents": 77670000,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -28248,7 +28248,7 @@
     }
    ],
    "best": {
-    "npvCents": 40961140.74074074,
+    "npvCents": 40966166.666666664,
     "survivorStartMonths": 804,
     "ownStartMonths": 745
    }
@@ -28739,7 +28739,7 @@
    {
     "deathMonth": 24377,
     "best": {
-     "npvCents": 24165820.964630414,
+     "npvCents": 24171381.438851453,
      "survivorStartMonths": 922,
      "ownStartMonths": 922
     }
@@ -28747,7 +28747,7 @@
    {
     "deathMonth": 24464,
     "best": {
-     "npvCents": 58917152.797385864,
+     "npvCents": 58930709.436317615,
      "survivorStartMonths": 922,
      "ownStartMonths": 922
     }
@@ -28781,7 +28781,7 @@
     }
    ],
    "best": {
-    "npvCents": 40135918.725785784,
+    "npvCents": 40145153.86585154,
     "survivorStartMonths": 922,
     "ownStartMonths": 922
    }
@@ -28891,7 +28891,7 @@
    {
     "deathMonth": 24617,
     "best": {
-     "npvCents": 48612097.557084344,
+     "npvCents": 48622092.63500549,
      "survivorStartMonths": 755,
      "ownStartMonths": 840
     }
@@ -28899,7 +28899,7 @@
    {
     "deathMonth": 24702,
     "best": {
-     "npvCents": 57101847.45385726,
+     "npvCents": 57113977.78074642,
      "survivorStartMonths": 755,
      "ownStartMonths": 840
     }
@@ -28933,7 +28933,7 @@
     }
    ],
    "best": {
-    "npvCents": 34840016.11285732,
+    "npvCents": 34848122.73058557,
     "survivorStartMonths": 755,
     "ownStartMonths": 818
    }
@@ -28967,7 +28967,7 @@
    {
     "deathMonth": 24359,
     "best": {
-     "npvCents": 16684200,
+     "npvCents": 16688100,
      "survivorStartMonths": 1001,
      "ownStartMonths": 1001
     }
@@ -28975,7 +28975,7 @@
    {
     "deathMonth": 24497,
     "best": {
-     "npvCents": 75720600,
+     "npvCents": 75738300,
      "survivorStartMonths": 1001,
      "ownStartMonths": 1001
     }
@@ -29009,7 +29009,7 @@
     }
    ],
    "best": {
-    "npvCents": 43635600,
+    "npvCents": 43645800,
     "survivorStartMonths": 1001,
     "ownStartMonths": 1001
    }
@@ -29424,7 +29424,7 @@
    {
     "deathMonth": 24431,
     "best": {
-     "npvCents": 46601769.00186122,
+     "npvCents": 46612360.31299801,
      "survivorStartMonths": 963,
      "ownStartMonths": 835
     }
@@ -29432,7 +29432,7 @@
    {
     "deathMonth": 24376,
     "best": {
-     "npvCents": 24046746.818129845,
+     "npvCents": 24052211.98786124,
      "survivorStartMonths": 963,
      "ownStartMonths": 835
     }
@@ -29466,7 +29466,7 @@
     }
    ],
    "best": {
-    "npvCents": 52643072.38732255,
+    "npvCents": 52655036.72195603,
     "survivorStartMonths": 963,
     "ownStartMonths": 835
    }
@@ -29805,7 +29805,7 @@
    {
     "deathMonth": 24482,
     "best": {
-     "npvCents": 26784150.17821607,
+     "npvCents": 26795944.167726513,
      "survivorStartMonths": 923,
      "ownStartMonths": 923
     }
@@ -29813,7 +29813,7 @@
    {
     "deathMonth": 24517,
     "best": {
-     "npvCents": 30595212.086641554,
+     "npvCents": 30608684.2187801,
      "survivorStartMonths": 923,
      "ownStartMonths": 923
     }
@@ -29847,7 +29847,7 @@
     }
    ],
    "best": {
-    "npvCents": 22732820.039972447,
+    "npvCents": 22742830.08842686,
     "survivorStartMonths": 923,
     "ownStartMonths": 923
    }
@@ -30109,9 +30109,9 @@
    {
     "deathMonth": 24361,
     "best": {
-     "npvCents": 10831200,
+     "npvCents": 10834800,
      "survivorStartMonths": 761,
-     "ownStartMonths": 826
+     "ownStartMonths": 825
     }
    },
    {
@@ -30151,7 +30151,7 @@
     }
    ],
    "best": {
-    "npvCents": 45734282.14285714,
+    "npvCents": 45749071.42857143,
     "survivorStartMonths": 761,
     "ownStartMonths": 840
    }
@@ -30345,7 +30345,7 @@
    {
     "deathMonth": 24669,
     "best": {
-     "npvCents": 20877705.563827194,
+     "npvCents": 20886025.521343265,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -30379,7 +30379,7 @@
     }
    ],
    "best": {
-    "npvCents": 11670891.5285708,
+    "npvCents": 11674636.512853028,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -30490,7 +30490,7 @@
    {
     "deathMonth": 24400,
     "best": {
-     "npvCents": 14131998.006114619,
+     "npvCents": 14138785.709287586,
      "survivorStartMonths": 989,
      "ownStartMonths": 989
     }
@@ -30498,7 +30498,7 @@
    {
     "deathMonth": 24447,
     "best": {
-     "npvCents": 20526879.744082298,
+     "npvCents": 20536738.95625525,
      "survivorStartMonths": 989,
      "ownStartMonths": 989
     }
@@ -30532,7 +30532,7 @@
     }
    ],
    "best": {
-    "npvCents": 16474393.40259859,
+    "npvCents": 16482306.175606564,
     "survivorStartMonths": 989,
     "ownStartMonths": 989
    }
@@ -30719,7 +30719,7 @@
    {
     "deathMonth": 24664,
     "best": {
-     "npvCents": 98531387.37016729,
+     "npvCents": 98555964.91752826,
      "survivorStartMonths": 754,
      "ownStartMonths": 840
     }
@@ -30727,7 +30727,7 @@
    {
     "deathMonth": 24495,
     "best": {
-     "npvCents": 58733064.83542152,
+     "npvCents": 58747715.138448566,
      "survivorStartMonths": 754,
      "ownStartMonths": 840
     }
@@ -30761,7 +30761,7 @@
     }
    ],
    "best": {
-    "npvCents": 60464525.28024596,
+    "npvCents": 60479607.476624176,
     "survivorStartMonths": 754,
     "ownStartMonths": 840
    }
@@ -30871,7 +30871,7 @@
    {
     "deathMonth": 24768,
     "best": {
-     "npvCents": 65390635.45869135,
+     "npvCents": 65395581.57414298,
      "survivorStartMonths": 804,
      "ownStartMonths": 745
     }
@@ -30913,7 +30913,7 @@
     }
    ],
    "best": {
-    "npvCents": 47867458.101803705,
+    "npvCents": 47878390.41163272,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -31175,7 +31175,7 @@
    {
     "deathMonth": 24586,
     "best": {
-     "npvCents": 103398831.00253908,
+     "npvCents": 103422672.09799737,
      "survivorStartMonths": 910,
      "ownStartMonths": 910
     }
@@ -31183,7 +31183,7 @@
    {
     "deathMonth": 24541,
     "best": {
-     "npvCents": 87469443.76577769,
+     "npvCents": 87489611.95663905,
      "survivorStartMonths": 910,
      "ownStartMonths": 910
     }
@@ -31217,7 +31217,7 @@
     }
    ],
    "best": {
-    "npvCents": 48218548.859395966,
+    "npvCents": 48229666.80932897,
     "survivorStartMonths": 910,
     "ownStartMonths": 910
    }
@@ -31327,7 +31327,7 @@
    {
     "deathMonth": 24456,
     "best": {
-     "npvCents": 48026287.40473842,
+     "npvCents": 48038113.626704626,
      "survivorStartMonths": 849,
      "ownStartMonths": 849
     }
@@ -31335,7 +31335,7 @@
    {
     "deathMonth": 24508,
     "best": {
-     "npvCents": 63117729.87370364,
+     "npvCents": 63133272.28440882,
      "survivorStartMonths": 849,
      "ownStartMonths": 849
     }
@@ -31369,7 +31369,7 @@
     }
    ],
    "best": {
-    "npvCents": 43119028.18788395,
+    "npvCents": 43129646.02294622,
     "survivorStartMonths": 849,
     "ownStartMonths": 849
    }
@@ -31555,7 +31555,7 @@
    {
     "deathMonth": 24487,
     "best": {
-     "npvCents": 36106787.5214449,
+     "npvCents": 36113777.831400864,
      "survivorStartMonths": 722,
      "ownStartMonths": 799
     }
@@ -31563,7 +31563,7 @@
    {
     "deathMonth": 24777,
     "best": {
-     "npvCents": 100700987.54436746,
+     "npvCents": 100720073.02330007,
      "survivorStartMonths": 722,
      "ownStartMonths": 840
     }
@@ -31597,7 +31597,7 @@
     }
    ],
    "best": {
-    "npvCents": 54829116.616402656,
+    "npvCents": 54838351.85896851,
     "survivorStartMonths": 722,
     "ownStartMonths": 840
    }
@@ -31707,7 +31707,7 @@
    {
     "deathMonth": 24741,
     "best": {
-     "npvCents": 115448400,
+     "npvCents": 115482300,
      "survivorStartMonths": 758,
      "ownStartMonths": 840
     }
@@ -31749,7 +31749,7 @@
     }
    ],
    "best": {
-    "npvCents": 60129600,
+    "npvCents": 60145922.727272734,
     "survivorStartMonths": 758,
     "ownStartMonths": 840
    }
@@ -32239,7 +32239,7 @@
    {
     "deathMonth": 24381,
     "best": {
-     "npvCents": 4937778.37933732,
+     "npvCents": 4943493.400609702,
      "survivorStartMonths": 1095,
      "ownStartMonths": 1095
     }
@@ -32247,7 +32247,7 @@
    {
     "deathMonth": 24349,
     "best": {
-     "npvCents": 2424809.430728276,
+     "npvCents": 2427615.923124952,
      "survivorStartMonths": 1095,
      "ownStartMonths": 1095
     }
@@ -32281,7 +32281,7 @@
     }
    ],
    "best": {
-    "npvCents": 3616589.0709628686,
+    "npvCents": 3620774.9379431494,
     "survivorStartMonths": 1095,
     "ownStartMonths": 1095
    }
@@ -32467,7 +32467,7 @@
    {
     "deathMonth": 24480,
     "best": {
-     "npvCents": 66506356.40081809,
+     "npvCents": 66521321.82755094,
      "survivorStartMonths": 866,
      "ownStartMonths": 866
     }
@@ -32475,7 +32475,7 @@
    {
     "deathMonth": 24569,
     "best": {
-     "npvCents": 99855064.069807,
+     "npvCents": 99877533.70618634,
      "survivorStartMonths": 866,
      "ownStartMonths": 866
     }
@@ -32509,7 +32509,7 @@
     }
    ],
    "best": {
-    "npvCents": 53010442.5111866,
+    "npvCents": 53022371.05360586,
     "survivorStartMonths": 866,
     "ownStartMonths": 866
    }
@@ -32543,7 +32543,7 @@
    {
     "deathMonth": 24520,
     "best": {
-     "npvCents": 38957227.80237252,
+     "npvCents": 38968291.44238848,
      "survivorStartMonths": 789,
      "ownStartMonths": 816
     }
@@ -32551,7 +32551,7 @@
    {
     "deathMonth": 24422,
     "best": {
-     "npvCents": 23559707.291109435,
+     "npvCents": 23568005.88473082,
      "survivorStartMonths": 789,
      "ownStartMonths": 789
     }
@@ -32585,7 +32585,7 @@
     }
    ],
    "best": {
-    "npvCents": 42627442.390497304,
+    "npvCents": 42637724.18146752,
     "survivorStartMonths": 789,
     "ownStartMonths": 840
    }
@@ -32999,7 +32999,7 @@
    {
     "deathMonth": 24418,
     "best": {
-     "npvCents": 6536600,
+     "npvCents": 6546400,
      "survivorStartMonths": 1021,
      "ownStartMonths": 1021
     }
@@ -33007,7 +33007,7 @@
    {
     "deathMonth": 24423,
     "best": {
-     "npvCents": 6870100,
+     "npvCents": 6880400,
      "survivorStartMonths": 1021,
      "ownStartMonths": 1021
     }
@@ -33041,7 +33041,7 @@
     }
    ],
    "best": {
-    "npvCents": 5602800,
+    "npvCents": 5611200,
     "survivorStartMonths": 1021,
     "ownStartMonths": 1021
    }
@@ -33075,7 +33075,7 @@
    {
     "deathMonth": 24737,
     "best": {
-     "npvCents": 58286924.11001088,
+     "npvCents": 58298817.98758975,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -33083,7 +33083,7 @@
    {
     "deathMonth": 24730,
     "best": {
-     "npvCents": 57298118.12141052,
+     "npvCents": 57309713.98633459,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -33117,7 +33117,7 @@
     }
    ],
    "best": {
-    "npvCents": 43879442.785752036,
+    "npvCents": 43887840.61742324,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -33227,7 +33227,7 @@
    {
     "deathMonth": 24643,
     "best": {
-     "npvCents": 99205300,
+     "npvCents": 99229500,
      "survivorStartMonths": 755,
      "ownStartMonths": 840
     }
@@ -33235,7 +33235,7 @@
    {
     "deathMonth": 24522,
     "best": {
-     "npvCents": 57617600,
+     "npvCents": 57629700,
      "survivorStartMonths": 755,
      "ownStartMonths": 840
     }
@@ -33269,7 +33269,7 @@
     }
    ],
    "best": {
-    "npvCents": 74376356,
+    "npvCents": 74393598,
     "survivorStartMonths": 755,
     "ownStartMonths": 840
    }
@@ -33760,7 +33760,7 @@
    {
     "deathMonth": 24594,
     "best": {
-     "npvCents": 64653500,
+     "npvCents": 64674800,
      "survivorStartMonths": 779,
      "ownStartMonths": 840
     }
@@ -33768,7 +33768,7 @@
    {
     "deathMonth": 24686,
     "best": {
-     "npvCents": 91103500,
+     "npvCents": 91134000,
      "survivorStartMonths": 779,
      "ownStartMonths": 840
     }
@@ -33802,7 +33802,7 @@
     }
    ],
    "best": {
-    "npvCents": 46323391.30434783,
+    "npvCents": 46338573.913043484,
     "survivorStartMonths": 779,
     "ownStartMonths": 840
    }
@@ -33878,7 +33878,7 @@
     }
    ],
    "best": {
-    "npvCents": 30294754.84488659,
+    "npvCents": 30301808.098141328,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -33990,7 +33990,7 @@
    {
     "deathMonth": 24333,
     "best": {
-     "npvCents": 4527900,
+     "npvCents": 4529200,
      "survivorStartMonths": 993,
      "ownStartMonths": 993
     }
@@ -33998,7 +33998,7 @@
    {
     "deathMonth": 24388,
     "best": {
-     "npvCents": 23684400,
+     "npvCents": 23691200,
      "survivorStartMonths": 993,
      "ownStartMonths": 993
     }
@@ -34032,7 +34032,7 @@
     }
    ],
    "best": {
-    "npvCents": 38611542.85714285,
+    "npvCents": 38622628.57142857,
     "survivorStartMonths": 993,
     "ownStartMonths": 993
    }
@@ -34066,7 +34066,7 @@
    {
     "deathMonth": 24510,
     "best": {
-     "npvCents": 69540000,
+     "npvCents": 69559000,
      "survivorStartMonths": 951,
      "ownStartMonths": 968
     }
@@ -34074,7 +34074,7 @@
    {
     "deathMonth": 24456,
     "best": {
-     "npvCents": 49776000,
+     "npvCents": 49789600,
      "survivorStartMonths": 951,
      "ownStartMonths": 968
     }
@@ -34108,7 +34108,7 @@
     }
    ],
    "best": {
-    "npvCents": 43054909.09090909,
+    "npvCents": 43066672.727272734,
     "survivorStartMonths": 951,
     "ownStartMonths": 968
    }
@@ -34142,9 +34142,9 @@
    {
     "deathMonth": 24475,
     "best": {
-     "npvCents": 3511333.6028710967,
+     "npvCents": 3512714.4879494514,
      "survivorStartMonths": 720,
-     "ownStartMonths": 762
+     "ownStartMonths": 761
     }
    },
    {
@@ -34218,7 +34218,7 @@
    {
     "deathMonth": 24797,
     "best": {
-     "npvCents": 50771998.41369816,
+     "npvCents": 50793108.666658185,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -34226,7 +34226,7 @@
    {
     "deathMonth": 24526,
     "best": {
-     "npvCents": 15453404.9766629,
+     "npvCents": 15455360.00009418,
      "survivorStartMonths": 720,
      "ownStartMonths": 825
     }
@@ -34260,7 +34260,7 @@
     }
    ],
    "best": {
-    "npvCents": 35892050.18953754,
+    "npvCents": 35905524.5439158,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -34294,7 +34294,7 @@
    {
     "deathMonth": 24393,
     "best": {
-     "npvCents": 27089242.737124298,
+     "npvCents": 27095520.661281224,
      "survivorStartMonths": 1033,
      "ownStartMonths": 1033
     }
@@ -34302,7 +34302,7 @@
    {
     "deathMonth": 24427,
     "best": {
-     "npvCents": 37210553.59988354,
+     "npvCents": 37219177.1349009,
      "survivorStartMonths": 1033,
      "ownStartMonths": 1033
     }
@@ -34336,7 +34336,7 @@
     }
    ],
    "best": {
-    "npvCents": 35907062.35189924,
+    "npvCents": 35915383.80319747,
     "survivorStartMonths": 1033,
     "ownStartMonths": 1033
    }
@@ -34489,7 +34489,7 @@
     }
    ],
    "best": {
-    "npvCents": 67083348.14814815,
+    "npvCents": 67085818.51851851,
     "survivorStartMonths": 774,
     "ownStartMonths": 745
    }
@@ -34524,7 +34524,7 @@
    {
     "deathMonth": 24417,
     "best": {
-     "npvCents": 29493755.563989818,
+     "npvCents": 29501722.54280235,
      "survivorStartMonths": 1003,
      "ownStartMonths": 1020
     }
@@ -34532,7 +34532,7 @@
    {
     "deathMonth": 24338,
     "best": {
-     "npvCents": 6386529.181002769,
+     "npvCents": 6388254.3374536075,
      "survivorStartMonths": 1003,
      "ownStartMonths": 1020
     }
@@ -34566,7 +34566,7 @@
     }
    ],
    "best": {
-    "npvCents": 29516780.935728945,
+    "npvCents": 29524754.134252913,
     "survivorStartMonths": 1003,
     "ownStartMonths": 1020
    }
@@ -34752,7 +34752,7 @@
    {
     "deathMonth": 24345,
     "best": {
-     "npvCents": 5016452.432303087,
+     "npvCents": 5018881.707088706,
      "survivorStartMonths": 1027,
      "ownStartMonths": 1027
     }
@@ -34760,7 +34760,7 @@
    {
     "deathMonth": 24476,
     "best": {
-     "npvCents": 27470211.683994044,
+     "npvCents": 27483514.44994271,
      "survivorStartMonths": 1027,
      "ownStartMonths": 1027
     }
@@ -34794,7 +34794,7 @@
     }
    ],
    "best": {
-    "npvCents": 11934461.09096935,
+    "npvCents": 11940240.4910134,
     "survivorStartMonths": 1027,
     "ownStartMonths": 1027
    }
@@ -34980,7 +34980,7 @@
    {
     "deathMonth": 24409,
     "best": {
-     "npvCents": 27098347.347969215,
+     "npvCents": 27105769.519250497,
      "survivorStartMonths": 1030,
      "ownStartMonths": 1030
     }
@@ -34988,7 +34988,7 @@
    {
     "deathMonth": 24374,
     "best": {
-     "npvCents": 17593516.463595122,
+     "npvCents": 17598335.284866992,
      "survivorStartMonths": 1030,
      "ownStartMonths": 1030
     }
@@ -35022,7 +35022,7 @@
     }
    ],
    "best": {
-    "npvCents": 22144908.15250184,
+    "npvCents": 22150973.588862427,
     "survivorStartMonths": 1030,
     "ownStartMonths": 1030
    }
@@ -35208,7 +35208,7 @@
    {
     "deathMonth": 24566,
     "best": {
-     "npvCents": 47976007.91517946,
+     "npvCents": 47995252.20234961,
      "survivorStartMonths": 797,
      "ownStartMonths": 783
     }
@@ -35216,7 +35216,7 @@
    {
     "deathMonth": 24340,
     "best": {
-     "npvCents": 4869740.372075063,
+     "npvCents": 4871693.737647495,
      "survivorStartMonths": 797,
      "ownStartMonths": 783
     }
@@ -35250,7 +35250,7 @@
     }
    ],
    "best": {
-    "npvCents": 35604475.383747354,
+    "npvCents": 35618757.16288244,
     "survivorStartMonths": 797,
     "ownStartMonths": 783
    }
@@ -35326,7 +35326,7 @@
     }
    ],
    "best": {
-    "npvCents": 25143169.480280068,
+    "npvCents": 25148835.15823277,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -35589,7 +35589,7 @@
    {
     "deathMonth": 24410,
     "best": {
-     "npvCents": 17304776.554135054,
+     "npvCents": 17312267.799396582,
      "survivorStartMonths": 1086,
      "ownStartMonths": 1086
     }
@@ -35597,7 +35597,7 @@
    {
     "deathMonth": 24413,
     "best": {
-     "npvCents": 17779585.135987278,
+     "npvCents": 17787281.926089436,
      "survivorStartMonths": 1086,
      "ownStartMonths": 1086
     }
@@ -35631,7 +35631,7 @@
     }
    ],
    "best": {
-    "npvCents": 9756569.466377242,
+    "npvCents": 9760793.08952286,
     "survivorStartMonths": 1086,
     "ownStartMonths": 1086
    }
@@ -35673,7 +35673,7 @@
    {
     "deathMonth": 24593,
     "best": {
-     "npvCents": 77547003.42079535,
+     "npvCents": 77547301.57497466,
      "survivorStartMonths": 800,
      "ownStartMonths": 755
     }
@@ -35818,7 +35818,7 @@
    {
     "deathMonth": 24468,
     "best": {
-     "npvCents": 37695600,
+     "npvCents": 37710400,
      "survivorStartMonths": 928,
      "ownStartMonths": 928
     }
@@ -35826,7 +35826,7 @@
    {
     "deathMonth": 24474,
     "best": {
-     "npvCents": 39223800,
+     "npvCents": 39239200,
      "survivorStartMonths": 928,
      "ownStartMonths": 928
     }
@@ -35860,7 +35860,7 @@
     }
    ],
    "best": {
-    "npvCents": 33074614.285714284,
+    "npvCents": 33087600,
     "survivorStartMonths": 928,
     "ownStartMonths": 928
    }
@@ -36046,7 +36046,7 @@
    {
     "deathMonth": 24652,
     "best": {
-     "npvCents": 17938117.211494595,
+     "npvCents": 17945621.178257346,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -36054,7 +36054,7 @@
    {
     "deathMonth": 24662,
     "best": {
-     "npvCents": 18727948.769895643,
+     "npvCents": 18735951.05309902,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -36088,7 +36088,7 @@
     }
    ],
    "best": {
-    "npvCents": 17167949.057471283,
+    "npvCents": 17175956.614672862,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -36198,7 +36198,7 @@
    {
     "deathMonth": 24629,
     "best": {
-     "npvCents": 62297381.82833986,
+     "npvCents": 62301552.91648041,
      "survivorStartMonths": 788,
      "ownStartMonths": 744
     }
@@ -36426,7 +36426,7 @@
    {
     "deathMonth": 24351,
     "best": {
-     "npvCents": 13652366.767851744,
+     "npvCents": 13655360.70793241,
      "survivorStartMonths": 890,
      "ownStartMonths": 890
     }
@@ -36434,7 +36434,7 @@
    {
     "deathMonth": 24444,
     "best": {
-     "npvCents": 49752717.57424673,
+     "npvCents": 49763628.25792528,
      "survivorStartMonths": 890,
      "ownStartMonths": 890
     }
@@ -36468,7 +36468,7 @@
     }
    ],
    "best": {
-    "npvCents": 64560771.86595166,
+    "npvCents": 64574929.92995733,
     "survivorStartMonths": 890,
     "ownStartMonths": 890
    }
@@ -37036,7 +37036,7 @@
    {
     "deathMonth": 24483,
     "best": {
-     "npvCents": 55473782.43587842,
+     "npvCents": 55489009.93586081,
      "survivorStartMonths": 911,
      "ownStartMonths": 898
     }
@@ -37044,7 +37044,7 @@
    {
     "deathMonth": 24599,
     "best": {
-     "npvCents": 90626514.23541443,
+     "npvCents": 90651391.12650293,
      "survivorStartMonths": 911,
      "ownStartMonths": 898
     }
@@ -37078,7 +37078,7 @@
     }
    ],
    "best": {
-    "npvCents": 44411369.785386175,
+    "npvCents": 44423560.6637242,
     "survivorStartMonths": 911,
     "ownStartMonths": 898
    }
@@ -37112,7 +37112,7 @@
    {
     "deathMonth": 24530,
     "best": {
-     "npvCents": 66856578.32505535,
+     "npvCents": 66867599.13502952,
      "survivorStartMonths": 776,
      "ownStartMonths": 840
     }
@@ -37154,7 +37154,7 @@
     }
    ],
    "best": {
-    "npvCents": 70934564.79487683,
+    "npvCents": 70946940.89134298,
     "survivorStartMonths": 776,
     "ownStartMonths": 840
    }
@@ -37340,7 +37340,7 @@
    {
     "deathMonth": 24653,
     "best": {
-     "npvCents": 101465600,
+     "npvCents": 101484000,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -37348,7 +37348,7 @@
    {
     "deathMonth": 24593,
     "best": {
-     "npvCents": 76631600,
+     "npvCents": 76644000,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -37382,7 +37382,7 @@
     }
    ],
    "best": {
-    "npvCents": 74211060,
+    "npvCents": 74224200,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -37416,7 +37416,7 @@
    {
     "deathMonth": 24710,
     "best": {
-     "npvCents": 83420721.0009719,
+     "npvCents": 83435552.84394932,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -37424,7 +37424,7 @@
    {
     "deathMonth": 24688,
     "best": {
-     "npvCents": 79127829.18375674,
+     "npvCents": 79141655.43015012,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -37458,7 +37458,7 @@
     }
    ],
    "best": {
-    "npvCents": 50022723.502447456,
+    "npvCents": 50030462.9002478,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }
@@ -37492,7 +37492,7 @@
    {
     "deathMonth": 24419,
     "best": {
-     "npvCents": 40467522.06011195,
+     "npvCents": 40477014.79341247,
      "survivorStartMonths": 1016,
      "ownStartMonths": 1016
     }
@@ -37500,7 +37500,7 @@
    {
     "deathMonth": 24340,
     "best": {
-     "npvCents": 8445181.274368571,
+     "npvCents": 8447162.316187562,
      "survivorStartMonths": 1016,
      "ownStartMonths": 1016
     }
@@ -37534,7 +37534,7 @@
     }
    ],
    "best": {
-    "npvCents": 39109971.27987069,
+    "npvCents": 39119145.56353944,
     "survivorStartMonths": 1016,
     "ownStartMonths": 1016
    }
@@ -37796,7 +37796,7 @@
    {
     "deathMonth": 24409,
     "best": {
-     "npvCents": 40156800,
+     "npvCents": 40165700,
      "survivorStartMonths": 1062,
      "ownStartMonths": 1062
     }
@@ -37804,7 +37804,7 @@
    {
     "deathMonth": 24422,
     "best": {
-     "npvCents": 46022400,
+     "npvCents": 46032600,
      "survivorStartMonths": 1062,
      "ownStartMonths": 1062
     }
@@ -37838,7 +37838,7 @@
     }
    ],
    "best": {
-    "npvCents": 33267746.341463417,
+    "npvCents": 33275119.512195125,
     "survivorStartMonths": 1062,
     "ownStartMonths": 1062
    }
@@ -38024,7 +38024,7 @@
    {
     "deathMonth": 24857,
     "best": {
-     "npvCents": 126706378.94304818,
+     "npvCents": 126730329.52484126,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -38032,7 +38032,7 @@
    {
     "deathMonth": 24743,
     "best": {
-     "npvCents": 94040129.55128573,
+     "npvCents": 94056429.95757724,
      "survivorStartMonths": 720,
      "ownStartMonths": 840
     }
@@ -38066,7 +38066,7 @@
     }
    ],
    "best": {
-    "npvCents": 76871228.70810412,
+    "npvCents": 76884683.0881277,
     "survivorStartMonths": 720,
     "ownStartMonths": 840
    }

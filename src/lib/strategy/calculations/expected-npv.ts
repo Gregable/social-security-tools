@@ -149,7 +149,7 @@ export interface CoupleFilingAgeResult {
  * Personal benefit at a given filing age, in cents.
  *
  * Replicates benefitAtAge (benefit-calculator.ts):
- *   PIA.floorToDollar().times(1 + multiplier).floorToDollar()
+ *   PIA.times(1 + multiplier).floorToDollar()
  *
  * The multiplier is SSA's piecewise-linear schedule around NRA:
  *   - Filed early: reduction of 5/9% per month for the first 36 months
@@ -157,7 +157,7 @@ export interface CoupleFilingAgeResult {
  *   - Filed late:  delayed retirement credit of DRI/12 per month past NRA.
  */
 function benefitCentsAtAge(
-  piaDollarCents: number,
+  piaCents: number,
   nraMonths: number,
   delayedRetirementIncrease: number,
   ageMonths: number
@@ -176,7 +176,7 @@ function benefitCentsAtAge(
     const after = creditedMonths - nraMonths;
     mult = (delayedRetirementIncrease / 12) * after;
   }
-  return Math.floor(Math.round(piaDollarCents * (1 + mult)) / 100) * 100;
+  return Math.floor(Math.round(piaCents * (1 + mult)) / 100) * 100;
 }
 
 /**
@@ -194,7 +194,7 @@ function benefitCentsAtAge(
  * returns the same value as `benefitCentsAtAge`.
  */
 function filingYearCents(
-  piaDollarCents: number,
+  piaCents: number,
   nraMonths: number,
   delayedRetirementIncrease: number,
   ageMonths: number,
@@ -208,7 +208,7 @@ function filingYearCents(
     filingEpoch % 12 === 0
   )
     return benefitCentsAtAge(
-      piaDollarCents,
+      piaCents,
       nraMonths,
       delayedRetirementIncrease,
       ageMonths
@@ -217,7 +217,7 @@ function filingYearCents(
   const thisJan = filingEpoch - (filingEpoch % 12);
   const compAge = Math.max(nraEpoch, thisJan) - ssaBirthEpoch;
   return benefitCentsAtAge(
-    piaDollarCents,
+    piaCents,
     nraMonths,
     delayedRetirementIncrease,
     compAge
@@ -287,7 +287,6 @@ function spousalCentsForPair(
  */
 function survivorCentsCalc(
   earnerPiaRaw: number,
-  earnerPiaDollar: number,
   earnerNra: number,
   earnerDelayedRetirementIncrease: number,
   earnerSsaBirth: number,
@@ -307,7 +306,7 @@ function survivorCentsCalc(
     } else {
       const effEpoch = Math.min(earnerDeathEpoch, earner70Epoch);
       base = benefitCentsAtAge(
-        earnerPiaDollar,
+        earnerPiaRaw,
         earnerNra,
         earnerDelayedRetirementIncrease,
         effEpoch - earnerSsaBirth
@@ -315,7 +314,7 @@ function survivorCentsCalc(
     }
   } else {
     const eBenefit = benefitCentsAtAge(
-      earnerPiaDollar,
+      earnerPiaRaw,
       earnerNra,
       earnerDelayedRetirementIncrease,
       earnerFilingEpoch - earnerSsaBirth
@@ -400,7 +399,6 @@ export function expectedNPVCoupleOptimized(
 
   // ── Recipient constants ──
   const ePiaRaw = earner.pia().primaryInsuranceAmount().cents();
-  const ePiaDol = Math.floor(ePiaRaw / 100) * 100;
   const eNra = earner.normalRetirementAge().asMonths();
   const eDri = earner.delayedRetirementIncrease();
   const eSsaBirth = earner.birthdate
@@ -410,7 +408,6 @@ export function expectedNPVCoupleOptimized(
   const e70Epoch = eSsaBirth + MAX_BENEFIT_AGE_MONTHS;
 
   const dPiaRaw = dependent.pia().primaryInsuranceAmount().cents();
-  const dPiaDol = Math.floor(dPiaRaw / 100) * 100;
   const dNra = dependent.normalRetirementAge().asMonths();
   const dDri = dependent.delayedRetirementIncrease();
   const dSsaBirth = dependent.birthdate
@@ -519,16 +516,16 @@ export function expectedNPVCoupleOptimized(
   const ePJ = new Float64Array(nEF);
   for (let i = 0; i < nEF; i++) {
     const age = eStart + i;
-    ePJ[i] = benefitCentsAtAge(ePiaDol, eNra, eDri, age);
-    eFY[i] = filingYearCents(ePiaDol, eNra, eDri, age, eSsaBirth, eNraEpoch);
+    ePJ[i] = benefitCentsAtAge(ePiaRaw, eNra, eDri, age);
+    eFY[i] = filingYearCents(ePiaRaw, eNra, eDri, age, eSsaBirth, eNraEpoch);
   }
 
   const dFY = new Float64Array(nDF);
   const dPJ = new Float64Array(nDF);
   for (let i = 0; i < nDF; i++) {
     const age = dStart + i;
-    dPJ[i] = benefitCentsAtAge(dPiaDol, dNra, dDri, age);
-    dFY[i] = filingYearCents(dPiaDol, dNra, dDri, age, dSsaBirth, dNraEpoch);
+    dPJ[i] = benefitCentsAtAge(dPiaRaw, dNra, dDri, age);
+    dFY[i] = filingYearCents(dPiaRaw, dNra, dDri, age, dSsaBirth, dNraEpoch);
   }
 
   // ── Pre-tabulate PV and discount factors ──
@@ -753,7 +750,6 @@ export function expectedNPVCoupleOptimized(
         const svStart = eDeath + 1 > dFile ? eDeath + 1 : dFile;
         const svAmt = survivorCentsCalc(
           ePiaRaw,
-          ePiaDol,
           eNra,
           eDri,
           eSsaBirth,

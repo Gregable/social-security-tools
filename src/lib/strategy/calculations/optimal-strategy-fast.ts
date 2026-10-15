@@ -75,7 +75,7 @@ import {
 
 /** Personal benefit at a given filing age, in cents. */
 function benefitCentsAtAge(
-  piaDollarCents: number,
+  piaCents: number,
   nraMonths: number,
   delayedRetirementIncrease: number,
   ageMonths: number
@@ -94,12 +94,12 @@ function benefitCentsAtAge(
     const after = creditedMonths - nraMonths;
     mult = (delayedRetirementIncrease / 12) * after;
   }
-  return Math.floor(Math.round(piaDollarCents * (1 + mult)) / 100) * 100;
+  return Math.floor(Math.round(piaCents * (1 + mult)) / 100) * 100;
 }
 
 /** Personal benefit during the filing year (before next January), in cents. */
 function filingYearCents(
-  piaDollarCents: number,
+  piaCents: number,
   nraMonths: number,
   delayedRetirementIncrease: number,
   ageMonths: number,
@@ -113,7 +113,7 @@ function filingYearCents(
     filingEpoch % 12 === 0
   )
     return benefitCentsAtAge(
-      piaDollarCents,
+      piaCents,
       nraMonths,
       delayedRetirementIncrease,
       ageMonths
@@ -121,7 +121,7 @@ function filingYearCents(
   const thisJan = filingEpoch - (filingEpoch % 12);
   const compAge = Math.max(nraEpoch, thisJan) - ssaBirthEpoch;
   return benefitCentsAtAge(
-    piaDollarCents,
+    piaCents,
     nraMonths,
     delayedRetirementIncrease,
     compAge
@@ -162,7 +162,6 @@ function spousalCentsForPair(
 /** Survivor benefit in cents. */
 function survivorCentsCalc(
   earnerPiaRaw: number,
-  earnerPiaDollar: number,
   earnerNra: number,
   earnerDelayedRetirementIncrease: number,
   earnerSsaBirth: number,
@@ -182,7 +181,7 @@ function survivorCentsCalc(
     } else {
       const effEpoch = Math.min(earnerDeathEpoch, earner70Epoch);
       base = benefitCentsAtAge(
-        earnerPiaDollar,
+        earnerPiaRaw,
         earnerNra,
         earnerDelayedRetirementIncrease,
         effEpoch - earnerSsaBirth
@@ -190,7 +189,7 @@ function survivorCentsCalc(
     }
   } else {
     const eBenefit = benefitCentsAtAge(
-      earnerPiaDollar,
+      earnerPiaRaw,
       earnerNra,
       earnerDelayedRetirementIncrease,
       earnerFilingEpoch - earnerSsaBirth
@@ -247,7 +246,6 @@ export function optimalStrategyCoupleFast(
 
   // ── Recipient constants ──
   const ePiaRaw = earner.pia().primaryInsuranceAmount().cents();
-  const ePiaDol = Math.floor(ePiaRaw / 100) * 100;
   const eNra = earner.normalRetirementAge().asMonths();
   const eDri = earner.delayedRetirementIncrease();
   const eSsaBirth = earner.birthdate
@@ -257,7 +255,6 @@ export function optimalStrategyCoupleFast(
   const e70Epoch = eSsaBirth + MAX_BENEFIT_AGE_MONTHS;
 
   const dPiaRaw = dependent.pia().primaryInsuranceAmount().cents();
-  const dPiaDol = Math.floor(dPiaRaw / 100) * 100;
   const dNra = dependent.normalRetirementAge().asMonths();
   const dDri = dependent.delayedRetirementIncrease();
   const dSsaBirth = dependent.birthdate
@@ -397,8 +394,8 @@ export function optimalStrategyCoupleFast(
   const ePersNPV = new Float64Array(nEF);
   for (let i = 0; i < nEF; i++) {
     const age = eStart + i;
-    ePJ[i] = benefitCentsAtAge(ePiaDol, eNra, eDri, age);
-    eFY[i] = filingYearCents(ePiaDol, eNra, eDri, age, eSsaBirth, eNraEpoch);
+    ePJ[i] = benefitCentsAtAge(ePiaRaw, eNra, eDri, age);
+    eFY[i] = filingYearCents(ePiaRaw, eNra, eDri, age, eSsaBirth, eNraEpoch);
     ePersNPV[i] = personalNPV(eSsaBirth + age, eDeath, eFY[i], ePJ[i]);
   }
 
@@ -417,8 +414,8 @@ export function optimalStrategyCoupleFast(
   if (!depZeroPia) {
     for (let i = 0; i < nDF; i++) {
       const age = dStart + i;
-      dPJ[i] = benefitCentsAtAge(dPiaDol, dNra, dDri, age);
-      dFY[i] = filingYearCents(dPiaDol, dNra, dDri, age, dSsaBirth, dNraEpoch);
+      dPJ[i] = benefitCentsAtAge(dPiaRaw, dNra, dDri, age);
+      dFY[i] = filingYearCents(dPiaRaw, dNra, dDri, age, dSsaBirth, dNraEpoch);
       const dFile = dSsaBirth + age;
       dPersFullNPV[i] = personalNPV(dFile, dDeath, dFY[i], dPJ[i]);
       // Truncated endpoint is min(dDeath, eDeath). If dFile > that endpoint
@@ -472,7 +469,6 @@ export function optimalStrategyCoupleFast(
       if (dDeath > svStart) {
         survAmt = survivorCentsCalc(
           ePiaRaw,
-          ePiaDol,
           eNra,
           eDri,
           eSsaBirth,

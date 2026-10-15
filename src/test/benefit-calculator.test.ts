@@ -3,6 +3,7 @@ import {
   allBenefitsOnDate,
   allBenefitsOnDateNominal,
   baseSpousalBenefit,
+  benefitAtAge,
   benefitOnDate,
   benefitOnDateNominal,
   eligibleForSpousalBenefit,
@@ -10,7 +11,7 @@ import {
 } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
-import { MonthDate } from '$lib/month-time';
+import { MonthDate, MonthDuration } from '$lib/month-time';
 import demo0 from '$lib/pastes/averagepaste.txt?raw';
 import { Recipient } from '$lib/recipient';
 import { parsePaste } from '$lib/ssa-parse';
@@ -306,5 +307,59 @@ describe('baseSpousalBenefit', () => {
     expect(eligibleForSpousalBenefit(eligibleLower, higher)).toBe(true);
     expect(baseSpousalBenefit(higher, ineligibleLower).value()).toBe(0);
     expect(eligibleForSpousalBenefit(ineligibleLower, higher)).toBe(false);
+  });
+});
+
+/**
+ * SSA applies the early-retirement reduction and delayed retirement credits to
+ * the PIA as computed (to the dime), and only rounds the resulting monthly
+ * benefit down to the dollar. See the worked examples in Appendix C of SSA's
+ * Annual Statistical Supplement:
+ * https://www.ssa.gov/policy/docs/statcomps/supplement/2024/apnc.html
+ */
+describe('benefitAtAge rounding', () => {
+  const age = (years: number, months = 0) =>
+    MonthDuration.initFromYearsMonths({ years, months });
+
+  function withPia(pia: Money, birthdate: Birthdate): Recipient {
+    const r = new Recipient();
+    r.birthdate = birthdate;
+    r.setPia(pia);
+    return r;
+  }
+
+  // Born 2 Jan 1960: full retirement age 67, 8% per year delayed credits.
+  const r = withPia(Money.fromCents(320090), Birthdate.FromYMD(1960, 0, 2));
+
+  it('pays the PIA rounded down to the dollar at full retirement age', () => {
+    expect(benefitAtAge(r, age(67)).wholeDollars()).toBe('$3,200');
+  });
+
+  it('applies delayed credits to the unrounded PIA', () => {
+    // $3,200.90 x 1.24 = $3,969.11, not $3,200 x 1.24 = $3,968.
+    expect(benefitAtAge(r, age(70)).wholeDollars()).toBe('$3,969');
+  });
+
+  it('applies the early reduction to the unrounded PIA', () => {
+    // 24 months early: $3,200.90 x (1 - 24 x 5/900) = $2,774.11, not
+    // $3,200 x (1 - 24 x 5/900) = $2,773.33.
+    expect(benefitAtAge(r, age(65)).wholeDollars()).toBe('$2,774');
+  });
+
+  it("matches SSA's published examples", () => {
+    // Early: PIA $1,640.90 at 62 with FRA 67 is $1,148.63, paid as $1,148.
+    const early = withPia(
+      Money.fromCents(164090),
+      Birthdate.FromYMD(1962, 0, 2)
+    );
+    expect(benefitAtAge(early, age(62)).wholeDollars()).toBe('$1,148');
+
+    // Delayed: born February 1957 (FRA 66y6m), claiming 5 months after FRA.
+    // PIA $1,640.90 becomes $1,695.59, paid as $1,695.
+    const delayed = withPia(
+      Money.fromCents(164090),
+      Birthdate.FromYMD(1957, 1, 15)
+    );
+    expect(benefitAtAge(delayed, age(66, 11)).wholeDollars()).toBe('$1,695');
   });
 });
