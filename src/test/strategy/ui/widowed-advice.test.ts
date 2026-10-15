@@ -16,7 +16,6 @@ import {
   widowedAmounts,
 } from '$lib/strategy/calculations/widowed-optimizer';
 import {
-  isClaimToMake,
   widowedAdvice,
   widowedAlternatives,
   widowedRecommendation,
@@ -265,32 +264,24 @@ describe('widowedRecommendation', () => {
       ).strategy.survivorStart.asMonths()
     ).toBe(context.survivorRange.earliest.asMonths());
   });
-});
 
-describe('isClaimToMake', () => {
-  it('is true only for a claim still to make', () => {
-    const amount = Money.from(1000);
-    expect(
-      isClaimToMake({
-        kind: 'file-in',
-        month: currentDate,
-        age: age(62, 0),
-        amount,
-      })
-    ).toBe(true);
-    expect(
-      isClaimToMake({ kind: 'file-now', backdateTo: currentDate, amount })
-    ).toBe(true);
-    expect(isClaimToMake({ kind: 'not-needed' })).toBe(false);
-    expect(isClaimToMake({ kind: 'no-benefit' })).toBe(false);
-    expect(
-      isClaimToMake({
-        kind: 'started',
-        month: currentDate,
-        age: age(62, 0),
-        amount,
-      })
-    ).toBe(false);
+  it('says whether a start date is left to choose', () => {
+    const open = widowedRecommendation(
+      contextFor(makeRecipient(2500, 1968, 2, 15)),
+      deathDistribution(58)
+    );
+    expect(open.hasChoice).toBe(true);
+    // The own benefit started at $2,112 and the survivor benefit can never
+    // pay more, so the plan is the same however long the survivor lives.
+    const settled = widowedRecommendation(
+      contextFor(
+        makeRecipient(3000, 1964, 2, 15),
+        { survivor: null, own: month(2026, 3) },
+        { ...lateSpouse, recipient: makeRecipient(2000, 1961, 2, 15) }
+      ),
+      deathDistribution(62)
+    );
+    expect(settled.hasChoice).toBe(false);
   });
 });
 

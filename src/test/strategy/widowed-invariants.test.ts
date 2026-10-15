@@ -29,9 +29,15 @@ import {
   optimalStrategyWidowed,
   type WidowedContext,
   widowedExpectedNPVCents,
+  widowedHasChoice,
   widowedNPVCents,
 } from '$lib/strategy/calculations/widowed-optimizer';
-import { widowedAlternatives } from '$lib/strategy/ui/widowed-advice';
+import {
+  type OwnClaimAdvice,
+  type WidowedAdvice,
+  widowedAlternatives,
+  widowedRecommendation,
+} from '$lib/strategy/ui/widowed-advice';
 
 const currentDate = MonthDate.initFromYearsMonths({ years: 2026, months: 9 });
 const months = (n: number) => new MonthDuration(n);
@@ -164,6 +170,57 @@ function deathDistribution(s: Scenario): DeathProbability[] {
 
 const close = (a: number, b: number, relative = 1e-6) =>
   Math.abs(a - b) <= relative * Math.max(1, Math.abs(b));
+
+/**
+ * Whether any two plans the context searches pay differently for some death
+ * month, checked a year apart up to age 110.
+ */
+function plansCanDiffer(context: WidowedContext, s: Scenario): boolean {
+  const last = s.survivor.birthdate
+    .dateAtLayAge(months(110 * 12))
+    .monthsSinceEpoch();
+  const { survivorRange, ownRange } = context;
+  for (let d = currentDate.monthsSinceEpoch(); d <= last; d += 12) {
+    const finalDate = new MonthDate(d);
+    let first: number | null = null;
+    for (
+      let a = survivorRange.earliest.asMonths();
+      a <= survivorRange.latest.asMonths();
+      a++
+    ) {
+      for (
+        let b = ownRange.earliest.asMonths();
+        b <= ownRange.latest.asMonths();
+        b++
+      ) {
+        const value = widowedNPVCents(
+          context,
+          { survivorStart: months(a), ownStart: months(b) },
+          finalDate
+        );
+        if (first === null) first = value;
+        else if (value !== first) return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** What a recommendation advises, as text that compares exactly. */
+function adviceText(advice: WidowedAdvice): string {
+  const one = (a: OwnClaimAdvice): string => {
+    switch (a.kind) {
+      case 'started':
+      case 'file-in':
+        return `${a.kind} ${a.month.toString()}`;
+      case 'file-now':
+        return `file-now ${a.backdateTo.toString()}`;
+      default:
+        return a.kind;
+    }
+  };
+  return `${one(advice.survivor)}; ${one(advice.own)}; first ${advice.first}`;
+}
 
 describe('widowed invariants', () => {
   it(
@@ -317,6 +374,43 @@ describe('widowed invariants', () => {
           true
         );
       }
+    }
+  );
+
+  it(
+    'leaves a start date to choose exactly when two plans can pay differently, and otherwise advises the same at any discount rate',
+    { timeout: 60_000 },
+    () => {
+      const rng = mulberry32(11);
+      let withChoice = 0;
+      let withoutChoice = 0;
+      for (let n = 0; n < 150; n++) {
+        const s = randomScenario(rng);
+        const context = contextFor(s);
+        const hasChoice = widowedHasChoice(context);
+        expect(hasChoice, `scenario ${n}`).toBe(plansCanDiffer(context, s));
+        if (hasChoice) {
+          withChoice++;
+          continue;
+        }
+        withoutChoice++;
+        const advice = [0, 0.025, 0.08].map((rate) => {
+          const atRate = createWidowedContext(
+            s.survivor,
+            s.lateSpouse,
+            currentDate,
+            rate,
+            s.filed
+          );
+          expect(widowedHasChoice(atRate), `scenario ${n}`).toBe(false);
+          return adviceText(
+            widowedRecommendation(atRate, deathDistribution(s))
+          );
+        });
+        expect(new Set(advice).size, `scenario ${n}: ${advice}`).toBe(1);
+      }
+      expect(withChoice).toBeGreaterThan(20);
+      expect(withoutChoice).toBeGreaterThan(20);
     }
   );
 });

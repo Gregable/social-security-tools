@@ -16,6 +16,7 @@ import {
   type WidowedContext,
   widowedAmounts,
   widowedBenefitUse,
+  widowedHasChoice,
   widowedHorizon,
   widowedNPVCents,
 } from '$lib/strategy/calculations/widowed-optimizer';
@@ -56,16 +57,6 @@ export type OwnClaimAdvice =
   /** There is no retirement benefit on their record. */
   | { readonly kind: 'no-benefit' };
 
-/** A claim still to make, as opposed to a settled fact. */
-export type ClaimToMake = Extract<
-  WidowedClaimAdvice,
-  { readonly kind: 'file-in' | 'file-now' }
->;
-
-export function isClaimToMake(advice: OwnClaimAdvice): advice is ClaimToMake {
-  return advice.kind === 'file-in' || advice.kind === 'file-now';
-}
-
 /** What the page says about each benefit in one plan. */
 export interface WidowedAdvice {
   readonly survivor: WidowedClaimAdvice;
@@ -81,6 +72,13 @@ export interface WidowedAdvice {
 export interface WidowedRecommendation extends WidowedAdvice {
   /** The plan's expected NPV across the death distribution, in cents. */
   readonly expectedNPVCents: number;
+  /**
+   * Whether a start date is left to choose (see `widowedHasChoice`). When
+   * not, the plan is the same however long the survivor lives and whatever
+   * the discount rate, so the page shows neither those assumptions, the
+   * death-age chart nor `expectedNPVCents`.
+   */
+  readonly hasChoice: boolean;
 }
 
 function adviceFor(
@@ -151,6 +149,7 @@ export function widowedRecommendation(
   return {
     ...widowedAdvice(context, best.strategy),
     expectedNPVCents: best.npvCents,
+    hasChoice: widowedHasChoice(context),
   };
 }
 

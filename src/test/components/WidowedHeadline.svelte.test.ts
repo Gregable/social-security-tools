@@ -67,4 +67,18 @@ describe('WidowedHeadline', () => {
       'Ask SSA to backdate the claim to April 2026; they can pay up to six months retroactively.'
     );
   });
+
+  it('gives the expected lifetime benefit while a start date is left to choose', () => {
+    const target = render('survivorFirstThenOwn');
+    expect(target.querySelector('.npv-line')).not.toBeNull();
+  });
+
+  it('leaves out the expected lifetime benefit, which only the assumptions would change, once nothing is left to choose', () => {
+    // 76 and past survivor full retirement age: both benefits are settled.
+    const target = render('fileNowBackdated');
+    expect(target.querySelector('.npv-line')).toBeNull();
+    expect(target.querySelector('.explanation')?.textContent).toMatch(
+      /same however long you live/
+    );
+  });
 });

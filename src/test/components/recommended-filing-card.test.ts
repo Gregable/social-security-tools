@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Birthdate } from '$lib/birthday';
 import {
+  anyChoiceLeft,
+  anyFilingChoice,
   buildStrategyUrl,
   currentMonthDate,
   DEFAULT_DISCOUNT_RATE,
@@ -329,5 +331,39 @@ describe('buildStrategyUrl', () => {
     expect(buildStrategyUrl(r1, r2)).toBe(
       '/strategy#pia1=2000&dob1=1960-04-15&pia2=800&dob2=1962-04-15'
     );
+  });
+});
+
+describe('anyFilingChoice', () => {
+  it('ignores the second slot for a single person, which filingChoices always fills with true', () => {
+    expect(anyFilingChoice(true, [false, true])).toBe(false);
+    expect(anyFilingChoice(true, [true, false])).toBe(true);
+  });
+
+  it('is true for a couple while either has a filing age to choose', () => {
+    expect(anyFilingChoice(false, [false, false])).toBe(false);
+    expect(anyFilingChoice(false, [true, false])).toBe(true);
+    expect(anyFilingChoice(false, [false, true])).toBe(true);
+  });
+});
+
+describe('anyChoiceLeft', () => {
+  it('uses anyFilingChoice in single and couple mode', () => {
+    expect(anyChoiceLeft('single', [false, true], undefined)).toBe(false);
+    expect(anyChoiceLeft('couple', [false, true], undefined)).toBe(true);
+    expect(anyChoiceLeft('couple', [false, false], undefined)).toBe(false);
+  });
+
+  it("follows the widowed recommendation's hasChoice in widowed mode", () => {
+    expect(anyChoiceLeft('widowed', [true, true], { hasChoice: false })).toBe(
+      false
+    );
+    expect(anyChoiceLeft('widowed', [false, false], { hasChoice: true })).toBe(
+      true
+    );
+  });
+
+  it('hides nothing in widowed mode before there is a result', () => {
+    expect(anyChoiceLeft('widowed', [false, false], undefined)).toBe(true);
   });
 });

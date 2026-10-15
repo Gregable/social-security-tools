@@ -43,6 +43,7 @@
     optimalStrategySingle,
   } from "$lib/strategy/calculations/strategy-calc";
   import {
+    anyChoiceLeft,
     currentMonthDate,
     filingChoices,
   } from "$lib/components/recommended-filing-card";
@@ -451,6 +452,13 @@
   // The filed months the current results were computed with; see
   // hasFilingChoice for why this is not derived reactively from the form.
   let resultsAlreadyFiled: AlreadyFiled = NOT_FILED;
+  // Whether the results leave anyone a start date to choose. When nobody
+  // has one, the advice is the same however long anyone lives and whatever
+  // the discount rate, so the page leaves out those tunable assumptions,
+  // the scenario details that use them and, in widowed mode, the death-age
+  // chart. The headlines drop their expected value on the same rule (see
+  // anyChoiceLeft).
+  $: hasChoiceLeft = anyChoiceLeft(mode, hasFilingChoice, optimalWidowedResult);
   $: discountRate = discountRatePercent / 100;
   $: shareUrl = strategyShareUrl({
     mode,
@@ -1031,6 +1039,7 @@
   </div>
 
   {#if stage === "results"}
+    {#if hasChoiceLeft}
     <div class="tunable-sentinel" bind:this={tunableSentinelEl}></div>
     <!-- Placeholder reserves the element's natural expanded height in flow
          while the sticky is detached (position: fixed) in stuck/compact
@@ -1057,6 +1066,7 @@
         />
       </div>
     </div>
+    {/if}
 
     <section class="calculation-section">
       {#if recomputeErrorMessage}
@@ -1091,7 +1101,7 @@
           bind:this={widgetAnchorEl}
         >
           {#if isWidowed}
-            {#if resultsWidowedContext && !resultsWidowedContext.survivorRange.hasChoice && !resultsWidowedContext.ownRange.hasChoice}
+            {#if !hasChoiceLeft}
               <div class="limited-width">
                 <NoFilingDecisionPanel variant="widowed" />
               </div>
@@ -1142,6 +1152,9 @@
       class="limited-width scenario-anchor"
       bind:this={scenarioAnchorEl}
     >
+      <!-- A selection restored from an earlier run would otherwise reopen a
+           scenario under results with nothing left to choose. -->
+      {#if hasChoiceLeft}
       {#if calculationResults.getSelectedCellData() && mode === "couple"}
         {#key calculationResults.getSelectedCellData()}
           <ScenarioDetail
@@ -1177,6 +1190,7 @@
             />
           {/key}
         {/if}
+      {/if}
       {/if}
     </section>
   {/if}

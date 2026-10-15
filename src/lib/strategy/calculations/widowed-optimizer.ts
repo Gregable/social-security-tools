@@ -555,6 +555,41 @@ export function widowedBenefitUse(
 }
 
 /**
+ * Whether the widow(er) still has a start date to choose that could change
+ * what they are paid. When not, the plan is the same however long they live
+ * and whatever the discount rate, so the page leaves out what only those
+ * assumptions affect: the death-age chart, the tunable assumptions and the
+ * expected lifetime benefit.
+ *
+ * A start date is open while a benefit's range has more than one age. With
+ * both open there is a choice, even if one benefit never pays more than the
+ * other: it can still bridge the months before the other starts. A settled
+ * benefit (started, stopped growing, or none on their own record) starts no
+ * later than now or pays nothing, so the other's start date matters only if
+ * it can pay more than the settled one, since SSA pays the larger of the
+ * two. A tie pays the same either way, so it is no choice.
+ */
+export function widowedHasChoice(context: WidowedContext): boolean {
+  const { survivorRange, ownRange, tables: t } = context;
+  if (survivorRange.hasChoice && ownRange.hasChoice) return true;
+  if (survivorRange.hasChoice) {
+    // A settled own benefit only steps up from here, so this month's
+    // payment is the least it pays.
+    return largest(t.survivorCents) > ownPaymentAt(t, 0, t.currentEpoch);
+  }
+  if (ownRange.hasChoice) {
+    return largest(t.ownCents) > t.survivorCents[0];
+  }
+  return false;
+}
+
+function largest(values: Float64Array): number {
+  let max = Number.NEGATIVE_INFINITY;
+  for (const value of values) max = Math.max(max, value);
+  return max;
+}
+
+/**
  * The monthly amount each benefit in `strategy` pays, in today's dollars:
  * the survivor benefit for its start age, and the own benefit once any
  * delayed credits from the claim year have arrived.

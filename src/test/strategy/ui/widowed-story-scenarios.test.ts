@@ -49,4 +49,22 @@ describe('widowed headline story scenarios', () => {
       'started'
     );
   });
+
+  it('leaves a start date to choose, so the headline gives an expected value, in every story but fileNowBackdated', () => {
+    const hasChoice = Object.fromEntries(
+      Object.keys(HEADLINE_SCENARIOS).map((name) => [
+        name,
+        recommendationFor(name as keyof typeof HEADLINE_SCENARIOS).hasChoice,
+      ])
+    );
+    expect(hasChoice).toEqual({
+      survivorFirstThenOwn: true,
+      ownFirstThenSurvivor: true,
+      ownNotNeeded: true,
+      fileNowBackdated: false,
+      // The survivor benefit has started; the own benefit, up to $2,232 at
+      // 70, can still pay more than its $1,789.
+      alreadyReceivingSurvivor: true,
+    });
+  });
 });

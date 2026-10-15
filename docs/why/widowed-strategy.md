@@ -64,6 +64,16 @@ lived.
   paid. Rather than show whichever date the search happened to keep, the
   page says the benefit is not needed. A benefit that has already started is
   a fact, so it is never "not needed", even once the other pays more.
+- **Nothing to tune when nothing is left to choose.** Once each benefit has
+  started, stopped growing, or would never pay more than the other, the plan
+  is the same however long the survivor lives and whatever the discount
+  rate. The page then shows a note in place of the death-age chart and
+  leaves out the tunable assumptions and the expected lifetime benefit,
+  which only those assumptions would change. Single and couple results do
+  the same once nobody has a filing age left. Never paying more than the
+  other rules a benefit out only when the other is settled: while the
+  survivor benefit is still growing, the own benefit can bridge the months
+  before it starts, so when to start the survivor benefit is a trade-off.
 - **Every answer is checked again before a calculation.** The form checks
   each month as it is entered, but a share link restores months it has not
   seen, and one answer can make another impossible. Continue checks them

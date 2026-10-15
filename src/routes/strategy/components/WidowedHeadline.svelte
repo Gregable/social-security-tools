@@ -4,14 +4,14 @@
   @description
     The widowed-mode recommendation: when to start the survivor benefit and
     when to start the survivor's own retirement benefit, in the order they
-    start, with the expected lifetime benefit of the plan.
+    start, and, while a start date is left to choose, the expected lifetime
+    benefit of the plan.
 -->
 
 <script lang="ts">
   import InfoTip from "$lib/components/InfoTip.svelte";
   import { Money } from "$lib/money";
   import {
-    isClaimToMake,
     type OwnClaimAdvice,
     type WidowedRecommendation,
   } from "$lib/strategy/ui/widowed-advice";
@@ -47,13 +47,6 @@
   const switches = $derived(
     recommendation.first === "survivor" || recommendation.first === "own"
   );
-  // Nothing left to decide: each benefit has started, is not needed, or
-  // does not exist.
-  const decided = $derived(
-    !isClaimToMake(recommendation.survivor) &&
-      !isClaimToMake(recommendation.own)
-  );
-
   function formatMonthFull(card: Card): string {
     const a = card.advice;
     if (a.kind !== "file-in" && a.kind !== "started") return "";
@@ -143,6 +136,7 @@
   </div>
 
   <div class="footer">
+    {#if recommendation.hasChoice}
     <div class="npv-line">
       <span class="npv-label">Expected lifetime benefit (NPV):</span>
       <strong class="npv-value"
@@ -154,11 +148,10 @@
         the rate set above. It updates as you tune health and discount rate.
       </InfoTip>
     </div>
+    {/if}
     <p class="explanation">
-      {#if decided}
-        There is no start date left to decide: each benefit has either started
-        or would not change your payments. The figure is the expected value of
-        what is still to come.
+      {#if !recommendation.hasChoice}
+        This plan is the same however long you live.
       {:else if switches}
         Survivor benefits are exempt from deemed filing, so you can take one
         benefit first and switch to the other later. When you apply for the first

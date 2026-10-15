@@ -6,7 +6,8 @@
     filing age left to choose: they are past 70 (delayed retirement credits
     have stopped, so the chart would be a single repeated value), they have
     already filed (the date is a fact), or, for a widow(er), each benefit has
-    started, stopped growing, or does not exist.
+    started, stopped growing, would never pay more than the other, or does
+    not exist.
 -->
 
 <script lang="ts">
@@ -23,28 +24,32 @@ export let variant:
 </script>
 
 <div class="no-decision-note">
-  <h2>There is no filing age left to choose</h2>
+  <h2>
+    {variant === "widowed"
+      ? "There is no start date left to choose"
+      : "There is no filing age left to choose"}
+  </h2>
   {#if variant === "widowed"}
     <p>
       This chart normally shows how the best start dates for your survivor
       benefit and your own retirement benefit shift with how long you live.
       Here there is nothing left to choose: each benefit has started already,
-      has stopped growing, or, with no retirement benefit on your own record,
-      does not exist. Survivor benefits stop growing at survivor full
-      retirement age, or sooner when your spouse claimed early, and retirement
-      benefits at 70.
+      has stopped growing, would never pay more than the other, or, with no
+      retirement benefit on your own record, does not exist. Survivor benefits
+      stop growing at survivor full retirement age, or sooner when your spouse
+      claimed early, and retirement benefits at 70.
     </p>
     <p>
-      Claim anything you have not yet started as soon as you can, and ask SSA
-      to backdate it. Once a benefit has stopped growing, SSA can pay up to six
-      months of it retroactively.
+      Where the recommendation above says to file, file now: that benefit has
+      stopped growing, so waiting would only skip payments. If the month it
+      names has already passed, ask SSA to backdate the claim. Once a benefit
+      has stopped growing, SSA can pay up to six months of it retroactively.
     </p>
   {:else if variant === "both-filed"}
     <p>
       These charts normally show how the best filing ages shift with how long
       each of you lives. You are both already receiving benefits, so those
-      dates are settled and there is nothing left to optimize here. The
-      expected lifetime benefit above is the value of what is still to come.
+      dates are settled and there is nothing left to optimize here.
     </p>
   {:else if variant === "filed-and-past-seventy"}
     <p>
