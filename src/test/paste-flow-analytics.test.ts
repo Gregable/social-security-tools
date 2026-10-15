@@ -77,9 +77,24 @@ describe('failedPasteProperties', () => {
       'has_tabs',
       'is_spouse_entry',
       'line_count',
+      'wrong_page',
       'year_token_count',
     ]);
     expect(props.is_spouse_entry).toBe(true);
+  });
+
+  it('reports the recognized wrong page', () => {
+    const props = failedPasteProperties(
+      'Eligibility and Earnings\nReview your full earnings record now\n',
+      false
+    );
+    expect(props.wrong_page).toBe('my_ssa_home');
+  });
+
+  it('reports no wrong page for an unrecognized paste', () => {
+    expect(
+      failedPasteProperties('anything at all', false).wrong_page
+    ).toBeNull();
   });
 });
 
