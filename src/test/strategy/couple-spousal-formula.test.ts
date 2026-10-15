@@ -401,8 +401,6 @@ describe('Spousal starts only when both filed', () => {
     // Personal benefit at 70 with delayed credits:
     // 36 months * 0.08/12 = 0.24, so personal = 600 * 1.24 = 744 => floor = $744
     // spousal = 200000/2 - 74400 = 25600 => floor = $256
-    // But actually Money.times uses Math.round, so:
-    // 60000 * 1.24 = 74400 exactly, floor = 74400. spousal = 100000 - 74400 = 25600
     expect(result.cents()).toBeGreaterThan(0);
   });
 
@@ -478,8 +476,6 @@ describe('Spousal after NRA - combined cap', () => {
     // filingDate = 68y0m (12 months after NRA).
     // personalBenefit = floor(600 * (1 + 12 * 0.08/12)) = floor(600*1.08)
     // = floor($648) = $648 (64800 cents).
-    // But Money.times: Math.round(60000 * 1.08) = Math.round(64800) = 64800.
-    // floorToDollar = 64800. So personal = $648.
     // spousal = 200000/2 - 64800 = 35200 => floor = $352.
     const earner = makeRecipient(2000, 1965, 5, 15);
     const dependent = makeRecipient(600, 1965, 5, 15);
@@ -503,7 +499,6 @@ describe('Spousal after NRA - combined cap', () => {
   it('dependent files at 69 (2yr delayed credits): spousal further reduced', () => {
     // personalBenefit = floor(600 * (1 + 24 * 0.08/12))
     // = floor(600 * 1.16) = floor(696) = $696 (69600 cents).
-    // Money.times: Math.round(60000 * 1.16) = 69600. Floor = 69600.
     // spousal = 100000 - 69600 = 30400 => floor = $304.
     const earner = makeRecipient(2000, 1965, 5, 15);
     const dependent = makeRecipient(600, 1965, 5, 15);
@@ -541,7 +536,7 @@ describe('Spousal after NRA - combined cap', () => {
       depFiling,
       atDate
     );
-    // Money.times: Math.round(80000 * 1.24) = 99200. Floor = 99200.
+    // Personal: 80000 * 1.24 = 99200.
     // spousal = 100000 - 99200 = 800. Floor = $8 (800 cents).
     expect(result.cents()).toBe(800);
   });
@@ -562,7 +557,7 @@ describe('Spousal after NRA - combined cap', () => {
       depFiling,
       atDate
     );
-    // Math.round(90000 * 1.24) = 111600. Floor = 111600.
+    // Personal: 90000 * 1.24 = 111600.
     // spousal = 80000 - 111600 = -31600 <= 0 => $0.
     expect(result.cents()).toBe(0);
   });

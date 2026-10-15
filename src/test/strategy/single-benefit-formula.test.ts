@@ -32,11 +32,10 @@ function age(years: number, months: number): MonthDuration {
 /**
  * Computes the expected benefit in cents using the SSA formula.
  *
- * The benefitAtAge function does:
- *   multiply PIA by (1 + multiplier) -> floor to dollar
- *
- * Money.times(factor) internally computes Math.round(cents * factor),
- * then floorToDollar does Math.floor(cents / 100) * 100.
+ * SSA multiplies the PIA by (1 + multiplier) and truncates to the dollar,
+ * never rounding up. The reduction or credit is a whole number of 1/3600ths
+ * before NRA (5/9% = 20/3600, 5/12% = 15/3600 a month) and of 1/12000ths after
+ * it (an 8% annual credit is 80/12000 a month), so this works in integers.
  *
  * @param piaCents PIA in cents
  * @param nraMonths NRA in total months
@@ -50,24 +49,24 @@ function expectedBenefitCents(
   ageMonths: number,
   delayedIncrease: number
 ): number {
-  let multiplier: number;
+  let numerator: number;
+  let denominator: number;
   if (ageMonths < nraMonths) {
     // Early filing
     const monthsBefore = nraMonths - ageMonths;
-    multiplier =
-      -1.0 *
-      ((Math.min(36, monthsBefore) * 5) / 900 +
-        (Math.max(0, monthsBefore - 36) * 5) / 1200);
+    numerator =
+      3600 -
+      Math.min(36, monthsBefore) * 20 -
+      Math.max(0, monthsBefore - 36) * 15;
+    denominator = 3600;
   } else {
     // At or after NRA
     const monthsAfter = ageMonths - nraMonths;
-    multiplier = (delayedIncrease / 12) * monthsAfter;
+    numerator = 12000 + Math.round(delayedIncrease * 1000) * monthsAfter;
+    denominator = 12000;
   }
-
-  // Money.times does Math.round(cents * factor)
-  const afterMultiply = Math.round(piaCents * (1 + multiplier));
-  // Then floorToDollar
-  return Math.floor(afterMultiply / 100) * 100;
+  // Truncate to the dollar.
+  return Math.floor((piaCents * numerator) / (denominator * 100)) * 100;
 }
 
 // ---------------------------------------------------------------------------
@@ -124,7 +123,7 @@ describe('benefitAtAge early filing - round years', () => {
   it('PIA $1000 at age 62y0m', () => {
     const r = makeRecipient(1000, 1965, 5, 15);
     // 60 months early: min(36,60)*5/900 + max(0,24)*5/1200 = 0.2 + 0.1 = 0.3
-    // benefit = floor(round(100000 * 0.7) / 100) * 100 = floor(70000/100)*100
+    // benefit = floor(100000 * 0.7 / 100) * 100 = 70000
     const expected = expectedBenefitCents(100000, nra, 62 * 12, delay);
     expect(expected).toBe(70000); // $700
     expect(benefitAtAge(r, age(62, 0)).cents()).toBe(expected);
@@ -544,7 +543,7 @@ describe('benefitOnDate delayed January bump', () => {
     // At filing date: same year as filing, not Jan, not at/before NRA, not 70.
     // benefitComputationDate = max(NRA=Mar2032, Jan2033) = Jan 2033
     // Age at Jan 2033 from SSA birth (Mar 1965) = 67y10m = 10 months after NRA.
-    // Benefit = floor(round(100000 * (1 + 0.08/12 * 10)) / 100) * 100
+    // Benefit = floor(100000 * (1 + 0.08/12 * 10) / 100) * 100
     const expected = expectedBenefitCents(100000, 67 * 12, 67 * 12 + 10, 0.08);
     expect(benefitOnDate(r, filingDate, filingDate).cents()).toBe(expected);
   });
@@ -558,7 +557,7 @@ describe('benefitOnDate delayed January bump', () => {
     const atDate = MonthDate.initFromYearsMonths({ years: 2034, months: 0 });
     // filingDate.year()=2033 < atDate.year()=2034: full credits.
     // filingAge = 68y0m = 12 months after NRA.
-    // Benefit = floor(round(100000 * (1 + 0.08)) / 100) * 100
+    // Benefit = floor(100000 * (1 + 0.08) / 100) * 100
     const expected = expectedBenefitCents(100000, 67 * 12, 68 * 12, 0.08);
     expect(expected).toBe(108000); // $1080
     expect(benefitOnDate(r, filingDate, atDate).cents()).toBe(expected);
@@ -705,24 +704,8 @@ describe('Exhaustive monthly sweep', () => {
   const nra = 67 * 12;
   const delay = 0.08;
 
-  /**
-   * Computes expected benefit cents for a given PIA and filing age,
-   * using the same SSA formula as expectedBenefitCents.
-   */
   function ssaExpected(piaCents: number, ageMonths: number): number {
-    let multiplier: number;
-    if (ageMonths < nra) {
-      const monthsBefore = nra - ageMonths;
-      multiplier =
-        -1.0 *
-        ((Math.min(36, monthsBefore) * 5) / 900 +
-          (Math.max(0, monthsBefore - 36) * 5) / 1200);
-    } else {
-      const monthsAfter = ageMonths - nra;
-      multiplier = (delay / 12) * monthsAfter;
-    }
-    const afterMultiply = Math.round(piaCents * (1 + multiplier));
-    return Math.floor(afterMultiply / 100) * 100;
+    return expectedBenefitCents(piaCents, nra, ageMonths, delay);
   }
 
   it('PIA $1000: every month from 62y0m to 70y0m matches SSA formula', () => {

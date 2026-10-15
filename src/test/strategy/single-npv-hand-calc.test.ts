@@ -51,28 +51,29 @@ function makeRecipient(
  * age, using the SSA formula for 1960+ births (NRA = 67y0m = 804 months,
  * delayed increase = 8%/year).
  *
- * The formula mirrors benefitAtAge: floor PIA to dollar, apply multiplier,
- * floor again.
+ * SSA applies the reduction or credit to the PIA and truncates to the
+ * dollar. Both are whole numbers of 1/3600ths (5/9% = 20/3600, 5/12% =
+ * 15/3600 a month early) or 1/12000ths (8%/12 = 80/12000 a month late), so
+ * this works in integers.
  */
 function expectedBenefitCents(
   piaDollars: number,
   filingAgeMonths: number
 ): number {
   const NRA_MONTHS = 804; // 67 * 12
-  const piaFlooredCents = Math.floor(piaDollars) * 100;
+  const piaCents = Math.round(piaDollars * 100);
 
   if (filingAgeMonths < NRA_MONTHS) {
     const monthsBefore = NRA_MONTHS - filingAgeMonths;
-    const reduction =
-      (Math.min(36, monthsBefore) * 5) / 900 +
-      (Math.max(0, monthsBefore - 36) * 5) / 1200;
-    const rawCents = Math.round(piaFlooredCents * (1 - reduction));
-    return Math.floor(rawCents / 100) * 100;
+    const numerator =
+      3600 -
+      Math.min(36, monthsBefore) * 20 -
+      Math.max(0, monthsBefore - 36) * 15;
+    return Math.floor((piaCents * numerator) / 360000) * 100;
   } else {
     const monthsAfter = filingAgeMonths - NRA_MONTHS;
-    const increase = (0.08 / 12) * monthsAfter;
-    const rawCents = Math.round(piaFlooredCents * (1 + increase));
-    return Math.floor(rawCents / 100) * 100;
+    const numerator = 12000 + 80 * monthsAfter;
+    return Math.floor((piaCents * numerator) / 1200000) * 100;
   }
 }
 

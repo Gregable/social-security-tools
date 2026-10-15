@@ -504,12 +504,8 @@ describe('survivorBenefit base calculation consistency', () => {
       survivorFilingDate
     );
 
-    // Deceased NRA = 66y0m. At age 70 (48 months delayed):
-    // increase = 0.065/12 * 48 = 0.26 (delayed increase is 6.5% for 1950 birth)
-    // Benefit = floor(round(100000 * 1.26)) = $1260
-    // Wait - delayed increase for 1950 birth: from constants, 1943-1954 => 0.07
-    // Actually: 1945-1956 bracket has delayedIncreaseAnnual = ?
-    // Let me just use benefitAtAge directly.
+    // Deceased NRA = 66y0m, 8% a year in delayed credits (1943-1954 births).
+    // At age 70, 48 months delayed: $1,000 x 1.32 = $1,320.
     const atAge70 = benefitAtAge(deceased, age(70, 0));
     // base = max(82.5% * 1000, atAge70) = max(825, atAge70)
     // atAge70 > PIA always, so base = atAge70.
