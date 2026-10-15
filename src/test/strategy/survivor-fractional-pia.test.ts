@@ -123,3 +123,72 @@ describe('couple fast paths with PIAs in cents', () => {
     });
   });
 });
+
+// Earner born 2 Jan 1959: FRA 66y10m (November 2025), 67y9m now. Filing now
+// is after FRA, outside January, in a year after the FRA year, so the
+// filing-year amount carries credits only through the prior January
+// (67y0m): a nonzero credit the cases above never reach, since there the
+// prior January is before FRA.
+describe('couple fast paths with PIAs in cents, filing-year credits', () => {
+  const lateRecipients: [Recipient, Recipient] = [
+    makeRecipient(1234.56, Birthdate.FromYMD(1959, 0, 2)),
+    makeRecipient(345.67, Birthdate.FromYMD(1962, 6, 20)),
+  ];
+
+  it('optimalStrategyCoupleFast matches the reference when filing now', () => {
+    const finalDates: [MonthDate, MonthDate] = [
+      lateRecipients[0].birthdate.dateAtLayAge(deathAge(72, 0)),
+      lateRecipients[1].birthdate.dateAtLayAge(deathAge(65, 0)),
+    ];
+    const [earnerAge, , reference] = optimalStrategyCouple(
+      lateRecipients,
+      finalDates,
+      currentDate,
+      0.08,
+      NOT_FILED
+    );
+    // The reference's best plan files now, so the filing-year amount counts.
+    expect(earnerAge.asMonths()).toBe(67 * 12 + 9);
+    const [, , npv] = optimalStrategyCoupleFast(
+      lateRecipients,
+      finalDates,
+      currentDate,
+      0.08,
+      NOT_FILED
+    );
+    expect(Math.abs(npv - reference)).toBeLessThan(1);
+  });
+
+  it('expectedNPVCoupleOptimized matches the reference for every pair', () => {
+    const dists: [DeathProbability[], DeathProbability[]] = [
+      [
+        { age: 68, probability: 0.5 },
+        { age: 80, probability: 0.5 },
+      ],
+      [
+        { age: 70, probability: 0.3 },
+        { age: 90, probability: 0.7 },
+      ],
+    ];
+    const key = ({ filingAges: [a, b] }: { filingAges: MonthDuration[] }) =>
+      `${a.asMonths()}/${b.asMonths()}`;
+    const reference = new Map(
+      expectedNPVCouple(lateRecipients, currentDate, 0.025, dists).map((r) => [
+        key(r),
+        r.expectedNPVCents,
+      ])
+    );
+    const optimized = expectedNPVCoupleOptimized(
+      lateRecipients,
+      currentDate,
+      0.025,
+      dists
+    );
+    expect(optimized.length).toBe(reference.size);
+    for (const r of optimized) {
+      const expected = reference.get(key(r));
+      expect(expected).toBeDefined();
+      expect(Math.abs(r.expectedNPVCents - (expected ?? 0))).toBeLessThan(1);
+    }
+  });
+});

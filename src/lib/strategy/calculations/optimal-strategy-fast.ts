@@ -130,15 +130,15 @@ function filingYearCents(
 
 /** Spousal benefit in cents for a given filing pair. */
 function spousalCentsForPair(
-  depPiaRaw: number,
-  earnerPiaRaw: number,
+  depPiaCents: number,
+  earnerPiaCents: number,
   depFilingEpoch: number,
   depNraEpoch: number,
   spousalStartEpoch: number,
   depFYCents: number,
   depPJCents: number
 ): number {
-  const base = earnerPiaRaw / 2 - depPiaRaw;
+  const base = earnerPiaCents / 2 - depPiaCents;
   if (base <= 0) return 0;
 
   if (spousalStartEpoch >= depNraEpoch) {
@@ -146,7 +146,7 @@ function spousalCentsForPair(
     const startYear = Math.floor(spousalStartEpoch / 12);
     const filingYear = Math.floor(depFilingEpoch / 12);
     const personal = startYear > filingYear ? depPJCents : depFYCents;
-    const excess = earnerPiaRaw / 2 - personal;
+    const excess = earnerPiaCents / 2 - personal;
     return excess <= 0 ? 0 : Math.floor(excess / 100) * 100;
   }
 
@@ -161,7 +161,7 @@ function spousalCentsForPair(
 
 /** Survivor benefit in cents. */
 function survivorCentsCalc(
-  earnerPiaRaw: number,
+  earnerPiaCents: number,
   earnerNra: number,
   earnerDelayedRetirementIncrease: number,
   earnerSsaBirth: number,
@@ -177,11 +177,11 @@ function survivorCentsCalc(
   let limit = Number.POSITIVE_INFINITY;
   if (earnerFilingEpoch >= earnerDeathEpoch) {
     if (earnerDeathEpoch < earnerNraEpoch) {
-      base = earnerPiaRaw;
+      base = earnerPiaCents;
     } else {
       const effEpoch = Math.min(earnerDeathEpoch, earner70Epoch);
       base = benefitCentsAtAge(
-        earnerPiaRaw,
+        earnerPiaCents,
         earnerNra,
         earnerDelayedRetirementIncrease,
         effEpoch - earnerSsaBirth
@@ -189,14 +189,14 @@ function survivorCentsCalc(
     }
   } else {
     const eBenefit = benefitCentsAtAge(
-      earnerPiaRaw,
+      earnerPiaCents,
       earnerNra,
       earnerDelayedRetirementIncrease,
       earnerFilingEpoch - earnerSsaBirth
     );
     if (earnerFilingEpoch < earnerNraEpoch) {
-      base = earnerPiaRaw;
-      limit = Math.max(Math.round(earnerPiaRaw * 0.825), eBenefit);
+      base = earnerPiaCents;
+      limit = Math.max(Math.round(earnerPiaCents * 0.825), eBenefit);
     } else {
       base = eBenefit;
     }
@@ -245,7 +245,7 @@ export function optimalStrategyCoupleFast(
     classifyEarnerDependent(recipients);
 
   // ── Recipient constants ──
-  const ePiaRaw = earner.pia().primaryInsuranceAmount().cents();
+  const ePiaCents = earner.pia().primaryInsuranceAmount().cents();
   const eNra = earner.normalRetirementAge().asMonths();
   const eDri = earner.delayedRetirementIncrease();
   const eSsaBirth = earner.birthdate
@@ -254,7 +254,7 @@ export function optimalStrategyCoupleFast(
   const eNraEpoch = eSsaBirth + eNra;
   const e70Epoch = eSsaBirth + MAX_BENEFIT_AGE_MONTHS;
 
-  const dPiaRaw = dependent.pia().primaryInsuranceAmount().cents();
+  const dPiaCents = dependent.pia().primaryInsuranceAmount().cents();
   const dNra = dependent.normalRetirementAge().asMonths();
   const dDri = dependent.delayedRetirementIncrease();
   const dSsaBirth = dependent.birthdate
@@ -269,7 +269,7 @@ export function optimalStrategyCoupleFast(
     );
   }
 
-  const depZeroPia = dPiaRaw === 0;
+  const depZeroPia = dPiaCents === 0;
   const spEligible = eligibleForSpousalBenefit(dependent, earner);
 
   const mRate = calculateMonthlyDiscountRate(discountRate);
@@ -394,8 +394,8 @@ export function optimalStrategyCoupleFast(
   const ePersNPV = new Float64Array(nEF);
   for (let i = 0; i < nEF; i++) {
     const age = eStart + i;
-    ePJ[i] = benefitCentsAtAge(ePiaRaw, eNra, eDri, age);
-    eFY[i] = filingYearCents(ePiaRaw, eNra, eDri, age, eSsaBirth, eNraEpoch);
+    ePJ[i] = benefitCentsAtAge(ePiaCents, eNra, eDri, age);
+    eFY[i] = filingYearCents(ePiaCents, eNra, eDri, age, eSsaBirth, eNraEpoch);
     ePersNPV[i] = personalNPV(eSsaBirth + age, eDeath, eFY[i], ePJ[i]);
   }
 
@@ -414,8 +414,15 @@ export function optimalStrategyCoupleFast(
   if (!depZeroPia) {
     for (let i = 0; i < nDF; i++) {
       const age = dStart + i;
-      dPJ[i] = benefitCentsAtAge(dPiaRaw, dNra, dDri, age);
-      dFY[i] = filingYearCents(dPiaRaw, dNra, dDri, age, dSsaBirth, dNraEpoch);
+      dPJ[i] = benefitCentsAtAge(dPiaCents, dNra, dDri, age);
+      dFY[i] = filingYearCents(
+        dPiaCents,
+        dNra,
+        dDri,
+        age,
+        dSsaBirth,
+        dNraEpoch
+      );
       const dFile = dSsaBirth + age;
       dPersFullNPV[i] = personalNPV(dFile, dDeath, dFY[i], dPJ[i]);
       // Truncated endpoint is min(dDeath, eDeath). If dFile > that endpoint
@@ -468,7 +475,7 @@ export function optimalStrategyCoupleFast(
       let isSurvivorActive = false;
       if (dDeath > svStart) {
         survAmt = survivorCentsCalc(
-          ePiaRaw,
+          ePiaCents,
           eNra,
           eDri,
           eSsaBirth,
@@ -509,8 +516,8 @@ export function optimalStrategyCoupleFast(
         const spEnd = svStart - 1 < dDeath ? svStart - 1 : dDeath;
         if (spEnd >= spStart) {
           const spAmt = spousalCentsForPair(
-            dPiaRaw,
-            ePiaRaw,
+            dPiaCents,
+            ePiaCents,
             dFile,
             dNraEpoch,
             spStart,

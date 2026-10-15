@@ -790,10 +790,10 @@ describe('Error cases', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. Survivor benefit with non-round PIAs (floor behavior)
+// 7. Survivor benefit floor-to-dollar behavior (whole-dollar PIAs)
 // ---------------------------------------------------------------------------
 
-describe('Survivor benefit with non-round PIAs', () => {
+describe('Survivor benefit floor-to-dollar behavior', () => {
   it('PIA $1234: verify floor to dollar on base', () => {
     const deceased = makeRecipient(1234, 1962, 0, 2);
     const survivor = makeRecipient(500, 1964, 0, 2);

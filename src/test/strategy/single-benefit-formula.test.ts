@@ -33,12 +33,12 @@ function age(years: number, months: number): MonthDuration {
  * Computes the expected benefit in cents using the SSA formula.
  *
  * The benefitAtAge function does:
- *   floor(PIA to dollar) -> multiply by (1 + multiplier) -> floor to dollar
+ *   multiply PIA by (1 + multiplier) -> floor to dollar
  *
  * Money.times(factor) internally computes Math.round(cents * factor),
  * then floorToDollar does Math.floor(cents / 100) * 100.
  *
- * @param piaCents PIA in cents (already floored to dollar by benefitAtAge)
+ * @param piaCents PIA in cents
  * @param nraMonths NRA in total months
  * @param ageMonths Filing age in total months
  * @param delayedIncrease Annual delayed retirement increase (e.g. 0.08)
@@ -50,9 +50,6 @@ function expectedBenefitCents(
   ageMonths: number,
   delayedIncrease: number
 ): number {
-  // Floor PIA to whole dollar first
-  const piaFloored = Math.floor(piaCents / 100) * 100;
-
   let multiplier: number;
   if (ageMonths < nraMonths) {
     // Early filing
@@ -68,7 +65,7 @@ function expectedBenefitCents(
   }
 
   // Money.times does Math.round(cents * factor)
-  const afterMultiply = Math.round(piaFloored * (1 + multiplier));
+  const afterMultiply = Math.round(piaCents * (1 + multiplier));
   // Then floorToDollar
   return Math.floor(afterMultiply / 100) * 100;
 }
@@ -247,7 +244,6 @@ describe('benefitAtAge early filing - specific months', () => {
   it('PIA $1234 at age 63y3m (45 months early)', () => {
     const r = makeRecipient(1234, 1965, 5, 15);
     // 45 months early: 36*5/900 + 9*5/1200 = 0.2 + 0.0375 = 0.2375
-    // PIA floored = 123400 (already whole dollar)
     // round(123400 * (1 - 0.2375)) = round(123400 * 0.7625) = round(94092.5) = 94093
     // floor(94093/100)*100 = 94000
     const expected = expectedBenefitCents(123400, nra, 63 * 12 + 3, delay);
@@ -257,7 +253,6 @@ describe('benefitAtAge early filing - specific months', () => {
   it('PIA $2777 at age 64y9m (27 months early)', () => {
     const r = makeRecipient(2777, 1965, 5, 15);
     // 27 months early: 27*5/900 = 0.15
-    // PIA floored = 277700
     // round(277700 * 0.85) = round(236045) = 236045
     // floor(236045/100)*100 = 236000
     const expected = expectedBenefitCents(277700, nra, 64 * 12 + 9, delay);
@@ -393,11 +388,20 @@ describe('benefitAtAge delayed filing', () => {
 // ---------------------------------------------------------------------------
 
 describe('benefitAtAge with non-round PIA', () => {
-  // These PIAs are already whole dollars (Money.from rounds to cents),
-  // so the first floorToDollar is a no-op. The interesting part is
-  // whether the second floorToDollar correctly truncates the result.
+  // Most of these PIAs are whole dollars; they check that floorToDollar
+  // truncates the adjusted benefit. The last case has cents, where the
+  // factor must apply to the PIA before any rounding to the dollar.
   const nra = 67 * 12;
   const delay = 0.08;
+
+  it('PIA $2345.60 at age 70y0m applies credits to the cents', () => {
+    const r = makeRecipient(2345.6, 1965, 5, 15);
+    // round(234560 * 1.24) = 290854 -> $2908. Flooring the PIA to $2345
+    // first would give round(234500 * 1.24) = 290780 -> $2907.
+    const expected = expectedBenefitCents(234560, nra, 70 * 12, delay);
+    expect(expected).toBe(290800);
+    expect(benefitAtAge(r, age(70, 0)).cents()).toBe(expected);
+  });
 
   it('PIA $1234 at age 62y0m', () => {
     const r = makeRecipient(1234, 1965, 5, 15);
@@ -706,7 +710,6 @@ describe('Exhaustive monthly sweep', () => {
    * using the same SSA formula as expectedBenefitCents.
    */
   function ssaExpected(piaCents: number, ageMonths: number): number {
-    const piaFloored = Math.floor(piaCents / 100) * 100;
     let multiplier: number;
     if (ageMonths < nra) {
       const monthsBefore = nra - ageMonths;
@@ -718,7 +721,7 @@ describe('Exhaustive monthly sweep', () => {
       const monthsAfter = ageMonths - nra;
       multiplier = (delay / 12) * monthsAfter;
     }
-    const afterMultiply = Math.round(piaFloored * (1 + multiplier));
+    const afterMultiply = Math.round(piaCents * (1 + multiplier));
     return Math.floor(afterMultiply / 100) * 100;
   }
 
