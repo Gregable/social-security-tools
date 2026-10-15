@@ -101,6 +101,8 @@ export const PASTE_FLOW_EVENTS = {
   parseFailed: 'Paste Flow: Parse Failed',
   linkClicked: 'Paste Flow: Link Clicked',
   helpExpanded: 'Paste Flow: Help Expanded',
+  /** The error's "Clear and try again" button; props wrong_page and is_spouse_entry. */
+  pasteReset: 'Paste Flow: Paste Reset',
 } as const;
 
 /** Links on the entry step whose clicks are tracked. */

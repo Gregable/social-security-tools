@@ -1,5 +1,5 @@
 import posthog from 'posthog-js';
-import { flushSync, mount, unmount } from 'svelte';
+import { flushSync, mount, tick, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import PastePrompt from '$lib/components/PastePrompt.svelte';
 
@@ -10,8 +10,9 @@ const HOME_PAGE_PASTE =
   'Review your full earnings record now\n';
 
 /**
- * The paste box's error message. A paste of the my Social Security home page
- * gets directions to the earnings record instead of the generic error.
+ * The paste box's error message, which takes the box's place until the user
+ * resets it. A paste of the my Social Security home page gets directions to
+ * the earnings record instead of the generic error.
  */
 describe('PastePrompt error message', () => {
   let cleanup: (() => void) | null = null;
@@ -29,6 +30,8 @@ describe('PastePrompt error message', () => {
     readonly target: HTMLElement;
     /** Replaces the paste box's contents, as a paste or edit would. */
     readonly setText: (contents: string) => void;
+    /** Clicks the error's reset button. */
+    readonly reset: () => void;
   }
 
   function render(props: { name?: string } = {}): Rendered {
@@ -39,14 +42,21 @@ describe('PastePrompt error message', () => {
       unmount(component);
       target.remove();
     };
-    const textarea = target.querySelector('textarea');
-    if (!textarea) throw new Error('PastePrompt has no textarea');
+    // The box is replaced while an error shows, so look it up each time.
     const setText = (contents: string) => {
+      const textarea = target.querySelector('textarea');
+      if (!textarea) throw new Error('No paste box to type into');
       textarea.value = contents;
       textarea.dispatchEvent(new Event('input'));
       flushSync();
     };
-    return { target, setText };
+    const reset = () => {
+      const button = target.querySelector<HTMLButtonElement>('.resetButton');
+      if (!button) throw new Error('No reset button in the error');
+      button.click();
+      flushSync();
+    };
+    return { target, setText, reset };
   }
 
   function errorText(target: HTMLElement): string {
@@ -81,23 +91,42 @@ describe('PastePrompt error message', () => {
   it('keeps the generic message for other unparseable pastes', () => {
     const { target, setText } = render();
     setText('not an earnings record');
-    expect(errorText(target)).toContain('could not be parsed');
+    expect(errorText(target)).toContain("couldn't read an earnings record");
     expect(errorText(target)).not.toContain('home page');
   });
 
-  it('reverts to the generic message when edited to other garbage', () => {
+  it('shows the error in place of the paste box', () => {
     const { target, setText } = render();
-    setText(HOME_PAGE_PASTE);
     setText('not an earnings record');
-    expect(errorText(target)).toContain('could not be parsed');
-    expect(errorText(target)).not.toContain('home page');
+    expect(target.querySelector('textarea')).toBeNull();
+    expect(target.querySelector('.pasteArea .pasteError')).not.toBeNull();
   });
 
-  it('clears the error when the box is emptied', () => {
+  it('moves focus to the reset button, since the focused box is gone', async () => {
     const { target, setText } = render();
+    setText('not an earnings record');
+    await tick();
+    expect(document.activeElement).toBe(target.querySelector('.resetButton'));
+  });
+
+  it('brings back an empty, focused paste box on reset', async () => {
+    const { target, setText, reset } = render();
     setText(HOME_PAGE_PASTE);
-    setText('');
+    reset();
+    await tick();
+    const textarea = target.querySelector('textarea');
+    expect(textarea?.value).toBe('');
+    expect(document.activeElement).toBe(textarea);
     expect(target.querySelector('.pasteError')).toBeNull();
+  });
+
+  it('shows the generic message for a new failure after a home page reset', () => {
+    const { target, setText, reset } = render();
+    setText(HOME_PAGE_PASTE);
+    reset();
+    setText('not an earnings record');
+    expect(errorText(target)).toContain("couldn't read an earnings record");
+    expect(errorText(target)).not.toContain('home page');
   });
 
   it('reports the home page as wrong_page in Parse Failed', () => {
@@ -119,6 +148,26 @@ describe('PastePrompt error message', () => {
       'Paste Flow: Parse Failed',
       expect.objectContaining({ wrong_page: null })
     );
+  });
+
+  it('reports a reset with the wrong page it dismissed', () => {
+    const { setText, reset } = render();
+    setText(HOME_PAGE_PASTE);
+    reset();
+    expect(posthog.capture).toHaveBeenCalledWith('Paste Flow: Paste Reset', {
+      wrong_page: 'my_ssa_home',
+      is_spouse_entry: false,
+    });
+  });
+
+  it('reports a reset of the generic error with no wrong page', () => {
+    const { setText, reset } = render();
+    setText('not an earnings record');
+    reset();
+    expect(posthog.capture).toHaveBeenCalledWith('Paste Flow: Paste Reset', {
+      wrong_page: null,
+      is_spouse_entry: false,
+    });
   });
 
   it('tracks clicks on the earnings record link as its own link', () => {

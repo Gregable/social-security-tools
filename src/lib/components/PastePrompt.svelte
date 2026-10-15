@@ -5,9 +5,10 @@
     Walks the user through copying their earnings record from ssa.gov and
     pasting it, with copy instructions for touch screens or keyboards (Cmd+A
     or Ctrl+A). Also offers PIA entry and, for a spouse, a skip option.
-    A paste that fails to parse gets a generic error or, when it is
-    recognizably the my Social Security home page, a link to the earnings
-    record instead.
+    A paste that fails to parse is replaced, in the paste box's place, by a
+    generic error or, when it is recognizably the my Social Security home
+    page, a link to the earnings record instead; a reset button brings the
+    box back.
     Sends "Paste Flow:" link, help and parse-failure events
     (see $lib/analytics/paste-flow).
 
@@ -22,7 +23,7 @@
 
 <script lang="ts">
 import posthog from 'posthog-js';
-import { onMount } from 'svelte';
+import { onMount, tick } from 'svelte';
 import { browser } from '$app/environment';
 import {
   failedPasteProperties,
@@ -61,6 +62,8 @@ let pasteError: boolean = false;
 // The ssa.gov page a failed paste was recognized as, or null. Read only while
 // pasteError is set, to pick the error message.
 let wrongPage: WrongSsaPage | null = null;
+let pasteBox: HTMLTextAreaElement | undefined;
+let resetButton: HTMLButtonElement | undefined;
 let failureReported: boolean = false;
 
 // Touch vs keyboard instructions are chosen in CSS so they are right on first
@@ -114,7 +117,21 @@ function parsePasteContents(contents: string) {
     reportOutcome('failed', contents);
     wrongPage = detectWrongSsaPage(contents);
     pasteError = true;
+    // The error replaces the focused paste box, so hand focus to its button.
+    tick().then(() => resetButton?.focus());
   }
+}
+
+async function resetPaste() {
+  if (browser) {
+    posthog.capture(PASTE_FLOW_EVENTS.pasteReset, {
+      wrong_page: wrongPage,
+      is_spouse_entry: isSpouse,
+    });
+  }
+  pasteContents = '';
+  await tick();
+  pasteBox?.focus();
 }
 $: parsePasteContents(pasteContents);
 
@@ -214,34 +231,6 @@ function skipEarnings() {
       >
     </li>
   </ol>
-  {#if pasteError}
-    <div class="pasteError" role="alert">
-      <span class="warningIcon">&#x26A0;</span>
-      {#if wrongPage === 'my_ssa_home'}
-        <p>
-          This looks like the my Social Security home page, not {name
-            ? `${name}'s`
-            : 'your'} earnings record. Clear the box, open the
-          <a
-            href="https://secure.ssa.gov/ec2/eligibility-earnings-ui/earnings-record"
-            target="_blank"
-            on:click={() => trackLink('wrong_page_earnings_record')}
-            >earnings record</a
-          > (the <em>"Review your full earnings record now"</em> link on that
-          page), and copy that page instead.
-        </p>
-      {:else}
-        <p>
-          The data you have pasted could not be parsed. Please clear the box and
-          try again. <a
-            href="/guides/earnings-record-paste"
-            target="_blank"
-            on:click={() => trackLink('paste_help_guide')}>Additional Help</a
-          >
-        </p>
-      {/if}
-    </div>
-  {/if}
   <div class="pasteArea">
     <div>
       <div class="privateDataNotice">
@@ -249,11 +238,49 @@ function skipEarnings() {
         <span>100% private — your data never leaves your device.</span>
         <a href="/guides/privacy" class="learnMore">Learn more</a>
       </div>
-      <textarea
-        wrap="soft"
-        placeholder={'Paste your earnings record here'}
-        bind:value={pasteContents}
-      ></textarea>
+      {#if pasteError}
+        <div class="pasteError" role="alert">
+          {#if wrongPage === 'my_ssa_home'}
+            <p>
+              <span class="warningIcon" aria-hidden="true">&#x26A0;</span>
+              This looks like the my Social Security home page, not {name
+                ? `${name}'s`
+                : 'your'} earnings record. Open the
+              <a
+                href="https://secure.ssa.gov/ec2/eligibility-earnings-ui/earnings-record"
+                target="_blank"
+                on:click={() => trackLink('wrong_page_earnings_record')}
+                >earnings record</a
+              > (the <em>"Review your full earnings record now"</em> link on
+              that page), copy that page, and paste it here.
+            </p>
+          {:else}
+            <p>
+              <span class="warningIcon" aria-hidden="true">&#x26A0;</span>
+              We couldn't read an earnings record from what you pasted. Make
+              sure you copied the whole table, then try again.
+              <a
+                href="/guides/earnings-record-paste"
+                target="_blank"
+                on:click={() => trackLink('paste_help_guide')}
+                >Additional help</a
+              >
+            </p>
+          {/if}
+          <button
+            class="resetButton"
+            bind:this={resetButton}
+            on:click={resetPaste}>Clear and try again</button
+          >
+        </div>
+      {:else}
+        <textarea
+          wrap="soft"
+          placeholder={'Paste your earnings record here'}
+          bind:this={pasteBox}
+          bind:value={pasteContents}
+        ></textarea>
+      {/if}
     </div>
   </div>
   </div>
@@ -428,20 +455,29 @@ function skipEarnings() {
     font-size: 14px;
   }
 
+  /* Takes the paste box's place, at least as tall, so the eye stays put. */
   .pasteError {
-    max-width: 480px;
-    margin: 0 auto 1em auto;
-    padding: 0;
-    width: 100%;
+    min-height: 100px;
+    border: 2px solid #d97706;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fffbeb;
+    box-sizing: border-box;
     font-size: 16px;
-    display: grid;
-    grid-template-columns: min-content auto;
+    text-align: center;
+  }
+
+  .pasteError p {
+    margin: 0 0 8px 0;
   }
 
   .warningIcon {
-    font-size: 32px;
-    color: #ff0000;
-    padding: 0 10px 0 0;
+    color: #d97706;
+    margin-right: 4px;
+  }
+
+  .resetButton {
+    padding: 6px 16px;
   }
 
   textarea {
