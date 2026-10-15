@@ -33,9 +33,9 @@ function age(years: number, months: number): MonthDuration {
  * Computes the expected benefit in cents using the SSA formula.
  *
  * SSA multiplies the PIA by (1 + multiplier) and truncates to the dollar,
- * never rounding up. The multiplier is a whole number of 1/3600ths before
- * NRA (5/9% = 20/3600, 5/12% = 15/3600 a month) and of 1/12000ths after it
- * (an 8% annual credit is 80/12000 a month), so this works in integers.
+ * never rounding up. The reduction or credit is a whole number of 1/3600ths
+ * before NRA (5/9% = 20/3600, 5/12% = 15/3600 a month) and of 1/12000ths after
+ * it (an 8% annual credit is 80/12000 a month), so this works in integers.
  *
  * @param piaCents PIA in cents
  * @param nraMonths NRA in total months

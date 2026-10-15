@@ -199,7 +199,7 @@ describe('Deceased never filed - died after NRA', () => {
   it('died at 68 (12 months delayed credits): gets 108% of PIA', () => {
     // NRA = 67y0m, died at 68y0m => 12 months of delayed credits at 8%/yr
     // multiplier = (0.08/12)*12 = 0.08
-    // benefit = floor(round(PIA_cents * 1.08) / 100) * 100
+    // benefit = floor(PIA_cents * 1.08 / 100) * 100
     const deceased = makeRecipient(2000, 1962, 0, 2);
     const survivor = makeRecipient(800, 1964, 0, 2);
 
@@ -217,7 +217,7 @@ describe('Deceased never filed - died after NRA', () => {
 
     // Hand calc: PIA = $2000 = 200000 cents
     // benefitAtAge at 68y0m: multiplier = (0.08/12)*12 = 0.08
-    // round(200000 * 1.08) = 216000, floor(216000/100)*100 = 216000
+    // 200000 * 1.08 = 216000, floor(216000/100)*100 = 216000
     // = $2160
     const expectedBenefit = benefitOnDate(
       deceased,
@@ -250,7 +250,7 @@ describe('Deceased never filed - died after NRA', () => {
     );
 
     // multiplier = (0.08/12)*24 = 0.16, benefit = 1500 * 1.16 = $1740
-    // round(150000 * 1.16) = 174000, floor(174000/100)*100 = 174000
+    // 150000 * 1.16 = 174000, floor(174000/100)*100 = 174000
     // Survivor at NRA or after => full base
     expect(result.value()).toBe(1740);
   });
@@ -338,7 +338,7 @@ describe('Deceased filed early - RIB-LIM', () => {
     // PIA = $2000 = 200000 cents
     // 82.5%: round(200000 * 0.825) = 165000 cents
     // Actual at 62: benefitAtAge at 62y0m
-    //   multiplier = -0.3, round(200000*0.7) = 140000
+    //   multiplier = -0.3, 200000*0.7 = 140000
     //   floor(140000/100)*100 = 140000 = $1400
     // max(165000, 140000) = 165000, floor(165000) = 165000
     // base = 165000 cents. Survivor at NRA => floor(165000/100)*100 = $1650
@@ -362,7 +362,7 @@ describe('Deceased filed early - RIB-LIM', () => {
     );
 
     // 82.5%: round(100000 * 0.825) = round(82500) = 82500
-    // Actual at 62: round(100000 * 0.7) = 70000, floor = 70000
+    // Actual at 62: 100000 * 0.7 = 70000, floor = 70000
     // max(82500, 70000) = 82500, floor(82500) = 82500
     // Survivor at NRA: floor(82500/100)*100 = $825
     expect(result.value()).toBe(825);
@@ -392,7 +392,7 @@ describe('Deceased filed early - RIB-LIM', () => {
 
     // PIA = $2000 = 200000 cents
     // multiplier = -(24*5/900) = -0.133333...
-    // round(200000 * (1 - 0.133333...)) = round(200000 * 0.866667) = round(173333.4) = 173333
+    // 200000 * (1 - 0.133333...) = 173333.33...
     // floor(173333/100)*100 = 173300 (actual benefit)
     // 82.5%: round(200000 * 0.825) = 165000
     // max(173300, 165000) = 173300
@@ -448,7 +448,7 @@ describe('Deceased filed early - RIB-LIM', () => {
     );
 
     // At 70: multiplier = (0.08/12)*36 = 0.24
-    // actual = round(200000 * 1.24) = 248000, floor = 248000
+    // actual = 200000 * 1.24 = 248000, floor = 248000
     // 82.5%: 165000
     // max(248000, 165000) = 248000
     // Survivor at 75y1m >= NRA => full base: $2480
@@ -476,7 +476,7 @@ describe('Deceased filed early - RIB-LIM', () => {
       survivorFilingDate
     );
 
-    // actual: round(200000 * 0.8) = 160000, floor = 160000
+    // actual: 200000 * 0.8 = 160000, floor = 160000
     // 82.5%: round(200000 * 0.825) = 165000
     // max(165000, 160000) = 165000, floor = 165000
     // $1650
@@ -569,7 +569,7 @@ describe('Survivor at full retirement age', () => {
 
     // RIB-LIM: max(82.5% of PIA, actual at 62)
     // 82.5%: round(200000*0.825) = 165000
-    // Actual at 62: 0.7 reduction => round(200000*0.7)=140000, floor=140000
+    // Actual at 62: 0.7 reduction => 200000*0.7=140000, floor=140000
     // max(165000, 140000) = 165000
     // Survivor at NRA: floor(165000/100)*100 = $1650
     expect(result.value()).toBe(1650);
@@ -832,7 +832,7 @@ describe('Survivor benefit floor-to-dollar behavior', () => {
 
     // PIA = $1777 = 177700 cents
     // 82.5%: round(177700 * 0.825) = round(146602.5) = 146603
-    // Actual at 62: round(177700 * 0.7) = round(124390) = 124390
+    // Actual at 62: 177700 * 0.7 = 124390
     //   floor(124390/100)*100 = 124300
     // max(146603, 124300) = 146603
     // floor(146603) = 146603 (already cents)

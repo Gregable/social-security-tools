@@ -59,21 +59,19 @@ import {
 // ─────────────────────────────────────────────────────────────────────────
 // Shared primitives
 //
-// The personal benefit itself comes from benefitCentsAtAge in
-// benefit-calculator.ts, shared with the slow path. The three functions
-// below (filingYearCents, spousalCentsForPair, survivorCentsCalc) are
-// byte-for-byte copies of the same-named helpers in the "Shared primitives"
-// block of expected-npv.ts.
-// (Named rather than line-numbered: line ranges rot on the next edit.) They are
-// duplicated rather than imported to keep this hot-path module
-// self-contained for inlining. Authoritative docstrings (early-filing
-// rules, "January bump", survivor ratio, etc.) live in expected-npv.ts;
-// consult those when editing.
+// The personal benefit at a filing age is not copied: it comes from
+// benefitCentsAtAge in benefit-calculator.ts, which benefitAtAge and
+// expected-npv.ts also use. The three functions below (filingYearCents,
+// spousalCentsForPair, survivorCentsCalc) are byte-for-byte copies of the
+// same-named helpers in the "COUPLE — FAST PATH (optimized)" block of
+// expected-npv.ts. (Named rather than line-numbered: line ranges rot on the
+// next edit.) Authoritative docstrings (early-filing rules, "January bump",
+// survivor ratio, etc.) live in expected-npv.ts; consult those when editing.
 //
 // Drift between the two copies will only surface through golden tests
 // (grid-optimal-goldens.test.ts + expected-npv-couple-goldens.test.ts),
-// so edit both copies together. Extracting to a shared module is a
-// pending follow-up.
+// so edit both copies together. Moving them into a shared module, as
+// benefitCentsAtAge now is, is a pending follow-up.
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Personal benefit during the filing year (before next January), in cents. */

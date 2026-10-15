@@ -146,7 +146,7 @@ describe('Born on 1st: benefit amount at 62y0m', () => {
     const r = makeRecipient(2000, 1964, 0, 1);
     const benefit = benefitAtAge(r, age(62, 0));
     // PIA = $2000 => 200000 cents. Multiplier = 1 - 0.30 = 0.70.
-    // Math.round(200000 * 0.70) = 140000, floor to dollar = 140000.
+    // 200000 * 0.70 = 140000, truncated to the dollar = 140000.
     expect(benefit.cents()).toBe(140000);
   });
 
@@ -175,7 +175,7 @@ describe('Born on 15th: benefit amount at 62y1m', () => {
     // monthsBefore = 804 - 745 = 59
     // reduction = 36*5/900 + 23*5/1200 = 0.2 + 0.09583333...
     // multiplier = 1 - 0.29583333... = 0.70416666...
-    // Math.round(200000 * 0.70416666...) = Math.round(140833.33...) = 140833
+    // 200000 * 0.70416666... = 140833.33...
     // floor to dollar = 140800
     expect(benefit.cents()).toBe(140800);
   });
@@ -183,7 +183,7 @@ describe('Born on 15th: benefit amount at 62y1m', () => {
   it('$1500 PIA, born Mar 15 1964, files at 62y1m', () => {
     const r = makeRecipient(1500, 1964, 2, 15);
     const benefit = benefitAtAge(r, age(62, 1));
-    // 150000 * 0.70416666... = Math.round(105625.0) = 105625
+    // 150000 * 0.70416666... = 105625
     // floor to dollar = 105600
     expect(benefit.cents()).toBe(105600);
   });
@@ -424,7 +424,7 @@ describe('December birthday special case', () => {
     // Benefit at filing age (1 month after NRA) with full delayed credits
     const fullBenefit = benefitAtAge(r, filingAge);
     // 1 month of delayed credits at 8%/yr = 0.08/12 = 0.006666...
-    // Math.round(200000 * 1.006666...) = Math.round(201333.33...) = 201333
+    // 200000 * 1.006666... = 201333.33...
     // floor to dollar = 201300
     expect(fullBenefit.cents()).toBe(201300);
 

@@ -145,8 +145,9 @@ export interface CoupleFilingAgeResult {
 // Correctness note: the formulas here MUST match the object-oriented
 // implementations in benefit-calculator.ts / strategy-calc.ts to the last
 // rounding step. Any divergence will show up as a golden-test failure.
-// The personal benefit at a filing age is not copied: both paths call
-// benefitCentsAtAge from benefit-calculator.ts.
+// The personal benefit at a filing age is not copied: this file,
+// optimal-strategy-fast.ts and benefitAtAge all use benefitCentsAtAge from
+// benefit-calculator.ts.
 
 /**
  * Personal benefit during the filing year, in cents.

@@ -4,6 +4,7 @@ import {
   allBenefitsOnDateNominal,
   baseSpousalBenefit,
   benefitAtAge,
+  benefitCentsAtAge,
   benefitOnDate,
   benefitOnDateNominal,
   eligibleForSpousalBenefit,
@@ -382,7 +383,7 @@ describe('benefitAtAge rounding', () => {
  * Checks benefitAtAge against exact rational arithmetic for every filing
  * month from 62 to 70 and a run of dime PIAs, at each delayed retirement
  * credit rate. Floating-point shortcuts that round to the cent before the
- * dollar floor pay $1 too much on roughly 1 in 300 of these.
+ * dollar floor pay $1 too much on roughly 1 in 250 of these.
  */
 describe('benefitAtAge matches exact SSA arithmetic', () => {
   // [birth year, FRA years, FRA months, annual delayed credit as n / 1000].
@@ -440,4 +441,26 @@ describe('benefitAtAge matches exact SSA arithmetic', () => {
     r.setPia(Money.fromCents(cents));
     return r;
   }
+});
+
+describe('benefitCentsAtAge delayed credit rates', () => {
+  it('accepts every rate in the full retirement age table', () => {
+    // A rate that is not a whole number of tenths of a percent would throw
+    // at runtime for that birth cohort; catch a bad constant here instead.
+    for (const bracket of constants.FULL_RETIREMENT_AGE) {
+      const fra = bracket.ageYears * 12 + bracket.ageMonths;
+      expect(() =>
+        benefitCentsAtAge(100000, fra, bracket.delayedIncreaseAnnual, 70 * 12)
+      ).not.toThrow();
+    }
+  });
+
+  it('rejects a rate that is not a whole number of tenths of a percent', () => {
+    // The rate only matters at or after full retirement age.
+    expect(() => benefitCentsAtAge(100000, 804, 0.0667, 816)).toThrow(
+      /tenths of a percent/
+    );
+    // 12 months early: $1,000 x 3360/3600 = $933.33, paid as $933.
+    expect(benefitCentsAtAge(100000, 804, 0.0667, 792)).toBe(93300);
+  });
 });

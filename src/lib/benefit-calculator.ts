@@ -61,6 +61,8 @@ function delayedCreditPerMille(delayedRetirementIncrease: number): number {
  * @param nraMonths - Full retirement age in months
  * @param delayedRetirementIncrease - Annual delayed credit rate, e.g. 0.08
  * @param ageMonths - Claiming age in months; ages past 70 count as 70
+ * @throws Error if claiming at or after full retirement age with a delayed
+ *   credit rate that is not a whole number of tenths of a percent
  */
 export function benefitCentsAtAge(
   piaCents: number,
