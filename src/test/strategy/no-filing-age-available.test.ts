@@ -51,6 +51,13 @@ const age = (years: number, months = 0): MonthDuration =>
 const monthDate = (year: number, monthIndex: number): MonthDate =>
   MonthDate.initFromYearsMonths({ years: year, months: monthIndex });
 
+/**
+ * Mid-month in `month`, for currentAge(), which otherwise reads today's date
+ * and would make these checks fail once the people in them have a birthday.
+ */
+const midMonth = (month: MonthDate): Date =>
+  new Date(Date.UTC(month.year(), month.monthIndex(), 15));
+
 function flatDeathDistribution(
   fromAge: number
 ): { age: number; probability: number }[] {
@@ -69,7 +76,7 @@ describe('earliestModelableDeathAge', () => {
     const r = makeRecipient(2000, 1964, 5, 15);
     const currentDate = monthDate(2026, 6); // Jul 2026 -> age 62y1m
 
-    expect(r.birthdate.currentAge()).toBe(62);
+    expect(r.birthdate.currentAge(midMonth(currentDate))).toBe(62);
     expect(earliestFiling(r, currentDate).asMonths()).toBe(
       age(62, 1).asMonths()
     );
@@ -84,7 +91,7 @@ describe('earliestModelableDeathAge', () => {
     const r = makeRecipient(2000, 1955, 9, 15);
     const currentDate = monthDate(2026, 8); // Sep 2026 -> age 70y11m
 
-    expect(r.birthdate.currentAge()).toBe(70);
+    expect(r.birthdate.currentAge(midMonth(currentDate))).toBe(70);
     const modelable = earliestModelableDeathAge(r, currentDate);
     expect(modelable.asMonths()).toBe(age(70, 11).asMonths());
     expect(modelable.greaterThanOrEqual(earliestFiling(r, currentDate))).toBe(
