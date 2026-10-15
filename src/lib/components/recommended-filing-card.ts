@@ -113,20 +113,34 @@ export function currentMonthDate(now: Date = new Date()): MonthDate {
 }
 
 /**
- * Why a recipient has no filing age left to choose:
+ * Why a recipient has no filing age left to choose, checked in this order:
  * - `filed`: their benefits have already started.
  * - `spousal-only`: they have no benefit on their own record, so filing only
- *   starts a spousal benefit on their spouse's, and they are past full
- *   retirement age, where spousal benefits stop growing.
- * - `past-seventy`: they are past 70, where delayed retirement credits stop.
+ *   starts a spousal benefit on their spouse's, and they have reached full
+ *   retirement age, where spousal benefits stop growing. This comes before
+ *   `past-seventy`: delayed retirement credits have nothing to grow for them.
+ * - `past-seventy`: they are at least 70 and 6 months old, too late to
+ *   backdate a claim to before 70, where delayed retirement credits stop
+ *   (see `filingAgeRange`).
  */
 export type NoChoiceReason = 'filed' | 'spousal-only' | 'past-seventy';
 
 /**
+ * Why each recipient has no filing age left to choose, or null while they
+ * have one. The second entry is null when there is no second recipient.
+ */
+export type NoChoiceReasons = readonly [
+  NoChoiceReason | null,
+  NoChoiceReason | null,
+];
+
+/**
  * Why `recipient` has no filing age left to choose as of `currentDate`, or
- * null while they still have one. `filedAt` is the month their benefits
- * started, or null; it must pass `validateFiledMonth` (see
- * `filingAgeRange`, which throws otherwise).
+ * null while they still have one. `spouse` is the other member of a couple,
+ * or null for a single person: `spousal-only` needs their PIA to be more
+ * than $0. `filedAt` is the month the recipient's benefits started, or null;
+ * it must pass `validateFiledMonth` (see `filingAgeRange`, which throws
+ * otherwise).
  */
 export function noChoiceReason(
   recipient: Recipient,
@@ -149,47 +163,92 @@ export function noChoiceReason(
   return range.hasChoice ? null : 'past-seventy';
 }
 
+/** `noChoiceReason` for both members of a couple, or for a single person. */
+export function noChoiceReasons(
+  recipient: Recipient,
+  spouse: Recipient | null,
+  currentDate: MonthDate = currentMonthDate(),
+  alreadyFiled: AlreadyFiled = NOT_FILED
+): NoChoiceReasons {
+  return [
+    noChoiceReason(recipient, spouse, currentDate, alreadyFiled[0]),
+    spouse
+      ? noChoiceReason(spouse, recipient, currentDate, alreadyFiled[1])
+      : null,
+  ];
+}
+
+/**
+ * When the other spouse's benefits start: `month`, which has already passed
+ * if `filed`, or is the recommended filing month otherwise (itself in the
+ * past for a claim to backdate).
+ */
+export interface OtherSpouseStart {
+  readonly month: MonthDate;
+  readonly filed: boolean;
+}
+
 /**
  * When a spouse whose reason is `spousal-only` should file. Their spousal
- * benefit has stopped growing and can start only once the other spouse's
- * benefits have, so it starts with them: in the month they start, or, once
- * that has passed, now, backdated as far as SSA pays (20 CFR 404.621): up to
- * six months, but not before the other spouse's benefits started or before
- * their own full retirement age, which would add reduction.
+ * benefit has stopped growing and cannot start before the other spouse's
+ * benefits, so it starts with them:
+ * - `with-other`: the other spouse is still to file, in `month` (this month
+ *   or later); file then too.
+ * - `now`: the other spouse's benefits have started, or start with a claim
+ *   backdated from now; file now and ask SSA to backdate to `backdateTo`,
+ *   or null when that would be this month. SSA pays up to six months back
+ *   (20 CFR 404.621), never before the other spouse's benefits started, and
+ *   never before the spouse's own full retirement age, which would add a
+ *   reduction. `limit` names which of those sets `backdateTo`.
  */
 export type SpousalOnlyAdvice =
-  | { readonly kind: 'file-in'; readonly month: MonthDate }
-  | { readonly kind: 'file-now'; readonly backdateTo: MonthDate };
+  | { readonly kind: 'with-other'; readonly month: MonthDate }
+  | {
+      readonly kind: 'now';
+      readonly backdateTo: MonthDate | null;
+      readonly limit: 'other-start' | 'full-retirement-age' | 'six-months';
+    };
 
+/** SSA's six-month limit on back payments, as in `earliestFiling`. */
 const MAX_RETROACTIVE = MonthDuration.initFromYearsMonths({
   years: 0,
   months: 6,
 });
 
-/** See `SpousalOnlyAdvice`; `otherStart` is when the other spouse's benefits start. */
+/** See `SpousalOnlyAdvice`. */
 export function spousalOnlyAdvice(
   recipient: Recipient,
-  otherStart: MonthDate,
+  other: OtherSpouseStart,
   currentDate: MonthDate
 ): SpousalOnlyAdvice {
-  if (!otherStart.lessThan(currentDate)) {
-    return { kind: 'file-in', month: otherStart };
+  if (!other.filed && !other.month.lessThan(currentDate)) {
+    return { kind: 'with-other', month: other.month };
   }
+  const fullRetirement = recipient.normalRetirementDate();
   const earliest = MonthDate.max(
-    MonthDate.max(otherStart, currentDate.subtractDuration(MAX_RETROACTIVE)),
-    recipient.normalRetirementDate()
+    MonthDate.max(other.month, currentDate.subtractDuration(MAX_RETROACTIVE)),
+    fullRetirement
   );
-  return earliest.lessThan(currentDate)
-    ? { kind: 'file-now', backdateTo: earliest }
-    : { kind: 'file-in', month: currentDate };
+  const same = (a: MonthDate) =>
+    a.monthsSinceEpoch() === earliest.monthsSinceEpoch();
+  return {
+    kind: 'now',
+    backdateTo: earliest.lessThan(currentDate) ? earliest : null,
+    limit: same(other.month)
+      ? 'other-start'
+      : same(fullRetirement)
+        ? 'full-retirement-age'
+        : 'six-months',
+  };
 }
 
 /**
  * Whether each recipient still has a filing age to choose, as of
- * `currentDate`: false for every reason in `NoChoiceReason`, since
- * presenting a filing date to them would imply a decision they no longer
- * have. Index 1 is always true when there is no second recipient, so
- * single-recipient callers can ignore it.
+ * `currentDate`: false for every reason in `NoChoiceReason`, since an
+ * optimized filing age for them would imply a decision they no longer have.
+ * Their start is a fact, is now, or follows the other spouse's. Index 1 is
+ * always true when there is no second recipient, so single-recipient callers
+ * can ignore it.
  *
  * Shared so the two surfaces that render a recommendation, the strategy page
  * and the calculator's card, cannot disagree about who still has a choice.
@@ -200,12 +259,13 @@ export function filingChoices(
   currentDate: MonthDate = currentMonthDate(),
   alreadyFiled: AlreadyFiled = NOT_FILED
 ): [boolean, boolean] {
-  return [
-    noChoiceReason(recipient, spouse, currentDate, alreadyFiled[0]) === null,
-    spouse
-      ? noChoiceReason(spouse, recipient, currentDate, alreadyFiled[1]) === null
-      : true,
-  ];
+  const [first, second] = noChoiceReasons(
+    recipient,
+    spouse,
+    currentDate,
+    alreadyFiled
+  );
+  return [first === null, second === null];
 }
 
 /**

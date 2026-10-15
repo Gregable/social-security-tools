@@ -49,18 +49,22 @@ describe('StrategyPromo', () => {
     for (const cleanup of cleanups.splice(0)) cleanup();
   });
 
-  function intro(r: Recipient, spouse: Recipient | null): string {
+  function render(props: {
+    recipient: Recipient;
+    spouse: Recipient | null;
+  }): HTMLElement {
     const target = document.createElement('div');
     document.body.appendChild(target);
-    const component = mount(StrategyPromo, {
-      target,
-      props: { recipient: r, spouse },
-    });
+    const component = mount(StrategyPromo, { target, props });
     cleanups.push(() => {
       unmount(component);
       target.remove();
     });
     flushSync();
+    return target;
+  }
+
+  function intro(target: HTMLElement): string {
     return (target.querySelector('.promo-intro')?.textContent ?? '').replace(
       /\s+/g,
       ' '
@@ -68,23 +72,68 @@ describe('StrategyPromo', () => {
   }
 
   it('offers to adjust the assumptions while a filing age is left to choose', () => {
-    expect(intro(young(), null)).toContain(
+    expect(intro(render({ recipient: young(), spouse: null }))).toContain(
       'adjust your health and discount-rate assumptions'
     );
-    expect(intro(young(), pastSeventy())).toContain(
-      "adjust each person's health"
-    );
+    expect(
+      intro(render({ recipient: young(), spouse: pastSeventy() }))
+    ).toContain("adjust each person's health");
   });
 
   it('does not promise adjustable assumptions to someone past 70', () => {
-    const text = intro(pastSeventy(), null);
-    expect(text).toContain('finds the filing age');
+    const text = intro(render({ recipient: pastSeventy(), spouse: null }));
+    expect(text).toContain('shows when to file, and why');
     expect(text).not.toMatch(/adjust|health|discount/);
   });
 
   it('does not promise adjustable assumptions to a couple both past 70', () => {
-    const text = intro(pastSeventy(), recipient(1500, 1941));
-    expect(text).toContain('finds the filing ages');
+    const text = intro(
+      render({ recipient: pastSeventy(), spouse: recipient(1500, 1941) })
+    );
+    expect(text).toContain('shows when to file, and why');
     expect(text).not.toMatch(/adjust|health|discount/);
+  });
+
+  it('follows a change of recipient', () => {
+    const props = $state({
+      recipient: young(),
+      spouse: null as Recipient | null,
+    });
+    const target = document.createElement('div');
+    document.body.appendChild(target);
+    const component = mount(StrategyPromo, { target, props });
+    cleanups.push(() => {
+      unmount(component);
+      target.remove();
+    });
+    flushSync();
+    expect(intro(target)).toContain('adjust your health');
+    props.recipient = pastSeventy();
+    flushSync();
+    expect(intro(target)).toContain('shows when to file, and why');
+  });
+
+  describe('with no benefit to plan', () => {
+    it('stays out of the way for a single person with a $0 PIA', () => {
+      const target = render({ recipient: recipient(0, 1990), spouse: null });
+      expect(target.querySelector('.promo-intro')).toBeNull();
+      expect(target.querySelector('.cta-btn')).toBeNull();
+    });
+
+    it('stays out of the way for a couple whose PIAs are both $0', () => {
+      const target = render({
+        recipient: recipient(0, 1990),
+        spouse: recipient(0, 1991),
+      });
+      expect(target.querySelector('.promo-intro')).toBeNull();
+    });
+
+    it('still shows for a couple with one benefit between them', () => {
+      const target = render({
+        recipient: recipient(0, 1990),
+        spouse: young(),
+      });
+      expect(target.querySelector('.promo-intro')).not.toBeNull();
+    });
   });
 });

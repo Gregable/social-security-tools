@@ -5,6 +5,7 @@
     buildStrategyUrl,
     filingChoices,
   } from "$lib/components/recommended-filing-card";
+  import { nothingToPlanProblem } from "$lib/strategy/ui/nothing-to-plan";
   import RecommendedFilingCard from "$lib/components/RecommendedFilingCard.svelte";
 
   export let recipient: Recipient;
@@ -14,20 +15,29 @@
   // The optimizer only shows health and discount-rate controls while someone
   // still has a filing age to choose, so the promo only offers them then.
   $: hasChoice = anyFilingChoice(spouse === null, filingChoices(recipient, spouse));
+  // With no benefit at all the optimizer only says there is nothing to plan,
+  // so the calculator does not send anyone there.
+  $: nothingToPlan =
+    nothingToPlanProblem(spouse ? "couple" : "single", [
+      recipient.pia().primaryInsuranceAmount().value(),
+      spouse ? spouse.pia().primaryInsuranceAmount().value() : null,
+    ]) !== null;
 </script>
 
+{#if !nothingToPlan}
 <div class="pageBreakAvoid">
   <h3 class="subheading">Strategy Optimizer</h3>
   <p class="promo-intro">
-    {#if spouse}
+    {#if !hasChoice}
+      The Strategy Optimizer shows when to file, and why.
+    {:else if spouse}
       The Strategy Optimizer finds the filing ages with the highest expected
-      combined lifetime benefit{#if hasChoice}, and lets you explore how the
-        answer shifts as you adjust each person's health and your
-        discount-rate assumptions{/if}.
+      combined lifetime benefit, and lets you explore how the answer shifts as
+      you adjust each person's health and your discount-rate assumptions.
     {:else}
       The Strategy Optimizer finds the filing age with the highest expected
-      lifetime benefit{#if hasChoice}, and lets you explore how the answer
-        shifts as you adjust your health and discount-rate assumptions{/if}.
+      lifetime benefit, and lets you explore how the answer shifts as you adjust
+      your health and discount-rate assumptions.
     {/if}
   </p>
   <RecommendedFilingCard {recipient} {spouse} />
@@ -49,6 +59,7 @@
     </svg>
   </a>
 </div>
+{/if}
 
 <style>
   .subheading {

@@ -1,16 +1,8 @@
 <script lang="ts">
 import HowToReadChart from '$lib/components/HowToReadChart.svelte';
 import RecipientName from '$lib/components/RecipientName.svelte';
-import {
-  currentMonthDate,
-  type NoChoiceReason,
-  noChoiceReason,
-} from '$lib/components/recommended-filing-card';
+import type { NoChoiceReasons } from '$lib/components/recommended-filing-card';
 import type { Recipient } from '$lib/recipient';
-import {
-  type AlreadyFiled,
-  NOT_FILED,
-} from '$lib/strategy/calculations/already-filed';
 import NoFilingDecisionPanel from './NoFilingDecisionPanel.svelte';
 import type {
   CalculationResults,
@@ -25,14 +17,15 @@ import StrategyMatrix from './StrategyMatrix.svelte';
 export let recipients: [Recipient, Recipient];
 export let displayAsAges: boolean;
 /**
- * Per recipient: false once they have no filing age left to choose (see
- * `noChoiceReason`). A recipient with no choice left has the same filing
- * age in every cell, so their grid carries no information and is not drawn
- * at all.
+ * Per recipient, why they have no filing age left to choose (see
+ * `noChoiceReason`), or null while they have one, computed with the
+ * results. A recipient with no choice gets no grid, because it would carry
+ * no information of its own: past 70 or already filed, their filing age is
+ * the same in every cell; with no benefit of their own past full retirement
+ * age, it only follows the other spouse's filing month (see
+ * `clampZeroPiaDepStrategy`).
  */
-export let hasFilingChoice: [boolean, boolean] = [true, true];
-/** Per recipient, the month benefits started, or null. Changes copy only. */
-export let alreadyFiled: AlreadyFiled = NOT_FILED;
+export let noChoiceReasons: NoChoiceReasons = [null, null];
 
 // Callback props for events
 export let onselectcell:
@@ -43,27 +36,14 @@ export let deathProbDistribution1: { age: number; probability: number }[];
 export let deathProbDistribution2: { age: number; probability: number }[];
 
 // Only recipients who still have a filing decision get a grid.
-$: gridIndexes = [0, 1].filter((i) => hasFilingChoice[i]);
-$: skippedIndex = [0, 1].find((i) => !hasFilingChoice[i]);
+$: gridIndexes = [0, 1].filter((i) => noChoiceReasons[i] === null);
+$: skippedIndex = [0, 1].find((i) => noChoiceReasons[i] !== null);
 
-// Why each recipient without a grid has no choice, so the copy can name
-// it. hasFilingChoice was settled with the results; the fallback only
-// matters if the month has turned since.
-$: reasons = [0, 1].map((i) =>
-  hasFilingChoice[i]
-    ? null
-    : (noChoiceReason(
-        recipients[i],
-        recipients[1 - i],
-        currentMonthDate(),
-        alreadyFiled[i]
-      ) ?? 'past-seventy')
-) as [NoChoiceReason | null, NoChoiceReason | null];
-
-// When nobody has a grid, the panel names both reasons.
+// When nobody has a grid, the panel names both reasons. The default is a
+// placeholder that never renders: the panel only shows once both are set.
 $: panelVariant =
-  reasons[0] !== null && reasons[1] !== null
-    ? noChoiceVariant([reasons[0], reasons[1]])
+  noChoiceReasons[0] !== null && noChoiceReasons[1] !== null
+    ? noChoiceVariant([noChoiceReasons[0], noChoiceReasons[1]])
     : ('both-past-seventy' satisfies NoChoiceVariant);
 
 // Shared state for matrix hovering
@@ -164,17 +144,18 @@ function handleHoverCell(detail: CellPosition | null) {
       {#if skippedIndex !== undefined}
         <div class="result-content">
           <p class="no-choice-note">
-            {#if reasons[skippedIndex] === 'filed'}
+            {#if noChoiceReasons[skippedIndex] === 'filed'}
               <RecipientName r={recipients[skippedIndex]} /> already receives
               benefits, so there is no grid for them: that filing date is
               settled.
-            {:else if reasons[skippedIndex] === 'spousal-only'}
+            {:else if noChoiceReasons[skippedIndex] === 'spousal-only'}
               <RecipientName r={recipients[skippedIndex]} /> has no retirement
-              benefit of their own and is past full retirement age, so there is
-              no grid for them: their spousal benefit has stopped growing and
-              starts whenever <RecipientName
+              benefit of their own and has reached full retirement age, so there
+              is no grid for them: their spousal benefit has stopped growing and
+              can start only once <RecipientName
                 r={recipients[skippedIndex === 0 ? 1 : 0]}
-              /> files.
+                apos
+              /> benefits do, so they should file then.
             {:else}
               <RecipientName r={recipients[skippedIndex]} /> is past 70, so
               there is no grid for them: delayed retirement credits have

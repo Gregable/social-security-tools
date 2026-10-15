@@ -3,6 +3,7 @@ import { Birthdate } from '$lib/birthday';
 import {
   filingChoices,
   noChoiceReason,
+  noChoiceReasons,
   spousalOnlyAdvice,
 } from '$lib/components/recommended-filing-card';
 import { Money } from '$lib/money';
@@ -12,6 +13,8 @@ import { noChoiceVariant } from '$lib/strategy/ui/no-choice';
 
 /** October 2026. */
 const currentDate = MonthDate.initFromYearsMonths({ years: 2026, months: 9 });
+const month = (year: number, monthIndex: number) =>
+  MonthDate.initFromYearsMonths({ years: year, months: monthIndex });
 
 function recipient(pia: number, year: number, monthIndex: number): Recipient {
   const r = new Recipient();
@@ -31,6 +34,8 @@ const pastSeventy = () => recipient(2400, 1955, 4);
 const zeroPiaPastFra = () => recipient(0, 1958, 2);
 /** No benefit of their own; full retirement age (67) is January 2029. */
 const zeroPiaBeforeFra = () => recipient(0, 1962, 0);
+/** No benefit of their own; full retirement age (66y10m) is October 2026. */
+const zeroPiaFraThisMonth = () => recipient(0, 1959, 11);
 
 describe('noChoiceReason', () => {
   it('is null while a filing age is left to choose', () => {
@@ -39,8 +44,9 @@ describe('noChoiceReason', () => {
 
   it('is filed once benefits have started', () => {
     // June 2024 is the first full month at 62 for a May 1962 birthdate.
-    const filed = MonthDate.initFromYearsMonths({ years: 2024, months: 5 });
-    expect(noChoiceReason(deciding(), null, currentDate, filed)).toBe('filed');
+    expect(noChoiceReason(deciding(), null, currentDate, month(2024, 5))).toBe(
+      'filed'
+    );
   });
 
   it('is past-seventy once delayed retirement credits have stopped', () => {
@@ -63,21 +69,64 @@ describe('noChoiceReason', () => {
     ).toBe(null);
   });
 
-  it('counts the month of full retirement age as no longer growing', () => {
-    // Born December 1959: full retirement age, 66 and 10 months, is
-    // October 2026. Born January 1960: 67, in January 2027.
+  it('counts the month of full retirement age as no longer growing, and not the month before', () => {
     expect(
-      noChoiceReason(recipient(0, 1959, 11), pastSeventy(), currentDate, null)
+      noChoiceReason(zeroPiaFraThisMonth(), pastSeventy(), currentDate, null)
     ).toBe('spousal-only');
     expect(
-      noChoiceReason(recipient(0, 1960, 0), pastSeventy(), currentDate, null)
+      noChoiceReason(zeroPiaFraThisMonth(), pastSeventy(), month(2026, 8), null)
     ).toBe(null);
   });
 
-  it('names having no benefit of their own over being past 70', () => {
+  it('names a recorded filing first, then having no benefit of their own, then being past 70', () => {
+    // March 1958: the first full month at 62 was April 2020.
+    expect(
+      noChoiceReason(
+        zeroPiaPastFra(),
+        pastSeventy(),
+        currentDate,
+        month(2025, 0)
+      )
+    ).toBe('filed');
     expect(
       noChoiceReason(recipient(0, 1950, 4), pastSeventy(), currentDate, null)
     ).toBe('spousal-only');
+  });
+
+  it('is not spousal-only without a spouse whose record pays a benefit', () => {
+    // There is no spousal benefit to wait for; the filing range decides.
+    expect(noChoiceReason(zeroPiaPastFra(), null, currentDate, null)).toBe(
+      null
+    );
+    expect(
+      noChoiceReason(zeroPiaPastFra(), zeroPiaBeforeFra(), currentDate, null)
+    ).toBe(null);
+    expect(
+      noChoiceReason(
+        recipient(0, 1950, 4),
+        recipient(0, 1955, 4),
+        currentDate,
+        null
+      )
+    ).toBe('past-seventy');
+  });
+
+  it('rejects a filed month that could not have happened', () => {
+    expect(() =>
+      noChoiceReason(deciding(), null, currentDate, month(2019, 0))
+    ).toThrow(/invalid filed month/);
+  });
+});
+
+describe('noChoiceReasons', () => {
+  it('gives a reason per spouse, and none for the missing spouse of a single person', () => {
+    expect(
+      noChoiceReasons(pastSeventy(), zeroPiaPastFra(), currentDate)
+    ).toEqual(['past-seventy', 'spousal-only']);
+    expect(noChoiceReasons(pastSeventy(), null, currentDate)).toEqual([
+      'past-seventy',
+      null,
+    ]);
   });
 });
 
@@ -96,6 +145,12 @@ describe('filingChoices with no benefit on one record', () => {
     expect(
       filingChoices(pastSeventy(), zeroPiaBeforeFra(), currentDate)
     ).toEqual([false, true]);
+  });
+
+  it('keeps the choice when neither record pays a benefit', () => {
+    expect(
+      filingChoices(zeroPiaPastFra(), zeroPiaBeforeFra(), currentDate)
+    ).toEqual([true, true]);
   });
 });
 
@@ -133,42 +188,98 @@ describe('noChoiceVariant', () => {
 });
 
 describe('spousalOnlyAdvice', () => {
-  const month = (year: number, monthIndex: number) =>
-    MonthDate.initFromYearsMonths({ years: year, months: monthIndex });
-
   it('files with the other spouse when their benefits start later', () => {
     // The spousal benefit cannot start before the other's benefits do.
     expect(
-      spousalOnlyAdvice(zeroPiaPastFra(), month(2027, 2), currentDate)
-    ).toEqual({ kind: 'file-in', month: month(2027, 2) });
+      spousalOnlyAdvice(
+        zeroPiaPastFra(),
+        { month: month(2027, 2), filed: false },
+        currentDate
+      )
+    ).toEqual({ kind: 'with-other', month: month(2027, 2) });
   });
 
-  it('files this month when the other spouse starts this month', () => {
+  it('files with the other spouse when they are to file this month', () => {
     expect(
-      spousalOnlyAdvice(zeroPiaPastFra(), currentDate, currentDate)
-    ).toEqual({ kind: 'file-in', month: currentDate });
+      spousalOnlyAdvice(
+        zeroPiaPastFra(),
+        { month: currentDate, filed: false },
+        currentDate
+      )
+    ).toEqual({ kind: 'with-other', month: currentDate });
   });
 
-  it('files now, backdated six months, once the other spouse has long been paid', () => {
+  it('files now, with nothing to backdate, when the other spouse started this month', () => {
     expect(
-      spousalOnlyAdvice(zeroPiaPastFra(), month(2022, 4), currentDate)
-    ).toEqual({ kind: 'file-now', backdateTo: month(2026, 3) });
+      spousalOnlyAdvice(
+        zeroPiaPastFra(),
+        { month: currentDate, filed: true },
+        currentDate
+      )
+    ).toEqual({ kind: 'now', backdateTo: null, limit: 'other-start' });
+  });
+
+  it('backdates six months once the other spouse has long been paid', () => {
+    expect(
+      spousalOnlyAdvice(
+        zeroPiaPastFra(),
+        { month: month(2022, 4), filed: true },
+        currentDate
+      )
+    ).toEqual({ kind: 'now', backdateTo: month(2026, 3), limit: 'six-months' });
   });
 
   it('backdates no further than the month the other spouse started', () => {
     expect(
-      spousalOnlyAdvice(zeroPiaPastFra(), month(2026, 6), currentDate)
-    ).toEqual({ kind: 'file-now', backdateTo: month(2026, 6) });
+      spousalOnlyAdvice(
+        zeroPiaPastFra(),
+        { month: month(2026, 6), filed: true },
+        currentDate
+      )
+    ).toEqual({
+      kind: 'now',
+      backdateTo: month(2026, 6),
+      limit: 'other-start',
+    });
+  });
+
+  it("backdates no further than the other spouse's own backdated start", () => {
+    // Past 70 and not yet filed: their claim goes back six months too.
+    expect(
+      spousalOnlyAdvice(
+        zeroPiaPastFra(),
+        { month: month(2026, 3), filed: false },
+        currentDate
+      )
+    ).toEqual({
+      kind: 'now',
+      backdateTo: month(2026, 3),
+      limit: 'other-start',
+    });
   });
 
   it('backdates no further than their own full retirement age', () => {
-    // Born December 1959: full retirement age in October 2026, this month,
-    // so there is nothing to backdate. Born October 1959: August 2026.
+    // Born October 1959: full retirement age in August 2026.
     expect(
-      spousalOnlyAdvice(recipient(0, 1959, 11), month(2022, 4), currentDate)
-    ).toEqual({ kind: 'file-in', month: currentDate });
+      spousalOnlyAdvice(
+        recipient(0, 1959, 9),
+        { month: month(2022, 4), filed: true },
+        currentDate
+      )
+    ).toEqual({
+      kind: 'now',
+      backdateTo: month(2026, 7),
+      limit: 'full-retirement-age',
+    });
+  });
+
+  it('files now, with nothing to backdate, in the month of full retirement age', () => {
     expect(
-      spousalOnlyAdvice(recipient(0, 1959, 9), month(2022, 4), currentDate)
-    ).toEqual({ kind: 'file-now', backdateTo: month(2026, 7) });
+      spousalOnlyAdvice(
+        zeroPiaFraThisMonth(),
+        { month: month(2022, 4), filed: true },
+        currentDate
+      )
+    ).toEqual({ kind: 'now', backdateTo: null, limit: 'full-retirement-age' });
   });
 });

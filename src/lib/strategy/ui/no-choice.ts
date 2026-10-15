@@ -18,7 +18,9 @@ export type NoChoiceVariant =
 /**
  * The explanation for a couple, from why each of them has no filing age
  * left to choose. Both cannot be `spousal-only`: that needs the other to
- * have a benefit of their own.
+ * have a benefit of their own. For the same reason, beside a `filed`
+ * spouse a `spousal-only` one always has the $0 PIA, since `filed` is
+ * checked first.
  */
 export function noChoiceVariant(
   reasons: readonly [NoChoiceReason, NoChoiceReason]

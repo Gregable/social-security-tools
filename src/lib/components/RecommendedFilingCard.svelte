@@ -6,13 +6,15 @@
     currentMonthDate,
     DEFAULT_DISCOUNT_RATE_ASSUMPTION,
     type DiscountRateAssumption,
-    filingChoices,
     loadDeathDistributions,
+    type NoChoiceReasons,
+    noChoiceReasons,
     loadDiscountRateAssumption,
     recommendedFromDistributions,
     type RecommendedFiling,
   } from "$lib/components/recommended-filing-card";
   import type { DeathProbability } from "$lib/life-tables";
+  import type { MonthDate } from "$lib/month-time";
   import type { Recipient } from "$lib/recipient";
 
   export let recipient: Recipient;
@@ -92,7 +94,8 @@
         now,
         discountRate.rate
       );
-      hasFilingChoice = filingChoices(recipient, spouse, now);
+      computedNoChoice = noChoiceReasons(recipient, spouse, now);
+      computedMonth = now;
       computedDiscountRate = discountRate;
     } catch (e) {
       // The optimizer returns an empty array for edge cases rather than
@@ -141,11 +144,12 @@
     spouse ? [recipient, spouse] : [recipient, recipient]
   ) as [Recipient, Recipient];
 
-  // Assigned inside compute(), alongside `result`, so the flag and the
-  // figures it re-skins always come from the same inputs: deriving it
-  // reactively here would let it change during the debounce window while
-  // `result` still belongs to the previous inputs.
-  let hasFilingChoice: [boolean, boolean] = [true, true];
+  // Assigned inside compute(), alongside `result`, so the reasons and the
+  // figures they re-skin always come from the same inputs and month:
+  // deriving them reactively here would let them change during the debounce
+  // window while `result` still belongs to the previous inputs.
+  let computedNoChoice: NoChoiceReasons = [null, null];
+  let computedMonth: MonthDate = currentMonthDate();
   // Likewise: the rate the displayed `result` was actually computed with, so
   // the card's copy never names the Treasury rate while the figures above it
   // still reflect the default from before that rate arrived.
@@ -166,8 +170,8 @@
       recipients={recipientsTuple}
       showInfoTip={false}
       discountRateAssumption={computedDiscountRate}
-      {hasFilingChoice}
-      currentDate={currentMonthDate()}
+      noChoiceReasons={computedNoChoice}
+      currentDate={computedMonth}
     />
   </a>
 {/if}

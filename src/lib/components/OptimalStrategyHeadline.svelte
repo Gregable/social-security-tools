@@ -7,8 +7,8 @@
     DEFAULT_DISCOUNT_RATE_ASSUMPTION,
     type DiscountRateAssumption,
     formatDiscountRatePercent,
-    type NoChoiceReason,
-    noChoiceReason,
+    type NoChoiceReasons,
+    type OtherSpouseStart,
     spousalOnlyAdvice,
   } from "$lib/components/recommended-filing-card";
   import { Money } from "$lib/money";
@@ -37,21 +37,24 @@
      */
     discountRateAssumption?: DiscountRateAssumption;
     /**
-     * Per recipient: false once filing immediately is their only remaining
-     * option. Such a recipient gets a "file now" card rather than a filing
-     * date, because the optimizer's answer for them is the most retroactive
-     * month SSA allows — a month that has already passed, which under a
-     * "File in" label reads as a bug rather than as advice.
+     * Per recipient, why they have no filing age left to choose (see
+     * `noChoiceReason`), or null while they have one, computed with the
+     * results for `currentDate`.
      *
-     * Also false for a recipient who has already filed. They get the
-     * "Started benefits" card instead, because `alreadyFiled` takes
+     * Someone past 70 gets a "File now" card rather than a filing date,
+     * because the optimizer's answer for them is the most retroactive month
+     * SSA allows: a month that has already passed, which under a "File in"
+     * label reads as a bug rather than as advice. A spouse with no benefit of
+     * their own past full retirement age gets a card that follows the other
+     * spouse's start (see `spousalOnlyAdvice`). Someone who has already
+     * filed gets the "Started benefits" card, because `alreadyFiled` takes
      * precedence in the snippet.
      *
-     * Required rather than defaulted: defaulting it to [true, true] would
+     * Required rather than defaulted: defaulting it to no reasons would
      * silently reinstate that already-passed date for any caller that forgot
      * to pass it.
      */
-    hasFilingChoice: [boolean, boolean];
+    noChoiceReasons: NoChoiceReasons;
     /**
      * The month the recommendation was computed for. Used to tell a filing
      * date that is still ahead from one that has already passed.
@@ -77,11 +80,16 @@
     recipients,
     showInfoTip = true,
     discountRateAssumption = DEFAULT_DISCOUNT_RATE_ASSUMPTION,
-    hasFilingChoice,
+    noChoiceReasons,
     currentDate,
     alreadyFiled = NOT_FILED,
     onAlreadyFiledHint,
   }: Props = $props();
+
+  /** Per recipient, whether they still have a filing age to choose. */
+  const hasFilingChoice = $derived(
+    noChoiceReasons.map((reason) => reason === null) as [boolean, boolean]
+  );
 
   /**
    * Whether anyone still has a filing age to choose. Once nobody does, the
@@ -92,36 +100,22 @@
   const hasChoiceLeft = $derived(anyFilingChoice(isSingle, hasFilingChoice));
 
   /**
-   * Why each person in a couple has no filing age left, so the explanation
-   * can name it; null while they still have one. Single mode explains its
-   * one case, past 70, on its own. The fallback only matters if the month
-   * has turned since hasFilingChoice was settled.
+   * When the spouse at `index` starts benefits: the month they started, if
+   * recorded as filed, or else their recommended filing month (which has
+   * passed for a claim to backdate); null without a couple result. A
+   * partner whose reason is `spousal-only` starts their spousal benefit
+   * with it.
    */
-  const noChoiceReasons = $derived(
-    [0, 1].map((i) =>
-      isSingle || hasFilingChoice[i]
-        ? null
-        : (noChoiceReason(
-            recipients[i],
-            recipients[1 - i],
-            currentDate,
-            alreadyFiled[i]
-          ) ?? "past-seventy")
-    ) as (NoChoiceReason | null)[]
-  );
-
-  /**
-   * When a spouse's benefits start: the month they started, or the
-   * recommended filing date. A spouse with no benefit of their own starts
-   * their spousal benefit with it.
-   */
-  function benefitStart(index: number): MonthDate | null {
+  function benefitStart(index: number): OtherSpouseStart | null {
     const filedAt = alreadyFiled[index];
-    if (filedAt !== null) return filedAt;
+    if (filedAt !== null) return { month: filedAt, filed: true };
     if (!coupleResult) return null;
-    return recipients[index].birthdate.dateAtSsaAge(
-      coupleResult.filingAges[index]
-    );
+    return {
+      month: recipients[index].birthdate.dateAtSsaAge(
+        coupleResult.filingAges[index]
+      ),
+      filed: false,
+    };
   }
 
   /**
@@ -193,8 +187,8 @@
 {#snippet noChoiceClause(index: number)}
   <RecipientName r={recipients[index]} />
   {#if noChoiceReasons[index] === "filed"}already receives benefits{:else if noChoiceReasons[index] === "spousal-only"}has
-    no retirement benefit of their own and is past full retirement age, when
-    spousal benefits stop growing{:else}is past 70, where delayed retirement
+    no retirement benefit of their own and has reached full retirement age,
+    where spousal benefits stop growing{:else}is past 70, where delayed retirement
     credits stop{/if}
 {/snippet}
 
@@ -219,23 +213,36 @@
         otherStart,
         currentDate
       )}
-      {#if advice.kind === "file-now"}
-        <div class="prefix">File</div>
-        <div class="date-big">now</div>
-        <div class="age-sub">
-          Past full retirement age, so the spousal benefit has stopped growing.
-          Ask SSA to backdate the claim to {advice.backdateTo.toFullString()};
-          they can pay up to six months retroactively.
-        </div>
-      {:else}
+      {#if advice.kind === "with-other"}
         <div class="prefix">File in</div>
         <div class="date-big">
           <span class="date-full">{advice.month.toFullString()}</span>
           <span class="date-short">{advice.month.toString()}</span>
         </div>
         <div class="age-sub">
-          when <RecipientName r={recipients[1 - index]} /> files: the spousal
-          benefit has stopped growing and starts with their benefits.
+          when <RecipientName r={recipients[1 - index]} apos /> benefits start:
+          the spousal benefit has stopped growing and starts with theirs.
+        </div>
+      {:else}
+        <div class="prefix">File</div>
+        <div class="date-big">now</div>
+        <div class="age-sub">
+          {#if advice.backdateTo === null && advice.limit === "other-start"}
+            <RecipientName r={recipients[1 - index]} apos /> benefits start this
+            month, and the spousal benefit has stopped growing, so it can start
+            now too.
+          {:else if advice.backdateTo === null}
+            Full retirement age is this month, when the spousal benefit stops
+            growing.
+          {:else}
+            The spousal benefit has stopped growing. Ask SSA to backdate the
+            claim to {advice.backdateTo.toFullString()}{#if advice.limit === "other-start" && otherStart.filed},
+              when <RecipientName r={recipients[1 - index]} apos /> benefits
+              started{:else if advice.limit === "other-start"}, as far back
+              as <RecipientName r={recipients[1 - index]} apos /> own claim{:else if advice.limit === "full-retirement-age"}, the
+              month of full retirement age{:else}; they can pay up to six
+              months retroactively{/if}.
+          {/if}
         </div>
       {/if}
     {/if}
@@ -352,9 +359,9 @@
           is no filing decision left here.
         {:else if !hasChoiceLeft}
           {@const first = noChoiceReasons[1] === "filed" ? 1 : 0}
-          {@render noChoiceClause(first)}{#if noChoiceReasons[first] !== "filed"},{/if}
-          and {@render noChoiceClause(1 - first)}, so there is no filing
-          decision left here.
+          {@render noChoiceClause(first)}, and {@render noChoiceClause(
+            1 - first
+          )}, so there is no filing decision left here.
         {:else if alreadyFiled[0] !== null || alreadyFiled[1] !== null}
           Maximizes your expected combined lifetime benefits, taking
           <RecipientName r={recipients[alreadyFiled[0] !== null ? 0 : 1]} />'s
