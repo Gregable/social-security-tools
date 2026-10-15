@@ -5,6 +5,9 @@
     Walks the user through copying their earnings record from ssa.gov and
     pasting it, with copy instructions for touch screens or keyboards (Cmd+A
     or Ctrl+A). Also offers PIA entry and, for a spouse, a skip option.
+    A paste that fails to parse gets a generic error or, when it is
+    recognizably the my Social Security home page, a link to the earnings
+    record instead.
     Sends "Paste Flow:" link, help and parse-failure events
     (see $lib/analytics/paste-flow).
 
@@ -55,8 +58,8 @@ export let copyInstructions: 'auto' | 'touch' | 'keyboard' = 'auto';
 
 let pasteContents: string = '';
 let pasteError: boolean = false;
-// Set when a failed paste came from an ssa.gov page other than the earnings
-// record, so the error can say where to go instead.
+// The ssa.gov page a failed paste was recognized as, or null. Read only while
+// pasteError is set, to pick the error message.
 let wrongPage: WrongSsaPage | null = null;
 let failureReported: boolean = false;
 
@@ -212,7 +215,7 @@ function skipEarnings() {
     </li>
   </ol>
   {#if pasteError}
-    <div class="pasteError">
+    <div class="pasteError" role="alert">
       <span class="warningIcon">&#x26A0;</span>
       {#if wrongPage === 'my_ssa_home'}
         <p>

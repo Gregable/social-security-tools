@@ -4,12 +4,15 @@
  * Kept free of Svelte and DOM access so it can be unit-tested.
  *
  * Privacy: failedPasteProperties' result is sent to PostHog, so it must never
- * include the pasted text, names, or earnings amounts. It reports only
- * structural counts. year_token_count roughly tracks how many years a pasted
- * record covers, the same kind of information "Paste Flow: Parse Success"
- * already sends as record_count; we accept that as non-identifying. Do not add
- * fields that could identify a person or reveal an amount. wrong_page names
- * an ssa.gov page by its fixed link text, which is the same for everyone.
+ * include the pasted text, names, or earnings amounts. It reports structural
+ * counts, whether this is a spouse entry, and wrong_page. year_token_count
+ * roughly tracks how many years a pasted record covers, the same kind of
+ * information "Paste Flow: Parse Success" already sends as record_count; we
+ * accept that as non-identifying. wrong_page is a fixed label, or null, for
+ * the ssa.gov page copied by mistake. It is chosen by link text that is the
+ * same on every copy of that page, so it reveals which page was copied, never
+ * anything on it. Do not add fields that could identify a person or reveal an
+ * amount.
  */
 
 import { detectWrongSsaPage, type WrongSsaPage } from '$lib/wrong-ssa-page';
@@ -49,7 +52,10 @@ export function describeFailedPaste(contents: string): FailedPasteSummary {
 
 export interface FailedPasteProperties extends FailedPasteSummary {
   readonly is_spouse_entry: boolean;
-  /** An ssa.gov page copied by mistake, recognized by its fixed link text. */
+  /**
+   * The ssa.gov page copied by mistake, recognized by its fixed link text;
+   * null when the paste matches no known page.
+   */
   readonly wrong_page: WrongSsaPage | null;
 }
 

@@ -83,7 +83,7 @@ describe('failedPasteProperties', () => {
     expect(props.is_spouse_entry).toBe(true);
   });
 
-  it('names a recognized wrong page, from its fixed link text only', () => {
+  it('reports the recognized wrong page', () => {
     const props = failedPasteProperties(
       'Eligibility and Earnings\nReview your full earnings record now\n',
       false
