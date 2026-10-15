@@ -142,14 +142,8 @@ describe('maximumBenefitInYear', () => {
   it('leaves later COLAs out of past years', () => {
     expect(maximumBenefitInYear(at(67), 2025).wholeDollars()).toBe('$4,043');
     expect(maximumBenefitInYear(at(70), 2021).wholeDollars()).toBe('$3,895');
-  });
-
-  // benefitAtAge floors the PIA to the dollar before applying delayed
-  // credits; SSA applies them to the dime-rounded PIA. With 46 months of
-  // credits (x 1.306667): $3,909.60 -> $5,108.54, but $3,909 -> $5,107.76.
-  // When that rounding is fixed this starts passing and vitest reports it;
-  // move the assertion into 'leaves later COLAs out of past years'.
-  it.fails('matches the published 2025 age-70 figure to the dollar', () => {
+    // SSA's published 2025 age-70 maximum. Delayed credits apply to the
+    // dime-rounded PIA: $3,909.60 x 1.306667 = $5,108.54.
     expect(maximumBenefitInYear(at(70), 2025).wholeDollars()).toBe('$5,108');
   });
 });

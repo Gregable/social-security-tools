@@ -81,7 +81,7 @@ describe('the figures the guide publishes', () => {
     expect(e.monthlyIncrease.string()).toBe('$29.70');
     expect(e.displacedYear?.string()).toBe('$30,000.00');
     expect(e.increaseIfClaimedAt62.string()).toBe('$21.00');
-    expect(e.increaseIfClaimedAt70.string()).toBe('$38.00');
+    expect(e.increaseIfClaimedAt70.string()).toBe('$37.00');
   });
 
   it('computes the 22-year career', () => {

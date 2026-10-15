@@ -57,6 +57,10 @@ function benefitMultiplierAtAge(
 /**
  * Returns personal benefit amount if starting benefits at a given age.
  *
+ * The early-retirement reduction or delayed retirement credit applies to the
+ * PIA as computed (to the dime); only the resulting benefit is rounded down
+ * to the dollar.
+ *
  * @param throughColaYear - Optional last COLA year to apply to the PIA. Defaults
  *   to the current-dollar value. Pass an earlier year (see benefitOnDateNominal)
  *   to compute the nominal benefit payable before later COLAs took effect.
@@ -69,7 +73,6 @@ export function benefitAtAge(
   return recipient
     .pia()
     .primaryInsuranceAmount(throughColaYear)
-    .floorToDollar()
     .times(
       1 +
         benefitMultiplierAtAge(

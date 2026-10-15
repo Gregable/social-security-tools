@@ -466,7 +466,7 @@ describe('Filing at 62', () => {
   //           = 0.2 + 115/1200
   //           = 0.2 + 0.095833...
   //           = 0.295833...
-  // benefit = floor( floor(PIA) * (1 - 0.295833...) ) = floor(PIA * 0.704166...)
+  // benefit = floor(PIA * (1 - 0.295833...)) = floor(PIA * 0.704166...)
   const AGE_62_1 = MonthDuration.initFromYearsMonths({ years: 62, months: 1 });
 
   it('PIA $1000, death at 80', () => {
