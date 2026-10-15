@@ -44,7 +44,9 @@ export function wageIndexRatio(indexingYear: number): number {
  *
  * COLA Timing:
  * - The "Year Y COLA" is announced in October of year Y
- * - It takes effect on benefits starting January of year Y+1
+ * - It is effective for the December benefit of year Y, first paid in
+ *   January of year Y+1. We treat it as applied from January, when
+ *   payments change.
  * - Therefore, in CURRENT_YEAR, all COLAs through year (CURRENT_YEAR - 1)
  *   have been applied to benefits
  */
@@ -224,8 +226,8 @@ export class PrimaryInsuranceAmount {
 
   /**
    * Returns the last year whose COLA has been applied to benefits.
-   * Since a year's COLA takes effect the following January, this is
-   * CURRENT_YEAR - 1. It trails MAX_COLA_YEAR from SSA's October
+   * A year's COLA is effective for its December benefit, first paid the
+   * following January, so this is CURRENT_YEAR - 1. It trails MAX_COLA_YEAR from SSA's October
    * announcement until January, while the newest COLA is known but unpaid.
    */
   lastAppliedColaYear(): number {
@@ -319,8 +321,9 @@ export class PrimaryInsuranceAmount {
    * The newest COLA when it is announced but not yet paid: from SSA's
    * October announcement until the following January. Null otherwise.
    *
-   * Its `start` is the PIA in effect today and its `end` the PIA from
-   * January on, so display code can name both.
+   * Its `start` is the PIA current payments are based on and its `end` the
+   * PIA from the December benefit on (first paid in January), so display
+   * code can name both.
    */
   pendingColaAdjustment(): ColaAdjustment | null {
     const adjustments = this.colaAdjustments();

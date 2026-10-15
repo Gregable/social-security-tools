@@ -175,9 +175,9 @@ function oneSignificantDigit(n: number) {
                     <li>
                       {#if !adjustment.applied}
                         <!-- Not yet applied, so special case the text: -->
-                        {adjustment.year}: At the <b>end</b> of the year,
+                        {adjustment.year}: Effective with the <b>December</b> benefit,
                         <b>{adjustment.start.string()}</b>
-                        will be increased by {oneSignificantDigit(
+                        increases by {oneSignificantDigit(
                           adjustment.cola
                         )}% =
                         <b>{adjustment.end.string()}</b>
@@ -190,10 +190,13 @@ function oneSignificantDigit(n: number) {
                   {/each}
                 </ul>
                 <p>
-                  The adjustments are applied at the <b>end</b> of the
-                  adjustment year. For example, the {constants.CURRENT_YEAR} adjustment
-                  will only affect <RName {r} apos>your</RName>
-                  benefit starting in January {constants.CURRENT_YEAR + 1}.
+                  Each year's adjustment takes effect with the benefit for
+                  <b>December</b> of that year. Because benefits are paid the
+                  month after they are due, the first larger payment arrives
+                  in <b>January</b>. For example, the {constants.CURRENT_YEAR}
+                  adjustment raises <RName {r} apos>your</RName> benefit
+                  starting with December {constants.CURRENT_YEAR}, paid in
+                  January {constants.CURRENT_YEAR + 1}.
                 </p>
               </div>
             {/if}
@@ -201,8 +204,9 @@ function oneSignificantDigit(n: number) {
             {#if pendingCola}
               <p>
                 The final value is <RName {r} apos>your</RName>
-                <u>primary insurance amount (PIA)</u> from January
-                {pendingCola.year + 1}. Until then it is
+                <u>primary insurance amount (PIA)</u> starting with the December
+                {pendingCola.year} benefit, first paid in January
+                {pendingCola.year + 1}. Payments before then are based on
                 <b>{pendingCola.start.string()}</b>. It will continue to
                 increase every year.
               </p>
