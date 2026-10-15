@@ -34386,23 +34386,18 @@
     },
     "output": {
       "filingAge0Months": 745,
-      "filingAge1Months": 745,
-      "expectedNPVCents": 20550319.52600926,
+      "filingAge1Months": 746,
+      "expectedNPVCents": 20543594.517228805,
       "top5": [
-        {
-          "filingAge0Months": 745,
-          "filingAge1Months": 745,
-          "expectedNPVCents": 20550319.52600926
-        },
         {
           "filingAge0Months": 745,
           "filingAge1Months": 746,
           "expectedNPVCents": 20543594.517228805
         },
         {
-          "filingAge0Months": 746,
+          "filingAge0Months": 745,
           "filingAge1Months": 745,
-          "expectedNPVCents": 20542406.281951543
+          "expectedNPVCents": 20536841.895364527
         },
         {
           "filingAge0Months": 745,
@@ -34413,6 +34408,11 @@
           "filingAge0Months": 746,
           "filingAge1Months": 746,
           "expectedNPVCents": 20535681.273171093
+        },
+        {
+          "filingAge0Months": 745,
+          "filingAge1Months": 749,
+          "expectedNPVCents": 20533738.330957588
         }
       ]
     }
@@ -78137,22 +78137,22 @@
     "output": {
       "filingAge0Months": 745,
       "filingAge1Months": 818,
-      "expectedNPVCents": 33363282.669077717,
+      "expectedNPVCents": 33352251.6560401,
       "top5": [
         {
           "filingAge0Months": 745,
           "filingAge1Months": 818,
-          "expectedNPVCents": 33363282.669077717
+          "expectedNPVCents": 33352251.6560401
         },
         {
           "filingAge0Months": 745,
           "filingAge1Months": 819,
-          "expectedNPVCents": 33355379.146392204
+          "expectedNPVCents": 33344348.13335459
         },
         {
           "filingAge0Months": 745,
           "filingAge1Months": 817,
-          "expectedNPVCents": 33349035.10850531
+          "expectedNPVCents": 33338004.095467683
         },
         {
           "filingAge0Months": 746,
@@ -78160,9 +78160,9 @@
           "expectedNPVCents": 33336956.848404735
         },
         {
-          "filingAge0Months": 745,
-          "filingAge1Months": 815,
-          "expectedNPVCents": 33336308.381003845
+          "filingAge0Months": 746,
+          "filingAge1Months": 819,
+          "expectedNPVCents": 33329053.325719222
         }
       ]
     }
@@ -80021,32 +80021,32 @@
     "output": {
       "filingAge0Months": 815,
       "filingAge1Months": 745,
-      "expectedNPVCents": 48836936.539870374,
+      "expectedNPVCents": 48825477.16971101,
       "top5": [
         {
           "filingAge0Months": 815,
           "filingAge1Months": 745,
-          "expectedNPVCents": 48836936.539870374
+          "expectedNPVCents": 48825477.16971101
         },
         {
           "filingAge0Months": 814,
           "filingAge1Months": 745,
-          "expectedNPVCents": 48832282.123441786
+          "expectedNPVCents": 48820822.75328243
         },
         {
           "filingAge0Months": 816,
           "filingAge1Months": 745,
-          "expectedNPVCents": 48827628.23926426
+          "expectedNPVCents": 48816168.86910489
+        },
+        {
+          "filingAge0Months": 815,
+          "filingAge1Months": 746,
+          "expectedNPVCents": 48810033.65014205
         },
         {
           "filingAge0Months": 817,
           "filingAge1Months": 745,
-          "expectedNPVCents": 48819051.42044583
-        },
-        {
-          "filingAge0Months": 813,
-          "filingAge1Months": 745,
-          "expectedNPVCents": 48816375.073855124
+          "expectedNPVCents": 48807592.05028644
         }
       ]
     }
@@ -93233,34 +93233,34 @@
       ]
     },
     "output": {
-      "filingAge0Months": 745,
+      "filingAge0Months": 746,
       "filingAge1Months": 792,
-      "expectedNPVCents": 18844605.846240662,
+      "expectedNPVCents": 18836950.926769257,
       "top5": [
         {
-          "filingAge0Months": 745,
+          "filingAge0Months": 746,
           "filingAge1Months": 792,
-          "expectedNPVCents": 18844605.846240662
+          "expectedNPVCents": 18836950.926769257
         },
         {
-          "filingAge0Months": 745,
+          "filingAge0Months": 746,
           "filingAge1Months": 795,
-          "expectedNPVCents": 18842045.48158942
+          "expectedNPVCents": 18834390.562118016
         },
         {
-          "filingAge0Months": 745,
+          "filingAge0Months": 746,
           "filingAge1Months": 789,
-          "expectedNPVCents": 18841461.38258076
+          "expectedNPVCents": 18833806.46310935
         },
         {
-          "filingAge0Months": 745,
+          "filingAge0Months": 746,
           "filingAge1Months": 798,
-          "expectedNPVCents": 18840189.86586357
+          "expectedNPVCents": 18832534.946392164
         },
         {
-          "filingAge0Months": 745,
+          "filingAge0Months": 746,
           "filingAge1Months": 791,
-          "expectedNPVCents": 18839697.545593742
+          "expectedNPVCents": 18832042.626122322
         }
       ]
     }
@@ -102585,19 +102585,19 @@
           "expectedNPVCents": 31388331.316655822
         },
         {
-          "filingAge0Months": 749,
-          "filingAge1Months": 831,
-          "expectedNPVCents": 31387486.166703906
-        },
-        {
           "filingAge0Months": 745,
           "filingAge1Months": 832,
           "expectedNPVCents": 31386770.587597113
         },
         {
-          "filingAge0Months": 749,
-          "filingAge1Months": 833,
-          "expectedNPVCents": 31386257.761116065
+          "filingAge0Months": 746,
+          "filingAge1Months": 831,
+          "expectedNPVCents": 31385559.13368705
+        },
+        {
+          "filingAge0Months": 745,
+          "filingAge1Months": 830,
+          "expectedNPVCents": 31385503.685240097
         }
       ]
     }
@@ -107914,7 +107914,7 @@
         {
           "filingAge0Months": 769,
           "filingAge1Months": 755,
-          "expectedNPVCents": 37787669.28615057
+          "expectedNPVCents": 37779253.214205645
         },
         {
           "filingAge0Months": 771,
@@ -107924,7 +107924,7 @@
         {
           "filingAge0Months": 770,
           "filingAge1Months": 755,
-          "expectedNPVCents": 37713621.6148239
+          "expectedNPVCents": 37705205.542878985
         }
       ]
     }

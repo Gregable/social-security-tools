@@ -40,6 +40,7 @@
  */
 
 import {
+  benefitCentsAtAge,
   eligibleForSpousalBenefit,
   MAX_BENEFIT_AGE_MONTHS,
   MIN_SURVIVOR_BENEFIT_RATIO,
@@ -144,40 +145,8 @@ export interface CoupleFilingAgeResult {
 // Correctness note: the formulas here MUST match the object-oriented
 // implementations in benefit-calculator.ts / strategy-calc.ts to the last
 // rounding step. Any divergence will show up as a golden-test failure.
-
-/**
- * Personal benefit at a given filing age, in cents.
- *
- * Replicates benefitAtAge (benefit-calculator.ts):
- *   PIA.times(1 + multiplier).floorToDollar()
- *
- * The multiplier is SSA's piecewise-linear schedule around NRA:
- *   - Filed early: reduction of 5/9% per month for the first 36 months
- *                  before NRA, 5/12% per month beyond that.
- *   - Filed late:  delayed retirement credit of DRI/12 per month past NRA.
- */
-function benefitCentsAtAge(
-  piaCents: number,
-  nraMonths: number,
-  delayedRetirementIncrease: number,
-  ageMonths: number
-): number {
-  let mult: number;
-  if (nraMonths > ageMonths) {
-    const before = nraMonths - ageMonths;
-    mult = -(
-      (Math.min(36, before) * 5) / 900 +
-      (Math.max(0, before - 36) * 5) / 1200
-    );
-  } else {
-    // Delayed credits stop accruing at age 70.
-    const creditedMonths =
-      ageMonths < MAX_BENEFIT_AGE_MONTHS ? ageMonths : MAX_BENEFIT_AGE_MONTHS;
-    const after = creditedMonths - nraMonths;
-    mult = (delayedRetirementIncrease / 12) * after;
-  }
-  return Math.floor(Math.round(piaCents * (1 + mult)) / 100) * 100;
-}
+// The personal benefit at a filing age is not copied: both paths call
+// benefitCentsAtAge from benefit-calculator.ts.
 
 /**
  * Personal benefit during the filing year, in cents.

@@ -362,4 +362,82 @@ describe('benefitAtAge rounding', () => {
     );
     expect(benefitAtAge(delayed, age(66, 11)).wholeDollars()).toBe('$1,695');
   });
+
+  // SSA truncates: an adjusted amount of $X.995 or more is still paid as $X,
+  // never rounded up to the next cent and then the next dollar.
+  it('truncates delayed amounts just below a whole dollar', () => {
+    // $1,003.70 x (1 + 12 x 2/3%) = $1,083.996.
+    const r = withPia(Money.fromCents(100370), Birthdate.FromYMD(1960, 0, 2));
+    expect(benefitAtAge(r, age(68)).wholeDollars()).toBe('$1,083');
+  });
+
+  it('truncates early amounts just below a whole dollar', () => {
+    // 57 months early: $1,000.70 x (1 - 36 x 5/9% - 21 x 5/12%) = $712.99875.
+    const r = withPia(Money.fromCents(100070), Birthdate.FromYMD(1960, 0, 2));
+    expect(benefitAtAge(r, age(62, 3)).wholeDollars()).toBe('$712');
+  });
+});
+
+/**
+ * Checks benefitAtAge against exact rational arithmetic for every filing
+ * month from 62 to 70 and a run of dime PIAs, at each delayed retirement
+ * credit rate. Floating-point shortcuts that round to the cent before the
+ * dollar floor pay $1 too much on roughly 1 in 300 of these.
+ */
+describe('benefitAtAge matches exact SSA arithmetic', () => {
+  // [birth year, FRA years, FRA months, annual delayed credit as n / 1000].
+  const brackets: [number, number, number, bigint][] = [
+    [1937, 65, 0, 65n],
+    [1940, 65, 6, 70n],
+    [1942, 65, 10, 75n],
+    [1960, 67, 0, 80n],
+  ];
+
+  /** Exact benefit in whole dollars: floor(PIA x factor), factor = n / d. */
+  function exactDollars(
+    piaCents: number,
+    fraMonths: number,
+    ageMonths: number,
+    annualPerMille: bigint
+  ): bigint {
+    let n: bigint;
+    let d: bigint;
+    if (ageMonths < fraMonths) {
+      // 5/9 of 1% for the first 36 months, 5/12 of 1% for each month beyond.
+      const k = fraMonths - ageMonths;
+      const first = BigInt(Math.min(36, k));
+      const beyond = BigInt(Math.max(0, k - 36));
+      // 1 - first*5/900 - beyond*5/1200, over a common denominator of 3600.
+      n = 3600n - first * 20n - beyond * 15n;
+      d = 3600n;
+    } else {
+      // annualPerMille/1000 per year = annualPerMille/12000 per month.
+      const m = BigInt(Math.min(ageMonths, 70 * 12) - fraMonths);
+      n = 12000n + annualPerMille * m;
+      d = 12000n;
+    }
+    return (BigInt(piaCents) * n) / (d * 100n);
+  }
+
+  it.each(brackets)('born %i', (year, fraYears, fraMonths, perMille) => {
+    const fra = fraYears * 12 + fraMonths;
+    const mismatches: string[] = [];
+    for (let piaCents = 100000; piaCents <= 110000; piaCents += 10) {
+      const r = withPiaCents(piaCents, Birthdate.FromYMD(year, 0, 2));
+      for (let a = 62 * 12; a <= 70 * 12; a++) {
+        const got = benefitAtAge(r, new MonthDuration(a)).cents();
+        const want = Number(exactDollars(piaCents, fra, a, perMille)) * 100;
+        if (got !== want)
+          mismatches.push(`${piaCents}c @${a}m: ${got} != ${want}`);
+      }
+    }
+    expect(mismatches.slice(0, 5)).toEqual([]);
+  });
+
+  function withPiaCents(cents: number, birthdate: Birthdate): Recipient {
+    const r = new Recipient();
+    r.birthdate = birthdate;
+    r.setPia(Money.fromCents(cents));
+    return r;
+  }
 });

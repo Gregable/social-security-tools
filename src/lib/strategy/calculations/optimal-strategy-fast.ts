@@ -42,6 +42,7 @@
  */
 
 import {
+  benefitCentsAtAge,
   eligibleForSpousalBenefit,
   MAX_BENEFIT_AGE_MONTHS,
   MIN_SURVIVOR_BENEFIT_RATIO,
@@ -58,9 +59,11 @@ import {
 // ─────────────────────────────────────────────────────────────────────────
 // Shared primitives
 //
-// The four functions below (benefitCentsAtAge, filingYearCents,
-// spousalCentsForPair, survivorCentsCalc) are byte-for-byte copies of the
-// same-named helpers in the "Shared primitives" block of expected-npv.ts.
+// The personal benefit itself comes from benefitCentsAtAge in
+// benefit-calculator.ts, shared with the slow path. The three functions
+// below (filingYearCents, spousalCentsForPair, survivorCentsCalc) are
+// byte-for-byte copies of the same-named helpers in the "Shared primitives"
+// block of expected-npv.ts.
 // (Named rather than line-numbered: line ranges rot on the next edit.) They are
 // duplicated rather than imported to keep this hot-path module
 // self-contained for inlining. Authoritative docstrings (early-filing
@@ -72,30 +75,6 @@ import {
 // so edit both copies together. Extracting to a shared module is a
 // pending follow-up.
 // ─────────────────────────────────────────────────────────────────────────
-
-/** Personal benefit at a given filing age, in cents. */
-function benefitCentsAtAge(
-  piaCents: number,
-  nraMonths: number,
-  delayedRetirementIncrease: number,
-  ageMonths: number
-): number {
-  let mult: number;
-  if (nraMonths > ageMonths) {
-    const before = nraMonths - ageMonths;
-    mult = -(
-      (Math.min(36, before) * 5) / 900 +
-      (Math.max(0, before - 36) * 5) / 1200
-    );
-  } else {
-    // Delayed credits stop accruing at age 70.
-    const creditedMonths =
-      ageMonths < MAX_BENEFIT_AGE_MONTHS ? ageMonths : MAX_BENEFIT_AGE_MONTHS;
-    const after = creditedMonths - nraMonths;
-    mult = (delayedRetirementIncrease / 12) * after;
-  }
-  return Math.floor(Math.round(piaCents * (1 + mult)) / 100) * 100;
-}
 
 /** Personal benefit during the filing year (before next January), in cents. */
 function filingYearCents(

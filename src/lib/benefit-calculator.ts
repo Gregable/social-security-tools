@@ -24,42 +24,75 @@ export const MAX_BENEFIT_AGE_MONTHS = 70 * 12;
 export const MIN_SURVIVOR_BENEFIT_RATIO = 0.715;
 
 /**
- * Returns benefit multiplier at a given age relative to normal retirement age.
+ * Returns an annual delayed retirement credit rate (e.g. 0.08) in tenths of a
+ * percent (80). Every rate SSA has used is a whole number of tenths.
  *
- * The early retirement reduction factor changes from 6.67%/yr for years
- * earlier than 3 years before normal retirement age to 5%/yr for the 3 years
- * immediately before normal retirement age.
- *
- * Delayed credits are capped at age 70; an age past 70 yields the same
- * multiplier as age 70 exactly.
+ * @throws Error if the rate is not a whole number of tenths of a percent.
  */
-function benefitMultiplierAtAge(
-  nra: MonthDuration,
-  delayedRetirementIncrease: number,
-  age: MonthDuration
-): number {
-  if (nra.greaterThan(age)) {
-    // Reduced benefits due to taking benefits early.
-    const before = nra.subtract(age);
-    return (
-      -1.0 *
-      ((Math.min(36, before.asMonths()) * 5) / 900 +
-        (Math.max(0, before.asMonths() - 36) * 5) / 1200)
+function delayedCreditPerMille(delayedRetirementIncrease: number): number {
+  const perMille = Math.round(delayedRetirementIncrease * 1000);
+  if (Math.abs(delayedRetirementIncrease * 1000 - perMille) > 1e-9) {
+    throw new Error(
+      `Delayed retirement credit ${delayedRetirementIncrease} is not a whole ` +
+        'number of tenths of a percent'
     );
-  } else {
-    // Increased benefits due to taking benefits late, up to age 70.
-    const creditedMonths = Math.min(age.asMonths(), MAX_BENEFIT_AGE_MONTHS);
-    const after = creditedMonths - nra.asMonths();
-    return (delayedRetirementIncrease / 12) * after;
   }
+  return perMille;
+}
+
+/**
+ * Personal benefit, in cents, from a PIA claimed at a given age.
+ *
+ * Claiming early reduces the PIA by 5/9 of 1% for each of the first 36 months
+ * before full retirement age and 5/12 of 1% for each month beyond that.
+ * Claiming late increases it by a twelfth of the annual delayed retirement
+ * credit for each month after full retirement age, up to age 70. SSA applies
+ * the factor to the PIA as computed (to the dime) and truncates the result to
+ * the dollar.
+ *
+ * Every factor is an exact fraction, so the product is computed in integers:
+ * rounding to the cent first would pay $1 too much whenever the exact amount
+ * ends in $X.995 or more.
+ *
+ * The strategy fast paths call this directly with raw numbers, so it takes no
+ * Money or MonthDuration objects.
+ *
+ * @param piaCents - The PIA in whole cents
+ * @param nraMonths - Full retirement age in months
+ * @param delayedRetirementIncrease - Annual delayed credit rate, e.g. 0.08
+ * @param ageMonths - Claiming age in months; ages past 70 count as 70
+ */
+export function benefitCentsAtAge(
+  piaCents: number,
+  nraMonths: number,
+  delayedRetirementIncrease: number,
+  ageMonths: number
+): number {
+  let numerator: number;
+  let denominator: number;
+  if (ageMonths < nraMonths) {
+    const before = nraMonths - ageMonths;
+    // 5/900 and 5/1200 over a common denominator: 20/3600 and 15/3600.
+    numerator =
+      3600 - 20 * Math.min(36, before) - 15 * Math.max(0, before - 36);
+    denominator = 3600;
+  } else {
+    const after = Math.min(ageMonths, MAX_BENEFIT_AGE_MONTHS) - nraMonths;
+    // An annual credit of r/1000 earns r/12000 a month.
+    numerator =
+      12000 + delayedCreditPerMille(delayedRetirementIncrease) * after;
+    denominator = 12000;
+  }
+  // The product is an integer far below 2^53, and a true quotient short of a
+  // whole dollar is short by at least 1/(denominator * 100), far more than
+  // floating-point division can err by, so the floor is exact.
+  return Math.floor((piaCents * numerator) / (denominator * 100)) * 100;
 }
 
 /**
  * Returns personal benefit amount if starting benefits at a given age.
  *
- * The early-retirement reduction or delayed retirement credit applies to the
- * PIA as computed (to the dime); only the resulting benefit is rounded down
- * to the dollar.
+ * See benefitCentsAtAge for the reduction, credit and rounding rules.
  *
  * @param throughColaYear - Optional last COLA year to apply to the PIA. Defaults
  *   to the current-dollar value. Pass an earlier year (see benefitOnDateNominal)
@@ -70,18 +103,14 @@ export function benefitAtAge(
   age: MonthDuration,
   throughColaYear?: number
 ): Money {
-  return recipient
-    .pia()
-    .primaryInsuranceAmount(throughColaYear)
-    .times(
-      1 +
-        benefitMultiplierAtAge(
-          recipient.normalRetirementAge(),
-          recipient.delayedRetirementIncrease(),
-          age
-        )
+  return Money.fromCents(
+    benefitCentsAtAge(
+      recipient.pia().primaryInsuranceAmount(throughColaYear).cents(),
+      recipient.normalRetirementAge().asMonths(),
+      recipient.delayedRetirementIncrease(),
+      age.asMonths()
     )
-    .floorToDollar();
+  );
 }
 
 /**
