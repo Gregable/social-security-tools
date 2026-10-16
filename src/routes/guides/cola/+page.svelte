@@ -236,7 +236,12 @@ const faqs: FAQItem[] = [
     into your first payment. This is separate from
     <a href="/guides/delayed-retirement-credits">delayed retirement credits</a>,
     which are an additional increase for waiting past your
-    <a href="/guides/nra">Normal Retirement Age</a>.
+    <a href="/guides/nra">Normal Retirement Age</a>. It is also why a
+    benefit can come in well above an estimate made before 62; the
+    <a href="/guides/benefit-estimate-differences"
+      >guide to benefits that don't match the estimate</a
+    >
+    works through an example.
   </p>
 
   <p>

@@ -127,7 +127,7 @@ export function exampleWorker(): Recipient {
  * taxable maximum before indexing, so a target above that cap yields a
  * maximum-earnings year rather than the target.
  */
-function nominalForIndexed(
+export function nominalForIndexed(
   target: Money,
   year: number,
   indexingYear: number
