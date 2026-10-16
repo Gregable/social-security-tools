@@ -39,13 +39,12 @@ const stop = stopWorkingExample();
 const cola = colaGrowthExample();
 const medicare = medicareDeductionExample();
 const spousal = spousalExample();
-const firstColaRow = cola.rows[0];
 const lastColaRow = cola.rows[cola.rows.length - 1];
 
 const faqs: FAQItem[] = [
   {
     question: 'Why is my Social Security check less than my estimate?',
-    answer: `The most common reasons are that the estimate assumed you would keep working until you claimed, that you claimed a few months earlier than the age the estimate showed, and that the Medicare Part B premium (${medicare.premium.string()} a month in ${medicare.premiumYear}) is deducted from the payment, along with any federal tax you asked Social Security to withhold. The benefit amount on your award letter is the figure before those deductions.`,
+    answer: `Usually one of three things. The estimate assumed you would keep working until you claimed. You claimed a few months earlier than the age the estimate showed. Or the Medicare Part B premium (${medicare.premium.string()} a month in ${medicare.premiumYear}) and any federal tax you asked to have withheld came out of the payment. The benefit on your award letter is the amount before those deductions.`,
   },
   {
     question: 'Why is my Social Security check more than my estimate?',
@@ -88,10 +87,10 @@ const faqs: FAQItem[] = [
   <p>
     Your Social Security Statement shows one number, the agent on the phone
     gave you another, and the deposit in your bank account is a third. Most
-    of the time none of them is wrong: each one answers a slightly different
-    question. This guide walks through the reasons the figures disagree, in
-    roughly the order they catch people out, with worked examples computed
-    by the same code as the
+    of the time none of them is wrong. Each answers a slightly different
+    question. This guide goes through the reasons the figures disagree,
+    roughly in order of how often they come up, with worked examples
+    computed by the same code as the
     <a href="/calculator">ssa.tools calculator</a>.
   </p>
 
@@ -167,20 +166,21 @@ const faqs: FAQItem[] = [
       href="https://www.ssa.gov/myaccount/assets/materials/statement-redesign-online.pdf"
       >sample Statement</a
     >
-    puts it plainly: the estimates “assume you continue to earn” your latest
-    year’s amount “per year until you start your benefits.” For someone in their fifties who
-    is still working, that is a reasonable guess. For someone who has already
+    says so in its fine print: the estimates “assume you continue to earn
+    $54,489 per year until you start your benefits,” $54,489 being that
+    worker’s most recent year. For someone in their fifties who is still
+    working, that is a reasonable guess. For someone who has already
     stopped, or plans to stop well before claiming, the estimate includes
     years of earnings that will never happen.
   </p>
 
   <p>
-    It matters because your benefit is based on your highest
-    <a href="/guides/aime">35 years of indexed earnings</a>, and any of those
-    35 years you did not work counts as zero. Take a worker born in
-    {stop.birthYear} who has earned the equivalent of
-    {stop.wage.wholeDollars()} a year for {stop.careerYears} years. Their
-    Statement assumes {stop.projectedYears} more years at that salary, through
+    This matters because your benefit is based on your highest
+    <a href="/guides/aime">35 years of indexed earnings</a>, and any of the
+    35 you did not work counts as zero. Take a worker born in
+    {stop.birthYear} who has earned {stop.wage.wholeDollars()} a year, in
+    today’s wages, for {stop.careerYears} years. Their Statement assumes
+    {stop.projectedYears} more years at that salary, through
     {stop.fraYear}, the year they reach full retirement age:
   </p>
 
@@ -215,12 +215,12 @@ const faqs: FAQItem[] = [
     dollar of that average is worth 32 cents of monthly benefit under the
     <a href="/guides/pia">benefit formula</a>. A worker who already had 35
     good years would lose much less, because the extra years would only
-    have replaced other years of similar earnings.
+    replace other years of similar earnings.
   </p>
 
   <p>
     The calculator starts from the same assumption as the Statement, so its
-    first answer should be close to yours. Then set its future earnings
+    first answer should be close to yours. Then move the future earnings
     sliders to the years and salary you actually expect, including zero, to
     see the benefit you are really on track for.
   </p>
@@ -278,16 +278,15 @@ const faqs: FAQItem[] = [
     {cola.increase.string()}, or {cola.percentIncrease.toFixed(1)}%. From
     January {lastColaRow.firstPaidYear} this worker’s full-retirement-age
     amount is {cola.piaAfterNewestCola.string()}, not the
-    {EXAMPLE_PIA.wholeDollars()} they saw at 62, and any early-claiming
-    reduction or delayed credits apply on top of the larger figure. A COLA announced in October takes effect with the December benefit,
-    which is paid in January, so in October through December the new figure
-    is known but not yet in your check. The
-    {firstColaRow.year} adjustment above, for example, first reached bank
-    accounts in January {firstColaRow.firstPaidYear}.
+    {EXAMPLE_PIA.wholeDollars()} they saw at 62, and any reduction for
+    claiming early or credit for claiming late is figured from the larger
+    amount. A COLA announced in October takes effect with the December
+    benefit, which is paid in January, so from October through December the
+    new figure is known but not yet in your check.
   </p>
 
   <p>
-    One more wrinkle for anyone under 62: the
+    There is one more moving part for anyone under 62. The
     <a href="/guides/indexing-factors">wage indexing</a> of your earnings is
     fixed by the national average wage in the year you turn 60, and the
     <a href="https://www.ssa.gov/oact/cola/bendpoints.html"
@@ -306,7 +305,7 @@ const faqs: FAQItem[] = [
     any federal income tax you asked it to withhold. A
     {medicare.benefit.wholeDollars()} benefit with the standard
     {medicare.premiumYear} Part B premium of {medicare.premium.string()}
-    arrives as a deposit of {medicare.deposit.wholeDollars()}: Social
+    arrives as a deposit of {medicare.deposit.wholeDollars()}. Social
     Security takes out the premium and then rounds the payment down to a
     whole dollar.
   </p>
@@ -366,19 +365,22 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    Calendar rules also move the start date. To claim at 62 you must be 62
-    for the whole month, so most people’s first month of benefits is the
-    month after their 62nd birthday. Social Security considers you to reach
-    an age the day before your birthday, so someone born on the 1st or 2nd
-    is 62 for their entire birthday month and can start a month sooner, and
-    someone born on the 1st also reaches full retirement age a month early,
-    which changes how many months of reduction or credit apply, as the
+    Calendar rules also move the start date. To start benefits at 62 you
+    have to be 62 for the whole month, so for most people the first month
+    is the month after their 62nd birthday. Social Security treats you as
+    reaching an age the day before your birthday, so anyone born on the 1st
+    or 2nd is 62 for the whole birthday month and can start a month sooner.
+    Someone born on the 1st also reaches full retirement age a month early,
+    which changes the number of months of reduction or credit. The
     <a href="/guides/1st-and-2nd-of-month">guide to those birthdays</a>
-    explains. And benefits are paid the month after they are due: the
-    benefit for March arrives in April, on a Wednesday that depends on your
-    birthday, according to the
-    <a href="https://www.ssa.gov/pubs/calendar.htm">payment calendar</a>.
-    That last rule does not change the amount, but it makes the first check
+    covers both.
+  </p>
+
+  <p>
+    Benefits are also paid a month behind. The benefit for March arrives in
+    April, on a Wednesday set by your birthday, as the
+    <a href="https://www.ssa.gov/pubs/calendar.htm">payment calendar</a>
+    shows. That does not change the amount, but it makes the first check
     arrive later than many people expect.
   </p>
 
@@ -388,11 +390,12 @@ const faqs: FAQItem[] = [
     If you claim after full retirement age but before 70, the
     <a href="/guides/delayed-retirement-credits">delayed retirement credits</a>
     you earned in the calendar year you claim are not added until the
-    following January. Your first checks are lower than the estimate for your
-    claiming age, and the difference arrives, without back pay for the
-    earlier months, with the January payment. Claiming at exactly 70 avoids
-    this. The <a href="/guides/delayed-january-bump">January bump guide</a>
-    works through the timing.
+    following January. Your first checks are lower than the estimate for
+    your claiming age. In January the check rises to the full amount, but
+    there is no back pay for the months in between. Claiming at exactly 70
+    avoids this. The
+    <a href="/guides/delayed-january-bump">January bump guide</a> works
+    through the timing.
   </p>
 
   <h2 id="spousal">Spousal Benefits Use the Full-Retirement-Age Amount</h2>
@@ -434,12 +437,12 @@ const faqs: FAQItem[] = [
   </table>
 
   <p>
-    Neither is the {spousal.halfOfWorkerCheck.wholeDollars()} that half of the
-    worker’s check would suggest. A spouse who also has their own benefit
-    receives their own amount plus only the difference, so the combined
-    total can look lower still. The delay is not wasted: a
-    <a href="/guides/survivor-benefits">survivor benefit</a> does include the
-    worker’s delayed credits.
+    Neither is the {spousal.halfOfWorkerCheck.wholeDollars()} that half of
+    the worker’s check would suggest. A spouse who also has a benefit of
+    their own receives that amount plus only the difference, so the
+    combined total can look lower still. The worker’s delay is not wasted,
+    though. A <a href="/guides/survivor-benefits">survivor benefit</a> does
+    include the delayed credits.
   </p>
 
   <h2 id="earnings-test">Working While You Collect</h2>
@@ -471,7 +474,8 @@ const faqs: FAQItem[] = [
 
   <p>
     Every estimate is only as good as the earnings record behind it, and an
-    error there is the one difference that is actually a mistake. Look for:
+    error there is the one case on this page where a figure really is wrong.
+    Look for:
   </p>
 
   <ul>
@@ -486,8 +490,9 @@ const faqs: FAQItem[] = [
     </li>
     <li>
       <strong>An older year that is zero or too low.</strong> A missing W-2,
-      an employer that reported under the wrong number, or self-employment
-      tax that was never filed. These do not correct themselves. You can ask
+      an employer that reported your wages under the wrong Social Security
+      number, or self-employment tax that was never filed. These do not
+      correct themselves. You can ask
       Social Security to fix them with
       <a href="https://www.ssa.gov/forms/ssa-7008.pdf">Form SSA-7008</a>,
       generally within
@@ -522,14 +527,15 @@ const faqs: FAQItem[] = [
       your exact claiming month, and the future earnings you actually expect.
     </li>
     <li>
-      Compare the benefit before deductions, not the deposit, and remember
-      that an award letter is in the dollars of the month it describes,
-      including every cost-of-living adjustment since you turned 62.
+      Compare the benefit before deductions, not the deposit, and compare
+      it with an estimate that includes the cost-of-living adjustments since
+      you turned 62, not one you wrote down years ago.
     </li>
     <li>
       If the gap is still there, ask Social Security for the computation
-      behind your benefit: the earnings, the average, and the formula it
-      used. Most real errors turn out to be a missing year of earnings.
+      behind your benefit, meaning the earnings it counted, the average, and
+      the formula it applied. Most real errors turn out to be a missing year
+      of earnings.
     </li>
     <li>
       If you disagree with a decision, you can ask for reconsideration in
@@ -551,8 +557,8 @@ const faqs: FAQItem[] = [
     <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
       >Social Security Fairness Act</a
     >
-    ended both for benefits payable after December 2023. If your estimate
-    still reflects either reduction, the
+    ended both for benefits payable after December 2023. If an older
+    estimate included either reduction, the
     <a href="/guides/wep">guide to the repeal</a> explains what changed.
   </p>
 
