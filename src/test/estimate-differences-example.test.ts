@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { benefitAtAge } from '$lib/benefit-calculator';
+import { Birthdate } from '$lib/birthday';
 import {
   COLA,
   MAX_COLA_YEAR,
@@ -13,7 +15,9 @@ import {
   stopWorkingExample,
 } from '$lib/estimate-differences-example';
 import { Money } from '$lib/money';
+import { MonthDuration } from '$lib/month-time';
 import { applyColas } from '$lib/pia';
+import { Recipient } from '$lib/recipient';
 
 describe('applyColas', () => {
   it('returns the PIA unchanged over an empty range', () => {
@@ -27,6 +31,13 @@ describe('applyColas', () => {
     expect(COLA[2024]).toBe(2.5);
     expect(
       applyColas(Money.from(1000.3), 2024, 2024).equals(Money.from(1025.3))
+    ).toBe(true);
+  });
+
+  it('applies the published years of a range that runs past the data', () => {
+    const one = applyColas(Money.from(1000), MAX_COLA_YEAR, MAX_COLA_YEAR);
+    expect(
+      applyColas(Money.from(1000), MAX_COLA_YEAR, MAX_COLA_YEAR + 2).equals(one)
     ).toBe(true);
   });
 
@@ -65,7 +76,7 @@ describe('stopWorkingExample', () => {
   });
 
   it('keeps both AIMEs in the 32% bracket, as the guide says', () => {
-    expect(example.bothInSecondBracket).toBe(true);
+    expect(example.aimesWithinSecondBracket).toBe(true);
   });
 
   // Golden values. When these move (usually the annual constants update),
@@ -103,12 +114,12 @@ describe('colaGrowthExample', () => {
       expect(row.firstPaidYear).toBe(row.year + 1);
       previous = row.piaAfter;
     }
-    expect(example.piaNow.equals(previous)).toBe(true);
+    expect(example.piaAfterNewestCola.equals(previous)).toBe(true);
   });
 
   it('agrees with applying all the COLAs at once', () => {
     expect(
-      example.piaNow.equals(
+      example.piaAfterNewestCola.equals(
         applyColas(EXAMPLE_PIA, example.turned62In, MAX_COLA_YEAR)
       )
     ).toBe(true);
@@ -123,6 +134,9 @@ describe('colaGrowthExample', () => {
       '$2,435.10',
       '$2,503.20',
       '$2,593.30',
+    ]);
+    expect(example.rows.map((r) => r.cola)).toEqual([
+      5.9, 8.7, 3.2, 2.5, 2.8, 3.6,
     ]);
     expect(example.increase.string()).toBe('$593.30');
     expect(example.percentIncrease.toFixed(1)).toBe('29.7');
@@ -153,6 +167,7 @@ describe('medicareDeductionExample', () => {
     expect(example.premiumYear).toBe(2026);
     expect(example.premium.string()).toBe('$202.90');
     expect(example.deposit.string()).toBe('$1,797.00');
+    expect(example.deposit.wholeDollars()).toBe('$1,797');
   });
 });
 
@@ -178,5 +193,23 @@ describe('spousalExample', () => {
     expect(example.halfOfWorkerCheck.string()).toBe('$1,280.00');
     expect(example.spousalAtFra.string()).toBe('$1,000.00');
     expect(example.spousalAt62.string()).toBe('$650.00');
+    // The guide prints these with wholeDollars(), which rounds; pin that too.
+    expect(example.workerBenefitAt70.wholeDollars()).toBe('$2,560');
+    expect(example.halfOfWorkerCheck.wholeDollars()).toBe('$1,280');
+    expect(example.spousalAtFra.wholeDollars()).toBe('$1,000');
+    expect(example.spousalAt62.wholeDollars()).toBe('$650');
+  });
+});
+
+describe('guide prose', () => {
+  it('claiming three months before full retirement age costs about 1.7%', () => {
+    const worker = new Recipient();
+    worker.birthdate = Birthdate.FromYMD(MAX_YEAR - 62, 0, 2);
+    worker.setPia(EXAMPLE_PIA);
+    const threeMonthsEarly = worker
+      .normalRetirementAge()
+      .subtract(new MonthDuration(3));
+    const cost = 1 - benefitAtAge(worker, threeMonthsEarly).div$(EXAMPLE_PIA);
+    expect((cost * 100).toFixed(1)).toBe('1.7');
   });
 });

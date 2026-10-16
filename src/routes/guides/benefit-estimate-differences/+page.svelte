@@ -231,7 +231,7 @@ const faqs: FAQItem[] = [
     A Statement estimate does not include future
     <a href="/guides/cola">cost-of-living adjustments</a>. The actual
     benefit does, and the adjustments
-    <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0233.htm"
+    <a href="https://www.ecfr.gov/current/title-20/part-404/section-404.271"
       >start in the year you turn 62</a
     >, whether or not you have claimed. Someone who checks an estimate in their late
     fifties and claims at 70 will see a far larger number than they wrote
@@ -277,7 +277,7 @@ const faqs: FAQItem[] = [
     Over those {cola.rows.length} adjustments the benefit grew by
     {cola.increase.string()}, or {cola.percentIncrease.toFixed(1)}%. From
     January {lastColaRow.firstPaidYear} this worker’s full-retirement-age
-    amount is {cola.piaNow.string()}, not the
+    amount is {cola.piaAfterNewestCola.string()}, not the
     {EXAMPLE_PIA.wholeDollars()} they saw at 62, and any early-claiming
     reduction or delayed credits apply on top of the larger figure. A COLA announced in October takes effect with the December benefit,
     which is paid in January, so in October through December the new figure
@@ -342,10 +342,11 @@ const faqs: FAQItem[] = [
     <a href="https://www.ssa.gov/OP_Home/handbook/handbook.07/handbook-0738.html"
       >benefit computation is rounded down to the dime</a
     >
-    at each step, and the amount actually paid is rounded down to the dollar
-    after every deduction. An award letter can show a benefit ending in
-    dimes and a payment that is the benefit less the premium with the cents
-    dropped.
+    at each step, and the amount paid is rounded down to the dollar after
+    the Medicare premium comes out. An award letter can show a benefit
+    ending in dimes and a payment that is the benefit less the premium with
+    the cents dropped. Federal tax withholding is taken after that rounding,
+    so a deposit with tax withheld can end in cents.
   </p>
 
   <h2 id="claiming-month">The Exact Month You Claimed</h2>
@@ -357,7 +358,7 @@ const faqs: FAQItem[] = [
     one percent for each month beyond that, under
     <a href="https://www.ecfr.gov/current/title-20/part-404/section-404.410"
       >Social Security’s rules</a
-    >. Claiming three months before the age on your Statement costs about
+    >. Claiming three months before full retirement age costs about
     1.7% of the full amount. Each month you wait past full retirement age
     adds two-thirds of one percent, up to 70. The
     <a href="/guides/filing-date-chart">filing date chart</a> shows the
@@ -365,16 +366,20 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    Two calendar rules also move the start date. Social Security considers
-    you to reach an age the day before your birthday, which matters if you
-    were born on the 1st or 2nd of the month, as the
+    Calendar rules also move the start date. To claim at 62 you must be 62
+    for the whole month, so most people’s first month of benefits is the
+    month after their 62nd birthday. Social Security considers you to reach
+    an age the day before your birthday, so someone born on the 1st or 2nd
+    is 62 for their entire birthday month and can start a month sooner, and
+    someone born on the 1st also reaches full retirement age a month early,
+    which changes how many months of reduction or credit apply, as the
     <a href="/guides/1st-and-2nd-of-month">guide to those birthdays</a>
     explains. And benefits are paid the month after they are due: the
     benefit for March arrives in April, on a Wednesday that depends on your
     birthday, according to the
     <a href="https://www.ssa.gov/pubs/calendar.htm">payment calendar</a>.
-    Neither changes the amount, but both make the first check arrive later
-    than many people expect.
+    That last rule does not change the amount, but it makes the first check
+    arrive later than many people expect.
   </p>
 
   <h2 id="january">Delayed Credits Arrive in January</h2>

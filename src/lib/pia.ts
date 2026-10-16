@@ -48,7 +48,6 @@ export function applyColas(
   for (let year = firstYear; year <= throughYear; ++year) {
     if (constants.COLA[year] !== undefined) {
       adjusted = adjusted.times(1 + constants.COLA[year] / 100.0);
-      // Primary Insurance amounts are rounded down to the nearest dime.
       adjusted = adjusted.floorToDime();
     }
   }

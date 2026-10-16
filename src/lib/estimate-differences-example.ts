@@ -13,6 +13,14 @@
  * sentence in the guide naming a bracket or a percentage are hand-written,
  * and the golden test pins the figures so a constants change prompts a
  * re-read of that prose.
+ *
+ * The examples are anchored to constants.MAX_YEAR, the latest year the
+ * constants cover, not to today's date, so the prerendered guide does not
+ * change between builds. From SSA's October announcement until January,
+ * MAX_YEAR is next year.
+ *
+ * The result records are plain readonly interfaces produced only by the
+ * functions beside them; they are not meant to be constructed by hand.
  */
 
 import { benefitAtAge, spousalBenefitOnDate } from './benefit-calculator';
@@ -35,10 +43,13 @@ export const EXAMPLE_PIA: Money = Money.from(2000);
 /** Age of the stop-working example in the latest year the constants cover. */
 const STOP_WORKING_AGE = 55;
 
-/** Years of earnings already on the record, ending last year. */
+/** Years of earnings already on the record, ending the year before MAX_YEAR. */
 const STOP_WORKING_CAREER_YEARS = 30;
 
-/** A steady salary, in the latest year's wage level. */
+/**
+ * A steady salary. Past years are scaled so they index to this amount at
+ * the latest published average wage index; future years earn it nominally.
+ */
 export const STOP_WORKING_WAGE: Money = Money.from(80000);
 
 export interface StopWorkingExample {
@@ -48,9 +59,9 @@ export interface StopWorkingExample {
   /** The year the worker reaches full retirement age. */
   readonly fraYear: number;
   /**
-   * Years of future earnings the estimate assumes: this year through the
-   * full-retirement-age year, inclusive, the same projection the calculator
-   * starts from.
+   * Years of future earnings the estimate assumes: MAX_YEAR through the
+   * full-retirement-age year, inclusive. The calculator's sliders apply the
+   * same rule counting from the current calendar year.
    */
   readonly projectedYears: number;
   /** Years of the 35 that count which hold $0 if the worker stops now. */
@@ -63,7 +74,7 @@ export interface StopWorkingExample {
    * Whether both monthly averages sit between the bend points, where 32
    * cents of each dollar becomes benefit. The guide says so in prose.
    */
-  readonly bothInSecondBracket: boolean;
+  readonly aimesWithinSecondBracket: boolean;
 }
 
 /** A wage year. Medicare earnings play no part in the PIA. */
@@ -127,6 +138,17 @@ export function stopWorkingExample(): StopWorkingExample {
     );
   };
 
+  // The guide says each dollar of the average is worth 32 cents of benefit,
+  // which holds only between the bend points. Fail the build rather than
+  // publish that sentence over figures it no longer describes.
+  const aimesWithinSecondBracket =
+    inSecondBracket(keepWorking) && inSecondBracket(stopNow);
+  if (!aimesWithinSecondBracket) {
+    throw new Error(
+      'stop-working example left the 32% bracket; revisit the wage and the guide prose'
+    );
+  }
+
   const piaIfKeepWorking = keepWorking.pia().primaryInsuranceAmountUnadjusted();
   const piaIfStopNow = stopNow.pia().primaryInsuranceAmountUnadjusted();
   return {
@@ -142,8 +164,7 @@ export function stopWorkingExample(): StopWorkingExample {
     piaIfKeepWorking,
     piaIfStopNow,
     difference: piaIfKeepWorking.sub(piaIfStopNow),
-    bothInSecondBracket:
-      inSecondBracket(keepWorking) && inSecondBracket(stopNow),
+    aimesWithinSecondBracket,
   };
 }
 
@@ -169,8 +190,12 @@ export interface ColaGrowthExample {
   readonly turned62In: number;
   readonly piaAt62: Money;
   readonly rows: readonly ColaYearRow[];
-  /** The PIA after the newest published COLA. */
-  readonly piaNow: Money;
+  /**
+   * The PIA after the newest published COLA, first paid in January after
+   * its announcement; from October to December that is ahead of current
+   * checks.
+   */
+  readonly piaAfterNewestCola: Money;
   readonly increase: Money;
   /** In percent. */
   readonly percentIncrease: number;
@@ -186,6 +211,9 @@ export function colaGrowthExample(): ColaGrowthExample {
   const rows: ColaYearRow[] = [];
   let pia = EXAMPLE_PIA;
   for (let year = turned62In; year <= constants.MAX_COLA_YEAR; year++) {
+    if (constants.COLA[year] === undefined) {
+      throw new Error(`no COLA published for ${year}`);
+    }
     const after = applyColas(pia, year, year);
     rows.push({
       year,
@@ -201,7 +229,7 @@ export function colaGrowthExample(): ColaGrowthExample {
     turned62In,
     piaAt62: EXAMPLE_PIA,
     rows,
-    piaNow: pia,
+    piaAfterNewestCola: pia,
     increase,
     percentIncrease: increase.div$(EXAMPLE_PIA) * 100,
   };
@@ -221,7 +249,8 @@ export interface MedicareDeductionExample {
 /**
  * EXAMPLE_PIA as a monthly benefit, less the newest standard Part B premium.
  * Social Security deducts the premium first and then rounds the payment down
- * to a whole dollar, so the deposit never has cents.
+ * to a whole dollar, so with only that premium withheld the deposit is a
+ * whole number of dollars.
  */
 export function medicareDeductionExample(): MedicareDeductionExample {
   const premiumYear = Math.max(
