@@ -190,13 +190,11 @@ function oneSignificantDigit(n: number) {
                   {/each}
                 </ul>
                 <p>
-                  Each year's adjustment takes effect with the benefit for
-                  <b>December</b> of that year. Because benefits are paid the
-                  month after they are due, the first larger payment arrives
-                  in <b>January</b>. For example, the {constants.CURRENT_YEAR}
-                  adjustment raises <RName {r} apos>your</RName> benefit
-                  starting with December {constants.CURRENT_YEAR}, paid in
-                  January {constants.CURRENT_YEAR + 1}.
+                  Each year's adjustment applies to the <b>December</b>
+                  benefit, which is paid in <b>January</b>. For example, the
+                  {constants.CURRENT_YEAR} adjustment first appears in
+                  <RName {r} apos>your</RName>
+                  January {constants.CURRENT_YEAR + 1} payment.
                 </p>
               </div>
             {/if}
@@ -204,9 +202,9 @@ function oneSignificantDigit(n: number) {
             {#if pendingCola}
               <p>
                 The final value is <RName {r} apos>your</RName>
-                <u>primary insurance amount (PIA)</u> starting with the December
-                {pendingCola.year} benefit, first paid in January
-                {pendingCola.year + 1}. Payments before then are based on
+                <u>primary insurance amount (PIA)</u> after the
+                {pendingCola.year} adjustment. Payments before January
+                {pendingCola.year + 1} are based on
                 <b>{pendingCola.start.string()}</b>. It will continue to
                 increase every year.
               </p>
