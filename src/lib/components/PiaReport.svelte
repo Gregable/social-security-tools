@@ -189,13 +189,16 @@ function oneSignificantDigit(n: number) {
                     </li>
                   {/each}
                 </ul>
-                <p>
-                  Each year's adjustment applies to the <b>December</b>
-                  benefit, which is paid in <b>January</b>. For example, the
-                  {constants.CURRENT_YEAR} adjustment first appears in
-                  <RName {r} apos>your</RName>
-                  January {constants.CURRENT_YEAR + 1} payment.
-                </p>
+                {#if !pendingCola}
+                  <!-- When a COLA is pending, the summary below states this rule. -->
+                  <p>
+                    Each year's adjustment applies to the <b>December</b>
+                    benefit, which is paid in <b>January</b>. For example, the
+                    {constants.CURRENT_YEAR} adjustment first appears in
+                    <RName {r} apos>your</RName>
+                    January {constants.CURRENT_YEAR + 1} payment.
+                  </p>
+                {/if}
               </div>
             {/if}
 
@@ -203,8 +206,9 @@ function oneSignificantDigit(n: number) {
               <p>
                 The final value is <RName {r} apos>your</RName>
                 <u>primary insurance amount (PIA)</u> after the
-                {pendingCola.year} adjustment. Payments before January
-                {pendingCola.year + 1} are based on
+                {pendingCola.year} adjustment. Each adjustment applies to the
+                <b>December</b> benefit, which is paid in <b>January</b>, so
+                payments before January {pendingCola.year + 1} are based on
                 <b>{pendingCola.start.string()}</b>. It will continue to
                 increase every year.
               </p>
