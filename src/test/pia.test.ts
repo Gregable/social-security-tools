@@ -239,4 +239,13 @@ describe('pendingColaAdjustment', () => {
     const w = await workerOn(new Date(constants.MAX_COLA_YEAR + 1, 0, 15));
     expect(w.pia.pendingColaAdjustment()).toBeNull();
   });
+
+  it('reports nothing for a PIA-only recipient, whose PIA is already current', () => {
+    // A typed-in PIA has no computed history to adjust, so there is never a
+    // pending COLA to show, whatever the date.
+    const r = new Recipient();
+    r.birthdate = Birthdate.FromYMD(1960, 3, 15);
+    r.setPia(Money.from(2500));
+    expect(r.pia().pendingColaAdjustment()).toBeNull();
+  });
 });
