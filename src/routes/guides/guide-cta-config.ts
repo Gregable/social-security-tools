@@ -21,6 +21,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   '60k-income': 'calculator',
   '80k-income': 'calculator',
   aime: 'calculator',
+  'benefit-estimate-differences': 'calculator',
   'delayed-january-bump': 'calculator',
   'earnings-cap': 'calculator',
   'earnings-record-paste': 'calculator',

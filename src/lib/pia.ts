@@ -35,6 +35,26 @@ export function wageIndexRatio(indexingYear: number): number {
 }
 
 /**
+ * Applies each year's cost-of-living adjustment from `firstYear` through
+ * `throughYear`, inclusive, rounding down to the dime after each one as SSA
+ * does. Years without a published COLA are skipped.
+ */
+export function applyColas(
+  pia: Money,
+  firstYear: number,
+  throughYear: number
+): Money {
+  let adjusted = pia;
+  for (let year = firstYear; year <= throughYear; ++year) {
+    if (constants.COLA[year] !== undefined) {
+      adjusted = adjusted.times(1 + constants.COLA[year] / 100.0);
+      adjusted = adjusted.floorToDime();
+    }
+  }
+  return adjusted;
+}
+
+/**
  * A PrimaryInsuranceAmount object manages calculating the user's Primary
  * Insurance Amount (PIA).
  *
@@ -249,19 +269,11 @@ export class PrimaryInsuranceAmount {
     pia: Money,
     throughYear: number = this.lastAppliedColaYear()
   ): Money {
-    let adjusted = pia;
-    for (
-      let year = this.input_.birthdate.yearTurningSsaAge(62);
-      year <= throughYear;
-      ++year
-    ) {
-      if (constants.COLA[year] !== undefined) {
-        adjusted = adjusted.times(1 + constants.COLA[year] / 100.0);
-        // Primary Insurance amounts are rounded down to the nearest dime.
-        adjusted = adjusted.floorToDime();
-      }
-    }
-    return adjusted;
+    return applyColas(
+      pia,
+      this.input_.birthdate.yearTurningSsaAge(62),
+      throughYear
+    );
   }
 
   /**

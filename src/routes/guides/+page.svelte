@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Oct 16, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/benefit-estimate-differences">
+            Why Your Social Security Benefit Doesn't Match the Estimate
+          </a>
+        </h3>
+        <p class="description">
+          The Statement, the agent, and the deposit can all show different
+          numbers. Assumed future earnings, cost-of-living adjustments since
+          62, Medicare premiums, delayed credits paid in January, spousal
+          benefits, the earnings test, and errors in your record, with worked
+          examples and how to check your own figure.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Oct 11, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/break-even-age">

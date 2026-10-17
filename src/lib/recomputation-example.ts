@@ -120,14 +120,16 @@ export function exampleWorker(): Recipient {
  * indexing year on, and years past the wage index data, carry a factor of
  * 1.0, so their nominal and indexed amounts are equal. It deliberately does
  * not mirror that method's `year <= 1950` branch, which returns a factor of
- * 0.0 and cannot be inverted; recomputationExample rejects careers reaching
- * that far back instead.
+ * 0.0 and cannot be inverted, so callers must not pass a year of 1950 or
+ * earlier. An indexing year past the wage index data is clamped to the
+ * latest published year, as EarningRecord does, so a worker under 60
+ * indexes to the latest average wage.
  *
  * The result is a pre-cap amount. EarningRecord caps earnings at the year's
  * taxable maximum before indexing, so a target above that cap yields a
  * maximum-earnings year rather than the target.
  */
-function nominalForIndexed(
+export function nominalForIndexed(
   target: Money,
   year: number,
   indexingYear: number
