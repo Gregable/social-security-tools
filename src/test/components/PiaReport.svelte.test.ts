@@ -24,7 +24,7 @@ describe('PiaReport', () => {
     return target;
   }
 
-  it('renders a typed-in PIA without computing its COLA history', () => {
+  it('renders a provided PIA without computing its COLA history', () => {
     // The calculator's manual entry path: a PIA and a birthdate, no earnings.
     const r = new Recipient();
     r.birthdate = Birthdate.FromYMD(1960, 3, 15);

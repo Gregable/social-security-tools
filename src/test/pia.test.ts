@@ -240,12 +240,32 @@ describe('pendingColaAdjustment', () => {
     expect(w.pia.pendingColaAdjustment()).toBeNull();
   });
 
-  it('reports nothing for a PIA-only recipient, whose PIA is already current', () => {
-    // A typed-in PIA has no computed history to adjust, so there is never a
-    // pending COLA to show, whatever the date.
-    const r = new Recipient();
-    r.birthdate = Birthdate.FromYMD(1960, 3, 15);
-    r.setPia(Money.from(2500));
-    expect(r.pia().pendingColaAdjustment()).toBeNull();
+  /** A PIA-only recipient, built from modules loaded on `date`. */
+  async function piaOnlyOn(date: Date) {
+    vi.useFakeTimers();
+    vi.setSystemTime(date);
+    vi.resetModules();
+    try {
+      const { Recipient: FreshRecipient } = await import('$lib/recipient');
+      const { Birthdate: FreshBirthdate } = await import('$lib/birthday');
+      const { Money: FreshMoney } = await import('$lib/money');
+      const r = new FreshRecipient();
+      r.birthdate = FreshBirthdate.FromYMD(1960, 3, 15);
+      r.setPia(FreshMoney.from(2500));
+      return r.pia();
+    } finally {
+      vi.useRealTimers();
+      vi.resetModules();
+    }
+  }
+
+  it('reports nothing for a provided PIA, which is already current', async () => {
+    // Inside the pending window (October) and after it (January).
+    for (const date of [
+      new Date(constants.MAX_COLA_YEAR, 9, 15),
+      new Date(constants.MAX_COLA_YEAR + 1, 0, 15),
+    ]) {
+      expect((await piaOnlyOn(date)).pendingColaAdjustment()).toBeNull();
+    }
   });
 });

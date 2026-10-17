@@ -299,6 +299,7 @@ export class PrimaryInsuranceAmount {
    * See PiaReport.svelte.
    *
    * @returns {Array<ColaAdjustment>} Array of COLA adjustment records
+   * @throws {Error} If isPiaOnly is true
    */
   colaAdjustments(): Array<ColaAdjustment> {
     let adjusted = this.primaryInsuranceAmountUnadjusted();
@@ -337,8 +338,10 @@ export class PrimaryInsuranceAmount {
    * PIA from the December benefit on (first paid in January), so display
    * code can name both.
    *
-   * A PIA-only recipient's PIA was typed in as a current-dollar amount and
-   * has no computed COLA history, so nothing is ever pending for them.
+   * A PIA-only recipient's PIA is provided as a current-dollar amount, so
+   * nothing is ever pending for them. They must return before
+   * colaAdjustments(), which throws without an unadjusted PIA to start from;
+   * PiaReport calls this for every recipient.
    */
   pendingColaAdjustment(): ColaAdjustment | null {
     if (this.input_.isPiaOnly) return null;
