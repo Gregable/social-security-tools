@@ -39,16 +39,23 @@
  * form is provided.
  */
 
+import { eligibleForSpousalBenefit } from '$lib/benefit-calculator';
 import {
   benefitCentsAtAge,
-  eligibleForSpousalBenefit,
+  benefitDimesAtAge,
+  floorToDollarCents,
   MAX_BENEFIT_AGE_MONTHS,
-  MIN_SURVIVOR_BENEFIT_RATIO,
-} from '$lib/benefit-calculator';
+} from '$lib/benefit-rounding';
 import type { DeathProbability } from '$lib/life-tables';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { type AlreadyFiled, NOT_FILED } from './already-filed';
+import {
+  filingYearCents,
+  filingYearDimes,
+  spousalCentsForPair,
+  survivorCentsCalc,
+} from './couple-fast-primitives';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import {
   calculateMonthlyDiscountRate,
@@ -137,180 +144,10 @@ export interface CoupleFilingAgeResult {
 // COUPLE — FAST PATH (optimized)
 // ═════════════════════════════════════════════════════════════════════════
 //
-// The helpers below replicate the same arithmetic as strategySumPeriodsCouple
-// in strategy-calc.ts, but operate on raw `number` values (cents, epoch
-// months) instead of allocating Money / MonthDate / MonthDuration objects.
-// They are used by `expectedNPVCoupleOptimized` below.
-//
-// Correctness note: the formulas here MUST match the object-oriented
-// implementations in benefit-calculator.ts / strategy-calc.ts to the last
-// rounding step. Any divergence will show up as a golden-test failure.
-// The personal benefit at a filing age is not copied: this file,
-// optimal-strategy-fast.ts and benefitAtAge all use benefitCentsAtAge from
-// benefit-calculator.ts.
-
-/**
- * Personal benefit during the filing year, in cents.
- *
- * Replicates benefitOnDateCore(r, fd, fd, age) from benefit-calculator.ts.
- *
- * The "January bump": for recipients filing after NRA but before age 70 in
- * a non-January month, SSA only grants delayed credits up to the previous
- * January. Full credits kick in the following January. This helper returns
- * the *reduced* amount that applies during the filing year; the full amount
- * is `benefitCentsAtAge` of the filing age.
- *
- * When the bump doesn't apply (filed before/at NRA, at 70, or in January),
- * returns the same value as `benefitCentsAtAge`.
- */
-function filingYearCents(
-  piaCents: number,
-  nraMonths: number,
-  delayedRetirementIncrease: number,
-  ageMonths: number,
-  ssaBirthEpoch: number,
-  nraEpoch: number
-): number {
-  const filingEpoch = ssaBirthEpoch + ageMonths;
-  if (
-    filingEpoch <= nraEpoch ||
-    ageMonths >= MAX_BENEFIT_AGE_MONTHS ||
-    filingEpoch % 12 === 0
-  )
-    return benefitCentsAtAge(
-      piaCents,
-      nraMonths,
-      delayedRetirementIncrease,
-      ageMonths
-    );
-
-  const thisJan = filingEpoch - (filingEpoch % 12);
-  const compAge = Math.max(nraEpoch, thisJan) - ssaBirthEpoch;
-  return benefitCentsAtAge(
-    piaCents,
-    nraMonths,
-    delayedRetirementIncrease,
-    compAge
-  );
-}
-
-/**
- * Spousal benefit in cents for a given filing pair.
- *
- * Replicates spousalBenefitOnDate (benefit-calculator.ts) at the spousal
- * period's start date. The amount is the excess of half the earner's PIA
- * over the dependent's own benefit, with two reduction schedules:
- *
- *   - If the spousal period starts before the dependent's NRA, apply an
- *     early-filing reduction to the excess.
- *   - If the dependent filed *after* their own NRA (accruing DRC), the
- *     personal benefit amount is higher, shrinking the remaining spousal
- *     excess.
- *
- * Returns 0 if the dependent has higher earnings or the excess is non-positive.
- */
-function spousalCentsForPair(
-  depPiaCents: number,
-  earnerPiaCents: number,
-  depFilingEpoch: number,
-  depNraEpoch: number,
-  spousalStartEpoch: number,
-  depFYCents: number,
-  depPJCents: number
-): number {
-  const base = earnerPiaCents / 2 - depPiaCents;
-  if (base <= 0) return 0;
-
-  if (spousalStartEpoch >= depNraEpoch) {
-    if (depFilingEpoch <= depNraEpoch) return Math.floor(base / 100) * 100;
-    const startYear = Math.floor(spousalStartEpoch / 12);
-    const filingYear = Math.floor(depFilingEpoch / 12);
-    const personal = startYear > filingYear ? depPJCents : depFYCents;
-    const excess = earnerPiaCents / 2 - personal;
-    return excess <= 0 ? 0 : Math.floor(excess / 100) * 100;
-  }
-
-  const mBefore = depNraEpoch - spousalStartEpoch;
-  if (mBefore <= 36)
-    return Math.floor((base * (1 - mBefore / 144)) / 100) * 100;
-
-  const r1 = base * 0.25;
-  const r2 = base * ((mBefore - 36) / 240);
-  return Math.floor((base - r1 - r2) / 100) * 100;
-}
-
-/**
- * Survivor benefit in cents. Replicates survivorBenefit (benefit-calculator.ts).
- *
- * Base (what the survivor's age reduction applies to):
- *   1. Earner died before filing and before NRA: the earner's PIA.
- *   2. Earner died before filing but after NRA: benefit as if the earner
- *      filed at min(death age, 70).
- *   3. Earner filed at or after NRA: the earner's benefit at filing.
- *   4. Earner filed before NRA: the earner's PIA.
- *
- * The base is reduced if the survivor starts collecting before their own
- * survivor-NRA (71.5% at age 60, linearly to 100% at NRA). In case 4 the
- * result is then capped at the widow(er)'s limit, max(82.5% of PIA, the
- * earner's reduced benefit); the cap applies after the age reduction, never
- * before it.
- */
-function survivorCentsCalc(
-  earnerPiaCents: number,
-  earnerNra: number,
-  earnerDelayedRetirementIncrease: number,
-  earnerSsaBirth: number,
-  earnerNraEpoch: number,
-  earnerFilingEpoch: number,
-  earnerDeathEpoch: number,
-  earner70Epoch: number,
-  depSurvNra: number,
-  survStartEpoch: number,
-  depSsaBirth: number
-): number {
-  let base: number;
-  let limit = Number.POSITIVE_INFINITY;
-  if (earnerFilingEpoch >= earnerDeathEpoch) {
-    if (earnerDeathEpoch < earnerNraEpoch) {
-      base = earnerPiaCents;
-    } else {
-      const effEpoch = Math.min(earnerDeathEpoch, earner70Epoch);
-      base = benefitCentsAtAge(
-        earnerPiaCents,
-        earnerNra,
-        earnerDelayedRetirementIncrease,
-        effEpoch - earnerSsaBirth
-      );
-    }
-  } else {
-    const eBenefit = benefitCentsAtAge(
-      earnerPiaCents,
-      earnerNra,
-      earnerDelayedRetirementIncrease,
-      earnerFilingEpoch - earnerSsaBirth
-    );
-    if (earnerFilingEpoch < earnerNraEpoch) {
-      base = earnerPiaCents;
-      limit = Math.max(Math.round(earnerPiaCents * 0.825), eBenefit);
-    } else {
-      base = eBenefit;
-    }
-  }
-
-  const survAge = survStartEpoch - depSsaBirth;
-  let reduced = base;
-  if (survAge < depSurvNra) {
-    const m60toNRA = depSurvNra - 720;
-    const m60toAge = survAge - 720;
-    // Computed exactly as reducedSurvivorBenefit does: (1 - ratio), not a 0.285
-    // literal, which is a different double and rounds half-cents differently.
-    const ratio =
-      MIN_SURVIVOR_BENEFIT_RATIO +
-      (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
-    reduced = Math.round(base * ratio);
-  }
-  return Math.floor(Math.min(reduced, limit) / 100) * 100;
-}
+// expectedNPVCoupleOptimized below replicates strategySumPeriodsCouple in
+// strategy-calc.ts on raw `number` values (cents, epoch months). The
+// per-benefit helpers it shares with optimal-strategy-fast.ts live in
+// couple-fast-primitives.ts.
 
 /**
  * Optimized expectedNPVCouple — produces identical results to the exact
@@ -490,12 +327,26 @@ export function expectedNPVCoupleOptimized(
     eFY[i] = filingYearCents(ePiaCents, eNra, eDri, age, eSsaBirth, eNraEpoch);
   }
 
+  // The dependent's own benefit at the dime (dFYDimes, dPJDimes), which the
+  // spousal amount is computed from, and as paid, truncated to the dollar
+  // (dFY, dPJ).
+  const dFYDimes = new Float64Array(nDF);
+  const dPJDimes = new Float64Array(nDF);
   const dFY = new Float64Array(nDF);
   const dPJ = new Float64Array(nDF);
   for (let i = 0; i < nDF; i++) {
     const age = dStart + i;
-    dPJ[i] = benefitCentsAtAge(dPiaCents, dNra, dDri, age);
-    dFY[i] = filingYearCents(dPiaCents, dNra, dDri, age, dSsaBirth, dNraEpoch);
+    dPJDimes[i] = benefitDimesAtAge(dPiaCents, dNra, dDri, age);
+    dFYDimes[i] = filingYearDimes(
+      dPiaCents,
+      dNra,
+      dDri,
+      age,
+      dSsaBirth,
+      dNraEpoch
+    );
+    dPJ[i] = floorToDollarCents(dPJDimes[i]);
+    dFY[i] = floorToDollarCents(dFYDimes[i]);
   }
 
   // ── Pre-tabulate PV and discount factors ──
@@ -678,8 +529,8 @@ export function expectedNPVCoupleOptimized(
           dFile,
           dNraEpoch,
           spStart,
-          dfy,
-          dpj
+          depZeroPia ? 0 : dFYDimes[fdI],
+          depZeroPia ? 0 : dPJDimes[fdI]
         );
       }
 

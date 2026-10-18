@@ -3,6 +3,7 @@ import {
   benefitAtAge,
   filedBeforeDeath,
   survivorBenefit,
+  widowLimitFloor,
 } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
@@ -72,7 +73,7 @@ describe('survivor base at the filing-month boundary', () => {
       deathDate,
       survivorFilingDate
     );
-    const ribLim = Money.from(2547).times(0.825).floorToDollar();
+    const ribLim = widowLimitFloor(Money.from(2547));
     expect(result.cents()).toBe(ribLim.cents());
   });
 

@@ -91,8 +91,8 @@
     },
     "output": {
       "filingAge0Months": 840,
-      "filingAge1Months": 805,
-      "npvCents": 55553184.46454623
+      "filingAge1Months": 802,
+      "npvCents": 55537367.54366055
     }
   },
   {
@@ -668,7 +668,7 @@
     "output": {
       "filingAge0Months": 821,
       "filingAge1Months": 771,
-      "npvCents": 34051429.87566253
+      "npvCents": 34036927.210133806
     }
   },
   {
@@ -1412,7 +1412,7 @@
     "output": {
       "filingAge0Months": 805,
       "filingAge1Months": 818,
-      "npvCents": 85548473.22079016
+      "npvCents": 85535104.06985453
     }
   },
   {
@@ -1604,7 +1604,7 @@
     "output": {
       "filingAge0Months": 827,
       "filingAge1Months": 840,
-      "npvCents": 85767439.85621338
+      "npvCents": 85763219.92328998
     }
   },
   {
@@ -1892,7 +1892,7 @@
     "output": {
       "filingAge0Months": 831,
       "filingAge1Months": 830,
-      "npvCents": 87768923.05850095
+      "npvCents": 87753341.59992468
     }
   },
   {
@@ -2036,7 +2036,7 @@
     "output": {
       "filingAge0Months": 828,
       "filingAge1Months": 806,
-      "npvCents": 53402881.67992498
+      "npvCents": 53383565.64096417
     }
   },
   {
@@ -2060,7 +2060,7 @@
     "output": {
       "filingAge0Months": 840,
       "filingAge1Months": 809,
-      "npvCents": 160205783.62261045
+      "npvCents": 160184924.88435394
     }
   },
   {
@@ -2348,7 +2348,7 @@
     "output": {
       "filingAge0Months": 823,
       "filingAge1Months": 811,
-      "npvCents": 28565067.766766835
+      "npvCents": 28560637.07469078
     }
   },
   {
@@ -2828,7 +2828,7 @@
     "output": {
       "filingAge0Months": 759,
       "filingAge1Months": 811,
-      "npvCents": 52541829.11438838
+      "npvCents": 52534860.165224135
     }
   },
   {
@@ -3356,7 +3356,7 @@
     "output": {
       "filingAge0Months": 769,
       "filingAge1Months": 808,
-      "npvCents": 14901907.222553626
+      "npvCents": 14895861.175809823
     }
   },
   {
@@ -4436,7 +4436,7 @@
     "output": {
       "filingAge0Months": 825,
       "filingAge1Months": 834,
-      "npvCents": 50556191.71101374
+      "npvCents": 50542172.68139664
     }
   },
   {
@@ -4556,7 +4556,7 @@
     "output": {
       "filingAge0Months": 815,
       "filingAge1Months": 815,
-      "npvCents": 94810750.93379599
+      "npvCents": 94792204.03957908
     }
   },
   {
@@ -5276,7 +5276,7 @@
     "output": {
       "filingAge0Months": 818,
       "filingAge1Months": 822,
-      "npvCents": 46740261.923006974
+      "npvCents": 46736713.21658925
     }
   },
   {
@@ -6548,7 +6548,7 @@
     "output": {
       "filingAge0Months": 811,
       "filingAge1Months": 814,
-      "npvCents": 44015787.03101507
+      "npvCents": 44015693.733817846
     }
   },
   {
@@ -7123,8 +7123,8 @@
     },
     "output": {
       "filingAge0Months": 840,
-      "filingAge1Months": 822,
-      "npvCents": 68388529.27107799
+      "filingAge1Months": 821,
+      "npvCents": 68376903.88597845
     }
   },
   {
@@ -7316,7 +7316,7 @@
     "output": {
       "filingAge0Months": 811,
       "filingAge1Months": 816,
-      "npvCents": 55548544.32725715
+      "npvCents": 55532022.46216353
     }
   },
   {
@@ -8299,8 +8299,8 @@
     },
     "output": {
       "filingAge0Months": 840,
-      "filingAge1Months": 830,
-      "npvCents": 121396757.02068277
+      "filingAge1Months": 829,
+      "npvCents": 121393969.99009155
     }
   },
   {
@@ -8924,7 +8924,7 @@
     "output": {
       "filingAge0Months": 835,
       "filingAge1Months": 835,
-      "npvCents": 178453281.8839015
+      "npvCents": 178427774.26774684
     }
   },
   {
@@ -9092,7 +9092,7 @@
     "output": {
       "filingAge0Months": 806,
       "filingAge1Months": 840,
-      "npvCents": 87403445.09311152
+      "npvCents": 87386171.44600666
     }
   },
   {
@@ -9500,7 +9500,7 @@
     "output": {
       "filingAge0Months": 840,
       "filingAge1Months": 827,
-      "npvCents": 28132341.997055393
+      "npvCents": 28123256.896920636
     }
   },
   {
@@ -9836,7 +9836,7 @@
     "output": {
       "filingAge0Months": 826,
       "filingAge1Months": 840,
-      "npvCents": 109893618.97374699
+      "npvCents": 109883533.83039318
     }
   },
   {
@@ -11876,7 +11876,7 @@
     "output": {
       "filingAge0Months": 809,
       "filingAge1Months": 789,
-      "npvCents": 48801709.9671843
+      "npvCents": 48782080.41382398
     }
   },
   {
@@ -12188,7 +12188,7 @@
     "output": {
       "filingAge0Months": 751,
       "filingAge1Months": 807,
-      "npvCents": 20874443.5920436
+      "npvCents": 20881340.756304443
     }
   },
   {
@@ -13268,7 +13268,7 @@
     "output": {
       "filingAge0Months": 799,
       "filingAge1Months": 824,
-      "npvCents": 40270235.10258235
+      "npvCents": 40267929.65338634
     }
   },
   {
@@ -15980,7 +15980,7 @@
     "output": {
       "filingAge0Months": 809,
       "filingAge1Months": 758,
-      "npvCents": 23143044.522071403
+      "npvCents": 23141349.03368034
     }
   },
   {
@@ -16004,7 +16004,7 @@
     "output": {
       "filingAge0Months": 818,
       "filingAge1Months": 831,
-      "npvCents": 50849826.75208793
+      "npvCents": 50846111.08746339
     }
   },
   {
@@ -16388,7 +16388,7 @@
     "output": {
       "filingAge0Months": 811,
       "filingAge1Months": 794,
-      "npvCents": 66791536.930434465
+      "npvCents": 66786042.9076384
     }
   },
   {
@@ -17708,7 +17708,7 @@
     "output": {
       "filingAge0Months": 762,
       "filingAge1Months": 810,
-      "npvCents": 26682128.683073536
+      "npvCents": 26664128.440071
     }
   },
   {
@@ -17924,7 +17924,7 @@
     "output": {
       "filingAge0Months": 828,
       "filingAge1Months": 793,
-      "npvCents": 29775060.329109643
+      "npvCents": 29767555.74142464
     }
   },
   {
@@ -19195,8 +19195,8 @@
     },
     "output": {
       "filingAge0Months": 829,
-      "filingAge1Months": 819,
-      "npvCents": 72854338.24096592
+      "filingAge1Months": 818,
+      "npvCents": 72849590.37969185
     }
   },
   {
@@ -19651,8 +19651,8 @@
     },
     "output": {
       "filingAge0Months": 825,
-      "filingAge1Months": 804,
-      "npvCents": 58595715.10190743
+      "filingAge1Months": 802,
+      "npvCents": 58594551.41156206
     }
   },
   {
@@ -20804,7 +20804,7 @@
     "output": {
       "filingAge0Months": 796,
       "filingAge1Months": 815,
-      "npvCents": 17810126.727112275
+      "npvCents": 17800771.08148294
     }
   },
   {
@@ -21356,7 +21356,7 @@
     "output": {
       "filingAge0Months": 840,
       "filingAge1Months": 806,
-      "npvCents": 94670535.03752041
+      "npvCents": 94658033.07943419
     }
   },
   {
@@ -21764,7 +21764,7 @@
     "output": {
       "filingAge0Months": 806,
       "filingAge1Months": 840,
-      "npvCents": 102439149.3223683
+      "npvCents": 102428768.4616081
     }
   },
   {
@@ -23324,7 +23324,7 @@
     "output": {
       "filingAge0Months": 806,
       "filingAge1Months": 815,
-      "npvCents": 20194559.726675477
+      "npvCents": 20179741.296035122
     }
   },
   {
@@ -23924,7 +23924,7 @@
     "output": {
       "filingAge0Months": 813,
       "filingAge1Months": 779,
-      "npvCents": 32793372.859116297
+      "npvCents": 32776281.012963384
     }
   },
   {

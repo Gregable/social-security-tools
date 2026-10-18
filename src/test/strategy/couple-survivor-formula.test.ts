@@ -33,23 +33,34 @@ function age(years: number, months: number): MonthDuration {
   return MonthDuration.initFromYearsMonths({ years, months });
 }
 
+/** Truncates `cents * numerator / denominator` to the dime. */
+function floorToDime(cents: number, numerator: number, denominator: number) {
+  return Math.floor((cents * numerator) / (denominator * 10)) * 10;
+}
+
 /**
- * Computes the widow(er)'s limit (RIB-LIM) by hand, for a deceased who filed
- * before full retirement age.
+ * Computes the widow(er)'s limit (RIB-LIM) by hand, at the dime, for a
+ * deceased who filed before full retirement age.
  *
- * limit = max(round(PIA * 0.825), benefitOnDate(deceased, filingDate, age71date))
+ * limit = max(82.5% of PIA, the deceased's reduced benefit), each truncated
+ * to the dime (POMS RS 00615.320). The reduced benefit is the PIA less 5/9%
+ * a month for the first 36 months early and 5/12% a month beyond.
  *
  * The limit caps the survivor benefit *after* the survivor's age reduction,
  * which applies to 100% of the PIA (see survivor-rib-lim.test.ts).
  */
 function handRibLim(deceased: Recipient, filingDate: MonthDate): number {
   const piaCents = deceased.pia().primaryInsuranceAmount().cents();
-  // 82.5% of PIA: Money.from(pia).times(0.825) = Math.round(piaCents * 0.825)
-  const ribLimCents = Math.round(piaCents * 0.825);
+  const ribLimCents = floorToDime(piaCents, 825, 1000);
 
-  const age71date = deceased.birthdate.dateAtSsaAge(age(71, 0));
-  const actualBenefit = benefitOnDate(deceased, filingDate, age71date);
-  const actualCents = actualBenefit.cents();
+  const monthsEarly =
+    deceased.normalRetirementAge().asMonths() -
+    deceased.birthdate.ageAtSsaDate(filingDate).asMonths();
+  const actualCents = floorToDime(
+    piaCents,
+    3600 - 20 * Math.min(36, monthsEarly) - 15 * Math.max(0, monthsEarly - 36),
+    3600
+  );
 
   return Math.max(ribLimCents, actualCents);
 }
@@ -60,16 +71,16 @@ function floorToDollarCents(cents: number): number {
 }
 
 /**
- * Computes the survivor age reduction by hand.
+ * Computes the survivor age reduction by hand (20 CFR 404.410(c)).
  *
- * If survivorAge >= survivorNRA: factor = 1.0
+ * If survivorAge >= survivorNRA: no reduction.
  * Otherwise:
- *   monthsBetween60AndNRA = survivorNRA.asMonths() - 720
- *   monthsBetweenAge60AndSurvivorAge = survivorAge.asMonths() - 720
- *   ratio = max(0, monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA)
- *   factor = 0.715 + 0.285 * ratio
+ *   reductionMonths = survivorNRA - 60 years
+ *   monthsEarly = min(reductionMonths, survivorNRA - survivorAge)
+ *   reduced = base x (1 - 0.285 x monthsEarly / reductionMonths), truncated
+ *     to the dime
  *
- * result = floor(baseCents * factor / 100) * 100  (floor to dollar)
+ * result = reduced truncated to the dollar
  */
 function handSurvivorReduction(
   baseCents: number,
@@ -77,19 +88,19 @@ function handSurvivorReduction(
   survivorNraMonths: number
 ): number {
   if (survivorAgeMonths >= survivorNraMonths) {
-    // Full benefit, floored to dollar
-    return Math.floor(baseCents / 100) * 100;
+    return floorToDollarCents(baseCents);
   }
-  const monthsBetween60AndNRA = survivorNraMonths - 720; // 60*12 = 720
-  const monthsBetweenAge60AndSurvivorAge = survivorAgeMonths - 720;
-  const ratio = Math.max(
-    0,
-    monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
+  const reductionMonths = survivorNraMonths - 720; // 60*12 = 720
+  const monthsEarly = Math.min(
+    reductionMonths,
+    survivorNraMonths - survivorAgeMonths
   );
-  const factor = 0.715 + 0.285 * ratio;
-  // Money.times does Math.round(cents * factor), then floorToDollar
-  const afterMultiply = Math.round(baseCents * factor);
-  return Math.floor(afterMultiply / 100) * 100;
+  const reduced = floorToDime(
+    baseCents,
+    1000 * reductionMonths - 285 * monthsEarly,
+    1000 * reductionMonths
+  );
+  return floorToDollarCents(reduced);
 }
 
 // ---------------------------------------------------------------------------

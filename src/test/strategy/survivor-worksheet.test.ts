@@ -11,9 +11,9 @@
  *
  * The chart below is copied from the worksheet, so these tests check the code
  * against SSA's procedure rather than against a restatement of it. The three
- * amounts themselves come from the existing benefit functions, which other
- * tests check against hand-worked figures; what is under test here is which
- * amount is paid. RS 00615.320 adds a worked example.
+ * amounts themselves come from the benefit primitives at the dime, which
+ * other tests check against hand-worked figures; what is under test here is
+ * which amount is paid. RS 00615.320 adds a worked example.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -22,6 +22,7 @@ import {
   reducedSurvivorBenefit,
   survivorBenefit,
 } from '$lib/benefit-calculator';
+import { benefitDimesAtAge } from '$lib/benefit-rounding';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
@@ -117,6 +118,28 @@ function randomCase(rng: () => number): Case {
   }
 }
 
+/**
+ * 82.5% of the PIA and the late spouse's reduced benefit, at the dime: SSA
+ * compares amounts before rounding the payable one to the dollar (POMS RS
+ * 00601.020 D.2), and truncates 82.5% of the PIA to the dime (RS 00615.320's
+ * examples: $374.90 gives $309.20).
+ */
+function limitAmounts(c: Case): { pct825: Money; rib: Money } {
+  const piaCents = c.deceased.pia().primaryInsuranceAmount().cents();
+  return {
+    pct825: Money.fromCents(Math.floor((piaCents * 825) / 10000) * 10),
+    // Claimed before full retirement age, so no credits ever apply.
+    rib: Money.fromCents(
+      benefitDimesAtAge(
+        piaCents,
+        c.deceased.normalRetirementAge().asMonths(),
+        c.deceased.delayedRetirementIncrease(),
+        c.deceased.birthdate.ageAtSsaDate(c.filedAt).asMonths()
+      )
+    ),
+  };
+}
+
 /** What the worksheet says is paid, and which part of it applied. */
 function worksheet(c: Case): {
   readonly dollars: number;
@@ -124,18 +147,14 @@ function worksheet(c: Case): {
 } {
   const pia = c.deceased.pia().primaryInsuranceAmount();
   const amounts: Record<WorksheetAmount, Money> = {
+    // Truncated to the dollar, which can only reorder it against an amount
+    // in the same dollar; either way the chart then pays that dollar.
     reducedWib: reducedSurvivorBenefit(
       c.survivor,
       { base: pia, limit: null },
       c.startsIn
     ),
-    pct825: pia.times(0.825),
-    // Their benefit as if they were alive, read after any credits land.
-    rib: benefitOnDate(
-      c.deceased,
-      c.filedAt,
-      c.filedAt.addDuration(MonthDuration.OneYear())
-    ),
+    ...limitAmounts(c),
   };
   const atFra = c.survivor.birthdate
     .ageAtSsaDate(c.startsIn)
@@ -156,17 +175,12 @@ function worksheet(c: Case): {
   };
 }
 
-/** The order the code used before the fix: cap first, then reduce. */
+/** The cap-then-reduce order the code used before the fix, on today's amounts. */
 function capThenReduce(c: Case): number {
-  const pia = c.deceased.pia().primaryInsuranceAmount();
-  const rib = benefitOnDate(
-    c.deceased,
-    c.filedAt,
-    c.filedAt.addDuration(MonthDuration.OneYear())
-  );
+  const { pct825, rib } = limitAmounts(c);
   return reducedSurvivorBenefit(
     c.survivor,
-    { base: Money.max(pia.times(0.825), rib), limit: null },
+    { base: Money.max(pct825, rib), limit: null },
     c.startsIn
   ).value();
 }

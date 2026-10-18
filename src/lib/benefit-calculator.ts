@@ -1,94 +1,24 @@
+import {
+  benefitCentsAtAge,
+  benefitDimesAtAge,
+  floorToDollarCents,
+  reducedSpousalExcessDimes,
+  reducedSurvivorDimes,
+  spousalOriginalBenefitCents,
+  widowLimitDimes,
+  widowLimitFloorDimes,
+} from '$lib/benefit-rounding';
 import * as constants from '$lib/constants';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 
 /**
- * The oldest age at which filing still changes the benefit amount. Delayed
- * retirement credits stop accruing the month a recipient turns 70, so waiting
- * beyond it only forgoes payments.
+ * 82.5% of a PIA as a survivor would be paid it, truncated to the dollar:
+ * the widow(er)'s limit floor, for display.
  */
-export const MAX_BENEFIT_AGE_MONTHS = 70 * 12;
-
-/**
- * A survivor benefit claimed at age 60 is reduced to this fraction of the
- * base amount, scaling linearly to 100% at survivor full retirement age.
- *
- * Shared with the fast paths in strategy/calculations so all three copies of
- * the survivor formula multiply by the same floating-point value. They must
- * agree to the last rounding step, and `1 - 0.715` is not `0.285` in IEEE
- * arithmetic — a literal 0.285 in one copy rounded a half-cent case the other
- * way, giving a $1/month survivor benefit the grid-cell NPV and the scenario
- * detail then disagreed on.
- */
-export const MIN_SURVIVOR_BENEFIT_RATIO = 0.715;
-
-/**
- * Returns an annual delayed retirement credit rate (e.g. 0.08) in tenths of a
- * percent (80). Every rate SSA has used is a whole number of tenths.
- *
- * @throws Error if the rate is not a whole number of tenths of a percent.
- */
-function delayedCreditPerMille(delayedRetirementIncrease: number): number {
-  const perMille = Math.round(delayedRetirementIncrease * 1000);
-  if (Math.abs(delayedRetirementIncrease * 1000 - perMille) > 1e-9) {
-    throw new Error(
-      `Delayed retirement credit ${delayedRetirementIncrease} is not a whole ` +
-        'number of tenths of a percent'
-    );
-  }
-  return perMille;
-}
-
-/**
- * Personal benefit, in cents, from a PIA claimed at a given age.
- *
- * Claiming early reduces the PIA by 5/9 of 1% for each of the first 36 months
- * before full retirement age and 5/12 of 1% for each month beyond that.
- * Claiming late increases it by a twelfth of the annual delayed retirement
- * credit for each month after full retirement age, up to age 70. SSA applies
- * the factor to the PIA as computed (to the dime) and truncates the result to
- * the dollar.
- *
- * Every factor is an exact fraction, so the product is computed in integers:
- * rounding to the cent first would pay $1 too much whenever the exact amount
- * ends in $X.995 or more.
- *
- * The strategy fast paths call this directly with raw numbers, so it takes no
- * Money or MonthDuration objects.
- *
- * @param piaCents - The PIA in whole cents
- * @param nraMonths - Full retirement age in months
- * @param delayedRetirementIncrease - Annual delayed credit rate, e.g. 0.08
- * @param ageMonths - Claiming age in months; ages past 70 count as 70
- * @throws Error if claiming at or after full retirement age with a delayed
- *   credit rate that is not a whole number of tenths of a percent
- */
-export function benefitCentsAtAge(
-  piaCents: number,
-  nraMonths: number,
-  delayedRetirementIncrease: number,
-  ageMonths: number
-): number {
-  let numerator: number;
-  let denominator: number;
-  if (ageMonths < nraMonths) {
-    const before = nraMonths - ageMonths;
-    // 5/900 and 5/1200 over a common denominator: 20/3600 and 15/3600.
-    numerator =
-      3600 - 20 * Math.min(36, before) - 15 * Math.max(0, before - 36);
-    denominator = 3600;
-  } else {
-    const after = Math.min(ageMonths, MAX_BENEFIT_AGE_MONTHS) - nraMonths;
-    // An annual credit of r/1000 earns r/12000 a month.
-    numerator =
-      12000 + delayedCreditPerMille(delayedRetirementIncrease) * after;
-    denominator = 12000;
-  }
-  // The product is an integer far below 2^53, and a true quotient short of a
-  // whole dollar is short by at least 1/(denominator * 100), far more than
-  // floating-point division can err by, so the floor is exact.
-  return Math.floor((piaCents * numerator) / (denominator * 100)) * 100;
+export function widowLimitFloor(pia: Money): Money {
+  return Money.fromCents(floorToDollarCents(widowLimitFloorDimes(pia.cents())));
 }
 
 /**
@@ -129,6 +59,39 @@ export function benefitOnDate(
   filingDate: MonthDate,
   atDate: MonthDate
 ): Money {
+  const filingAge = checkedFilingAge(recipient, filingDate);
+
+  // If the recipient hasn't filed yet, return $0:
+  if (filingDate.greaterThan(atDate)) return Money.from(0);
+
+  return benefitOnDateCore(recipient, filingDate, atDate, filingAge);
+}
+
+/**
+ * benefitOnDate before dollar rounding: the benefit at the dime, which is
+ * what spousal and survivor amounts are computed from.
+ *
+ * @throws Error if filing age is less than 62
+ */
+function benefitDimesOnDate(
+  recipient: Recipient,
+  filingDate: MonthDate,
+  atDate: MonthDate
+): Money {
+  const filingAge = checkedFilingAge(recipient, filingDate);
+  if (filingDate.greaterThan(atDate)) return Money.from(0);
+  return benefitDimesOnDateCore(recipient, filingDate, atDate, filingAge);
+}
+
+/**
+ * The recipient's SSA age at `filingDate`.
+ *
+ * @throws Error if it is less than 62
+ */
+function checkedFilingAge(
+  recipient: Recipient,
+  filingDate: MonthDate
+): MonthDuration {
   const filingAge = recipient.birthdate.ageAtSsaDate(filingDate);
   const minFilingAge = MonthDuration.initFromYearsMonths({
     years: 62,
@@ -139,11 +102,7 @@ export function benefitOnDate(
       `Filing age must be at least 62, got ${filingAge.years()}y ${filingAge.modMonths()}m`
     );
   }
-
-  // If the recipient hasn't filed yet, return $0:
-  if (filingDate.greaterThan(atDate)) return Money.from(0);
-
-  return benefitOnDateCore(recipient, filingDate, atDate, filingAge);
+  return filingAge;
 }
 
 /**
@@ -229,6 +188,49 @@ export function benefitOnDateNominal(
 }
 
 /**
+ * The age whose delayed credits are in effect on `atDate` for a recipient who
+ * filed at `filingAge`. Usually that is the filing age itself; filing after
+ * full retirement age in a month other than January, before 70, credits only
+ * the months before January of the filing year (or full retirement age, if
+ * later) until the following January.
+ */
+function creditedAgeOnDate(
+  recipient: Recipient,
+  filingDate: MonthDate,
+  atDate: MonthDate,
+  filingAge: MonthDuration
+): MonthDuration {
+  // If this is the year after filing, delayed credits are fully applied.
+  if (filingDate.year() < atDate.year()) return filingAge;
+
+  const normalRetirementDate: MonthDate = recipient.normalRetirementDate();
+
+  // If you are filing before normal retirement, no delayed credits apply.
+  if (filingDate.lessThanOrEqual(normalRetirementDate)) return filingAge;
+
+  // 70 is an explicit exception because the SSA likes to make my life harder.
+  // Normally, you'd need to wait until the next year to get delayed credits,
+  // but not if you file at exactly 70.
+  if (filingAge.years() >= 70) return filingAge;
+
+  // If you file in January, delayed credits are fully applied.
+  if (filingDate.monthIndex() === 0) return filingAge;
+
+  // Otherwise, you only get credits up to January of this year,
+  // or NRA, whichever is later.
+  const thisJan = MonthDate.initFromYearsMonths({
+    years: filingDate.year(),
+    months: 0,
+  });
+
+  const benefitComputationDate = normalRetirementDate.greaterThan(thisJan)
+    ? normalRetirementDate
+    : thisJan;
+
+  return recipient.birthdate.ageAtSsaDate(benefitComputationDate);
+}
+
+/**
  * Core benefit calculation logic shared between benefitOnDate variants.
  * Calculates delayed retirement credits based on filing date.
  *
@@ -243,41 +245,32 @@ function benefitOnDateCore(
   filingAge: MonthDuration,
   throughColaYear?: number
 ): Money {
-  // If this is the year after filing, delayed credits are fully applied.
-  if (filingDate.year() < atDate.year())
-    return benefitAtAge(recipient, filingAge, throughColaYear);
-
-  const normalRetirementDate: MonthDate = recipient.normalRetirementDate();
-
-  // If you are filing before normal retirement, no delayed credits apply.
-  if (filingDate.lessThanOrEqual(normalRetirementDate))
-    return benefitAtAge(recipient, filingAge, throughColaYear);
-
-  // 70 is an explicit exception because the SSA likes to make my life harder.
-  // Normally, you'd need to wait until the next year to get delayed credits,
-  // but not if you file at exactly 70.
-  if (filingAge.years() >= 70)
-    return benefitAtAge(recipient, filingAge, throughColaYear);
-
-  // If you file in January, delayed credits are fully applied.
-  if (filingDate.monthIndex() === 0)
-    return benefitAtAge(recipient, filingAge, throughColaYear);
-
-  // Otherwise, you only get credits up to January of this year,
-  // or NRA, whichever is later.
-  const thisJan = MonthDate.initFromYearsMonths({
-    years: filingDate.year(),
-    months: 0,
-  });
-
-  const benefitComputationDate = normalRetirementDate.greaterThan(thisJan)
-    ? normalRetirementDate
-    : thisJan;
-
   return benefitAtAge(
     recipient,
-    recipient.birthdate.ageAtSsaDate(benefitComputationDate),
+    creditedAgeOnDate(recipient, filingDate, atDate, filingAge),
     throughColaYear
+  );
+}
+
+/**
+ * benefitOnDateCore before dollar rounding: the benefit at the dime, which
+ * is what spousal and survivor amounts are computed from (POMS RS 00601.020
+ * D.2, RS 00615.694).
+ */
+function benefitDimesOnDateCore(
+  recipient: Recipient,
+  filingDate: MonthDate,
+  atDate: MonthDate,
+  filingAge: MonthDuration,
+  throughColaYear?: number
+): Money {
+  return Money.fromCents(
+    benefitDimesAtAge(
+      recipient.pia().primaryInsuranceAmount(throughColaYear).cents(),
+      recipient.normalRetirementAge().asMonths(),
+      recipient.delayedRetirementIncrease(),
+      creditedAgeOnDate(recipient, filingDate, atDate, filingAge).asMonths()
+    )
   );
 }
 
@@ -293,21 +286,28 @@ export function higherEarningsThan(a: Recipient, b: Recipient): boolean {
 }
 
 /**
+ * A spouse's original benefit: half the worker's PIA, truncated to the dime
+ * (POMS RS 00202.020, RS 00601.020).
+ */
+export function spousalOriginalBenefit(workerPia: Money): Money {
+  return Money.fromCents(spousalOriginalBenefitCents(workerPia.cents()));
+}
+
+/**
  * The base (unreduced) spousal benefit at normal retirement age: 50% of the
- * higher earner's PIA minus the lower earner's own PIA, floored at $0. This is
- * the spousal top-up before any early-filing reduction. A lower earner is
- * eligible for a spousal benefit exactly when this is positive.
+ * higher earner's PIA, truncated to the dime, minus the lower earner's own
+ * PIA, floored at $0. This is the spousal top-up before any early-filing
+ * reduction. A lower earner is eligible for a spousal benefit exactly when
+ * this is positive.
  *
  * @param higher - The higher earner (whose PIA the spousal benefit is based on)
  * @param lower - The potential spousal claimant
  */
 export function baseSpousalBenefit(higher: Recipient, lower: Recipient): Money {
-  const spousal = higher
-    .pia()
-    .primaryInsuranceAmount()
-    .div(2)
-    .sub(lower.pia().primaryInsuranceAmount());
-  return spousal.value() > 0 ? spousal : Money.from(0);
+  const excessCents =
+    spousalOriginalBenefitCents(higher.pia().primaryInsuranceAmount().cents()) -
+    lower.pia().primaryInsuranceAmount().cents();
+  return Money.fromCents(Math.max(0, excessCents));
 }
 
 /**
@@ -366,14 +366,14 @@ export function spousalBenefitOnDate(
     .pia()
     .primaryInsuranceAmount(throughColaYear)
     .cents();
-  const spousePiaAmountCents: number = spouse
-    .pia()
-    .primaryInsuranceAmount(throughColaYear)
-    .cents();
+  // The original benefit: half the higher earner's PIA, at the dime.
+  const originalCents = spousalOriginalBenefitCents(
+    spouse.pia().primaryInsuranceAmount(throughColaYear).cents()
+  );
 
-  // Calculate the base spousal benefit amount:
-  const spousalCents = spousePiaAmountCents / 2 - piaAmountCents;
-  if (spousalCents <= 0) {
+  // The excess over the recipient's own PIA is what is paid as a spouse:
+  const excessCents = originalCents - piaAmountCents;
+  if (excessCents <= 0) {
     return Money.zero();
   }
 
@@ -382,56 +382,39 @@ export function spousalBenefitOnDate(
   // Spousal Benefits start on after normal retirement date:
   if (startDate.greaterThanOrEqual(normalRetirementDate)) {
     if (filingDate.lessThanOrEqual(normalRetirementDate)) {
-      return Money.fromCents(spousalCents).floorToDollar();
+      return Money.fromCents(floorToDollarCents(excessCents));
     }
     // https://www.bogleheads.org/forum/viewtopic.php?p=3986794#p3986794
     // https://secure.ssa.gov/apps10/poms.nsf/lnx/0300615694
-    // The combined spousal and personal benefits cannot be greater than
-    // 50% of the higher earner's PIA, except in the case where personal
-    // benefits alone are higher than 50% of the higher earner's PIA.
-    // The way this is computed is to reduce the spousal benefit if the sum
-    // of the spousal and personal benefits exceeds 50% of the higher
-    // earner's PIA.
-    // Use benefitOnDateCore (not benefitOnDate) so the optional COLA cutoff is
-    // applied to the personal benefit too. In this branch filingDate is past
-    // NRA and startDate <= atDate, so benefitOnDate's age>=62 and
-    // filingDate>atDate guards are never relevant here; the result matches
-    // benefitOnDate when throughColaYear is undefined.
-    const personalBenefit = benefitOnDateCore(
+    // Filed for their own benefit after full retirement age, so it carries
+    // delayed credits. SSA computes the combined amount without them (own
+    // PIA plus the excess, i.e. the original benefit) and pays as a spouse
+    // that combined amount minus the own benefit with credits. Both are at
+    // the dime; each benefit is then truncated to the dollar separately
+    // (POMS RS 00601.020 D.2).
+    // Use benefitDimesOnDateCore (not benefitOnDate) so the optional COLA
+    // cutoff is applied to the personal benefit too. In this branch
+    // filingDate is past NRA and startDate <= atDate, so benefitOnDate's
+    // age>=62 and filingDate>atDate guards are never relevant here.
+    const personalDimes = benefitDimesOnDateCore(
       recipient,
       filingDate,
       atDate,
       recipient.birthdate.ageAtSsaDate(filingDate),
       throughColaYear
     );
-    const spouseBenefitCents =
-      spousePiaAmountCents / 2 - personalBenefit.cents();
-    if (spouseBenefitCents <= 0) {
-      return Money.zero();
-    } else {
-      return Money.fromCents(spouseBenefitCents).floorToDollar();
-    }
+    const payableCents = originalCents - personalDimes.cents();
+    return Money.fromCents(
+      payableCents <= 0 ? 0 : floorToDollarCents(payableCents)
+    );
   }
 
-  // Spousal Benefits start before normal retirement date:
-  let monthsBeforeNra: number =
+  // Spousal Benefits start before normal retirement date: reduce the excess.
+  const monthsBeforeNra =
     normalRetirementDate.monthsSinceEpoch() - startDate.monthsSinceEpoch();
-  if (monthsBeforeNra <= 36) {
-    // 25 / 36 of one percent for each month:
-    return Money.fromCents(
-      spousalCents * (1 - monthsBeforeNra / 144)
-    ).floorToDollar();
-  } else {
-    // 25% for the first 36 months:
-    const firstReductionCents: number = spousalCents * 0.25;
-    monthsBeforeNra = monthsBeforeNra - 36;
-    // 5 / 12 of one percent for each additional month:
-    const secondReductionCents: number = spousalCents * (monthsBeforeNra / 240);
-
-    return Money.fromCents(
-      spousalCents - firstReductionCents - secondReductionCents
-    ).floorToDollar();
-  }
+  return Money.fromCents(
+    floorToDollarCents(reducedSpousalExcessDimes(excessCents, monthsBeforeNra))
+  );
 }
 
 /**
@@ -525,6 +508,10 @@ export function filedBeforeDeath(
  * 202(e)(2)(D); POMS RS 00615.320). Reducing the capped amount for age
  * instead would understate any survivor benefit claimed before survivor full
  * retirement age.
+ *
+ * Both are kept at the dime (exact cents for a PIA with cents), before any
+ * rounding to the dollar: SSA rounds only the final survivor benefit to the
+ * dollar (POMS RS 00601.020).
  */
 export interface SurvivorBenefitBasis {
   readonly base: Money;
@@ -547,13 +534,17 @@ export function survivorBenefitBasis(
 ): SurvivorBenefitBasis {
   const pia = deceased.pia().primaryInsuranceAmount();
 
-  // The deceased's benefit is read at a date late enough that every delayed
-  // credit has taken effect. A year after filing always qualifies (delayed
-  // credits land the January after filing at the latest). A fixed age-71 date
-  // does not: someone who files past 71 would be read *before* they filed,
-  // and benefitOnDate returns $0 for a date before filing.
-  const afterAllCredits = (filingDate: MonthDate): MonthDate =>
-    filingDate.addDuration(MonthDuration.OneYear());
+  // The deceased's benefit, at the dime, read at a date late enough that
+  // every delayed credit has taken effect. A year after filing always
+  // qualifies (delayed credits land the January after filing at the latest).
+  // A fixed age-71 date does not: someone who files past 71 would be read
+  // *before* they filed, and the benefit is $0 for a date before filing.
+  const benefitAfterAllCredits = (filingDate: MonthDate): Money =>
+    benefitDimesOnDate(
+      deceased,
+      filingDate,
+      filingDate.addDuration(MonthDuration.OneYear())
+    );
 
   if (!filedBeforeDeath(deceasedFilingDate, deceasedDeathDate)) {
     // Died before filing, and before full retirement age: 100% of the PIA.
@@ -570,20 +561,12 @@ export function survivorBenefitBasis(
     );
     const effectiveFilingDate = MonthDate.min(deceasedDeathDate, age70Date);
     return {
-      base: benefitOnDate(
-        deceased,
-        effectiveFilingDate,
-        afterAllCredits(effectiveFilingDate)
-      ),
+      base: benefitAfterAllCredits(effectiveFilingDate),
       limit: null,
     };
   }
 
-  const ownBenefit = benefitOnDate(
-    deceased,
-    deceasedFilingDate,
-    afterAllCredits(deceasedFilingDate)
-  );
+  const ownBenefit = benefitAfterAllCredits(deceasedFilingDate);
   // Filed at or after full retirement age: the benefit they received,
   // including any delayed retirement credits.
   if (!deceasedFilingDate.lessThan(deceased.normalRetirementDate())) {
@@ -591,7 +574,10 @@ export function survivorBenefitBasis(
   }
   // Filed early: the age reduction starts from 100% of the PIA, and the
   // widow(er)'s limit caps the result.
-  return { base: pia, limit: Money.max(pia.times(0.825), ownBenefit) };
+  return {
+    base: pia,
+    limit: Money.fromCents(widowLimitDimes(pia.cents(), ownBenefit.cents())),
+  };
 }
 
 /**
@@ -613,32 +599,29 @@ export function reducedSurvivorBenefit(
   basis: SurvivorBenefitBasis,
   survivorFilingDate: MonthDate
 ): Money {
-  const survivorAgeAtFiling =
-    survivor.birthdate.ageAtSsaDate(survivorFilingDate);
-  let reduced = basis.base;
-  if (survivorAgeAtFiling.lessThan(survivor.survivorNormalRetirementAge())) {
-    const monthsBetween60AndNRA = survivor
-      .survivorNormalRetirementAge()
-      .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
-      .asMonths();
-    const monthsBetweenAge60AndSurvivorAge = survivorAgeAtFiling
-      .subtract(MonthDuration.initFromYearsMonths({ years: 60, months: 0 }))
-      .asMonths();
-
-    const reductionRatio = Math.max(
-      0,
-      monthsBetweenAge60AndSurvivorAge / monthsBetween60AndNRA
+  const survivorAgeAtFiling = survivor.birthdate
+    .ageAtSsaDate(survivorFilingDate)
+    .asMonths();
+  const survivorNra = survivor.survivorNormalRetirementAge().asMonths();
+  let reducedCents = basis.base.cents();
+  if (survivorAgeAtFiling < survivorNra) {
+    const reductionMonths = survivorNra - 60 * 12;
+    // A claim before 60 is reduced as though made at 60.
+    const monthsEarly = Math.min(
+      reductionMonths,
+      survivorNra - survivorAgeAtFiling
     );
-    reduced = basis.base.times(
-      MIN_SURVIVOR_BENEFIT_RATIO +
-        (1 - MIN_SURVIVOR_BENEFIT_RATIO) * reductionRatio
+    reducedCents = reducedSurvivorDimes(
+      reducedCents,
+      monthsEarly,
+      reductionMonths
     );
   }
-  const limited =
-    basis.limit !== null && reduced.greaterThan(basis.limit)
-      ? basis.limit
-      : reduced;
-  return limited.floorToDollar();
+  const limitedCents =
+    basis.limit !== null
+      ? Math.min(reducedCents, basis.limit.cents())
+      : reducedCents;
+  return Money.fromCents(floorToDollarCents(limitedCents));
 }
 
 /**

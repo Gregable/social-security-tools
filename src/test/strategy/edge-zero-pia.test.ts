@@ -411,7 +411,7 @@ describe('Zero-PIA survivor benefits', () => {
     //   next 23 months: 23 * 5/1200 = 0.09583...
     //   total reduction = 0.29583... => multiplier = 0.70416...
     //   benefit = floor(2000 * 0.70416...) = floor($1408.33) = $1408
-    // RIB-LIM = floor(2000 * 0.825) = $1650
+    // RIB-LIM = 82.5% of $2000, truncated to the dime = $1650
     // base survivor = max($1650, $1408) = $1650
     const earner = makeRecipient(2000, 1962, 5, 2);
     const dependent = makeRecipient(0, 1964, 5, 2);
@@ -427,7 +427,7 @@ describe('Zero-PIA survivor benefits', () => {
       deathDate,
       survivorFilingDate
     );
-    // RIB-LIM: Math.round(200000 * 0.825) = 165000 = $1650
+    // RIB-LIM: 82.5% of 200000 cents, truncated to the dime = 165000 = $1650
     // Early benefit is less than RIB-LIM, so base = $1650
     expect(result.cents()).toBe(165000);
   });

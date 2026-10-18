@@ -10,7 +10,11 @@
  * directly, couple period construction, NPV calculation, and the optimizer.
  */
 import { describe, expect, it } from 'vitest';
-import { benefitAtAge, survivorBenefit } from '$lib/benefit-calculator';
+import {
+  benefitAtAge,
+  survivorBenefit,
+  widowLimitFloor,
+} from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
@@ -449,7 +453,7 @@ describe('bug fix does not affect earner-filed-before-death cases', () => {
       earner,
       earner.birthdate.earliestFilingMonth()
     );
-    const floor825 = Money.from(2000).times(0.825).floorToDollar();
+    const floor825 = widowLimitFloor(Money.from(2000));
     const expectedBase = Money.max(earnerBenefitAtFiling, floor825);
 
     expect(result.cents()).toBeGreaterThan(0);
@@ -489,7 +493,7 @@ describe('bug fix does not affect earner-filed-before-death cases', () => {
 
     // At 70, benefit = PIA * 1.24. Survivor gets max(that, 82.5% * PIA).
     const age70Benefit = benefitAtAge(earner, ageMonths(70));
-    const floor825 = Money.from(2000).times(0.825).floorToDollar();
+    const floor825 = widowLimitFloor(Money.from(2000));
     const expectedBase = Money.max(age70Benefit, floor825);
 
     expect(result.cents()).toEqual(expectedBase.floorToDollar().cents());
