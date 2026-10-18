@@ -16,7 +16,11 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { spousalBenefitOnDate, survivorBenefit } from '$lib/benefit-calculator';
+import {
+  reducedSurvivorBenefit,
+  spousalBenefitOnDate,
+  survivorBenefit,
+} from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
@@ -56,6 +60,8 @@ function spousal(
 describe("spousal benefits follow SSA's rounding", () => {
   it('matches 20 CFR 404.410(b): $412.40 reduced for 28 months is $332', () => {
     // $412.40 x 116/144 = $332.21, truncated to $332.20, paid as $332.
+    // The CFR example claims at 63 with FRA 65y4m; this is the same 28
+    // months early at FRA 67.
     const earner = person(82480, 1960);
     const dependent = person(0, 1962); // FRA 67
     expect(spousal(earner, dependent, age(64, 8))).toBe(33200);
@@ -108,18 +114,19 @@ describe("survivor benefits follow SSA's rounding", () => {
 
   it('matches POMS RS 00615.301: $987.60, 37 of 62 months early, is $819', () => {
     // Survivor born 1940: survivor FRA 65y2m, 62 months from 60.
-    // $987.60 - $168.00 reduction = $819.60 -> $819.
+    // POMS: $987.60 - $168.00 reduction (rounded up) = $819.60 -> $819.
+    // Truncating the reduced amount ($819.628) to the dime is the same.
     expect(survivorOfEarlyDeath(98760, 1940, age(61), age(62, 1))).toBe(81900);
   });
 
   it('truncates an age-reduced amount just below a whole dollar', () => {
-    // $501.40 x (1 - 0.285 x 2/84) = $497.9979, paid as $497, not $498.
+    // $501.40 x (1 - 0.285 x 2/84) = $497.9976, paid as $497, not $498.
     expect(survivorOfEarlyDeath(50140, 1962, age(64), age(66, 10))).toBe(49700);
   });
 
   it("reduces the deceased's benefit with delayed credits at the dime", () => {
     // Deceased born 1955 (FRA 66y2m), PIA $1,003.40, claimed at 70: 46
-    // months of credits, $1,311.12 -> $1,311.10. Survivor born 1965 claims
+    // months of credits, $1,311.11 -> $1,311.10. Survivor born 1965 claims
     // 9 of 84 months early: $1,311.10 x 0.9694643 = $1,271.06 -> $1,271.
     // Reducing the dollar-rounded $1,311 instead would give $1,270.
     const deceased = person(100340, 1955);
@@ -150,6 +157,17 @@ describe("survivor benefits follow SSA's rounding", () => {
         at(survivor, 67)
       ).cents()
     ).toBe(84100);
+  });
+
+  it('reduces a claim before 60 as though made at 60, to 71.5%', () => {
+    // A disabled survivor can claim from 50; the reduction stops at 60's.
+    const survivor = person(0, 1962);
+    const basis = { base: Money.fromCents(100000), limit: null };
+    const at60 = reducedSurvivorBenefit(survivor, basis, at(survivor, 60));
+    expect(at60.cents()).toBe(71500);
+    expect(
+      reducedSurvivorBenefit(survivor, basis, at(survivor, 55)).cents()
+    ).toBe(71500);
   });
 });
 

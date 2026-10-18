@@ -1,6 +1,6 @@
 /**
- * The couple fast paths carry their own copies of the survivor formula in
- * raw cents, and the goldens that check them use whole-dollar PIAs. The form
+ * The couple fast paths share a raw-cents copy of the survivor formula
+ * (couple-fast-primitives.ts), and the goldens that check them use whole-dollar PIAs. The form
  * accepts PIAs with cents, so these compare both fast paths with the slow
  * references on PIAs that are not whole dollars, including the case the
  * widow(er)'s limit covers: the earner claimed early and the survivor claims
@@ -183,6 +183,86 @@ describe('couple fast paths with PIAs in cents, filing-year credits', () => {
       currentDate,
       0.025,
       dists
+    );
+    expect(optimized.length).toBe(reference.size);
+    for (const r of optimized) {
+      const expected = reference.get(key(r));
+      expect(expected).toBeDefined();
+      expect(Math.abs(r.expectedNPVCents - (expected ?? 0))).toBeLessThan(1);
+    }
+  });
+});
+
+// Earner born 2 Jan 1960, PIA $1,020.60, claimed at 62 in February 2022:
+// 82.5% of the PIA is $841.995, so the widow(er)'s limit is $841.90 and pays
+// $841, where rounding to the cent first would pay $842. The dependent, born
+// 1966, is about 64 when the earner dies at 70, so the survivor benefit
+// reduced from the full PIA exceeds the limit and the limit binds.
+describe("couple fast paths with a widow(er)'s limit just below a dollar", () => {
+  const limitRecipients: [Recipient, Recipient] = [
+    makeRecipient(1020.6, Birthdate.FromYMD(1960, 0, 2)),
+    makeRecipient(200, Birthdate.FromYMD(1966, 6, 20)),
+  ];
+  const claimedEarly: AlreadyFiled = [
+    MonthDate.initFromYearsMonths({ years: 2022, months: 1 }),
+    null,
+  ];
+
+  it('optimal strategy matches the reference', () => {
+    const finalDates: [MonthDate, MonthDate] = [
+      limitRecipients[0].birthdate.dateAtLayAge(deathAge(70, 0)),
+      limitRecipients[1].birthdate.dateAtLayAge(deathAge(90, 0)),
+    ];
+    const [, , reference] = optimalStrategyCouple(
+      limitRecipients,
+      finalDates,
+      currentDate,
+      discountRate,
+      claimedEarly
+    );
+    for (const solver of [
+      optimalStrategyCoupleOptimized,
+      optimalStrategyCoupleFast,
+    ]) {
+      const [, , npv] = solver(
+        limitRecipients,
+        finalDates,
+        currentDate,
+        discountRate,
+        claimedEarly
+      );
+      expect(Math.abs(npv - reference)).toBeLessThan(1);
+    }
+  });
+
+  it('expected NPV matches the reference for every pair', () => {
+    const dists: [DeathProbability[], DeathProbability[]] = [
+      [
+        { age: 70, probability: 0.6 },
+        { age: 80, probability: 0.4 },
+      ],
+      [
+        { age: 85, probability: 0.5 },
+        { age: 95, probability: 0.5 },
+      ],
+    ];
+    const key = ({ filingAges: [a, b] }: { filingAges: MonthDuration[] }) =>
+      `${a.asMonths()}/${b.asMonths()}`;
+    const reference = new Map(
+      expectedNPVCouple(
+        limitRecipients,
+        currentDate,
+        discountRate,
+        dists,
+        claimedEarly
+      ).map((r) => [key(r), r.expectedNPVCents])
+    );
+    const optimized = expectedNPVCoupleOptimized(
+      limitRecipients,
+      currentDate,
+      discountRate,
+      dists,
+      claimedEarly
     );
     expect(optimized.length).toBe(reference.size);
     for (const r of optimized) {

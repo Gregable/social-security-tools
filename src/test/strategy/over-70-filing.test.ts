@@ -16,7 +16,11 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { benefitAtAge, survivorBenefit } from '$lib/benefit-calculator';
+import {
+  benefitAtAge,
+  survivorBenefit,
+  widowLimitFloor,
+} from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { filingChoices } from '$lib/components/recommended-filing-card';
 import { Money } from '$lib/money';
@@ -133,7 +137,7 @@ describe('survivor benefit when the deceased filed past 70', () => {
     const at70 = benefitAtAge(deceased, MAX_FILING_AGE);
     expect(benefit.cents()).toBe(at70.cents());
     expect(benefit.cents()).toBeGreaterThan(
-      deceased.pia().primaryInsuranceAmount().times(0.825).cents()
+      widowLimitFloor(deceased.pia().primaryInsuranceAmount()).cents()
     );
   });
 
@@ -287,9 +291,9 @@ describe('single optimizer past age 70', () => {
 });
 
 describe('survivor rounding agrees between fast path and reference', () => {
-  // Found by fuzzing the regime this change opens: the fast copies used a
-  // literal 0.285 where the reference computes (1 - 0.715), a different
-  // double. On a half-cent base*ratio the two rounded opposite ways, giving
+  // Historical: found by fuzzing the regime #589 opened, when the fast
+  // copies used a literal 0.285 where the reference computed (1 - 0.715), a
+  // different double. Both paths now share an exact integer reduction. On a half-cent base*ratio the two rounded opposite ways, giving
   // a $1/month survivor benefit that the grid-cell NPV and the scenario
   // detail (which re-sums periods with the reference) disagreed on by ~$200.
   it('pins a half-cent case to within a cent', () => {

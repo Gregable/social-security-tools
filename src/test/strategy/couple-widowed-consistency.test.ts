@@ -1,9 +1,10 @@
 /**
  * Couple mode and widowed mode reach the survivor benefit by different
  * routes: couple mode builds it into a couple's payment timeline (and its
- * two fast optimizers carry their own copies of the formula), while widowed
- * mode describes the late spouse with a LateSpouseClaim. These check that the
- * routes agree on the same facts.
+ * two fast optimizers share a raw-cents copy of the formula in
+ * couple-fast-primitives.ts), while widowed mode describes the late spouse
+ * with a LateSpouseClaim. These check that the routes agree on the same
+ * facts.
  */
 
 import { describe, expect, it } from 'vitest';

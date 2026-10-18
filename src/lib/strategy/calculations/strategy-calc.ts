@@ -1,10 +1,10 @@
 import {
   benefitOnDate,
   eligibleForSpousalBenefit,
-  MAX_BENEFIT_AGE_MONTHS,
   spousalBenefitOnDate,
   survivorBenefit,
 } from '$lib/benefit-calculator';
+import { MAX_BENEFIT_AGE_MONTHS } from '$lib/benefit-rounding';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';

@@ -41,13 +41,13 @@
  * slow reference; see `src/test/strategy/grid-optimal-goldens.test.ts`.
  */
 
+import { eligibleForSpousalBenefit } from '$lib/benefit-calculator';
 import {
   benefitCentsAtAge,
   benefitDimesAtAge,
-  eligibleForSpousalBenefit,
   floorToDollarCents,
   MAX_BENEFIT_AGE_MONTHS,
-} from '$lib/benefit-calculator';
+} from '$lib/benefit-rounding';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { type AlreadyFiled, NOT_FILED } from './already-filed';
@@ -246,7 +246,8 @@ export function optimalStrategyCoupleFast(
   }
 
   // The dependent's own benefit at the dime (dFYDimes, dPJDimes), which the
-  // spousal amount is computed from, and paid, truncated to the dollar.
+  // spousal amount is computed from, and as paid, truncated to the dollar
+  // (dFY, dPJ).
   const dFYDimes = new Float64Array(nDF);
   const dPJDimes = new Float64Array(nDF);
   const dFY = new Float64Array(nDF);

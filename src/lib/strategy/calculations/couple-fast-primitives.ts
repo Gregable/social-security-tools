@@ -22,13 +22,13 @@ import {
   reducedSurvivorDimes,
   spousalOriginalBenefitCents,
   widowLimitDimes,
-} from '$lib/benefit-calculator';
+} from '$lib/benefit-rounding';
 
 /**
  * Personal benefit during the filing year, at the dime, in cents.
  *
- * Replicates benefitOnDateCore(r, fd, fd, age) from benefit-calculator.ts,
- * before dollar rounding.
+ * Replicates benefitDimesOnDateCore(r, fd, fd, age) from
+ * benefit-calculator.ts.
  *
  * The "January bump": for recipients filing after NRA but before age 70 in
  * a non-January month, SSA only grants delayed credits up to the previous

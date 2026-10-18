@@ -11,18 +11,18 @@
  *
  * The chart below is copied from the worksheet, so these tests check the code
  * against SSA's procedure rather than against a restatement of it. The three
- * amounts themselves come from the existing benefit functions, which other
- * tests check against hand-worked figures; what is under test here is which
- * amount is paid. RS 00615.320 adds a worked example.
+ * amounts themselves come from the benefit primitives at the dime, which
+ * other tests check against hand-worked figures; what is under test here is
+ * which amount is paid. RS 00615.320 adds a worked example.
  */
 
 import { describe, expect, it } from 'vitest';
 import {
-  benefitDimesAtAge,
   benefitOnDate,
   reducedSurvivorBenefit,
   survivorBenefit,
 } from '$lib/benefit-calculator';
+import { benefitDimesAtAge } from '$lib/benefit-rounding';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
@@ -175,7 +175,7 @@ function worksheet(c: Case): {
   };
 }
 
-/** The order the code used before the fix: cap first, then reduce. */
+/** The cap-then-reduce order the code used before the fix, on today's amounts. */
 function capThenReduce(c: Case): number {
   const { pct825, rib } = limitAmounts(c);
   return reducedSurvivorBenefit(

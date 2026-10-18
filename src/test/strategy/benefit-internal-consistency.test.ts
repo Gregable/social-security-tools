@@ -6,6 +6,7 @@ import {
   higherEarningsThan,
   spousalBenefitOnDate,
   survivorBenefit,
+  widowLimitFloor,
 } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
@@ -479,7 +480,7 @@ describe('survivorBenefit base calculation consistency', () => {
     // floor(150833/100)*100 = 150800 = $1508
     // base = max($1650, $1508) = $1650
     const pia = Money.from(2000);
-    const ribLim = pia.times(0.825).floorToDollar();
+    const ribLim = widowLimitFloor(pia);
     expect(result.cents()).toBe(ribLim.cents());
   });
 
@@ -509,7 +510,7 @@ describe('survivorBenefit base calculation consistency', () => {
     const atAge70 = benefitAtAge(deceased, age(70, 0));
     // base = max(82.5% * 1000, atAge70) = max(825, atAge70)
     // atAge70 > PIA always, so base = atAge70.
-    const ribLim = Money.from(1000).times(0.825).floorToDollar();
+    const ribLim = widowLimitFloor(Money.from(1000));
     expect(atAge70.cents()).toBeGreaterThan(ribLim.cents());
     expect(result.cents()).toBe(atAge70.cents());
   });

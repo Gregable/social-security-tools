@@ -3,6 +3,7 @@ import {
   benefitAtAge,
   eligibleForSpousalBenefit,
   spousalBenefitOnDate,
+  spousalOriginalBenefit,
   survivorBenefit,
   widowLimitFloor,
 } from '$lib/benefit-calculator';
@@ -710,16 +711,20 @@ function spousalSection(higher: Recipient, lower: Recipient): string {
   const lowerName = displayName(lower, 'the lower earner');
   const higherPia = higher.pia().primaryInsuranceAmount();
   const lowerPia = lower.pia().primaryInsuranceAmount();
+  // Half the PIA truncated to the dime, as SSA computes it; shown to the
+  // cent so the subtraction below adds up.
+  const halfPia = spousalOriginalBenefit(higherPia);
 
   const lines = ['## Spousal benefits', ''];
   if (!eligibleForSpousalBenefit(lower, higher)) {
     lines.push(
       `Neither partner qualifies for a spousal top-up: half of ${higherName}'s`,
-      `PIA (${higherPia.div(2).wholeDollars()}) does not exceed ${lowerName}'s own PIA`,
-      `(${lowerPia.wholeDollars()}). The lower earner simply takes their own benefit.`
+      `PIA (${halfPia.string()}) does not exceed ${lowerName}'s own PIA`,
+      `(${lowerPia.string()}). The lower earner simply takes their own benefit.`
     );
     return lines.join('\n');
   }
+  const base = baseSpousalBenefit(higher, lower);
 
   lines.push(
     `${lowerName} can receive a spousal top-up on top of their own benefit.`,
@@ -728,7 +733,7 @@ function spousalSection(higher: Recipient, lower: Recipient): string {
     '',
     `- At full retirement age the spousal benefit equals 50% of ${higherName}'s`,
     `  PIA (${higherPia.wholeDollars()}) minus ${lowerName}'s own PIA (${lowerPia.wholeDollars()}):`,
-    `  ${higherPia.div(2).wholeDollars()} - ${lowerPia.wholeDollars()} = ${baseSpousalBenefit(higher, lower).wholeDollars()} / month.`,
+    `  ${halfPia.string()} - ${lowerPia.string()} = ${base.string()}, paid as ${base.floorToDollar().wholeDollars()} / month.`,
     `- It is based on ${higherName}'s PIA, not their actual (delayed or reduced)`,
     `  benefit, and ${higherName} must have filed before ${lowerName} can collect it.`,
     '- Claiming before FRA reduces the spousal benefit by 25/36 of 1% per month',

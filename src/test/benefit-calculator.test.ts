@@ -4,12 +4,12 @@ import {
   allBenefitsOnDateNominal,
   baseSpousalBenefit,
   benefitAtAge,
-  benefitCentsAtAge,
   benefitOnDate,
   benefitOnDateNominal,
   eligibleForSpousalBenefit,
   spousalBenefitOnDate,
 } from '$lib/benefit-calculator';
+import { benefitCentsAtAge } from '$lib/benefit-rounding';
 import { Birthdate } from '$lib/birthday';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
