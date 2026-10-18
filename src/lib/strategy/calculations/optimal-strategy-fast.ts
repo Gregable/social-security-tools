@@ -43,156 +43,25 @@
 
 import {
   benefitCentsAtAge,
+  benefitDimesAtAge,
   eligibleForSpousalBenefit,
+  floorToDollarCents,
   MAX_BENEFIT_AGE_MONTHS,
-  MIN_SURVIVOR_BENEFIT_RATIO,
 } from '$lib/benefit-calculator';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import { type AlreadyFiled, NOT_FILED } from './already-filed';
+import {
+  filingYearCents,
+  filingYearDimes,
+  spousalCentsForPair,
+  survivorCentsCalc,
+} from './couple-fast-primitives';
 import { classifyEarnerDependent } from './earner-dependent.js';
 import {
   calculateMonthlyDiscountRate,
   filingAgeRange,
 } from './strategy-calc.js';
-
-// ─────────────────────────────────────────────────────────────────────────
-// Shared primitives
-//
-// The personal benefit at a filing age is not copied: it comes from
-// benefitCentsAtAge in benefit-calculator.ts, which benefitAtAge and
-// expected-npv.ts also use. The three functions below (filingYearCents,
-// spousalCentsForPair, survivorCentsCalc) are byte-for-byte copies of the
-// same-named helpers in the "COUPLE — FAST PATH (optimized)" block of
-// expected-npv.ts. (Named rather than line-numbered: line ranges rot on the
-// next edit.) Authoritative docstrings (early-filing rules, "January bump",
-// survivor ratio, etc.) live in expected-npv.ts; consult those when editing.
-//
-// Drift between the two copies will only surface through golden tests
-// (grid-optimal-goldens.test.ts + expected-npv-couple-goldens.test.ts),
-// so edit both copies together. Moving them into a shared module, as
-// benefitCentsAtAge now is, is a pending follow-up.
-// ─────────────────────────────────────────────────────────────────────────
-
-/** Personal benefit during the filing year (before next January), in cents. */
-function filingYearCents(
-  piaCents: number,
-  nraMonths: number,
-  delayedRetirementIncrease: number,
-  ageMonths: number,
-  ssaBirthEpoch: number,
-  nraEpoch: number
-): number {
-  const filingEpoch = ssaBirthEpoch + ageMonths;
-  if (
-    filingEpoch <= nraEpoch ||
-    ageMonths >= MAX_BENEFIT_AGE_MONTHS ||
-    filingEpoch % 12 === 0
-  )
-    return benefitCentsAtAge(
-      piaCents,
-      nraMonths,
-      delayedRetirementIncrease,
-      ageMonths
-    );
-  const thisJan = filingEpoch - (filingEpoch % 12);
-  const compAge = Math.max(nraEpoch, thisJan) - ssaBirthEpoch;
-  return benefitCentsAtAge(
-    piaCents,
-    nraMonths,
-    delayedRetirementIncrease,
-    compAge
-  );
-}
-
-/** Spousal benefit in cents for a given filing pair. */
-function spousalCentsForPair(
-  depPiaCents: number,
-  earnerPiaCents: number,
-  depFilingEpoch: number,
-  depNraEpoch: number,
-  spousalStartEpoch: number,
-  depFYCents: number,
-  depPJCents: number
-): number {
-  const base = earnerPiaCents / 2 - depPiaCents;
-  if (base <= 0) return 0;
-
-  if (spousalStartEpoch >= depNraEpoch) {
-    if (depFilingEpoch <= depNraEpoch) return Math.floor(base / 100) * 100;
-    const startYear = Math.floor(spousalStartEpoch / 12);
-    const filingYear = Math.floor(depFilingEpoch / 12);
-    const personal = startYear > filingYear ? depPJCents : depFYCents;
-    const excess = earnerPiaCents / 2 - personal;
-    return excess <= 0 ? 0 : Math.floor(excess / 100) * 100;
-  }
-
-  const mBefore = depNraEpoch - spousalStartEpoch;
-  if (mBefore <= 36)
-    return Math.floor((base * (1 - mBefore / 144)) / 100) * 100;
-
-  const r1 = base * 0.25;
-  const r2 = base * ((mBefore - 36) / 240);
-  return Math.floor((base - r1 - r2) / 100) * 100;
-}
-
-/** Survivor benefit in cents. */
-function survivorCentsCalc(
-  earnerPiaCents: number,
-  earnerNra: number,
-  earnerDelayedRetirementIncrease: number,
-  earnerSsaBirth: number,
-  earnerNraEpoch: number,
-  earnerFilingEpoch: number,
-  earnerDeathEpoch: number,
-  earner70Epoch: number,
-  depSurvNra: number,
-  survStartEpoch: number,
-  depSsaBirth: number
-): number {
-  let base: number;
-  let limit = Number.POSITIVE_INFINITY;
-  if (earnerFilingEpoch >= earnerDeathEpoch) {
-    if (earnerDeathEpoch < earnerNraEpoch) {
-      base = earnerPiaCents;
-    } else {
-      const effEpoch = Math.min(earnerDeathEpoch, earner70Epoch);
-      base = benefitCentsAtAge(
-        earnerPiaCents,
-        earnerNra,
-        earnerDelayedRetirementIncrease,
-        effEpoch - earnerSsaBirth
-      );
-    }
-  } else {
-    const eBenefit = benefitCentsAtAge(
-      earnerPiaCents,
-      earnerNra,
-      earnerDelayedRetirementIncrease,
-      earnerFilingEpoch - earnerSsaBirth
-    );
-    if (earnerFilingEpoch < earnerNraEpoch) {
-      base = earnerPiaCents;
-      limit = Math.max(Math.round(earnerPiaCents * 0.825), eBenefit);
-    } else {
-      base = eBenefit;
-    }
-  }
-
-  const survAge = survStartEpoch - depSsaBirth;
-  let reduced = base;
-  if (survAge < depSurvNra) {
-    const m60toNRA = depSurvNra - 720;
-    const m60toAge = survAge - 720;
-    // Computed exactly as reducedSurvivorBenefit does: (1 - ratio), not a 0.285
-    // literal, which is a different double and rounds half-cents differently.
-    const ratio =
-      MIN_SURVIVOR_BENEFIT_RATIO +
-      (1 - MIN_SURVIVOR_BENEFIT_RATIO) * Math.max(0, m60toAge / m60toNRA);
-    reduced = Math.round(base * ratio);
-  }
-  return Math.floor(Math.min(reduced, limit) / 100) * 100;
-}
 
 // ─────────────────────────────────────────────────────────────────────────
 // Main entry point
@@ -376,6 +245,10 @@ export function optimalStrategyCoupleFast(
     ePersNPV[i] = personalNPV(eSsaBirth + age, eDeath, eFY[i], ePJ[i]);
   }
 
+  // The dependent's own benefit at the dime (dFYDimes, dPJDimes), which the
+  // spousal amount is computed from, and paid, truncated to the dollar.
+  const dFYDimes = new Float64Array(nDF);
+  const dPJDimes = new Float64Array(nDF);
   const dFY = new Float64Array(nDF);
   const dPJ = new Float64Array(nDF);
   // `dPersFullNPV[i]` = dep personal NPV with no survivor truncation
@@ -391,8 +264,8 @@ export function optimalStrategyCoupleFast(
   if (!depZeroPia) {
     for (let i = 0; i < nDF; i++) {
       const age = dStart + i;
-      dPJ[i] = benefitCentsAtAge(dPiaCents, dNra, dDri, age);
-      dFY[i] = filingYearCents(
+      dPJDimes[i] = benefitDimesAtAge(dPiaCents, dNra, dDri, age);
+      dFYDimes[i] = filingYearDimes(
         dPiaCents,
         dNra,
         dDri,
@@ -400,6 +273,8 @@ export function optimalStrategyCoupleFast(
         dSsaBirth,
         dNraEpoch
       );
+      dPJ[i] = floorToDollarCents(dPJDimes[i]);
+      dFY[i] = floorToDollarCents(dFYDimes[i]);
       const dFile = dSsaBirth + age;
       dPersFullNPV[i] = personalNPV(dFile, dDeath, dFY[i], dPJ[i]);
       // Truncated endpoint is min(dDeath, eDeath). If dFile > that endpoint
@@ -435,10 +310,11 @@ export function optimalStrategyCoupleFast(
       // Zero-PIA dep can't file before earner (they'd get $0 until spousal).
       if (depZeroPia && dFile < eFile) dFile = eFile;
 
-      // Dep personal benefit amounts for this fd. For depZeroPia both are 0
-      // (dep has no personal benefit of their own).
-      const dfy = depZeroPia ? 0 : dFY[fdI];
-      const dpj = depZeroPia ? 0 : dPJ[fdI];
+      // Dep personal benefit amounts for this fd, at the dime, for the
+      // spousal amount. For depZeroPia both are 0 (dep has no personal
+      // benefit of their own).
+      const dfyDimes = depZeroPia ? 0 : dFYDimes[fdI];
+      const dpjDimes = depZeroPia ? 0 : dPJDimes[fdI];
 
       // Survivor start = max(earnerDeath+1, depFiling).
       const svStart = eDeath + 1 > dFile ? eDeath + 1 : dFile;
@@ -498,8 +374,8 @@ export function optimalStrategyCoupleFast(
             dFile,
             dNraEpoch,
             spStart,
-            dfy,
-            dpj
+            dfyDimes,
+            dpjDimes
           );
           total += npvConstant(spAmt, spStart + 1, spEnd + 1);
         }

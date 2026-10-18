@@ -4,6 +4,7 @@ import {
   eligibleForSpousalBenefit,
   spousalBenefitOnDate,
   survivorBenefit,
+  widowLimitFloor,
 } from '$lib/benefit-calculator';
 import type { Birthdate } from '$lib/birthday';
 import {
@@ -786,7 +787,7 @@ function survivorSection(higher: Recipient, lower: Recipient): string {
     `  then capped at the larger of ${higherName}'s reduced benefit or 82.5% of`,
     `  ${higherName}'s PIA (the "widow(er)'s limit", or RIB-LIM). Waiting past`,
     '  the month the reduced amount reaches that cap gains nothing. For',
-    `  ${higherName}, 82.5% of PIA = ${higherPia.times(0.825).wholeDollars()}.`,
+    `  ${higherName}, 82.5% of PIA = ${widowLimitFloor(higherPia).wholeDollars()}.`,
     `- Survivor benefits use a separate survivor full retirement age`,
     `  (${lowerName}'s is ${survivorFra.toFullAgeString()}), which can be earlier than the`,
     '  retirement FRA. Claiming before it reduces the benefit proportionally, down',

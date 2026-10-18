@@ -1,6 +1,10 @@
 <script lang="ts">
 import { onMount, tick } from 'svelte';
-import { higherEarningsThan, survivorBenefit } from '$lib/benefit-calculator';
+import {
+  higherEarningsThan,
+  survivorBenefit,
+  widowLimitFloor,
+} from '$lib/benefit-calculator';
 import {
   higherEarnerFilingDate,
   setHigherEarnerFilingDate,
@@ -562,11 +566,9 @@ $: {
               </td>
               <td>
                 <span class="cell-condition"><RName r={higherEarner} /> filed before age {breakEvenAge.years()}y {breakEvenAge.modMonths()}m</span>
-                <span class="cell-result">Survivor receives 82.5% of PIA = {higherEarner
-                  .pia()
-                  .primaryInsuranceAmount()
-                  .times(0.825)
-                  .wholeDollars()}</span>
+                <span class="cell-result">Survivor receives 82.5% of PIA = {widowLimitFloor(
+                  higherEarner.pia().primaryInsuranceAmount()
+                ).wholeDollars()}</span>
               </td>
               <td>
                 <span class="cell-condition"><RName r={higherEarner} /> died before age {higherEarner.normalRetirementAge().years()}y {#if higherEarner.normalRetirementAge().modMonths() > 0}{higherEarner.normalRetirementAge().modMonths()}m {/if}(FRA)</span>

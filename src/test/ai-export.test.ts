@@ -601,12 +601,12 @@ describe('buildCoupleCalculatorAiExport', () => {
   it('numerically anchors the survivor widow-limit (82.5% of PIA)', () => {
     const higher = eligibleRecipient('Alex');
     const md = buildCoupleCalculatorAiExport(higher, lowerEarner('Jordan'));
-    const widowLimit = higher
-      .pia()
-      .primaryInsuranceAmount()
-      .times(0.825)
-      .wholeDollars();
-    expect(md).toContain(widowLimit);
+    // 82.5% of the PIA truncated to the dime (POMS RS 00615.320), then to
+    // the dollar as paid; never rounded up.
+    const piaCents = higher.pia().primaryInsuranceAmount().cents();
+    const dimes = Math.floor((piaCents * 825) / 10000) * 10;
+    const widowLimit = Money.fromCents(Math.floor(dimes / 100) * 100);
+    expect(md).toContain(`82.5% of PIA = ${widowLimit.wholeDollars()}.`);
   });
 
   it('orders the spousal/survivor framing by PIA regardless of argument order', () => {
