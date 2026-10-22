@@ -9,10 +9,11 @@
  *     diff then shows exactly which results moved, on the same cases.
  *   - `regenerate` (or `1`): draw fresh inputs from the generator's seeded
  *     PRNG and compute their outputs. Input sampling never depends on a
- *     library result, so this reproduces the committed inputs unless the
- *     sampling itself changed; use it only to change what the goldens cover.
+ *     search result, so this reproduces the committed inputs unless the
+ *     sampling changed; golden-inputs.test.ts fails when it has. Use it to
+ *     change what the goldens cover, or after that test fails.
  *
- * For example:
+ * Unset, empty or `0` skips the generator. For example:
  *   GENERATE_COUPLE_GOLDENS=recompute npx vitest run src/test/strategy/generate-goldens.test.ts
  */
 
@@ -21,14 +22,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 export type GoldenMode = 'recompute' | 'regenerate';
 
 /**
- * The mode named by `envVar`, or null when it is unset.
+ * The mode named by `envVar`, or null when it is unset, empty or `0`.
  *
  * @throws Error if it is set to anything else, so a typo fails loudly
  *   instead of silently skipping the generator.
  */
 export function goldenMode(envVar: string): GoldenMode | null {
   const value = process.env[envVar];
-  if (value === undefined || value === '') return null;
+  if (value === undefined || value === '' || value === '0') return null;
   if (value === 'recompute') return 'recompute';
   if (value === 'regenerate' || value === '1') return 'regenerate';
   throw new Error(

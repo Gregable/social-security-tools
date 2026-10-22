@@ -157,8 +157,14 @@ describe('expectedNPVCoupleOptimized vs goldens', () => {
         [tc.inputs.deathProbs0, tc.inputs.deathProbs1]
       );
 
-      let tcPassed = true;
-      for (let i = 0; i < Math.min(5, tc.output.top5.length); i++) {
+      // Fewer than five recorded results means those were every filing pair
+      // there is (a recipient past 70y6m has one option left), so the
+      // optimized path must return exactly as many.
+      let tcPassed =
+        tc.output.top5.length < 5
+          ? results.length === tc.output.top5.length
+          : results.length >= 5;
+      for (let i = 0; tcPassed && i < tc.output.top5.length; i++) {
         const expected = tc.output.top5[i];
         const actual = results[i];
 
