@@ -1,15 +1,20 @@
 /**
  * Golden test case generator for expectedNPVCouple.
  *
- * Generates 1,000 test cases with varied inputs and records the exact output
- * from the current (correct but slow) expectedNPVCouple function. These
- * goldens are used to validate optimized implementations.
+ * Records the exact output of the slow reference expectedNPVCouple for 1,000
+ * varied couples, which expected-npv-couple-goldens.test.ts uses to validate
+ * the optimized implementation.
  *
- * Run with: npm test src/test/strategy/generate-goldens.test.ts
+ * Skipped in normal runs. See golden-modes.ts for the modes:
+ *   GENERATE_COUPLE_GOLDENS=recompute npx vitest run src/test/strategy/generate-goldens.test.ts
+ *   GENERATE_COUPLE_GOLDENS=regenerate npx vitest run src/test/strategy/generate-goldens.test.ts
  * Output: src/test/strategy/goldens/couple-goldens.json
+ *
+ * Inputs are drawn from a seeded PRNG and rejected only on their own values
+ * (ages), never on a result: a skip that depends on the library makes the
+ * stream of inputs, and so the whole file, change whenever the library does.
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it } from 'vitest';
 import { Birthdate } from '$lib/birthday';
@@ -18,6 +23,11 @@ import { Money } from '$lib/money';
 import { MonthDate } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
 import { expectedNPVCouple } from '$lib/strategy/calculations/expected-npv';
+import { goldenMode, readGoldens, writeGoldens } from './golden-modes';
+
+const GOLDENS_PATH = resolve(__dirname, 'goldens/couple-goldens.json');
+const FORMAT = { indent: 2, trailingNewline: false };
+const CASES = 1000;
 
 // Simple seedable PRNG (mulberry32)
 function mulberry32(seed: number) {
@@ -30,38 +40,42 @@ function mulberry32(seed: number) {
   };
 }
 
-interface GoldenTestCase {
-  id: number;
-  inputs: {
-    earnerPIA: number;
-    depPIA: number;
-    earnerBirthYear: number;
-    earnerBirthMonth: number;
-    earnerBirthDay: number;
-    depBirthYear: number;
-    depBirthMonth: number;
-    depBirthDay: number;
-    discountRate: number;
-    currentDateYear: number;
-    currentDateMonth: number;
-    // When true, recipients[0] is the lower-PIA "dependent" and recipients[1]
-    // is the higher-PIA "earner". Exercises the earner/dependent role
-    // classification in the optimized code.
-    swapOrder: boolean;
-    deathProbs0: DeathProbability[];
-    deathProbs1: DeathProbability[];
-  };
-  output: {
+interface CoupleGoldenInputs {
+  earnerPIA: number;
+  depPIA: number;
+  earnerBirthYear: number;
+  earnerBirthMonth: number;
+  earnerBirthDay: number;
+  depBirthYear: number;
+  depBirthMonth: number;
+  depBirthDay: number;
+  discountRate: number;
+  currentDateYear: number;
+  currentDateMonth: number;
+  // When true, recipients[0] is the lower-PIA "dependent" and recipients[1]
+  // is the higher-PIA "earner". Exercises the earner/dependent role
+  // classification in the optimized code.
+  swapOrder: boolean;
+  deathProbs0: DeathProbability[];
+  deathProbs1: DeathProbability[];
+}
+
+interface CoupleGoldenOutput {
+  filingAge0Months: number;
+  filingAge1Months: number;
+  expectedNPVCents: number;
+  // Top 5 for additional validation
+  top5: Array<{
     filingAge0Months: number;
     filingAge1Months: number;
     expectedNPVCents: number;
-    // Top 5 for additional validation
-    top5: Array<{
-      filingAge0Months: number;
-      filingAge1Months: number;
-      expectedNPVCents: number;
-    }>;
-  };
+  }>;
+}
+
+interface GoldenTestCase {
+  id: number;
+  inputs: CoupleGoldenInputs;
+  output: CoupleGoldenOutput;
 }
 
 function generateDeathProbs(
@@ -96,7 +110,11 @@ function generateDeathProbs(
   }));
 }
 
-function generateTestCase(id: number, rng: () => number): GoldenTestCase {
+/**
+ * Draws one couple from the seeded stream, or null when the draw falls
+ * outside the ages the goldens cover. Depends only on `rng`.
+ */
+function sampleInputs(rng: () => number): CoupleGoldenInputs | null {
   // Random PIAs. ~10% of cases have a zero-PIA "dependent" (tests the
   // depZeroPia branch of the optimized code).
   const earnerPIA = Math.floor(500 + rng() * 3500);
@@ -129,132 +147,126 @@ function generateTestCase(id: number, rng: () => number): GoldenTestCase {
   const earnerCurrentAge = currentDateYear - earnerBirthYear;
   const depCurrentAge = currentDateYear - depBirthYear;
 
-  // Skip if either is too young (< 55) or too old (> 75)
-  // to have a meaningful filing range
-  if (earnerCurrentAge < 55 || earnerCurrentAge > 75) return null as any;
-  if (depCurrentAge < 55 || depCurrentAge > 75) return null as any;
+  // Skip if either is too young (< 55) or too old (> 75). Past 70y6m a
+  // recipient has a single filing option left, which the goldens include.
+  if (earnerCurrentAge < 55 || earnerCurrentAge > 75) return null;
+  if (depCurrentAge < 55 || depCurrentAge > 75) return null;
 
   // Generate death probability distributions (10-15 ages each)
   const numDeathAges = 10 + Math.floor(rng() * 6); // 10-15
   const startAge0 = Math.max(earnerCurrentAge, 62);
   const startAge1 = Math.max(depCurrentAge, 62);
-  // These are keyed to the earner / dependent semantically (indices 0/1 by
-  // PIA). When swapOrder is true below, we'll reorder both recipients and
-  // their death distributions together so they stay paired correctly.
+  // These are keyed to the earner / dependent semantically. When swapOrder
+  // is true, reorder them with the recipients so they stay paired.
   const deathProbs0Raw = generateDeathProbs(rng, numDeathAges, startAge0);
   const deathProbs1Raw = generateDeathProbs(rng, numDeathAges, startAge1);
-
-  // Create recipients. When swapOrder is true, recipients[0] is the lower-PIA
-  // "dependent" and recipients[1] is the higher-PIA "earner". deathProbs0 /
-  // deathProbs1 are paired with recipients[0] / recipients[1] respectively.
-  const earnerRec = new Recipient();
-  earnerRec.birthdate = Birthdate.FromYMD(
-    earnerBirthYear,
-    earnerBirthMonth,
-    earnerBirthDay
-  );
-  earnerRec.setPia(Money.from(earnerPIA));
-
-  const depRec = new Recipient();
-  depRec.birthdate = Birthdate.FromYMD(
-    depBirthYear,
-    depBirthMonth,
-    depBirthDay
-  );
-  depRec.setPia(Money.from(depPIA));
-
-  const recipients: [Recipient, Recipient] = swapOrder
-    ? [depRec, earnerRec]
-    : [earnerRec, depRec];
-  // Death distributions are keyed to the earner/dependent semantics: they were
-  // generated from earnerCurrentAge/depCurrentAge. Keep them aligned with the
-  // person they were generated for when we swap recipient order.
-  const deathProbsByIndex: [DeathProbability[], DeathProbability[]] = swapOrder
+  const [deathProbs0, deathProbs1] = swapOrder
     ? [deathProbs1Raw, deathProbs0Raw]
     : [deathProbs0Raw, deathProbs1Raw];
 
-  const currentDate = MonthDate.initFromYearsMonths({
-    years: currentDateYear,
-    months: currentDateMonth,
-  });
+  return {
+    earnerPIA,
+    depPIA,
+    earnerBirthYear,
+    earnerBirthMonth,
+    earnerBirthDay,
+    depBirthYear,
+    depBirthMonth,
+    depBirthDay,
+    discountRate,
+    currentDateYear,
+    currentDateMonth,
+    swapOrder,
+    deathProbs0,
+    deathProbs1,
+  };
+}
 
-  // Run the exact calculation
+/**
+ * The slow reference's answer for a couple.
+ *
+ * @throws Error if it has none: every couple has at least one filing option
+ *   each, so an empty result is a library bug, not a case to skip.
+ */
+function computeOutput(inputs: CoupleGoldenInputs): CoupleGoldenOutput {
+  const recipient = (pia: number, y: number, m: number, d: number) => {
+    const r = new Recipient();
+    r.birthdate = Birthdate.FromYMD(y, m, d);
+    r.setPia(Money.from(pia));
+    return r;
+  };
+  const earner = recipient(
+    inputs.earnerPIA,
+    inputs.earnerBirthYear,
+    inputs.earnerBirthMonth,
+    inputs.earnerBirthDay
+  );
+  const dep = recipient(
+    inputs.depPIA,
+    inputs.depBirthYear,
+    inputs.depBirthMonth,
+    inputs.depBirthDay
+  );
+  // When swapOrder is true, recipients[0] is the lower-PIA "dependent";
+  // deathProbs0 / deathProbs1 are already paired by index.
+  const recipients: [Recipient, Recipient] = inputs.swapOrder
+    ? [dep, earner]
+    : [earner, dep];
+
   const results = expectedNPVCouple(
     recipients,
-    currentDate,
-    discountRate,
-    deathProbsByIndex
+    MonthDate.initFromYearsMonths({
+      years: inputs.currentDateYear,
+      months: inputs.currentDateMonth,
+    }),
+    inputs.discountRate,
+    [inputs.deathProbs0, inputs.deathProbs1]
   );
-
-  if (results.length === 0) return null as any;
+  if (results.length === 0) {
+    throw new Error(`no result for ${JSON.stringify(inputs)}`);
+  }
 
   const top5 = results.slice(0, 5).map((r) => ({
     filingAge0Months: r.filingAges[0].asMonths(),
     filingAge1Months: r.filingAges[1].asMonths(),
     expectedNPVCents: r.expectedNPVCents,
   }));
-
   return {
-    id,
-    inputs: {
-      earnerPIA,
-      depPIA,
-      earnerBirthYear,
-      earnerBirthMonth,
-      earnerBirthDay,
-      depBirthYear,
-      depBirthMonth,
-      depBirthDay,
-      discountRate,
-      currentDateYear,
-      currentDateMonth,
-      swapOrder,
-      deathProbs0: deathProbsByIndex[0],
-      deathProbs1: deathProbsByIndex[1],
-    },
-    output: {
-      filingAge0Months: top5[0].filingAge0Months,
-      filingAge1Months: top5[0].filingAge1Months,
-      expectedNPVCents: top5[0].expectedNPVCents,
-      top5,
-    },
+    filingAge0Months: top5[0].filingAge0Months,
+    filingAge1Months: top5[0].filingAge1Months,
+    expectedNPVCents: top5[0].expectedNPVCents,
+    top5,
   };
 }
 
-describe('golden test case generation', () => {
-  it('generate 1000 golden test cases', () => {
-    const rng = mulberry32(42);
-    const goldens: GoldenTestCase[] = [];
-    let attempts = 0;
+/** Fresh inputs from the seeded stream, with their outputs. */
+function regenerate(): GoldenTestCase[] {
+  const rng = mulberry32(42);
+  const goldens: GoldenTestCase[] = [];
+  let attempts = 0;
+  while (goldens.length < CASES && attempts < 2 * CASES) {
+    attempts++;
+    const inputs = sampleInputs(rng);
+    if (inputs === null) continue;
+    goldens.push({ id: goldens.length, inputs, output: computeOutput(inputs) });
+  }
+  if (goldens.length < CASES) {
+    throw new Error(`only ${goldens.length} cases in ${attempts} attempts`);
+  }
+  return goldens;
+}
 
-    while (goldens.length < 1000 && attempts < 2000) {
-      attempts++;
-      const tc = generateTestCase(goldens.length, rng);
-      if (tc !== null) {
-        goldens.push(tc);
-        if (goldens.length % 50 === 0) {
-          console.log(
-            `Generated ${goldens.length}/1000 goldens (${attempts} attempts)`
-          );
-        }
-      }
-    }
+const mode = goldenMode('GENERATE_COUPLE_GOLDENS');
 
-    console.log(
-      `\nGenerated ${goldens.length} goldens from ${attempts} attempts`
-    );
-
-    // Write to file
-    const outDir = resolve(__dirname, 'goldens');
-    mkdirSync(outDir, { recursive: true });
-    const outPath = resolve(outDir, 'couple-goldens.json');
-    writeFileSync(outPath, JSON.stringify(goldens, null, 2));
-    console.log(`Written to ${outPath}`);
-
-    // Basic stats
-    const avgNPV =
-      goldens.reduce((s, g) => s + g.output.expectedNPVCents, 0) /
-      goldens.length;
-    console.log(`Average optimal NPV: $${(avgNPV / 100).toFixed(0)}`);
-  }, 3600000); // 1 hour timeout
+describe.runIf(mode !== null)('couple golden generation', () => {
+  it(`writes ${CASES} cases (${mode})`, { timeout: 3_600_000 }, () => {
+    const goldens =
+      mode === 'recompute'
+        ? readGoldens<GoldenTestCase>(GOLDENS_PATH).map((g) => ({
+            ...g,
+            output: computeOutput(g.inputs),
+          }))
+        : regenerate();
+    writeGoldens(GOLDENS_PATH, goldens, FORMAT);
+  });
 });

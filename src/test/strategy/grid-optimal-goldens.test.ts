@@ -4,8 +4,9 @@
  * reference. For now, validates the existing `optimalStrategyCoupleOptimized`;
  * a future faster replacement should be validated against the same goldens.
  *
- * The goldens file must be generated first by running:
- *   npm test src/test/strategy/generate-grid-goldens.test.ts
+ * The goldens come from generate-grid-goldens.test.ts. When a benefit
+ * rule changes, recompute their outputs for the committed inputs with:
+ *   GENERATE_GRID_GOLDENS=recompute npx vitest run src/test/strategy/generate-grid-goldens.test.ts
  */
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -49,7 +50,8 @@ function loadGoldens(): GridGoldenCase[] {
   if (!existsSync(GOLDENS_PATH)) {
     throw new Error(
       `Grid goldens file not found at ${GOLDENS_PATH}. ` +
-        'Run: npm test src/test/strategy/generate-grid-goldens.test.ts'
+        'Run: GENERATE_GRID_GOLDENS=regenerate npx vitest run ' +
+        'src/test/strategy/generate-grid-goldens.test.ts'
     );
   }
   return JSON.parse(readFileSync(GOLDENS_PATH, 'utf-8'));

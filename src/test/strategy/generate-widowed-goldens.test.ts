@@ -6,17 +6,18 @@
  * independent computation, and any later change to either path that moves a
  * result has to be regenerated deliberately and shows up in review.
  *
- * Skipped in normal runs. Regenerate with:
- *   GENERATE_WIDOWED_GOLDENS=1 npx vitest run src/test/strategy/generate-widowed-goldens.test.ts
+ * Skipped in normal runs. See golden-modes.ts for the modes:
+ *   GENERATE_WIDOWED_GOLDENS=recompute npx vitest run src/test/strategy/generate-widowed-goldens.test.ts
+ *   GENERATE_WIDOWED_GOLDENS=regenerate npx vitest run src/test/strategy/generate-widowed-goldens.test.ts
  * Output: src/test/strategy/goldens/widowed-goldens.json
  *
  * Results depend on src/lib/constants.ts (bend points, COLAs, wage indices)
  * only through the start-age ranges and benefit rules, since PIAs are given
- * directly. The PRNG is seeded, so a regeneration with unchanged code and
- * constants reproduces the file.
+ * directly. The PRNG is seeded and no draw depends on a search result, so a
+ * regeneration with unchanged sampling reproduces the inputs.
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it } from 'vitest';
 import { Birthdate } from '$lib/birthday';
@@ -36,6 +37,7 @@ import {
   survivorFilingRange,
   type WidowedStrategy,
 } from '$lib/strategy/calculations/widowed-benefits';
+import { goldenMode, readGoldens, writeGoldens } from './golden-modes';
 import {
   WIDOWED_GOLDENS_PATH,
   type WidowedGoldenCase,
@@ -45,6 +47,7 @@ import {
 } from './widowed-goldens-format';
 
 const CASES = 500;
+const FORMAT = { indent: 1, trailingNewline: true };
 const CURRENT_DATE = MonthDate.initFromYearsMonths({ years: 2026, months: 9 });
 
 // Seedable PRNG (mulberry32), as in the other golden generators.
@@ -173,11 +176,54 @@ function slowBest(
   if (best === null) throw new Error('empty search space');
   return best;
 }
+/**
+ * Everything one case draws from the seeded stream: the people and claims,
+ * two death months, and a death distribution. Drawn in this order, which
+ * fixes the stream; nothing here depends on a search result.
+ */
+interface SampledCase {
+  readonly inputs: WidowedGoldenInputs;
+  readonly deathMonths: readonly number[];
+  readonly distribution: DeathProbability[];
+}
 
-function goldenCase(id: number, rng: () => number): WidowedGoldenCase {
+function sampleCase(rng: () => number): SampledCase {
   const inputs = randomInputs(rng);
   const int = (lo: number, hi: number) =>
     lo + Math.floor(rng() * (hi - lo + 1));
+  const survivor = recipientFor(inputs.survivorPiaCents, inputs.survivorBirth);
+  const current = new MonthDate(inputs.currentDate);
+
+  // Two deaths from a year out to 100, at month precision.
+  const currentAgeMonths = survivor.birthdate.ageAtSsaDate(current).asMonths();
+  const deathMonths = [0, 1].map(() => {
+    const deathAgeMonths = int(
+      Math.max(currentAgeMonths + 12, 61 * 12),
+      Math.max(currentAgeMonths + 24, 100 * 12)
+    );
+    return survivor.birthdate
+      .dateAtLayAge(new MonthDuration(deathAgeMonths))
+      .monthsSinceEpoch();
+  });
+
+  // Six death ages from now to 100, as expected NPVs are: each at mid-year.
+  const fromAge = Math.max(Math.floor(currentAgeMonths / 12), 60);
+  const span = Math.max(100 - fromAge, 6);
+  const raw = [0, 1, 2, 3, 4, 5].map((i) => ({
+    age: fromAge + Math.round((i * span) / 5),
+    weight: 1 + int(0, 9),
+  }));
+  const total = raw.reduce((s, r) => s + r.weight, 0);
+  const distribution: DeathProbability[] = raw.map((r) => ({
+    age: r.age,
+    probability: r.weight / total,
+  }));
+  return { inputs, deathMonths, distribution };
+}
+
+/** The slow reference's best plans for a sampled case. */
+function computeCase(id: number, sampled: SampledCase): WidowedGoldenCase {
+  const { inputs, distribution } = sampled;
   const survivor = recipientFor(inputs.survivorPiaCents, inputs.survivorBirth);
   const lateSpouse: LateSpouse = {
     recipient: recipientFor(inputs.spousePiaCents, inputs.spouseBirth),
@@ -195,33 +241,14 @@ function goldenCase(id: number, rng: () => number): WidowedGoldenCase {
       strategy
     );
 
-  // Two deaths from a year out to 100, at month precision.
-  const currentAgeMonths = survivor.birthdate.ageAtSsaDate(current).asMonths();
-  const byDeath = [0, 1].map(() => {
-    const deathAgeMonths = int(
-      Math.max(currentAgeMonths + 12, 61 * 12),
-      Math.max(currentAgeMonths + 24, 100 * 12)
-    );
-    const finalDate = survivor.birthdate.dateAtLayAge(
-      new MonthDuration(deathAgeMonths)
-    );
-    return {
-      deathMonth: finalDate.monthsSinceEpoch(),
-      best: slowBest(survivor, lateSpouse, inputs, valueAt(finalDate)),
-    };
-  });
-
-  // Six death ages from now to 100, as expected NPVs are: each at mid-year.
-  const fromAge = Math.max(Math.floor(currentAgeMonths / 12), 60);
-  const span = Math.max(100 - fromAge, 6);
-  const raw = [0, 1, 2, 3, 4, 5].map((i) => ({
-    age: fromAge + Math.round((i * span) / 5),
-    weight: 1 + int(0, 9),
-  }));
-  const total = raw.reduce((s, r) => s + r.weight, 0);
-  const distribution: DeathProbability[] = raw.map((r) => ({
-    age: r.age,
-    probability: r.weight / total,
+  const byDeath = sampled.deathMonths.map((deathMonth) => ({
+    deathMonth,
+    best: slowBest(
+      survivor,
+      lateSpouse,
+      inputs,
+      valueAt(new MonthDate(deathMonth))
+    ),
   }));
   const expected = slowBest(survivor, lateSpouse, inputs, (strategy) =>
     distribution.reduce(
@@ -239,17 +266,27 @@ function goldenCase(id: number, rng: () => number): WidowedGoldenCase {
   return { id, inputs, byDeath, expected: { distribution, best: expected } };
 }
 
-describe.runIf(process.env.GENERATE_WIDOWED_GOLDENS === '1')(
-  'generate widowed goldens',
-  () => {
-    it(`writes ${CASES} cases`, { timeout: 3_600_000 }, () => {
-      const rng = mulberry32(1960);
-      const goldens = Array.from({ length: CASES }, (_, id) =>
-        goldenCase(id, rng)
+const mode = goldenMode('GENERATE_WIDOWED_GOLDENS');
+
+describe.runIf(mode !== null)('widowed golden generation', () => {
+  it(`writes ${CASES} cases (${mode})`, { timeout: 3_600_000 }, () => {
+    const outPath = resolve(__dirname, WIDOWED_GOLDENS_PATH);
+    let goldens: WidowedGoldenCase[];
+    if (mode === 'recompute') {
+      goldens = readGoldens<WidowedGoldenCase>(outPath).map((g) =>
+        computeCase(g.id, {
+          inputs: g.inputs,
+          deathMonths: g.byDeath.map((b) => b.deathMonth),
+          distribution: [...g.expected.distribution],
+        })
       );
-      const outPath = resolve(__dirname, WIDOWED_GOLDENS_PATH);
-      mkdirSync(resolve(outPath, '..'), { recursive: true });
-      writeFileSync(outPath, `${JSON.stringify(goldens, null, 1)}\n`);
-    });
-  }
-);
+    } else {
+      const rng = mulberry32(1960);
+      goldens = Array.from({ length: CASES }, (_, id) =>
+        computeCase(id, sampleCase(rng))
+      );
+    }
+    mkdirSync(resolve(outPath, '..'), { recursive: true });
+    writeGoldens(outPath, goldens, FORMAT);
+  });
+});
