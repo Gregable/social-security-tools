@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Oct 22, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/retroactive-retirement-benefits">
+            Retroactive Social Security Retirement Benefits: Six Months of
+            Back Pay, and What It Costs
+          </a>
+        </h3>
+        <p class="description">
+          Filing after full retirement age lets you ask for up to six months
+          of back pay, at the price of a permanently smaller check. How the
+          six-month rule works, the payback age for each filing age, why the
+          months after 70 are free, and what a surviving spouse inherits.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Oct 16, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/benefit-estimate-differences">
