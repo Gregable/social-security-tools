@@ -6,6 +6,8 @@ import {
   EXAMPLE_PIA,
   exampleRetiree,
   MAX_RETROACTIVE_MONTHS,
+  PAST_SEVENTY_EXAMPLE_AGE,
+  type Payback,
   paybackRows,
   retroactiveChoice,
 } from '$lib/retroactive-retirement-example';
@@ -60,7 +62,7 @@ const birthYear = retiree.birthdate.ssaBirthYear();
 const fra = retiree.normalRetirementAge();
 const sixMonthsPast = fra.add(new MonthDuration(MAX_RETROACTIVE_MONTHS));
 const threeMonthsPast = fra.add(new MonthDuration(3));
-const pastSeventy = age(70, 4);
+const pastSeventy = PAST_SEVENTY_EXAMPLE_AGE;
 // Filing six months past full retirement age and taking all six back.
 const six = retroactiveChoice(retiree, sixMonthsPast, MAX_RETROACTIVE_MONTHS);
 // Filing at 69 and taking six months back.
@@ -95,14 +97,14 @@ const durationText = (d: MonthDuration): string => {
 // An age in prose: whole years alone, otherwise years and months.
 const ageText = (a: MonthDuration): string =>
   a.modMonths() === 0 ? `${a.years()}` : a.toYearsAndMonthsString();
-const ageOrFree = (a: MonthDuration | null): string =>
-  a === null ? 'Free' : ageText(a);
+const ageOrFree = (p: Payback | null): string =>
+  p === null ? 'Never: the back pay is free' : ageText(p.age);
 const monthsText = (n: number): string =>
   `${n} ${n === 1 ? 'month' : 'months'}`;
 
 // The percentages below are hand-written for a two-thirds of one percent
-// monthly credit and a full retirement age of 67; re-read them with the
-// golden test each year.
+// monthly credit and a full retirement age of 67; re-read them each year
+// alongside src/test/retroactive-retirement-example.test.ts.
 const faqs: FAQItem[] = [
   {
     question: 'How far back will Social Security pay retirement benefits?',
@@ -111,7 +113,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'Does taking retroactive benefits lower my monthly check?',
-    answer: `Yes, unless you are past 70. Every month of back pay is a month you are no longer counted as having delayed, and each one costs two-thirds of one percent of your full benefit for life. Six months of back pay means a check 4% smaller than it would otherwise have been. For a full benefit of ${EXAMPLE_PIA.wholeDollars()}, that is ${six.monthlyCost.string()} less every month in exchange for ${six.lumpSum.string()} now.`,
+    answer: `Yes, unless you are past 70. Every month of back pay is a month you are no longer counted as having delayed, and each one costs two-thirds of one percent of your full benefit for life. Six months of back pay means a check smaller by 4% of your full benefit, for life. For a full benefit of ${EXAMPLE_PIA.wholeDollars()}, that is ${six.monthlyCost.string()} less every month in exchange for ${six.lumpSum.string()} now.`,
   },
   {
     question: 'When is Social Security back pay free?',
@@ -120,7 +122,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'Is it better to take the lump sum or the higher monthly benefit?',
-    answer: `It depends mostly on how long you expect to collect. The larger checks catch up with the lump sum after about ${durationText(six.timeToPayBack ?? new MonthDuration(0))} if your back pay reaches to full retirement age, and a few months longer for each month your back pay starts after that. Someone filing at ${ageText(six.filingAge)} comes out ahead by declining the back pay if they live past ${ageText(six.paybackAge ?? six.filingAge)}. A surviving spouse inherits whichever monthly amount you choose, which usually tips the balance toward declining.`,
+    answer: `It depends mostly on how long you expect to collect. The larger checks catch up with the lump sum after about ${durationText(six.payback?.time ?? new MonthDuration(0))} if your back pay reaches to full retirement age, and one month longer for each month your back pay starts after that. Someone filing at ${ageText(six.filingAge)} comes out ahead by declining the back pay if they live past ${ageText(six.payback?.age ?? six.filingAge)}. A surviving spouse inherits whichever monthly amount you choose, which usually tips the balance toward declining.`,
   },
   {
     question: 'Is a retroactive Social Security payment taxable?',
@@ -130,7 +132,7 @@ const faqs: FAQItem[] = [
   {
     question: 'Can I get back pay if I am under full retirement age?',
     answer:
-      'No. Social Security does not pay retroactive retirement benefits for any month that would be paid at a reduced rate, and every month before full retirement age is reduced. If you contact Social Security and say you intend to file, that date is protected for six months while you complete the application, so a delay in the paperwork does not cost you the month.',
+      'Not in the ordinary case. Social Security does not pay retroactive retirement benefits for any month that would be paid at a reduced rate, and every month before full retirement age is reduced; the regulation has narrow exceptions, such as someone already entitled to disability benefits. If you contact Social Security and say you intend to file, that date is protected for six months while you complete the application, so a delay in the paperwork does not cost you the month.',
   },
 ];
 </script>
@@ -162,8 +164,9 @@ const faqs: FAQItem[] = [
     It is not free. Every month of back pay is a month you are no longer
     credited with waiting, and waiting past full retirement age is what earns
     <a href="/guides/delayed-retirement-credits">delayed retirement credits</a
-    >. Six months of back pay means a check 4% smaller, for the rest of your
-    life and for a surviving spouse after that. The trade can still be
+    >. Six months of back pay means a check smaller by 4% of your full
+    benefit, for the rest of your life and for a surviving spouse after
+    that. The trade can still be
     worth making. This guide explains the six-month rule, puts numbers on
     what the lump sum costs, shows the one case in which it costs nothing,
     and gives a simple way to decide. The figures are computed with the
@@ -188,8 +191,10 @@ const faqs: FAQItem[] = [
     paid retroactively if paying it would reduce your benefit because of
     your age. Every month before
     <a href="/guides/nra">full retirement age</a> is a reduced month, so the
-    back pay can never reach further back than the month you reached that
-    age.
+    back pay cannot reach further back than the month you reached that age.
+    The regulation has narrow exceptions, for someone already entitled to
+    disability benefits for example, but none that apply to an ordinary
+    retirement claim.
   </p>
 
   <table class="rule-table">
@@ -303,24 +308,29 @@ const faqs: FAQItem[] = [
   <p>
     Dividing the lump sum by the monthly cost tells you how long the larger
     checks take to catch up: {six.lumpSum.string()} divided by
-    {six.monthlyCost.string()} is {six.timeToPayBack?.asMonths()} months,
-    {durationText(six.timeToPayBack ?? new MonthDuration(0))} after filing,
-    at age {ageOrFree(six.paybackAge)}. Live past that and declining the back
+    {six.monthlyCost.string()} is {six.payback?.time.asMonths()} months,
+    {durationText(six.payback?.time ?? new MonthDuration(0))} after filing,
+    at age {ageOrFree(six.payback)}. Live past that and declining the back
     pay paid more in total; die before it and the lump sum did. It is the
     same arithmetic as the
     <a href="/guides/break-even-age">break-even age</a> for claiming later
-    rather than earlier, in miniature. The cost-of-living adjustment does not
-    move the answer, because it scales the lump sum and the monthly cost by
-    the same factor.
+    rather than earlier, in miniature. The figures are in today's dollars.
+    In actual dollars the picture tilts a little each way: the
+    <a href="/guides/cola">cost-of-living adjustment</a> raises the monthly
+    gap every year while the lump sum is paid once, which brings the payback
+    sooner, and anything the lump sum earns in the meantime pushes it later.
   </p>
 
   <p>
     The payback has a simple shape. Because the lump sum is paid at the rate
     for the backdated start, and the monthly cost is always two-thirds of
     one percent of the full benefit per month taken, the catch-up takes
-    {six.timeToPayBack?.asMonths()} months plus however many months past
+    {six.payback?.time.asMonths()} months plus however many months past
     full retirement age the back pay starts. The later you file, the larger
     the lump sum, but the longer it takes the bigger checks to overtake it.
+    One rule, covered below, is left out of these figures: credits earned in
+    the year you file are not paid until the following January, which for a
+    mid-year filer can push the real payback up to a year later.
   </p>
 
   <h2>Payback Age by Filing Age</h2>
@@ -351,7 +361,7 @@ const faqs: FAQItem[] = [
           <td>{row.lumpSum.string()}</td>
           <td>{row.benefitWithoutBackPay.string()}</td>
           <td>{row.benefitWithBackPay.string()}</td>
-          <td>{ageOrFree(row.paybackAge)}</td>
+          <td>{ageOrFree(row.payback)}</td>
         </tr>
       {/each}
     </tbody>
@@ -363,7 +373,7 @@ const faqs: FAQItem[] = [
     only {monthsText(three.monthsBack)}, to {ageText(three.startAge)}: a lump
     sum of {three.lumpSum.string()} for a check {three.monthlyCost.string()}
     smaller, which the larger check repays by age
-    {ageOrFree(three.paybackAge)}.
+    {ageOrFree(three.payback)}.
   </p>
 
   <h2>When the Back Pay Is Free</h2>
@@ -407,8 +417,8 @@ const faqs: FAQItem[] = [
     delayed credits included. The {six.monthlyCost.string()} a month that
     the back pay costs in the example comes out of their check too, for as
     long as they live. For a couple, the payback age in the table is really
-    measured against the longer of the two lifetimes, which is why advisers
-    who work with couples usually recommend declining the back pay.
+    measured against the longer of the two lifetimes, which makes the
+    larger check easier to justify than it is for a single person.
   </p>
 
   <h3>Your spouse's benefit on your record</h3>
@@ -418,9 +428,12 @@ const faqs: FAQItem[] = [
     before your own benefit does, so backdating your start also lets your
     spouse's start earlier, if they have applied. Spousal benefits do not
     earn delayed credits, so if your spouse is past their own full
-    retirement age, those months are pure gain for them with no cost to
-    their ongoing amount. The cost of the back pay falls entirely on your
-    own check and, later, on the survivor benefit.
+    retirement age, those months add to their total without lowering their
+    spousal amount. Two cautions: the backdated months must be at or after
+    your spouse's own full retirement age too, and under deemed filing a
+    spouse's application also covers their own retirement benefit, so if
+    they have one, back pay costs them delayed credits on it just as it
+    costs you.
   </p>
 
   <h3>The January crediting rule</h3>
@@ -433,10 +446,13 @@ const faqs: FAQItem[] = [
     is paid at first on only the credits earned through the previous
     December, and the rest arrive as a raise in January. This makes the
     first few checks look closer to the back-pay figure than they really
-    are; the full difference shows up after the January adjustment. Our
-    guide to the <a href="/guides/delayed-january-bump">January bump</a>
-    explains the quirk. It does not apply at 70, when all credits are paid
-    at once.
+    are; the full difference shows up after the January adjustment. In the
+    example above, a worker who reached full retirement age in January and
+    filed in July is paid {six.benefitWithBackPay.string()} either way until
+    the next January, so the real payback comes about six months after the
+    age in the table. Our guide to the
+    <a href="/guides/delayed-january-bump">January bump</a> explains the
+    quirk. It does not apply at 70, when all credits are paid at once.
   </p>
 
   <h3>Taxes on the lump sum</h3>
@@ -477,7 +493,7 @@ const faqs: FAQItem[] = [
     {six.lumpSum.string()} in back pay, at {six.benefitWithBackPay.string()}
     a month. Declining gives her {six.benefitWithoutBackPay.string()} a
     month and no lump sum. The {six.monthlyCost.string()} a month she gives
-    up takes until age {ageOrFree(six.paybackAge)} to add up to
+    up takes until age {ageOrFree(six.payback)} to add up to
     {six.lumpSum.string()}. Marta is in good health and her husband, who
     earned less, will rely on her record as a survivor. She declines the
     back pay.
@@ -492,9 +508,9 @@ const faqs: FAQItem[] = [
     against {at69.benefitWithoutBackPay.string()} a month with no back pay.
     The cost is the same {at69.monthlyCost.string()} a month as in Marta's
     case, but the lump sum is larger, so the payback stretches to age
-    {ageOrFree(at69.paybackAge)}. Leon is single, has a heart condition, and
+    {ageOrFree(at69.payback)}. Leon is single, has a heart condition, and
     wants the cash to replace a roof. He takes it, understanding that he is
-    trading a lifetime 4% for a payment he can use now.
+    trading 4% of his full benefit, for life, for a payment he can use now.
   </p>
 
   <h3>Grace, filing at {ageText(at70.filingAge)}</h3>

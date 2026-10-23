@@ -32,9 +32,20 @@ export const EXAMPLE_PIA: Money = Money.from(2500);
 
 /**
  * Retirement benefits can be paid for at most this many months before the
- * month of filing (20 CFR 404.621(a)(1)).
+ * month of filing (20 CFR 404.621(a)(2)).
  */
 export const MAX_RETROACTIVE_MONTHS = 6;
+
+/**
+ * The filing age the guide uses for someone who files past 70: late enough
+ * to show the free months back to 70, early enough that all of them fit in
+ * the six-month window. The page's prose example and the table's last row
+ * both read it from here so they cannot drift apart.
+ */
+export const PAST_SEVENTY_EXAMPLE_AGE = MonthDuration.initFromYearsMonths({
+  years: 70,
+  months: 4,
+});
 
 /** Age of the example retiree in the guide's year: full retirement age. */
 const EXAMPLE_RETIREE_AGE = 67;
@@ -77,7 +88,7 @@ function requireAtOrPastFra(retiree: Recipient, filingAge: MonthDuration) {
  * How many months of back pay Social Security can offer someone filing at
  * `filingAge`: up to six, but never for a month before full retirement age,
  * because those months would be paid at a reduced rate (20 CFR
- * 404.621(a)(1)(ii)).
+ * 404.621(a)(3)).
  */
 export function maxRetroactiveMonths(
   retiree: Recipient,
@@ -117,13 +128,18 @@ export interface RetroactiveChoice {
   /** How much smaller every later check is for taking the back pay. */
   readonly monthlyCost: Money;
   /**
-   * Time after filing for the larger checks to add up to the lump sum.
-   * Null when the back pay is free, which happens once the backdated start
-   * is at or past 70.
+   * When declining the back pay has paid off. Null whenever the back pay
+   * costs nothing: the backdated start is at or past 70, or no months were
+   * taken.
    */
-  readonly timeToPayBack: MonthDuration | null;
-  /** The age at which declining the back pay has paid off: filingAge plus timeToPayBack. */
-  readonly paybackAge: MonthDuration | null;
+  readonly payback: Payback | null;
+}
+
+export interface Payback {
+  /** Time after filing for the larger checks to add up to the lump sum. */
+  readonly time: MonthDuration;
+  /** The filing age plus that time. */
+  readonly age: MonthDuration;
 }
 
 /**
@@ -156,9 +172,10 @@ export function retroactiveChoice(
   const lumpSum = benefitWithBackPay.times(monthsBack);
   const monthlyCost = benefitWithoutBackPay.sub(benefitWithBackPay);
 
-  let timeToPayBack: MonthDuration | null = null;
+  let payback: Payback | null = null;
   if (monthlyCost.greaterThan(Money.from(0))) {
-    timeToPayBack = new MonthDuration(Math.ceil(lumpSum.div$(monthlyCost)));
+    const time = new MonthDuration(Math.ceil(lumpSum.div$(monthlyCost)));
+    payback = { time, age: filingAge.add(time) };
   }
   return {
     filingAge,
@@ -168,8 +185,7 @@ export function retroactiveChoice(
     benefitWithBackPay,
     lumpSum,
     monthlyCost,
-    timeToPayBack,
-    paybackAge: timeToPayBack === null ? null : filingAge.add(timeToPayBack),
+    payback,
   };
 }
 
@@ -177,7 +193,9 @@ export function retroactiveChoice(
  * The filing ages the guide tabulates, each taking the full six months of
  * back pay: the first age with six months available, then whole years to
  * 70. A final row files past 70 and takes only the months back to 70, the
- * ones that cost nothing.
+ * ones that cost nothing. Assumes a whole-year full retirement age, which
+ * every birth year from 1960 on has; with an earlier one the first whole
+ * year would fall inside the six-month window.
  */
 export function paybackRows(retiree: Recipient): RetroactiveChoice[] {
   const fra = retiree.normalRetirementAge();
@@ -194,12 +212,11 @@ export function paybackRows(retiree: Recipient): RetroactiveChoice[] {
   const rows = filingAges.map((filingAge) =>
     retroactiveChoice(retiree, filingAge, MAX_RETROACTIVE_MONTHS)
   );
-  const pastSeventy = LATEST_CREDIT_AGE.add(new MonthDuration(4));
   rows.push(
     retroactiveChoice(
       retiree,
-      pastSeventy,
-      costFreeMonths(retiree, pastSeventy)
+      PAST_SEVENTY_EXAMPLE_AGE,
+      costFreeMonths(retiree, PAST_SEVENTY_EXAMPLE_AGE)
     )
   );
   return rows;
