@@ -72,6 +72,11 @@ const pages = [
     changefreq: 'yearly',
   },
   {
+    path: '/guides/retroactive-retirement-benefits',
+    priority: '0.7',
+    changefreq: 'yearly',
+  },
+  {
     path: '/guides/working-past-full-retirement-age',
     priority: '0.7',
     changefreq: 'yearly',

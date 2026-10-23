@@ -362,7 +362,10 @@ const faqs: FAQItem[] = [
     your own benefit to the month you turned 70 at no cost. Do not take
     retroactive months before 70, though: credits are earned only for months
     in which you receive no retirement benefit, so each retroactive month
-    gives up two-thirds of a percent for good.
+    gives up two-thirds of a percent for good. Our guide to
+    <a href="/guides/retroactive-retirement-benefits"
+      >retroactive retirement benefits</a
+    > puts numbers on that trade.
   </p>
 
   <h2>Working and Taxes</h2>

@@ -371,7 +371,11 @@ const faqs: FAQItem[] = [
     If you apply after Normal Retirement Age, you can request
     <a href="https://secure.ssa.gov/poms.nsf/lnx/0200204030">up to six months of retroactive benefits</a>. No retroactive benefits are paid for
     months before Normal Retirement Age, because those months would have
-    carried an early-claiming reduction. Survivor benefits follow a similar
+    carried an early-claiming reduction. Each month of back pay also gives up
+    a delayed retirement credit; our guide to
+    <a href="/guides/retroactive-retirement-benefits"
+      >retroactive retirement benefits</a
+    > weighs that trade. Survivor benefits follow a similar
     rule with a few exceptions; see our guide to
     <a href="/guides/retroactive-survivor-benefits"
       >retroactive survivor benefits</a
