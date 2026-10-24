@@ -6,7 +6,7 @@ import { page } from '$app/stores';
 import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
-import type { GuideCTAType } from './guide-cta-config';
+import { type GuideCTAType, guideOffersChat } from './guide-cta-config';
 import { guideSlugFromPath } from './guide-slug';
 
 export let type: GuideCTAType;
@@ -20,6 +20,11 @@ export let sponsorCopy: SponsorCopy = DEFAULT_SPONSOR_COPY;
 let ctaElement: HTMLElement;
 
 $: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
+$: offersChat = guideOffersChat($page?.url?.pathname ?? '');
+
+function handleChatClick() {
+  trackOutboundClick(SPONSOR.destination, 'guide-inline-chat', { guide_slug: guideSlug });
+}
 
 function handleClick() {
   if (!browser) return;
@@ -108,6 +113,14 @@ onMount(() => {
       </div>
     </div>
   </a>
+{:else if offersChat}
+  <!-- Not an anchor: the card carries its own Schedule and Chat links. -->
+  <div class="inline-cta sponsor" bind:this={ctaElement}>
+    <SponsorAd
+      copy={sponsorCopy}
+      links={{ onSchedule: handleClick, onChat: handleChatClick }}
+    />
+  </div>
 {:else}
   <a
     href={SPONSOR.url}

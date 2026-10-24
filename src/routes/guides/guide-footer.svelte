@@ -5,10 +5,11 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { SPONSOR } from '$lib/sponsor';
+import { guideOffersChat } from './guide-cta-config';
+import { guideSlugFromPath } from './guide-slug';
 
-$: guideSlug = ($page?.url?.pathname ?? '')
-  .replace('/guides/', '')
-  .replace(/\/$/, '');
+$: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
+$: offersChat = guideOffersChat($page?.url?.pathname ?? '');
 
 let footerElement: HTMLElement;
 
@@ -23,6 +24,10 @@ function handleCtaClick() {
 
 function handleSponsorClick() {
   trackOutboundClick(SPONSOR.destination, 'guide-footer', { guide_slug: guideSlug });
+}
+
+function handleChatClick() {
+  trackOutboundClick(SPONSOR.destination, 'guide-footer-chat', { guide_slug: guideSlug });
 }
 
 onMount(() => {
@@ -121,25 +126,58 @@ onMount(() => {
     </div>
   </div>
 
-  <a
-    href={SPONSOR.url}
-    class="sponsor-recommendation"
-    target="_blank"
-    rel="noopener"
-    bind:this={sponsorElement}
-    on:click={handleSponsorClick}
-  >
-    <div class="sponsor-content">
-      <div class="sponsor-badge">Sponsor</div>
-      <div class="sponsor-text">
-        Deciding when to claim is a big decision.
-        <strong>{SPONSOR.name}</strong> offers a free call with
-        a Social Security specialist.
+  {#if offersChat}
+    <!-- Not an anchor: the block carries its own Schedule and Chat links.
+         Schedule's ::after covers the block so a click anywhere still
+         schedules; Chat sits above that overlay. -->
+    <div class="sponsor-recommendation two-links" bind:this={sponsorElement}>
+      <div class="sponsor-content">
+        <div class="sponsor-badge">Sponsor</div>
+        <div class="sponsor-text">
+          Deciding when to claim is a big decision.
+          <strong>{SPONSOR.name}</strong> offers a free call or a live chat
+          with a Social Security specialist.
+        </div>
+        <div class="sponsor-ctas">
+          <a
+            href={SPONSOR.url}
+            class="sponsor-cta stretched"
+            target="_blank"
+            rel="noopener"
+            on:click={handleSponsorClick}>Schedule a Free Call &rarr;</a
+          >
+          <a
+            href={SPONSOR.chatUrl}
+            class="sponsor-cta above"
+            target="_blank"
+            rel="noopener nofollow"
+            on:click={handleChatClick}>Start a Live Chat &rarr;</a
+          >
+        </div>
+        <div class="sponsor-note">No cost for the first conversation</div>
       </div>
-      <span class="sponsor-cta">Schedule a Free Call &rarr;</span>
-      <div class="sponsor-note">No cost for the first conversation</div>
     </div>
-  </a>
+  {:else}
+    <a
+      href={SPONSOR.url}
+      class="sponsor-recommendation"
+      target="_blank"
+      rel="noopener"
+      bind:this={sponsorElement}
+      on:click={handleSponsorClick}
+    >
+      <div class="sponsor-content">
+        <div class="sponsor-badge">Sponsor</div>
+        <div class="sponsor-text">
+          Deciding when to claim is a big decision.
+          <strong>{SPONSOR.name}</strong> offers a free call with
+          a Social Security specialist.
+        </div>
+        <span class="sponsor-cta">Schedule a Free Call &rarr;</span>
+        <div class="sponsor-note">No cost for the first conversation</div>
+      </div>
+    </a>
+  {/if}
 </div>
 
 <style>
@@ -299,6 +337,46 @@ onMount(() => {
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
+  }
+
+  .sponsor-recommendation.two-links {
+    position: relative;
+  }
+
+  .sponsor-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4em 2em;
+  }
+
+  .sponsor-cta.stretched::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+  }
+
+  .sponsor-cta.above {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sponsor-cta {
+    text-decoration: none;
+  }
+
+  /* Overrides the block-hover underline at
+     .sponsor-recommendation:hover .sponsor-cta below, so only the link
+     under the pointer is underlined. Hovering the block anywhere but Chat
+     hovers the stretched Schedule link. */
+  .sponsor-recommendation.two-links:hover .sponsor-cta:not(:hover) {
+    text-decoration: none;
+  }
+
+  .sponsor-cta:focus-visible {
+    outline: 2px solid #081d88;
+    outline-offset: 2px;
   }
 
   .sponsor-recommendation:hover {

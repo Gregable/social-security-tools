@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_SPONSOR_COPY, SPONSOR } from '$lib/sponsor';
 import {
+  CHAT_TRIAL_GUIDES,
   GUIDE_CTA_TYPES,
   getGuideCTAType,
+  guideOffersChat,
 } from '../routes/guides/guide-cta-config';
 import { guideSlugFromPath } from '../routes/guides/guide-slug';
 
@@ -14,6 +16,12 @@ describe('SPONSOR config', () => {
 
   it('reports analytics under its own destination', () => {
     expect(SPONSOR.destination).toBe('socialsecurityadvisors');
+  });
+
+  it('links chat to an https page, not a .js file', () => {
+    const chat = new URL(SPONSOR.chatUrl ?? '');
+    expect(chat.protocol).toBe('https:');
+    expect(chat.pathname.endsWith('.js')).toBe(false);
   });
 });
 
@@ -58,6 +66,27 @@ describe('guide CTA types', () => {
   it('only uses known CTA types', () => {
     for (const type of Object.values(GUIDE_CTA_TYPES)) {
       expect(['calculator', 'sponsor']).toContain(type);
+    }
+  });
+});
+
+describe('sponsor chat trial', () => {
+  it('offers chat on the trial guides, with or without a trailing slash', () => {
+    expect(guideOffersChat('/guides/divorced-spouse')).toBe(true);
+    expect(guideOffersChat('/guides/spousal-benefits/')).toBe(true);
+  });
+
+  it('does not offer chat on other guides or outside guides', () => {
+    expect(guideOffersChat('/guides/survivor-benefits')).toBe(false);
+    expect(guideOffersChat('/guides/pia')).toBe(false);
+    expect(guideOffersChat('/calculator')).toBe(false);
+    expect(guideOffersChat('/strategy')).toBe(false);
+    expect(guideOffersChat('')).toBe(false);
+  });
+
+  it('only runs on guides that already carry the sponsor card', () => {
+    for (const slug of CHAT_TRIAL_GUIDES) {
+      expect(GUIDE_CTA_TYPES[slug]).toBe('sponsor');
     }
   });
 });
