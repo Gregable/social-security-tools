@@ -2,33 +2,36 @@ import type { OutboundDestination } from './analytics/outbound';
 
 /**
  * The site's current paid sponsor. Every sponsor placement (calculator
- * sponsor box, guide CTAs, strategy prompt) links here and reports analytics
- * under `destination`. Swapping sponsors means updating this object, adding
- * the new destination to OutboundDestination, revising DEFAULT_SPONSOR_COPY
- * and the `sponsorCopy` written into each guide that shows the sponsor CTA
- * (grep for SponsorCopy under src/routes/guides), and revising the
- * remaining hard-coded text in SponsorAd, Sponsor, AdvisorPrompt, and
- * guide-footer.
+ * sponsor box, guide CTAs, strategy prompt) links to `url`, the guides in
+ * CHAT_TRIAL_GUIDES also link to `chatUrl`, and all report analytics under
+ * `destination`. Swapping sponsors means updating this object (dropping or
+ * replacing `chatUrl`), adding the new destination to OutboundDestination,
+ * revising DEFAULT_SPONSOR_COPY and the `sponsorCopy` written into each
+ * guide that shows the sponsor CTA (grep for SponsorCopy under
+ * src/routes/guides), and revising the remaining hard-coded text in
+ * SponsorAd, Sponsor, AdvisorPrompt, and guide-footer.
  */
 export interface SponsorConfig {
   readonly name: string;
-  /** Outbound link for every placement. */
+  /** The scheduling link: every placement's main destination. */
   readonly url: string;
   /** PostHog `destination` property for impressions and clicks. */
   readonly destination: OutboundDestination;
   /**
-   * The sponsor's hosted chat page, linked as a secondary option on the
-   * guides in CHAT_TRIAL_GUIDES. Always a page we link to, never a widget
-   * script: a third-party script on ssa.tools could read the earnings and
-   * birthdates the privacy guide promises stay in the browser.
+   * The sponsor's hosted chat page, linked beside the scheduling link on
+   * the guides in CHAT_TRIAL_GUIDES. Leaving it unset turns the trial off
+   * everywhere. Always a page we link to, never a widget script: a
+   * third-party script on ssa.tools could read the earnings and birthdates
+   * the privacy guide promises stay in the browser.
    */
   readonly chatUrl?: string;
 }
 
 /**
  * The pitch shown inside a sponsor placement. SponsorAd renders
- * `intro`, the sponsor name (styled as a link; the whole card is the
- * anchor), and `outro` as one sentence, supplying the spaces between them,
+ * `intro`, the sponsor name (styled as a link; clicking it schedules,
+ * through the wrapping anchor or the Schedule link's overlay), and `outro`
+ * as one sentence, supplying the spaces between them,
  * then lists `bullets`. Each guide declares its own `sponsorCopy` so the
  * pitch can follow on from the prose it sits under.
  */

@@ -1,8 +1,10 @@
 <script context="module" lang="ts">
 /**
  * Click handlers for a card that carries its own links. Pass these only
- * when the card is not wrapped in an anchor: the card then renders real
- * Schedule and Chat buttons instead of a decorative one.
+ * when the card is not wrapped in an anchor and SPONSOR.chatUrl is set:
+ * the card then renders real Schedule and Chat buttons instead of a
+ * decorative one. Not for use with `animated`: its transforms on the
+ * card's inner regions would shrink the Schedule overlay to those regions.
  */
 export interface SponsorAdLinks {
   readonly onSchedule: () => void;

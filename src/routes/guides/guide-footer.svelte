@@ -158,25 +158,25 @@ onMount(() => {
       </div>
     </div>
   {:else}
-  <a
-    href={SPONSOR.url}
-    class="sponsor-recommendation"
-    target="_blank"
-    rel="noopener"
-    bind:this={sponsorElement}
-    on:click={handleSponsorClick}
-  >
-    <div class="sponsor-content">
-      <div class="sponsor-badge">Sponsor</div>
-      <div class="sponsor-text">
-        Deciding when to claim is a big decision.
-        <strong>{SPONSOR.name}</strong> offers a free call with
-        a Social Security specialist.
+    <a
+      href={SPONSOR.url}
+      class="sponsor-recommendation"
+      target="_blank"
+      rel="noopener"
+      bind:this={sponsorElement}
+      on:click={handleSponsorClick}
+    >
+      <div class="sponsor-content">
+        <div class="sponsor-badge">Sponsor</div>
+        <div class="sponsor-text">
+          Deciding when to claim is a big decision.
+          <strong>{SPONSOR.name}</strong> offers a free call with
+          a Social Security specialist.
+        </div>
+        <span class="sponsor-cta">Schedule a Free Call &rarr;</span>
+        <div class="sponsor-note">No cost for the first conversation</div>
       </div>
-      <span class="sponsor-cta">Schedule a Free Call &rarr;</span>
-      <div class="sponsor-note">No cost for the first conversation</div>
-    </div>
-  </a>
+    </a>
   {/if}
 </div>
 
@@ -366,12 +366,10 @@ onMount(() => {
     text-decoration: none;
   }
 
-  /* Hovering the block hovers the stretched Schedule link; underline only
-     the link the pointer would follow. */
-  .sponsor-cta:hover {
-    text-decoration: underline;
-  }
-
+  /* Overrides the block-hover underline at
+     .sponsor-recommendation:hover .sponsor-cta below, so only the link
+     under the pointer is underlined. Hovering the block anywhere but Chat
+     hovers the stretched Schedule link. */
   .sponsor-recommendation.two-links:hover .sponsor-cta:not(:hover) {
     text-decoration: none;
   }

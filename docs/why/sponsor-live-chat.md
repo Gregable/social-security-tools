@@ -27,8 +27,9 @@ even in a browser with JavaScript on. Use the `direct.lc.chat` link.
 
 ## Where it shows
 
-Chat is a trial on the two busiest guides that already carry the sponsor
-card: divorced spouse and spousal benefits. On those guides, the sponsor
+Chat is a trial on divorced spouse and spousal benefits. In October 2026
+those two guides produced about two thirds of all guide sponsor clicks.
+They already carried the sponsor card. On those guides, the sponsor
 card and the footer sponsor block show "Start a Live Chat" with the same
 weight as "Schedule a Free Call". Every other placement is unchanged.
 
@@ -45,3 +46,9 @@ placements `guide-inline-chat` and `guide-footer-chat`, beside the existing
 impression per card. Because the overlay counts clicks on the card body as
 scheduling, schedule has the larger target, and a raw comparison slightly
 favors it.
+
+## Ending the trial
+
+Empty `CHAT_TRIAL_GUIDES`, or remove `chatUrl` from the sponsor config.
+Either one puts every card and footer back to the single scheduling link.
+To widen it, add guides to the set.

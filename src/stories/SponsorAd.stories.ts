@@ -10,7 +10,7 @@ const meta: Meta<SponsorAd> = {
     docs: {
       description: {
         component:
-          "The sponsor card. Wrapped in a link it shows one decorative Schedule button. Given `links`, it carries real Schedule and Live Chat buttons itself; the chat button links to the sponsor's hosted chat page, so no third-party script runs on ssa.tools.",
+          "The sponsor card. When used inside a link it shows one decorative Schedule button. Given `links` (and while SPONSOR.chatUrl is set), it carries real Schedule and Live Chat buttons itself; the chat button links to the sponsor's hosted chat page, so no third-party script runs on ssa.tools.",
       },
     },
   },

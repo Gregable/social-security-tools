@@ -1,3 +1,4 @@
+import { SPONSOR } from '$lib/sponsor';
 import { guideSlugFromPath } from './guide-slug';
 
 export type GuideCTAType = 'calculator' | 'sponsor';
@@ -65,9 +66,12 @@ export function getGuideCTAType(pathname: string): GuideCTAType {
 
 /**
  * Guides that offer a live chat with the sponsor beside the scheduling
- * link, as a trial. Chosen as the two busiest guides that already carry
- * the sponsor card, so chat and scheduling clicks can be compared on the
- * same impressions. Every entry must be a 'sponsor' guide.
+ * link, as a trial. Chosen in October 2026 as the two guides with the most
+ * sponsor impressions and clicks, so chat and scheduling clicks can be
+ * compared on the same impressions. Every entry must be a 'sponsor' guide
+ * (sponsor.test.ts checks): a calculator guide's inline card has no
+ * sponsor, so it would offer chat only in the footer. Empty the set to end
+ * the trial; every card and footer then go back to the single link.
  */
 export const CHAT_TRIAL_GUIDES: ReadonlySet<string> = new Set([
   'divorced-spouse',
@@ -75,5 +79,8 @@ export const CHAT_TRIAL_GUIDES: ReadonlySet<string> = new Set([
 ]);
 
 export function guideOffersChat(pathname: string): boolean {
-  return CHAT_TRIAL_GUIDES.has(guideSlugFromPath(pathname));
+  return (
+    SPONSOR.chatUrl !== undefined &&
+    CHAT_TRIAL_GUIDES.has(guideSlugFromPath(pathname))
+  );
 }

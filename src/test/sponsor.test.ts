@@ -18,7 +18,7 @@ describe('SPONSOR config', () => {
     expect(SPONSOR.destination).toBe('socialsecurityadvisors');
   });
 
-  it('offers chat through a hosted https page, never an embedded script', () => {
+  it('links chat to an https page, not a .js file', () => {
     const chat = new URL(SPONSOR.chatUrl ?? '');
     expect(chat.protocol).toBe('https:');
     expect(chat.pathname.endsWith('.js')).toBe(false);
