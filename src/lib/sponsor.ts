@@ -16,6 +16,13 @@ export interface SponsorConfig {
   readonly url: string;
   /** PostHog `destination` property for impressions and clicks. */
   readonly destination: OutboundDestination;
+  /**
+   * The sponsor's hosted chat page, linked as a secondary option on the
+   * guides in CHAT_TRIAL_GUIDES. Always a page we link to, never a widget
+   * script: a third-party script on ssa.tools could read the earnings and
+   * birthdates the privacy guide promises stay in the browser.
+   */
+  readonly chatUrl?: string;
 }
 
 /**
@@ -53,4 +60,5 @@ export const SPONSOR: SponsorConfig = {
   name: 'Social Security Advisors',
   url: 'https://app.acuityscheduling.com/schedule/7e26ca70/appointment/97656215/calendar/167392?appointmentTypeIds[]=97656215',
   destination: 'socialsecurityadvisors',
+  chatUrl: 'https://direct.lc.chat/4725641/',
 };

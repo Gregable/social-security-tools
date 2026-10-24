@@ -62,3 +62,18 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
 export function getGuideCTAType(pathname: string): GuideCTAType {
   return GUIDE_CTA_TYPES[guideSlugFromPath(pathname)] ?? 'sponsor';
 }
+
+/**
+ * Guides that offer a live chat with the sponsor beside the scheduling
+ * link, as a trial. Chosen as the two busiest guides that already carry
+ * the sponsor card, so chat and scheduling clicks can be compared on the
+ * same impressions. Every entry must be a 'sponsor' guide.
+ */
+export const CHAT_TRIAL_GUIDES: ReadonlySet<string> = new Set([
+  'divorced-spouse',
+  'spousal-benefits',
+]);
+
+export function guideOffersChat(pathname: string): boolean {
+  return CHAT_TRIAL_GUIDES.has(guideSlugFromPath(pathname));
+}

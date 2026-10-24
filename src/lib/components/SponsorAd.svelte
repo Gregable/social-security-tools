@@ -1,3 +1,15 @@
+<script context="module" lang="ts">
+/**
+ * Click handlers for a card that carries its own links. Pass these only
+ * when the card is not wrapped in an anchor: the card then renders real
+ * Schedule and Chat buttons instead of a decorative one.
+ */
+export interface SponsorAdLinks {
+  readonly onSchedule: () => void;
+  readonly onChat: () => void;
+}
+</script>
+
 <script lang="ts">
 import SponsorLogo from '$lib/images/social-security-advisors.png';
 import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
@@ -5,6 +17,7 @@ import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
 export let animated = false;
 export let isVisible = true;
 export let copy: SponsorCopy = DEFAULT_SPONSOR_COPY;
+export let links: SponsorAdLinks | null = null;
 </script>
 
 <div
@@ -44,12 +57,41 @@ export let copy: SponsorCopy = DEFAULT_SPONSOR_COPY;
             <li>{bullet}</li>
           {/each}
         </ul>
-        <div class="cta-section">
-          <div class="cta-button">Schedule a Free Call →</div>
-          <div class="cta-subtext">
-            Opens their scheduling calendar in a new tab
+        {#if links && SPONSOR.chatUrl}
+          <!-- The Schedule link's ::after stretches over the whole card, so
+               a click anywhere still schedules, as on the wrapped card. The
+               Chat link sits above that overlay as a link of its own. -->
+          <div class="cta-section">
+            <div class="cta-pair">
+              <a
+                class="cta-link stretched"
+                href={SPONSOR.url}
+                target="_blank"
+                rel="noopener"
+                on:click={links.onSchedule}
+              >
+                <span class="cta-button">Schedule a Free Call →</span>
+              </a>
+              <a
+                class="cta-link above"
+                href={SPONSOR.chatUrl}
+                target="_blank"
+                rel="noopener nofollow"
+                on:click={links.onChat}
+              >
+                <span class="cta-button">Start a Live Chat →</span>
+              </a>
+            </div>
+            <div class="cta-subtext">Both open in a new tab</div>
           </div>
-        </div>
+        {:else}
+          <div class="cta-section">
+            <div class="cta-button">Schedule a Free Call →</div>
+            <div class="cta-subtext">
+              Opens their scheduling calendar in a new tab
+            </div>
+          </div>
+        {/if}
       </div>
     </div>
   </div>
@@ -300,6 +342,55 @@ export let copy: SponsorCopy = DEFAULT_SPONSOR_COPY;
 
   .cta-button:hover::before {
     left: 100%;
+  }
+
+  /* Stacked, and as wide as the wider label, so neither button reads as
+     the lesser option. */
+  .cta-pair {
+    display: inline-grid;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .cta-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 6px;
+  }
+
+  .cta-link .cta-button {
+    display: block;
+    margin-bottom: 0;
+  }
+
+  .cta-link.stretched::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+  }
+
+  .cta-link.above {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Hovering the card hovers the stretched Schedule link, so key the
+     button effect off the link rather than the button itself. */
+  .cta-link:hover .cta-button {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #23527c 0%, #1a3d5c 100%);
+  }
+
+  .cta-link:hover .cta-button::before {
+    left: 100%;
+  }
+
+  .cta-link:focus-visible {
+    outline: 2px solid #081d88;
+    outline-offset: 3px;
   }
 
   .cta-subtext {
