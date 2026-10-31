@@ -112,6 +112,119 @@
   }
 }
 
+/* Interactive widgets embedded in guides (earnings test, taxable benefits) */
+.guide-widget {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  font-size: 1.1em;
+  color: #333;
+}
+
+.guide-widget h3 {
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+.guide-widget .widget-intro {
+  font-size: 1em;
+  margin: 0 0 1rem 0;
+  color: #555;
+}
+
+.guide-widget .widget-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.guide-widget .widget-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.guide-widget .widget-field > span {
+  font-weight: 600;
+}
+
+.guide-widget .widget-field input[type='number'],
+.guide-widget .widget-field select {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  background: #fff;
+  max-width: 14em;
+}
+
+.guide-widget .widget-field input:focus-visible,
+.guide-widget .widget-field select:focus-visible,
+.guide-widget .widget-choice input:focus-visible {
+  outline: 3px solid #3498db;
+  outline-offset: 1px;
+}
+
+.guide-widget .widget-choices {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.guide-widget .widget-choices > span {
+  font-weight: 600;
+  flex-basis: 100%;
+}
+
+.guide-widget .widget-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.guide-widget .widget-results {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1rem;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 1rem;
+}
+
+.guide-widget .widget-results dt {
+  color: #555;
+}
+
+.guide-widget .widget-results dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.guide-widget .widget-results dd.widget-headline {
+  font-size: 1.2em;
+}
+
+.guide-widget .widget-note {
+  font-size: 0.85em;
+  color: #555;
+  margin: 1rem 0 0 0;
+}
+
+@media (max-width: 600px) {
+  .guide-widget .widget-inputs,
+  .guide-widget .widget-results {
+    grid-template-columns: 1fr;
+  }
+  .guide-widget .widget-results dt {
+    margin-top: 0.5rem;
+  }
+}
+
 /* Earnings cap guide - CSS columns for year/amount pairs */
 .css-column {
   columns: 4;
