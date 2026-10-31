@@ -547,8 +547,9 @@ const pageImageAlt = 'Social Security guides and educational resources';
           </a>
         </h3>
         <p class="description">
-          A Comprehensive Guide to Calculating the Taxability of Social Security
-          Benefits Based on AGI.
+          How much of your Social Security is taxable: the provisional income
+          formula and thresholds, a calculator for your own numbers, the tax
+          torpedo, and withholding with Form W-4V.
         </p>
       </li>
 
