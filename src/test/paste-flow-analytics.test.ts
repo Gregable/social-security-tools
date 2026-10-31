@@ -5,6 +5,7 @@ import {
   failedPasteProperties,
   nextFailureState,
   type PasteOutcome,
+  parseSuccessProperties,
   selectAllShortcut,
 } from '$lib/analytics/paste-flow';
 import { claimOncePerSession } from '$lib/analytics/session-once';
@@ -134,6 +135,38 @@ describe('clipboardReadProperties', () => {
       result: 'unavailable',
       error_name: 'NotAllowedError',
       is_spouse_entry: false,
+    });
+  });
+});
+
+describe('parseSuccessProperties', () => {
+  it('reports counts and the entry source, nothing else', () => {
+    expect(
+      parseSuccessProperties(
+        { earningsRecords: [1, 2, 3], isPiaOnly: false },
+        true,
+        'clipboard_button'
+      )
+    ).toEqual({
+      is_spouse_entry: true,
+      record_count: 3,
+      is_pia_only: false,
+      source: 'clipboard_button',
+    });
+  });
+
+  it('reports a PIA entry', () => {
+    expect(
+      parseSuccessProperties(
+        { earningsRecords: [], isPiaOnly: true },
+        false,
+        'pia_entry'
+      )
+    ).toEqual({
+      is_spouse_entry: false,
+      record_count: 0,
+      is_pia_only: true,
+      source: 'pia_entry',
     });
   });
 });

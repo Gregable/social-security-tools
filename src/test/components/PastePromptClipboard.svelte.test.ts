@@ -69,11 +69,21 @@ describe('PastePrompt clipboard button', () => {
       const b = button();
       if (!b) throw new Error('No clipboard button');
       b.click();
-      // Let the readText promise and the component's handler settle.
+      // Let the readText promise and the component's handler settle. The
+      // stubs settle immediately, so one macrotask is enough.
       await new Promise((resolve) => setTimeout(resolve, 0));
       flushSync();
     };
     return { target, onpaste, button, clickPaste };
+  }
+
+  /** Types (or hand-pastes) text into the paste box. */
+  function typeInBox(target: HTMLElement, text: string) {
+    const textarea = target.querySelector('textarea');
+    if (!textarea) throw new Error('No paste box');
+    textarea.value = text;
+    textarea.dispatchEvent(new Event('input'));
+    flushSync();
   }
 
   function statusText(target: HTMLElement): string {
@@ -138,7 +148,7 @@ describe('PastePrompt clipboard button', () => {
     const { target, onpaste, clickPaste } = render();
     await clickPaste();
     expect(onpaste).not.toHaveBeenCalled();
-    expect(statusText(target)).toContain('Your clipboard is empty');
+    expect(statusText(target)).toContain('no text on your clipboard');
     expect(target.querySelector('.clipboardStatus')?.getAttribute('role')).toBe(
       'status'
     );
@@ -170,24 +180,131 @@ describe('PastePrompt clipboard button', () => {
       .mockResolvedValueOnce('')
       .mockReturnValueOnce(new Promise<string>(() => {}));
     stubClipboard({ readText });
-    const { target, button, clickPaste } = render();
+    const { target, clickPaste } = render();
     await clickPaste();
-    expect(statusText(target)).toContain('Your clipboard is empty');
+    expect(statusText(target)).toContain('no text on your clipboard');
     await clickPaste();
     expect(statusText(target)).toBe('');
-    // Still waiting on the second read.
-    expect(button()?.disabled).toBe(true);
+  });
+
+  it('stays usable while a browser prompt never settles', async () => {
+    // The first read hangs, as when a paste prompt is left open; a second
+    // click starts a new read, and only that one's result is used.
+    const readText = vi
+      .fn<() => Promise<string>>()
+      .mockReturnValueOnce(new Promise<string>(() => {}))
+      .mockResolvedValueOnce(EARNINGS_RECORD);
+    stubClipboard({ readText });
+    const { onpaste, button, clickPaste } = render();
+    await clickPaste();
+    expect(button()?.disabled).toBe(false);
+    await clickPaste();
+    expect(readText).toHaveBeenCalledTimes(2);
+    expect(onpaste).toHaveBeenCalledTimes(1);
+    expect(onpaste.mock.calls[0][0].source).toBe('clipboard_button');
+  });
+
+  it('uses only the newest read when an older one finishes later', async () => {
+    let finishFirst: (text: string) => void = () => {};
+    const readText = vi
+      .fn<() => Promise<string>>()
+      .mockReturnValueOnce(
+        new Promise<string>((resolve) => {
+          finishFirst = resolve;
+        })
+      )
+      .mockResolvedValueOnce('');
+    stubClipboard({ readText });
+    const { target, onpaste, clickPaste } = render();
+    await clickPaste();
+    await clickPaste();
+    expect(statusText(target)).toContain('no text on your clipboard');
+    finishFirst(EARNINGS_RECORD);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    flushSync();
+    expect(onpaste).not.toHaveBeenCalled();
+    // Only the newest read is reported.
+    expect(
+      vi
+        .mocked(posthog.capture)
+        .mock.calls.filter(([event]) => event === 'Paste Flow: Clipboard Read')
+    ).toHaveLength(1);
+  });
+
+  it('ignores a read that finishes after a hand paste', async () => {
+    let finishRead: (text: string) => void = () => {};
+    stubClipboard({
+      readText: () =>
+        new Promise<string>((resolve) => {
+          finishRead = resolve;
+        }),
+    });
+    const { target, onpaste, clickPaste } = render();
+    await clickPaste();
+    // A failed hand paste replaces the box, and the button, with an error.
+    typeInBox(target, 'not an earnings record');
+    finishRead(EARNINGS_RECORD);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    flushSync();
+    expect(onpaste).not.toHaveBeenCalled();
+    expect(posthog.capture).not.toHaveBeenCalledWith(
+      'Paste Flow: Clipboard Read',
+      expect.anything()
+    );
+  });
+
+  it('reports a hand paste after a reset as from the paste box', async () => {
+    stubClipboard({
+      readText: () => Promise.resolve('not an earnings record'),
+    });
+    const { target, onpaste, clickPaste } = render();
+    await clickPaste();
+    target.querySelector<HTMLButtonElement>('.resetButton')?.click();
+    flushSync();
+    typeInBox(target, 'still not a record');
+    expect(posthog.capture).toHaveBeenLastCalledWith(
+      'Paste Flow: Parse Failed',
+      expect.objectContaining({ source: 'paste_box' })
+    );
+    target.querySelector<HTMLButtonElement>('.resetButton')?.click();
+    flushSync();
+    typeInBox(target, EARNINGS_RECORD);
+    expect(onpaste.mock.calls[0][0].source).toBe('paste_box');
+  });
+
+  it('tags a spouse clipboard paste failure as a spouse entry', async () => {
+    stubClipboard({
+      readText: () => Promise.resolve('not an earnings record'),
+    });
+    const { clickPaste } = render({ isSpouse: true });
+    await clickPaste();
+    expect(posthog.capture).toHaveBeenCalledWith(
+      'Paste Flow: Parse Failed',
+      expect.objectContaining({
+        source: 'clipboard_button',
+        is_spouse_entry: true,
+      })
+    );
   });
 
   it('reports a typed or pasted record as from the paste box', () => {
     stubClipboard(undefined);
     const { target, onpaste } = render();
-    const textarea = target.querySelector('textarea');
-    if (!textarea) throw new Error('No paste box');
-    textarea.value = EARNINGS_RECORD;
-    textarea.dispatchEvent(new Event('input'));
-    flushSync();
+    typeInBox(target, EARNINGS_RECORD);
     expect(onpaste.mock.calls[0][0].source).toBe('paste_box');
+  });
+
+  it('reports a typed PIA as pia_entry', () => {
+    stubClipboard(undefined);
+    const { target, onpaste } = render();
+    const input = target.querySelector<HTMLInputElement>('.piaInput');
+    if (!input) throw new Error('No PIA input');
+    input.value = '2000';
+    input.dispatchEvent(new Event('input'));
+    flushSync();
+    target.querySelector<HTMLButtonElement>('.piaEntry button')?.click();
+    flushSync();
+    expect(onpaste.mock.calls[0][0].source).toBe('pia_entry');
   });
 
   it('reports a skipped spouse entry as skip', () => {

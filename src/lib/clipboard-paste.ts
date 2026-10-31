@@ -3,10 +3,11 @@
  * "Paste from clipboard" button. Kept free of Svelte and the global navigator
  * so every outcome can be unit-tested with a stub clipboard.
  *
- * Browsers differ in how a read is confirmed: iOS Safari shows its own
- * "Paste" bubble that must be tapped, Chrome asks for permission once, and
- * Firefox shows a one-item paste menu. Dismissing or denying any of these
- * rejects the read, usually with a NotAllowedError.
+ * Browsers differ in how a read is confirmed: Safari shows its own "Paste"
+ * bubble to tap, Chrome asks for permission once, and Firefox shows a
+ * one-item paste menu. Safari and Firefox skip theirs when the clipboard came
+ * from this site, which never applies to text copied on ssa.gov. Dismissing
+ * or denying any of these rejects the read, usually with a NotAllowedError.
  */
 
 /** The part of the Clipboard API this module uses. */
@@ -18,7 +19,7 @@ export interface ClipboardTextReader {
 export type ClipboardReadResult =
   /** Non-blank text, passed on unchanged for the paste parser. */
   | { readonly kind: 'text'; readonly text: string }
-  /** Blank text, e.g. an empty clipboard or one holding only an image. */
+  /** Blank text, e.g. an empty clipboard, or in most browsers an image. */
   | { readonly kind: 'empty' }
   /**
    * The read failed. errorName is the error's name (NotAllowedError when the
@@ -47,8 +48,8 @@ export async function readClipboardText(
 }
 
 function errorNameOf(error: unknown): string {
-  // DOMException is an Error subclass in browsers but not in every test
-  // environment, so check for a string name rather than instanceof.
+  // A rejection can be any value, so read a string name when there is one
+  // rather than relying on instanceof.
   if (typeof error === 'object' && error !== null && 'name' in error) {
     const { name } = error as { name: unknown };
     if (typeof name === 'string' && name !== '') return name;

@@ -3,19 +3,21 @@
  * shortcut to suggest, and the event names and properties the step reports.
  * Kept free of Svelte and DOM access so it can be unit-tested.
  *
- * Privacy: failedPasteProperties' result is sent to PostHog, so it must never
- * include the pasted text, names, or earnings amounts. It reports structural
- * counts, whether this is a spouse entry, and wrong_page. year_token_count
- * roughly tracks how many years a pasted record covers, the same kind of
- * information "Paste Flow: Parse Success" already sends as record_count; we
- * accept that as non-identifying. source is a fixed label for how the text
- * got into the box. clipboardReadProperties' result is sent too; it carries
- * the read's outcome and the browser's error name, never the clipboard text.
- * wrong_page is a fixed label, or null, for
- * the ssa.gov page copied by mistake. It is chosen by link text that is the
- * same on every copy of that page, so it reveals which page was copied, never
- * anything on it. Do not add fields that could identify a person or reveal an
- * amount.
+ * Privacy: everything this module builds for PostHog must never include the
+ * pasted or clipboard text, names, or earnings amounts.
+ * - failedPasteProperties reports structural counts, whether this is a spouse
+ *   entry, wrong_page, and source. year_token_count roughly tracks how many
+ *   years a pasted record covers, the same kind of information
+ *   parseSuccessProperties sends as record_count; we accept that as
+ *   non-identifying.
+ * - wrong_page is a fixed label, or null, for the ssa.gov page copied by
+ *   mistake. It is chosen by link text that is the same on every copy of that
+ *   page, so it reveals which page was copied, never anything on it.
+ * - source, on both parse events, is a fixed label for how the data was
+ *   entered.
+ * - The object clipboardReadProperties returns carries the read's outcome and
+ *   the browser's error name, never the clipboard text.
+ * Do not add fields that could identify a person or reveal an amount.
  */
 
 import type { ClipboardReadResult } from '$lib/clipboard-paste';
@@ -87,26 +89,62 @@ export function failedPasteProperties(
   };
 }
 
-export interface ClipboardReadProperties {
-  readonly result: ClipboardReadResult['kind'];
-  /** Only when result is 'unavailable', e.g. NotAllowedError. */
-  readonly error_name?: string;
-  readonly is_spouse_entry: boolean;
-}
+/**
+ * The property set for PASTE_FLOW_EVENTS.clipboardRead; never the text. The
+ * result values are spelled out, not taken from ClipboardReadResult, because
+ * they are stored in PostHog: renaming one must be a deliberate change here.
+ */
+export type ClipboardReadProperties =
+  | {
+      readonly result: 'text' | 'empty';
+      readonly is_spouse_entry: boolean;
+    }
+  | {
+      readonly result: 'unavailable';
+      /** The browser's error name, e.g. NotAllowedError. */
+      readonly error_name: string;
+      readonly is_spouse_entry: boolean;
+    };
 
-/** The property set for PASTE_FLOW_EVENTS.clipboardRead; never the text. */
 export function clipboardReadProperties(
   result: ClipboardReadResult,
   isSpouseEntry: boolean
 ): ClipboardReadProperties {
   if (result.kind === 'unavailable') {
     return {
-      result: result.kind,
+      result: 'unavailable',
       error_name: result.errorName,
       is_spouse_entry: isSpouseEntry,
     };
   }
   return { result: result.kind, is_spouse_entry: isSpouseEntry };
+}
+
+/** What parseSuccessProperties needs from the entered Recipient. */
+export interface EnteredRecord {
+  readonly earningsRecords: readonly unknown[];
+  readonly isPiaOnly: boolean;
+}
+
+export interface ParseSuccessProperties {
+  readonly is_spouse_entry: boolean;
+  readonly record_count: number;
+  readonly is_pia_only: boolean;
+  readonly source: EntrySource;
+}
+
+/** The property set for PASTE_FLOW_EVENTS.parseSuccess. */
+export function parseSuccessProperties(
+  entered: EnteredRecord,
+  isSpouseEntry: boolean,
+  source: EntrySource
+): ParseSuccessProperties {
+  return {
+    is_spouse_entry: isSpouseEntry,
+    record_count: entered.earningsRecords.length,
+    is_pia_only: entered.isPiaOnly,
+    source,
+  };
 }
 
 /** What parsing the paste box's current contents produced. */
@@ -136,6 +174,7 @@ export function nextFailureState(
  * inline in PasteFlow.svelte.
  */
 export const PASTE_FLOW_EVENTS = {
+  parseSuccess: 'Paste Flow: Parse Success',
   parseFailed: 'Paste Flow: Parse Failed',
   linkClicked: 'Paste Flow: Link Clicked',
   helpExpanded: 'Paste Flow: Help Expanded',

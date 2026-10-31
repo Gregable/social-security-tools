@@ -5,13 +5,13 @@
     Walks the user through copying their earnings record from ssa.gov and
     pasting it, with copy instructions for touch screens or keyboards (Cmd+A
     or Ctrl+A). A "Paste from clipboard" button above the paste box fills it
-    where the browser allows. Also offers PIA entry and, for a spouse, a skip
-    option.
+    where the browser allows; that button sends its own "Paste Flow: Clipboard
+    Read" event. Also offers PIA entry and, for a spouse, a skip option.
     A paste that fails to parse is replaced, in the paste box's place, by a
     generic error or, when it is recognizably the my Social Security home
     page, a link to the earnings record instead; a reset button brings the
     box back.
-    Sends "Paste Flow:" link, help and parse-failure events
+    Sends "Paste Flow:" link, help, parse-failure and reset events
     (see $lib/analytics/paste-flow).
 
   @example
