@@ -48,11 +48,9 @@ describe('TaxableBenefitsCalculator', () => {
     return target;
   }
 
-  function input(target: HTMLElement, label: string): HTMLInputElement {
-    const el = target.querySelector<HTMLInputElement>(
-      `[aria-label="${label}"]`
-    );
-    if (!el) throw new Error(`No input labelled ${label}`);
+  function input(target: HTMLElement, name: string): HTMLInputElement {
+    const el = target.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+    if (!el) throw new Error(`No input named ${name}`);
     return el;
   }
 
@@ -100,7 +98,7 @@ describe('TaxableBenefitsCalculator', () => {
 
   it('treats an emptied field as zero rather than breaking', () => {
     const target = render();
-    setNumber(input(target, 'Social Security benefits for the year'), '');
+    setNumber(input(target, 'benefits'), '');
     expect(results(target)).toContain('$0');
   });
 
@@ -113,10 +111,10 @@ describe('TaxableBenefitsCalculator', () => {
 
   it('reports one usage event per page view, without values', () => {
     const target = render();
-    const agi = input(target, 'Adjusted gross income before Social Security');
+    const agi = input(target, 'agi');
     setNumber(agi, '40000');
     setNumber(agi, '41000');
-    setNumber(input(target, 'Tax-exempt interest'), '500');
+    setNumber(input(target, 'taxExemptInterest'), '500');
     expect(posthog.capture).toHaveBeenCalledTimes(1);
     expect(posthog.capture).toHaveBeenCalledWith(GUIDE_WIDGET_USED, {
       widget: 'taxable-benefits',

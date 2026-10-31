@@ -48,11 +48,9 @@ describe('EarningsTestCalculator', () => {
     return target;
   }
 
-  function input(target: HTMLElement, label: string): HTMLInputElement {
-    const el = target.querySelector<HTMLInputElement>(
-      `[aria-label="${label}"]`
-    );
-    if (!el) throw new Error(`No input labelled ${label}`);
+  function input(target: HTMLElement, name: string): HTMLInputElement {
+    const el = target.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+    if (!el) throw new Error(`No input named ${name}`);
     return el;
   }
 
@@ -81,7 +79,7 @@ describe('EarningsTestCalculator', () => {
 
   it('recomputes when earnings change', () => {
     const target = render({ year: 2027, period: 'underFra' });
-    setNumber(input(target, 'Expected earnings from work'), '20000');
+    setNumber(input(target, 'earnings'), '20000');
     const results = target.querySelector('.widget-results')?.textContent ?? '';
     expect(results).toContain('under the limit');
     expect(results).not.toContain('checks');
@@ -108,17 +106,17 @@ describe('EarningsTestCalculator', () => {
 
   it('treats an emptied field as zero rather than breaking', () => {
     const target = render({ year: 2027 });
-    setNumber(input(target, 'Monthly benefit'), '');
+    setNumber(input(target, 'monthlyBenefit'), '');
     const results = target.querySelector('.widget-results')?.textContent ?? '';
     expect(results).toContain('$0');
   });
 
   it('reports one usage event per page view, without values', () => {
     const target = render({ year: 2027 });
-    const earnings = input(target, 'Expected earnings from work');
+    const earnings = input(target, 'earnings');
     setNumber(earnings, '40000');
     setNumber(earnings, '41000');
-    setNumber(input(target, 'Monthly benefit'), '1600');
+    setNumber(input(target, 'monthlyBenefit'), '1600');
     expect(posthog.capture).toHaveBeenCalledTimes(1);
     expect(posthog.capture).toHaveBeenCalledWith(GUIDE_WIDGET_USED, {
       widget: 'earnings-test',

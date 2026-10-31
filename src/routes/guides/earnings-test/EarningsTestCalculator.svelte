@@ -100,13 +100,12 @@ const firstPaidMonth = $derived(
   <div class="widget-inputs">
     <label class="widget-field">
       <span>Year</span>
-      <select aria-label="Year" bind:value={yearChoice} onchange={used}>
+      <select name="year" bind:value={yearChoice} onchange={used}>
         {#each years as y}
           <option value={y}>{y}</option>
         {/each}
       </select>
     </label>
-    <div class="widget-field"></div>
     <div class="widget-choices" role="radiogroup" aria-label="Your age that year">
       <span>Your age that year</span>
       <label class="widget-choice">
@@ -138,7 +137,7 @@ const firstPaidMonth = $derived(
       </span>
       <input
         type="number"
-        aria-label="Expected earnings from work"
+        name="earnings"
         min="0"
         step="1000"
         inputmode="numeric"
@@ -150,7 +149,7 @@ const firstPaidMonth = $derived(
       <span>Monthly benefit</span>
       <input
         type="number"
-        aria-label="Monthly benefit"
+        name="monthlyBenefit"
         min="0"
         step="100"
         inputmode="numeric"

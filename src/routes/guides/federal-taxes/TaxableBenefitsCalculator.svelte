@@ -100,7 +100,7 @@ const untaxed = $derived(dollars(benefitsValue).sub(result.taxable));
       <span>Adjusted gross income before Social Security</span>
       <input
         type="number"
-        aria-label="Adjusted gross income before Social Security"
+        name="agi"
         min="0"
         step="1000"
         inputmode="numeric"
@@ -112,7 +112,7 @@ const untaxed = $derived(dollars(benefitsValue).sub(result.taxable));
       <span>Tax-exempt interest</span>
       <input
         type="number"
-        aria-label="Tax-exempt interest"
+        name="taxExemptInterest"
         min="0"
         step="100"
         inputmode="numeric"
@@ -124,7 +124,7 @@ const untaxed = $derived(dollars(benefitsValue).sub(result.taxable));
       <span>Social Security benefits for the year</span>
       <input
         type="number"
-        aria-label="Social Security benefits for the year"
+        name="benefits"
         min="0"
         step="1000"
         inputmode="numeric"
