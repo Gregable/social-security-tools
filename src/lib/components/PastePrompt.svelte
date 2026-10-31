@@ -4,19 +4,21 @@
   @description
     Walks the user through copying their earnings record from ssa.gov and
     pasting it, with copy instructions for touch screens or keyboards (Cmd+A
-    or Ctrl+A). Also offers PIA entry and, for a spouse, a skip option.
+    or Ctrl+A). A "Paste from clipboard" button above the paste box fills it
+    where the browser allows; that button sends its own "Paste Flow: Clipboard
+    Read" event. Also offers PIA entry and, for a spouse, a skip option.
     A paste that fails to parse is replaced, in the paste box's place, by a
     generic error or, when it is recognizably the my Social Security home
     page, a link to the earnings record instead; a reset button brings the
     box back.
-    Sends "Paste Flow:" link, help and parse-failure events
+    Sends "Paste Flow:" link, help, parse-failure and reset events
     (see $lib/analytics/paste-flow).
 
   @example
     <PastePrompt onpaste={handlePaste} isSpouse={false} name="" />
 
-  @prop onpaste - Called with { recipient: Recipient } after a successful
-    paste, a PIA entry, or a skip (PIA = $0).
+  @prop onpaste - Called with { recipient: Recipient, source: EntrySource }
+    after a successful paste, a PIA entry, or a skip (PIA = $0).
   @prop copyInstructions - 'auto' (default) picks touch or keyboard copy
     instructions in CSS; 'touch' or 'keyboard' force one, for stories.
 -->
@@ -26,13 +28,16 @@ import posthog from 'posthog-js';
 import { onMount, tick } from 'svelte';
 import { browser } from '$app/environment';
 import {
+  type EntrySource,
   failedPasteProperties,
   nextFailureState,
   PASTE_FLOW_EVENTS,
   type PasteFlowHelpSection,
   type PasteFlowLink,
+  type PasteSource,
   selectAllShortcut,
 } from '$lib/analytics/paste-flow';
+import ClipboardPasteButton from '$lib/components/ClipboardPasteButton.svelte';
 import Expando from '$lib/components/Expando.svelte';
 import EarningsRecordLinkImage from '$lib/images/earnings-record-link.png';
 import { Money } from '$lib/money';
@@ -42,10 +47,11 @@ import { detectWrongSsaPage, type WrongSsaPage } from '$lib/wrong-ssa-page';
 import CopyPasteDemoMp4 from '$lib/videos/copy-paste-demo.mp4';
 import CopyPasteDemoPoster from '$lib/videos/copy-paste-demo-poster.jpg';
 
-// Called with the new Recipient after a successful paste, a PIA entry, or a
-// skip.
-export let onpaste: ((detail: { recipient: Recipient }) => void) | undefined =
-  undefined;
+// Called with the new Recipient, and how it was entered, after a successful
+// paste, a PIA entry, or a skip.
+export let onpaste:
+  | ((detail: { recipient: Recipient; source: EntrySource }) => void)
+  | undefined = undefined;
 
 // Whether we're entering data for a spouse: shows the skip option and tags
 // analytics events with is_spouse_entry.
@@ -58,6 +64,9 @@ export let name: string = '';
 export let copyInstructions: 'auto' | 'touch' | 'keyboard' = 'auto';
 
 let pasteContents: string = '';
+// How pasteContents got there: the clipboard button sets it before filling
+// the box, and any edit in the box sets it back.
+let pasteSource: PasteSource = 'paste_box';
 let pasteError: boolean = false;
 // The ssa.gov page a failed paste was recognized as, or null. Read only while
 // pasteError is set, to pick the error message.
@@ -92,7 +101,7 @@ function reportOutcome(outcome: 'empty' | 'failed' | 'parsed', contents: string)
   if (next.report && browser) {
     posthog.capture(
       PASTE_FLOW_EVENTS.parseFailed,
-      failedPasteProperties(contents, isSpouse)
+      failedPasteProperties(contents, isSpouse, pasteSource)
     );
   }
 }
@@ -112,6 +121,7 @@ function parsePasteContents(contents: string) {
 
     onpaste?.({
       recipient: recipient,
+      source: pasteSource,
     });
   } else {
     reportOutcome('failed', contents);
@@ -120,6 +130,11 @@ function parsePasteContents(contents: string) {
     // The error replaces the focused paste box, so hand focus to its button.
     tick().then(() => resetButton?.focus());
   }
+}
+
+function pasteFromClipboard(text: string) {
+  pasteSource = 'clipboard_button';
+  pasteContents = text;
 }
 
 async function resetPaste() {
@@ -145,6 +160,7 @@ function piaEntry() {
 
   onpaste?.({
     recipient: recipient,
+    source: 'pia_entry',
   });
 }
 $: piaDisabled = (() => {
@@ -155,7 +171,7 @@ $: piaDisabled = (() => {
 function skipEarnings() {
   let recipient: Recipient = new Recipient();
   recipient.setPia(Money.from(0));
-  onpaste?.({ recipient: recipient });
+  onpaste?.({ recipient: recipient, source: 'skip' });
 }
 </script>
 
@@ -274,11 +290,13 @@ function skipEarnings() {
           >
         </div>
       {:else}
+        <ClipboardPasteButton ontext={pasteFromClipboard} {isSpouse} />
         <textarea
           wrap="soft"
           placeholder={'Paste your earnings record here'}
           bind:this={pasteBox}
           bind:value={pasteContents}
+          on:input={() => (pasteSource = 'paste_box')}
         ></textarea>
       {/if}
     </div>
