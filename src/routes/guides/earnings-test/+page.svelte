@@ -1,8 +1,41 @@
 <script lang="ts">
+  import { EARNINGS_TEST_LIMITS, MAX_EARNINGS_TEST_YEAR } from "$lib/constants";
+  import { earningsTest } from "$lib/earnings-test";
+  import { Money } from "$lib/money";
   import { GuidesSchema } from "$lib/schema-org";
+  import type { SponsorCopy } from "$lib/sponsor";
   import GuideFooter from "../guide-footer.svelte";
   import InlineCTA from "../InlineCTA.svelte";
-  import type { SponsorCopy } from "$lib/sponsor";
+  import EarningsTestCalculator from "./EarningsTestCalculator.svelte";
+
+  // The guide shows the two most recent years of limits: the one in force
+  // and the one just announced. SSA publishes the monthly test amounts as
+  // one twelfth of the annual figures.
+  const latestYear = MAX_EARNINGS_TEST_YEAR;
+  const priorYear = latestYear - 1;
+  const limitYears = [priorYear, latestYear];
+  const limits = (year: number) => EARNINGS_TEST_LIMITS[year];
+  const monthlyLimit = (annual: Money) => annual.div(12);
+
+  // Worked examples, computed so they follow the annual update. Sarah earns
+  // a round $10,000 over the limit; Tom's earnings are fixed, so his excess
+  // moves with the limit. earnings-test.test.ts pins both.
+  const sarahBenefit = Money.from(1500);
+  const sarahEarnings = limits(latestYear).underFra.plus(Money.from(10000));
+  const sarah = earningsTest({
+    year: latestYear,
+    period: "underFra",
+    earnings: sarahEarnings,
+    monthlyBenefit: sarahBenefit,
+  });
+  const tomBenefit = Money.from(2000);
+  const tomEarnings = Money.from(73000);
+  const tom = earningsTest({
+    year: latestYear,
+    period: "fraYear",
+    earnings: tomEarnings,
+    monthlyBenefit: tomBenefit,
+  });
 
   const sponsorCopy: SponsorCopy = {
     intro:
@@ -18,9 +51,9 @@
   const title =
     "Working While Receiving Social Security: The Earnings Test Explained";
   const description =
-    "Can you work while collecting Social Security? Learn about the earnings test, 2026 and 2027 income limits, how benefits are reduced, and why withheld benefits are returned at full retirement age.";
+    `Can you work while collecting Social Security? Learn about the earnings test, ${priorYear} and ${latestYear} income limits, how benefits are reduced, and why withheld benefits are returned at full retirement age.`;
   const publishDate = new Date("2026-01-26T00:00:00+00:00");
-  const updateDate = new Date("2026-10-14T00:00:00+00:00");
+  const updateDate = new Date("2026-10-31T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/earnings-test";
@@ -65,7 +98,7 @@
     different.
   </p>
 
-  <h2>2026 and 2027 Earnings Limits</h2>
+  <h2>{priorYear} and {latestYear} Earnings Limits</h2>
 
   <p>
     The Social Security Administration adjusts the
@@ -77,20 +110,23 @@
     <thead>
       <tr>
         <th>Situation</th>
-        <th>2026 Limit</th>
-        <th>2027 Limit</th>
+        {#each limitYears as year}
+          <th>{year} Limit</th>
+        {/each}
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Under FRA all year</td>
-        <td>$24,480</td>
-        <td>$25,560</td>
+        {#each limitYears as year}
+          <td>{limits(year).underFra.wholeDollars()}</td>
+        {/each}
       </tr>
       <tr>
         <td>Year you reach FRA</td>
-        <td>$65,160</td>
-        <td>$67,920</td>
+        {#each limitYears as year}
+          <td>{limits(year).fraYear.wholeDollars()}</td>
+        {/each}
       </tr>
       <tr>
         <td>Month you reach FRA and after</td>
@@ -115,13 +151,19 @@
   </p>
 
   <p>
-    Take Sarah, age 63, with a benefit of $1,500 per month ($18,000 per year).
-    She earns $35,560 in 2027 — that's $10,000 over the $25,560 limit. Half of
-    the excess, $5,000, is withheld from her benefits, so she receives $13,000
-    for the year instead of $18,000. In practice, Social Security
+    Take Sarah, age 63, with a benefit of {sarahBenefit.wholeDollars()} per
+    month ({sarah.annualBenefit.wholeDollars()} per year). She earns
+    {sarahEarnings.wholeDollars()} in {latestYear} — that's
+    {sarah.excess.wholeDollars()} over the {sarah.limit.wholeDollars()} limit.
+    Half of the excess, {sarah.withheld.wholeDollars()}, is withheld from her
+    benefits, so she receives {sarah.netBenefit.wholeDollars()} for the year
+    instead of {sarah.annualBenefit.wholeDollars()}. In practice, Social
+    Security
     <a href="https://secure.ssa.gov/poms.nsf/lnx/0302501095">withholds whole checks starting in January</a>
-    until the $5,000 is recovered: Sarah gets
-    no checks for the first 3-4 months, then full checks the rest of the year.
+    until the {sarah.withheld.wholeDollars()} is recovered: Sarah gets no
+    checks for the first {sarah.checksWithheld} months, then full checks the
+    rest of the year, and the {sarah.overWithheld.wholeDollars()} that those
+    whole checks over-collected comes back to her after the year ends.
   </p>
 
   <h3>Year You Reach Full Retirement Age</h3>
@@ -134,11 +176,14 @@
   </p>
 
   <p>
-    Say Tom turns 67 — his FRA — in August 2027, and his benefit is $2,000 per
-    month. He earns $73,000 from January through July, which is $5,080 over
-    the $67,920 limit. One third of that, about $1,693, is withheld — roughly
-    one month of benefits. Starting in August, the earnings test no longer
-    applies to him at all.
+    Say Tom turns 67 — his FRA — in August {latestYear}, and his benefit is
+    {tomBenefit.wholeDollars()} per month. He earns {tomEarnings.wholeDollars()}
+    from January through July, which is {tom.excess.wholeDollars()} over the
+    {tom.limit.wholeDollars()} limit. One third of that, about
+    {tom.withheld.wholeDollars()}, is withheld — roughly
+    {tom.checksWithheld === 1 ? "one month" : `${tom.checksWithheld} months`}
+    of benefits. Starting in August, the earnings test no longer applies to
+    him at all.
   </p>
 
   <p>
@@ -146,6 +191,13 @@
     <a href="https://www.ssa.gov/benefits/retirement/planner/whileworking.html">the earnings test disappears entirely</a>. You can earn any amount from working without any
     reduction to your benefits.
   </p>
+
+  <EarningsTestCalculator
+    year={latestYear}
+    period="underFra"
+    earnings={sarahEarnings.value()}
+    monthlyBenefit={sarahBenefit.value()}
+  />
 
   <InlineCTA type="calculator" />
 
@@ -229,30 +281,35 @@
     <thead>
       <tr>
         <th>Situation</th>
-        <th>2026 Monthly Limit</th>
-        <th>2027 Monthly Limit</th>
+        {#each limitYears as year}
+          <th>{year} Monthly Limit</th>
+        {/each}
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Under FRA all year</td>
-        <td>$2,040</td>
-        <td>$2,130</td>
+        {#each limitYears as year}
+          <td>{monthlyLimit(limits(year).underFra).wholeDollars()}</td>
+        {/each}
       </tr>
       <tr>
         <td>Year you reach FRA</td>
-        <td>$5,430</td>
-        <td>$5,660</td>
+        {#each limitYears as year}
+          <td>{monthlyLimit(limits(year).fraYear).wholeDollars()}</td>
+        {/each}
       </tr>
     </tbody>
   </table>
 
   <p>
     Here's how it helps. Mike, age 64, earned $80,000 from January through June
-    2027, then retired and started Social Security in July. Under the annual
-    test, $80,000 is way over the $25,560 limit. But under the monthly test, he
-    earns $0 per month from July through December — well under the $2,130
-    monthly limit — so he receives full benefits for those months. The monthly
+    {latestYear}, then retired and started Social Security in July. Under the
+    annual test, $80,000 is way over the
+    {limits(latestYear).underFra.wholeDollars()} limit. But under the monthly
+    test, he earns $0 per month from July through December — well under the
+    {monthlyLimit(limits(latestYear).underFra).wholeDollars()} monthly limit —
+    so he receives full benefits for those months. The monthly
     test only applies in the first year you receive benefits; after that, only
     the annual test applies.
   </p>

@@ -203,6 +203,51 @@ export const MAX_MAXIMUM_EARNINGS_YEAR: number = Math.max(
 );
 
 /**
+ * Annual exempt amounts for the retirement earnings test, by year.
+ *
+ * Someone collecting benefits before full retirement age who earns more than
+ * the exempt amount has part of the year's benefits withheld. `underFra`
+ * applies to years entirely before the year of full retirement age, with $1
+ * withheld per $2 over. `fraYear` applies to the months of the year of full
+ * retirement age before the birthday month, with $1 withheld per $3 over.
+ * The monthly test amounts SSA publishes are these figures divided by 12.
+ *
+ * Values from https://www.ssa.gov/oact/cola/rtea.html
+ */
+export const EARNINGS_TEST_LIMITS: {
+  [key: number]: { underFra: Money; fraYear: Money };
+} = {
+  2023: { underFra: Money.from(21240), fraYear: Money.from(56520) },
+  2024: { underFra: Money.from(22320), fraYear: Money.from(59520) },
+  2025: { underFra: Money.from(23400), fraYear: Money.from(62160) },
+  2026: { underFra: Money.from(24480), fraYear: Money.from(65160) },
+  2027: { underFra: Money.from(25560), fraYear: Money.from(67920) },
+};
+
+/**
+ * Latest year for which earnings test exempt amounts have been published.
+ */
+export const MAX_EARNINGS_TEST_YEAR: number = Math.max(
+  ...Object.keys(EARNINGS_TEST_LIMITS).map(Number)
+);
+
+/**
+ * Provisional income thresholds for federal taxation of benefits, by filing
+ * status. Set by statute in 1983 and 1993 and never indexed, so they do not
+ * change year to year. Up to half of benefits is taxable above `first`, up
+ * to 85% above `second`.
+ *
+ * https://www.ssa.gov/history/taxationofbenefits.html
+ */
+export const BENEFIT_TAXATION_THRESHOLDS: {
+  single: { first: Money; second: Money };
+  joint: { first: Money; second: Money };
+} = {
+  single: { first: Money.from(25000), second: Money.from(34000) },
+  joint: { first: Money.from(32000), second: Money.from(44000) },
+};
+
+/**
  * Tax rates for social security contributions by year.
  *
  * Values are expressed as a decimal, e.g. 0.062 for 6.2%.
