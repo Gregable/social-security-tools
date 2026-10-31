@@ -8,14 +8,27 @@
  * counts, whether this is a spouse entry, and wrong_page. year_token_count
  * roughly tracks how many years a pasted record covers, the same kind of
  * information "Paste Flow: Parse Success" already sends as record_count; we
- * accept that as non-identifying. wrong_page is a fixed label, or null, for
+ * accept that as non-identifying. source is a fixed label for how the text
+ * got into the box. clipboardReadProperties' result is sent too; it carries
+ * the read's outcome and the browser's error name, never the clipboard text.
+ * wrong_page is a fixed label, or null, for
  * the ssa.gov page copied by mistake. It is chosen by link text that is the
  * same on every copy of that page, so it reveals which page was copied, never
  * anything on it. Do not add fields that could identify a person or reveal an
  * amount.
  */
 
+import type { ClipboardReadResult } from '$lib/clipboard-paste';
 import { detectWrongSsaPage, type WrongSsaPage } from '$lib/wrong-ssa-page';
+
+/** How the paste box's contents got there. */
+export type PasteSource = 'clipboard_button' | 'paste_box';
+
+/**
+ * How the entry step produced a recipient: a parsed paste, a typed PIA, or a
+ * skipped spouse entry (PIA = $0). Sent with "Paste Flow: Parse Success".
+ */
+export type EntrySource = PasteSource | 'pia_entry' | 'skip';
 
 /**
  * The Select All shortcut for keyboard users. Touch screens get separate
@@ -57,18 +70,43 @@ export interface FailedPasteProperties extends FailedPasteSummary {
    * null when the paste matches no known page.
    */
   readonly wrong_page: WrongSsaPage | null;
+  readonly source: PasteSource;
 }
 
 /** The full property set for PASTE_FLOW_EVENTS.parseFailed. */
 export function failedPasteProperties(
   contents: string,
-  isSpouseEntry: boolean
+  isSpouseEntry: boolean,
+  source: PasteSource
 ): FailedPasteProperties {
   return {
     ...describeFailedPaste(contents),
     is_spouse_entry: isSpouseEntry,
     wrong_page: detectWrongSsaPage(contents),
+    source,
   };
+}
+
+export interface ClipboardReadProperties {
+  readonly result: ClipboardReadResult['kind'];
+  /** Only when result is 'unavailable', e.g. NotAllowedError. */
+  readonly error_name?: string;
+  readonly is_spouse_entry: boolean;
+}
+
+/** The property set for PASTE_FLOW_EVENTS.clipboardRead; never the text. */
+export function clipboardReadProperties(
+  result: ClipboardReadResult,
+  isSpouseEntry: boolean
+): ClipboardReadProperties {
+  if (result.kind === 'unavailable') {
+    return {
+      result: result.kind,
+      error_name: result.errorName,
+      is_spouse_entry: isSpouseEntry,
+    };
+  }
+  return { result: result.kind, is_spouse_entry: isSpouseEntry };
 }
 
 /** What parsing the paste box's current contents produced. */
@@ -103,6 +141,8 @@ export const PASTE_FLOW_EVENTS = {
   helpExpanded: 'Paste Flow: Help Expanded',
   /** The error's "Clear and try again" button; props wrong_page and is_spouse_entry. */
   pasteReset: 'Paste Flow: Paste Reset',
+  /** Each "Paste from clipboard" click, once the read finishes. */
+  clipboardRead: 'Paste Flow: Clipboard Read',
 } as const;
 
 /** Links on the entry step whose clicks are tracked. */

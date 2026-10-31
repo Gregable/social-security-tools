@@ -2,6 +2,7 @@
 import posthog from 'posthog-js';
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
+import type { EntrySource } from '$lib/analytics/paste-flow';
 import type { Birthdate } from '$lib/birthday';
 import { recipient, spouse } from '$lib/context';
 import type { EarningRecord } from '$lib/earning-record';
@@ -221,7 +222,7 @@ function handleDemo(detail: {
  * Handle the user pasting their earnings record. We display a confirmation
  * step, and then prompt for age.
  */
-function handlePaste(detail: { recipient: Recipient }) {
+function handlePaste(detail: { recipient: Recipient; source: EntrySource }) {
   if (isRecipient) {
     recipient.set(detail.recipient);
   } else {
@@ -236,6 +237,7 @@ function handlePaste(detail: { recipient: Recipient }) {
     is_spouse_entry: !isRecipient,
     record_count: detail.recipient.earningsRecords.length,
     is_pia_only: detail.recipient.isPiaOnly,
+    source: detail.source,
   });
 
   // Notify that user has started entering data (no longer showing initial prompt)

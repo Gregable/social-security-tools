@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  clipboardReadProperties,
   describeFailedPaste,
   failedPasteProperties,
   nextFailureState,
@@ -71,30 +72,69 @@ describe('describeFailedPaste', () => {
 
 describe('failedPasteProperties', () => {
   it('sends exactly the reviewed fields, so new ones need a deliberate change', () => {
-    const props = failedPasteProperties('anything at all', true);
+    const props = failedPasteProperties('anything at all', true, 'paste_box');
     expect(Object.keys(props).sort()).toEqual([
       'char_count',
       'has_tabs',
       'is_spouse_entry',
       'line_count',
+      'source',
       'wrong_page',
       'year_token_count',
     ]);
     expect(props.is_spouse_entry).toBe(true);
   });
 
+  it('reports how the text got into the paste box', () => {
+    expect(
+      failedPasteProperties('anything', false, 'clipboard_button').source
+    ).toBe('clipboard_button');
+  });
+
   it('reports the recognized wrong page', () => {
     const props = failedPasteProperties(
       'Eligibility and Earnings\nReview your full earnings record now\n',
-      false
+      false,
+      'paste_box'
     );
     expect(props.wrong_page).toBe('my_ssa_home');
   });
 
   it('reports no wrong page for an unrecognized paste', () => {
     expect(
-      failedPasteProperties('anything at all', false).wrong_page
+      failedPasteProperties('anything at all', false, 'paste_box').wrong_page
     ).toBeNull();
+  });
+});
+
+describe('clipboardReadProperties', () => {
+  it('never includes the clipboard text', () => {
+    const props = clipboardReadProperties(
+      { kind: 'text', text: 'Pat 2010 $45,000' },
+      false
+    );
+    expect(props).toEqual({ result: 'text', is_spouse_entry: false });
+    expect(JSON.stringify(props)).not.toContain('Pat');
+  });
+
+  it('reports an empty clipboard', () => {
+    expect(clipboardReadProperties({ kind: 'empty' }, true)).toEqual({
+      result: 'empty',
+      is_spouse_entry: true,
+    });
+  });
+
+  it('adds the error name only when the clipboard could not be read', () => {
+    expect(
+      clipboardReadProperties(
+        { kind: 'unavailable', errorName: 'NotAllowedError' },
+        false
+      )
+    ).toEqual({
+      result: 'unavailable',
+      error_name: 'NotAllowedError',
+      is_spouse_entry: false,
+    });
   });
 });
 
