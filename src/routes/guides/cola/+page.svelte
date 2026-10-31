@@ -11,6 +11,7 @@ import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import type { SponsorCopy } from '$lib/sponsor';
 import GuideFooter from '../guide-footer.svelte';
 import InlineCTA from '../InlineCTA.svelte';
+import ColaHistoryChart from './ColaHistoryChart.svelte';
 
 const headline = latestAnnouncedCola();
 const history = colaHistory();
@@ -259,9 +260,12 @@ const faqs: FAQItem[] = [
 
   <p>
     Automatic annual adjustments began in 1975. The average since then is
-    {average.toFixed(1)}%, though the range is wide. The table below shows the
-    last ten years by the year each increase was first paid.
+    {average.toFixed(1)}%, though the range is wide: the chart shows every
+    increase by the year it was first paid, and the table below lists the
+    last ten.
   </p>
+
+  <ColaHistoryChart {history} {average} />
 
   <div class="table-scroll">
     <table class="cola-table">
