@@ -2,6 +2,7 @@
 import { GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import type { FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import strategyGrid from './strategy-grid.png';
 
 const title = 'SSA.tools vs OpenSocialSecurity';
@@ -60,7 +61,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     If you have run both the <a href="/strategy">ssa.tools/strategy</a> filing

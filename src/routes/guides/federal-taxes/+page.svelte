@@ -7,6 +7,7 @@ import { Money } from '$lib/money';
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import type { SponsorCopy } from '$lib/sponsor';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './taxes.jpg';
 import TaxableBenefitsCalculator from './TaxableBenefitsCalculator.svelte';
@@ -125,7 +126,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <figure class="hero-image">
     <img

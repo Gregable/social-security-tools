@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from "../InlineCTA.svelte";
 
   const title =
@@ -71,7 +72,7 @@
 
 <div class="guide-page">
   <h1>Delayed Retirement Credits</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     If you've ever wondered whether it's worth waiting to claim Social Security,

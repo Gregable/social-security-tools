@@ -7,6 +7,7 @@ import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outb
 import { SPONSOR } from '$lib/sponsor';
 import { guideOffersChat } from './guide-cta-config';
 import { guideSlugFromPath } from './guide-slug';
+import GuideAuthorBox from './GuideAuthorBox.svelte';
 
 $: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
 $: offersChat = guideOffersChat($page?.url?.pathname ?? '');
@@ -88,6 +89,8 @@ onMount(() => {
   };
 });
 </script>
+
+<GuideAuthorBox />
 
 <!-- Wrapper observed for the "Guide Footer: Visible" impression event -->
 <div class="guide-footer-marker" bind:this={footerElement}>

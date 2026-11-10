@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import type { SponsorCopy } from '$lib/sponsor';
 
@@ -73,7 +74,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <div class="key-takeaways">
     <h3>The Short Answer</h3>
@@ -208,12 +209,6 @@ const faqs: FAQItem[] = [
 </div>
 
 <style>
-  .postdate {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 1.5rem;
-  }
-
   .key-takeaways {
     background-color: #fff3cd;
     border: 2px solid #ffc107;

@@ -109,9 +109,12 @@
     </p>
     <h1>Major Contributors</h1>
     <p>
-      <a href="/contact">Greg Grothaus</a>: Greg is the primary developer of
-      this site. He is a software engineer who has worked on this project on the
-      side for several years. You can find Greg's personal blog at
+      <a href="/author/greg-grothaus">Greg Grothaus</a>: Greg built the
+      calculator in 2017, has maintained it since, and writes every guide on
+      the site. He is a software engineer who has worked at Google and FEMA.
+      Read more about
+      <a href="/author/greg-grothaus">how the guides are researched and how
+      the math is checked</a>, or find his personal blog at
       <a href="http://www.gregable.com/"> gregable.com</a>.
     </p>
     <p>

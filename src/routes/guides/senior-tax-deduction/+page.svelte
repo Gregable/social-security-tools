@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from "../InlineCTA.svelte";
   import HeroImage from "./senior-tax-deduction.jpg";
 
@@ -43,7 +44,7 @@
 
 <div class="guide-page">
   <h1>The New Senior Tax Deduction</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <figure class="hero-image">
     <img

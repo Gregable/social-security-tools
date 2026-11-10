@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import EarnignsRecordLinkImage from './earnings-record-link.png';
 import ErrorMessageImage from './error.png';
@@ -43,7 +44,7 @@ schema.tags = ['Earnings Record', 'Social Security', 'SSA.gov', 'Import Data'];
     />
   </figure>
 
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} />
 
   <p>
     You likely reached this page after seeing an error like the following when

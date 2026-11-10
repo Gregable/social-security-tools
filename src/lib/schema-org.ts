@@ -1,3 +1,5 @@
+import { AUTHOR, authorPerson } from './author';
+
 /**
  * Schema for WebSite type - used on home page
  */
@@ -147,10 +149,7 @@ export class GuidesSchema {
       image: null,
       datePublished: this.datePublished,
       dateModified: null,
-      author: {
-        '@type': 'Person',
-        name: 'Greg Grothaus',
-      },
+      author: authorPerson(),
       publisher: {
         '@type': 'Organization',
         name: 'SSA.Tools',
@@ -199,7 +198,7 @@ export class GuidesSchema {
     if (this.dateModified) {
       meta += `<meta property="article:modified_time" content="${this.dateModified}" />`;
     }
-    meta += `<meta property="article:author" content="SSA.tools" />`;
+    meta += `<meta property="article:author" content="${AUTHOR.url}" />`;
     meta += `<meta property="article:section" content="Social Security" />`;
 
     // Add tags if provided
@@ -230,6 +229,30 @@ export class GuidesSchema {
 
     return meta;
   }
+}
+
+/**
+ * Renders ProfilePage structured data for the author page.
+ *
+ * ProfilePage is the type Google documents for author entities: its
+ * mainEntity is the same Person that every guide names as its author, so the
+ * two can be reconciled by URL.
+ */
+export function renderProfilePageSchema(): string {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    mainEntity: {
+      ...authorPerson(),
+      description: AUTHOR.bio,
+      worksFor: {
+        '@type': 'Organization',
+        name: 'SSA.tools',
+        url: 'https://ssa.tools',
+      },
+    },
+  };
+  return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
 }
 
 /**

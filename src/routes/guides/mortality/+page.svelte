@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import lifeTable from './life-table.png';
 import type { SponsorCopy } from '$lib/sponsor';
@@ -43,7 +44,7 @@ schema.tags = ['Life Expectancy', 'Social Security', 'Mortality', 'Actuarial'];
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
   <figure class="hero-float">
     <img src={lifeTable} width="512" height="512" alt="" loading="lazy" />
   </figure>

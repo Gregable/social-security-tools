@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import chainLinkImage from './chain-link.jpg'; // imported so bundler serves asset
 
@@ -38,7 +39,7 @@ schema.tags = [
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <div class="hero-image">
     <img
@@ -681,11 +682,6 @@ schema.tags = [
     line-height: 1.6;
   }
 
-  .postdate {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 2rem;
-  }
 
   .hero-image {
     text-align: center;

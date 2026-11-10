@@ -9,6 +9,7 @@ import { MAX_YEAR } from '$lib/constants';
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import type { SponsorCopy } from '$lib/sponsor';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 const sponsorCopy: SponsorCopy = {
@@ -118,7 +119,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>Social Security Benefits for Children When a Parent Retires</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     Most people picture Social Security as a check for a retiree, and maybe

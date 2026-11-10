@@ -14,6 +14,7 @@ import {
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import type { SponsorCopy } from '$lib/sponsor';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 const sponsorCopy: SponsorCopy = {
@@ -151,7 +152,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>Retroactive Social Security Retirement Benefits</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     You are past full retirement age and finally filing for Social Security.

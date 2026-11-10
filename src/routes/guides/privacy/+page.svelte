@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 
 const title = 'Privacy & Security';
 const description =
@@ -26,7 +27,7 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
 <div class="guide-page">
   <h1>{title}</h1>
 
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} />
 
   <p>
     SSA.tools is designed with privacy as a core principle. Your Social Security

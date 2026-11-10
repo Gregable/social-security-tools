@@ -12,6 +12,7 @@ import {
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import type { SponsorCopy } from '$lib/sponsor';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 const sponsorCopy: SponsorCopy = {
@@ -130,7 +131,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>Working Past Full Retirement Age</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     You have reached full retirement age, or you are about to, and you are

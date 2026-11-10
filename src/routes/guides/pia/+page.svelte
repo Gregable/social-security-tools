@@ -15,6 +15,7 @@
   import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
   import { parsePaste } from "$lib/ssa-parse";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from "../InlineCTA.svelte";
 
   // Current year from constants
@@ -128,7 +129,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     Your <strong>Primary Insurance Amount</strong> (PIA) is the most important number

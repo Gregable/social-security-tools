@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from '../InlineCTA.svelte';
   import EarlyFile100Image from "./early-file-100.png";
   import EarlyFileImage from "./early-file.png";
@@ -67,7 +68,7 @@
 <div class="guide-page">
   <h1>{title}</h1>
 
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <div class="key-takeaways">
     <h3>Key Points</h3>
@@ -410,12 +411,6 @@
 </div>
 
 <style>
-  .postdate {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 1.5rem;
-  }
-
   .key-takeaways {
     background-color: #e8f4fd;
     border: 2px solid #4a90e2;

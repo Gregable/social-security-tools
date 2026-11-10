@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.jpg';
 import type { SponsorCopy } from '$lib/sponsor';
@@ -47,12 +48,7 @@ schema.tags = ['Government Shutdown', 'Social Security', 'Federal Benefits'];
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">
-    Published: {publishDate.toLocaleDateString()}
-    {#if updateDate.getTime() !== publishDate.getTime()}
-      <br />Updated: {updateDate.toLocaleDateString()}
-    {/if}
-  </p>
+  <GuideByline {publishDate} {updateDate} />
 
   <figure class="hero-image">
     <img

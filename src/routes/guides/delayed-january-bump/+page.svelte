@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 import HeroImage from './delayed-bump.png';
@@ -38,10 +39,7 @@ schema.tags = [
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">
-    Published: {publishDate.toLocaleDateString()}<br />
-    Updated: {updateDate.toLocaleDateString()}
-  </p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     When using the ssa.tools calculator, you may have noticed a small notch or

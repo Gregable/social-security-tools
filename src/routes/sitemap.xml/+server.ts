@@ -5,6 +5,7 @@ const pages = [
   { path: '/calculator', priority: '0.9', changefreq: 'monthly' },
   { path: '/guides', priority: '0.8', changefreq: 'weekly' },
   { path: '/about', priority: '0.5', changefreq: 'yearly' },
+  { path: '/author/greg-grothaus', priority: '0.5', changefreq: 'yearly' },
   { path: '/contact', priority: '0.3', changefreq: 'yearly' },
   // Guide pages
   { path: '/guides/privacy', priority: '0.7', changefreq: 'yearly' },
