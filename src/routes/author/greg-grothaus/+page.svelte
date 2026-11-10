@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AUTHOR } from "$lib/author";
+  import { AUTHOR, authorBio } from "$lib/author";
   import Header from "$lib/components/Header.svelte";
   import { renderProfilePageSchema, renderWebsiteSocialMeta } from "$lib/schema-org";
 
@@ -30,7 +30,7 @@
     <h1>{AUTHOR.name}</h1>
     <p class="role">{AUTHOR.jobTitle}</p>
 
-    <p>{AUTHOR.bio}</p>
+    <p>{authorBio()}</p>
 
     <h2>How the guides are written</h2>
     <p>
@@ -42,21 +42,21 @@
       word for it.
     </p>
     <p>
-      Worked examples in the guides are not typed in by hand. They are
-      computed by the same code that powers the
+      Where a guide shows worked dollar examples, the newer ones are computed
+      by the same code that powers the
       <a href="/calculator">calculator</a>, with automated tests that pin each
       figure so a future change to the math cannot silently drift a published
-      number.
+      number. Older guides are being moved to the same approach.
     </p>
 
     <h2>How the calculator is checked</h2>
     <p>
-      The calculator is <a href="https://github.com/Gregable/social-security-tools">open source</a>
+      The calculator is <a href={AUTHOR.githubUrl + "/social-security-tools"}>open source</a>
       and has been in continuous development since 2017. Its test suite covers
       the benefit formulas, bend points, cost-of-living adjustments, earnings
       indexing, spousal and survivor rules, and the strategy optimizer, and is
-      run on every change. The annual SSA figures are updated each October when
-      the administration publishes them.
+      run on every change. The annual SSA figures are updated when the
+      administration publishes them, usually in October.
     </p>
     <p>
       None of this makes the site infallible. Social Security rules have
@@ -68,25 +68,26 @@
 
     <h2>Background</h2>
     <p>
-      Greg is a software engineer. He has worked at Google and at the Federal
-      Emergency Management Agency (FEMA). He built SSA.tools after finding that
-      the official estimate tools gave a number without explaining it, and
-      wanted something that showed people how their benefit is actually put
-      together.
+      {AUTHOR.givenName} is a software engineer. He has worked at Google and at
+      the Federal Emergency Management Agency (FEMA). He built SSA.tools after
+      finding that the official estimate tools gave a number without
+      explaining it, and wanted something that showed people how their benefit
+      is actually put together.
     </p>
 
     <h2>Elsewhere</h2>
     <ul>
-      <li>Personal blog: <a href={AUTHOR.sameAs[0]} rel="me">gregable.com</a></li>
-      <li>GitHub: <a href={AUTHOR.sameAs[1]} rel="me">github.com/Gregable</a></li>
+      <li>Personal blog: <a href={AUTHOR.blogUrl} rel="me">gregable.com</a></li>
+      <li>GitHub: <a href={AUTHOR.githubUrl} rel="me">github.com/Gregable</a></li>
       <li><a href="/contact">Contact</a></li>
     </ul>
 
     <h2>Guides</h2>
     <p>
       All of the <a href="/guides">Social Security guides</a> on this site are
-      written and maintained by Greg. The <a href="/about">about page</a> lists
-      the people who have contributed to the calculator itself.
+      written and maintained by {AUTHOR.givenName}. The
+      <a href="/about">about page</a> lists the people who have contributed to
+      the calculator itself.
     </p>
   </div>
 </main>

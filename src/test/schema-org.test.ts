@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AUTHOR } from '$lib/author';
+import { AUTHOR, authorBio, authorSameAs } from '$lib/author';
 import { GuidesSchema, renderProfilePageSchema } from '$lib/schema-org';
 
 function parseJsonLd(html: string): Record<string, unknown> {
@@ -24,7 +24,7 @@ describe('GuidesSchema author', () => {
     expect(author['@type']).toBe('Person');
     expect(author.name).toBe(AUTHOR.name);
     expect(author.url).toBe(AUTHOR.url);
-    expect(author.sameAs).toEqual(AUTHOR.sameAs);
+    expect(author.sameAs).toEqual(authorSameAs());
   });
 
   it('points article:author at the profile page, not the site name', () => {
@@ -44,6 +44,18 @@ describe('renderProfilePageSchema', () => {
     expect(main['@type']).toBe('Person');
     expect(main.name).toBe(AUTHOR.name);
     expect(main.url).toBe(AUTHOR.url);
-    expect(main.description).toBe(AUTHOR.bio);
+    expect(main.sameAs).toEqual(authorSameAs());
+    expect(main.description).toBe(authorBio());
+    const employer = main.worksFor as Record<string, unknown>;
+    expect(employer.name).toBe('SSA.tools');
+  });
+
+  it('names the publisher identically on guides and the profile', () => {
+    const guide = parseJsonLd(guideSchema().render());
+    const profile = parseJsonLd(renderProfilePageSchema());
+    const publisher = guide.publisher as Record<string, unknown>;
+    const employer = (profile.mainEntity as Record<string, unknown>)
+      .worksFor as Record<string, unknown>;
+    expect(publisher.name).toBe(employer.name);
   });
 });

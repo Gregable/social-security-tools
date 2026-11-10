@@ -10,10 +10,15 @@
   let { publishDate, updateDate }: { publishDate: Date; updateDate?: Date } =
     $props();
 
-  const authorPath = new URL(AUTHOR.url).pathname;
+  // Guides construct dates at UTC midnight, and the <time datetime> and the
+  // JSON-LD carry that UTC date. Formatting in UTC keeps the visible date on
+  // the same day instead of slipping back one in US timezones.
+  function formatDate(date: Date): string {
+    return date.toLocaleDateString("en-US", { timeZone: "UTC" });
+  }
 
-  // Some guides set updateDate equal to publishDate as a placeholder; an
-  // "Updated" line that repeats the publish date is noise.
+  // A guide may set updateDate equal to publishDate when it has never been
+  // revised; an "Updated" line that repeats the publish date is noise.
   const showUpdated = $derived(
     updateDate !== undefined && updateDate.getTime() !== publishDate.getTime()
   );
@@ -21,19 +26,15 @@
 
 <p class="byline">
   <span class="author">
-    By <a href={authorPath} rel="author">{AUTHOR.name}</a>
+    By <a href={AUTHOR.path} rel="author">{AUTHOR.name}</a>
   </span>
   <span class="dates">
     Published:
-    <time datetime={publishDate.toISOString()}>
-      {publishDate.toLocaleDateString()}
-    </time>
+    <time datetime={publishDate.toISOString()}>{formatDate(publishDate)}</time>
     {#if showUpdated && updateDate}
       <span class="separator" aria-hidden="true">&middot;</span>
       Updated:
-      <time datetime={updateDate.toISOString()}>
-        {updateDate.toLocaleDateString()}
-      </time>
+      <time datetime={updateDate.toISOString()}>{formatDate(updateDate)}</time>
     {/if}
   </span>
 </p>

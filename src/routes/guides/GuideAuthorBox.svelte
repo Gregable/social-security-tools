@@ -7,17 +7,16 @@
    * reader (or a search quality rater) can see who wrote the page and follow
    * through to the profile.
    */
-  const authorPath = new URL(AUTHOR.url).pathname;
 </script>
 
 <aside class="author-box" aria-label="About the author">
   <div class="label">About the author</div>
   <p class="bio">
-    <a href={authorPath} rel="author" class="name">{AUTHOR.name}</a>
-    {AUTHOR.bio.replace(`${AUTHOR.name} `, "")}
+    <a href={AUTHOR.path} rel="author" class="name">{AUTHOR.name}</a>
+    {AUTHOR.summary}
   </p>
   <p class="more">
-    <a href={authorPath}>More about {AUTHOR.name.split(" ")[0]} and how this site is checked &rarr;</a>
+    <a href={AUTHOR.path}>More about {AUTHOR.givenName} and how this site is checked &rarr;</a>
   </p>
 </aside>
 

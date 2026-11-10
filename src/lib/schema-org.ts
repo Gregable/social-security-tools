@@ -1,4 +1,19 @@
-import { AUTHOR, authorPerson } from './author';
+import { AUTHOR, authorBio, authorPerson } from './author';
+
+/**
+ * The site as a schema.org Organization. One spelling everywhere so the
+ * publisher on guides and the employer on the author profile reconcile
+ * to the same entity.
+ */
+const PUBLISHER = Object.freeze({
+  '@type': 'Organization',
+  name: 'SSA.tools',
+  url: 'https://ssa.tools',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://ssa.tools/laptop-piggybank.jpg',
+  },
+});
 
 /**
  * Schema for WebSite type - used on home page
@@ -15,14 +30,7 @@ export class WebSiteSchema {
       url: this.url,
       name: this.name,
       description: this.description,
-      publisher: {
-        '@type': 'Organization',
-        name: 'SSA.tools',
-        logo: {
-          '@type': 'ImageObject',
-          url: 'https://ssa.tools/laptop-piggybank.jpg',
-        },
-      },
+      publisher: PUBLISHER,
     };
     return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
   }
@@ -150,14 +158,7 @@ export class GuidesSchema {
       datePublished: this.datePublished,
       dateModified: null,
       author: authorPerson(),
-      publisher: {
-        '@type': 'Organization',
-        name: 'SSA.Tools',
-        logo: {
-          '@type': 'ImageObject',
-          url: 'https://ssa.tools/laptop-piggybank.jpg',
-        },
-      },
+      publisher: PUBLISHER,
     };
     // Optional Fields:
     if (this.image) {
@@ -244,12 +245,8 @@ export function renderProfilePageSchema(): string {
     '@type': 'ProfilePage',
     mainEntity: {
       ...authorPerson(),
-      description: AUTHOR.bio,
-      worksFor: {
-        '@type': 'Organization',
-        name: 'SSA.tools',
-        url: 'https://ssa.tools',
-      },
+      description: authorBio(),
+      worksFor: PUBLISHER,
     },
   };
   return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;

@@ -575,7 +575,6 @@ The calculator also shows you the "cutoff" indexed earnings amount: the
     line-height: 1.6;
   }
 
-
   h1 {
     color: #2c3e50;
     border-bottom: 3px solid #3498db;

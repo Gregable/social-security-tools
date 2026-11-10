@@ -19,6 +19,9 @@ afterEach(() => {
   target?.remove();
 });
 
+// Guides construct dates at UTC midnight. The expected strings are literal
+// so the test fails if the component ever formats in the local timezone,
+// where these would show as the previous day across the US.
 const published = new Date('2026-01-18T00:00:00+00:00');
 const updated = new Date('2026-09-17T00:00:00+00:00');
 
@@ -28,20 +31,18 @@ describe('GuideByline', () => {
     const link = el.querySelector('a[rel="author"]') as HTMLAnchorElement;
     expect(link).not.toBeNull();
     expect(link.textContent).toBe(AUTHOR.name);
-    expect(link.getAttribute('href')).toBe('/author/greg-grothaus');
+    expect(link.getAttribute('href')).toBe(AUTHOR.path);
   });
 
-  it('shows the publish date and omits Updated when there is none', () => {
+  it('shows the publish date in UTC and omits Updated when there is none', () => {
     const el = render({ publishDate: published });
-    expect(el.textContent).toContain('Published');
-    expect(el.textContent).toContain(published.toLocaleDateString());
+    expect(el.textContent).toContain('Published: 1/18/2026');
     expect(el.textContent).not.toContain('Updated');
   });
 
   it('shows the update date when provided', () => {
     const el = render({ publishDate: published, updateDate: updated });
-    expect(el.textContent).toContain('Updated');
-    expect(el.textContent).toContain(updated.toLocaleDateString());
+    expect(el.textContent).toContain('Updated: 9/17/2026');
   });
 
   it('omits Updated when it merely repeats the publish date', () => {

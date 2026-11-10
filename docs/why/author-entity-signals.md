@@ -26,9 +26,12 @@ says why they are credible. Bing weighs them lightly, which fits the gap.
   links, and the Open Graph author tag points at the profile URL.
 - Every guide renders `GuideByline` under its title instead of a bare
   "Published" paragraph. The byline links the author with `rel="author"`,
-  marks dates up with `<time datetime>`, and shows the update date whenever
-  one is set. Before, most guides set an update date in schema but did not
-  display it.
+  marks dates up with `<time datetime>`, and shows the update date when one
+  is set and differs from the publish date. Before, most guides set an
+  update date in schema but did not display it. Dates are formatted in UTC,
+  because guides construct them at UTC midnight and local formatting showed
+  the previous day across the US. A test checks that each guide shows an
+  update date exactly when its schema carries one.
 - `GuideAuthorBox` is rendered from the shared guide footer so all guides
   get the bio and profile link without per-page edits.
 - `/author/greg-grothaus` is a `ProfilePage` whose `mainEntity` is the same
@@ -40,8 +43,10 @@ says why they are credible. Bing weighs them lightly, which fits the gap.
 
 ## What was deliberately not done
 
-- No `reviewedBy`. No one else wrote or reviewed the guides, so claiming a
-  reviewer would be false.
+- No `reviewedBy`. No one else wrote the guides or acted as a
+  subject-matter reviewer for them, so claiming a reviewer would be false.
+- No test count or other figure in the bio. Numbers in prose rot, and a
+  stale one on the page meant to establish trust is worse than none.
 - No backlink work; that is off-domain.
 - No domain change. Google treats new gTLDs the same as `.com`, and the
   site ranks on Google for low-competition queries on this same domain.

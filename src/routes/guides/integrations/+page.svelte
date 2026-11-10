@@ -35,7 +35,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <GuideByline publishDate={new Date(published)} />
+  <GuideByline publishDate={new Date(published)} updateDate={new Date(modified)} />
 
   <p>
     SSA.tools is designed to be a powerful, standalone calculator for Social
@@ -161,7 +161,6 @@
       </tr>
     </tbody>
   </table>
-
 
   <h2>How Integrations Work</h2>
 

@@ -95,7 +95,6 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
     information.
   </p>
 
-
   <h2>Open Source Transparency</h2>
   <p>
     SSA.tools is completely open source. You can inspect every line of code on

@@ -682,7 +682,6 @@ schema.tags = [
     line-height: 1.6;
   }
 
-
   .hero-image {
     text-align: center;
     margin: 2rem 0;
