@@ -1,8 +1,8 @@
 /**
  * The single author of every guide on the site.
  *
- * One source of truth for the byline on each guide, the author box, the
- * author profile page, the sitemap, and the schema.org Person emitted in
+ * One source of truth for the byline on each guide, the author profile
+ * page, the sitemap, and the schema.org Person emitted in
  * structured data. Search engines use the `url` and `sameAs` links to
  * resolve the name to one entity, so these must stay stable across pages.
  */
@@ -18,7 +18,7 @@ export interface Author {
   /**
    * The bio with the name left off, so it reads as a predicate: "is a
    * software engineer who...". The profile page and schema prepend the
-   * name; the guide author box puts a linked name in front of it.
+   * name.
    */
   readonly summary: string;
   readonly blogUrl: string;
