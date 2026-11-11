@@ -11,8 +11,9 @@
  * Every Primary Insurance Amount is set directly, and a set PIA never has
  * cost-of-living adjustments applied, so the figures are in today's
  * dollars. The benefit amounts come from the same calculator the rest of
- * the site uses; the PIAs, the ages, and any sentence in the guide naming a
- * percentage are hand-written and need a read each year.
+ * the site uses; the PIAs, the ages, and the legal ages and waiting periods
+ * in the guide's prose (60, 62, 50, one year, nine months) are hand-written
+ * and need a read each year.
  *
  * The result records are plain readonly interfaces produced only by the
  * functions beside them; they are not meant to be constructed by hand.

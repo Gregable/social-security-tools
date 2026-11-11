@@ -18,7 +18,7 @@ const sponsorCopy: SponsorCopy = {
   outro: 'before you set one.',
   bullets: [
     'They work out which of your records pays the most: your own, a former spouse, a late spouse, or the person you are marrying.',
-    'They know the exceptions, such as marrying someone who is already on benefits, that keep a benefit from ending.',
+    'They know the exceptions, such as marrying someone who is on certain benefits, that keep a benefit from ending.',
     'The first call is free, and you pick the time.',
   ],
 };
@@ -53,8 +53,8 @@ const divorced = divorcedRemarriage();
 const safeAge = REMARRIAGE_SAFE_AGE;
 const fra = widow.fullRetirementAge.years();
 
-// The percentages and ages below are hand-written; re-read them each year
-// alongside src/test/remarriage-example.test.ts.
+// The ages and waiting periods below are hand-written; re-read them each
+// year alongside src/test/remarriage-example.test.ts.
 const faqs: FAQItem[] = [
   {
     question: 'Will I lose my own Social Security if I remarry?',
@@ -63,7 +63,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'Can I remarry and keep my survivor benefits?',
-    answer: `Yes, if you marry at ${safeAge} or later, or at 50 or later while you are disabled. A marriage before that age blocks widow's or widower's benefits on your late spouse for as long as the new marriage lasts, even after you turn ${safeAge}. If that marriage ends through death, divorce, or annulment, you can qualify again.`,
+    answer: `Yes, if you marry at ${safeAge} or later. If you are disabled, a marriage at 50 or later can also be disregarded, when you were receiving a disabled widow's or widower's benefit at the time or qualified for one and claim it before ${safeAge}. A marriage before that age blocks widow's or widower's benefits on your late spouse for as long as the new marriage lasts, even after you turn ${safeAge}. If that marriage ends through death or divorce, you can qualify again.`,
   },
   {
     question:
@@ -159,7 +159,10 @@ const faqs: FAQItem[] = [
         <td>
           Mother's or father's benefit for caring for a late spouse's child
         </td>
-        <td>Ends, unless your new spouse receives Social Security</td>
+        <td>
+          Ends, unless your new spouse is entitled to Social Security
+          benefits of almost any kind
+        </td>
       </tr>
       <tr>
         <td>Your children's benefits on a parent's record</td>
@@ -218,7 +221,7 @@ const faqs: FAQItem[] = [
     <li>
       <strong>The new marriage ends.</strong> Once you are unmarried again,
       whether through death, divorce, or annulment, you meet the requirement
-      again and can go back to your first former spouse's record.
+      again and can apply again on your first former spouse's record.
     </li>
   </ul>
 
@@ -317,16 +320,18 @@ const faqs: FAQItem[] = [
       the wedding day.
     </li>
     <li>
-      <strong>If that marriage ends</strong>, through death, divorce, or
-      annulment, you can be
+      <strong>If that marriage ends</strong>, through death or divorce, you
+      can be
       <a href="https://secure.ssa.gov/poms.nsf/lnx/0300207003"
         >entitled again from the month it ended</a
       >.
     </li>
     <li>
       <strong>If you are disabled</strong>, the age is 50. A marriage after
-      50 is disregarded if you met the requirements for a disabled widow's
-      or widower's benefit when you married.
+      50 is disregarded if you were already receiving a disabled widow's or
+      widower's benefit when you married, or if you met its disability
+      requirements on the wedding day and claim it before you turn
+      {safeAge}.
     </li>
   </ul>
 
@@ -466,8 +471,9 @@ const faqs: FAQItem[] = [
     including an adult child disabled since before 22,
     <a href="https://www.ecfr.gov/current/title-20/section-404.352"
       >end when the child marries</a
-    >, unless a disabled adult child marries another Social Security
-    beneficiary.
+    >, unless a disabled adult child marries someone entitled to Social
+    Security retirement, disability, survivor, or disabled adult child
+    benefits. Supplemental Security Income does not count.
   </p>
 
   <h2>What the New Marriage Adds</h2>
@@ -486,8 +492,9 @@ const faqs: FAQItem[] = [
       >, unless you are the parents of a child together, or you were
       entitled to benefits as a spouse, divorced spouse, widow, or widower
       in the month before the wedding, or would have been had you applied
-      and been old enough. Most people in this guide's situations meet that last
-      exception and do not have to wait. See our guide to
+      and been old enough. Widows, widowers, and people already eligible on a
+      former spouse's record meet that last exception and do not have to
+      wait. See our guide to
       <a href="/guides/spousal-benefits">spousal benefits</a>.
     </li>
     <li>
@@ -512,9 +519,10 @@ const faqs: FAQItem[] = [
   <p>
     Everything above concerns Social Security benefits, which are based on
     work records. Supplemental Security Income is a separate program based
-    on need, and marriage affects it directly at any age: a spouse's
+    on need, and marriage affects it directly at any age: some of the income
+    of a spouse you live with
     <a href="https://www.ecfr.gov/current/title-20/section-416.1160"
-      >income is counted</a
+      >is counted</a
     >
     when your payment is figured, which can reduce or end it.
   </p>
@@ -535,8 +543,9 @@ const faqs: FAQItem[] = [
     </li>
     <li>
       If you are paid on a living former spouse's record, compare half of
-      their full benefit with half of your intended spouse's. You will be
-      paid on the new record, not the old one.
+      their full benefit with half of your intended spouse's. Unless your
+      new spouse is on one of the benefits listed above, the old record
+      stops paying and only the new one can add to your own benefit.
     </li>
     <li>
       Enter your own earnings record and your intended spouse's in the

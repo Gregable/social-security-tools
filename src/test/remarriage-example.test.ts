@@ -67,6 +67,14 @@ describe('widowRemarriage', () => {
     expect(w.survivorAtFra.greaterThan(w.marriedEarlyTotalAtFra)).toBe(true);
     expect(w.survivorAtSixty.greaterThan(w.marriedEarlyTotalAtFra)).toBe(true);
   });
+
+  /** "Her own benefit brought up to half of Sam's", and the full survivor. */
+  it('backs the half-of sentence in the guide', () => {
+    expect(
+      w.marriedEarlyTotalAtFra.equals(WIDOW_EXAMPLE.newSpousePia.div(2))
+    ).toBe(true);
+    expect(w.survivorAtFra.equals(WIDOW_EXAMPLE.lateSpousePia)).toBe(true);
+  });
 });
 
 describe('divorcedRemarriage', () => {
@@ -92,5 +100,28 @@ describe('divorcedRemarriage', () => {
 
   it('would pay $3,200 as a surviving divorced spouse', () => {
     expect(d.survivorOnFormerSpouse.string()).toBe('$3,200.00');
+  });
+
+  /**
+   * The guide's heading gives her age, and its prose says she is at full
+   * retirement age and married after 60.
+   */
+  it('follows a retiree of 67, past the age at which remarriage is disregarded', () => {
+    expect(DIVORCED_EXAMPLE.age).toBe(67);
+    expect(DIVORCED_EXAMPLE.age).toBeGreaterThan(REMARRIAGE_SAFE_AGE);
+  });
+
+  /**
+   * Relationships the guide states in prose: she is paid up to half of a
+   * spouse's full benefit, the new spouse's half is the smaller but still
+   * more than her own, and a survivor is paid the whole of it.
+   */
+  it('backs the half-of and smaller-than sentences in the guide', () => {
+    const { ownPia, formerSpousePia, newSpousePia } = DIVORCED_EXAMPLE;
+    expect(d.totalUnmarried.equals(formerSpousePia.div(2))).toBe(true);
+    expect(d.totalRemarried.equals(newSpousePia.div(2))).toBe(true);
+    expect(newSpousePia.lessThan(formerSpousePia)).toBe(true);
+    expect(ownPia.lessThan(newSpousePia.div(2))).toBe(true);
+    expect(d.survivorOnFormerSpouse.equals(formerSpousePia)).toBe(true);
   });
 });
