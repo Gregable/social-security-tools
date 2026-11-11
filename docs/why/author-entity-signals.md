@@ -19,7 +19,7 @@ says why they are credible. Bing weighs them lightly, which fits the gap.
 ## What changed
 
 - `src/lib/author.ts` holds one frozen `AUTHOR` record and builds the
-  schema.org Person from it. The byline, the author box, the profile page,
+  schema.org Person from it. The byline, the profile page,
   and every guide's JSON-LD read from this single source, so the entity is
   identical everywhere.
 - The guide schema's author now carries `url`, `jobTitle`, and `sameAs`
@@ -32,8 +32,11 @@ says why they are credible. Bing weighs them lightly, which fits the gap.
   because guides construct them at UTC midnight and local formatting showed
   the previous day across the US. A test checks that each guide shows an
   update date exactly when its schema carries one.
-- `GuideAuthorBox` is rendered from the shared guide footer so all guides
-  get the bio and profile link without per-page edits.
+- An "About the author" box in the shared guide footer shipped with this
+  change and was removed shortly after. It repeated the byline's name and
+  profile link, and the bio it carried is already on the profile page and
+  in each guide's structured data, so it added length to every guide
+  without telling a reader or a search engine anything new.
 - `/author/greg-grothaus` is a `ProfilePage` whose `mainEntity` is the same
   Person. It explains how guides are sourced and how the calculator is
   checked, which is the content a quality rater looks for. The about page
