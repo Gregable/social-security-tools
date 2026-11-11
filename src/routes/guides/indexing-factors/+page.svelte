@@ -2,6 +2,7 @@
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import { MAX_YEAR, MAX_WAGE_INDEX_YEAR, WAGE_INDICES } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import HeroImage from './hero.png';
 
@@ -71,9 +72,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page indexing-factors-guide">
   <h1>{title}</h1>
-  <p class="postdate">
-    Published: {publishDate.toLocaleDateString()} · Updated: {updateDate.toLocaleDateString()}
-  </p>
+  <GuideByline {publishDate} {updateDate} />
 
   <figure class="hero-image">
     <img
@@ -298,12 +297,6 @@ const faqs: FAQItem[] = [
 </div>
 
 <style>
-  .postdate {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 1.5rem;
-  }
-
   .key-takeaways {
     background-color: #e8f5e9;
     border: 1px solid #4caf50;

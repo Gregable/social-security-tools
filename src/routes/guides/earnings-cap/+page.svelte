@@ -2,6 +2,7 @@
 import { MAX_CREDITS, MAXIMUM_EARNINGS, MAX_YEAR, SSA_EARNINGS_YEARS } from '$lib/constants';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 const currentYear = MAX_YEAR;
@@ -43,7 +44,7 @@ schema.tags = [
 <div class="guide-page earnings-cap-guide">
   <h1>{title}</h1>
 
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <div class="key-takeaways">
     <h3>Key Facts</h3>
@@ -197,12 +198,6 @@ schema.tags = [
 </div>
 
 <style>
-  .postdate {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 1.5rem;
-  }
-
   .key-takeaways {
     background-color: #e8f4fd;
     border: 2px solid #4a90e2;

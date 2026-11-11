@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import DateSelectBoxImage from './date-select-box.png';
 import HeroImage from './hero.png';
@@ -50,7 +51,7 @@ schema.tags = [
     <figcaption>Combined filing date chart for an example couple</figcaption>
   </figure>
 
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} />
 
   <p>
     This site's calculator shows a information dense chart of how filing dates

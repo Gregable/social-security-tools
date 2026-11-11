@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import type { SponsorCopy } from '$lib/sponsor';
 
@@ -79,7 +80,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>Social Security Spousal Benefits</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     If you are married, you may be able to collect a Social Security benefit

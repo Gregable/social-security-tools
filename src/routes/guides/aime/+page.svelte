@@ -12,6 +12,7 @@
   import { Recipient } from "$lib/recipient";
   import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from "../InlineCTA.svelte";
 
   // Current year from constants
@@ -111,7 +112,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     Your Social Security benefits are fundamentally based on a single key
@@ -572,12 +573,6 @@ The calculator also shows you the "cutoff" indexed earnings amount: the
     margin: 0 auto;
     padding: 2rem;
     line-height: 1.6;
-  }
-
-  .postdate {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 2rem;
   }
 
   h1 {

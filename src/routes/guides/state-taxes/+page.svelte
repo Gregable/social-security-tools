@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from "../InlineCTA.svelte";
   import HeroImage from "./state-taxes.jpg";
 import type { SponsorCopy } from '$lib/sponsor';
@@ -66,7 +67,7 @@ const sponsorCopy: SponsorCopy = {
 
 <div class="guide-page">
   <h1>State Taxes on Social Security Benefits</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <figure class="hero-map">
     <img

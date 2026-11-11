@@ -8,6 +8,7 @@ import {
 } from '$lib/estimate-differences-example';
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 const title = "Why Your Social Security Benefit Doesn't Match the Estimate";
@@ -82,7 +83,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     Your Social Security Statement shows one number, the agent on the phone

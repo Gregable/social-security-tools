@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 import HeroImage from './covid-19.jpg';
@@ -46,7 +47,7 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
 <div class="guide-page">
   <h1>{title}</h1>
   <img class="hero" src={HeroImage} alt="Artist depiction of Covid-19 virus" />
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} />
   <p>
     Reddit user <a href="https://www.reddit.com/user/jgatcomb/">jgatcomb</a>
     started an interesting thread about the

@@ -2,6 +2,7 @@
 import { GuidesSchema } from '$lib/schema-org';
 import { FULL_RETIREMENT_AGE } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 
 const title = 'Normal Retirement Age (NRA): What It Means for Your Benefits';
@@ -70,7 +71,7 @@ fraTable.push({
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <h2>What Is Normal Retirement Age?</h2>
 

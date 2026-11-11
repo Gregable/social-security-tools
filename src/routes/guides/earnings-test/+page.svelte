@@ -5,6 +5,7 @@
   import { GuidesSchema } from "$lib/schema-org";
   import type { SponsorCopy } from "$lib/sponsor";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from "../InlineCTA.svelte";
   import EarningsTestCalculator from "./EarningsTestCalculator.svelte";
 
@@ -86,7 +87,7 @@
 
 <div class="guide-page">
   <h1>Working While Receiving Social Security</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     A lot of people believe that if they work while collecting Social Security,

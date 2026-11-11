@@ -6,6 +6,7 @@
   import type { FAQItem } from "$lib/schema-org";
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import GuideByline from "../GuideByline.svelte";
 
   const title =
     "ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security";
@@ -64,7 +65,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {new Date(published).toLocaleDateString()}</p>
+  <GuideByline publishDate={new Date(published)} />
 
   <p>
     This site focuses on one thing: helping you understand your Social Security

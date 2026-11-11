@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
+import GuideByline from '../GuideByline.svelte';
 import InlineCTA from '../InlineCTA.svelte';
 import type { SponsorCopy } from '$lib/sponsor';
 
@@ -75,7 +76,7 @@ const faqs = [
 
 <div class="guide-page">
   <h1>Social Security Benefits for Divorced Spouses</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     If you were married for at least 10 years before divorcing, you may be able

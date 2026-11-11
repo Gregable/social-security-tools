@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from "../InlineCTA.svelte";
 import type { SponsorCopy } from '$lib/sponsor';
 
@@ -77,7 +78,7 @@ const sponsorCopy: SponsorCopy = {
 
 <div class="guide-page">
   <h1>Social Security Survivor Benefits</h1>
-  <p class="postdate">Published: {publishDate.toLocaleDateString()}</p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     How much can a surviving spouse receive? Up to 100% of the deceased

@@ -12,6 +12,7 @@
   import { MonthDuration } from "$lib/month-time";
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+import GuideByline from "../GuideByline.svelte";
   import InlineCTA from '../InlineCTA.svelte';
 
   // Current year from constants
@@ -162,10 +163,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">
-    Published: {publishDate.toLocaleDateString()}<br />
-    Updated: {updateDate.toLocaleDateString()}
-  </p>
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     The maximum monthly Social Security benefit is a number that most retirees
@@ -462,12 +460,6 @@
   .fra-row {
     background-color: #fff3cd;
     font-style: italic;
-  }
-
-  .postdate {
-    color: #666;
-    font-style: italic;
-    margin-bottom: 1.5rem;
   }
 
   ol {

@@ -1,3 +1,20 @@
+import { AUTHOR, authorBio, authorPerson } from './author';
+
+/**
+ * The site as a schema.org Organization. One spelling everywhere so the
+ * publisher on guides and the employer on the author profile reconcile
+ * to the same entity.
+ */
+const PUBLISHER = Object.freeze({
+  '@type': 'Organization',
+  name: 'SSA.tools',
+  url: 'https://ssa.tools',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://ssa.tools/laptop-piggybank.jpg',
+  },
+});
+
 /**
  * Schema for WebSite type - used on home page
  */
@@ -13,14 +30,7 @@ export class WebSiteSchema {
       url: this.url,
       name: this.name,
       description: this.description,
-      publisher: {
-        '@type': 'Organization',
-        name: 'SSA.tools',
-        logo: {
-          '@type': 'ImageObject',
-          url: 'https://ssa.tools/laptop-piggybank.jpg',
-        },
-      },
+      publisher: PUBLISHER,
     };
     return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
   }
@@ -147,18 +157,8 @@ export class GuidesSchema {
       image: null,
       datePublished: this.datePublished,
       dateModified: null,
-      author: {
-        '@type': 'Person',
-        name: 'Greg Grothaus',
-      },
-      publisher: {
-        '@type': 'Organization',
-        name: 'SSA.Tools',
-        logo: {
-          '@type': 'ImageObject',
-          url: 'https://ssa.tools/laptop-piggybank.jpg',
-        },
-      },
+      author: authorPerson(),
+      publisher: PUBLISHER,
     };
     // Optional Fields:
     if (this.image) {
@@ -199,7 +199,7 @@ export class GuidesSchema {
     if (this.dateModified) {
       meta += `<meta property="article:modified_time" content="${this.dateModified}" />`;
     }
-    meta += `<meta property="article:author" content="SSA.tools" />`;
+    meta += `<meta property="article:author" content="${AUTHOR.url}" />`;
     meta += `<meta property="article:section" content="Social Security" />`;
 
     // Add tags if provided
@@ -230,6 +230,26 @@ export class GuidesSchema {
 
     return meta;
   }
+}
+
+/**
+ * Renders ProfilePage structured data for the author page.
+ *
+ * ProfilePage is the type Google documents for author entities: its
+ * mainEntity is the same Person that every guide names as its author, so the
+ * two can be reconciled by URL.
+ */
+export function renderProfilePageSchema(): string {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    mainEntity: {
+      ...authorPerson(),
+      description: authorBio(),
+      worksFor: PUBLISHER,
+    },
+  };
+  return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
 }
 
 /**

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
+  import GuideByline from "../GuideByline.svelte";
 
   const title = "Third-Party Integrations";
   const description =
@@ -34,7 +35,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <p class="postdate">Published: {new Date(published).toLocaleDateString()}</p>
+  <GuideByline publishDate={new Date(published)} updateDate={new Date(modified)} />
 
   <p>
     SSA.tools is designed to be a powerful, standalone calculator for Social
@@ -160,7 +161,6 @@
       </tr>
     </tbody>
   </table>
-
 
   <h2>How Integrations Work</h2>
 
