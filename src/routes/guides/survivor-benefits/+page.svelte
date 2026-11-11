@@ -351,6 +351,8 @@ const sponsorCopy: SponsorCopy = {
     If you remarry at age 60 or later (50 if disabled), you keep your
     eligibility. So if you're considering remarriage and are close to 60,
     waiting until after your 60th birthday preserves your survivor benefit.
+    Our guide to <a href="/guides/remarriage">remarriage and Social Security</a>
+    works through what marrying before 60 can cost.
   </p>
 
   <h2>Work Credits Required</h2>

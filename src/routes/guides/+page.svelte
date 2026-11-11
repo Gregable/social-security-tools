@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Nov 11, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/remarriage">
+            How Remarriage Affects Social Security Benefits: What Ends, What
+            Continues, and the Age 60 Rule
+          </a>
+        </h3>
+        <p class="description">
+          Remarrying can end benefits paid on a former spouse's record, and
+          before 60 it blocks survivor benefits on a late spouse. Which
+          benefits are affected, the exceptions, what the new marriage adds,
+          and two worked examples.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Oct 22, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/retroactive-retirement-benefits">

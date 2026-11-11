@@ -316,7 +316,8 @@ const faqs: FAQItem[] = [
     only if you were entitled to certain benefits in the month before the
     marriage, such as spouse's, widow's or widower's, parent's, or childhood
     disability benefits. Receiving your own retirement benefit does not waive
-    it.
+    it. If you receive benefits on a former or late spouse's record, see our
+    guide to <a href="/guides/remarriage">how remarriage affects them</a>.
   </p>
 
   <h3>Same-Sex and Common-Law Marriages</h3>

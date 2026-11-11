@@ -265,7 +265,8 @@ const faqs = [
     benefits from your first ex-spouse (assuming the 10-year requirement was
     met). And if you <a href="https://www.ssa.gov/OP_Home/cfr20/404/404-0335.htm">remarry after age 60</a> (or age 50 if
     disabled), you can still receive divorced spouse <em>survivor</em> benefits if your ex-spouse
-    has died.
+    has died. Our guide to <a href="/guides/remarriage">remarriage and Social Security</a>
+    covers the exceptions and compares the old record with the new one.
   </p>
 
   <h2>Divorced Spouse Survivor Benefits</h2>
