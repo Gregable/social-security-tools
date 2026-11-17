@@ -1,11 +1,13 @@
 /**
  * Ensures every guide that renders the sponsor CTA writes its own pitch,
- * and that the pitch is shaped the way SponsorAd renders it.
+ * and that the pitch is shaped the way SponsorAd renders it. It also pins
+ * which guides carry the second (`guide-inline-apply`) card and that no
+ * guide renders two cards under one placement.
  *
  * The copy lives in each guide's +page.svelte so it sits next to the prose
  * it has to follow on from, which puts it out of reach of a normal import.
  * These tests therefore read it back out of the pages: svelte's parser
- * locates the CTA and the module script, and the TypeScript parser reads
+ * locates the CTA and the page's script, and the TypeScript parser reads
  * the object literal. That keeps the guarantee tied to what the pages
  * actually render rather than to a table that could drift from them.
  */
@@ -40,6 +42,8 @@ interface SponsorCard {
   /** The script constant passed as `sponsorCopy`, if one is passed. */
   readonly copyName: string | null;
   readonly copy: CopyStrings;
+  /** Tag name of the element right after the card, e.g. `h2`. */
+  readonly followedBy: string | null;
 }
 
 const FIRST_CARD = 'guide-inline';
@@ -49,7 +53,8 @@ const APPLY_CARD = 'guide-inline-apply';
  * Guides that carry a second sponsor card ahead of their "how to apply"
  * section. Listed here rather than discovered so that adding the card to
  * another guide is a decision someone records: see
- * docs/why/sponsor-apply-card.md.
+ * docs/why/sponsor-apply-card.md. Keep it sorted: the test compares it
+ * with the sorted list of guides found.
  */
 const APPLY_CARD_GUIDES = [
   'divorced-spouse',
@@ -130,14 +135,31 @@ function attributeText(attribute: Record<string, unknown>): string | null {
   return null;
 }
 
-/** The identifier in a `name={identifier}` or `{name}` attribute. */
+/**
+ * The identifier in a `name={identifier}` or `{name}` attribute. Null for
+ * any other expression (a spread, a ternary, a member access): the copy
+ * such an expression renders cannot be read back from one constant, so
+ * the card then fails the "writes its own pitch" check instead of being
+ * checked against strings it does not show.
+ */
 function attributeIdentifier(
   attribute: Record<string, unknown>
 ): string | null {
-  for (const part of walk(attribute.value)) {
-    if (part.type === 'Identifier' && typeof part.name === 'string') {
-      return part.name;
-    }
+  const parts = [attribute.value].flat() as Record<string, unknown>[];
+  if (parts.length !== 1 || parts[0]?.type !== 'ExpressionTag') return null;
+  const expression = parts[0].expression as Record<string, unknown>;
+  if (expression?.type !== 'Identifier') return null;
+  return typeof expression.name === 'string' ? expression.name : null;
+}
+
+/** Tag name of the first element after `index`, skipping text and comments. */
+function nextElementName(
+  siblings: Record<string, unknown>[],
+  index: number
+): string | null {
+  for (const sibling of siblings.slice(index + 1)) {
+    if (sibling.type === 'Text' || sibling.type === 'Comment') continue;
+    return typeof sibling.name === 'string' ? sibling.name : null;
   }
   return null;
 }
@@ -154,23 +176,29 @@ function sponsorCards(): SponsorCard[] {
     const span = ast.instance?.content as unknown as SourceSpan | undefined;
     const script = span ? source.slice(span.start, span.end) : '';
 
-    for (const node of walk(ast.fragment)) {
-      if (node.type !== 'Component' || node.name !== 'InlineCTA') continue;
-      const attributes = (node.attributes ?? []) as Record<string, unknown>[];
-      const named = (name: string) => attributes.find((a) => a.name === name);
+    // Visit each list of sibling nodes, so a card can see what follows it.
+    for (const parent of walk(ast.fragment)) {
+      if (!Array.isArray(parent.nodes)) continue;
+      const siblings = parent.nodes as Record<string, unknown>[];
+      siblings.forEach((node, index) => {
+        if (node.type !== 'Component' || node.name !== 'InlineCTA') return;
+        const attributes = (node.attributes ?? []) as Record<string, unknown>[];
+        const named = (name: string) => attributes.find((a) => a.name === name);
 
-      const type = named('type');
-      if (!type || attributeText(type) !== 'sponsor') continue;
-      const placement = named('placement');
-      const copy = named('sponsorCopy');
-      const copyName = copy ? attributeIdentifier(copy) : null;
-      cards.push({
-        slug,
-        placement: placement
-          ? (attributeText(placement) ?? '(not plain text)')
-          : FIRST_CARD,
-        copyName,
-        copy: copyName ? readSponsorCopy(script, copyName) : {},
+        const type = named('type');
+        if (!type || attributeText(type) !== 'sponsor') return;
+        const placement = named('placement');
+        const copy = named('sponsorCopy');
+        const copyName = copy ? attributeIdentifier(copy) : null;
+        cards.push({
+          slug,
+          placement: placement
+            ? (attributeText(placement) ?? '(not plain text)')
+            : FIRST_CARD,
+          copyName,
+          copy: copyName ? readSponsorCopy(script, copyName) : {},
+          followedBy: nextElementName(siblings, index),
+        });
       });
     }
   }
@@ -261,6 +289,18 @@ describe('guide sponsor copy', () => {
         // Two cards under one placement would share an impression count
         // and make the click rate of either unreadable.
         expect(cardsOn(slug).map((card) => card.placement)).toEqual(expected);
+      }
+    );
+
+    it.each(APPLY_CARD_GUIDES)(
+      'puts the second card on %s directly above a section heading',
+      (slug) => {
+        // The card is pitched at the reader about to act, so it belongs
+        // right before the section that says how, not somewhere inside it.
+        const second = cardsOn(slug).find(
+          (card) => card.placement === APPLY_CARD
+        );
+        expect(second?.followedBy).toBe('h2');
       }
     );
 

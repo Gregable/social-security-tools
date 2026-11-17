@@ -6,9 +6,10 @@ import type { OutboundDestination } from './analytics/outbound';
  * CHAT_TRIAL_GUIDES also link to `chatUrl`, and all report analytics under
  * `destination`. Swapping sponsors means updating this object (dropping or
  * replacing `chatUrl`), adding the new destination to OutboundDestination,
- * revising DEFAULT_SPONSOR_COPY and the `sponsorCopy` written into each
- * guide that shows the sponsor CTA (grep for SponsorCopy under
- * src/routes/guides), and revising the remaining hard-coded text in
+ * revising DEFAULT_SPONSOR_COPY and the copy written into each guide that
+ * shows the sponsor CTA (`sponsorCopy`, plus `applySponsorCopy` on guides
+ * with a second card; grep for SponsorCopy under src/routes/guides), and
+ * revising the remaining hard-coded text in
  * SponsorAd, Sponsor, AdvisorPrompt, and guide-footer.
  */
 export interface SponsorConfig {
@@ -32,8 +33,8 @@ export interface SponsorConfig {
  * `intro`, the sponsor name (styled as a link; clicking it schedules,
  * through the wrapping anchor or the Schedule link's overlay), and `outro`
  * as one sentence, supplying the spaces between them,
- * then lists `bullets`. Each guide declares its own `sponsorCopy` so the
- * pitch can follow on from the prose it sits under.
+ * then lists `bullets`. Each guide declares its own copy for each card it
+ * shows, so the pitch can follow on from the prose it sits under.
  */
 export interface SponsorCopy {
   /** Trimmed fragment before the sponsor name, usually ending in "at". */

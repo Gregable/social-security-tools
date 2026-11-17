@@ -17,15 +17,16 @@ const sponsorCopy: SponsorCopy = {
 };
 
 // The second card, ahead of "What to Do Now", for the reader who has
-// already been turned down or paid from the wrong month. Step 1 below
-// (call SSA today) comes first either way, and the pitch says so.
+// already been turned down or paid from the wrong month. A reader who has
+// not filed yet should still make the call in step 1 below first. The
+// intro says so itself, because phones do not show the bullets.
 const applySponsorCopy: SponsorCopy = {
   intro:
-    'If Social Security has already told you no, or paid you from a later month than these rules allow, you do not have to argue it alone. You can have a Social Security specialist at',
+    'If Social Security has already told you no, or paid you from a later month than these rules allow, you do not have to argue it alone. Once you are on record with the call in step 1 below, you can have a Social Security specialist at',
   outro: 'review the dates and pursue the back pay with you.',
   bullets: [
     'They compare the month your benefits started with the month the rules allow.',
-    'Make the call in step 1 below either way; it protects your filing date.',
+    'If you have not filed yet, make the call in step 1 below first; it protects your filing date.',
     'The first call is free, and you pick the time.',
   ],
 };

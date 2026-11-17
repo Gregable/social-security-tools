@@ -27,10 +27,12 @@ survivor-benefits, and "What to Do Now" on retroactive-survivor-benefits.
 That is where a reader has decided to claim, which is what the sponsor
 sells help with.
 
-Only these four, because they are where sponsor clicks come from. The first
-three produce about two thirds of all sponsor clicks, and survivor cases
-appear over-represented among the sponsor's sign-ups, though the sample is small. A second ad on every
-guide would cost reader goodwill for clicks that mostly are not there.
+Only these four, because they are where sponsor clicks come from. From
+2026-09-07 to 2026-11-16 the first three produced about two thirds of
+sponsor clicks across every placement on the site, and survivor cases
+appear over-represented among the sponsor's sign-ups, though the sample is
+small. A second ad on every guide would cost reader goodwill for clicks
+that mostly are not there.
 
 ## The copy
 
@@ -41,8 +43,9 @@ twice would read as an ad repeated, not as a second, different offer.
 
 On the two survivor guides the section below the card tells the reader to
 call Social Security at once, because that call fixes the filing date. The
-pitch says the same thing in a bullet. It must never read as a reason to
-delay that call.
+pitch must never read as a reason to delay that call, so its opening
+sentence puts the call first. A bullet repeats it, but phones do not show
+the bullets, so the sentence has to carry it alone.
 
 ## Measuring it
 

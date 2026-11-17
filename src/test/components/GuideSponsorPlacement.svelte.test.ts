@@ -18,8 +18,9 @@ vi.mock('$app/stores', () => ({
   },
 }));
 
-// happy-dom has no IntersectionObserver. This one reports every observed
-// element as visible straight away, so mounting a card fires its impression.
+// happy-dom's IntersectionObserver never calls back. This one reports
+// every observed element as visible straight away, so mounting a card
+// fires its impression.
 class ImmediateIntersectionObserver {
   constructor(private readonly callback: IntersectionObserverCallback) {}
   observe(target: Element): void {
@@ -103,10 +104,13 @@ describe('sponsor card placement on guides', () => {
     );
   });
 
-  it('keeps chat clicks on the apply card apart from the first card', () => {
+  it('keeps the apply card apart from the first card on a chat trial guide', () => {
     const target = render(CHAT_TRIAL_GUIDE, {
       placement: 'guide-inline-apply',
     });
+    // The chat trial card is a different element from the plain one, so
+    // its impression is worth checking separately.
+    expect(placements('Outbound: Visible')).toEqual(['guide-inline-apply']);
     clickLinkTo(target, SPONSOR.chatUrl);
     clickLinkTo(target, SPONSOR.url);
     expect(placements('Outbound: Clicked')).toEqual([

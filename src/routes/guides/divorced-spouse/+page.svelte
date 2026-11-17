@@ -21,7 +21,7 @@ const applySponsorCopy: SponsorCopy = {
   intro: "A divorced-spouse claim usually takes an appointment and paperwork from a marriage that ended years ago. Before you apply, you can have a Social Security specialist at",
   outro: "check which record pays you more and what SSA will ask for.",
   bullets: [
-    "They compare your own benefit with the one on your ex's record, so you file for the right one at the right age.",
+    "They compare your own benefit with the one on your ex's record, so you know what you will be paid and file at the right age.",
     "If you want more help after that, they can also handle the filing.",
     "The first call is free, and you pick the time.",
   ],

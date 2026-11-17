@@ -68,7 +68,10 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
  * `guide-inline-apply` is a second card ahead of the section on how to
  * apply, on the few guides where that is worth a second ask (see
  * docs/why/sponsor-apply-card.md). They are separate placements so each
- * card's clicks are counted against its own impressions.
+ * card's clicks are counted against its own impressions. On chat trial
+ * guides the card's chat link reports the same value with a `-chat`
+ * suffix. The footer's `guide-footer` placement is set in
+ * guide-footer.svelte and is not part of this type.
  */
 export type GuideSponsorPlacement = 'guide-inline' | 'guide-inline-apply';
 
