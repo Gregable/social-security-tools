@@ -61,6 +61,17 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'working-past-full-retirement-age': 'sponsor',
 };
 
+/**
+ * Where on a guide a sponsor card sits, as reported in the `placement`
+ * property of its impression and click events. `guide-inline` is the card
+ * beside the decision, which every sponsor guide carries.
+ * `guide-inline-apply` is a second card ahead of the section on how to
+ * apply, on the few guides where that is worth a second ask (see
+ * docs/why/sponsor-apply-card.md). They are separate placements so each
+ * card's clicks are counted against its own impressions.
+ */
+export type GuideSponsorPlacement = 'guide-inline' | 'guide-inline-apply';
+
 export function getGuideCTAType(pathname: string): GuideCTAType {
   return GUIDE_CTA_TYPES[guideSlugFromPath(pathname)] ?? 'sponsor';
 }

@@ -16,6 +16,20 @@ const sponsorCopy: SponsorCopy = {
   ],
 };
 
+// The second card, ahead of "What to Do Now", for the reader who has
+// already been turned down or paid from the wrong month. Step 1 below
+// (call SSA today) comes first either way, and the pitch says so.
+const applySponsorCopy: SponsorCopy = {
+  intro:
+    'If Social Security has already told you no, or paid you from a later month than these rules allow, you do not have to argue it alone. You can have a Social Security specialist at',
+  outro: 'review the dates and pursue the back pay with you.',
+  bullets: [
+    'They compare the month your benefits started with the month the rules allow.',
+    'Make the call in step 1 below either way; it protects your filing date.',
+    'The first call is free, and you pick the time.',
+  ],
+};
+
 const title =
   'Retroactive Survivor Benefits: How Far Back Social Security Pays';
 const description =
@@ -416,6 +430,12 @@ const faqs: FAQItem[] = [
       >cannot receive it</a
     >.
   </p>
+
+  <InlineCTA
+    type="sponsor"
+    placement="guide-inline-apply"
+    sponsorCopy={applySponsorCopy}
+  />
 
   <h2>What to Do Now</h2>
 

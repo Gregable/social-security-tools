@@ -29,11 +29,34 @@ interface SourceSpan {
   readonly end: number;
 }
 
-interface GuidePitch {
+/** A copy object's strings, keyed by property name. */
+type CopyStrings = Record<string, string[]>;
+
+/** One `<InlineCTA type="sponsor" />` as a guide page renders it. */
+interface SponsorCard {
   readonly slug: string;
-  readonly passesCopy: boolean;
-  readonly copy: Record<string, string[]>;
+  /** The analytics placement; the first card's is the component default. */
+  readonly placement: string;
+  /** The script constant passed as `sponsorCopy`, if one is passed. */
+  readonly copyName: string | null;
+  readonly copy: CopyStrings;
 }
+
+const FIRST_CARD = 'guide-inline';
+const APPLY_CARD = 'guide-inline-apply';
+
+/**
+ * Guides that carry a second sponsor card ahead of their "how to apply"
+ * section. Listed here rather than discovered so that adding the card to
+ * another guide is a decision someone records: see
+ * docs/why/sponsor-apply-card.md.
+ */
+const APPLY_CARD_GUIDES = [
+  'divorced-spouse',
+  'retroactive-survivor-benefits',
+  'spousal-benefits',
+  'survivor-benefits',
+];
 
 function guideSlugs(): string[] {
   return readdirSync(guidesDir, { withFileTypes: true })
@@ -61,23 +84,23 @@ function* walk(node: unknown): Generator<Record<string, unknown>> {
 }
 
 /**
- * The strings in a `const sponsorCopy = {...}` declaration, keyed by
- * property name. Arrays and plain strings are flattened the same way, so
- * `bullets` comes back as its elements.
+ * The strings in a `const <name> = {...}` declaration, keyed by property
+ * name. Arrays and plain strings are flattened the same way, so `bullets`
+ * comes back as its elements.
  */
-function readSponsorCopy(script: string): Record<string, string[]> {
+function readSponsorCopy(script: string, name: string): CopyStrings {
   const source = ts.createSourceFile(
     'guide.ts',
     script,
     ts.ScriptTarget.Latest,
     true
   );
-  const copy: Record<string, string[]> = {};
+  const copy: CopyStrings = {};
   for (const statement of source.statements) {
     if (!ts.isVariableStatement(statement)) continue;
     for (const declaration of statement.declarationList.declarations) {
       if (!ts.isIdentifier(declaration.name)) continue;
-      if (declaration.name.text !== 'sponsorCopy') continue;
+      if (declaration.name.text !== name) continue;
       const init = declaration.initializer;
       if (!init || !ts.isObjectLiteralExpression(init)) continue;
       for (const property of init.properties) {
@@ -97,63 +120,90 @@ function readSponsorCopy(script: string): Record<string, string[]> {
   return copy;
 }
 
-/** Guides whose page renders `<InlineCTA type="sponsor" ... />`. */
-function sponsorGuides(): GuidePitch[] {
-  const pitches: GuidePitch[] = [];
+/** The text of a `name="text"` attribute, or null if it is not plain text. */
+function attributeText(attribute: Record<string, unknown>): string | null {
+  for (const part of walk(attribute.value)) {
+    if (part.type === 'Text' && typeof part.data === 'string') {
+      return part.data;
+    }
+  }
+  return null;
+}
+
+/** The identifier in a `name={identifier}` or `{name}` attribute. */
+function attributeIdentifier(
+  attribute: Record<string, unknown>
+): string | null {
+  for (const part of walk(attribute.value)) {
+    if (part.type === 'Identifier' && typeof part.name === 'string') {
+      return part.name;
+    }
+  }
+  return null;
+}
+
+/** Every `<InlineCTA type="sponsor" ... />` across the guide pages. */
+function sponsorCards(): SponsorCard[] {
+  const cards: SponsorCard[] = [];
   for (const slug of guideSlugs()) {
     const source = readFileSync(
       resolve(guidesDir, slug, '+page.svelte'),
       'utf-8'
     );
     const ast = parse(source, { modern: true });
+    const span = ast.instance?.content as unknown as SourceSpan | undefined;
+    const script = span ? source.slice(span.start, span.end) : '';
 
-    let isSponsor = false;
-    let passesCopy = false;
     for (const node of walk(ast.fragment)) {
       if (node.type !== 'Component' || node.name !== 'InlineCTA') continue;
       const attributes = (node.attributes ?? []) as Record<string, unknown>[];
-      for (const attribute of attributes) {
-        if (attribute.name === 'sponsorCopy') passesCopy = true;
-        if (attribute.name !== 'type') continue;
-        for (const part of walk(attribute.value)) {
-          if (part.type === 'Text' && part.data === 'sponsor') isSponsor = true;
-        }
-      }
-    }
-    if (!isSponsor) continue;
+      const named = (name: string) => attributes.find((a) => a.name === name);
 
-    const span = ast.instance?.content as unknown as SourceSpan | undefined;
-    const script = span ? source.slice(span.start, span.end) : '';
-    pitches.push({ slug, passesCopy, copy: readSponsorCopy(script) });
+      const type = named('type');
+      if (!type || attributeText(type) !== 'sponsor') continue;
+      const placement = named('placement');
+      const copy = named('sponsorCopy');
+      const copyName = copy ? attributeIdentifier(copy) : null;
+      cards.push({
+        slug,
+        placement: placement
+          ? (attributeText(placement) ?? '(not plain text)')
+          : FIRST_CARD,
+        copyName,
+        copy: copyName ? readSponsorCopy(script, copyName) : {},
+      });
+    }
   }
-  return pitches;
+  return cards;
 }
 
+const cardLabel = (card: SponsorCard) => `${card.slug} (${card.placement})`;
+
 describe('guide sponsor copy', () => {
-  const pitches = sponsorGuides();
+  const cards = sponsorCards();
+  const sponsorSlugs = [...new Set(cards.map((card) => card.slug))].sort();
+  const labelled = cards.map((card) => [cardLabel(card), card] as const);
 
   it('finds the guides that render a sponsor CTA', () => {
     // A floor, so an empty scan cannot make the it.each blocks vacuous.
-    expect(pitches.length).toBeGreaterThan(10);
+    expect(sponsorSlugs.length).toBeGreaterThan(10);
   });
 
-  it.each(pitches.map((p) => p.slug))(
+  it.each(labelled)(
     'writes %s its own pitch instead of falling back to the generic one',
-    (slug) => {
-      const pitch = pitches.find((p) => p.slug === slug);
-      expect(pitch?.passesCopy).toBe(true);
-      expect(pitch?.copy.intro?.[0]).toBeTruthy();
-      expect(pitch?.copy.outro?.[0]).toBeTruthy();
-      expect(pitch?.copy.bullets?.length).toBeGreaterThan(0);
+    (_label, card) => {
+      expect(card.copyName).toBeTruthy();
+      expect(card.copy.intro?.[0]).toBeTruthy();
+      expect(card.copy.outro?.[0]).toBeTruthy();
+      expect(card.copy.bullets?.length).toBeGreaterThan(0);
     }
   );
 
-  it.each(pitches.map((p) => p.slug))(
+  it.each(labelled)(
     'renders %s as one sentence built around the sponsor name',
-    (slug) => {
-      const copy = pitches.find((p) => p.slug === slug)?.copy ?? {};
-      const intro = copy.intro?.[0] ?? '';
-      const outro = copy.outro?.[0] ?? '';
+    (_label, card) => {
+      const intro = card.copy.intro?.[0] ?? '';
+      const outro = card.copy.outro?.[0] ?? '';
       // SponsorAd emits intro, the name, and outro as sibling nodes and
       // relies on HTML collapsing the newlines between them into single
       // spaces, so each fragment must carry no padding of its own.
@@ -167,17 +217,16 @@ describe('guide sponsor copy', () => {
     }
   );
 
-  it.each(pitches.map((p) => p.slug))(
+  it.each(labelled)(
     'supports %s with well-formed bullets that never repeat the sponsor name',
-    (slug) => {
-      const copy = pitches.find((p) => p.slug === slug)?.copy ?? {};
-      for (const bullet of copy.bullets ?? []) {
+    (_label, card) => {
+      for (const bullet of card.copy.bullets ?? []) {
         expect(bullet).toBe(bullet.trim());
         expect(bullet.endsWith('.')).toBe(true);
       }
       // SponsorAd supplies the name itself; a fragment repeating it would
       // render the sponsor's name twice in a row.
-      for (const fragment of Object.values(copy).flat()) {
+      for (const fragment of Object.values(card.copy).flat()) {
         expect(fragment).not.toContain(SPONSOR.name);
       }
     }
@@ -188,6 +237,41 @@ describe('guide sponsor copy', () => {
       .filter(([, type]) => type === 'sponsor')
       .map(([slug]) => slug)
       .sort();
-    expect(configured).toEqual(pitches.map((p) => p.slug));
+    expect(configured).toEqual(sponsorSlugs);
+  });
+
+  describe('second card ahead of the apply section', () => {
+    const cardsOn = (slug: string) =>
+      cards.filter((card) => card.slug === slug);
+
+    it('appears on exactly the guides chosen for it', () => {
+      const withApplyCard = cards
+        .filter((card) => card.placement === APPLY_CARD)
+        .map((card) => card.slug)
+        .sort();
+      expect(withApplyCard).toEqual(APPLY_CARD_GUIDES);
+    });
+
+    it.each(sponsorSlugs)(
+      'gives %s one first card and no placement twice',
+      (slug) => {
+        const expected = APPLY_CARD_GUIDES.includes(slug)
+          ? [FIRST_CARD, APPLY_CARD]
+          : [FIRST_CARD];
+        // Two cards under one placement would share an impression count
+        // and make the click rate of either unreadable.
+        expect(cardsOn(slug).map((card) => card.placement)).toEqual(expected);
+      }
+    );
+
+    it.each(APPLY_CARD_GUIDES)(
+      'gives the second card on %s a different pitch from the first',
+      (slug) => {
+        const [first, second] = cardsOn(slug);
+        expect(second?.copyName).toBeTruthy();
+        expect(second?.copyName).not.toBe(first?.copyName);
+        expect(second?.copy.intro).not.toEqual(first?.copy.intro);
+      }
+    );
   });
 });
