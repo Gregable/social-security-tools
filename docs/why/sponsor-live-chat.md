@@ -42,7 +42,9 @@ before. The Chat link sits above that overlay.
 
 Clicks go through the usual "Outbound: Clicked" event. Chat clicks use the
 placements `guide-inline-chat` and `guide-footer-chat`, beside the existing
-`guide-inline` and `guide-footer` for scheduling. Both buttons share one
+`guide-inline` and `guide-footer` for scheduling. The second card on these
+guides (see sponsor-apply-card.md) reports its chat clicks as
+`guide-inline-apply-chat`. Both buttons share one
 impression per card. Because the overlay counts clicks on the card body as
 scheduling, schedule has the larger target, and a raw comparison slightly
 favors it.

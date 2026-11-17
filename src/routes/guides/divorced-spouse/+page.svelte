@@ -15,6 +15,18 @@ const sponsorCopy: SponsorCopy = {
   ],
 };
 
+// The second card, ahead of "How to Apply": the reader has decided to
+// claim, so this one is about getting the claim right, not whether to.
+const applySponsorCopy: SponsorCopy = {
+  intro: "A divorced-spouse claim usually takes an appointment and paperwork from a marriage that ended years ago. Before you apply, you can have a Social Security specialist at",
+  outro: "check which record pays you more and what SSA will ask for.",
+  bullets: [
+    "They compare your own benefit with the one on your ex's record, so you know what you will be paid and file at the right age.",
+    "If you want more help after that, they can also handle the filing.",
+    "The first call is free, and you pick the time.",
+  ],
+};
+
 const title = 'Social Security Benefits for Divorced Spouses: Eligibility, Rules & How to Claim';
 const description =
   'Can you collect Social Security from your ex-spouse? Learn the divorced spouse benefit rules, including the 10-year marriage requirement, how benefits are calculated, and whether your ex needs to know.';
@@ -316,6 +328,12 @@ const faqs = [
     earnings, or if you delay claiming past your full retirement age (your own
     benefit grows with delay, but the divorced spouse benefit doesn't).
   </p>
+
+  <InlineCTA
+    type="sponsor"
+    placement="guide-inline-apply"
+    sponsorCopy={applySponsorCopy}
+  />
 
   <h2>How to Apply for Divorced Spouse Benefits</h2>
 

@@ -15,6 +15,18 @@ const sponsorCopy: SponsorCopy = {
   ],
 };
 
+// The second card, ahead of "How to Apply": the reader has decided to
+// claim, so this one is about the filing itself.
+const applySponsorCopy: SponsorCopy = {
+  intro: "The month your spousal benefit starts sets its size, and that is hard to change afterward. Before you file, you can have a Social Security specialist at",
+  outro: "check your timing against your spouse's.",
+  bullets: [
+    "They check whether you are filing for one benefit or two, since one application covers both.",
+    "If you want more help after that, they can also handle the filing.",
+    "The first call is free, and you pick the time.",
+  ],
+};
+
 const title =
   'Social Security Spousal Benefits: Eligibility, How Much You Get, and When to Claim';
 const description =
@@ -353,6 +365,12 @@ const faqs: FAQItem[] = [
     <a href="/guides/inflation">cost-of-living adjustment</a> as retirement
     benefits.
   </p>
+
+  <InlineCTA
+    type="sponsor"
+    placement="guide-inline-apply"
+    sponsorCopy={applySponsorCopy}
+  />
 
   <h2>How to Apply for Spousal Benefits</h2>
 

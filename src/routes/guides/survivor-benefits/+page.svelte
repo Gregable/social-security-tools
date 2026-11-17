@@ -15,6 +15,20 @@ const sponsorCopy: SponsorCopy = {
   ],
 };
 
+// The second card, ahead of "How to Apply". The section below tells the
+// reader to call SSA at once to protect the filing date, so this pitch
+// must never read as a reason to put that call off. The intro says so
+// itself, because phones do not show the bullets.
+const applySponsorCopy: SponsorCopy = {
+  intro: "Survivor claims are made by phone or in person, and which benefit you ask for decides what you are paid for years. Once you have called Social Security to protect your filing date, you can talk that choice through with a Social Security specialist at",
+  outro: "before your appointment.",
+  bullets: [
+    "Do not wait on this to make your first call to Social Security; that call protects your filing date.",
+    "They work out from both records which benefit to start now and which to switch to later.",
+    "The first call is free, and you pick the time.",
+  ],
+};
+
   const title =
     "Social Security Survivor Benefits: Guide for Widows, Widowers & Families";
   const description =
@@ -462,6 +476,12 @@ const sponsorCopy: SponsorCopy = {
       delayed retirement credits.
     </p>
   </div>
+
+  <InlineCTA
+    type="sponsor"
+    placement="guide-inline-apply"
+    sponsorCopy={applySponsorCopy}
+  />
 
   <h2>How to Apply for Survivor Benefits</h2>
 

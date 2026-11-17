@@ -6,7 +6,11 @@ import { page } from '$app/stores';
 import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
-import { type GuideCTAType, guideOffersChat } from './guide-cta-config';
+import {
+  type GuideCTAType,
+  type GuideSponsorPlacement,
+  guideOffersChat,
+} from './guide-cta-config';
 import { guideSlugFromPath } from './guide-slug';
 
 export let type: GuideCTAType;
@@ -16,6 +20,11 @@ export let type: GuideCTAType;
  * variant supplies its own; guide-sponsor-copy-sync.test.ts enforces that.
  */
 export let sponsorCopy: SponsorCopy = DEFAULT_SPONSOR_COPY;
+/**
+ * Which sponsor card this is, for analytics. Only a guide's second card
+ * sets it. The calculator variant ignores it.
+ */
+export let placement: GuideSponsorPlacement = 'guide-inline';
 
 let ctaElement: HTMLElement;
 
@@ -23,13 +32,13 @@ $: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
 $: offersChat = guideOffersChat($page?.url?.pathname ?? '');
 
 function handleChatClick() {
-  trackOutboundClick(SPONSOR.destination, 'guide-inline-chat', { guide_slug: guideSlug });
+  trackOutboundClick(SPONSOR.destination, `${placement}-chat`, { guide_slug: guideSlug });
 }
 
 function handleClick() {
   if (!browser) return;
   if (type === 'sponsor') {
-    trackOutboundClick(SPONSOR.destination, 'guide-inline', { guide_slug: guideSlug });
+    trackOutboundClick(SPONSOR.destination, placement, { guide_slug: guideSlug });
   } else {
     posthog.capture('Guide Inline CTA: Clicked', { type, guide_slug: guideSlug });
   }
@@ -42,7 +51,7 @@ onMount(() => {
         if (entry.isIntersecting) {
           if (browser) {
             if (type === 'sponsor') {
-              trackOutboundImpression(SPONSOR.destination, 'guide-inline', { guide_slug: guideSlug });
+              trackOutboundImpression(SPONSOR.destination, placement, { guide_slug: guideSlug });
             } else {
               posthog.capture('Guide Inline CTA: Visible', { type, guide_slug: guideSlug });
             }
