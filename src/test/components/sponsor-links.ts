@@ -1,4 +1,8 @@
 import { SPONSOR } from '$lib/sponsor';
+import { SPONSOR_REF_ALPHABET } from '$lib/sponsor-ref';
+
+/** A ref as newSponsorRef makes it. */
+export const SPONSOR_REF_PATTERN = new RegExp(`^[${SPONSOR_REF_ALPHABET}]{6}$`);
 
 /**
  * Whether `a` links to `href`. Chat links carry a per-card ref in their
@@ -11,11 +15,12 @@ export function isLinkTo(
 ): boolean {
   const actual = a.getAttribute('href');
   if (actual === href) return true;
+  if (actual === null || href === undefined || href !== SPONSOR.chatUrl) {
+    return false;
+  }
+  const url = new URL(a.href);
   return (
-    href !== undefined &&
-    href === SPONSOR.chatUrl &&
-    actual !== null &&
-    actual.startsWith(`${href}?params=`)
+    `${url.origin}${url.pathname}` === href && url.searchParams.has('params')
   );
 }
 

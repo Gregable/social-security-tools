@@ -18,7 +18,7 @@ browser, and it is code we do not control running on every page.
 ## What we did instead
 
 LiveChat also hosts a chat page for each account at
-`https://direct.lc.chat/<license>/`. We link to it. The chat happens on
+`https://direct.lc.chat/<license>` (no trailing slash; see below). We link to it. The chat happens on
 their domain, in a new tab, and nothing of theirs runs on ssa.tools.
 
 The snippet's own fallback link, `livechat.com/chat-with/<license>/`, is not
@@ -52,7 +52,7 @@ favors it.
 ## Matching chats to clicks
 
 The sponsor's referral sheet and our PostHog clicks could only be matched by
-date. So each card with a chat link now makes a random six-character code
+date. So each sponsor card now makes a random six-character code
 when it mounts (`src/lib/sponsor-ref.ts`), puts it on the chat link as
 `?params=ref%3D<code>%26source%3Dssa.tools`, and logs the same code as
 `ref` on the chat click event. The LiveChat chat page turns `params` into

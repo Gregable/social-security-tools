@@ -2,7 +2,7 @@ import posthog from 'posthog-js';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SPONSOR } from '$lib/sponsor';
-import { isLinkTo, refOnChatLink } from './sponsor-links';
+import { isLinkTo, refOnChatLink, SPONSOR_REF_PATTERN } from './sponsor-links';
 
 vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 
@@ -129,7 +129,7 @@ describe('sponsor chat trial on guides', () => {
     it('logs the ref carried on the chat link with the chat click', () => {
       const chat = linkTo(renderInline(TRIAL_GUIDE), SPONSOR.chatUrl);
       const ref = refOnChatLink(chat);
-      expect(ref).toMatch(/^[2-9A-Z]{6}$/);
+      expect(ref).toMatch(SPONSOR_REF_PATTERN);
       chat.click();
       expect(outboundClickProps()).toEqual([expect.objectContaining({ ref })]);
     });
@@ -154,6 +154,8 @@ describe('sponsor chat trial on guides', () => {
           guide_slug: 'spousal-benefits',
         }),
       ]);
+      // The schedule link carries no ref, so its click must not claim one.
+      expect(outboundClickProps()[0]).not.toHaveProperty('ref');
     });
 
     it('stays a single schedule link on guides outside the trial', () => {
@@ -172,7 +174,7 @@ describe('sponsor chat trial on guides', () => {
         SPONSOR.chatUrl
       );
       const ref = refOnChatLink(chat);
-      expect(ref).toMatch(/^[2-9A-Z]{6}$/);
+      expect(ref).toMatch(SPONSOR_REF_PATTERN);
       chat.click();
       expect(outboundClickProps()).toEqual([
         expect.objectContaining({
@@ -192,6 +194,8 @@ describe('sponsor chat trial on guides', () => {
           guide_slug: 'divorced-spouse',
         }),
       ]);
+      // The schedule link carries no ref, so its click must not claim one.
+      expect(outboundClickProps()[0]).not.toHaveProperty('ref');
     });
 
     it('stays a single schedule link on guides outside the trial', () => {

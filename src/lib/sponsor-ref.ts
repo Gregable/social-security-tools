@@ -17,7 +17,11 @@ const REF_LENGTH = 6;
 /** Largest multiple of the alphabet size below 256, for unbiased picks. */
 const BYTE_LIMIT = 256 - (256 % SPONSOR_REF_ALPHABET.length);
 
-/** A fresh six-character code. Browser only: needs crypto.getRandomValues. */
+/**
+ * A fresh six-character code. Call it on mount, never at render: guides
+ * are prerendered, so a code made at render would be shared by every
+ * reader (see InlineCTA and sponsor-chat-prerender.test.ts).
+ */
 export function newSponsorRef(): string {
   let ref = '';
   while (ref.length < REF_LENGTH) {

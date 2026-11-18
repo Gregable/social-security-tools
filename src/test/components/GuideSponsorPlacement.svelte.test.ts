@@ -2,7 +2,7 @@ import posthog from 'posthog-js';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SPONSOR } from '$lib/sponsor';
-import { isLinkTo } from './sponsor-links';
+import { isLinkTo, refOnChatLink } from './sponsor-links';
 
 vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 
@@ -112,11 +112,22 @@ describe('sponsor card placement on guides', () => {
     // The chat trial card is a different element from the plain one, so
     // its impression is worth checking separately.
     expect(placements('Outbound: Visible')).toEqual(['guide-inline-apply']);
+    const chat = Array.from(target.querySelectorAll('a')).find((a) =>
+      isLinkTo(a, SPONSOR.chatUrl)
+    );
+    const ref = chat ? refOnChatLink(chat) : null;
+    expect(ref).not.toBeNull();
     clickLinkTo(target, SPONSOR.chatUrl);
     clickLinkTo(target, SPONSOR.url);
     expect(placements('Outbound: Clicked')).toEqual([
       'guide-inline-apply-chat',
       'guide-inline-apply',
     ]);
+    const clicks = vi
+      .mocked(posthog.capture)
+      .mock.calls.filter(([name]) => name === 'Outbound: Clicked')
+      .map(([, props]) => props);
+    expect(clicks[0]).toEqual(expect.objectContaining({ ref }));
+    expect(clicks[1]).not.toHaveProperty('ref');
   });
 });
