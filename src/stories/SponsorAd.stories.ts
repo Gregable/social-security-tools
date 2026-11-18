@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
 import SponsorAd from '$lib/components/SponsorAd.svelte';
+import { SPONSOR } from '$lib/sponsor';
 
 const meta: Meta<SponsorAd> = {
   component: SponsorAd,
@@ -25,13 +26,13 @@ const noop = () => {};
 
 export const WithChat: Story = {
   args: {
-    links: { onSchedule: noop, onChat: noop },
+    links: { onSchedule: noop, onChat: noop, chatHref: SPONSOR.chatUrl ?? '' },
   },
 };
 
 export const WithChatMobile: Story = {
   args: {
-    links: { onSchedule: noop, onChat: noop },
+    links: { onSchedule: noop, onChat: noop, chatHref: SPONSOR.chatUrl ?? '' },
   },
   parameters: {
     viewport: {

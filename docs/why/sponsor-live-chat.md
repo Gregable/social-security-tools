@@ -18,7 +18,7 @@ browser, and it is code we do not control running on every page.
 ## What we did instead
 
 LiveChat also hosts a chat page for each account at
-`https://direct.lc.chat/<license>/`. We link to it. The chat happens on
+`https://direct.lc.chat/<license>` (no trailing slash; see below). We link to it. The chat happens on
 their domain, in a new tab, and nothing of theirs runs on ssa.tools.
 
 The snippet's own fallback link, `livechat.com/chat-with/<license>/`, is not
@@ -48,6 +48,23 @@ guides (see sponsor-apply-card.md) reports its chat clicks as
 impression per card. Because the overlay counts clicks on the card body as
 scheduling, schedule has the larger target, and a raw comparison slightly
 favors it.
+
+## Matching chats to clicks
+
+The sponsor's referral sheet and our PostHog clicks could only be matched by
+date. So each sponsor card now makes a random six-character code
+when it mounts (`src/lib/sponsor-ref.ts`), puts it on the chat link as
+`?params=ref%3D<code>%26source%3Dssa.tools`, and logs the same code as
+`ref` on the chat click event. The LiveChat chat page turns `params` into
+session variables, which agents see in the chat's details. When the sponsor
+copies the code into their sheet, one PostHog query finds the click and its
+session.
+
+The code is random per card, not a PostHog id, so the sponsor never gets an
+identifier that follows a reader across visits. It is made on mount rather
+than at render because the guides are prerendered: a code made at build
+time would be shared by every reader. The link has no trailing slash because
+LiveChat redirects `/4725641/` to `/4725641` and drops the query string.
 
 ## Ending the trial
 

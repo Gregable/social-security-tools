@@ -23,6 +23,10 @@ describe('SPONSOR config', () => {
     expect(chat.protocol).toBe('https:');
     expect(chat.pathname.endsWith('.js')).toBe(false);
   });
+
+  it('links chat without a trailing slash, which would drop the ref', () => {
+    expect(new URL(SPONSOR.chatUrl ?? '').pathname.endsWith('/')).toBe(false);
+  });
 });
 
 describe('DEFAULT_SPONSOR_COPY', () => {

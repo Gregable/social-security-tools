@@ -2,6 +2,7 @@ import posthog from 'posthog-js';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SPONSOR } from '$lib/sponsor';
+import { isLinkTo, refOnChatLink, SPONSOR_REF_PATTERN } from './sponsor-links';
 
 vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 
@@ -78,18 +79,21 @@ describe('sponsor chat trial on guides', () => {
   /** Sponsor links in render order, ignoring the footer's calculator link. */
   function sponsorLinks(target: HTMLElement): HTMLAnchorElement[] {
     return Array.from(target.querySelectorAll('a')).filter(
-      (a) =>
-        a.getAttribute('href') === SPONSOR.url ||
-        a.getAttribute('href') === SPONSOR.chatUrl
+      (a) => isLinkTo(a, SPONSOR.url) || isLinkTo(a, SPONSOR.chatUrl)
     );
   }
 
-  function clickLinkTo(target: HTMLElement, href: string | undefined): void {
-    const link = sponsorLinks(target).find(
-      (a) => a.getAttribute('href') === href
-    );
+  function linkTo(
+    target: HTMLElement,
+    href: string | undefined
+  ): HTMLAnchorElement {
+    const link = sponsorLinks(target).find((a) => isLinkTo(a, href));
     expect(link).toBeDefined();
-    link?.click();
+    return link as HTMLAnchorElement;
+  }
+
+  function clickLinkTo(target: HTMLElement, href: string | undefined): void {
+    linkTo(target, href).click();
   }
 
   function outboundClickProps(): unknown[] {
@@ -102,10 +106,9 @@ describe('sponsor chat trial on guides', () => {
   describe('inline sponsor card', () => {
     it('offers Schedule and Chat as separate links on a trial guide', () => {
       const links = sponsorLinks(renderInline(TRIAL_GUIDE));
-      expect(links.map((a) => a.getAttribute('href'))).toEqual([
-        SPONSOR.url,
-        SPONSOR.chatUrl,
-      ]);
+      expect(links).toHaveLength(2);
+      expect(isLinkTo(links[0], SPONSOR.url)).toBe(true);
+      expect(isLinkTo(links[1], SPONSOR.chatUrl)).toBe(true);
       for (const link of links) {
         expect(link.target).toBe('_blank');
         expect(link.rel).toContain('noopener');
@@ -123,6 +126,26 @@ describe('sponsor chat trial on guides', () => {
       ]);
     });
 
+    it('logs the ref carried on the chat link with the chat click', () => {
+      const chat = linkTo(renderInline(TRIAL_GUIDE), SPONSOR.chatUrl);
+      const ref = refOnChatLink(chat);
+      expect(ref).toMatch(SPONSOR_REF_PATTERN);
+      chat.click();
+      expect(outboundClickProps()).toEqual([expect.objectContaining({ ref })]);
+    });
+
+    it('gives each card its own ref', () => {
+      const first = refOnChatLink(
+        linkTo(renderInline(TRIAL_GUIDE), SPONSOR.chatUrl)
+      );
+      const second = refOnChatLink(
+        linkTo(renderInline(TRIAL_GUIDE), SPONSOR.chatUrl)
+      );
+      expect(first).not.toBeNull();
+      expect(second).not.toBeNull();
+      expect(first).not.toBe(second);
+    });
+
     it('still reports a schedule click as guide-inline, once', () => {
       clickLinkTo(renderInline(TRIAL_GUIDE), SPONSOR.url);
       expect(outboundClickProps()).toEqual([
@@ -131,6 +154,8 @@ describe('sponsor chat trial on guides', () => {
           guide_slug: 'spousal-benefits',
         }),
       ]);
+      // The schedule link carries no ref, so its click must not claim one.
+      expect(outboundClickProps()[0]).not.toHaveProperty('ref');
     });
 
     it('stays a single schedule link on guides outside the trial', () => {
@@ -143,13 +168,20 @@ describe('sponsor chat trial on guides', () => {
   });
 
   describe('guide footer', () => {
-    it('reports a chat click under its own placement', () => {
-      clickLinkTo(renderFooter(TRIAL_GUIDE_WITH_SLASH), SPONSOR.chatUrl);
+    it('reports a chat click under its own placement, with its ref', () => {
+      const chat = linkTo(
+        renderFooter(TRIAL_GUIDE_WITH_SLASH),
+        SPONSOR.chatUrl
+      );
+      const ref = refOnChatLink(chat);
+      expect(ref).toMatch(SPONSOR_REF_PATTERN);
+      chat.click();
       expect(outboundClickProps()).toEqual([
         expect.objectContaining({
           destination: SPONSOR.destination,
           placement: 'guide-footer-chat',
           guide_slug: 'divorced-spouse',
+          ref,
         }),
       ]);
     });
@@ -162,6 +194,8 @@ describe('sponsor chat trial on guides', () => {
           guide_slug: 'divorced-spouse',
         }),
       ]);
+      // The schedule link carries no ref, so its click must not claim one.
+      expect(outboundClickProps()[0]).not.toHaveProperty('ref');
     });
 
     it('stays a single schedule link on guides outside the trial', () => {
