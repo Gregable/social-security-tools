@@ -2,6 +2,7 @@ import posthog from 'posthog-js';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SPONSOR } from '$lib/sponsor';
+import { isLinkTo } from './sponsor-links';
 
 vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 
@@ -69,8 +70,8 @@ describe('sponsor card placement on guides', () => {
   }
 
   function clickLinkTo(target: HTMLElement, href: string | undefined): void {
-    const link = Array.from(target.querySelectorAll('a')).find(
-      (a) => a.getAttribute('href') === href
+    const link = Array.from(target.querySelectorAll('a')).find((a) =>
+      isLinkTo(a, href)
     );
     expect(link).toBeDefined();
     link?.click();

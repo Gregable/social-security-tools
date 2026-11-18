@@ -5,6 +5,7 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { SPONSOR } from '$lib/sponsor';
+import { chatUrlWithRef, newSponsorRef } from '$lib/sponsor-ref';
 import { guideOffersChat } from './guide-cta-config';
 import { guideSlugFromPath } from './guide-slug';
 
@@ -12,6 +13,10 @@ $: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
 $: offersChat = guideOffersChat($page?.url?.pathname ?? '');
 
 let footerElement: HTMLElement;
+/** Made on mount, not at render: see the same field in InlineCTA. */
+let chatRef = '';
+
+$: chatHref = SPONSOR.chatUrl ? chatUrlWithRef(SPONSOR.chatUrl, chatRef) : '';
 
 function handleCtaClick() {
   if (browser) {
@@ -27,10 +32,14 @@ function handleSponsorClick() {
 }
 
 function handleChatClick() {
-  trackOutboundClick(SPONSOR.destination, 'guide-footer-chat', { guide_slug: guideSlug });
+  trackOutboundClick(SPONSOR.destination, 'guide-footer-chat', {
+    guide_slug: guideSlug,
+    ...(chatRef && { ref: chatRef }),
+  });
 }
 
 onMount(() => {
+  chatRef = newSponsorRef();
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -147,7 +156,7 @@ onMount(() => {
             on:click={handleSponsorClick}>Schedule a Free Call &rarr;</a
           >
           <a
-            href={SPONSOR.chatUrl}
+            href={chatHref}
             class="sponsor-cta above"
             target="_blank"
             rel="noopener nofollow"

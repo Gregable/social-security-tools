@@ -23,7 +23,9 @@ export interface SponsorConfig {
    * the guides in CHAT_TRIAL_GUIDES. Leaving it unset turns the trial off
    * everywhere. Always a page we link to, never a widget script: a
    * third-party script on ssa.tools could read the earnings and birthdates
-   * the privacy guide promises stay in the browser.
+   * the privacy guide promises stay in the browser. Placements add a ref
+   * code with chatUrlWithRef. No trailing slash: LiveChat redirects the
+   * slash form to this one and drops the query string on the way.
    */
   readonly chatUrl?: string;
 }
@@ -64,5 +66,5 @@ export const SPONSOR: SponsorConfig = {
   name: 'Social Security Advisors',
   url: 'https://app.acuityscheduling.com/schedule/7e26ca70/appointment/97656215/calendar/167392?appointmentTypeIds[]=97656215',
   destination: 'socialsecurityadvisors',
-  chatUrl: 'https://direct.lc.chat/4725641/',
+  chatUrl: 'https://direct.lc.chat/4725641',
 };

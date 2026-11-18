@@ -9,6 +9,8 @@
 export interface SponsorAdLinks {
   readonly onSchedule: () => void;
   readonly onChat: () => void;
+  /** SPONSOR.chatUrl with this card's ref attached (see sponsor-ref.ts). */
+  readonly chatHref: string;
 }
 </script>
 
@@ -76,7 +78,7 @@ export let links: SponsorAdLinks | null = null;
               </a>
               <a
                 class="cta-link above"
-                href={SPONSOR.chatUrl}
+                href={links.chatHref}
                 target="_blank"
                 rel="noopener nofollow"
                 on:click={links.onChat}

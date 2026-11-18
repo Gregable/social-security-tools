@@ -6,6 +6,7 @@ import { page } from '$app/stores';
 import SponsorAd from '$lib/components/SponsorAd.svelte';
 import { trackOutboundClick, trackOutboundImpression } from '$lib/analytics/outbound';
 import { DEFAULT_SPONSOR_COPY, SPONSOR, type SponsorCopy } from '$lib/sponsor';
+import { chatUrlWithRef, newSponsorRef } from '$lib/sponsor-ref';
 import {
   type GuideCTAType,
   type GuideSponsorPlacement,
@@ -27,12 +28,21 @@ export let sponsorCopy: SponsorCopy = DEFAULT_SPONSOR_COPY;
 export let placement: GuideSponsorPlacement = 'guide-inline';
 
 let ctaElement: HTMLElement;
+/**
+ * This card's chat ref. Made on mount, not at render: the guides are
+ * prerendered, and a code made then would be shared by every reader.
+ */
+let chatRef = '';
 
 $: guideSlug = guideSlugFromPath($page?.url?.pathname ?? '');
 $: offersChat = guideOffersChat($page?.url?.pathname ?? '');
+$: chatHref = SPONSOR.chatUrl ? chatUrlWithRef(SPONSOR.chatUrl, chatRef) : '';
 
 function handleChatClick() {
-  trackOutboundClick(SPONSOR.destination, `${placement}-chat`, { guide_slug: guideSlug });
+  trackOutboundClick(SPONSOR.destination, `${placement}-chat`, {
+    guide_slug: guideSlug,
+    ...(chatRef && { ref: chatRef }),
+  });
 }
 
 function handleClick() {
@@ -45,6 +55,7 @@ function handleClick() {
 }
 
 onMount(() => {
+  chatRef = newSponsorRef();
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -127,7 +138,7 @@ onMount(() => {
   <div class="inline-cta sponsor" bind:this={ctaElement}>
     <SponsorAd
       copy={sponsorCopy}
-      links={{ onSchedule: handleClick, onChat: handleChatClick }}
+      links={{ onSchedule: handleClick, onChat: handleChatClick, chatHref }}
     />
   </div>
 {:else}
