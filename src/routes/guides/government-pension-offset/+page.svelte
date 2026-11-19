@@ -94,7 +94,7 @@ const faqs: FAQItem[] = [
   {
     question: 'Why is Fairness Act back pay limited to 6 months for some people?',
     answer:
-      'The ordinary rule for any retirement, spouse, or survivor application is at most six months of back pay, and usually none for a benefit reduced for claiming before full retirement age. The Act left that rule in place. People already entitled to a reduced or $0 benefit were paid back to January 2024; people who apply now get the ordinary limit. Senators asked Social Security in April 2025 and again in February 2026 to pay new applicants back to January 2024. Social Security answered in April 2025 that the law did not change retroactivity, and we have found no change since.',
+      'The ordinary rule for any retirement, spouse, or survivor application is at most six months of back pay, and usually none for a benefit reduced for claiming before full retirement age. The Act left that rule in place. People already entitled to a reduced or $0 benefit were paid back to January 2024; people who apply now get the ordinary limit.',
   },
   {
     question: 'I never received my Fairness Act back pay. What should I do?',
@@ -321,19 +321,6 @@ const faqs: FAQItem[] = [
       for people who did not apply earlier because of GPO.
     </li>
   </ul>
-
-  <p>
-    Some senators have pushed for more. In April 2025, and again in a
-    <a
-      href="https://www.cassidy.senate.gov/wp-content/uploads/2026/02/Cassidy-Letter-to-SSA-on-WEP-GPO-Retroactivity-2.5.26.pdf"
-      >February 2026 letter</a
-    >, senators asked Social Security to pay people in this group back to
-    {repealStart}. Social Security
-    <a href="https://www.congress.gov/crs-product/IF13181">replied in April 2025</a
-    > that the Act did not change retroactivity. We have found no change to
-    that answer. Do not wait for one: applying now protects the months you
-    can still get.
-  </p>
 
   <h3>If Social Security told you not to apply</h3>
 
