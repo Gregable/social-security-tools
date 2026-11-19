@@ -11,7 +11,8 @@ export interface SitemapEntry {
   readonly priority: string;
   /**
    * Last meaningful content change. Left out where no honest date exists
-   * (the app pages change with every deploy), since a lastmod that does
+   * (the app pages change with every deploy; about, contact and the author
+   * page have no tracked edit date), since a lastmod that does
    * not track real changes teaches Google to ignore the site's lastmods.
    */
   readonly lastmod?: IsoDay;

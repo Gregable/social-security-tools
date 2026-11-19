@@ -71,6 +71,28 @@ describe('Guides registry, sitemap and index synchronization', () => {
     ).toEqual([]);
   });
 
+  it('every guide shows both registry dates in its byline and schema', () => {
+    // Bumping `updated` in the registry moves the sitemap lastmod, so the
+    // page has to show it too, or the page and the sitemap disagree. The
+    // byline hides an update date equal to the publish date.
+    const required = [
+      'schema.datePublished = publishDate.toISOString();',
+      'schema.dateModified = updateDate.toISOString();',
+      '<GuideByline {publishDate} {updateDate} />',
+    ];
+    const wrong = guides.filter((g) => {
+      const source = readFileSync(
+        resolve(guidesDir, g, '+page.svelte'),
+        'utf-8'
+      );
+      return !required.every((line) => source.includes(line));
+    });
+    expect(
+      wrong,
+      `Guides not wiring both dates into schema and byline: ${wrong.join(', ')}`
+    ).toEqual([]);
+  });
+
   it('every guide directory is linked from the guides index', () => {
     const missing = guides.filter(
       (g) => !indexLinks.includes(g) && !INDEX_EXCEPTIONS.includes(g)

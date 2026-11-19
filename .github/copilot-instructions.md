@@ -38,9 +38,11 @@ The core logic resides in `src/lib/` and strictly follows SSA rules.
 
 ## Guide Writing Guidelines:
 
-- **Always use current date for new guides**: Use the `date --iso-8601` command
-  to get the current date for both `published` and `modified` fields in guide
-  metadata
+- **Guide dates live in `src/lib/guide-dates.ts`**: add the new guide to
+  `GUIDE_DATES` (use `date --iso-8601` for both `published` and `updated`) and
+  read them in the page with `guideDates('<slug>')`; this also adds the guide
+  to `sitemap.xml`. When revising a guide's content, bump its `updated` date,
+  which becomes the sitemap `<lastmod>`; skip it for styling-only changes
 - Guides should be placed in `/src/routes/guides/{topic}/+page.svelte` following
   SvelteKit routing conventions
 - Include proper schema.org structured data for SEO (Article, author,

@@ -42,14 +42,14 @@ describe('GUIDE_DATES', () => {
 
 describe('guideDates', () => {
   it('returns UTC-midnight dates matching the registry', () => {
-    const { publishDate, updateDate } = guideDates('60k-income');
-    expect(publishDate.toISOString()).toBe('2025-06-15T00:00:00.000Z');
-    expect(updateDate.toISOString()).toBe('2026-10-14T00:00:00.000Z');
-  });
-
-  it('returns equal dates for a guide that was never revised', () => {
-    const { publishDate, updateDate } = guideDates('remarriage');
-    expect(updateDate.getTime()).toBe(publishDate.getTime());
+    for (const slug of slugs) {
+      const { publishDate, updateDate } = guideDates(slug);
+      const { published, updated } = GUIDE_DATES[slug];
+      expect(publishDate.toISOString(), slug).toBe(
+        `${published}T00:00:00.000Z`
+      );
+      expect(updateDate.toISOString(), slug).toBe(`${updated}T00:00:00.000Z`);
+    }
   });
 
   it('returns fresh Date objects, so callers cannot alter the registry', () => {

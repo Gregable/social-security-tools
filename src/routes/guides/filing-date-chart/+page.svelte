@@ -13,13 +13,14 @@ import SliderImage from './slider.png';
 const title = 'Navigate the Filing Date Chart';
 const description =
   "This site's calculator shows a information dense chart of how filing dates affect your benefits. The chart can be a little confusing at first, so here's a guide to help you understand it.";
-const { publishDate } = guideDates('filing-date-chart');
+const { publishDate, updateDate } = guideDates('filing-date-chart');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/filing-date-chart';
 schema.title = title;
 schema.image = HeroImage;
 schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
 schema.description = description; // Pass the description to the schema
 schema.imageAlt =
   'Laptop with piggybank representing Social Security filing strategies';
@@ -52,7 +53,7 @@ schema.tags = [
     <figcaption>Combined filing date chart for an example couple</figcaption>
   </figure>
 
-  <GuideByline {publishDate} />
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     This site's calculator shows a information dense chart of how filing dates

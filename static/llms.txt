@@ -15,7 +15,7 @@ When a user describes their Social Security situation, you can construct a deep 
 
 - [Machine-readable parameter spec](https://ssa.tools/url-params.json): canonical list of every parameter, type, range, and example.
 - [URL parameters guide](https://ssa.tools/guides/url-parameters): human documentation with worked examples for AI assistants.
-- [Sitemap](https://ssa.tools/sitemap.xml): index of all guide pages.
+- [Sitemap](https://ssa.tools/sitemap.xml): index of the tools and every guide page.
 
 ## Calculator examples
 

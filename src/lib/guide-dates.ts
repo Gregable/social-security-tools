@@ -2,9 +2,10 @@
  * Publish and last-update dates for every guide, keyed by the guide's slug
  * (its directory under src/routes/guides).
  *
- * This is the only place a guide's dates live. The guide's byline and its
- * schema.org markup read them through guideDates(), and sitemap.xml sends
- * `updated` to search engines as <lastmod>. Bump `updated` when a guide's
+ * Every guide's byline and schema.org markup read these through
+ * guideDates(), and sitemap.xml sends `updated` to search engines as
+ * <lastmod>. (The guides index page still types its own display dates;
+ * keep them in step by hand.) Bump `updated` when a guide's
  * content changes in a way a reader would notice (new figures, new sections,
  * corrected advice), not for styling or sponsor-card tweaks: Google only
  * trusts lastmod from sites whose dates track real content changes.

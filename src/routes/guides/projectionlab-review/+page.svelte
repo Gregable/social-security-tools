@@ -13,13 +13,14 @@
     "ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security";
   const description =
     "A review of ProjectionLab, a retirement planning tool that complements Social Security calculators like SSA.tools. Covers features, pros and cons, and an exclusive SSA-TOOLS coupon code for 10% off.";
-  const { publishDate } = guideDates("projectionlab-review");
+  const { publishDate, updateDate } = guideDates("projectionlab-review");
 
   const schema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/projectionlab-review";
   schema.title = title;
   schema.description = description;
   schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
   schema.image = "https://ssa.tools/laptop-piggybank.jpg";
   schema.imageAlt = "ProjectionLab retirement planning tool review";
   schema.tags = [
@@ -66,7 +67,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <GuideByline {publishDate} />
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     This site focuses on one thing: helping you understand your Social Security
