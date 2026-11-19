@@ -63,6 +63,7 @@
   import { UrlParams } from "$lib/url-params";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
+  import StrategyIntro from "./components/StrategyIntro.svelte";
   import NoFilingDecisionPanel from "./components/NoFilingDecisionPanel.svelte";
   import RecipientInputs from "./components/RecipientInputs.svelte";
   import ScenarioDetail from "./components/ScenarioDetail.svelte";
@@ -997,6 +998,7 @@
         transition:slide={{ duration: 320, easing: cubicOut }}
       >
         <ModePicker onselect={handleModeSelect} />
+        <StrategyIntro />
       </section>
     {/if}
 
