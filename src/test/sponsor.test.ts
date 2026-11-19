@@ -78,6 +78,7 @@ describe('sponsor chat trial', () => {
   it('offers chat on the trial guides, with or without a trailing slash', () => {
     expect(guideOffersChat('/guides/divorced-spouse')).toBe(true);
     expect(guideOffersChat('/guides/spousal-benefits/')).toBe(true);
+    expect(guideOffersChat('/guides/government-pension-offset')).toBe(true);
   });
 
   it('does not offer chat on other guides or outside guides', () => {

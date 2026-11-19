@@ -83,15 +83,18 @@ export function getGuideCTAType(pathname: string): GuideCTAType {
 
 /**
  * Guides that offer a live chat with the sponsor beside the scheduling
- * link, as a trial. Chosen in October 2026 as the two guides with the most
+ * link, as a trial. Started in October 2026 on the two guides with the most
  * sponsor impressions and clicks, so chat and scheduling clicks can be
- * compared on the same impressions. Every entry must be a 'sponsor' guide
+ * compared on the same impressions. government-pension-offset joined at
+ * launch in November 2026, after a Fairness Act back-pay case reached the
+ * sponsor through chat. Every entry must be a 'sponsor' guide
  * (sponsor.test.ts checks): a calculator guide's inline card has no
  * sponsor, so it would offer chat only in the footer. Empty the set to end
  * the trial; every card and footer then go back to the single link.
  */
 export const CHAT_TRIAL_GUIDES: ReadonlySet<string> = new Set([
   'divorced-spouse',
+  'government-pension-offset',
   'spousal-benefits',
 ]);
 
