@@ -30,7 +30,8 @@
         Enter your date of birth and your Primary Insurance Amount (PIA), the
         monthly benefit Social Security pays if you file at full retirement
         age. The optimizer checks every month you could file, up to age 70,
-        and recommends the one with the largest expected lifetime benefit.
+        and recommends the one with the largest expected lifetime benefit in
+        today's dollars.
       </p>
     </div>
     <div class="media">
@@ -49,10 +50,11 @@
       <h3 class="section-title">Planned for every possible life span</h3>
       <p>
         Filing early pays off if you die young, and waiting pays off if you
-        live long. Nobody knows which, so the optimizer finds the best filing
-        age for each possible age of death, then weights each one by the
-        chance you live that long, using Social Security's life tables for
-        your birth year.
+        live long. Nobody knows which, so for each filing month the optimizer
+        averages your lifetime benefits over every possible age of death,
+        weighted by how likely each one is under Social Security's life
+        tables for your birth year. A chart shows how the best filing age
+        changes with the age you die.
       </p>
     </div>
     <div class="media">
@@ -62,7 +64,7 @@
         height="412"
         loading="lazy"
         decoding="async"
-        alt="Chart of the best filing age for each possible age of death: 62 for someone who dies around 80, rising to 70 for someone who lives past 88, next to the chance of having died by each age."
+        alt="Chart of the best filing age for each possible age of death: about 62 for deaths before 81, rising in steps to 70 for deaths after about 88, next to the chance of having died by each age."
       />
     </div>
 
@@ -94,7 +96,8 @@
         Expect to live longer or shorter than average? Move the health slider
         and watch the recommendation change. You can also set the discount
         rate, which counts a dollar now as worth more than a dollar later. It
-        starts at the current 20-year Treasury real (after-inflation) yield.
+        starts at the current 20-year Treasury real (after-inflation) yield,
+        or 2.5% if that can't be loaded.
       </p>
     </div>
     <div class="media">
@@ -119,8 +122,8 @@
       <p>
         If your spouse has died, you can take a survivor benefit and your own
         retirement benefit at different times and switch from one to the
-        other. The optimizer tells you which to start first and when to
-        switch.
+        other. The optimizer tells you when to start each one, or whether you
+        only need one of them.
       </p>
     </div>
     <div class="media">
@@ -139,8 +142,8 @@
     <h3 class="section-title">Before you start</h3>
     <p>
       Don't know your PIA? The <a href="/calculator">calculator</a> works it
-      out from the earnings record in your my Social Security account. Your
-      numbers stay in your browser; nothing you enter is sent to us.
+      out from the earnings record in your my Social Security account. The
+      calculations run in your browser, and there's no account to create.
     </p>
     <p>Related guides:</p>
     <ul>
@@ -176,7 +179,7 @@
   }
 
   .section-label {
-    color: #a8a8a8;
+    color: #767676;
     letter-spacing: 0.2rem;
     text-transform: uppercase;
     font-size: 0.85rem;

@@ -998,8 +998,14 @@
         transition:slide={{ duration: 320, easing: cubicOut }}
       >
         <ModePicker onselect={handleModeSelect} />
-        <StrategyIntro />
       </section>
+    {/if}
+
+    <!-- No transition: a slide would animate this tall block out, holding
+         the form below the fold, and links that open on the form (from
+         the calculator or a share link) would watch it collapse. -->
+    {#if stage === "mode"}
+      <StrategyIntro />
     {/if}
 
     {#if stage === "form"}

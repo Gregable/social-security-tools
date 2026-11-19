@@ -1,12 +1,27 @@
 import { render } from 'svelte/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { GUIDE_SLUGS } from '$lib/guide-dates';
 import StrategyIntro from '../../../../routes/strategy/components/StrategyIntro.svelte';
+
+vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 
 // /strategy is prerendered, and before a mode is picked this intro is most
 // of the page's text. Rendering on the server, as the build does, checks
 // that search engines get it without running any JavaScript.
 const { body } = render(StrategyIntro);
+
+describe('/strategy server render', () => {
+  it('places the intro after the mode picker', async () => {
+    const { default: Page } = await import(
+      '../../../../routes/strategy/+page.svelte'
+    );
+    const page = render(Page).body;
+    const picker = page.indexOf('Who are we calculating for?');
+    const intro = page.indexOf('How the optimizer works');
+    expect(picker).toBeGreaterThan(-1);
+    expect(intro).toBeGreaterThan(picker);
+  });
+});
 
 describe('StrategyIntro', () => {
   it('renders its explanation in the server HTML', () => {
