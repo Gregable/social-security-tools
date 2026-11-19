@@ -99,7 +99,7 @@ const faqs: FAQItem[] = [
   {
     question: 'I never received my Fairness Act back pay. What should I do?',
     answer:
-      'Sign in to your my Social Security account or call 1-800-772-1213 and check two things: that Social Security has your current mailing address and bank account, and that it shows you as entitled to the spousal or survivor benefit. The payment goes to the bank account on file. If you were never entitled because you never applied, you need to file an application.',
+      'Sign in to your my Social Security account or call Social Security and check two things: that Social Security has your current mailing address and bank account, and that it shows you as entitled to the spousal or survivor benefit. The payment goes to the bank account on file. If you were never entitled because you never applied, you need to file an application.',
   },
   {
     question:
@@ -314,8 +314,7 @@ const faqs: FAQItem[] = [
     </li>
     <li>
       <strong>Survivor benefits</strong> cannot be filed online. Call
-      1-800-772-1213, Monday through Friday, 8:00 a.m. to 7:00 p.m. local
-      time.
+      Social Security to apply.
     </li>
     <li>
       Social Security says it can also take a spousal application by phone
@@ -560,7 +559,7 @@ const faqs: FAQItem[] = [
     <li>
       If you never applied, apply this month: online at
       <a href="https://www.ssa.gov/apply">ssa.gov/apply</a> for spousal
-      benefits, or by calling 1-800-772-1213 for survivor benefits. Write down
+      benefits, or by calling Social Security for survivor benefits. Write down
       the date you called or applied.
     </li>
     <li>
