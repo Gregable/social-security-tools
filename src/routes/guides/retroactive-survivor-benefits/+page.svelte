@@ -188,8 +188,9 @@ const faqs: FAQItem[] = [
   <p>
     These limits also apply to widows and widowers who never applied
     because the Government Pension Offset would have cut their benefit to
-    $0. If you applied before 2024 and were entitled at $0, you are owed
-    back to January 2024 instead; see our
+    $0. If you applied before the Fairness Act became law and were entitled
+    at $0, you are owed back to January 2024, or to when your entitlement
+    began if that was later; see our
     <a href="/guides/government-pension-offset"
       >Government Pension Offset guide</a
     >.

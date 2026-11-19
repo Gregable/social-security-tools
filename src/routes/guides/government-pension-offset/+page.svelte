@@ -84,7 +84,7 @@ const faqs: FAQItem[] = [
   {
     question:
       'GPO reduced my spousal or survivor benefit to $0. Am I owed back pay?',
-    answer: `If you applied and Social Security approved your claim but paid $0 because of GPO, you were entitled to the benefit, and the repeal covers you from ${repealStart}. You should have received a payment for the months since then and a higher monthly benefit. If you did not, contact Social Security and ask for it. The six-month limit on back pay applies to new applications, not to you.`,
+    answer: `If you applied and Social Security approved your claim but paid $0 because of GPO, you were entitled to the benefit, and the repeal covers you from ${repealStart}, or from the month your entitlement began if that was later. You should have received a payment for those months and a higher monthly benefit. If you did not, contact Social Security and ask for it. The six-month limit on back pay applies to new applications, not to you.`,
   },
   {
     question:
@@ -94,7 +94,7 @@ const faqs: FAQItem[] = [
   {
     question: 'Why is Fairness Act back pay limited to 6 months for some people?',
     answer:
-      'The six-month limit is the ordinary rule for any retirement, spouse, or survivor application, and the Act left it in place. People already entitled to a reduced or $0 benefit were paid back to January 2024; people who apply now get the ordinary limit. Several senators have asked Social Security to pay new applicants back to January 2024. Social Security answered in April 2025 that the law did not change retroactivity, and we have found no change since.',
+      'The ordinary rule for any retirement, spouse, or survivor application is at most six months of back pay, and usually none for a benefit reduced for claiming before full retirement age. The Act left that rule in place. People already entitled to a reduced or $0 benefit were paid back to January 2024; people who apply now get the ordinary limit. Senators asked Social Security in April 2025 and again in February 2026 to pay new applicants back to January 2024. Social Security answered in April 2025 that the law did not change retroactivity, and we have found no change since.',
   },
   {
     question: 'I never received my Fairness Act back pay. What should I do?',
@@ -110,7 +110,7 @@ const faqs: FAQItem[] = [
   {
     question: 'Social Security told me not to apply. Does that help?',
     answer:
-      'It can. If a Social Security employee gave you incorrect, incomplete, or misleading information that kept you from applying, Social Security can treat you as having applied on the date you were given that information, or the date you first qualified if that is later. A written notice from Social Security is the best evidence. Advice before 2024 that GPO would reduce your benefit to $0 was correct at the time, so on its own it is unlikely to qualify.',
+      'It can. If a Social Security employee gave you incorrect, incomplete, or misleading information that kept you from applying, Social Security can treat you as having applied on the date you were given that information, or the date you first qualified if that is later. The information must have come from a Social Security employee answering your question about your own eligibility; information from a pension system or another state or local government agency does not count. Make the request in writing, saying who told you, when, how, and what was said. A written notice from Social Security is the best evidence. Until the Act became law in January 2025, being told that GPO would cut your benefit to $0 was correct, so that advice on its own is unlikely to qualify.',
   },
 ];
 </script>
@@ -181,7 +181,8 @@ const faqs: FAQItem[] = [
           to $0
         </td>
         <td>
-          The full benefit from {repealStart}. You were entitled, even though
+          The full benefit from {repealStart}, or from the month your
+          entitlement began if that was later. You were entitled, even though
           you were paid nothing.
         </td>
       </tr>
@@ -214,8 +215,8 @@ const faqs: FAQItem[] = [
     <a
       href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
       >entitled to benefits reduced fully or partially</a
-    > by GPO. So you are owed every month from {repealStart}, with no
-    six-month limit.
+    > by GPO. So you are owed every month from {repealStart}, or from the
+    month your entitlement began if that was later, with no six-month limit.
   </p>
 
   <h3>How to check</h3>
@@ -253,7 +254,7 @@ const faqs: FAQItem[] = [
   <p>
     If you have no payment and no letter, call Social Security at
     1-800-772-1213. Say that GPO reduced your spousal or survivor benefit to
-    $0, that you were entitled before 2024, and that you have not received
+    $0, that you were entitled before the Act became law, and that you have not received
     the Fairness Act payment. Ask them to confirm your address and bank
     account.
   </p>
@@ -331,8 +332,11 @@ const faqs: FAQItem[] = [
   </ul>
 
   <p>
-    Some senators have pushed for more. In April 2025, and again in February
-    2026, senators asked Social Security to pay people in this group back to
+    Some senators have pushed for more. In April 2025, and again in a
+    <a
+      href="https://www.cassidy.senate.gov/wp-content/uploads/2026/02/Cassidy-Letter-to-SSA-on-WEP-GPO-Retroactivity-2.5.26.pdf"
+      >February 2026 letter</a
+    >, senators asked Social Security to pay people in this group back to
     {repealStart}. Social Security
     <a href="https://www.congress.gov/crs-product/IF13181">replied in April 2025</a
     > that the Act did not change retroactivity. We have found no change to
@@ -357,11 +361,27 @@ const faqs: FAQItem[] = [
     Social Security is the best evidence, so look for old letters.
   </p>
 
+  <ul>
+    <li>
+      The information must have come from a Social Security employee, in
+      answer to your own question about your eligibility.
+    </li>
+    <li>
+      Information from other government agencies does not count. That
+      includes state and local governments, such as a state retirement
+      system.
+    </li>
+    <li>
+      Make the request in writing. Say what you were told, how, when, and
+      where, who told you, and why it kept you from applying.
+    </li>
+  </ul>
+
   <p>
-    One caution. Before 2024, being told that GPO would reduce your benefit
-    to $0 was correct, so that advice on its own is unlikely to count as
-    misinformation. Advice given after the repeal that discouraged you from
-    applying is a different matter.
+    One caution. Until the Act became law in January 2025, being told that
+    GPO would cut your benefit to $0 was correct, so that advice on its own
+    is unlikely to count as misinformation. Advice given after January 2025
+    that discouraged you from applying is a different matter.
   </p>
 
   <h3>If you contacted Social Security earlier</h3>
@@ -372,6 +392,9 @@ const faqs: FAQItem[] = [
     <a href="https://secure.ssa.gov/poms.nsf/lnx/0200204010"
       >protective filing date</a
     > earlier than your application. Ask Social Security to check for one.
+    To keep that date, the application has to be filed within the six-month
+    period stated in the notice Social Security sends you, so finish it
+    promptly.
   </p>
 
   <h2>Survivors and Ex-Spouses</h2>
@@ -414,8 +437,11 @@ const faqs: FAQItem[] = [
       href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
       >teachers, firefighters, and police officers in many states</a
     >, and federal employees covered by the Civil Service Retirement System
-    (CSRS). Most state and local government workers, about 72 percent, pay
-    Social Security taxes and never had GPO.
+    (CSRS).
+    <a
+      href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
+      >Most state and local public employees, about 72 percent</a
+    >, pay Social Security taxes and never had GPO.
   </p>
 
   <p>
@@ -446,9 +472,10 @@ const faqs: FAQItem[] = [
 
   <p>
     The first widow applied years ago and was entitled at $0, but her
-    Fairness Act payment never reached her. The second never applied. Both contact Social Security in {contactMonth}. Both are
-    past full retirement age and neither has a Social Security benefit of
-    her own, so neither benefit is reduced for age. We start from the stated
+    Fairness Act payment never reached her. The second never applied. Both
+    contact Social Security in {contactMonth}. Both are past full retirement
+    age and neither has a Social Security benefit of her own, so neither
+    benefit is reduced for age. We start from the stated
     {repealStart} benefit rather than from earnings records, and raise it
     by each cost-of-living adjustment since. Each adjustment takes effect
     with the December benefit, and the monthly payment is rounded down to
@@ -493,7 +520,7 @@ const faqs: FAQItem[] = [
     </thead>
     <tbody>
       <tr>
-        <td>Entitled at $0 before 2024</td>
+        <td>Entitled at $0 before the Act</td>
         <td>{example.entitled.months}</td>
         <td>{example.entitled.total.wholeDollars()}</td>
       </tr>
@@ -517,9 +544,9 @@ const faqs: FAQItem[] = [
     {example.neverApplied.months} months before she applies, {retroStart}
     through {lastOwed}: {example.neverApplied.total.wholeDollars()}. The other
     {example.monthsLost} months, worth {example.amountLost.wholeDollars()},
-    are lost to her unless she can show an earlier filing date. From
-    {contactMonth} on, both are paid the same
-    {example.paymentFromContactMonth.wholeDollars()} a month.
+    are lost to her unless she can show an earlier filing date. Both are
+    paid {example.paymentFromContactMonth.wholeDollars()} for {contactMonth},
+    and both get the same cost-of-living increases after that.
   </p>
 
   <p>

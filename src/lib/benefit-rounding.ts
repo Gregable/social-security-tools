@@ -57,16 +57,23 @@ function floorToDime(
  * RS 00601.020). Every COLA SSA has published is a whole number of tenths
  * of a percent, so the factor is the exact fraction (1000 + tenths) / 1000.
  *
- * pia.ts's applyColas multiplies by a float and rounds to the cent before
- * truncating, which can land a dime high when the exact product falls
- * within half a cent below a whole dime. This helper never rounds up.
+ * Unlike Money.times, which rounds to the cent before a later truncation
+ * and so can land a dime high when the exact product falls within half a
+ * cent below a whole dime, this never rounds up.
  *
  * @param cents - The amount before the adjustment, in whole cents
  * @param colaPercent - The adjustment in percent, e.g. 2.8
- * @throws Error if the adjustment is negative or not a whole number of
+ * @throws Error if `cents` is not a non-negative integer, or if the
+ *   adjustment is not finite, is negative, or is not a whole number of
  *   tenths of a percent
  */
 export function colaAdjustedDimes(cents: number, colaPercent: number): number {
+  if (!Number.isInteger(cents) || cents < 0) {
+    throw new Error(`cents must be a non-negative integer, got ${cents}`);
+  }
+  if (!Number.isFinite(colaPercent)) {
+    throw new Error(`COLA must be a finite number, got ${colaPercent}`);
+  }
   const tenths = Math.round(colaPercent * 10);
   if (Math.abs(colaPercent * 10 - tenths) > 1e-9 || tenths < 0) {
     throw new Error(

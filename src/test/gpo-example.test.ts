@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { colaAdjustedDimes } from '$lib/benefit-rounding';
 import {
   backPay,
   EXAMPLE_CONTACT_MONTH,
@@ -15,28 +14,6 @@ import { MonthDate } from '$lib/month-time';
 const month = (years: number, months: number) =>
   MonthDate.initFromYearsMonths({ years, months });
 
-describe('colaAdjustedDimes', () => {
-  it('applies the COLA as an exact fraction and truncates to the dime', () => {
-    // $1,845.00 x 1.028 = $1,896.66, truncated to $1,896.60.
-    expect(colaAdjustedDimes(184500, 2.8)).toBe(189660);
-    expect(colaAdjustedDimes(180000, 2.5)).toBe(184500);
-    expect(colaAdjustedDimes(180000, 0)).toBe(180000);
-  });
-
-  it('never rounds up across a dime', () => {
-    // $123.45 x 1.028 = $126.9066 and $1,234.95 x 1.032 = $1,274.4684.
-    expect(colaAdjustedDimes(12345, 2.8)).toBe(12690);
-    expect(colaAdjustedDimes(123495, 3.2)).toBe(127440);
-    // $9.99 x 1.001 = $9.99999: rounding to the cent first gives $10.00.
-    expect(colaAdjustedDimes(999, 0.1)).toBe(990);
-  });
-
-  it('rejects a COLA that is negative or not in tenths of a percent', () => {
-    expect(() => colaAdjustedDimes(10000, 2.85)).toThrow();
-    expect(() => colaAdjustedDimes(10000, -0.1)).toThrow();
-  });
-});
-
 describe('monthlyPayment', () => {
   const benefit = GPO_EXAMPLE.january2024Benefit;
 
@@ -47,19 +24,33 @@ describe('monthlyPayment', () => {
     expect(monthlyPayment(benefit, month(2025, 11)).string()).toBe('$1,896.00');
   });
 
-  it('truncates the payment to the dollar but carries dimes forward', () => {
-    // $1,800.10 x 1.025 = $1,845.1025, kept as $1,845.10; x 1.028 =
-    // $1,896.7628, kept as $1,896.70. Each month pays whole dollars.
-    const odd = Money.from(1800.1);
-    expect(monthlyPayment(odd, month(2024, 0)).string()).toBe('$1,800.00');
-    expect(monthlyPayment(odd, month(2025, 0)).string()).toBe('$1,845.00');
-    expect(monthlyPayment(odd, month(2026, 0)).string()).toBe('$1,896.00');
+  it('carries the dimes through each COLA, which can change a later dollar', () => {
+    // $1,800.90 is paid as $1,800, like $1,800.00. But $1,800.90 x 1.025 =
+    // $1,845.9225, kept as $1,845.90, and x 1.028 = $1,897.5852, kept as
+    // $1,897.50: a dollar more than $1,800.00 reaches by December 2025.
+    const withDimes = Money.from(1800.9);
+    expect(monthlyPayment(withDimes, month(2024, 0)).string()).toBe(
+      '$1,800.00'
+    );
+    expect(monthlyPayment(withDimes, month(2024, 11)).string()).toBe(
+      '$1,845.00'
+    );
+    expect(monthlyPayment(withDimes, month(2025, 11)).string()).toBe(
+      '$1,897.00'
+    );
+    expect(monthlyPayment(benefit, month(2025, 11)).string()).toBe('$1,896.00');
   });
 
   it('refuses months before the repeal and malformed benefits', () => {
-    expect(() => monthlyPayment(benefit, month(2023, 11))).toThrow();
-    expect(() => monthlyPayment(Money.zero(), month(2024, 0))).toThrow();
-    expect(() => monthlyPayment(Money.from(1800.05), month(2024, 0))).toThrow();
+    expect(() => monthlyPayment(benefit, month(2023, 11))).toThrow(
+      /offset still applies/
+    );
+    expect(() => monthlyPayment(Money.zero(), month(2024, 0))).toThrow(
+      /whole number of dimes/
+    );
+    expect(() => monthlyPayment(Money.from(1800.05), month(2024, 0))).toThrow(
+      /whole number of dimes/
+    );
   });
 
   it('refuses a month whose COLA constants.ts does not have', () => {
@@ -71,7 +62,7 @@ describe('backPay', () => {
   it('refuses an empty range', () => {
     expect(() =>
       backPay(GPO_EXAMPLE.january2024Benefit, month(2025, 1), month(2025, 0))
-    ).toThrow();
+    ).toThrow(/at least one month/);
   });
 
   it('counts a single month', () => {
@@ -86,9 +77,10 @@ describe('backPay', () => {
 });
 
 /**
- * The guide renders these exact figures and writes prose around them. When
- * a constants update moves them, update the expectations and re-read the
- * prose in src/routes/guides/government-pension-offset/+page.svelte.
+ * The guide renders these exact figures and writes prose around them. Only
+ * GPO_EXAMPLE, EXAMPLE_CONTACT_MONTH, or the 2024 and 2025 COLAs in
+ * constants.ts can move them; if one changes, update the expectations and
+ * re-read the prose in src/routes/guides/government-pension-offset/+page.svelte.
  */
 describe('gpoExample', () => {
   const g = gpoExample();
@@ -144,5 +136,49 @@ describe('gpoExample', () => {
 
   it('pays both $1,896 a month from November 2026', () => {
     expect(g.paymentFromContactMonth.string()).toBe('$1,896.00');
+  });
+});
+
+describe('gpoExample inputs', () => {
+  it('refuses a pension whose two-thirds does not exceed the benefit', () => {
+    // Two-thirds of $2,700 is exactly $1,800: total GPO, but not "more
+    // than" the benefit as the guide's prose says.
+    expect(() =>
+      gpoExample({
+        january2024Benefit: Money.from(1800),
+        pension: Money.from(2700),
+      })
+    ).toThrow(/must be more than/);
+    expect(() =>
+      gpoExample({
+        january2024Benefit: Money.from(1800),
+        pension: Money.from(1500),
+      })
+    ).toThrow(/must be more than/);
+  });
+
+  it('refuses a missing pension and a contact month not after January 2024', () => {
+    expect(() =>
+      gpoExample({
+        january2024Benefit: Money.from(1800),
+        pension: Money.zero(),
+      })
+    ).toThrow(/positive amount/);
+    expect(() => gpoExample(GPO_EXAMPLE, month(2024, 0))).toThrow(
+      /contact month must be after/
+    );
+  });
+
+  it('never reaches back before January 2024 for the late filer', () => {
+    // Contact in March 2024: six months back would be September 2023, but
+    // the repeal starts in January 2024, so both are paid January and
+    // February 2024 and nothing is lost.
+    const early = gpoExample(GPO_EXAMPLE, month(2024, 2));
+    expect(early.neverApplied.first.toFullString()).toBe('January 2024');
+    expect(early.neverApplied.last.toFullString()).toBe('February 2024');
+    expect(early.neverApplied.months).toBe(2);
+    expect(early.entitled.months).toBe(2);
+    expect(early.monthsLost).toBe(0);
+    expect(early.amountLost.string()).toBe('$0.00');
   });
 });

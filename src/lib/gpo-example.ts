@@ -3,8 +3,8 @@
  *
  * Two widows have the same survivor benefit and the same non-covered
  * pension, which the Government Pension Offset cut to $0 for both. One
- * applied before 2024 and was entitled to her survivor benefit at a $0
- * payment amount; the other never applied. The Social Security Fairness
+ * applied before the Act became law and was entitled to her survivor
+ * benefit at a $0 payment amount; the other never applied. The Social Security Fairness
  * Act ends the offset for benefits payable for January 2024 onward (POMS
  * GN 02608.100). The entitled widow is owed every month from January 2024.
  * The widow who never applied must file now, and like any applicant past
@@ -13,7 +13,8 @@
  *
  * The example starts from a stated survivor benefit payable for January
  * 2024 rather than from earnings records: both widows are past survivor
- * full retirement age and neither has a benefit of her own, so the benefit
+ * full retirement age and neither has a Social Security benefit of her
+ * own, so the benefit
  * is the late husband's full benefit and is not reduced for age. Each later
  * month applies the cost-of-living adjustments in constants.ts. A COLA is
  * effective for the December benefit of its year, so the December figure
@@ -23,9 +24,6 @@
  * The month both widows contact Social Security is a fixed, named month
  * rather than today, so the figures do not move as the calendar does. The
  * guide states it in prose; re-read that prose if it changes.
- *
- * The result records are plain readonly interfaces produced only by the
- * functions beside them; they are not meant to be constructed by hand.
  */
 
 import { colaAdjustedDimes, floorToDollarCents } from './benefit-rounding';
@@ -40,8 +38,11 @@ export const REPEAL_FIRST_MONTH: MonthDate = MonthDate.initFromYearsMonths({
 });
 
 /**
- * Retirement and survivor benefits can be paid for at most this many
- * months before the month of filing (POMS GN 00204.030).
+ * The most months before the month of filing that an unreduced retirement,
+ * spouse, or survivor claim filed at or after full retirement age can be
+ * paid for (POMS GN 00204.030). Claims based on disability can reach back
+ * 12 months, and a benefit reduced for age generally none; the example's
+ * widows are past full retirement age, so six applies.
  */
 export const MAX_RETROACTIVE_MONTHS = 6;
 
@@ -58,8 +59,8 @@ export const EXAMPLE_CONTACT_MONTH: MonthDate = MonthDate.initFromYearsMonths({
 export const GPO_EXAMPLE = {
   /**
    * The survivor benefit payable for January 2024 before any offset: the
-   * late husband's full benefit at the dime, already including the COLA
-   * paid from that month.
+   * late husband's full benefit at the dime, already including the 2023
+   * COLA, which took effect with the December 2023 benefit.
    */
   january2024Benefit: Money.from(1800),
   /** The widow's monthly pension from work not covered by Social Security. */
@@ -181,12 +182,24 @@ export function backPay(
   };
 }
 
+/** The amounts the example starts from. */
+export interface GpoExampleInputs {
+  readonly january2024Benefit: Money;
+  readonly pension: Money;
+}
+
 export interface GpoExample {
-  /** Two-thirds of the pension, the amount GPO took from the benefit. */
+  /**
+   * The offset GPO computed: two-thirds of the pension. It is more than
+   * the benefit, so GPO cut the benefit to $0.
+   */
   readonly offsetBeforeRepeal: Money;
   /** The month both widows contact Social Security. */
   readonly contactMonth: MonthDate;
-  /** Owed to the widow entitled at $0: January 2024 to the month before. */
+  /**
+   * Owed to the widow entitled at $0: January 2024 through the month before
+   * contactMonth.
+   */
   readonly entitled: BackPay;
   /** Payable to the widow who files in the contact month. */
   readonly neverApplied: BackPay;
@@ -200,40 +213,53 @@ export interface GpoExample {
 
 /**
  * The two widows of the guide's example, both contacting Social Security
- * in EXAMPLE_CONTACT_MONTH.
+ * in `contactMonth`.
  *
- * @throws Error if the example pension would not have offset the benefit
- *   to $0, since the guide's story depends on it
+ * @throws Error if the pension is not a positive whole number of cents, if
+ *   two-thirds of it is not more than the benefit (the guide's story needs
+ *   the benefit offset to $0, and its prose says "more than"), if
+ *   `contactMonth` is not after January 2024, or for any reason
+ *   monthlyPayment or backPay throws
  */
-export function gpoExample(): GpoExample {
-  const { january2024Benefit, pension } = GPO_EXAMPLE;
-  // Total GPO: two-thirds of the pension is at least the benefit (POMS
-  // GN 02608.100). Compared in exact integers before dividing.
-  if (pension.cents() * 2 < january2024Benefit.cents() * 3) {
+export function gpoExample(
+  inputs: GpoExampleInputs = GPO_EXAMPLE,
+  contactMonth: MonthDate = EXAMPLE_CONTACT_MONTH
+): GpoExample {
+  const { january2024Benefit, pension } = inputs;
+  requireBenefit(january2024Benefit);
+  if (!Number.isInteger(pension.cents()) || pension.cents() <= 0) {
     throw new Error(
-      'the example pension must offset the survivor benefit to $0'
+      `the pension must be a positive amount, got ${pension.string()}`
+    );
+  }
+  // Total GPO: two-thirds of the pension is at least the benefit (POMS
+  // GN 02608.100). The guide says "more than", so this is strict. Compared
+  // in exact integers before dividing.
+  if (pension.cents() * 2 <= january2024Benefit.cents() * 3) {
+    throw new Error(
+      `two-thirds of the ${pension.string()} pension must be more than the ${january2024Benefit.string()} benefit, so GPO cut it to $0`
+    );
+  }
+  if (!contactMonth.greaterThan(REPEAL_FIRST_MONTH)) {
+    throw new Error(
+      `the contact month must be after ${REPEAL_FIRST_MONTH.toString()}, got ${contactMonth.toString()}`
     );
   }
   const oneMonth = new MonthDuration(1);
-  const lastOwed = EXAMPLE_CONTACT_MONTH.subtractDuration(oneMonth);
+  const lastOwed = contactMonth.subtractDuration(oneMonth);
   const entitled = backPay(january2024Benefit, REPEAL_FIRST_MONTH, lastOwed);
   const retroStart = MonthDate.max(
     REPEAL_FIRST_MONTH,
-    EXAMPLE_CONTACT_MONTH.subtractDuration(
-      new MonthDuration(MAX_RETROACTIVE_MONTHS)
-    )
+    contactMonth.subtractDuration(new MonthDuration(MAX_RETROACTIVE_MONTHS))
   );
   const neverApplied = backPay(january2024Benefit, retroStart, lastOwed);
   return {
     offsetBeforeRepeal: Money.fromCents(Math.floor((pension.cents() * 2) / 3)),
-    contactMonth: EXAMPLE_CONTACT_MONTH,
+    contactMonth,
     entitled,
     neverApplied,
     monthsLost: entitled.months - neverApplied.months,
     amountLost: entitled.total.sub(neverApplied.total),
-    paymentFromContactMonth: monthlyPayment(
-      january2024Benefit,
-      EXAMPLE_CONTACT_MONTH
-    ),
+    paymentFromContactMonth: monthlyPayment(january2024Benefit, contactMonth),
   };
 }
