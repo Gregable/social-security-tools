@@ -31,7 +31,7 @@ const pageImageAlt = 'Social Security guides and educational resources';
         <h3 class="posttitle">
           <a href="/guides/government-pension-offset">
             Government Pension Offset (GPO) Repeal: Spousal and Survivor
-            Benefits You May Still Be Owed
+            Back Pay You May Still Be Owed
           </a>
         </h3>
         <p class="description">

@@ -37,9 +37,9 @@ const applySponsorCopy: SponsorCopy = {
 };
 
 const title =
-  'Government Pension Offset (GPO) Repeal: Spousal and Survivor Benefits You May Still Be Owed';
+  'Government Pension Offset (GPO) Repeal: Spousal and Survivor Back Pay You May Still Be Owed';
 const description =
-  'The Social Security Fairness Act repealed the Government Pension Offset from January 2024. If GPO cut your spousal or survivor benefit to $0, you may be owed back pay you never received. If you never applied, how far back you can be paid and what to do now.';
+  'The Social Security Fairness Act ended the Government Pension Offset. If GPO cut your spousal or survivor benefit to $0, see what back pay you are owed.';
 const publishDate = new Date('2026-11-18T00:00:00+00:00');
 const updateDate = new Date('2026-11-18T00:00:00+00:00');
 
@@ -55,6 +55,8 @@ schema.imageAlt =
 schema.tags = [
   'Government Pension Offset',
   'GPO repeal',
+  'GPO back pay',
+  'Fairness Act retroactive payment',
   'Social Security Fairness Act spousal benefits',
   'Social Security Fairness Act back pay not received',
   'Fairness Act retroactive 6 months',
@@ -95,6 +97,10 @@ const faqs: FAQItem[] = [
       'The ordinary rule for any retirement, spouse, or survivor application is at most six months of back pay, and usually none for a benefit reduced for claiming before full retirement age. The Act left that rule in place. People already entitled to a reduced or $0 benefit were paid back to January 2024; people who apply now get the ordinary limit.',
   },
   {
+    question: 'How much GPO back pay could I be owed?',
+    answer: `It depends on your benefit and on whether you were already entitled. In this guide's example, a widow with a ${benefit2024} survivor benefit who was entitled at $0 is owed ${example.entitled.total.wholeDollars()} for ${repealStart} through ${lastOwed}. A widow with the same benefit who never applied and files in ${contactMonth} can be paid ${example.neverApplied.total.wholeDollars()}, for the ${example.neverApplied.months} months before she applies.`,
+  },
+  {
     question: 'I never received my Fairness Act back pay. What should I do?',
     answer:
       'Sign in to your my Social Security account or call Social Security and check two things: that Social Security has your current mailing address and bank account, and that it shows you as entitled to the spousal or survivor benefit. The payment goes to the bank account on file. If you were never entitled because you never applied, you need to file an application.',
@@ -127,7 +133,7 @@ const faqs: FAQItem[] = [
 
 <div class="guide-page">
   <h1>
-    Government Pension Offset Repeal: Spousal and Survivor Benefits You May
+    Government Pension Offset Repeal: Spousal and Survivor Back Pay You May
     Still Be Owed
   </h1>
   <GuideByline {publishDate} {updateDate} />
@@ -144,11 +150,11 @@ const faqs: FAQItem[] = [
   </p>
 
   <p>
-    Most people whose benefits GPO reduced were paid automatically in 2025.
-    Some were not. And many people never applied, because they were told,
-    correctly at the time, that GPO would leave them nothing. This guide is
-    for both groups. It explains who is owed money back to {repealStart},
-    who is limited to a few months, and what to do now.
+    Most people whose benefits GPO reduced got a retroactive payment
+    automatically in 2025. Some did not. And many people never applied,
+    because they were told, correctly at the time, that GPO would leave them
+    nothing. This guide is for both groups. It explains who is owed back pay
+    to {repealStart}, who is limited to a few months, and what to do now.
   </p>
 
   <h2>Did GPO Reduce Your Spousal or Survivor Benefit to $0?</h2>
@@ -202,14 +208,27 @@ const faqs: FAQItem[] = [
     >, because the date you apply can affect when your benefits begin.
   </p>
 
+  <p>
+    One case is easy to miss. If you claimed your own Social Security
+    retirement benefit while your husband or wife was already collecting,
+    that application may have counted as an application for spousal benefits
+    too. This is called
+    <a href="https://www.ecfr.gov/current/title-20/section-404.623"
+      >deemed filing</a
+    >. Ask Social Security whether its records show you as entitled to a
+    spouse's benefit.
+  </p>
+
   <h2>If You Were Entitled at $0: You Are Owed Back to January 2024</h2>
 
   <p>
-    When you applied for a spousal or survivor benefit and GPO took all of
-    it, Social Security still approved the claim. Its manual calls this
+    When someone applied for a spousal or survivor benefit and GPO took all
+    of it, Social Security normally still approved the claim and then paid
+    $0. Its manual calls this
     <a href="https://secure.ssa.gov/poms.nsf/lnx/0202608100">total GPO</a>:
-    the payment amount is reduced to zero, but you are entitled to the
-    benefit. The repeal applies to everyone who was
+    the payment amount is reduced to zero, but you are "entitled" to the
+    benefit. Entitled is Social Security's word for approved, and it is the
+    word to use when you talk to them. The repeal applies to everyone who was
     <a
       href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
       >entitled to benefits reduced fully or partially</a
@@ -223,7 +242,9 @@ const faqs: FAQItem[] = [
     <li>
       Look for the letter Social Security sent when you applied. A letter
       saying your benefit is reduced to $0 because of your government pension
-      means you were entitled.
+      means you were entitled. If the letter says your claim was denied,
+      ask Social Security whether you were ever entitled; if not, treat
+      yourself as someone who never applied.
     </li>
     <li>
       Look for letters from 2025. Social Security mailed a notice to everyone
@@ -251,7 +272,7 @@ const faqs: FAQItem[] = [
 
   <InlineCTA type="sponsor" {sponsorCopy} />
 
-  <h2>If You Never Applied: Apply Now</h2>
+  <h2>If You Never Applied Because of GPO: Apply Now</h2>
 
   <p>
     If you never applied because GPO would have reduced your benefit to $0,
@@ -259,7 +280,8 @@ const faqs: FAQItem[] = [
     <a
       href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
       >did not change the rules on retroactive benefits</a
-    >, so your application can reach back only as far as anyone else's.
+    >, so your application can reach back only as far as anyone else's:
+    {MAX_RETROACTIVE_MONTHS} months at most, and often less.
   </p>
 
   <table class="rule-table">
@@ -332,9 +354,8 @@ const faqs: FAQItem[] = [
     qualified, whichever is later
     (<a href="https://www.ecfr.gov/current/title-20/section-404.633"
       >20 CFR 404.633</a
-    >). You can raise this at any time, before or after you apply. You have
-    to show that the information kept you from filing. A written notice from
-    Social Security is the best evidence, so look for old letters.
+    >). You can ask for this at any time, before or after you apply. The
+    conditions are strict:
   </p>
 
   <ul>
@@ -350,6 +371,10 @@ const faqs: FAQItem[] = [
     <li>
       Make the request in writing. Say what you were told, how, when, and
       where, who told you, and why it kept you from applying.
+    </li>
+    <li>
+      A written notice from Social Security is the best evidence, so look
+      for old letters.
     </li>
   </ul>
 
@@ -373,7 +398,7 @@ const faqs: FAQItem[] = [
     promptly.
   </p>
 
-  <h2>Survivors and Ex-Spouses</h2>
+  <h2>Spouses, Divorced Spouses, and Widows: Who the Repeal Covers</h2>
 
   <p>
     GPO applied to every benefit paid as a spouse: current spouses,
@@ -403,7 +428,7 @@ const faqs: FAQItem[] = [
     </li>
   </ul>
 
-  <h2>Who Had the Government Pension Offset</h2>
+  <h2>Who Was Affected by the Government Pension Offset</h2>
 
   <p>
     GPO applied to people with a pension from federal, state, or local
@@ -451,11 +476,7 @@ const faqs: FAQItem[] = [
     Fairness Act payment never reached her. The second never applied. Both
     contact Social Security in {contactMonth}. Both are past full retirement
     age and neither has a Social Security benefit of her own, so neither
-    benefit is reduced for age. We start from the stated
-    {repealStart} benefit rather than from earnings records, and raise it
-    by each cost-of-living adjustment since. Each adjustment takes effect
-    with the December benefit, and the monthly payment is rounded down to
-    the dollar, as Social Security does.
+    benefit is reduced for age.
   </p>
 
   <table class="rule-table">
@@ -523,6 +544,14 @@ const faqs: FAQItem[] = [
     are lost to her unless she can show an earlier filing date. Both are
     paid {example.paymentFromContactMonth.wholeDollars()} for {contactMonth},
     and both get the same cost-of-living increases after that.
+  </p>
+
+  <p>
+    How we calculated this: we start from the stated {repealStart} benefit
+    rather than from earnings records, and raise it by each cost-of-living
+    adjustment since. Each adjustment takes effect with the December
+    benefit, and the monthly payment is rounded down to the dollar, as
+    Social Security does.
   </p>
 
   <p>
@@ -613,6 +642,11 @@ const faqs: FAQItem[] = [
     <li>
       <a href="https://www.ecfr.gov/current/title-20/section-404.633"
         >20 CFR 404.633: Deemed filing date in a case of misinformation</a
+      >
+    </li>
+    <li>
+      <a href="https://www.ecfr.gov/current/title-20/section-404.623"
+        >20 CFR 404.623: Presumed filing for husband's or wife's benefits</a
       >
     </li>
     <li>
