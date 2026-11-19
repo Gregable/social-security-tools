@@ -36,7 +36,7 @@ const title =
 const description =
   'Applied late for Social Security survivor benefits? Learn how many months of back pay a widow or widower can receive, why the answer depends on your age and your spouse\'s filing, and how to protect your filing date.';
 const publishDate = new Date('2026-09-17T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const updateDate = new Date('2026-11-18T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/retroactive-survivor-benefits';
@@ -183,6 +183,16 @@ const faqs: FAQItem[] = [
     retroactive months are money you would otherwise never see. If you
     reached survivor full retirement age less than six months ago, the window
     is shorter: it stops at the month you reached that age.
+  </p>
+
+  <p>
+    These limits also apply to widows and widowers who never applied
+    because the Government Pension Offset would have cut their benefit to
+    $0. If you applied before 2024 and were entitled at $0, you are owed
+    back to January 2024 instead; see our
+    <a href="/guides/government-pension-offset"
+      >Government Pension Offset guide</a
+    >.
   </p>
 
   <div class="callout">

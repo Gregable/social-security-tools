@@ -58,6 +58,7 @@ const APPLY_CARD = 'guide-inline-apply';
  */
 const APPLY_CARD_GUIDES = [
   'divorced-spouse',
+  'government-pension-offset',
   'retroactive-survivor-benefits',
   'spousal-benefits',
   'survivor-benefits',

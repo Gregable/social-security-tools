@@ -75,6 +75,11 @@ const pages = [
   },
   { path: '/guides/remarriage', priority: '0.7', changefreq: 'yearly' },
   {
+    path: '/guides/government-pension-offset',
+    priority: '0.7',
+    changefreq: 'yearly',
+  },
+  {
     path: '/guides/retroactive-retirement-benefits',
     priority: '0.7',
     changefreq: 'yearly',

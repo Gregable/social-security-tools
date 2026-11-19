@@ -47,6 +47,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'divorced-spouse': 'sponsor',
   'earnings-test': 'sponsor',
   'federal-taxes': 'sponsor',
+  'government-pension-offset': 'sponsor',
   'government-shutdown': 'sponsor',
   'international-agreements': 'sponsor',
   mortality: 'sponsor',

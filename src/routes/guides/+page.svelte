@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Nov 18, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/government-pension-offset">
+            Government Pension Offset (GPO) Repeal: Spousal and Survivor
+            Benefits You May Still Be Owed
+          </a>
+        </h3>
+        <p class="description">
+          If GPO cut your spousal or survivor benefit to $0, the Social
+          Security Fairness Act may owe you every month from January 2024. If
+          you never applied, back pay is limited. Who is owed what, a worked
+          example, and what to do now.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Nov 11, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/remarriage">
