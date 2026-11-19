@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -19,8 +20,7 @@ const sponsorCopy: SponsorCopy = {
 const title = 'Mortality Tables and Health Adjustments';
 const description =
   'How SSA cohort life tables are used, how q(x) death probabilities are derived, gender blending, and how the health multiplier adjusts mortality.';
-const publishDate = new Date('2025-08-08T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('mortality');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/mortality';

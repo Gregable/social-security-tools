@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -9,8 +10,7 @@ import HeroImage from './delayed-bump.png';
 const title = 'Bump in delayed Social Security benefits after January';
 const description =
   'For those starting benefits after Normal Retirement Age, there is a small delay in some of the delayed credits until the following January.';
-const publishDate = new Date('2023-12-29T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('delayed-january-bump');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/delayed-january-bump';

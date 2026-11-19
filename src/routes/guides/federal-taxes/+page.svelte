@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import {
   BENEFIT_TAXATION_THRESHOLDS,
   taxableBenefits,
@@ -66,8 +67,7 @@ const sponsorCopy: SponsorCopy = {
 
 const title = 'Federal Taxation of Social Security Benefits';
 const description = `How much of your Social Security is taxable: the provisional income formula, the ${thresholds.single.first.wholeDollars()} and ${thresholds.single.second.wholeDollars()} thresholds, a calculator for your own numbers, the tax torpedo, and withholding with Form W-4V.`;
-const publishDate = new Date('2022-12-04T00:00:00+00:00');
-const updateDate = new Date('2026-10-31T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('federal-taxes');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/federal-taxes';

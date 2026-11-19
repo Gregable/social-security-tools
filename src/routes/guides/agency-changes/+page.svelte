@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -19,8 +20,7 @@ const sponsorCopy: SponsorCopy = {
 const title = 'Navigating Social Security During Administrative Changes';
 const description =
   "If you've tried to access Social Security services recently, you may have encountered longer wait times, website outages, or difficulty reaching representatives.";
-const publishDate = new Date('2025-04-30T00:00:00+00:00');
-const updateDate = new Date('2025-04-30T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('agency-changes');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/agency-changes';

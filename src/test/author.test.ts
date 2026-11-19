@@ -1,7 +1,8 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { AUTHOR, authorBio, authorPerson, authorSameAs } from '$lib/author';
+import { sitemapEntries } from '$lib/sitemap';
 
 describe('AUTHOR', () => {
   it('has an absolute profile URL on ssa.tools built from its path', () => {
@@ -21,12 +22,8 @@ describe('AUTHOR', () => {
   });
 
   it('is listed in the sitemap by the same path', () => {
-    const sitemap = readFileSync(
-      join(process.cwd(), 'src', 'routes', 'sitemap.xml', '+server.ts'),
-      'utf8'
-    );
-    // The sitemap reads the path from the constant rather than repeating it.
-    expect(sitemap).toContain('path: AUTHOR.path');
+    const paths = sitemapEntries().map((entry) => entry.path);
+    expect(paths).toContain(AUTHOR.path);
   });
 
   it('links to external profiles for entity reconciliation', () => {

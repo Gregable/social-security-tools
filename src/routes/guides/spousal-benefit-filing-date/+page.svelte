@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { GuidesSchema, renderFAQSchema, type FAQItem } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 import GuideByline from "../GuideByline.svelte";
@@ -12,8 +13,7 @@ import GuideByline from "../GuideByline.svelte";
   const title = "Spousal Benefits and Filing Dates: A Deep Dive";
   const description =
     "Spousal benefits aren't always half of your spouse's benefit. Learn how filing dates affect spousal benefits, why early filing reduces them more than personal benefits, and why delayed credits don't increase spousal benefits.";
-  const publishDate = new Date("2023-09-06T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('spousal-benefit-filing-date');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/spousal-benefit-filing-date";

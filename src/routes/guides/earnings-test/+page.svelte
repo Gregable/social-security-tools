@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { EARNINGS_TEST_LIMITS, MAX_EARNINGS_TEST_YEAR } from "$lib/constants";
   import { earningsTest } from "$lib/earnings-test";
   import { Money } from "$lib/money";
@@ -53,8 +54,7 @@ import GuideByline from "../GuideByline.svelte";
     "Working While Receiving Social Security: The Earnings Test Explained";
   const description =
     `Can you work while collecting Social Security? Learn about the earnings test, ${priorYear} and ${latestYear} income limits, how benefits are reduced, and why withheld benefits are returned at full retirement age.`;
-  const publishDate = new Date("2026-01-26T00:00:00+00:00");
-  const updateDate = new Date("2026-10-31T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('earnings-test');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/earnings-test";

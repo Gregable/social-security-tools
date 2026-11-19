@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -24,7 +25,7 @@ const sponsorCopy: SponsorCopy = {
 const title = 'Effect of Covid-19 on Social Security Benefits';
 const description =
   'Will a weak economy in 2020 result in a benefits decrease for those born in 1960?';
-const publishDate = new Date('2020-12-01T00:00:00+00:00');
+const { publishDate } = guideDates('covid-awi-drop');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/covid-awi-drop'; // Corrected URL

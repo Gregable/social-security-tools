@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 import GuideByline from "../GuideByline.svelte";
@@ -20,8 +21,7 @@ const sponsorCopy: SponsorCopy = {
     "State Taxes on Social Security Benefits: Which States Tax Your Benefits?";
   const description =
     "Most states don't tax Social Security benefits. Learn which 8 states still tax benefits in 2026, exemption thresholds, recent changes, and planning strategies.";
-  const publishDate = new Date("2026-02-15T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('state-taxes');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/state-taxes";

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import { FULL_RETIREMENT_AGE } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
@@ -8,8 +9,7 @@ import InlineCTA from '../InlineCTA.svelte';
 const title = 'Normal Retirement Age (NRA): What It Means for Your Benefits';
 const description =
   'Learn about Normal Retirement Age (NRA), also called Full Retirement Age (FRA), how it varies by birth year, and why it matters for calculating your Social Security benefits.';
-const publishDate = new Date('2026-01-17T00:00:00+00:00');
-const updateDate = new Date('2026-10-14T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('nra');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/nra';

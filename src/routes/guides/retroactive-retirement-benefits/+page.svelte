@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { MAX_YEAR } from '$lib/constants';
 import { MonthDuration } from '$lib/month-time';
 import {
@@ -32,8 +33,7 @@ const title =
   'Retroactive Social Security Retirement Benefits: Six Months of Back Pay, and What It Costs';
 const description =
   'Filing for Social Security after full retirement age? You can ask for up to six months of back pay, but every month you take back permanently lowers your check. How the six-month rule works, what the lump sum costs, when it is free, and how to decide.';
-const publishDate = new Date('2026-10-22T00:00:00+00:00');
-const updateDate = new Date('2026-10-22T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('retroactive-retirement-benefits');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/retroactive-retirement-benefits';

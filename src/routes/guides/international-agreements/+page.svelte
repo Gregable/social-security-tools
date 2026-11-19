@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -18,7 +19,7 @@ const sponsorCopy: SponsorCopy = {
 
 const title = 'Social Security International Agreements';
 const description = 'How does working abroad affect social security?';
-const publishDate = new Date('2022-06-26T00:00:00+00:00');
+const { publishDate } = guideDates('international-agreements');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/international-agreements';

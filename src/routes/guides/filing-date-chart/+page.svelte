@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -12,7 +13,7 @@ import SliderImage from './slider.png';
 const title = 'Navigate the Filing Date Chart';
 const description =
   "This site's calculator shows a information dense chart of how filing dates affect your benefits. The chart can be a little confusing at first, so here's a guide to help you understand it.";
-const publishDate = new Date('2023-08-15T00:00:00+00:00');
+const { publishDate } = guideDates('filing-date-chart');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/filing-date-chart';

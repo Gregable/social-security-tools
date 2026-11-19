@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { EARNINGS_PER_CREDIT, MAX_CREDITS, MAX_YEAR } from '$lib/constants';
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
@@ -12,8 +13,7 @@ const requiredCredits = MAX_CREDITS;
 const title = 'Social Security Work Credits: How Many Do You Need?';
 const description =
   `Learn how Social Security work credits work and how many you need to qualify for benefits. In ${currentYear}, you need ${currentYearCredit.wholeDollars()} in earnings per credit, and ${requiredCredits} total credits (about 10 years of work) for retirement benefits.`;
-const publishDate = new Date('2024-02-26T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('work-credits');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/work-credits';

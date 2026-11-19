@@ -89,7 +89,8 @@ Standard SvelteKit file-based routing in `src/routes/`:
 
 New guides go in `/src/routes/guides/{topic}/+page.svelte`:
 
-- Use `date --iso-8601` for `published` and `modified` fields in metadata
+- Add the guide's dates to `GUIDE_DATES` in `src/lib/guide-dates.ts` (use `date --iso-8601`) and read them with `guideDates('<slug>')`; this also adds the guide to `sitemap.xml`
+- When revising a guide's content, bump its `updated` date there; it becomes the sitemap `<lastmod>`, so skip it for styling-only changes
 - Include schema.org structured data for SEO
 - Set `schema.imageAlt` and `schema.tags` for social media cards
 - Update the index at `/src/routes/guides/+page.svelte`

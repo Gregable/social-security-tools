@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import {
   breakEven,
   claimAgeRows,
@@ -30,8 +31,7 @@ const title =
   'Social Security Break-Even Age: Claiming at 62 vs 67 vs 70';
 const description =
   'How long you have to live for a later Social Security claim to pay off. The break-even ages for 62 vs 67, 62 vs 70, and 67 vs 70, a table for every claiming age, how the arithmetic works, and why the break-even age is the wrong place to stop.';
-const publishDate = new Date('2026-10-11T00:00:00+00:00');
-const updateDate = new Date('2026-10-11T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('break-even-age');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/break-even-age';
