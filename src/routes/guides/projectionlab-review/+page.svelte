@@ -3,6 +3,7 @@
     outboundImpression,
     trackOutboundClick,
   } from "$lib/analytics/outbound";
+  import { guideDates } from "$lib/guide-dates";
   import type { FAQItem } from "$lib/schema-org";
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
@@ -12,13 +13,14 @@
     "ProjectionLab Review and Coupon Code: Retirement Planning Beyond Social Security";
   const description =
     "A review of ProjectionLab, a retirement planning tool that complements Social Security calculators like SSA.tools. Covers features, pros and cons, and an exclusive SSA-TOOLS coupon code for 10% off.";
-  const published = "2026-02-15";
+  const { publishDate, updateDate } = guideDates("projectionlab-review");
 
   const schema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/projectionlab-review";
   schema.title = title;
   schema.description = description;
-  schema.datePublished = published;
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
   schema.image = "https://ssa.tools/laptop-piggybank.jpg";
   schema.imageAlt = "ProjectionLab retirement planning tool review";
   schema.tags = [
@@ -65,7 +67,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <GuideByline publishDate={new Date(published)} />
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     This site focuses on one thing: helping you understand your Social Security

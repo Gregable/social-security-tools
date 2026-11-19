@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -8,8 +9,7 @@ import HeroImage from './hero.png';
 const title = 'Extra rules for those born on the 1st or 2nd of the month';
 const description =
   'Learn more about how Social Security law is affected by the day of the month one was born in.';
-const publishDate = new Date('2022-06-05T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('1st-and-2nd-of-month');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/1st-and-2nd-of-month';

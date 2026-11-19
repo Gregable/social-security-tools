@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -31,8 +32,7 @@ const title =
   'Social Security Spousal Benefits: Eligibility, How Much You Get, and When to Claim';
 const description =
   'Can you get Social Security from your spouse? Learn who qualifies for spousal benefits, how the 50% rule really works, how filing age changes the amount, and whether you can claim if you never worked.';
-const publishDate = new Date('2026-09-09T00:00:00+00:00');
-const updateDate = new Date('2026-11-18T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('spousal-benefits');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/spousal-benefits';

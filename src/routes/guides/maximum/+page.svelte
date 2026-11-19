@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import {
     MAX_YEAR,
     MAXIMUM_EARNINGS,
@@ -132,8 +133,7 @@ import GuideByline from "../GuideByline.svelte";
 
   const title = `Maximum Social Security Benefit ${currentYear}`;
   const description = `The maximum Social Security benefit in ${currentYear} is ${maxBenefitAt70.wholeDollars()}/month at age 70. Learn what it takes to reach the maximum, how filing age affects your benefit, and the requirements for the highest possible payment.`;
-  const publishDate = new Date("2019-08-03T00:00:00+00:00");
-  const updateDate = new Date("2026-10-14T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('maximum');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/maximum";

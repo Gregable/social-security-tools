@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { MAX_CREDITS, MAXIMUM_EARNINGS, MAX_YEAR, SSA_EARNINGS_YEARS } from '$lib/constants';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
@@ -11,8 +12,7 @@ const currentYearCap = MAXIMUM_EARNINGS[currentYear];
 const title = 'Social Security Earnings Cap: How Much Counts Toward Benefits?';
 const description =
   `The Social Security earnings cap limits how much of your income is taxed and counted toward benefits. In ${currentYear}, the cap is ${currentYearCap.wholeDollars()}. See the complete history of earnings caps since 1937.`;
-const publishDate = new Date('2020-11-28T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('earnings-cap');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/earnings-cap';

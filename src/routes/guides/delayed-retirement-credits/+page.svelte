@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 import GuideByline from "../GuideByline.svelte";
@@ -8,8 +9,7 @@ import GuideByline from "../GuideByline.svelte";
     "Delayed Retirement Credits: How Waiting Past Full Retirement Age Increases Your Benefit";
   const description =
     "Learn how Delayed Retirement Credits (DRCs) increase your Social Security benefit by 8% per year for each year you wait past Full Retirement Age, up to age 70. Includes the month-by-month calculation, survivor benefit rules, and COLA interactions.";
-  const publishDate = new Date("2026-02-18T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('delayed-retirement-credits');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/delayed-retirement-credits";

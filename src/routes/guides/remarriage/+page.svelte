@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import {
   DIVORCED_EXAMPLE,
   divorcedRemarriage,
@@ -27,8 +28,7 @@ const title =
   'How Remarriage Affects Social Security Benefits: What Ends, What Continues, and the Age 60 Rule';
 const description =
   'Getting remarried can end Social Security benefits paid on a former spouse, and before 60 it blocks survivor benefits on a late spouse. Your own retirement benefit and your children are not affected. The rules, the exceptions, and two worked examples.';
-const publishDate = new Date('2026-11-11T00:00:00+00:00');
-const updateDate = new Date('2026-11-11T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('remarriage');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/remarriage';

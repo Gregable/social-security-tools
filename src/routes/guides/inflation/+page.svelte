@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import { MAX_YEAR, MAX_WAGE_INDEX_YEAR, WAGE_INDICES } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
@@ -50,8 +51,7 @@ const lastRow = earningsRows.at(-1)!;
 const title = "How Inflation Affects Your Social Security Benefits: AWI and COLA Explained";
 const description =
   "Discover how Social Security protects your benefits from inflation through wage indexing (AWI) during your working years and Cost of Living Adjustments (COLA) after retirement.";
-const publishDate = new Date('2018-11-23T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('inflation');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/inflation';

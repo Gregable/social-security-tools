@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -24,13 +25,14 @@ const sponsorCopy: SponsorCopy = {
 const title = 'Effect of Covid-19 on Social Security Benefits';
 const description =
   'Will a weak economy in 2020 result in a benefits decrease for those born in 1960?';
-const publishDate = new Date('2020-12-01T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('covid-awi-drop');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/covid-awi-drop'; // Corrected URL
 schema.title = title;
 schema.image = HeroImage;
 schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
 schema.description = description; // Pass the description to the schema
 schema.imageAlt = 'An image of a covid virus, artists rendition';
 schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
@@ -47,7 +49,7 @@ schema.tags = ['COVID-19', 'Social Security', 'Wage Index', 'Pandemic Impact'];
 <div class="guide-page">
   <h1>{title}</h1>
   <img class="hero" src={HeroImage} alt="Artist depiction of Covid-19 virus" />
-  <GuideByline {publishDate} />
+  <GuideByline {publishDate} {updateDate} />
   <p>
     Reddit user <a href="https://www.reddit.com/user/jgatcomb/">jgatcomb</a>
     started an interesting thread about the

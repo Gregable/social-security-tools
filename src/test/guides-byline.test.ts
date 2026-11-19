@@ -39,7 +39,7 @@ describe('guide bylines', () => {
   const pages = guidePages();
 
   it('finds the guide pages', () => {
-    // A floor against an empty directory walk passing vacuously; 45 guides
+    // A floor against an empty directory walk passing vacuously; 47 guides
     // at the time of writing.
     expect(pages.length).toBeGreaterThan(40);
   });

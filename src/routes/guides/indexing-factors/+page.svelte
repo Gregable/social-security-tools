@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import { MAX_YEAR, MAX_WAGE_INDEX_YEAR, WAGE_INDICES } from '$lib/constants';
 import GuideFooter from '../guide-footer.svelte';
@@ -9,8 +10,7 @@ import HeroImage from './hero.png';
 const title = 'Social Security Wage Indexing: How Your Earnings Are Adjusted';
 const description =
   "Learn how Social Security uses wage indexing to adjust your earnings for inflation. Understand indexing factors, the AWI formula, and why your benefit is shown in today's dollars.";
-const publishDate = new Date('2020-12-28T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('indexing-factors');
 
 // Calculate example indexing factor
 const exampleYear = 1990;

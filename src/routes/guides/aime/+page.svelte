@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { aimeTableRows } from "$lib/aime-examples";
   import { Birthdate } from "$lib/birthday";
   import {
@@ -61,8 +62,7 @@ import GuideByline from "../GuideByline.svelte";
   const title = "Averaged Indexed Monthly Earnings (AIME)";
   const description =
     "Learn how AIME (Average Indexed Monthly Earnings) is calculated and why it matters for your Social Security benefits. Comprehensive guide with examples.";
-  const publishDate = new Date("2025-09-19T00:00:00+00:00");
-  const updateDate = new Date("2026-10-14T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('aime');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/aime";

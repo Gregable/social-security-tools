@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { GuidesSchema, renderFAQSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 import GuideByline from "../GuideByline.svelte";
@@ -33,8 +34,7 @@ const applySponsorCopy: SponsorCopy = {
     "Social Security Survivor Benefits: Guide for Widows, Widowers & Families";
   const description =
     "Learn about Social Security survivor benefits for widows, widowers, and children. Understand eligibility at age 60, benefit amounts up to 100% of spouse's benefit, and claiming strategies.";
-  const publishDate = new Date("2026-01-19T00:00:00+00:00");
-  const updateDate = new Date("2026-11-18T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('survivor-benefits');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/survivor-benefits";

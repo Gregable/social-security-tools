@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema, renderFAQSchema, type FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -18,8 +19,7 @@ const sponsorCopy: SponsorCopy = {
 const title = 'Will Social Security Run Out of Money?';
 const description =
   "Social Security's trust fund is projected to be depleted by 2034, but benefits won't disappear. Learn what happens when the fund runs out, how much benefits might be reduced, and what Congress could do to fix it.";
-const publishDate = new Date('2023-08-11T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('will-social-security-run-out');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/will-social-security-run-out';

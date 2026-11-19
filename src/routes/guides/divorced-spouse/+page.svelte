@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -30,8 +31,7 @@ const applySponsorCopy: SponsorCopy = {
 const title = 'Social Security Benefits for Divorced Spouses: Eligibility, Rules & How to Claim';
 const description =
   'Can you collect Social Security from your ex-spouse? Learn the divorced spouse benefit rules, including the 10-year marriage requirement, how benefits are calculated, and whether your ex needs to know.';
-const publishDate = new Date('2026-01-18T00:00:00+00:00');
-const updateDate = new Date('2026-11-18T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('divorced-spouse');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/divorced-spouse';

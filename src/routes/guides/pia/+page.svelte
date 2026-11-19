@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { aboveSecondBendExampleAime, aimeTableRows } from "$lib/aime-examples";
   import { Birthdate } from "$lib/birthday";
   import BendpointChart from "$lib/components/BendpointChart.svelte";
@@ -76,8 +77,7 @@ import GuideByline from "../GuideByline.svelte";
 
   const title = "Primary Insurance Amount (PIA)";
   const description = `Learn how Social Security calculates your Primary Insurance Amount (PIA) in ${currentYear}. Understand the bendpoint formula (${firstBendPoint.wholeDollars()} and ${secondBendPoint.wholeDollars()}), calculate your monthly benefit, and discover strategies to maximize your PIA.`;
-  const publishDate = new Date("2025-09-19T00:00:00+00:00");
-  const updateDate = new Date("2026-10-14T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('pia');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/pia";

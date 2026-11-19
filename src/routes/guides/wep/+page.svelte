@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -19,8 +20,7 @@ const sponsorCopy: SponsorCopy = {
 const title = 'Windfall Elimination Provision (WEP): What It Was and Why It No Longer Applies';
 const description =
   'Was WEP repealed? Yes. What the Windfall Elimination Provision was, who it affected, and how the Social Security Fairness Act back pay worked.';
-const publishDate = new Date('2026-01-16T00:00:00+00:00');
-const updateDate = new Date('2026-11-18T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('wep');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/wep';

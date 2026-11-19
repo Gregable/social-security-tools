@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -23,8 +24,7 @@ const sponsorCopy: SponsorCopy = {
 const title = 'How Government Shutdowns Affect Social Security';
 const description =
   'Government shutdowns never stop Social Security payments, but they severely disrupt services. Learn what continues, what stops, and how to protect yourself during funding gaps.';
-const publishDate = new Date(2025, 8, 30); // September 30, 2025 (month is 0-indexed)
-const updateDate = new Date(2025, 8, 30); // September 30, 2025 (month is 0-indexed)
+const { publishDate, updateDate } = guideDates('government-shutdown');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/government-shutdown';

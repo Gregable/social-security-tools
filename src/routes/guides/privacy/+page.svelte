@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -6,12 +7,13 @@ import GuideByline from '../GuideByline.svelte';
 const title = 'Privacy & Security';
 const description =
   'SSA.tools is designed with privacy as a core principle. Your Social Security earnings data never leaves your computer. All calculations happen entirely in your browser.';
-const publishDate = new Date('2025-01-14T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('privacy');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/privacy';
 schema.title = title;
 schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
 schema.description = description;
 schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
 </script>
@@ -27,7 +29,7 @@ schema.tags = ['Privacy', 'Security', 'Data Protection', 'Social Security'];
 <div class="guide-page">
   <h1>{title}</h1>
 
-  <GuideByline {publishDate} />
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     SSA.tools is designed with privacy as a core principle. Your Social Security

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import {
   colaGrowthExample,
   EXAMPLE_PIA,
@@ -14,8 +15,7 @@ import InlineCTA from '../InlineCTA.svelte';
 const title = "Why Your Social Security Benefit Doesn't Match the Estimate";
 const description =
   'The common reasons a Social Security payment differs from the estimate on your Statement or from what an agent told you: assumed future earnings, cost-of-living adjustments since 62, Medicare premiums, delayed credits paid in January, spousal benefits, the earnings test, and errors in your record. With worked examples and how to check your own number.';
-const publishDate = new Date('2026-10-16T00:00:00+00:00');
-const updateDate = new Date('2026-10-16T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('benefit-estimate-differences');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/benefit-estimate-differences';

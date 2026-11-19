@@ -10,15 +10,16 @@
   let { publishDate, updateDate }: { publishDate: Date; updateDate?: Date } =
     $props();
 
-  // Guides construct dates at UTC midnight, and the <time datetime> and the
+  // guideDates() returns dates at UTC midnight, and the <time datetime> and the
   // JSON-LD carry that UTC date. Formatting in UTC keeps the visible date on
   // the same day instead of slipping back one in US timezones.
   function formatDate(date: Date): string {
     return date.toLocaleDateString("en-US", { timeZone: "UTC" });
   }
 
-  // A guide may set updateDate equal to publishDate when it has never been
-  // revised; an "Updated" line that repeats the publish date is noise.
+  // GUIDE_DATES keeps `updated` equal to `published` for a guide that has
+  // never been revised; an "Updated" line that repeats the publish date is
+  // noise.
   const showUpdated = $derived(
     updateDate !== undefined && updateDate.getTime() !== publishDate.getTime()
   );

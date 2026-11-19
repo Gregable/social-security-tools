@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -10,8 +11,7 @@ const HeroImage = '/thoughtful_person.png'; // Using a specific image for all gu
 const title = 'How much Social Security will I get if I make $40,000 / year?';
 const description =
   'Understand how your Social Security benefits are calculated if you consistently earn $40,000 per year.';
-const publishDate = new Date('2025-06-15T00:00:00+00:00'); // Current date
-const updateDate = new Date('2026-10-14T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('40k-income');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/40k-income';

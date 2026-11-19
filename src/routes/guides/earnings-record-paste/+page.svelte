@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -11,13 +12,14 @@ import StatementImage from './statement.png';
 const title = 'Possible causes of Parsing Errors';
 const description =
   "SSA.tools accepts a copy and pasted earnings record from the Social Security Administration's website. This guide explains If your earnings record is not being parsed correctly, this guide may help you understand why and how to fix it.";
-const publishDate = new Date('2023-09-12T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('earnings-record-paste');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/earnings-record-paste';
 schema.title = title;
 schema.image = HeroImage;
 schema.datePublished = publishDate.toISOString();
+schema.dateModified = updateDate.toISOString();
 schema.description = description; // Pass the description to the schema
 schema.imageAlt =
   'A woman looking confused with a tangle of pipes and a robot above her head';
@@ -44,7 +46,7 @@ schema.tags = ['Earnings Record', 'Social Security', 'SSA.gov', 'Import Data'];
     />
   </figure>
 
-  <GuideByline {publishDate} />
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     You likely reached this page after seeing an error like the following when

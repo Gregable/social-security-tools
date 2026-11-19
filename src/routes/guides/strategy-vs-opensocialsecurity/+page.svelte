@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import type { FAQItem } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
@@ -8,8 +9,7 @@ import strategyGrid from './strategy-grid.png';
 const title = 'SSA.tools vs OpenSocialSecurity';
 const description =
   'If you run both ssa.tools and OpenSocialSecurity, you may see different optimal filing dates. Here is why the tools differ, and why the practical impact is usually small.';
-const publishDate = new Date('2026-04-27T00:00:00+00:00');
-const updateDate = publishDate;
+const { publishDate, updateDate } = guideDates('strategy-vs-opensocialsecurity');
 
 const schema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/strategy-vs-opensocialsecurity';

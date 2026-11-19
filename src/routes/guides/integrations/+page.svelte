@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from "$lib/guide-dates";
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
   import GuideByline from "../GuideByline.svelte";
@@ -6,15 +7,14 @@
   const title = "Third-Party Integrations";
   const description =
     "Learn about third-party tools that integrate with SSA.tools to provide enhanced retirement planning capabilities.";
-  const published = "2025-12-20";
-  const modified = "2026-01-14";
+  const { publishDate, updateDate } = guideDates("integrations");
 
   const schema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/integrations";
   schema.title = title;
   schema.description = description;
-  schema.datePublished = published;
-  schema.dateModified = modified;
+  schema.datePublished = publishDate.toISOString();
+  schema.dateModified = updateDate.toISOString();
   schema.image = "https://ssa.tools/laptop-piggybank.jpg";
   schema.imageAlt = "SSA.tools Integrations Guide";
   schema.tags = [
@@ -35,7 +35,7 @@
 
 <div class="guide-page">
   <h1>{title}</h1>
-  <GuideByline publishDate={new Date(published)} updateDate={new Date(modified)} />
+  <GuideByline {publishDate} {updateDate} />
 
   <p>
     SSA.tools is designed to be a powerful, standalone calculator for Social

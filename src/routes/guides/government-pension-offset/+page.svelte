@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import {
   EXAMPLE_CONTACT_MONTH,
   GPO_EXAMPLE,
@@ -40,8 +41,7 @@ const title =
   'Government Pension Offset (GPO) Repeal: Spousal and Survivor Back Pay You May Still Be Owed';
 const description =
   'The Social Security Fairness Act ended the Government Pension Offset. If GPO cut your spousal or survivor benefit to $0, see what back pay you are owed.';
-const publishDate = new Date('2026-11-18T00:00:00+00:00');
-const updateDate = new Date('2026-11-18T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('government-pension-offset');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/government-pension-offset';

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { guideDates } from '$lib/guide-dates';
   import { GuidesSchema } from "$lib/schema-org";
   import GuideFooter from "../guide-footer.svelte";
 import GuideByline from "../GuideByline.svelte";
@@ -9,8 +10,7 @@ import GuideByline from "../GuideByline.svelte";
     "The New Senior Tax Deduction: What It Means for Social Security Recipients";
   const description =
     "The One Big Beautiful Bill Act created a new $6,000 tax deduction for seniors 65+. Learn who qualifies, income phase-outs, how it interacts with Social Security benefit taxation, and planning strategies for 2025-2028.";
-  const publishDate = new Date("2026-02-02T00:00:00+00:00");
-  const updateDate = new Date("2026-09-17T00:00:00+00:00");
+  const { publishDate, updateDate } = guideDates('senior-tax-deduction');
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/senior-tax-deduction";

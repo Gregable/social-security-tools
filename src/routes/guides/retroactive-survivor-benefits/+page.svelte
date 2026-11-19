@@ -1,4 +1,5 @@
 <script lang="ts">
+import { guideDates } from '$lib/guide-dates';
 import { type FAQItem, GuidesSchema, renderFAQSchema } from '$lib/schema-org';
 import GuideFooter from '../guide-footer.svelte';
 import GuideByline from '../GuideByline.svelte';
@@ -35,8 +36,7 @@ const title =
   'Retroactive Survivor Benefits: How Far Back Social Security Pays';
 const description =
   'Applied late for Social Security survivor benefits? Learn how many months of back pay a widow or widower can receive, why the answer depends on your age and your spouse\'s filing, and how to protect your filing date.';
-const publishDate = new Date('2026-09-17T00:00:00+00:00');
-const updateDate = new Date('2026-11-18T00:00:00+00:00');
+const { publishDate, updateDate } = guideDates('retroactive-survivor-benefits');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/retroactive-survivor-benefits';
