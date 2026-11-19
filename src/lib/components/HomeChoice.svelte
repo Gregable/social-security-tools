@@ -75,7 +75,6 @@ function handleProLinkClick(): void {
           Social Security specialist.
         </p>
         <span class="card-button">Schedule a Free Call &rarr;</span>
-        <p class="card-footnote">Opens the scheduling calendar in a new tab.</p>
       </a>
     {/if}
   </div>
