@@ -351,7 +351,7 @@ const pageImageAlt = 'Social Security guides and educational resources';
           For 42 years, the Windfall Elimination Provision reduced Social
           Security benefits for teachers, firefighters, and other public
           servants. Learn what WEP was, who it affected, and why it no longer
-          applies after the Social Security Fairness Act of 2025.
+          applies after the Social Security Fairness Act.
         </p>
       </li>
 

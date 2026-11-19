@@ -18,7 +18,7 @@ const sponsorCopy: SponsorCopy = {
 
 const title = 'Windfall Elimination Provision (WEP): What It Was and Why It No Longer Applies';
 const description =
-  'Was WEP repealed? Yes! Learn about the Windfall Elimination Provision, the Social Security rule that reduced benefits for teachers and public employees for 42 years before its repeal in January 2025.';
+  'Was WEP repealed? Yes. What the Windfall Elimination Provision was, who it affected, and how the Social Security Fairness Act back pay worked.';
 const publishDate = new Date('2026-01-16T00:00:00+00:00');
 const updateDate = new Date('2026-11-18T00:00:00+00:00');
 
@@ -35,6 +35,8 @@ schema.tags = [
   'Windfall Elimination Provision',
   'WEP',
   'WEP repeal',
+  'WEP back pay',
+  'WEP retroactive payment',
   'Social Security',
   'Government Pension Offset',
   'GPO',
@@ -235,7 +237,7 @@ schema.tags = [
     > covers who is owed back pay and how to claim it.
   </p>
 
-  <h2>The Social Security Fairness Act of 2025</h2>
+  <h2>The Social Security Fairness Act</h2>
 
   <p>
     After decades of advocacy, the Social Security Fairness Act (H.R. 82)
@@ -253,7 +255,7 @@ schema.tags = [
     public servants."
   </p>
 
-  <h2>How Do I Get My WEP Money Back?</h2>
+  <h2>WEP Back Pay: How the Retroactive Payments Worked</h2>
 
   <p>
     If you were already receiving benefits reduced by WEP or GPO, you don't
@@ -408,6 +410,19 @@ schema.tags = [
       payments back to January 2024. Most were sent by July 2025. If you
       never applied, you must file, and the normal limits on back pay apply.
       For spousal and survivor benefits, see the
+      <a href="/guides/government-pension-offset"
+        >Government Pension Offset guide</a
+      >.
+    </p>
+
+    <h3>I never received my WEP back pay. What should I do?</h3>
+    <p>
+      Sign in to your
+      <a href="https://www.ssa.gov/myaccount/">my Social Security</a> account
+      and check that your mailing address and bank account are current, then
+      contact Social Security and ask about your Fairness Act payment. The
+      payment goes to the bank account on file. If the missing money is a
+      spousal or survivor benefit, see the
       <a href="/guides/government-pension-offset"
         >Government Pension Offset guide</a
       >.

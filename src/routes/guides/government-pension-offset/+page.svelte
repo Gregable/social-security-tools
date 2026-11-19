@@ -318,10 +318,7 @@ const faqs: FAQItem[] = [
   </table>
 
   <p>
-    The rules are in
-    <a href="https://secure.ssa.gov/poms.nsf/lnx/0200204030"
-      >Social Security's manual, GN 00204.030</a
-    >. The point for you is simple: every month you wait is a month you will
+    The point for you is simple: every month you wait is a month you will
     not be paid for. Apply this month.
   </p>
 
