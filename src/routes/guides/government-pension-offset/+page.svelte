@@ -23,17 +23,15 @@ const sponsorCopy: SponsorCopy = {
   ],
 };
 
-// The second card, ahead of "What to Do Now". A reader who has never
-// applied should make the call in step 1 before anything else, because the
-// date of that contact can decide how many months are paid. The intro says
-// so itself, because phones do not show the bullets.
+// The second card, ahead of "What to Do Now", pitched at readers ready to
+// act: back pay that is missing or short, or a first application.
 const applySponsorCopy: SponsorCopy = {
   intro:
-    'If you have never applied, call Social Security today: the date you contact them can decide how many months you are paid. If your back pay is missing, short, or was refused, you can also have a Social Security specialist at',
+    'If your back pay is missing, short, or was refused, or you never applied, you can have a Social Security specialist at',
   outro: 'review your letters and pursue the money with you.',
   bullets: [
-    'Make the call in step 1 below first; it does not need to wait for anyone.',
     'They compare what you were paid with the months the law covers.',
+    'If you never applied, they file with you and look for an earlier filing date you can prove.',
     'The first call is free, and you pick the time.',
   ],
 };
