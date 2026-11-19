@@ -251,14 +251,6 @@ const faqs: FAQItem[] = [
     2024 and it needs to confirm what it paid for those months.
   </p>
 
-  <p>
-    If you have no payment and no letter, call Social Security at
-    1-800-772-1213. Say that GPO reduced your spousal or survivor benefit to
-    $0, that you were entitled before the Act became law, and that you have not received
-    the Fairness Act payment. Ask them to confirm your address and bank
-    account.
-  </p>
-
   <InlineCTA type="sponsor" {sponsorCopy} />
 
   <h2>If You Never Applied: Apply Now</h2>
