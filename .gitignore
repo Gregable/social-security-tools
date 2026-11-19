@@ -44,3 +44,7 @@ dist-ssr
 # Local developer files
 /local
 /.superpowers/
+
+# Internal reasoning and plan docs (kept locally, not published)
+/docs/why/
+/docs/plans/
