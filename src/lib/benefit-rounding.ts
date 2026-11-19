@@ -51,6 +51,38 @@ function floorToDime(
   return Math.floor((cents * numerator) / (denominator * 10)) * 10;
 }
 
+/**
+ * An amount at the dime after one cost-of-living adjustment, in cents: the
+ * amount raised by `colaPercent` percent and truncated to the dime (POMS
+ * RS 00601.020). Every COLA SSA has published is a whole number of tenths
+ * of a percent, so the factor is the exact fraction (1000 + tenths) / 1000.
+ *
+ * Unlike Money.times, which rounds to the cent before a later truncation
+ * and so can land a dime high when the exact product falls within half a
+ * cent below a whole dime, this never rounds up.
+ *
+ * @param cents - The amount before the adjustment, in whole cents
+ * @param colaPercent - The adjustment in percent, e.g. 2.8
+ * @throws Error if `cents` is not a non-negative integer, or if the
+ *   adjustment is not finite, is negative, or is not a whole number of
+ *   tenths of a percent
+ */
+export function colaAdjustedDimes(cents: number, colaPercent: number): number {
+  if (!Number.isInteger(cents) || cents < 0) {
+    throw new Error(`cents must be a non-negative integer, got ${cents}`);
+  }
+  if (!Number.isFinite(colaPercent)) {
+    throw new Error(`COLA must be a finite number, got ${colaPercent}`);
+  }
+  const tenths = Math.round(colaPercent * 10);
+  if (Math.abs(colaPercent * 10 - tenths) > 1e-9 || tenths < 0) {
+    throw new Error(
+      `COLA ${colaPercent}% is not a non-negative whole number of tenths of a percent`
+    );
+  }
+  return floorToDime(cents, 1000 + tenths, 1000);
+}
+
 /** Truncates an amount in whole cents to the dollar. */
 export function floorToDollarCents(cents: number): number {
   return Math.floor(cents / 100) * 100;

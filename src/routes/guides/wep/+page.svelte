@@ -11,15 +11,16 @@ const sponsorCopy: SponsorCopy = {
   bullets: [
     "They can tell whether your payment reflects the repeal, and what to do if it does not.",
     "A pension alongside Social Security also reshapes your tax picture, which this guide doesn't cover.",
+    "If GPO cut a spousal or survivor benefit to $0, or you never applied because of it, they can check what you are still owed.",
     "The first call is free, and you pick the time.",
   ],
 };
 
 const title = 'Windfall Elimination Provision (WEP): What It Was and Why It No Longer Applies';
 const description =
-  'Was WEP repealed? Yes! Learn about the Windfall Elimination Provision, the Social Security rule that reduced benefits for teachers and public employees for 42 years before its repeal in January 2025.';
+  'Was WEP repealed? Yes. What the Windfall Elimination Provision was, who it affected, and how the Social Security Fairness Act back pay worked.';
 const publishDate = new Date('2026-01-16T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const updateDate = new Date('2026-11-18T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/wep';
@@ -34,6 +35,8 @@ schema.tags = [
   'Windfall Elimination Provision',
   'WEP',
   'WEP repeal',
+  'WEP back pay',
+  'WEP retroactive payment',
   'Social Security',
   'Government Pension Offset',
   'GPO',
@@ -221,28 +224,20 @@ schema.tags = [
     > (GPO), enacted even
     earlier in 1977. While WEP reduced a worker's <em>own</em> retirement
     benefits, GPO targeted <em>spousal and survivor benefits</em>, reducing
-    them by two-thirds of the recipient's government pension.
+    them by two-thirds of the recipient's government pension. By December
+    2023, 71% of those affected by GPO lost their entire spousal or survivor
+    benefit. Both were repealed together by the Social Security Fairness Act.
   </p>
 
   <p>
-    The GPO could take a big bite. A widow with a $900 monthly government
-    pension would see her Social Security survivor benefit cut by $600. If her
-    survivor benefit would have been $800, the GPO eliminated it entirely. By
-    December 2023, 71% of those affected by GPO lost their entire Social
-    Security spousal or survivor benefit.
+    GPO raises different questions from WEP, because many people it affected
+    were paid nothing or never applied. Our
+    <a href="/guides/government-pension-offset"
+      >Government Pension Offset guide</a
+    > covers who is owed back pay and how to claim it.
   </p>
 
-  <p>
-    The provision disproportionately affected women: 83% of the approximately
-    746,000 GPO-affected beneficiaries were female, many of them widows of
-    workers who had paid into Social Security their entire careers.
-  </p>
-
-  <p>
-    Both WEP and GPO were repealed together by the Social Security Fairness Act.
-  </p>
-
-  <h2>The Social Security Fairness Act of 2025</h2>
+  <h2>The Social Security Fairness Act</h2>
 
   <p>
     After decades of advocacy, the Social Security Fairness Act (H.R. 82)
@@ -260,10 +255,10 @@ schema.tags = [
     public servants."
   </p>
 
-  <h2>How Do I Get My WEP Money Back?</h2>
+  <h2>WEP Back Pay: How the Retroactive Payments Worked</h2>
 
   <p>
-    If you were already receiving reduced benefits due to WEP or GPO, you don't
+    If you were already receiving benefits reduced by WEP or GPO, you don't
     need to do anything. The Social Security Administration automatically
     recalculated benefits and
     <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
@@ -277,6 +272,19 @@ schema.tags = [
     retroactive benefits, covering the period from January 2024 (when the
     repeal took effect retroactively) through the implementation date.
   </p>
+
+  <div class="callout">
+    <p>
+      <strong>Spousal or survivor benefit cut to $0 by GPO?</strong> The
+      automatic payments reached people Social Security already had on its
+      records as entitled to a reduced benefit. If you were entitled at $0
+      and never got the payment, or you never applied because of GPO, see
+      the <a href="/guides/government-pension-offset"
+        >Government Pension Offset guide</a
+      >. People who apply now get at most a few months of back pay, so do not
+      wait.
+    </p>
+  </div>
 
   <p>The benefit increases varied based on individual circumstances:</p>
 
@@ -344,12 +352,28 @@ schema.tags = [
 
   <h2>If You Were Affected by WEP or GPO</h2>
 
+  <ul>
+    <li>
+      <strong>Already receiving a reduced benefit:</strong> your monthly
+      payment should already reflect the increase, and your lump sum back to
+      January 2024 should have arrived.
+    </li>
+    <li>
+      <strong>Entitled to a spousal or survivor benefit that GPO cut to
+      $0:</strong> you are owed back to January 2024 too; if nothing arrived,
+      see the <a href="/guides/government-pension-offset">GPO guide</a>.
+    </li>
+    <li>
+      <strong>Never applied because of WEP or GPO:</strong> you need to apply,
+      and back pay is limited to the
+      <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
+        >normal retroactivity rules</a
+      >, so apply now.
+    </li>
+  </ul>
+
   <p>
-    If you were already receiving benefits, your monthly payment should already
-    reflect the increased amount, and your retroactive lump sum should have
-    arrived. If you haven't yet applied, you can now apply for benefits using
-    the standard formula; there is no longer any WEP or GPO reduction. The
-    ssa.tools calculator shows your benefits using the standard
+    The ssa.tools calculator shows your benefits using the standard
     <a href="/guides/pia">PIA formula</a> with no WEP adjustment, because WEP no
     longer exists.
   </p>
@@ -381,9 +405,27 @@ schema.tags = [
 
     <h3>Will I get back pay for WEP?</h3>
     <p>
-      If you were already receiving benefits before the repeal, the SSA
-      automatically sent retroactive payments covering January 2024 through mid-2025.
-      Most affected beneficiaries received these payments by July 2025.
+      If Social Security already had you on its records as entitled to a
+      benefit reduced by WEP or GPO, it automatically sent retroactive
+      payments back to January 2024. Most were sent by July 2025. If you
+      never applied, you must file, and the normal limits on back pay apply.
+      For spousal and survivor benefits, see the
+      <a href="/guides/government-pension-offset"
+        >Government Pension Offset guide</a
+      >.
+    </p>
+
+    <h3>I never received my WEP back pay. What should I do?</h3>
+    <p>
+      Sign in to your
+      <a href="https://www.ssa.gov/myaccount/">my Social Security</a> account
+      and check that your mailing address and bank account are current, then
+      contact Social Security and ask about your Fairness Act payment. The
+      payment goes to the bank account on file. If the missing money is a
+      spousal or survivor benefit, see the
+      <a href="/guides/government-pension-offset"
+        >Government Pension Offset guide</a
+      >.
     </p>
   </div>
 
@@ -468,6 +510,18 @@ schema.tags = [
 
   .wep-table tbody tr:hover {
     background-color: #f5f5f5;
+  }
+
+  .callout {
+    background-color: #e8f4fd;
+    border: 1px solid #4a90d9;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .callout p {
+    margin: 0;
   }
 
   .faq h3 {

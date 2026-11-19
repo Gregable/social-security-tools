@@ -32,7 +32,7 @@ const title =
 const description =
   'Can you get Social Security from your spouse? Learn who qualifies for spousal benefits, how the 50% rule really works, how filing age changes the amount, and whether you can claim if you never worked.';
 const publishDate = new Date('2026-09-09T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const updateDate = new Date('2026-11-18T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/spousal-benefits';
@@ -139,6 +139,15 @@ const faqs: FAQItem[] = [
     You do not need any work history of your own. Divorced spouses have a
     different set of rules, including a 10-year marriage requirement, covered
     in the <a href="/guides/divorced-spouse">divorced spouse benefits guide</a>.
+  </p>
+
+  <p>
+    A pension from government work that did not pay Social Security taxes
+    no longer reduces spousal benefits. If the Government Pension Offset cut
+    your spousal benefit to $0, or you never applied because of it, see our
+    <a href="/guides/government-pension-offset"
+      >Government Pension Offset guide</a
+    > for back pay you may still be owed.
   </p>
 
   <h2>How Much You Get</h2>

@@ -27,6 +27,22 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Nov 18, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/government-pension-offset">
+            Government Pension Offset (GPO) Repeal: Spousal and Survivor
+            Back Pay You May Still Be Owed
+          </a>
+        </h3>
+        <p class="description">
+          If GPO cut your spousal or survivor benefit to $0, the Social
+          Security Fairness Act may owe you every month from January 2024. If
+          you never applied, back pay is limited. Who is owed what, a worked
+          example, and what to do now.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Nov 11, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/remarriage">
@@ -335,7 +351,7 @@ const pageImageAlt = 'Social Security guides and educational resources';
           For 42 years, the Windfall Elimination Provision reduced Social
           Security benefits for teachers, firefighters, and other public
           servants. Learn what WEP was, who it affected, and why it no longer
-          applies after the Social Security Fairness Act of 2025.
+          applies after the Social Security Fairness Act.
         </p>
       </li>
 

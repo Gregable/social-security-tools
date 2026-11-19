@@ -47,6 +47,7 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
   'divorced-spouse': 'sponsor',
   'earnings-test': 'sponsor',
   'federal-taxes': 'sponsor',
+  'government-pension-offset': 'sponsor',
   'government-shutdown': 'sponsor',
   'international-agreements': 'sponsor',
   mortality: 'sponsor',
@@ -66,8 +67,9 @@ export const GUIDE_CTA_TYPES: Record<string, GuideCTAType> = {
  * property of its impression and click events. `guide-inline` is the card
  * beside the decision, which every sponsor guide carries.
  * `guide-inline-apply` is a second card ahead of the section on how to
- * apply, on the few guides where that is worth a second ask (see
- * docs/why/sponsor-apply-card.md). They are separate placements so each
+ * apply, on the few guides where that is worth a second ask; those guides
+ * are listed in guide-sponsor-copy-sync.test.ts. They are separate
+ * placements so each
  * card's clicks are counted against its own impressions. On chat trial
  * guides the card's chat link reports the same value with a `-chat`
  * suffix. The footer's `guide-footer` placement is set in
@@ -81,15 +83,18 @@ export function getGuideCTAType(pathname: string): GuideCTAType {
 
 /**
  * Guides that offer a live chat with the sponsor beside the scheduling
- * link, as a trial. Chosen in October 2026 as the two guides with the most
+ * link, as a trial. Started in October 2026 on the two guides with the most
  * sponsor impressions and clicks, so chat and scheduling clicks can be
- * compared on the same impressions. Every entry must be a 'sponsor' guide
+ * compared on the same impressions. government-pension-offset joined at
+ * launch in November 2026, after a Fairness Act back-pay case reached the
+ * sponsor through chat. Every entry must be a 'sponsor' guide
  * (sponsor.test.ts checks): a calculator guide's inline card has no
  * sponsor, so it would offer chat only in the footer. Empty the set to end
  * the trial; every card and footer then go back to the single link.
  */
 export const CHAT_TRIAL_GUIDES: ReadonlySet<string> = new Set([
   'divorced-spouse',
+  'government-pension-offset',
   'spousal-benefits',
 ]);
 

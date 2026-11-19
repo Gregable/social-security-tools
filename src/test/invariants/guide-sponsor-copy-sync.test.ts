@@ -52,12 +52,13 @@ const APPLY_CARD = 'guide-inline-apply';
 /**
  * Guides that carry a second sponsor card ahead of their "how to apply"
  * section. Listed here rather than discovered so that adding the card to
- * another guide is a decision someone records: see
- * docs/why/sponsor-apply-card.md. Keep it sorted: the test compares it
- * with the sorted list of guides found.
+ * a guide is a deliberate decision, recorded in the change that adds the
+ * guide here. Keep it sorted: the test compares it with the sorted list of
+ * guides found.
  */
 const APPLY_CARD_GUIDES = [
   'divorced-spouse',
+  'government-pension-offset',
   'retroactive-survivor-benefits',
   'spousal-benefits',
   'survivor-benefits',

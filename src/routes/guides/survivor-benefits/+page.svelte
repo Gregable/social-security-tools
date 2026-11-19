@@ -34,7 +34,7 @@ const applySponsorCopy: SponsorCopy = {
   const description =
     "Learn about Social Security survivor benefits for widows, widowers, and children. Understand eligibility at age 60, benefit amounts up to 100% of spouse's benefit, and claiming strategies.";
   const publishDate = new Date("2026-01-19T00:00:00+00:00");
-  const updateDate = new Date("2026-10-03T00:00:00+00:00");
+  const updateDate = new Date("2026-11-18T00:00:00+00:00");
 
   let schema: GuidesSchema = new GuidesSchema();
   schema.url = "https://ssa.tools/guides/survivor-benefits";
@@ -419,18 +419,16 @@ const applySponsorCopy: SponsorCopy = {
   <h2>Government Pension Offset (GPO) - Now Repealed</h2>
 
   <p>
-    Prior to January 2025, the Government Pension Offset (GPO) reduced survivor
-    benefits for those receiving government pensions from work not covered by
-    Social Security. The
-    <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html">Social Security Fairness Act of 2025</a> repealed this
-    provision.
-  </p>
-
-  <p>
-    Government workers (teachers, firefighters, state employees, etc.) now
-    receive their full survivor benefits without reduction. See our
-    <a href="/guides/wep">WEP guide</a> for more information about these historic
-    changes.
+    The Government Pension Offset used to reduce survivor benefits for
+    widows and widowers with a pension from government work that did not pay
+    Social Security taxes, often to $0. The
+    <a href="https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html"
+      >Social Security Fairness Act</a
+    > ended it for benefits payable from January 2024. If GPO cut your
+    survivor benefit to $0, or you never applied because of it, see our
+    <a href="/guides/government-pension-offset"
+      >Government Pension Offset guide</a
+    > for back pay you may still be owed.
   </p>
 
   <h2>Common Misconceptions</h2>

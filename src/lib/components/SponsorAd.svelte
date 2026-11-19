@@ -86,14 +86,10 @@ export let links: SponsorAdLinks | null = null;
                 <span class="cta-button">Start a Live Chat →</span>
               </a>
             </div>
-            <div class="cta-subtext">Both open in a new tab</div>
           </div>
         {:else}
           <div class="cta-section">
             <div class="cta-button">Schedule a Free Call →</div>
-            <div class="cta-subtext">
-              Opens their scheduling calendar in a new tab
-            </div>
           </div>
         {/if}
       </div>
@@ -395,12 +391,6 @@ export let links: SponsorAdLinks | null = null;
   .cta-link:focus-visible {
     outline: 2px solid #081d88;
     outline-offset: 3px;
-  }
-
-  .cta-subtext {
-    font-size: 0.9em;
-    color: #666;
-    font-style: italic;
   }
 
   .mobile-title {

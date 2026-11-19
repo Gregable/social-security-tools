@@ -31,7 +31,7 @@ const title = 'Social Security Benefits for Divorced Spouses: Eligibility, Rules
 const description =
   'Can you collect Social Security from your ex-spouse? Learn the divorced spouse benefit rules, including the 10-year marriage requirement, how benefits are calculated, and whether your ex needs to know.';
 const publishDate = new Date('2026-01-18T00:00:00+00:00');
-const updateDate = new Date('2026-09-17T00:00:00+00:00');
+const updateDate = new Date('2026-11-18T00:00:00+00:00');
 
 let schema: GuidesSchema = new GuidesSchema();
 schema.url = 'https://ssa.tools/guides/divorced-spouse';
@@ -141,6 +141,16 @@ const faqs = [
       </li>
     </ol>
   </div>
+
+  <p>
+    A teacher, CSRS, or other government pension from work that did not pay
+    Social Security taxes no longer reduces divorced spouse benefits. If the
+    Government Pension Offset cut yours to $0, or you never applied because
+    of it, see our
+    <a href="/guides/government-pension-offset"
+      >Government Pension Offset guide</a
+    > for back pay you may still be owed.
+  </p>
 
   <h2>The 10-Year Marriage Rule Explained</h2>
 
