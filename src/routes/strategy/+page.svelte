@@ -207,6 +207,13 @@
   type Stage = "mode" | "form" | "results";
   let stage: Stage = "mode";
 
+  // The intro under the picker explains the tool to someone who has not
+  // used it yet. Once the page moves past the picker, by a pick or by a
+  // link that opens on the form, the intro stays away for the rest of the
+  // visit, including when Start over brings the picker back.
+  let showIntro = true;
+  $: if (stage !== "mode") showIntro = false;
+
   const calculationResultsStore = writable<CalculationResults>(
     new CalculationResults()
   );
@@ -634,6 +641,15 @@
   }
 
   /**
+   * From the choices that close the intro, far down the page. The form
+   * replaces everything on screen, so show it from the top.
+   */
+  function handleIntroModeSelect(selected: StrategyMode) {
+    handleModeSelect(selected);
+    window.scrollTo({ top: 0 });
+  }
+
+  /**
    * From the single-mode form: a widow(er) who picked "Just me" switches to
    * widowed mode, keeping their own details.
    */
@@ -1001,13 +1017,6 @@
       </section>
     {/if}
 
-    <!-- No transition: a slide would animate this tall block out, holding
-         the form below the fold, and links that open on the form (from
-         the calculator or a share link) would watch it collapse. -->
-    {#if stage === "mode"}
-      <StrategyIntro />
-    {/if}
-
     {#if stage === "form"}
       <section
         class="stage-section"
@@ -1060,6 +1069,14 @@
       </section>
     {/if}
   </div>
+
+  <!-- Outside the width limit above, so its band can run the width of the
+       window. No transition: a slide would animate this tall block out,
+       holding the form below the fold, and links that open on the form
+       (from the calculator or a share link) would watch it collapse. -->
+  {#if showIntro}
+    <StrategyIntro onselect={handleIntroModeSelect} />
+  {/if}
 
   {#if stage === "results"}
     {#if hasChoiceLeft}
