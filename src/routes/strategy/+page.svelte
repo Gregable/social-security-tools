@@ -1077,7 +1077,9 @@
        under the form, and a link that opens on the form (from the
        calculator or a share link) would open on that collapse. -->
   {#if showIntro}
-    <StrategyIntro onselect={handleIntroModeSelect} />
+    <div class="intro-bleed">
+      <StrategyIntro onselect={handleIntroModeSelect} />
+    </div>
   {/if}
 
   {#if stage === "results"}
@@ -1404,6 +1406,12 @@
     main {
       max-width: 100%;
       padding: 1rem;
+    }
+
+    /* The intro's band reaches the edges of the window and the end of the
+       page, so it takes back the padding above. */
+    .intro-bleed {
+      margin: 0 -1rem -1rem;
     }
   }
 </style>

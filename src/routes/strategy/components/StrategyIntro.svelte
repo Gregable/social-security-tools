@@ -459,17 +459,32 @@
   }
 
   @media (min-width: 900px) {
+    .topics {
+      row-gap: 0;
+    }
+
     .topics--three {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .topics--two {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 3rem;
+      column-gap: 3rem;
     }
 
     .topic {
       max-width: none;
+    }
+
+    /* Side by side, a label or heading that wraps in one column would push
+       that column's picture and text out of line with its neighbors. A
+       topic's four parts sit on rows the whole group shares instead. */
+    @supports (grid-template-rows: subgrid) {
+      .topic {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 4;
+      }
     }
 
     .closing {
@@ -478,13 +493,9 @@
     }
   }
 
-  /* At this width and below, `main` in ../+page.svelte has 1rem of padding.
-     Negative margins take that back, so the band still reaches the edges
-     of the window and the end of the page, and the content gets the
-     padding instead. */
   @media (max-width: 768px) {
     .intro {
-      margin: 2rem -1rem -1rem;
+      margin-top: 2rem;
       padding: 2.25rem 0 3rem;
     }
 
