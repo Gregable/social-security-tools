@@ -1,6 +1,5 @@
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
-import { GUIDE_SLUGS } from '$lib/guide-dates';
 import type { StrategyMode } from '$lib/strategy/ui';
 import StrategyIntro from '../../routes/strategy/components/StrategyIntro.svelte';
 
@@ -46,7 +45,6 @@ describe('StrategyIntro', () => {
       'Averaged over possible ages of death',
       'Health and discount rate',
       'Before you start',
-      'Related guides',
     ]);
   });
 
@@ -82,29 +80,15 @@ describe('StrategyIntro', () => {
     });
   });
 
-  describe('links', () => {
-    function paths(intro: HTMLElement): string[] {
-      return [...intro.querySelectorAll('a')].map(
-        (link) =>
-          new URL(link.getAttribute('href') ?? '', 'https://ssa.tools').pathname
-      );
-    }
-
-    it('go only to guides that exist', () => {
-      const { intro } = mountIntro();
-      const guidePaths = paths(intro).filter((path) =>
-        path.startsWith('/guides/')
-      );
-      expect(guidePaths.length).toBeGreaterThan(0);
-      for (const path of guidePaths) {
-        expect(GUIDE_SLUGS, path).toContain(path.slice('/guides/'.length));
-      }
-    });
-
-    it('include the calculator, for people who do not know their PIA', () => {
-      const { intro } = mountIntro();
-      expect(paths(intro)).toContain('/calculator');
-    });
+  // The site header already links to the guides, so the intro carries no
+  // list of them.
+  it('links only to the calculator, for people who do not know their PIA', () => {
+    const { intro } = mountIntro();
+    const paths = [...intro.querySelectorAll('a')].map(
+      (link) =>
+        new URL(link.getAttribute('href') ?? '', 'https://ssa.tools').pathname
+    );
+    expect(paths).toEqual(['/calculator']);
   });
 
   // The intro is long, so it ends with the picker's choices again: a reader

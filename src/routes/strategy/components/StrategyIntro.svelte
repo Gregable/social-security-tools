@@ -172,35 +172,14 @@
       </article>
     </div>
 
-    <div class="closing">
-      <div>
-        <h3>Before you start</h3>
-        <p>
-          If you don't know your PIA, the
-          <a href="/calculator">calculator</a> works it out from the earnings
-          record in your my Social Security account. The calculations run in
-          your browser, and no account is needed.
-        </p>
-      </div>
-      <div>
-        <h3>Related guides</h3>
-        <ul>
-          <li>
-            <a href="/guides/break-even-age">Social Security break-even age</a>
-          </li>
-          <li>
-            <a href="/guides/spousal-benefit-filing-date"
-              >When to file for spousal benefits</a
-            >
-          </li>
-          <li><a href="/guides/survivor-benefits">Survivor benefits</a></li>
-          <li>
-            <a href="/guides/strategy-vs-opensocialsecurity"
-              >How this optimizer compares with Open Social Security</a
-            >
-          </li>
-        </ul>
-      </div>
+    <div class="before-start">
+      <h3>Before you start</h3>
+      <p>
+        If you don't know your PIA, the
+        <a href="/calculator">calculator</a> works it out from the earnings
+        record in your my Social Security account. The calculations run in
+        your browser, and no account is needed.
+      </p>
     </div>
 
     <div class="start" role="group" aria-labelledby="strategy-intro-start">
@@ -377,31 +356,29 @@
   }
 
   .topic > p:last-child,
-  .closing p,
-  .closing ul {
+  .before-start p {
     margin: 0;
     font-size: 1rem;
     line-height: 1.55;
   }
 
-  .closing {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2.25rem;
+  /* Centered like the heading above and the choices below, which it leads
+     into. */
+  .before-start {
     padding-top: 2.5rem;
     border-top: 1px solid var(--rule);
+    text-align: center;
   }
 
-  .closing h3 {
+  .before-start h3 {
     font-size: 1.2rem;
     line-height: 1.25;
     margin: 0 0 0.5rem;
   }
 
-  .closing ul {
-    padding: 0;
-    list-style: none;
-    line-height: 1.75;
+  .before-start p {
+    max-width: 52ch;
+    margin: 0 auto;
   }
 
   /* Darker than the site's usual link blue, which is too faint on the
@@ -485,11 +462,6 @@
         grid-template-rows: subgrid;
         grid-row: span 4;
       }
-    }
-
-    .closing {
-      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-      gap: 3rem;
     }
   }
 

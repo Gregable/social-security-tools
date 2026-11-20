@@ -33,7 +33,6 @@ describe('/strategy server render', () => {
       'Averaged over possible ages of death',
       'Health and discount rate',
       'Before you start',
-      'Related guides',
     ]) {
       expect(body, text).toContain(text);
     }
