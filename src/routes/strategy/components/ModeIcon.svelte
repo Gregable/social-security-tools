@@ -2,9 +2,9 @@
   @component
   @name ModeIcon
   @description
-    The line drawing for a strategy mode. The mode picker and the intro
-    below it both use it, so a choice looks the same wherever it is named.
-    It takes the text color of whatever contains it.
+    The line drawing for a strategy mode, shared so a choice looks the same
+    wherever the page names it. Drawn in currentColor, so it takes the text
+    color of whatever contains it.
 -->
 <script lang="ts">
   import type { StrategyMode } from "$lib/strategy/ui";

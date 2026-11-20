@@ -15,11 +15,14 @@ export const STRATEGY_MODES: readonly StrategyMode[] = [
   'widowed',
 ];
 
-/** How a mode is named wherever the page offers it as a choice. */
+/** How a mode is named wherever the page offers or mentions it as a choice. */
 export interface StrategyModeLabel {
   /** The choice itself, such as "Just me". */
   readonly title: string;
-  /** A short gloss shown under the title, such as "Single filer". */
+  /**
+   * A short gloss for the title, such as "Single filer", shown where there
+   * is room for a second line.
+   */
   readonly subtitle: string;
 }
 

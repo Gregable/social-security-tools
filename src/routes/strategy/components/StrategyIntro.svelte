@@ -2,16 +2,16 @@
   @component
   @name StrategyIntro
   @description
-    Explains what the optimizer does, shown below the mode picker until a
-    mode is chosen. It is the page's main crawlable text: the rest of the
-    page only appears after a click, so search engines and first-time
-    visitors would otherwise see three buttons. Screenshots are of
-    fictional examples.
+    Explains what the optimizer does. The page shows it under the mode
+    picker to someone who has not used the tool yet (see `showIntro` in
+    ../+page.svelte). It is the page's main crawlable text: everything past
+    the picker only appears after a click, so search engines and first-time
+    visitors would otherwise get a headline, two sentences and three
+    buttons. Screenshots are of fictional examples.
 
-    The layout follows the picker above it: one column per choice with the
-    kind of answer that choice gets, then how the answer is worked out,
-    then the same choices again so a reader at the bottom can start from
-    there.
+    It mirrors the picker: an example result for each choice, in the
+    picker's order, and at the end the same choices again so a reader at
+    the bottom can start from there.
 -->
 <script lang="ts">
   import {
@@ -233,9 +233,11 @@
     color: #4b4b4b;
   }
 
-  /* The same side padding as the site header, so the band's content lines
-     up with the logo and the last nav link, up to the width limit the rest
-     of this page uses. */
+  /* Above 768px this is the site header's side padding (Header.svelte), so
+     the band's content starts under the logo and ends under the last nav
+     link. content-box keeps that padding outside the max-width, the limit
+     the rest of this page uses; past it the content stops widening while
+     the header keeps going. */
   .inner {
     box-sizing: content-box;
     max-width: 1200px;
@@ -345,7 +347,8 @@
 
   /* The three answer cards are cropped to different heights. One frame
      shape, in the cards' own background color, keeps the text under them
-     level. */
+     level. The frame has to be at least as tall as the tallest crop, or
+     overflow: hidden cuts that card off. */
   .figure--answer {
     aspect-ratio: 553 / 226;
     background: #f7f8fd;
@@ -360,6 +363,8 @@
     object-fit: contain;
   }
 
+  /* Images are content-box site-wide; border-box keeps this padding inside
+     the frame. */
   .figure--panel img {
     box-sizing: border-box;
     padding: 0.75rem 1.25rem;
@@ -473,9 +478,10 @@
     }
   }
 
-  /* The page pads its content by 1rem at this width. Negative margins take
-     that back, so the band still reaches the edges of the window and the
-     end of the page, and the content gets the padding instead. */
+  /* At this width and below, `main` in ../+page.svelte has 1rem of padding.
+     Negative margins take that back, so the band still reaches the edges
+     of the window and the end of the page, and the content gets the
+     padding instead. */
   @media (max-width: 768px) {
     .intro {
       margin: 2rem -1rem -1rem;

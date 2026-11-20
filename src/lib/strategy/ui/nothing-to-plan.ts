@@ -1,10 +1,10 @@
-import type { StrategyMode } from './strategy-mode';
+import { STRATEGY_MODE_LABELS, type StrategyMode } from './strategy-mode';
 
 const SINGLE =
   'With a PIA of $0 there is no retirement benefit on your record, so there ' +
   'is nothing to plan. If you are married or widowed, you may still be paid ' +
-  "on your spouse's record: start over and choose Married couple, or plan " +
-  'as a surviving spouse.';
+  "on your spouse's record: start over and choose " +
+  `${STRATEGY_MODE_LABELS.couple.title}, or plan as a surviving spouse.`;
 
 const COUPLE =
   'Both PIAs are $0, so neither of you has a benefit to plan: spousal and ' +

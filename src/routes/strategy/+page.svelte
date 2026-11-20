@@ -209,8 +209,8 @@
 
   // The intro under the picker explains the tool to someone who has not
   // used it yet. Once the page moves past the picker, by a pick or by a
-  // link that opens on the form, the intro stays away for the rest of the
-  // visit, including when Start over brings the picker back.
+  // link that opens on the form, the intro stays away until the page is
+  // reloaded or left, including when Start over brings the picker back.
   let showIntro = true;
   $: if (stage !== "mode") showIntro = false;
 
@@ -641,12 +641,14 @@
   }
 
   /**
-   * From the choices that close the intro, far down the page. The form
-   * replaces everything on screen, so show it from the top.
+   * From the choices at the end of the intro, far down the page. The form
+   * replaces everything on screen, so show it from the top. The jump is
+   * instant: the site scrolls smoothly by default, which would animate up
+   * a page that has just collapsed.
    */
   function handleIntroModeSelect(selected: StrategyMode) {
     handleModeSelect(selected);
-    window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   /**
@@ -1071,9 +1073,9 @@
   </div>
 
   <!-- Outside the width limit above, so its band can run the width of the
-       window. No transition: a slide would animate this tall block out,
-       holding the form below the fold, and links that open on the form
-       (from the calculator or a share link) would watch it collapse. -->
+       window. No transition: a slide would animate this tall block away
+       under the form, and a link that opens on the form (from the
+       calculator or a share link) would open on that collapse. -->
   {#if showIntro}
     <StrategyIntro onselect={handleIntroModeSelect} />
   {/if}
