@@ -1,5 +1,10 @@
 <script lang="ts">
-  import type { StrategyMode } from "$lib/strategy/ui";
+  import {
+    STRATEGY_MODE_LABELS,
+    STRATEGY_MODES,
+    type StrategyMode,
+  } from "$lib/strategy/ui";
+  import ModeIcon from "./ModeIcon.svelte";
 
   export let onselect: (mode: StrategyMode) => void;
 </script>
@@ -8,64 +13,13 @@
   <h2>Who are we calculating for?</h2>
   <p class="hint">Pick one to continue.</p>
   <div class="choices">
-    <button type="button" class="choice" on:click={() => onselect("single")}>
-      <svg
-        class="icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="8" r="4" />
-        <path d="M5 21a7 7 0 0 1 14 0" />
-      </svg>
-      <span class="title">Just me</span>
-      <span class="sub">Single filer</span>
-    </button>
-    <button type="button" class="choice" on:click={() => onselect("couple")}>
-      <svg
-        class="icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="8" cy="9" r="3" />
-        <circle cx="16" cy="9" r="3" />
-        <path d="M2 20a5 5 0 0 1 10 0" />
-        <path d="M12 20a5 5 0 0 1 10 0" />
-      </svg>
-      <span class="title">Married couple</span>
-      <span class="sub">Two filers</span>
-    </button>
-    <button type="button" class="choice" on:click={() => onselect("widowed")}>
-      <!-- The late spouse is drawn in a dashed outline beside the survivor. -->
-      <svg
-        class="icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="8" cy="9" r="3" />
-        <path d="M2 20a5 5 0 0 1 10 0" />
-        <g class="late" stroke-dasharray="1.6 1.9">
-          <circle cx="16" cy="9" r="3" />
-          <path d="M12 20a5 5 0 0 1 10 0" />
-        </g>
-      </svg>
-      <span class="title">Widowed</span>
-      <span class="sub">Surviving spouse</span>
-    </button>
+    {#each STRATEGY_MODES as mode}
+      <button type="button" class="choice" on:click={() => onselect(mode)}>
+        <span class="icon"><ModeIcon {mode} size={44} /></span>
+        <span class="title">{STRATEGY_MODE_LABELS[mode].title}</span>
+        <span class="sub">{STRATEGY_MODE_LABELS[mode].subtitle}</span>
+      </button>
+    {/each}
   </div>
 </section>
 
@@ -120,13 +74,8 @@
     transform: translateY(-1px);
   }
   .icon {
-    width: 44px;
-    height: 44px;
     margin-bottom: 0.5rem;
     flex-shrink: 0;
-  }
-  .late {
-    opacity: 0.6;
   }
   .title {
     font-weight: bold;

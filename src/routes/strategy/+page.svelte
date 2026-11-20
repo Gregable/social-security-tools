@@ -63,6 +63,7 @@
   import { UrlParams } from "$lib/url-params";
   import LockedSummary from "./components/LockedSummary.svelte";
   import ModePicker from "./components/ModePicker.svelte";
+  import StrategyIntro from "./components/StrategyIntro.svelte";
   import NoFilingDecisionPanel from "./components/NoFilingDecisionPanel.svelte";
   import RecipientInputs from "./components/RecipientInputs.svelte";
   import ScenarioDetail from "./components/ScenarioDetail.svelte";
@@ -205,6 +206,13 @@
 
   type Stage = "mode" | "form" | "results";
   let stage: Stage = "mode";
+
+  // The intro under the picker explains the tool to someone who has not
+  // used it yet. Once the page moves past the picker, by a pick or by a
+  // link that opens on the form, the intro stays away until the page is
+  // reloaded or left, including when Start over brings the picker back.
+  let showIntro = true;
+  $: if (stage !== "mode") showIntro = false;
 
   const calculationResultsStore = writable<CalculationResults>(
     new CalculationResults()
@@ -633,6 +641,17 @@
   }
 
   /**
+   * From the choices at the end of the intro, far down the page. The form
+   * replaces everything on screen, so show it from the top. The jump is
+   * instant: the site scrolls smoothly by default, which would animate up
+   * a page that has just collapsed.
+   */
+  function handleIntroModeSelect(selected: StrategyMode) {
+    handleModeSelect(selected);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  /**
    * From the single-mode form: a widow(er) who picked "Just me" switches to
    * widowed mode, keeping their own details.
    */
@@ -1053,6 +1072,16 @@
     {/if}
   </div>
 
+  <!-- Outside the width limit above, so its band can run the width of the
+       window. No transition: a slide would animate this tall block away
+       under the form, and a link that opens on the form (from the
+       calculator or a share link) would open on that collapse. -->
+  {#if showIntro}
+    <div class="intro-bleed">
+      <StrategyIntro onselect={handleIntroModeSelect} />
+    </div>
+  {/if}
+
   {#if stage === "results"}
     {#if hasChoiceLeft}
     <div class="tunable-sentinel" bind:this={tunableSentinelEl}></div>
@@ -1377,6 +1406,12 @@
     main {
       max-width: 100%;
       padding: 1rem;
+    }
+
+    /* The intro's band reaches the edges of the window and the end of the
+       page, so it takes back the padding above. */
+    .intro-bleed {
+      margin: 0 -1rem -1rem;
     }
   }
 </style>

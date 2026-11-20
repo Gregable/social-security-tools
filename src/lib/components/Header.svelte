@@ -61,7 +61,8 @@ const mainNav = [
     width: 100%;
     /* 7.5vw each side = the homepage's centered 85% content column
        (.jumbotron-grid / .grid-container in routes/+page.svelte and .choice
-       in HomeChoice.svelte). Update together. */
+       in HomeChoice.svelte) and the strategy intro's (.inner in
+       routes/strategy/components/StrategyIntro.svelte). Update together. */
     padding: 0 7.5vw;
     border-bottom: 1px solid #c5c5c5;
     margin-bottom: 1.5em;
