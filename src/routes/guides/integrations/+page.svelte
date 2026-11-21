@@ -170,7 +170,7 @@
         <td>
           Lists each Social Security benefit as an entry for TPAW's Income
           During Retirement section: a monthly amount in today's dollars, the
-          age it starts, and whose max age it ends at.
+          age it starts, and when it ends (at your or your partner's max age).
         </td>
       </tr>
     </tbody>

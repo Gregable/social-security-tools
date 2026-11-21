@@ -1,63 +1,88 @@
 <!--
   @component
   A small button that copies a value to the clipboard and briefly shows
-  "Copied". Used beside values that users type into another tool.
+  "Copied", or "Not copied" if the browser refuses. Used beside values that
+  users paste into another tool. Hidden where the Clipboard API is
+  unavailable (for example, pages not served over HTTPS).
 -->
 <script lang="ts">
-import { onDestroy } from 'svelte';
+import { onDestroy, onMount } from 'svelte';
 
 /** The text to copy. */
 export let value: string;
-/** Accessible name, e.g. "Copy amount". */
+/** Accessible name and tooltip, e.g. "Copy amount for Social Security". */
 export let label: string;
 
-let copied = false;
+type CopyStatus = 'idle' | 'copied' | 'failed';
+
+let canCopy = false;
+let status: CopyStatus = 'idle';
 let timer: ReturnType<typeof setTimeout> | undefined;
 
+onMount(() => {
+  canCopy = typeof navigator.clipboard?.writeText === 'function';
+});
+
+function resetStatus(_value: string) {
+  clearTimeout(timer);
+  status = 'idle';
+}
+
+// A new value means any earlier "Copied" no longer describes it.
+$: resetStatus(value);
+
 async function copy() {
-  if (typeof navigator === 'undefined' || !navigator.clipboard) return;
   try {
     await navigator.clipboard.writeText(value);
+    status = 'copied';
   } catch (err) {
-    console.error('Failed to copy:', err);
-    return;
+    console.error('Clipboard write failed:', err);
+    status = 'failed';
   }
-  copied = true;
   clearTimeout(timer);
   timer = setTimeout(() => {
-    copied = false;
+    status = 'idle';
   }, 1500);
 }
 
 onDestroy(() => clearTimeout(timer));
+
+const STATUS_TEXT: Record<CopyStatus, string> = {
+  idle: '',
+  copied: 'Copied',
+  failed: 'Not copied',
+};
 </script>
 
-<button
-  type="button"
-  class="copy-btn"
-  title={label}
-  aria-label={label}
-  on:click={copy}
->
-  {#if copied}
-    <span class="copied">Copied</span>
-  {:else}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-    </svg>
-  {/if}
-</button>
-<span class="visually-hidden" aria-live="polite">{copied ? 'Copied' : ''}</span>
+{#if canCopy}
+  <button
+    type="button"
+    class="copy-btn"
+    class:failed={status === 'failed'}
+    title={label}
+    aria-label={label}
+    on:click={copy}
+  >
+    {#if status === 'idle'}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+    {:else}
+      <span class="status" aria-hidden="true">{STATUS_TEXT[status]}</span>
+    {/if}
+  </button>
+  <span class="visually-hidden" aria-live="polite">{STATUS_TEXT[status]}</span>
+{/if}
 
 <style>
   .copy-btn {
@@ -79,12 +104,17 @@ onDestroy(() => clearTimeout(timer));
     background: #f1f3f5;
   }
 
+  .copy-btn.failed {
+    border-color: #c92a2a;
+    color: #c92a2a;
+  }
+
   .copy-btn svg {
     width: 1em;
     height: 1em;
   }
 
-  .copied {
+  .status {
     font-size: 0.8em;
   }
 

@@ -413,6 +413,31 @@ describe('IntegrationContext', () => {
           context.spousalBenefitFor(higherAtFra, lowerAtFra)
         );
       });
+
+      it('pairs with the personal benefit after all delayed credits apply', () => {
+        // The lower earner files for their own benefit at 68, in June 2030.
+        // Credits for June-December 2029 apply at filing; credits for
+        // January-May 2030 apply the next January. The spousal benefit is
+        // half the higher PIA minus the credited personal benefit, so it is
+        // $453 in the first months and $420 from January 2031 on. The steady
+        // amount, $420, is the one to pair with the $1,080 personal benefit.
+        lowerEarningRecipient.setPia(Money.from(1000));
+        const lowerAt68 = MonthDate.initFromYearsMonths({
+          years: 2030,
+          months: 5,
+        });
+        const context = new IntegrationContext(
+          higherEarningRecipient,
+          lowerEarningRecipient
+        );
+
+        const spousal = context.spousalBenefitFor(higherAtFra, lowerAt68);
+        const personal = context.getLowerEarnerPersonalBenefit(lowerAt68);
+
+        expect(personal.value()).toBe(1080);
+        expect(spousal?.startDate).toEqual(lowerAt68);
+        expect(spousal?.monthlyBenefit.value()).toBe(420);
+      });
     });
   });
 });

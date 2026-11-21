@@ -2,7 +2,8 @@
  * Social Security income entries for TPAW Planner (tpawplanner.com).
  *
  * TPAW's "Income During Retirement" section takes one entry per income
- * stream: a label, a monthly amount in today's dollars, and a start and end
+ * stream: a label, a monthly amount (entered here in today's dollars, TPAW's
+ * "adjusted for inflation (real dollars)" option), and a start and end
  * month. A start can be a person's age in years and months ("When you are",
  * "When your partner is"), and an end can be that person's max age, so each
  * benefit maps to one entry owned by the person who receives it.
@@ -19,10 +20,23 @@ export type TpawPerson = 'you' | 'partner';
 export type TpawEntryKind = 'personal' | 'spousal';
 
 /**
- * When an entry starts, as the recipient's age in that month.
+ * Which household member is "you" in TPAW: the calculator's recipient or
+ * spouse. The other person is TPAW's partner.
+ */
+export type TpawYouChoice = 'recipient' | 'spouse';
+
+/** The household members as TPAW's "you" and partner. */
+export interface TpawPeople {
+  readonly you: Recipient;
+  /** Null when there is no spouse. */
+  readonly partner: Recipient | null;
+}
+
+/**
+ * When an entry starts, as the age of the person who receives the benefit.
  *
  * TPAW's Start menu has no "now" option, so a benefit that has already
- * started begins at the recipient's age in the current month.
+ * started begins at that person's age in the current month.
  */
 export interface TpawIncomeStart {
   /** Age as TPAW counts it, see {@link tpawAge}. */
@@ -39,21 +53,35 @@ export interface TpawIncomeEntry {
   readonly recipient: Recipient;
   /** Which TPAW person the entry belongs to. Its end is their max age. */
   readonly person: TpawPerson;
-  /** Monthly benefit in today's dollars, rounded to whole dollars. */
+  /** Monthly benefit in today's dollars, in whole dollars. */
   readonly monthlyAmount: Money;
   readonly start: TpawIncomeStart;
 }
 
 export interface TpawEntryInputs {
   readonly context: IntegrationContext;
-  /** The recipient's chosen filing month, or null if none is chosen. */
+  /** The filing month of `context.recipient`, or null if none is chosen. */
   readonly recipientFilingDate: MonthDate | null;
-  /** The spouse's chosen filing month, or null if none or no spouse. */
+  /** The filing month of `context.spouse`, or null if none or no spouse. */
   readonly spouseFilingDate: MonthDate | null;
-  /** The household member who is "You" in TPAW. The other is "Partner". */
-  readonly you: Recipient;
+  /** Who is "you" in TPAW. Without a spouse, this is always the recipient. */
+  readonly you: TpawYouChoice;
   /** The current month. Benefits that began earlier start here. */
   readonly now: MonthDate;
+}
+
+/** Resolves a {@link TpawYouChoice} to the household members. */
+export function tpawPeople(
+  context: IntegrationContext,
+  choice: TpawYouChoice
+): TpawPeople {
+  if (context.spouse === null) {
+    return { you: context.recipient, partner: null };
+  }
+  if (choice === 'spouse') {
+    return { you: context.spouse, partner: context.recipient };
+  }
+  return { you: context.recipient, partner: context.spouse };
 }
 
 /**
@@ -68,12 +96,13 @@ export function tpawBirthMonth(r: Recipient): MonthDate {
 }
 
 /**
- * A person's age in a given month as TPAW counts it: whole months since
- * their calendar birth month.
+ * A person's age in a given month as TPAW counts it: the number of calendar
+ * months from their birth month to `month`.
  *
  * TPAW stores only a month of birth, so this is deliberately not SSA's
  * attained age. SSA treats a person as attaining an age the day before their
- * birthday, which puts someone born on the 1st a month ahead of TPAW.
+ * birthday, so for someone born June 1, SSA age 67 (May) is 66 years,
+ * 11 months in TPAW.
  */
 export function tpawAge(r: Recipient, month: MonthDate): MonthDuration {
   return month.subtractDate(tpawBirthMonth(r));
@@ -89,10 +118,6 @@ function startFor(
   return { age: tpawAge(r, month), month, alreadyStarted };
 }
 
-function personFor(inputs: TpawEntryInputs, r: Recipient): TpawPerson {
-  return r === inputs.you ? 'you' : 'partner';
-}
-
 function filingDateFor(
   inputs: TpawEntryInputs,
   r: Recipient
@@ -104,7 +129,8 @@ function filingDateFor(
 
 function personalEntry(
   inputs: TpawEntryInputs,
-  r: Recipient
+  r: Recipient,
+  person: TpawPerson
 ): TpawIncomeEntry | null {
   const { context, now } = inputs;
   const filingDate = filingDateFor(inputs, r);
@@ -119,13 +145,16 @@ function personalEntry(
   return {
     kind: 'personal',
     recipient: r,
-    person: personFor(inputs, r),
+    person,
     monthlyAmount,
     start: startFor(r, filingDate, now),
   };
 }
 
-function spousalEntry(inputs: TpawEntryInputs): TpawIncomeEntry | null {
+function spousalEntry(
+  inputs: TpawEntryInputs,
+  people: TpawPeople
+): TpawIncomeEntry | null {
   const { context, now } = inputs;
   const lowerEarner = context.lowerEarner();
   if (lowerEarner === null) return null;
@@ -140,27 +169,28 @@ function spousalEntry(inputs: TpawEntryInputs): TpawIncomeEntry | null {
   return {
     kind: 'spousal',
     recipient: lowerEarner,
-    person: personFor(inputs, lowerEarner),
-    monthlyAmount: spousal.monthlyBenefit.roundToDollar(),
+    person: lowerEarner === people.you ? 'you' : 'partner',
+    monthlyAmount: spousal.monthlyBenefit,
     start: startFor(lowerEarner, spousal.startDate, now),
   };
 }
 
 /**
  * The TPAW income entries for the household's filing dates: each person's
- * own benefit ("You" first, then "Partner"), then the lower earner's spousal
- * benefit when there is one. Benefits of $0 are left out.
+ * own benefit ("you" first, then the partner), then the lower earner's
+ * spousal benefit when there is one. Benefits of $0, and benefits without a
+ * chosen filing date, are left out.
  */
 export function buildTpawIncomeEntries(
   inputs: TpawEntryInputs
-): TpawIncomeEntry[] {
-  const { context, you } = inputs;
-  const partner =
-    you === context.recipient ? context.spouse : context.recipient;
-  const household = partner === null ? [you] : [you, partner];
+): readonly TpawIncomeEntry[] {
+  const people = tpawPeople(inputs.context, inputs.you);
   const entries = [
-    ...household.map((r) => personalEntry(inputs, r)),
-    spousalEntry(inputs),
+    personalEntry(inputs, people.you, 'you'),
+    people.partner === null
+      ? null
+      : personalEntry(inputs, people.partner, 'partner'),
+    spousalEntry(inputs, people),
   ];
   return entries.filter((e): e is TpawIncomeEntry => e !== null);
 }

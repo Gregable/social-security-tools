@@ -5,9 +5,11 @@ import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 import {
   buildTpawIncomeEntries,
   type TpawIncomeEntry,
+  type TpawYouChoice,
   tpawBirthMonth,
   tpawEndText,
   tpawLabel,
+  tpawPeople,
   tpawStartText,
 } from '$lib/integrations/tpaw';
 import { MonthDate } from '$lib/month-time';
@@ -22,25 +24,8 @@ const TPAW_INCOME_URL =
   'https://tpawplanner.com/plan?section=income-during-retirement';
 const now = MonthDate.initFromNow();
 
-type YouChoice = 'recipient' | 'spouse';
-
-interface TpawPeople {
-  you: Recipient;
-  partner: Recipient | null;
-}
-
 /** Which household member is "you" in TPAW; the other is the partner. */
-let youChoice: YouChoice = 'recipient';
-
-function tpawPeople(ctx: IntegrationContext, choice: YouChoice): TpawPeople {
-  if (ctx.spouse === null) {
-    return { you: ctx.recipient, partner: null };
-  }
-  if (choice === 'spouse') {
-    return { you: ctx.spouse, partner: ctx.recipient };
-  }
-  return { you: ctx.recipient, partner: ctx.spouse };
-}
+let youChoice: TpawYouChoice = 'recipient';
 
 $: context = new IntegrationContext($recipient, spouse ? $spouse : null);
 $: ({ you, partner } = tpawPeople(context, youChoice));
@@ -48,11 +33,25 @@ $: entries = buildTpawIncomeEntries({
   context,
   recipientFilingDate: $recipientFilingDate,
   spouseFilingDate: context.spouse === null ? null : $spouseFilingDate,
-  you,
+  you: youChoice,
   now,
 });
 $: higherEarner = context.higherEarner();
 $: lowerEarner = context.lowerEarner();
+// With every PIA at $0 there is nothing to enter, at any filing date.
+$: hasNoBenefit =
+  hasZeroPia(context.recipient) &&
+  (context.spouse === null || hasZeroPia(context.spouse));
+
+function hasZeroPia(r: Recipient): boolean {
+  return r.pia().primaryInsuranceAmount().cents() <= 0;
+}
+
+/** Stable across "you" changes, so each entry keeps its own copy buttons. */
+function entryKey(entry: TpawIncomeEntry): string {
+  const role = entry.recipient === context.recipient ? 'recipient' : 'spouse';
+  return `${entry.kind}-${role}`;
+}
 
 function startHint(entry: TpawIncomeEntry): string {
   const month = entry.start.month.toFullString();
@@ -89,96 +88,110 @@ function startHint(entry: TpawIncomeEntry): string {
       </a>
     </div>
 
-    <p>
-      In TPAW, open <strong>Income During Retirement</strong>, select
-      <strong>Add</strong>, and create one entry for each benefit below. The
-      amounts are monthly, in today's dollars, for the filing
-      {context.spouse === null ? 'date' : 'dates'} you selected above.
-    </p>
-
-    {#if context.spouse !== null}
-      <fieldset class="you-choice">
-        <legend>In TPAW, who is "you"? The other person is your partner.</legend>
-        <label>
-          <input type="radio" bind:group={youChoice} value="recipient" />
-          <RecipientName r={context.recipient} alwaysShowName />
-        </label>
-        <label>
-          <input type="radio" bind:group={youChoice} value="spouse" />
-          <RecipientName r={context.spouse} alwaysShowName />
-        </label>
-      </fieldset>
-    {/if}
-
-    <p class="age-check">
-      TPAW counts ages from the <strong>Month of Birth</strong> in its
-      <strong>Age</strong> section. The start ages below assume
-      {#if partner === null}
-        a month of birth of
-        <strong>{tpawBirthMonth(you).toFullString()}</strong>.
-      {:else}
-        <strong>{tpawBirthMonth(you).toFullString()}</strong> for you
-        (<RecipientName r={you} alwaysShowName />) and
-        <strong>{tpawBirthMonth(partner).toFullString()}</strong> for your
-        partner (<RecipientName r={partner} alwaysShowName />).
-      {/if}
-    </p>
-
-    {#if entries.length === 0}
-      <p>Choose a filing date in the charts above to see the entries.</p>
+    {#if hasNoBenefit}
+      <p class="no-benefit">
+        With a $0 Primary Insurance Amount, there is no Social Security
+        retirement benefit to add to TPAW.
+      </p>
     {:else}
-      <ol class="entry-list">
-        {#each entries as entry}
-          {@const label = tpawLabel(entry, partner !== null)}
-          <li class="entry-item">
-            <h3>{label}</h3>
-            <dl class="steps">
-              <div class="step">
-                <dt>Label</dt>
-                <dd>
-                  <span class="value">{label}</span>
-                  <CopyButton value={label} label="Copy label" />
-                </dd>
-              </div>
-              <div class="step">
-                <dt>Amount per Month</dt>
-                <dd>
-                  <span class="value">{entry.monthlyAmount.wholeDollars()}</span>
-                  <CopyButton
-                    value={entry.monthlyAmount.value().toFixed(0)}
-                    label="Copy amount"
-                  />
-                  <span class="hint">adjusted for inflation (real dollars)</span>
-                </dd>
-              </div>
-              <div class="step">
-                <dt>For These Months</dt>
-                <dd>
-                  <span class="range-line">
-                    Start: <span class="value">{tpawStartText(entry)}</span>
-                    <span class="hint">({startHint(entry)})</span>
-                  </span>
-                  <span class="range-line">
-                    End: <span class="value">{tpawEndText(entry)}</span>
-                  </span>
-                </dd>
-              </div>
-            </dl>
-          </li>
-        {/each}
-      </ol>
+      <p>
+        In TPAW, open <strong>Income During Retirement</strong>, select
+        <strong>Add</strong>, and create one entry for each benefit below. The
+        amounts are monthly, in today's dollars, for the filing
+        {context.spouse === null ? 'date' : 'dates'} you selected above.
+      </p>
 
-      {#if lowerEarner !== null}
-        <p class="note">
-          TPAW ends each entry at that person's max age. If
-          <RecipientName r={higherEarner} alwaysShowName /> dies first,
-          <RecipientName r={lowerEarner} alwaysShowName /> would switch to a
-          <a href="/guides/survivor-benefits">survivor benefit</a> based on
-          <RecipientName r={higherEarner} alwaysShowName apos />
-          record. These entries don't include it, so the plan shows
-          <RecipientName r={lowerEarner} alwaysShowName apos /> income after that
-          point as lower than it would be.
-        </p>
+      {#if context.spouse !== null}
+        <fieldset class="you-choice">
+          <legend
+            >In TPAW, who is "you"? The other person is your partner.</legend
+          >
+          <label>
+            <input type="radio" bind:group={youChoice} value="recipient" />
+            <RecipientName r={context.recipient} alwaysShowName />
+          </label>
+          <label>
+            <input type="radio" bind:group={youChoice} value="spouse" />
+            <RecipientName r={context.spouse} alwaysShowName />
+          </label>
+        </fieldset>
+      {/if}
+
+      <p class="age-check">
+        TPAW counts ages from the <strong>Month of Birth</strong> in its
+        <strong>Age</strong> section. The start ages below assume
+        {#if partner === null}
+          a month of birth of
+          <strong>{tpawBirthMonth(you).toFullString()}</strong>.
+        {:else}
+          <strong>{tpawBirthMonth(you).toFullString()}</strong> for you
+          (<RecipientName r={you} alwaysShowName />) and
+          <strong>{tpawBirthMonth(partner).toFullString()}</strong> for your
+          partner (<RecipientName r={partner} alwaysShowName />).
+        {/if}
+      </p>
+
+      {#if entries.length === 0}
+        <p>Choose a filing date in the charts above to see the entries.</p>
+      {:else}
+        <ol class="entry-list">
+          {#each entries as entry (entryKey(entry))}
+            {@const label = tpawLabel(entry, partner !== null)}
+            <li class="entry-item">
+              <h3>
+                <RecipientName r={entry.recipient} apos>Your</RecipientName>
+                {entry.kind === 'personal' ? 'Social Security' : 'spousal benefit'}
+              </h3>
+              <dl class="steps">
+                <div class="step">
+                  <dt>Label</dt>
+                  <dd>
+                    <span class="value">{label}</span>
+                    <CopyButton value={label} label="Copy label for {label}" />
+                  </dd>
+                </div>
+                <div class="step">
+                  <dt>Amount per Month</dt>
+                  <dd>
+                    <span class="value"
+                      >{entry.monthlyAmount.wholeDollars()}</span
+                    >
+                    <CopyButton
+                      value={entry.monthlyAmount.value().toFixed(0)}
+                      label="Copy amount for {label}"
+                    />
+                    <span class="hint">adjusted for inflation (real dollars)</span>
+                  </dd>
+                </div>
+                <div class="step">
+                  <dt>For These Months</dt>
+                  <dd>
+                    <span class="range-line">
+                      Start: <span class="value">{tpawStartText(entry)}</span>
+                      <span class="hint">({startHint(entry)})</span>
+                    </span>
+                    <span class="range-line">
+                      End: <span class="value">{tpawEndText(entry)}</span>
+                    </span>
+                  </dd>
+                </div>
+              </dl>
+            </li>
+          {/each}
+        </ol>
+
+        {#if lowerEarner !== null}
+          <p class="note">
+            TPAW ends each entry at that person's max age. If
+            <RecipientName r={higherEarner} alwaysShowName /> dies first,
+            <RecipientName r={lowerEarner} alwaysShowName /> would switch to a
+            <a href="/guides/survivor-benefits">survivor benefit</a> based on
+            <RecipientName r={higherEarner} alwaysShowName apos />
+            record. These entries don't include it, so the plan shows
+            <RecipientName r={lowerEarner} alwaysShowName apos /> income after that
+            point as lower than it would be.
+          </p>
+        {/if}
       {/if}
     {/if}
   </div>

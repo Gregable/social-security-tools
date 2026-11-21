@@ -201,22 +201,30 @@ warning.
 
 - **Intro Banner**: Says the report will list the Social Security entries to
   add to TPAW's Income During Retirement section
-- **Report End**: Links to TPAW (`/plan?section=income-during-retirement`,
-  which opens the section for signed-in users; guests see TPAW's sign-in
-  choice first) and lists one entry per benefit: each person's own benefit
-  and, when there is one, the lower earner's spousal benefit. Each entry
-  follows TPAW's "Add Retirement Income" dialog: Label, Amount per Month in
-  today's dollars ("adjusted for inflation (real dollars)"), and For These
-  Months with Start "When you are" / "When your partner is" an age and End
-  "At your max age" / "At your partner's max age". Labels and amounts have
-  copy buttons. TPAW counts ages from the Month of Birth in its Age section,
-  so ages are counted from the calendar birth month (not SSA's attained age),
-  and the report shows the month of birth each person should have there.
-  TPAW has no "now" start, so a benefit already being paid starts at the
-  person's current age. Couples choose which of them is "you" in TPAW. A note
-  explains that survivor benefits are not included. The entries are built in
-  `src/lib/integrations/tpaw.ts`. Clicks on the TPAW link are recorded as
-  `Outbound: Clicked` with destination `tpawplanner`.
+- **Report End**: Lists one entry per benefit for TPAW's "Add Retirement
+  Income" dialog.
+  - Link: `/plan?section=income-during-retirement`. Signed-in users land on
+    the section; visitors who aren't signed in see TPAW's Login / Guest
+    screen first.
+  - Entries: each person's own benefit, then the lower earner's spousal
+    benefit. Benefits of $0, and benefits without a filing date, are left
+    out. With every PIA at $0, the section says there is nothing to add.
+  - Fields: Label, Amount per Month in today's dollars ("adjusted for
+    inflation (real dollars)"), Start "When you are" / "When your partner
+    is" an age, End "At your max age" / "At your partner's max age". Labels
+    and amounts have copy buttons.
+  - Amounts are the ones payable a year after each benefit starts, after
+    all delayed retirement credits apply.
+  - Ages are counted from the calendar birth month, matching TPAW's Month of
+    Birth, not SSA's attained age. The report shows the month of birth to
+    enter in TPAW.
+  - TPAW has no "now" start, so a benefit that has already started begins
+    at the person's current age.
+  - Couples choose who is "you" in TPAW, and see a note that survivor
+    benefits are not included.
+  - Code: `src/lib/integrations/tpaw.ts`. Clicks on the TPAW link are
+    recorded as `Outbound: Clicked` with `destination: 'tpawplanner'` and
+    `placement: 'integration-report-end'`.
 
 ## Testing
 
