@@ -41,7 +41,7 @@
     SSA.tools is designed to be a powerful, standalone calculator for Social
     Security benefits. However, retirement planning often involves more than
     just Social Security. That's why I've built an integration system that
-    allows other financial planning tools to seamlessly connect with SSA.tools.
+    allows other financial planning tools to connect with SSA.tools.
   </p>
 
   <p>
@@ -52,8 +52,8 @@
 
   <h2>Current Integrations</h2>
   <p>
-    The following tools have built-in integrations with SSA.tools. Each
-    integration is designed to streamline your planning workflow.
+    The following tools link their users to SSA.tools with an integration
+    turned on.
   </p>
 
   <table class="integration-table">
@@ -76,9 +76,8 @@
           strategy to maximize your lifetime benefits.
         </td>
         <td>
-          Transfers your detailed earnings record from SSA.tools to Open Social
-          Security, ensuring their optimization engine uses the most accurate
-          benefit estimates.
+          Links you back to Open Social Security with the birth dates and
+          Primary Insurance Amounts (PIAs) from your report filled in.
         </td>
       </tr>
       <tr>
@@ -102,7 +101,8 @@
           Uses auditable intelligence to assist with financial planning.
         </td>
         <td>
-          Connects your SSA.tools data with Fin Pods AI's analysis tools.
+          Shows a banner while you use the calculator, with a link back to Fin
+          Pods AI.
         </td>
       </tr>
       <tr>
@@ -137,13 +137,13 @@
   <h3>Getting Data Out</h3>
   <p>
     When an integration is active, you'll see a banner at the top of the page.
-    Once you've completed your earnings record entry, a new section will appear
-    at the bottom of your report.
+    Some integrations also add a section at the bottom of your report once
+    you've entered your earnings record.
   </p>
   <p>
-    This "Report End" section is customized for each integration. It might
-    display your data in a specific format, provide copy-paste values, or offer
-    a button to send your calculated benefits back to the third-party tool.
+    That section is specific to the tool. It might show your data in the format
+    the tool expects, give you values to copy, or link you back to the tool
+    with your benefits filled in.
   </p>
 
   <h2>Interested in Integrating?</h2>
