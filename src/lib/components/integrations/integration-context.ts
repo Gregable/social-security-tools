@@ -16,6 +16,13 @@ import { Money } from '$lib/money';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 
+/** A spousal benefit and the month it begins. */
+export interface SpousalBenefitInfo {
+  /** Monthly benefit in today's dollars. */
+  monthlyBenefit: Money;
+  startDate: MonthDate;
+}
+
 /**
  * Context class for integration components that need to work with
  * recipient/spouse pairs and their filing dates.
@@ -199,21 +206,28 @@ export class IntegrationContext {
    * benefit begins. Returns null when a spousal benefit does not apply
    * for the current filing selections.
    */
-  getLowerEarnerSpousalBenefit(): {
-    monthlyBenefit: Money;
-    startDate: MonthDate;
-  } | null {
-    const lowerEarner = this.lowerEarner();
-    if (lowerEarner === null) return null;
-
-    const higherEarner = this.higherEarner();
+  getLowerEarnerSpousalBenefit(): SpousalBenefitInfo | null {
     const higherFilingDate = this.higherEarnerFilingDate();
     const lowerFilingDate = this.lowerEarnerFilingDate();
 
     if (higherFilingDate === null || lowerFilingDate === null) {
       return null;
     }
+    return this.spousalBenefitFor(higherFilingDate, lowerFilingDate);
+  }
 
+  /**
+   * Same as {@link getLowerEarnerSpousalBenefit}, for explicit filing dates
+   * instead of the ones in the global filing date stores.
+   */
+  spousalBenefitFor(
+    higherFilingDate: MonthDate,
+    lowerFilingDate: MonthDate
+  ): SpousalBenefitInfo | null {
+    const lowerEarner = this.lowerEarner();
+    if (lowerEarner === null) return null;
+
+    const higherEarner = this.higherEarner();
     const spousalStart = higherFilingDate.greaterThan(lowerFilingDate)
       ? higherFilingDate
       : lowerFilingDate;

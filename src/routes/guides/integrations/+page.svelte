@@ -159,6 +159,20 @@
           system.
         </td>
       </tr>
+      <tr>
+        <td>
+          <a href="/calculator#integration=tpawplanner.com">TPAW Planner</a>
+        </td>
+        <td>
+          A free retirement planner that sets spending and asset allocation
+          from your total portfolio, including future income.
+        </td>
+        <td>
+          Lists each Social Security benefit as an entry for TPAW's Income
+          During Retirement section: a monthly amount in today's dollars, the
+          age it starts, and whose max age it ends at.
+        </td>
+      </tr>
     </tbody>
   </table>
 

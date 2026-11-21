@@ -361,5 +361,58 @@ describe('IntegrationContext', () => {
         expect(result.cents()).toBeGreaterThan(0);
       });
     });
+
+    describe('spousalBenefitFor', () => {
+      // Each at full retirement age (67).
+      const higherAtFra = MonthDate.initFromYearsMonths({
+        years: 2027,
+        months: 0,
+      });
+      const lowerAtFra = MonthDate.initFromYearsMonths({
+        years: 2029,
+        months: 5,
+      });
+
+      it('starts when both have filed, at half the higher PIA minus the lower PIA', () => {
+        lowerEarningRecipient.setPia(Money.from(1000));
+        const context = new IntegrationContext(
+          higherEarningRecipient,
+          lowerEarningRecipient
+        );
+
+        const result = context.spousalBenefitFor(higherAtFra, lowerAtFra);
+
+        expect(result?.startDate).toEqual(lowerAtFra);
+        expect(result?.monthlyBenefit.value()).toBe(500);
+      });
+
+      it('returns null when the spousal benefit would be $0', () => {
+        // Lower PIA 1500 is already half of the higher PIA 3000.
+        const context = new IntegrationContext(
+          higherEarningRecipient,
+          lowerEarningRecipient
+        );
+        expect(context.spousalBenefitFor(higherAtFra, lowerAtFra)).toBeNull();
+      });
+
+      it('returns null without a spouse', () => {
+        const context = new IntegrationContext(higherEarningRecipient, null);
+        expect(context.spousalBenefitFor(higherAtFra, lowerAtFra)).toBeNull();
+      });
+
+      it('matches getLowerEarnerSpousalBenefit for the stored filing dates', () => {
+        lowerEarningRecipient.setPia(Money.from(1000));
+        recipientFilingDate.set(higherAtFra);
+        spouseFilingDate.set(lowerAtFra);
+        const context = new IntegrationContext(
+          higherEarningRecipient,
+          lowerEarningRecipient
+        );
+
+        expect(context.getLowerEarnerSpousalBenefit()).toEqual(
+          context.spousalBenefitFor(higherAtFra, lowerAtFra)
+        );
+      });
+    });
   });
 });

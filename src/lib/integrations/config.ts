@@ -135,6 +135,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'tpawplanner.com': {
+    id: 'tpawplanner.com',
+    displayName: 'TPAW Planner',
+    reportEndLabel: 'TPAW Planner',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/tpawplanner.com/favicon.ico'
+      );
+      return module.default;
+    },
+  },
   'rachaelcampwealth.com': {
     id: 'rachaelcampwealth.com',
     displayName: 'Rachael Camp Wealth',
