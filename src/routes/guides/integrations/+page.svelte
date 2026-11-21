@@ -82,47 +82,16 @@
         </td>
       </tr>
       <tr>
-        <td><a href="/calculator#integration=linopt.com">Linopt</a></td>
-        <td>Focuses on retirement income optimization.</td>
         <td>
-          Displays your Primary Insurance Amount (PIA) adjusted for inflation,
-          formatted specifically for input into Linopt's planning models.
-        </td>
-      </tr>
-      <tr>
-        <td><a href="/calculator#integration=firecalc.com">FIRECalc</a></td>
-        <td>
-          A popular tool for testing the viability of your retirement portfolio
-          against historical market data.
+          <a href="/calculator#integration=projectionlab.com">ProjectionLab</a>
         </td>
         <td>
-          Provides your Social Security benefits in today's dollars, with start
-          years rather than ages, making it easy to plug accurate figures into
-          FIRECalc's "Social Security" tab.
-        </td>
-      </tr>
-      <tr>
-        <td><a href="/calculator#integration=ficalc.app">FI Calc</a></td>
-        <td>
-          A modern retirement calculator that helps you visualize your
-          withdrawal strategy success rates.
+          A financial planning app for modeling your savings, spending, and
+          retirement over your lifetime.
         </td>
         <td>
-          Generates specific income entries for FI Calc, including annual
-          amounts and start-year offsets, so you can accurately model your
-          Social Security income streams within their app.
-        </td>
-      </tr>
-      <tr>
-        <td><a href="/calculator#integration=cfiresim.com">cFIREsim</a></td>
-        <td>
-          Crowdsourced FIRE Simulator is another historical simulation tool for
-          retirement planning.
-        </td>
-        <td>
-          Guides you through creating the correct adjustment entries for
-          cFIREsim, ensuring your Social Security benefits are modeled correctly
-          in your simulations.
+          Shows a banner while you use the calculator, with a link back to
+          ProjectionLab.
         </td>
       </tr>
       <tr>
@@ -144,34 +113,6 @@
         </td>
         <td>A comprehensive retirement planning application.</td>
         <td> Displays your Primary Insurance Amount (PIA) values. </td>
-      </tr>
-      <tr>
-        <td>
-          <a href="/calculator#integration=fireproofme.com">FIREProof</a>
-        </td>
-        <td>
-          A retirement planning tool that helps you model income streams and
-          expenses throughout retirement.
-        </td>
-        <td>
-          Provides your Social Security benefits as annual amounts with start
-          years, formatted for easy entry into FIREProof's income tracking
-          system.
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <a href="/calculator#integration=tpawplanner.com">TPAW Planner</a>
-        </td>
-        <td>
-          A free retirement planner that sets spending and asset allocation
-          from your total portfolio, including future income.
-        </td>
-        <td>
-          Lists each Social Security benefit as an entry for TPAW's Income
-          During Retirement section: a monthly amount in today's dollars, the
-          age it starts, and when it ends (at your or your partner's max age).
-        </td>
       </tr>
     </tbody>
   </table>
