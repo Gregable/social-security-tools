@@ -41,7 +41,7 @@
     SSA.tools is designed to be a powerful, standalone calculator for Social
     Security benefits. However, retirement planning often involves more than
     just Social Security. That's why I've built an integration system that
-    allows other financial planning tools to seamlessly connect with SSA.tools.
+    allows other financial planning tools to connect with SSA.tools.
   </p>
 
   <p>
@@ -52,8 +52,8 @@
 
   <h2>Current Integrations</h2>
   <p>
-    The following tools have built-in integrations with SSA.tools. Each
-    integration is designed to streamline your planning workflow.
+    The following tools link their users to SSA.tools with an integration
+    turned on.
   </p>
 
   <table class="integration-table">
@@ -76,53 +76,21 @@
           strategy to maximize your lifetime benefits.
         </td>
         <td>
-          Transfers your detailed earnings record from SSA.tools to Open Social
-          Security, ensuring their optimization engine uses the most accurate
-          benefit estimates.
+          Links you back to Open Social Security with the birth dates and
+          Primary Insurance Amounts (PIAs) from your report filled in.
         </td>
       </tr>
       <tr>
-        <td><a href="/calculator#integration=linopt.com">Linopt</a></td>
-        <td>Focuses on retirement income optimization.</td>
         <td>
-          Displays your Primary Insurance Amount (PIA) adjusted for inflation,
-          formatted specifically for input into Linopt's planning models.
-        </td>
-      </tr>
-      <tr>
-        <td><a href="/calculator#integration=firecalc.com">FIRECalc</a></td>
-        <td>
-          A popular tool for testing the viability of your retirement portfolio
-          against historical market data.
+          <a href="/calculator#integration=projectionlab.com">ProjectionLab</a>
         </td>
         <td>
-          Provides your Social Security benefits in today's dollars, with start
-          years rather than ages, making it easy to plug accurate figures into
-          FIRECalc's "Social Security" tab.
-        </td>
-      </tr>
-      <tr>
-        <td><a href="/calculator#integration=ficalc.app">FI Calc</a></td>
-        <td>
-          A modern retirement calculator that helps you visualize your
-          withdrawal strategy success rates.
+          A financial planning app for modeling your savings, spending, and
+          retirement over your lifetime.
         </td>
         <td>
-          Generates specific income entries for FI Calc, including annual
-          amounts and start-year offsets, so you can accurately model your
-          Social Security income streams within their app.
-        </td>
-      </tr>
-      <tr>
-        <td><a href="/calculator#integration=cfiresim.com">cFIREsim</a></td>
-        <td>
-          Crowdsourced FIRE Simulator is another historical simulation tool for
-          retirement planning.
-        </td>
-        <td>
-          Guides you through creating the correct adjustment entries for
-          cFIREsim, ensuring your Social Security benefits are modeled correctly
-          in your simulations.
+          Shows a banner while you use the calculator, with a link back to
+          ProjectionLab.
         </td>
       </tr>
       <tr>
@@ -133,7 +101,8 @@
           Uses auditable intelligence to assist with financial planning.
         </td>
         <td>
-          Connects your SSA.tools data with Fin Pods AI's analysis tools.
+          Shows a banner while you use the calculator, with a link back to Fin
+          Pods AI.
         </td>
       </tr>
       <tr>
@@ -144,34 +113,6 @@
         </td>
         <td>A comprehensive retirement planning application.</td>
         <td> Displays your Primary Insurance Amount (PIA) values. </td>
-      </tr>
-      <tr>
-        <td>
-          <a href="/calculator#integration=fireproofme.com">FIREProof</a>
-        </td>
-        <td>
-          A retirement planning tool that helps you model income streams and
-          expenses throughout retirement.
-        </td>
-        <td>
-          Provides your Social Security benefits as annual amounts with start
-          years, formatted for easy entry into FIREProof's income tracking
-          system.
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <a href="/calculator#integration=tpawplanner.com">TPAW Planner</a>
-        </td>
-        <td>
-          A free retirement planner that sets spending and asset allocation
-          from your total portfolio, including future income.
-        </td>
-        <td>
-          Lists each Social Security benefit as an entry for TPAW's Income
-          During Retirement section: a monthly amount in today's dollars, the
-          age it starts, and when it ends (at your or your partner's max age).
-        </td>
       </tr>
     </tbody>
   </table>
@@ -196,13 +137,13 @@
   <h3>Getting Data Out</h3>
   <p>
     When an integration is active, you'll see a banner at the top of the page.
-    Once you've completed your earnings record entry, a new section will appear
-    at the bottom of your report.
+    Some integrations also add a section at the bottom of your report once
+    you've entered your earnings record.
   </p>
   <p>
-    This "Report End" section is customized for each integration. It might
-    display your data in a specific format, provide copy-paste values, or offer
-    a button to send your calculated benefits back to the third-party tool.
+    That section is specific to the tool. It might show your data in the format
+    the tool expects, give you values to copy, or link you back to the tool
+    with your benefits filled in.
   </p>
 
   <h2>Interested in Integrating?</h2>
