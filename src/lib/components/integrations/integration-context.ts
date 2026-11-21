@@ -16,6 +16,17 @@ import { Money } from '$lib/money';
 import { type MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 
+/** A spousal benefit and the month it begins. */
+export interface SpousalBenefitInfo {
+  /**
+   * Positive monthly spousal benefit in today's dollars, truncated to the
+   * dollar, as payable a year after startDate.
+   */
+  readonly monthlyBenefit: Money;
+  /** The later of the two spouses' filing months. */
+  readonly startDate: MonthDate;
+}
+
 /**
  * Context class for integration components that need to work with
  * recipient/spouse pairs and their filing dates.
@@ -199,21 +210,36 @@ export class IntegrationContext {
    * benefit begins. Returns null when a spousal benefit does not apply
    * for the current filing selections.
    */
-  getLowerEarnerSpousalBenefit(): {
-    monthlyBenefit: Money;
-    startDate: MonthDate;
-  } | null {
-    const lowerEarner = this.lowerEarner();
-    if (lowerEarner === null) return null;
-
-    const higherEarner = this.higherEarner();
+  getLowerEarnerSpousalBenefit(): SpousalBenefitInfo | null {
     const higherFilingDate = this.higherEarnerFilingDate();
     const lowerFilingDate = this.lowerEarnerFilingDate();
 
     if (higherFilingDate === null || lowerFilingDate === null) {
       return null;
     }
+    return this.spousalBenefitFor(higherFilingDate, lowerFilingDate);
+  }
 
+  /**
+   * The lower earner's spousal benefit for the given filing dates, payable
+   * from the later of the two. Returns null when there is no spouse or the
+   * spousal benefit would be $0. getLowerEarnerSpousalBenefit calls this
+   * with the dates in the global filing date stores.
+   *
+   * The amount is the one payable a year after the start, matching the
+   * personal benefit methods above. When the lower earner files for their
+   * own benefit after full retirement age, some delayed credits apply only
+   * the next January; the spousal benefit is reduced by those credits, so
+   * its first months are slightly higher than the amount that continues.
+   */
+  spousalBenefitFor(
+    higherFilingDate: MonthDate,
+    lowerFilingDate: MonthDate
+  ): SpousalBenefitInfo | null {
+    const lowerEarner = this.lowerEarner();
+    if (lowerEarner === null) return null;
+
+    const higherEarner = this.higherEarner();
     const spousalStart = higherFilingDate.greaterThan(lowerFilingDate)
       ? higherFilingDate
       : lowerFilingDate;
@@ -223,7 +249,7 @@ export class IntegrationContext {
       higherEarner,
       higherFilingDate,
       lowerFilingDate,
-      spousalStart
+      spousalStart.addDuration(MonthDuration.OneYear())
     );
 
     if (monthlyBenefit.cents() <= 0) {

@@ -46,6 +46,16 @@ describe('Integration Configuration', () => {
     expect(typeof faviconUrl).toBe('string');
   });
 
+  it('should have TPAW Planner registered', async () => {
+    const tpaw = INTEGRATIONS['tpawplanner.com'];
+    expect(tpaw).toBeDefined();
+    expect(tpaw.id).toBe('tpawplanner.com');
+    expect(tpaw.displayName).toBe('TPAW Planner');
+    expect(tpaw.reportEndLabel).toBe('TPAW Planner');
+    expect(tpaw.maxHouseholdMembers).toBeUndefined();
+    expect(typeof (await tpaw.getFavicon())).toBe('string');
+  });
+
   it('should have Owl Retirement Planner registered', async () => {
     expect(INTEGRATIONS['owlplanner.streamlit.app']).toBeDefined();
     expect(INTEGRATIONS['owlplanner.streamlit.app'].id).toBe(
