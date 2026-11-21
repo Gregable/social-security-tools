@@ -18,6 +18,7 @@ import LinoptReportEnd from '$lib/components/integrations/linopt.com/ReportEnd.s
 import OpenSSReportEnd from '$lib/components/integrations/opensocialsecurity.com/ReportEnd.svelte';
 import OwlPlannerReportEnd from '$lib/components/integrations/owlplanner.streamlit.app/ReportEnd.svelte';
 import FIREProofReportEnd from '$lib/components/integrations/fireproofme.com/ReportEnd.svelte';
+import TpawReportEnd from '$lib/components/integrations/tpawplanner.com/ReportEnd.svelte';
 
 export let recipientData: Recipient;
 export let spouseData: Recipient | null = null;
@@ -125,6 +126,11 @@ $: hasSpouse = spouseData !== null;
       <div class="report-item">
         <h3>FIREProof</h3>
         <FIREProofReportEnd {recipient} spouse={hasSpouse ? spouse : null} />
+      </div>
+
+      <div class="report-item">
+        <h3>TPAW Planner</h3>
+        <TpawReportEnd {recipient} spouse={hasSpouse ? spouse : null} />
       </div>
     </div>
   </div>

@@ -4,7 +4,8 @@ import { browser } from '$app/environment';
 export type OutboundDestination =
   | 'projectionlab'
   | 'kofi'
-  | 'socialsecurityadvisors';
+  | 'socialsecurityadvisors'
+  | 'tpawplanner';
 
 export function trackOutboundClick(
   destination: OutboundDestination,

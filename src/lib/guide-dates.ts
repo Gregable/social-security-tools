@@ -57,7 +57,7 @@ export const GUIDE_DATES = {
   'government-shutdown': { published: '2025-09-30', updated: '2025-09-30' },
   'indexing-factors': { published: '2020-12-28', updated: '2026-09-17' },
   inflation: { published: '2018-11-23', updated: '2026-09-17' },
-  integrations: { published: '2025-12-20', updated: '2026-01-14' },
+  integrations: { published: '2025-12-20', updated: '2026-11-20' },
   'international-agreements': {
     published: '2022-06-26',
     updated: '2022-06-26',

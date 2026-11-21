@@ -197,6 +197,35 @@ warning.
   settings (Recurrence: Recurring, End Year: default, Treat as post-tax: off).
   Links to the federal taxes guide for more information on Social Security taxation.
 
+### TPAW Planner (tpawplanner.com)
+
+- **Intro Banner**: Says the report will list the Social Security entries to
+  add to TPAW's Income During Retirement section
+- **Report End**: Lists one entry per benefit for TPAW's "Add Retirement
+  Income" dialog.
+  - Link: `/plan?section=income-during-retirement`. Signed-in users land on
+    the section; visitors who aren't signed in see TPAW's Login / Guest
+    screen first.
+  - Entries: each person's own benefit, then the lower earner's spousal
+    benefit. Benefits of $0, and benefits without a filing date, are left
+    out. With every PIA at $0, the section says there is nothing to add.
+  - Fields: Label, Amount per Month in today's dollars ("adjusted for
+    inflation (real dollars)"), Start "When you are" / "When your partner
+    is" an age, End "At your max age" / "At your partner's max age". Labels
+    and amounts have copy buttons.
+  - Amounts are the ones payable a year after each benefit starts, after
+    all delayed retirement credits apply.
+  - Ages are counted from the calendar birth month, matching TPAW's Month of
+    Birth, not SSA's attained age. The report shows the month of birth to
+    enter in TPAW.
+  - TPAW has no "now" start, so a benefit that has already started begins
+    at the person's current age.
+  - Couples choose who is "you" in TPAW, and see a note that survivor
+    benefits are not included.
+  - Code: `src/lib/integrations/tpaw.ts`. Clicks on the TPAW link are
+    recorded as `Outbound: Clicked` with `destination: 'tpawplanner'` and
+    `placement: 'integration-report-end'`.
+
 ## Testing
 
 Unit tests for the integration system are in `src/test/integrations.test.ts`.
