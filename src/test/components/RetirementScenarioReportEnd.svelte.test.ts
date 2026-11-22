@@ -173,6 +173,28 @@ describe('Retirement Scenario report end', () => {
     expect(rows(target)[0][0]).toBe('Your benefit at FRA (age 67): $2,053');
   });
 
+  it('explains the spousal-only cap instead of rounding', () => {
+    const alex = person('Alex', 2600, Birthdate.FromYMD(1964, 7, 20));
+    const chris = person('Chris', 0, Birthdate.FromYMD(1966, 0, 10));
+    alex.markFirst();
+    chris.markSecond();
+    recipientFilingDate.set(month(2031, 7)); // Alex at 67
+    spouseFilingDate.set(month(2035, 0)); // Chris at 69
+    const target = render({ recipient: alex, spouse: chris });
+
+    expect(planOf(target)).toMatchObject({
+      spouseUse50pct: true,
+      spouseSsClaimAge: 67,
+    });
+    expect(rows(target)[1]).toEqual([
+      'Estimate as 50% of your FRA benefit: Checked',
+      'Spouse planned claim age: 67',
+    ]);
+    expect(Array.from(target.querySelectorAll('.note')).map(text)).toEqual([
+      "Spousal benefits stop growing at full retirement age, so Retirement Scenario's spousal estimate takes a claim age of at most 67.",
+    ]);
+  });
+
   it('says there is nothing to add with a $0 PIA', () => {
     const alex = person('Alex', 0, Birthdate.FromYMD(1965, 3, 15));
     recipientFilingDate.set(month(2032, 3));

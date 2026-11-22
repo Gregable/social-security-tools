@@ -7,6 +7,7 @@ import {
   type RsHousehold,
   type RsPerson,
   retirementScenarioUrl,
+  rsClaimAge,
   rsFields,
 } from '$lib/integrations/retirement-scenario';
 import { MonthDate } from '$lib/month-time';
@@ -43,8 +44,17 @@ function hasZeroPia(r: Recipient): boolean {
   return r.pia().primaryInsuranceAmount().cents() <= 0;
 }
 
+/** True when the spousal-only claim age was lowered to 67. */
+function isCapped(p: RsPerson): boolean {
+  return p.claimAge !== rsClaimAge(p.filingAge);
+}
+
+/** True when the filing age had to be rounded or clamped to whole years. */
 function isRounded(p: RsPerson): boolean {
-  return p.filingAge.modMonths() !== 0 || p.filingAge.years() !== p.claimAge;
+  return (
+    !isCapped(p) &&
+    (p.filingAge.modMonths() !== 0 || p.filingAge.years() !== p.claimAge)
+  );
 }
 
 /** True when the age-67 amount includes delayed credits (FRA before 67). */
@@ -149,6 +159,13 @@ function hasEarlierFra(p: RsPerson): boolean {
             <p class="note">
               Retirement Scenario takes claim ages in whole years, so a filing
               age of {p.filingAge.toFullAgeString()} is entered as {p.claimAge}.
+            </p>
+          {/if}
+          {#if isCapped(p)}
+            <p class="note">
+              Spousal benefits stop growing at full retirement age, so
+              Retirement Scenario's spousal estimate takes a claim age of at
+              most 67.
             </p>
           {/if}
           {#if hasEarlierFra(p)}

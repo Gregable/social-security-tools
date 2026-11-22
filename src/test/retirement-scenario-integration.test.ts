@@ -100,7 +100,9 @@ describe('buildRsHousehold', () => {
       claimAge: 68,
       benefit: { kind: 'planned' },
     });
-    if (household.you.benefit.kind !== 'planned') throw new Error();
+    if (household.you.benefit.kind !== 'planned') {
+      throw new Error('expected a planned benefit');
+    }
     expect(household.you.benefit.benefitAt67.value()).toBe(2000);
     expect(household.you.filingAge).toEqual(age(68, 3));
   });
@@ -111,7 +113,9 @@ describe('buildRsHousehold', () => {
     const alex = person('Alex', 2000, Birthdate.FromYMD(1958, 5, 15));
     const household = build(single(alex, atAge(alex, 69)));
 
-    if (household.you.benefit.kind !== 'planned') throw new Error();
+    if (household.you.benefit.kind !== 'planned') {
+      throw new Error('expected a planned benefit');
+    }
     expect(household.you.benefit.benefitAt67.value()).toBe(2053);
     expect(household.you.claimAge).toBe(69);
   });
@@ -122,7 +126,9 @@ describe('buildRsHousehold', () => {
     const household = build(single(alex, atAge(alex, 64)));
 
     expect(household.you.claimAge).toBe(64);
-    if (household.you.benefit.kind !== 'claiming') throw new Error();
+    if (household.you.benefit.kind !== 'claiming') {
+      throw new Error('expected a claiming benefit');
+    }
     expect(household.you.benefit.currentBenefit.value()).toBe(1644);
   });
 
@@ -150,6 +156,68 @@ describe('buildRsHousehold', () => {
 
     expect(household.spouse?.benefit.kind).toBe('spousal-only');
     expect(household.spouse?.claimAge).toBe(67);
+  });
+
+  it('counts a filing date in the current month as planned', () => {
+    const alex = person('Alex', 2000, Birthdate.FromYMD(1959, 4, 15));
+    const household = build(single(alex, NOW));
+    expect(household.you.benefit.kind).toBe('planned');
+  });
+
+  it('uses the calendar birth month for people born on the 1st', () => {
+    const alex = person('Alex', 2000, Birthdate.FromYMD(1965, 3, 1)); // Apr 1
+    const household = build(single(alex, atAge(alex, 67)));
+    expect(household.you).toMatchObject({ birthYear: 1965, birthMonth: 4 });
+  });
+
+  it('treats a January 1, 1960 birthday as born in 1959 for the age-67 amount', () => {
+    // SSA counts January 1, 1960 as 1959: full retirement age 66 and 10
+    // months, so filing at 67 earns 2 months of credits: $2,026.67 -> $2,026.
+    const alex = person('Alex', 2000, Birthdate.FromYMD(1960, 0, 1));
+    const household = build(single(alex, atAge(alex, 68)));
+    expect(household.you).toMatchObject({ birthYear: 1960, birthMonth: 1 });
+    if (household.you.benefit.kind !== 'planned') {
+      throw new Error('expected a planned benefit');
+    }
+    expect(household.you.benefit.benefitAt67.value()).toBe(2026);
+  });
+
+  it('gives each already-claiming spouse their own current benefit', () => {
+    // Both born June 1958 (full retirement age 66 and 8 months). Chris, the
+    // higher earner, filed at full retirement age; Alex filed at 64, 32
+    // months early: $1,000 * (1 - 17.78%) = $822.
+    const alex = person('Alex', 1000, Birthdate.FromYMD(1958, 5, 15));
+    const chris = person('Chris', 2600, Birthdate.FromYMD(1958, 5, 15));
+    const household = build(
+      couple(alex, atAge(alex, 64), chris, atAge(chris, 66, 8))
+    );
+
+    expect(household.you.recipient).toBe(chris);
+    if (household.you.benefit.kind !== 'claiming') {
+      throw new Error('expected a claiming benefit');
+    }
+    expect(household.you.benefit.currentBenefit.value()).toBe(2600);
+    expect(household.spouse?.benefit).toMatchObject({ kind: 'claiming' });
+    expect(rsPlanFields(household)).toMatchObject({
+      ssClaimAge: 67,
+      ssFRABenefit: 2600,
+      ssAlreadyClaiming: true,
+      spouseSsClaimAge: 64,
+      spouseSsFRABenefit: 1027.5, // $822 / 0.8
+      spouseSsAlreadyClaiming: true,
+    });
+  });
+
+  it('keeps a $0-PIA spouse spousal-only after their filing date has passed', () => {
+    const alex = person('Alex', 2600, Birthdate.FromYMD(1958, 5, 15));
+    const chris = person('Chris', 0, Birthdate.FromYMD(1958, 5, 15));
+    const household = build(
+      couple(alex, atAge(alex, 66, 8), chris, atAge(chris, 68))
+    );
+
+    expect(household.spouse?.benefit.kind).toBe('spousal-only');
+    expect(household.spouse?.claimAge).toBe(67);
+    expect(rsPlanFields(household).spouseSsAlreadyClaiming).toBeUndefined();
   });
 
   it('returns null when every PIA is $0', () => {
@@ -217,7 +285,9 @@ describe('rsPlanFields', () => {
     for (const [pia, years, months] of cases) {
       const alex = person('Alex', pia, Birthdate.FromYMD(1958, 5, 15));
       const household = build(single(alex, atAge(alex, years, months)));
-      if (household.you.benefit.kind !== 'claiming') throw new Error();
+      if (household.you.benefit.kind !== 'claiming') {
+        throw new Error('expected a claiming benefit');
+      }
       const fields = rsPlanFields(household);
       const shown = Math.round(
         (fields.ssFRABenefit as number) *
@@ -255,13 +325,25 @@ describe('retirementScenarioUrl', () => {
 });
 
 describe('rsFields', () => {
+  it('copies plain digits for amounts and ages', () => {
+    const alex = person('Alex', 2400, Birthdate.FromYMD(1965, 3, 15));
+    expect(rsFields(build(single(alex, atAge(alex, 67))).you)).toEqual([
+      {
+        label: 'Your benefit at FRA (age 67)',
+        value: '$2,400',
+        copyValue: '2400',
+      },
+      { label: 'Your planned claim age', value: '67', copyValue: '67' },
+    ]);
+  });
+
   it('lists the spousal-only estimate for a spouse with a $0 PIA', () => {
     const alex = person('Alex', 2600, Birthdate.FromYMD(1964, 7, 20));
     const chris = person('Chris', 0, Birthdate.FromYMD(1966, 0, 10));
     const household = build(
       couple(alex, atAge(alex, 67), chris, atAge(chris, 66))
     );
-    if (household.spouse === null) throw new Error();
+    if (household.spouse === null) throw new Error('expected a spouse');
     expect(rsFields(household.spouse)).toEqual([
       { label: 'Estimate as 50% of your FRA benefit', value: 'Checked' },
       { label: 'Spouse planned claim age', value: '66', copyValue: '66' },
@@ -274,7 +356,7 @@ describe('rsFields', () => {
     const household = build(
       couple(alex, atAge(alex, 70), chris, atAge(chris, 62, 1))
     );
-    if (household.spouse === null) throw new Error();
+    if (household.spouse === null) throw new Error('expected a spouse');
     expect(rsFields(household.spouse).map((f) => f.label)).toEqual([
       'Spouse is already receiving Social Security',
       'Spouse Current Monthly Benefit',

@@ -85,7 +85,10 @@ export interface RsHouseholdInputs {
   readonly recipientFilingDate: MonthDate | null;
   /** The filing month of `context.spouse`, or null if none or no spouse. */
   readonly spouseFilingDate: MonthDate | null;
-  /** The current month. Benefits that began earlier are already claiming. */
+  /**
+   * The current month. Benefits that began earlier are already claiming,
+   * except a $0-PIA spouse's, which is always the spousal-only estimate.
+   */
   readonly now: MonthDate;
 }
 
@@ -176,8 +179,8 @@ function person(
 
 /**
  * The household as Retirement Scenario takes it, for the chosen filing
- * dates. Returns null when there is nothing to enter: every PIA is $0, or a
- * filing date is missing.
+ * dates. Returns null when there is nothing to enter: the higher (so every)
+ * PIA is $0, or a filing date is missing.
  */
 export function buildRsHousehold(
   inputs: RsHouseholdInputs

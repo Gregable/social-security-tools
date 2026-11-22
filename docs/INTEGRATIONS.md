@@ -247,12 +247,16 @@ warning.
     `ssFRABenefit`, `ssAlreadyClaiming`, the `spouse...` equivalents, and
     `spouseUse50pct` for a spouse with a $0 PIA.
   - Retirement Scenario uses 67 as everyone's full retirement age and works
-    out other claim ages, spousal top-ups and survivor benefits itself, so
-    the link sends each person's benefit for filing at SSA age 67 (the PIA
-    for anyone born in 1960 or later) and their claim age, rounded to the
-    nearest year. The higher earner is "you", since only the spouse can use
+    out other claim ages, spousal top-ups and survivor benefits itself. For
+    someone not yet claiming, the link sends their benefit for filing at SSA
+    age 67 (the PIA, rounded down to the dollar, when their full retirement
+    age is 67) and their claim age, rounded to the nearest year. The higher earner is "you", since only the spouse can use
     the 50% spousal estimate.
-  - A benefit that began before this month is sent as already claiming:
+  - A spouse with a $0 PIA is always sent as spousal-only, with a claim age
+    of at most 67; Retirement Scenario starts that estimate no earlier than
+    the year "you" claims, and has no already-claiming option for it.
+  - Any other benefit that began before this month is sent as already
+    claiming:
     `ssFRABenefit` is the current benefit divided by Retirement Scenario's
     own claim-age factor, with cents kept, which is how its "Current Monthly
     Benefit" field stores a value.
