@@ -226,6 +226,45 @@ warning.
     recorded as `Outbound: Clicked` with `destination: 'tpawplanner'` and
     `placement: 'integration-report-end'`.
 
+### Retirement Scenario Explorer (retirementscenario.com)
+
+- **Intro Banner**: Says the report will link back with the Social Security
+  benefits filled in, and list them for entering by hand
+- **Report End**: A link that opens Retirement Scenario's app with the
+  household's Social Security and birthdays, plus the Social Security
+  settings to type into a plan the visitor already has. Birthdays are not
+  listed there; an existing plan is assumed to have them.
+  - Not listed on `/guides/integrations`: that table includes only tools
+    that link to SSA.tools.
+  - Link: `https://app.retirementscenario.com/?goto=social-security#plan=<base64 JSON>`.
+    The app merges the given fields over its defaults and shows a "Shared
+    retirement plan" card; after "Explore This Plan", `goto` opens the
+    Inputs tab at the Social Security section. A visitor with a saved plan
+    sees the linked plan as a separate copy ("Replace my plan with this" /
+    "Back to my plan"), so their own plan is never overwritten.
+  - Fields: `planType` (`solo_single` or `household`), `filingStatus`,
+    `birthYear` / `birthMonth` (calendar month, January = 1), `ssClaimAge`,
+    `ssFRABenefit`, `ssAlreadyClaiming`, the `spouse...` equivalents, and
+    `spouseUse50pct` for a spouse with a $0 PIA.
+  - Retirement Scenario uses 67 as everyone's full retirement age and works
+    out other claim ages, spousal top-ups and survivor benefits itself. For
+    someone not yet claiming, the link sends their benefit for filing at SSA
+    age 67 (the PIA, rounded down to the dollar, when their full retirement
+    age is 67) and their claim age, rounded to the nearest year. The higher earner is "you", since only the spouse can use
+    the 50% spousal estimate.
+  - A spouse with a $0 PIA is always sent as spousal-only, with a claim age
+    of at most 67; Retirement Scenario starts that estimate no earlier than
+    the year "you" claims, and has no already-claiming option for it.
+  - Any other benefit that began before this month is sent as already
+    claiming:
+    `ssFRABenefit` is the current benefit divided by Retirement Scenario's
+    own claim-age factor, with cents kept, which is how its "Current Monthly
+    Benefit" field stores a value.
+  - Code: `src/lib/integrations/retirement-scenario.ts`. Clicks on the link
+    are recorded as `Outbound: Clicked` with
+    `destination: 'retirementscenario'` and
+    `placement: 'integration-report-end'`.
+
 ## Testing
 
 Unit tests for the integration system are in `src/test/integrations.test.ts`.
