@@ -146,6 +146,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'retirementscenario.com': {
+    id: 'retirementscenario.com',
+    displayName: 'Retirement Scenario Explorer',
+    reportEndLabel: 'Retirement Scenario',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/retirementscenario.com/favicon.svg'
+      );
+      return module.default;
+    },
+  },
   'rachaelcampwealth.com': {
     id: 'rachaelcampwealth.com',
     displayName: 'Rachael Camp Wealth',

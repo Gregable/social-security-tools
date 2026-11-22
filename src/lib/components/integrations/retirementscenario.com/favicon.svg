@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Retirement Scenario Explorer">
+  <title>Retirement Scenario Explorer</title>
+  <defs>
+    <linearGradient id="rs-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7ab3e0"/>
+      <stop offset="100%" stop-color="#3dd68c"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="120" height="120" rx="22" fill="#0d0f14"/>
+  <path d="M 60 10 A 50 50 0 1 1 19.6 30.6"
+        fill="none"
+        stroke="url(#rs-grad)"
+        stroke-width="16"
+        stroke-linecap="round"/>
+</svg>

@@ -56,6 +56,16 @@ describe('Integration Configuration', () => {
     expect(typeof (await tpaw.getFavicon())).toBe('string');
   });
 
+  it('should have Retirement Scenario Explorer registered', async () => {
+    const rs = INTEGRATIONS['retirementscenario.com'];
+    expect(rs).toBeDefined();
+    expect(rs.id).toBe('retirementscenario.com');
+    expect(rs.displayName).toBe('Retirement Scenario Explorer');
+    expect(rs.reportEndLabel).toBe('Retirement Scenario');
+    expect(rs.maxHouseholdMembers).toBeUndefined();
+    expect(typeof (await rs.getFavicon())).toBe('string');
+  });
+
   it('should have Owl Retirement Planner registered', async () => {
     expect(INTEGRATIONS['owlplanner.streamlit.app']).toBeDefined();
     expect(INTEGRATIONS['owlplanner.streamlit.app'].id).toBe(
