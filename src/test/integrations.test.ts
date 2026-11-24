@@ -66,6 +66,16 @@ describe('Integration Configuration', () => {
     expect(typeof (await rs.getFavicon())).toBe('string');
   });
 
+  it('should have Retirement Chartplotter registered', async () => {
+    const rcp = INTEGRATIONS['retirementchartplotter.com'];
+    expect(rcp).toBeDefined();
+    expect(rcp.id).toBe('retirementchartplotter.com');
+    expect(rcp.displayName).toBe('Retirement Chartplotter');
+    expect(rcp.reportEndLabel).toBe('Retirement Chartplotter');
+    expect(rcp.maxHouseholdMembers).toBeUndefined();
+    expect(typeof (await rcp.getFavicon())).toBe('string');
+  });
+
   it('should have Owl Retirement Planner registered', async () => {
     expect(INTEGRATIONS['owlplanner.streamlit.app']).toBeDefined();
     expect(INTEGRATIONS['owlplanner.streamlit.app'].id).toBe(
@@ -472,6 +482,10 @@ describe('Dynamic Component Loading', () => {
   it('should have component loader functions', () => {
     expect(loadIntroBanner).toBeDefined();
     expect(loadReportEnd).toBeDefined();
+  });
+
+  it('should load the Retirement Chartplotter report end', async () => {
+    expect(await loadReportEnd('retirementchartplotter.com')).not.toBeNull();
   });
 
   // Note: Testing actual dynamic imports is difficult in unit tests

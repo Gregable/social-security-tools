@@ -157,6 +157,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'retirementchartplotter.com': {
+    id: 'retirementchartplotter.com',
+    displayName: 'Retirement Chartplotter',
+    reportEndLabel: 'Retirement Chartplotter',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/retirementchartplotter.com/favicon.svg'
+      );
+      return module.default;
+    },
+  },
   'rachaelcampwealth.com': {
     id: 'rachaelcampwealth.com',
     displayName: 'Rachael Camp Wealth',
