@@ -10,9 +10,10 @@
  * keeps its other plan settings, and works out spousal and survivor benefits
  * itself.
  *
- * The claim month is the start month of the year the person turns the claim
- * age (birth year + age). Any filing month from the first eligible month at
- * 62 to the age-70 month can be entered exactly.
+ * A claim is entered as an age (claim year minus birth year) plus the
+ * calendar month as "Benefit Start Month", so any filing month in
+ * Chartplotter's range (the first eligible month at 62 to the age-70 month)
+ * is entered exactly.
  *
  * Someone already receiving benefits has to be switched to receiving mode in
  * the regular Social Security panel afterwards; rcpReceivingFields lists those
@@ -52,7 +53,12 @@ export function rcpLatestClaimMonth(r: Recipient): MonthDate {
 
 /** A claim month as Chartplotter takes it. */
 export interface RcpClaim {
-  /** The claim year minus the birth year, 62 to 70. */
+  /**
+   * The claim year minus the birth year. This can differ from the person's
+   * age in the claim month: it is 63 for someone born in late December
+   * claiming in their first eligible month, and 69 at the age-70 month for
+   * someone born on January 1.
+   */
   readonly age: number;
   /** The claim month; its calendar month is the "Benefit Start Month". */
   readonly month: MonthDate;
@@ -122,9 +128,9 @@ function hasZeroPia(r: Recipient): boolean {
 }
 
 /**
- * The current benefit when the filing month is before `now`, in whole dollars.
- * Evaluated a year after filing so delayed credits for the filing year are
- * included.
+ * The current benefit when the filing month is before `now`. Evaluated a year
+ * after filing so delayed credits for the filing year are included.
+ * benefitOnDate already returns whole dollars.
  */
 function currentBenefitFor(
   r: Recipient,
@@ -136,7 +142,7 @@ function currentBenefitFor(
     r,
     filingDate,
     filingDate.addDuration(MonthDuration.OneYear())
-  ).roundToDollar();
+  );
 }
 
 function rcpPerson(
@@ -160,8 +166,7 @@ function rcpPerson(
 
 /**
  * The household as Chartplotter takes it, for the chosen filing dates.
- * Returns null when there is nothing to enter: the higher (so every) PIA is
- * $0, or a filing date is missing.
+ * Returns null when every PIA is $0 or a filing date is not chosen yet.
  */
 export function buildRcpHousehold(
   inputs: RcpHouseholdInputs
@@ -181,21 +186,29 @@ export function buildRcpHousehold(
 }
 
 /**
- * One setting in Chartplotter. `copyValue` is set for values worth copying
- * into a text field; ages and months are dropdowns there, so they have none.
+ * One setting in Chartplotter. `kind` is whether Chartplotter shows a typed
+ * number box or a dropdown/picker for it. Only number fields carry a
+ * `copyValue`, the plain number to paste.
  */
-export interface RcpField {
+export type RcpField = {
   readonly label: string;
   readonly value: string;
-  readonly copyValue?: string;
-}
+} & (
+  | { readonly kind: 'number'; readonly copyValue: string }
+  | { readonly kind: 'select' }
+);
 
 function amountField(label: string, amount: Money): RcpField {
   return {
+    kind: 'number',
     label,
     value: amount.wholeDollars(),
     copyValue: amount.value().toFixed(0),
   };
+}
+
+function selectField(label: string, value: string): RcpField {
+  return { kind: 'select', label, value };
 }
 
 /**
@@ -206,14 +219,14 @@ export function rcpGuidedFields(p: RcpPerson): readonly RcpField[] {
   const isPrimary = p.role === 'primary';
   return [
     amountField('Gross SS/mo at Full Retirement Age', p.fraBenefit),
-    {
-      label: isPrimary ? 'Initially Selected Claim Age' : 'Selected Claim Age',
-      value: String(p.claim.age),
-    },
-    {
-      label: isPrimary ? 'Benefit Start Month' : 'Spouse Benefit Start Month',
-      value: p.claim.month.monthFullName(),
-    },
+    selectField(
+      isPrimary ? 'Initially Selected Claim Age' : 'Selected Claim Age',
+      String(p.claim.age)
+    ),
+    selectField(
+      isPrimary ? 'Benefit Start Month' : 'Spouse Benefit Start Month',
+      p.claim.month.monthFullName()
+    ),
   ];
 }
 
@@ -231,22 +244,20 @@ export function rcpReceivingFields(
   const claimAge = String(p.claim.age);
   const startMonth = p.claim.month.monthFullName();
   const originalClaimAge: RcpField = {
+    kind: 'number',
     label: 'Original Claim Age',
     value: claimAge,
     copyValue: claimAge,
   };
-  const ownBenefitOnly: RcpField = {
-    label: 'Current Benefit Includes',
-    value: 'Own Retirement Benefit Only',
-  };
-  const benefitYear: RcpField = {
-    label: 'Benefit Year',
-    value: String(household.year),
-  };
+  const ownBenefitOnly = selectField(
+    'Current Benefit Includes',
+    'Own Retirement Benefit Only'
+  );
+  const benefitYear = selectField('Benefit Year', String(household.year));
   if (p.role === 'spouse') {
     return [
-      { label: 'Benefit Status', value: 'Already Receiving Benefits' },
-      { label: 'Spouse Original Benefit Start Month', value: startMonth },
+      selectField('Benefit Status', 'Already Receiving Benefits'),
+      selectField('Spouse Original Benefit Start Month', startMonth),
       amountField('Gross SS/mo', p.currentBenefit),
       ownBenefitOnly,
       originalClaimAge,
@@ -254,8 +265,8 @@ export function rcpReceivingFields(
     ];
   }
   return [
-    { label: 'Benefit Values', value: 'Receiving Benefits' },
-    { label: 'Original Benefit Start Month', value: startMonth },
+    selectField('Benefit Values', 'Receiving Benefits'),
+    selectField('Original Benefit Start Month', startMonth),
     originalClaimAge,
     amountField('Gross SS/mo (before Medicare)', p.currentBenefit),
     ...(household.spouse === null ? [] : [ownBenefitOnly]),

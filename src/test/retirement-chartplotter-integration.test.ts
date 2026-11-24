@@ -86,6 +86,27 @@ describe('rcpClaim', () => {
     });
   });
 
+  it('counts the claim year minus the birth year for a late-December birthday', () => {
+    // Born December 15: the first eligible month is January 2028, in the year
+    // she turns 63.
+    const r = person('Alex', 2000, Birthdate.FromYMD(1965, 11, 15));
+    const earliest = rcpEarliestClaimMonth(r);
+    expect(earliest).toEqual(month(2028, 0));
+    expect(rcpClaim(r, earliest)).toEqual({
+      age: 63,
+      month: month(2028, 0),
+      moved: false,
+    });
+  });
+
+  it('does not move the first and last months Chartplotter accepts', () => {
+    for (const day of [1, 2, 15]) {
+      const r = person('Alex', 2000, Birthdate.FromYMD(1965, 2, day));
+      expect(rcpClaim(r, rcpEarliestClaimMonth(r)).moved).toBe(false);
+      expect(rcpClaim(r, rcpLatestClaimMonth(r)).moved).toBe(false);
+    }
+  });
+
   it('moves a filing month after age 70 back to the age-70 month', () => {
     const r = person('Alex', 2000, Birthdate.FromYMD(1955, 5, 15));
     expect(rcpClaim(r, month(2025, 8))).toEqual({
@@ -202,6 +223,15 @@ describe('buildRcpHousehold', () => {
     expect(h.primary.claim.month.monthFullName()).toBe('May');
   });
 
+  it('gives the benefit with delayed credits for someone who filed after FRA', () => {
+    // FRA 66y8m: filing at 68y0m (May 2026) is 16 months late, so
+    // 2400 * (1 + 16 * 2/300) = 2656. Evaluated at the filing month itself the
+    // credits would not all count yet ($2,592).
+    const r = person('Alex', 2400, Birthdate.FromYMD(1958, 4, 10));
+    const h = build(single(r, r.birthdate.dateAtSsaAge(age(68, 0))));
+    expect(h.primary.currentBenefit).toEqual(Money.from(2656));
+  });
+
   it('treats a filing date in the current month as not yet claiming', () => {
     const r = person('Alex', 2400, Birthdate.FromYMD(1960, 10, 15));
     const h = build(single(r, NOW));
@@ -239,7 +269,7 @@ describe('buildRcpHousehold', () => {
 function rows(fields: readonly RcpField[]): string[] {
   return fields.map(
     (f) =>
-      `${f.label}: ${f.value}${f.copyValue === undefined ? '' : ` [${f.copyValue}]`}`
+      `${f.label}: ${f.value}${f.kind === 'number' ? ` [${f.copyValue}]` : ''}`
   );
 }
 

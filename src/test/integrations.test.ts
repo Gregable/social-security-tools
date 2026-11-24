@@ -484,6 +484,10 @@ describe('Dynamic Component Loading', () => {
     expect(loadReportEnd).toBeDefined();
   });
 
+  it('should load the Retirement Chartplotter report end', async () => {
+    expect(await loadReportEnd('retirementchartplotter.com')).not.toBeNull();
+  });
+
   // Note: Testing actual dynamic imports is difficult in unit tests
   // as they require the actual component files to exist.
   // These would be better tested in integration or e2e tests.

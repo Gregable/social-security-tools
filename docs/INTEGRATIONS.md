@@ -270,7 +270,8 @@ warning.
 - **Intro Banner**: Says the report will list the Social Security settings to
   enter in Retirement Chartplotter
 - **Report End**: The values to enter in Chartplotter's Guided Setup, with
-  copy buttons for dollar amounts, and a link to its planner. Chartplotter has
+  copy buttons for values typed into number fields, and a link to its
+  planner. Chartplotter has
   no link prefill, and its "Import Plan" needs a complete plan file including
   its tax tables, so nothing is filled in automatically.
   - Not listed on `/guides/integrations`: that table includes only tools
@@ -282,8 +283,9 @@ warning.
     down to the dollar), the claim age ("Initially Selected Claim Age" for
     the primary person, "Selected Claim Age" for the spouse) and "Benefit
     Start Month" ("Spouse Benefit Start Month"). Chartplotter computes
-    spousal and survivor benefits itself. For couples, "Plan For" is set to
-    Married Couple, with the higher earner as the primary person.
+    spousal and survivor benefits itself. For couples, the report names the
+    higher earner as the primary person and says to set Plan For to Married
+    Couple if there is no spouse section.
   - A claim is a whole age plus the start month (that month of the year
     birth year + age), so filing months are entered exactly. A filing month
     outside what Chartplotter accepts (before its first eligible month at 62,

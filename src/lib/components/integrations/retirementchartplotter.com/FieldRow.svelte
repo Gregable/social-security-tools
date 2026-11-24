@@ -1,25 +1,32 @@
 <!--
   @component
   One Retirement Chartplotter setting, drawn like Chartplotter's own field:
-  the label above a box with the value. Values with a copyValue are typed
-  into a text field there and get a copy button; the rest are dropdown
-  choices and get a dropdown arrow.
+  the label above a box with the value. Number fields are typed into a box
+  there and get a copy button; select fields are dropdowns or pickers and get
+  a dropdown arrow. `owner` names the person in couples, so each copy button
+  has a distinct accessible name.
 -->
 <script lang="ts">
 import type { RcpField } from '$lib/integrations/retirement-chartplotter';
 import CopyButton from '../CopyButton.svelte';
 
 export let field: RcpField;
+export let owner: string | null = null;
 </script>
 
 <div class="rcp-field">
   <span class="rcp-label">{field.label}</span>
   <div class="rcp-control">
-    <span class="rcp-box" class:select={field.copyValue === undefined}>
+    <span class="rcp-box" class:select={field.kind === 'select'}>
       <span class="value">{field.value}</span>
     </span>
-    {#if field.copyValue !== undefined}
-      <CopyButton value={field.copyValue} label="Copy {field.label}" />
+    {#if field.kind === 'number'}
+      <CopyButton
+        value={field.copyValue}
+        label={owner === null
+          ? `Copy ${field.label}`
+          : `Copy ${field.label} (${owner})`}
+      />
     {/if}
   </div>
 </div>

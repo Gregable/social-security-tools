@@ -44,6 +44,11 @@ function hasZeroPia(r: Recipient): boolean {
   return r.pia().primaryInsuranceAmount().cents() <= 0;
 }
 
+/** Names the person on copy buttons in couples, where labels repeat. */
+function owner(p: RcpPerson): string | null {
+  return isCouple ? p.recipient.name : null;
+}
+
 /** Guided Setup's heading for a person's Social Security fields. */
 function guidedLegend(p: RcpPerson, couple: boolean): string {
   if (!couple) return 'Social Security';
@@ -103,7 +108,7 @@ function panelLegend(p: RcpPerson): string {
                   {/if}
                 </legend>
                 {#each rcpGuidedFields(p) as field (field.label)}
-                  <FieldRow {field} />
+                  <FieldRow {field} owner={owner(p)} />
                 {/each}
                 {#if p.claim.moved}
                   <p class="note">
@@ -146,7 +151,7 @@ function panelLegend(p: RcpPerson): string {
                     {/if}
                   </legend>
                   {#each rcpReceivingFields(p, household) as field (field.label)}
-                    <FieldRow {field} />
+                    <FieldRow {field} owner={owner(p)} />
                   {/each}
                 </fieldset>
               {/each}
@@ -241,13 +246,6 @@ function panelLegend(p: RcpPerson): string {
   .who {
     font-weight: 400;
   }
-
-
-
-
-
-
-
 
   .text .note {
     color: #64748b;
