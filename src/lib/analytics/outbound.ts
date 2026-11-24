@@ -6,7 +6,8 @@ export type OutboundDestination =
   | 'kofi'
   | 'socialsecurityadvisors'
   | 'tpawplanner'
-  | 'retirementscenario';
+  | 'retirementscenario'
+  | 'retirementchartplotter';
 
 export function trackOutboundClick(
   destination: OutboundDestination,

@@ -19,6 +19,7 @@ import OpenSSReportEnd from '$lib/components/integrations/opensocialsecurity.com
 import OwlPlannerReportEnd from '$lib/components/integrations/owlplanner.streamlit.app/ReportEnd.svelte';
 import FIREProofReportEnd from '$lib/components/integrations/fireproofme.com/ReportEnd.svelte';
 import RetirementScenarioReportEnd from '$lib/components/integrations/retirementscenario.com/ReportEnd.svelte';
+import RetirementChartplotterReportEnd from '$lib/components/integrations/retirementchartplotter.com/ReportEnd.svelte';
 import TpawReportEnd from '$lib/components/integrations/tpawplanner.com/ReportEnd.svelte';
 
 export let recipientData: Recipient;
@@ -137,6 +138,14 @@ $: hasSpouse = spouseData !== null;
       <div class="report-item">
         <h3>Retirement Scenario Explorer</h3>
         <RetirementScenarioReportEnd
+          {recipient}
+          spouse={hasSpouse ? spouse : null}
+        />
+      </div>
+
+      <div class="report-item">
+        <h3>Retirement Chartplotter</h3>
+        <RetirementChartplotterReportEnd
           {recipient}
           spouse={hasSpouse ? spouse : null}
         />

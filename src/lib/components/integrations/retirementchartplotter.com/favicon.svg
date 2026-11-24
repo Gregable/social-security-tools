@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="22" fill="#fff"/>
+  <svg x="0" y="0" width="128" height="128" viewBox="0 0 128 128">
+    <defs><clipPath id="favicon-light-bars"><circle cx="64" cy="64" r="43"/></clipPath></defs>
+    <g clip-path="url(#favicon-light-bars)"><path fill="#287b78" d="M31 82h17v33H31z"/><path fill="#185a91" d="M54.5 70h17v45H54.5z"/><path fill="#173a5e" d="M78 58h17v57H78z"/></g>
+    <circle cx="64" cy="64" r="43" fill="none" stroke="#173a5e" stroke-width="7"/>
+    <path fill="#173a5e" d="M64 4l8 18H56zM124 64l-18 8V56zM64 124l-8-18h16zM4 64l18-8v16z"/>
+    <path d="M28 67C39 61 49 56 59 50C67 45 73 43 77 40" fill="none" stroke="#287b78" stroke-width="5.5" stroke-linecap="round"/>
+    <g fill="#fff" stroke="#287b78" stroke-width="4.5"><circle cx="36" cy="63" r="5.5"/><circle cx="59" cy="50" r="5.5"/></g>
+    <path fill="#287b78" d="M84 32l-5 12-7-7z"/>
+  </svg>
+</svg>

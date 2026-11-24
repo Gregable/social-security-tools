@@ -14,6 +14,7 @@ import OwlPlannerIntroBanner from '$lib/components/integrations/owlplanner.strea
 import FinPodsIntroBanner from '$lib/components/integrations/finpodsai.com/IntroBanner.svelte';
 import FIREProofIntroBanner from '$lib/components/integrations/fireproofme.com/IntroBanner.svelte';
 import RetirementScenarioIntroBanner from '$lib/components/integrations/retirementscenario.com/IntroBanner.svelte';
+import RetirementChartplotterIntroBanner from '$lib/components/integrations/retirementchartplotter.com/IntroBanner.svelte';
 import TpawIntroBanner from '$lib/components/integrations/tpawplanner.com/IntroBanner.svelte';
 
 export let isReportView: boolean = false;
@@ -81,6 +82,11 @@ export let isReportView: boolean = false;
     <div class="banner-item">
       <h3>Retirement Scenario Explorer</h3>
       <RetirementScenarioIntroBanner {isReportView} />
+    </div>
+
+    <div class="banner-item">
+      <h3>Retirement Chartplotter</h3>
+      <RetirementChartplotterIntroBanner {isReportView} />
     </div>
   </div>
 </div>
