@@ -111,8 +111,8 @@ export class Birthdate {
   }
 
   /**
-   * Returns the lay birthdate as YYYY-MM-DD, e.g. "1965-09-21": the form of
-   * the `dob1` / `dob2` URL parameters.
+   * Returns the lay (calendar) birthdate as an ISO 8601 date, e.g.
+   * "1965-09-21".
    */
   layBirthdateIsoString(): string {
     const pad = (n: number) => String(n).padStart(2, '0');

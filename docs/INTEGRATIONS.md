@@ -280,7 +280,9 @@ warning.
     `pia2=0` means a spouse with spousal benefits only. A single person
     gets no `pia2` / `dob2`. `from=ssa.tools` lets Retirement Figures say
     where the figures came from.
-  - Retirement Figures links to `#integration=retirementfigures.com`.
+  - Retirement Figures plans to link to `#integration=retirementfigures.com`.
+    Add it to `/guides/integrations` once that link is live; the table there
+    includes only tools that link to SSA.tools.
   - Code: `src/lib/integrations/retirement-figures.ts`. Clicks on the link
     are recorded as `Outbound: Clicked` with
     `destination: 'retirementfigures'` and

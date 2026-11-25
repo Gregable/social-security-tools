@@ -2,15 +2,17 @@
  * Link back to the Retirement Figures Social Security calculator
  * (retirementfigures.com).
  *
- * That calculator takes each person's birth date and monthly benefit at full
- * retirement age, and works out the amounts for claiming at 62 to 70,
- * including spousal benefits, itself. It reads them from the URL fragment:
+ * That calculator takes each person's birth date and monthly benefit, and
+ * works out the amounts for claiming at 62 to 70, including spousal benefits,
+ * itself. Retirement Figures proposed this URL fragment, with `pia` defined
+ * as the PIA (the benefit at full retirement age):
  *
  *   #from=ssa.tools&pia1=2547&dob1=1965-09-21&pia2=599&dob2=1966-03-02
  *
  * `pia2=0` marks a spouse with spousal benefits only, so the higher earner is
  * always person 1. `from=ssa.tools` lets Retirement Figures say where the
- * figures came from. The fragment is not sent to any server.
+ * figures came from. Browsers leave the fragment out of the HTTP request, so
+ * the figures do not reach Retirement Figures' server logs.
  */
 
 import type { IntegrationContext } from '$lib/components/integrations/integration-context';

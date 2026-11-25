@@ -96,7 +96,6 @@ function asPercent(fraction: number): string {
   return `${+(fraction * 100).toFixed(2)}%`;
 }
 
-/** Formats a birthdate as an ISO `YYYY-MM-DD` string for the `dob` URL param. */
 function piaParam(recipient: Recipient): number {
   return Math.round(recipient.pia().primaryInsuranceAmount().value());
 }

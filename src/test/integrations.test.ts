@@ -484,7 +484,21 @@ describe('Dynamic Component Loading', () => {
     expect(loadReportEnd).toBeDefined();
   });
 
-  // Note: Testing actual dynamic imports is difficult in unit tests
-  // as they require the actual component files to exist.
-  // These would be better tested in integration or e2e tests.
+  // The loaders return null instead of throwing, so a component directory
+  // that doesn't match its registry key would silently drop the banner.
+  it.each(Object.keys(INTEGRATIONS))(
+    'loads the IntroBanner for %s',
+    async (id) => {
+      expect(await loadIntroBanner(id)).not.toBeNull();
+    }
+  );
+
+  // An empty reportEndLabel means the integration has no report end section.
+  it.each(Object.values(INTEGRATIONS).map((c) => [c.id, c.reportEndLabel]))(
+    'loads a ReportEnd for %s only when it has a report end label',
+    async (id, label) => {
+      const component = await loadReportEnd(id);
+      expect(component !== null).toBe(label !== '');
+    }
+  );
 });
