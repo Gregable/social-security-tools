@@ -66,6 +66,16 @@ describe('Integration Configuration', () => {
     expect(typeof (await rs.getFavicon())).toBe('string');
   });
 
+  it('should have Retirement Figures registered', async () => {
+    const rf = INTEGRATIONS['retirementfigures.com'];
+    expect(rf).toBeDefined();
+    expect(rf.id).toBe('retirementfigures.com');
+    expect(rf.displayName).toBe('Retirement Figures');
+    expect(rf.reportEndLabel).toBe('Retirement Figures');
+    expect(rf.maxHouseholdMembers).toBeUndefined();
+    expect(typeof (await rf.getFavicon())).toBe('string');
+  });
+
   it('should have Owl Retirement Planner registered', async () => {
     expect(INTEGRATIONS['owlplanner.streamlit.app']).toBeDefined();
     expect(INTEGRATIONS['owlplanner.streamlit.app'].id).toBe(

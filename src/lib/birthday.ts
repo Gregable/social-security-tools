@@ -111,6 +111,17 @@ export class Birthdate {
   }
 
   /**
+   * Returns the lay birthdate as YYYY-MM-DD, e.g. "1965-09-21": the form of
+   * the `dob1` / `dob2` URL parameters.
+   */
+  layBirthdateIsoString(): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${this.layBirthYear()}-${pad(this.layBirthMonth() + 1)}-${pad(
+      this.layBirthDayOfMonth()
+    )}`;
+  }
+
+  /**
    * Returns true iff the lay birthdate lies on the first of the month,
    * for example Jan 1.
    */

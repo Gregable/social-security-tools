@@ -34,6 +34,25 @@ describe('layBirth', () => {
     expect(bd.layBirthMonth()).toBe(0);
   });
 });
+describe('layBirthdateIsoString', () => {
+  it('formats the lay birthdate as YYYY-MM-DD with a 1-indexed month', () => {
+    expect(Birthdate.FromYMD(1965, 8, 21).layBirthdateIsoString()).toBe(
+      '1965-09-21'
+    );
+  });
+
+  it('zero-pads the month and day', () => {
+    expect(Birthdate.FromYMD(1966, 2, 2).layBirthdateIsoString()).toBe(
+      '1966-03-02'
+    );
+  });
+
+  it('keeps a birthday on the 1st rather than the SSA day before', () => {
+    expect(Birthdate.FromYMD(1960, 0, 1).layBirthdateIsoString()).toBe(
+      '1960-01-01'
+    );
+  });
+});
 describe('ssaBirth', () => {
   it('is correct Month and Year', () => {
     const bd = Birthdate.FromYMD(2000, 0, 1); // Jan 1, 2000

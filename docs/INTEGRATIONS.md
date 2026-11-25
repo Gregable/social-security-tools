@@ -265,6 +265,27 @@ warning.
     `destination: 'retirementscenario'` and
     `placement: 'integration-report-end'`.
 
+### Retirement Figures (retirementfigures.com)
+
+- **Intro Banner**: Says the report will link back to the Retirement Figures
+  Social Security calculator with the benefits filled in
+- **Report End**: Lists each person's PIA and birth date and links to the
+  calculator with them filled in. The calculator works out the benefit for
+  each claiming age from 62 to 70, including spousal benefits, itself, so
+  the filing dates chosen on SSA.tools are not sent.
+  - Link format, proposed by Retirement Figures:
+    `https://retirementfigures.com/social-security-calculator/#from=ssa.tools&pia1=2547&dob1=1965-09-21&pia2=599&dob2=1966-03-02`.
+    `pia` is the PIA rounded down to the dollar and `dob` the calendar
+    birthdate (`YYYY-MM-DD`). Person 1 is the higher earner, because
+    `pia2=0` means a spouse with spousal benefits only. A single person
+    gets no `pia2` / `dob2`. `from=ssa.tools` lets Retirement Figures say
+    where the figures came from.
+  - Retirement Figures links to `#integration=retirementfigures.com`.
+  - Code: `src/lib/integrations/retirement-figures.ts`. Clicks on the link
+    are recorded as `Outbound: Clicked` with
+    `destination: 'retirementfigures'` and
+    `placement: 'integration-report-end'`.
+
 ## Testing
 
 Unit tests for the integration system are in `src/test/integrations.test.ts`.

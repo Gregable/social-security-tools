@@ -354,14 +354,6 @@ export function recommendedFromDistributions(
   return { isSingle: false, couple: results[0] };
 }
 
-function formatDob(r: Recipient): string {
-  const bd = r.birthdate;
-  const y = bd.layBirthYear();
-  const m = (bd.layBirthMonth() + 1).toString().padStart(2, '0');
-  const d = bd.layBirthDayOfMonth().toString().padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
 /**
  * Builds the pre-filled `/strategy` URL for the recipient (and optional spouse).
  * Shared by RecommendedFilingCard and StrategyPromo so both links stay in sync.
@@ -378,7 +370,7 @@ export function buildStrategyUrl(
   const hash = buildStrategyHash({
     isSingle,
     pia1: recipient.pia().primaryInsuranceAmount().roundToDollar().value(),
-    dob1: formatDob(recipient),
+    dob1: recipient.birthdate.layBirthdateIsoString(),
     name1,
     gender1:
       recipient.gender === 'male' || recipient.gender === 'female'
@@ -387,7 +379,7 @@ export function buildStrategyUrl(
     pia2: spouse
       ? spouse.pia().primaryInsuranceAmount().roundToDollar().value()
       : undefined,
-    dob2: spouse ? formatDob(spouse) : undefined,
+    dob2: spouse ? spouse.birthdate.layBirthdateIsoString() : undefined,
     name2,
     gender2: spouse
       ? spouse.gender === 'male' || spouse.gender === 'female'
