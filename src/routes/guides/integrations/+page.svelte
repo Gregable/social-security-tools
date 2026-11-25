@@ -114,6 +114,22 @@
         <td>A comprehensive retirement planning application.</td>
         <td> Displays your Primary Insurance Amount (PIA) values. </td>
       </tr>
+      <tr>
+        <td>
+          <a href="/calculator#integration=retirementfigures.com"
+            >Retirement Figures</a
+          >
+        </td>
+        <td>
+          A free retirement planner with Monte Carlo simulation and a Social
+          Security calculator that compares claiming ages.
+        </td>
+        <td>
+          Links you back to the Retirement Figures Social Security calculator
+          with the birth dates and Primary Insurance Amounts (PIAs) from your
+          report filled in.
+        </td>
+      </tr>
     </tbody>
   </table>
 
