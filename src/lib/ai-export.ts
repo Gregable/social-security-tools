@@ -7,7 +7,6 @@ import {
   survivorBenefit,
   widowLimitFloor,
 } from '$lib/benefit-calculator';
-import type { Birthdate } from '$lib/birthday';
 import {
   AFTER_BENDPOINT2_MULTIPLIER,
   BEFORE_BENDPOINT1_MULTIPLIER,
@@ -95,15 +94,6 @@ export function renderTable(
 /** Formats a fraction (e.g. 0.32) as a percent string (e.g. "32%"). */
 function asPercent(fraction: number): string {
   return `${+(fraction * 100).toFixed(2)}%`;
-}
-
-/** Formats a birthdate as an ISO `YYYY-MM-DD` string for the `dob` URL param. */
-function isoBirthdate(birthdate: Birthdate): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  // layBirthMonth() is 0-indexed (January = 0); the dob parameter is 1-indexed.
-  const month = pad(birthdate.layBirthMonth() + 1);
-  const day = pad(birthdate.layBirthDayOfMonth());
-  return `${birthdate.layBirthYear()}-${month}-${day}`;
 }
 
 function piaParam(recipient: Recipient): number {
@@ -376,7 +366,7 @@ function recipientLinkHash(recipient: Recipient): string {
   return buildStrategyHash({
     isSingle: true,
     pia1: piaParam(recipient),
-    dob1: isoBirthdate(recipient.birthdate),
+    dob1: recipient.birthdate.layBirthdateIsoString(),
     name1: nameParam(recipient.name, 'Self'),
     gender1: recipient.gender as Gender,
   });
@@ -547,7 +537,7 @@ function embedNameParam(name: string): string {
 /** Per-recipient embeds: filing-age (PIA based), plus earnings-based charts. */
 function recipientEmbeds(recipient: Recipient, prefix = ''): string[] {
   const pia = piaParam(recipient);
-  const dob = isoBirthdate(recipient.birthdate);
+  const dob = recipient.birthdate.layBirthdateIsoString();
   const name = embedNameParam(recipient.name);
   const piaHash = `#pia1=${pia}&dob1=${dob}${name}`;
   const entries: string[][] = [
@@ -639,11 +629,11 @@ function coupleLinkHash(recipient: Recipient, spouse: Recipient): string {
   return buildStrategyHash({
     isSingle: false,
     pia1: piaParam(recipient),
-    dob1: isoBirthdate(recipient.birthdate),
+    dob1: recipient.birthdate.layBirthdateIsoString(),
     name1: nameParam(recipient.name, 'Self'),
     gender1: recipient.gender as Gender,
     pia2: piaParam(spouse),
-    dob2: isoBirthdate(spouse.birthdate),
+    dob2: spouse.birthdate.layBirthdateIsoString(),
     name2: nameParam(spouse.name, 'Spouse'),
     gender2: spouse.gender as Gender,
   });
@@ -872,8 +862,8 @@ function coupleNameParams(recipient: Recipient, spouse: Recipient): string {
 /** Couple embeds: the couple filing-age chart plus each partner's own charts. */
 function coupleEmbeds(recipient: Recipient, spouse: Recipient): string[] {
   const coupleHash =
-    `#pia1=${piaParam(recipient)}&dob1=${isoBirthdate(recipient.birthdate)}` +
-    `&pia2=${piaParam(spouse)}&dob2=${isoBirthdate(spouse.birthdate)}` +
+    `#pia1=${piaParam(recipient)}&dob1=${recipient.birthdate.layBirthdateIsoString()}` +
+    `&pia2=${piaParam(spouse)}&dob2=${spouse.birthdate.layBirthdateIsoString()}` +
     coupleNameParams(recipient, spouse);
   return [
     '',

@@ -157,6 +157,17 @@ export const INTEGRATIONS: Record<string, IntegrationConfig> = {
       return module.default;
     },
   },
+  'retirementfigures.com': {
+    id: 'retirementfigures.com',
+    displayName: 'Retirement Figures',
+    reportEndLabel: 'Retirement Figures',
+    getFavicon: async () => {
+      const module = await import(
+        '../components/integrations/retirementfigures.com/favicon.png'
+      );
+      return module.default;
+    },
+  },
   'rachaelcampwealth.com': {
     id: 'rachaelcampwealth.com',
     displayName: 'Rachael Camp Wealth',

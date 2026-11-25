@@ -111,6 +111,17 @@ export class Birthdate {
   }
 
   /**
+   * Returns the lay (calendar) birthdate as an ISO 8601 date, e.g.
+   * "1965-09-21".
+   */
+  layBirthdateIsoString(): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${this.layBirthYear()}-${pad(this.layBirthMonth() + 1)}-${pad(
+      this.layBirthDayOfMonth()
+    )}`;
+  }
+
+  /**
    * Returns true iff the lay birthdate lies on the first of the month,
    * for example Jan 1.
    */
