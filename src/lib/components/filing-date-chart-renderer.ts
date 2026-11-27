@@ -9,6 +9,11 @@ import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import type { Recipient } from '$lib/recipient';
 import {
+  overlaps,
+  type Rect,
+  rotatedLabelAt,
+} from './filing-date-chart-labels';
+import {
   canvasX,
   canvasY,
   dateX,
@@ -53,11 +58,15 @@ export function renderHorizontalLines(
 
 /**
  * Render vertical year grid lines with rotated year labels.
+ *
+ * @param coveredBy An area that another label will be drawn over. A year
+ *     label that would overlap it is left out, rather than half covered.
  */
 export function renderYearVerticalLines(
   ctx: CanvasRenderingContext2D,
   recipient: Recipient,
-  layout: ChartLayout
+  layout: ChartLayout,
+  coveredBy: Rect | null = null
 ): void {
   const maxY = maxRenderedYDollars(recipient);
   const birthdate = recipient.birthdate;
@@ -102,6 +111,12 @@ export function renderYearVerticalLines(
     const text = `${date.year()}`;
     const textWidth = ctx.measureText(text).width;
     const ypos = layout.reservedTop - textWidth - 5;
+    if (
+      coveredBy !== null &&
+      overlaps(rotatedLabelAt(x + 5, ypos, textWidth).bounds, coveredBy)
+    ) {
+      continue;
+    }
     ctx.save();
     ctx.translate(x + 5, ypos);
     ctx.rotate((-90 * Math.PI) / 180);
@@ -319,23 +334,8 @@ export function renderTrendline(
 }
 
 /**
- * Renders the complete benefit visualization: boxes, trendline, and labels.
- */
-export function renderBenefit(
-  ctx: CanvasRenderingContext2D,
-  recipient: Recipient,
-  selectedDate: MonthDate,
-  userFloor: number,
-  layout: ChartLayout
-): void {
-  const boxes = benefitBoxes(recipient, selectedDate, layout);
-  renderFilingDateBenefitBoxes(ctx, boxes, recipient, layout);
-  renderTrendline(ctx, recipient, userFloor, layout);
-  renderBenefitLabels(ctx, boxes, recipient, layout);
-}
-
-/**
- * Renders a vertical dashed line at the selected date with a month/year label.
+ * Renders a vertical dashed line at the selected date with a label, which is
+ * the month and year unless other text is given.
  *
  * The selected date is passed as a MonthDate (not a pixel) so the line and its
  * label land on the same month regardless of the current canvas width. The
@@ -346,14 +346,14 @@ export function renderSelectedDateVerticalLine(
   ctx: CanvasRenderingContext2D,
   date: MonthDate,
   recipient: Recipient,
-  layout: ChartLayout
+  layout: ChartLayout,
+  text: string = `${date.monthName()} ${date.year()}`
 ): void {
   const x = canvasX(date, recipient.birthdate, layout);
   if (x < layout.reservedLeft || x >= layout.canvasWidth) return;
 
   ctx.save();
 
-  const text = `${date.monthName()} ${date.year()}`;
   const textWidth = ctx.measureText(text).width;
   // This seems to position the year to line up with the vertical year lines.
   // Why 67?  I don't know and didn't bother to figure it out.
@@ -365,9 +365,10 @@ export function renderSelectedDateVerticalLine(
   ctx.lineCap = 'butt';
   ctx.lineWidth = 2;
 
-  // Draw vertical line.
+  // Draw vertical line. It starts where the label's text ends, rather than
+  // running on up to the slider, where only the filing date line belongs.
   ctx.beginPath();
-  ctx.moveTo(x, 0);
+  ctx.moveTo(x, xpos - textWidth);
   ctx.lineTo(x, layout.canvasHeight);
   ctx.stroke();
   ctx.save();
