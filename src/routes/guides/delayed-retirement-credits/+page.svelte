@@ -89,6 +89,14 @@ import GuideByline from "../GuideByline.svelte";
     especially around spousal and survivor benefits.
   </p>
 
+  <p>
+    Under the
+    <a href="/guides/claiming-age-clarity-act">Claiming Age Clarity Act</a>,
+    signed in November 2026, Social Security will stop using the term
+    "delayed retirement credit" by November 2027 and will call age 70 the
+    "maximum monthly benefit age." The increase itself does not change.
+  </p>
+
   <h2>What Are Delayed Retirement Credits?</h2>
 
   <p>

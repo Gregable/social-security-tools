@@ -93,6 +93,14 @@ fraTable.push({
     filing and no increase for delayed filing.
   </p>
 
+  <p>
+    Both terms are on their way out. Under the
+    <a href="/guides/claiming-age-clarity-act">Claiming Age Clarity Act</a>,
+    signed in November 2026, Social Security will call this age the
+    "standard monthly benefit age" by November 2027. The age itself does not
+    change.
+  </p>
+
   <h2>NRA by Birth Year</h2>
 
   <p>

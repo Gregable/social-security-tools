@@ -27,6 +27,21 @@ const pageImageAlt = 'Social Security guides and educational resources';
     <h1>Social Security Guides</h1>
     <ul class="guides">
       <li>
+        <span class="postdate">Nov 27, 2026</span>
+        <h3 class="posttitle">
+          <a href="/guides/claiming-age-clarity-act">
+            Claiming Age Clarity Act: New Names for Ages 62, Full Retirement
+            Age, and 70
+          </a>
+        </h3>
+        <p class="description">
+          A new law renames Social Security's claiming ages: the minimum,
+          standard, and maximum monthly benefit age. What the new terms mean,
+          what stays the same, and when Social Security switches.
+        </p>
+      </li>
+
+      <li>
         <span class="postdate">Nov 18, 2026</span>
         <h3 class="posttitle">
           <a href="/guides/government-pension-offset">
