@@ -190,6 +190,8 @@ describe('claimAgeRows', () => {
     ]);
   });
 
+  // The claiming-age-clarity-act guide also prints the 62, 67, and 70 rows
+  // and their share of the PIA; re-read its example if these move.
   it('pins the monthly benefit at each age', () => {
     expect(rows.map((r) => r.benefit.string())).toEqual([
       '$1,750.00',
