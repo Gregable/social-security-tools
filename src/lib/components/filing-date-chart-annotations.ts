@@ -8,6 +8,8 @@ import type { Recipient } from '$lib/recipient';
 import {
   fitsAbove,
   hoverPhase,
+  LINE_DASH,
+  LINE_LABEL_FONT,
   lineLabel,
   lineLabelsCollide,
   type RotatedLabel,
@@ -20,14 +22,11 @@ import {
 } from './filing-date-chart-math';
 
 /**
- * Canvas drawing for the parts of the filing date chart that explain what the
- * reader is looking at: the line from the slider to the shaded area, the
- * labels that say which line is the filing date and which is the month shown.
+ * The parts of the filing date chart that explain what the reader is looking
+ * at: the dashed line from the slider to the shaded area and its label, which
+ * are drawn here, and the choice of text for the hover line's label, which
+ * renderSelectedDateVerticalLine draws.
  */
-
-/** Dash pattern shared by the hover line and the filing date line. */
-const LINE_DASH = [6, 4];
-const LINE_LABEL_FONT = 'bold 14px Helvetica';
 
 const FILING_DATE_TEXT = 'Filing date';
 const MONTH_SHOWN_TEXT = 'Month shown';
@@ -76,7 +75,8 @@ function measure(ctx: CanvasRenderingContext2D, text: string): number {
 
 /**
  * Chooses the text for the hover line's label: the month, preceded by "Month
- * shown" when the longer text does not reach down into the shaded area.
+ * shown" when the longer text fits above whatever is beneath it. That is the
+ * shaded area if the label is over it, and otherwise the $0 line.
  */
 export function selectedDateLabelText(
   ctx: CanvasRenderingContext2D,
@@ -90,8 +90,8 @@ export function selectedDateLabelText(
   const lineX = canvasX(hoverDate, recipient.birthdate, layout);
   const label = lineLabel(lineX, measure(ctx, fullText), layout);
 
-  // The label may run down the hover line as far as the bottom of the chart,
-  // unless the shaded area is beneath it.
+  // A label on a line just before the filing date can still reach over the
+  // shaded area's corner, because the label is wider than the line.
   const corner = filingCorner(recipient, filingDate, layout);
   const overShadedArea = label.bounds.right >= corner.x;
   const shadedTopY =
@@ -136,8 +136,9 @@ export function placeFilingDateLabel(
 }
 
 /**
- * Renders a dashed line from the slider handle down to the top-left corner of
- * the shaded area, tying the selected filing age to the date benefits start.
+ * Renders one part of the dashed line that runs from the slider handle down
+ * to the top-left corner of the shaded area, tying the selected filing age to
+ * the date benefits start. See FilingDateLinePart for why there are two.
  */
 export function renderFilingDateLine(
   ctx: CanvasRenderingContext2D,

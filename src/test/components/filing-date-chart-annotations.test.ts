@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { benefitOnDateNominal } from '$lib/benefit-calculator';
 import { Birthdate } from '$lib/birthday';
 import type { ChartLayout } from '$lib/components/chart-utils';
 import {
@@ -8,7 +9,11 @@ import {
   renderFilingDateLine,
   selectedDateLabelText,
 } from '$lib/components/filing-date-chart-annotations';
-import { canvasX } from '$lib/components/filing-date-chart-math';
+import {
+  canvasX,
+  canvasY,
+  maxRenderedYDollars,
+} from '$lib/components/filing-date-chart-math';
 import { renderYearVerticalLines } from '$lib/components/filing-date-chart-renderer';
 import { Money } from '$lib/money';
 import type { MonthDate } from '$lib/month-time';
@@ -131,6 +136,22 @@ describe('selectedDateLabelText', () => {
     const shortChart = { ...layout, canvasHeight: 200 };
     expect(textAt(dateAtAge(recipient, 64, 6), shortChart)).toBe('Apr 2049');
   });
+
+  it('gives the month alone just before the filing date, where the label would reach over the corner of the shaded area', () => {
+    expect(textAt(dateAtAge(recipient, 66, 11))).toBe('Sep 2051');
+  });
+
+  it('says "Month shown" over a shaded area low enough to leave room', () => {
+    const earlyFilingDate = dateAtAge(recipient, 62, 1);
+    const text = selectedDateLabelText(
+      asCanvasContext(recordingContext()),
+      recipient,
+      earlyFilingDate,
+      dateAtAge(recipient, 66),
+      layout
+    );
+    expect(text).toBe('Month shown: Oct 2050');
+  });
 });
 
 describe('renderFilingDateLine', () => {
@@ -160,12 +181,14 @@ describe('renderFilingDateLine', () => {
       'inside-chart',
       layout
     );
+    const cornerY = canvasY(
+      benefitOnDateNominal(recipient, filingDate, filingDate),
+      maxRenderedYDollars(recipient),
+      layout
+    );
+    expect(cornerY).toBeGreaterThan(layout.reservedTop);
     expect(ctx.moveTos).toEqual([[lineX, layout.reservedTop]]);
-    expect(ctx.lineTos).toHaveLength(1);
-    const [endX, endY] = ctx.lineTos[0];
-    expect(endX).toBe(lineX);
-    expect(endY).toBeGreaterThan(layout.reservedTop);
-    expect(endY).toBeLessThan(412);
+    expect(ctx.lineTos).toEqual([[lineX, cornerY]]);
   });
 
   it('has no second part when the shaded area reaches the top of the chart', () => {
@@ -190,6 +213,9 @@ describe('renderFilingDateLine', () => {
       layout
     );
     expect(ctx.lineDashes).toEqual([[6, 4]]);
+    // The second part starts its dash pattern where the first part, which
+    // began at y = 0, left off.
+    expect(ctx.lineDashOffset).toBe(layout.reservedTop);
   });
 });
 
@@ -208,6 +234,10 @@ describe('renderFilingDateLabel', () => {
     if (placed === null) return;
     renderFilingDateLabel(asCanvasContext(ctx), recipient, placed);
     expect(ctx.fillTexts).toEqual(['Oct 2051']);
+    // It is drawn at the place that was chosen for it.
+    expect(ctx.translates).toEqual([
+      [placed.label.anchorX, placed.label.anchorY],
+    ]);
   });
 });
 

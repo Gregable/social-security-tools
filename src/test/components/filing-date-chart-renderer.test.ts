@@ -85,8 +85,32 @@ describe('renderSelectedDateVerticalLine', () => {
       );
       // The vertical line starts where the label's text ends (67px above the
       // chart area), at the date's x position, and not up at the slider.
-      expect(ctx.moveTos).toContainEqual([expectedX, 53]);
+      expect(ctx.moveTos).toContainEqual([
+        expectedX,
+        layoutOfWidth(width).reservedTop - 67,
+      ]);
     }
+  });
+
+  it('labels the line with other text when it is given some', () => {
+    const recipient = recipientBornJan1960();
+    const layout = layoutOfWidth(740);
+    const ctx = recordingContext();
+    renderSelectedDateVerticalLine(
+      ctx as unknown as CanvasRenderingContext2D,
+      selectedDate,
+      recipient,
+      layout,
+      'Month shown: Jan 2025'
+    );
+
+    expect(ctx.fillTexts).toEqual(['Month shown: Jan 2025']);
+    // A longer label hangs further down, but the line still starts where
+    // the label's text ends.
+    expect(ctx.moveTos).toContainEqual([
+      canvasX(selectedDate, recipient.birthdate, layout),
+      layout.reservedTop - 67,
+    ]);
   });
 
   // The renderer's guard is the half-open interval [reservedLeft, canvasWidth):
@@ -113,7 +137,10 @@ describe('renderSelectedDateVerticalLine', () => {
       layout
     );
 
-    expect(ctx.moveTos).toContainEqual([layout.reservedLeft, 53]);
+    expect(ctx.moveTos).toContainEqual([
+      layout.reservedLeft,
+      layout.reservedTop - 67,
+    ]);
     expect(ctx.fillTexts.length).toBeGreaterThan(0);
   });
 

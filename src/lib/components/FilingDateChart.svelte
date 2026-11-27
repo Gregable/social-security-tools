@@ -14,26 +14,12 @@ import { Recipient } from '$lib/recipient';
 import FilingDateHoverText from './FilingDateHoverText.svelte';
 import RecipientName from './RecipientName.svelte';
 import Slider from './Slider.svelte';
-import {
-  placeFilingDateLabel,
-  renderFilingDateLabel,
-  renderFilingDateLine,
-  selectedDateLabelText,
-} from './filing-date-chart-annotations';
+import { renderFilingDateChart } from './filing-date-chart-scene';
 import { SliderHint } from './slider-hint';
 import {
   dateX,
   maxRenderedYDollars,
 } from './filing-date-chart-math';
-import {
-  benefitBoxes,
-  renderBenefitLabels,
-  renderFilingDateBenefitBoxes,
-  renderHorizontalLines,
-  renderSelectedDateVerticalLine,
-  renderTrendline,
-  renderYearVerticalLines,
-} from './filing-date-chart-renderer';
 
 export let recipient: Recipient = new Recipient();
 
@@ -75,6 +61,9 @@ $: {
   if (filingDateValue && $recipient && mounted_) {
     const currentEpoch = userSelectedDate().monthsSinceEpoch();
     if (filingDateValue.monthsSinceEpoch() !== currentEpoch) {
+      // The filing date was changed somewhere else, such as on the combined
+      // chart's slider, so this reader knows that the sliders move.
+      sliderHint_.sliderUsed();
       const ageAtFiling = $recipient.birthdate.ageAtSsaDate(filingDateValue);
       sliderMonths_ = ageAtFiling.asMonths();
     }
@@ -278,48 +267,13 @@ function render() {
   ctx_.save();
   ctx_.clearRect(0, 0, canvasEl_.width, canvasEl_.height);
 
-  const filingDate = userSelectedDate();
-
-  const filingLabel = placeFilingDateLabel(
-    ctx_,
+  renderFilingDateChart(ctx_, {
     recipient,
-    filingDate,
-    selectedDate_,
-    l
-  );
-
-  // The order here decides what covers what where things cross. The filing
-  // date line is drawn in two parts: the year labels sit on top of the part
-  // under the slider, and the part inside the chart sits on top of the
-  // benefit labels, which would otherwise cut it short. The benefit labels
-  // in turn sit on top of the hover line, so their text stays readable.
-  renderFilingDateLine(ctx_, recipient, filingDate, 'below-slider', l);
-  renderYearVerticalLines(
-    ctx_,
-    recipient,
-    l,
-    filingLabel?.label.bounds ?? null
-  );
-  renderHorizontalLines(ctx_, recipient, l);
-  const boxes = benefitBoxes(recipient, filingDate, l);
-  renderFilingDateBenefitBoxes(ctx_, boxes, recipient, l);
-  renderTrendline(ctx_, recipient, userFloor_, l);
-
-  if (selectedDate_ !== null) {
-    renderSelectedDateVerticalLine(
-      ctx_,
-      selectedDate_,
-      recipient,
-      l,
-      selectedDateLabelText(ctx_, recipient, filingDate, selectedDate_, l)
-    );
-  }
-
-  renderBenefitLabels(ctx_, boxes, recipient, l);
-  renderFilingDateLine(ctx_, recipient, filingDate, 'inside-chart', l);
-  if (filingLabel !== null) {
-    renderFilingDateLabel(ctx_, recipient, filingLabel);
-  }
+    filingDate: userSelectedDate(),
+    hoverDate: selectedDate_,
+    userFloor: userFloor_,
+    layout: l,
+  });
 
   ctx_.restore();
 }
@@ -461,6 +415,17 @@ $: filingDateString_ = updateFilingDateString(
   }
   .selectedDateBox.hidden {
     visibility: hidden;
+  }
+  /**
+   * On narrow screens some of the sentences in the box wrap to a third line
+   * and others do not. Reserving three lines keeps the page below from
+   * moving as the reader moves across the chart. The 20px is the box's
+   * padding and border.
+   */
+  @media screen and (max-width: 600px) {
+    .selectedDateBox {
+      min-height: calc(3lh + 20px);
+    }
   }
   /**
    * If the screen is wide, the sidebar is displayed. The sidebar takes

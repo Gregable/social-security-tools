@@ -74,17 +74,24 @@ describe('fitsAbove', () => {
 });
 
 describe('lineLabelsCollide', () => {
-  it('is true exactly when the labels of the two lines would overlap', () => {
-    for (const distance of [0, 10, 18, 20, 21, 22, 40]) {
+  it('is true whenever the labels of the two lines would overlap', () => {
+    for (const distance of [0, 5, 10, 17]) {
       const a = lineLabel(300, 60, layout);
       const b = lineLabel(300 + distance, 60, layout);
-      if (overlaps(a.bounds, b.bounds)) {
-        expect(lineLabelsCollide(300, 300 + distance)).toBe(true);
-      }
+      expect(overlaps(a.bounds, b.bounds)).toBe(true);
+      expect(lineLabelsCollide(300, 300 + distance)).toBe(true);
     }
-    expect(lineLabelsCollide(300, 340)).toBe(false);
-    expect(lineLabelsCollide(340, 300)).toBe(false);
-    expect(lineLabelsCollide(300, 310)).toBe(true);
-    expect(lineLabelsCollide(310, 300)).toBe(true);
+  });
+
+  it('is also true for labels less than 3px apart, but not for 3px', () => {
+    // Each label is 18px thick, so lines 18px apart have labels that touch.
+    expect(lineLabelsCollide(300, 318)).toBe(true);
+    expect(lineLabelsCollide(300, 320)).toBe(true);
+    expect(lineLabelsCollide(300, 321)).toBe(false);
+  });
+
+  it('does not depend on which line is on the left', () => {
+    expect(lineLabelsCollide(320, 300)).toBe(true);
+    expect(lineLabelsCollide(321, 300)).toBe(false);
   });
 });

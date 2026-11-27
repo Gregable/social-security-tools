@@ -170,14 +170,16 @@ onMount(() => {
 let dragging: boolean = false;
 let selected: boolean = false;
 
-// True while the handle is pulsing to draw attention to itself.
+// True while the handle is pulsing to draw attention to itself. Cleared when
+// the pulse animation ends.
 let attention: boolean = false;
 
 /**
  * Briefly pulses a ring around the handle, to show that it can be moved.
- * Does nothing visible for readers who have asked for reduced motion.
+ * Does nothing for readers who have asked for reduced motion.
  */
 export function drawAttention() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   attention = true;
 }
 
@@ -295,7 +297,7 @@ function updateHandleLabel(widthIn = width) {
     return;
   const rect = handleLabelEl.getBoundingClientRect();
   const percent = (value - floor) / (ceiling - floor);
-  handleLabelEl.style.left = `${Math.floor(percent * widthIn) - rect.width / 2}px`;
+  handleLabelEl.style.left = `${Math.round(percent * widthIn) - rect.width / 2}px`;
 }
 afterUpdate(() => {
   updateHandleLabel();
@@ -513,8 +515,10 @@ $: ticks =
     border-radius: 4px;
   }
   .handle::before {
-    /* A ring the size of the handle, which expands and fades to draw
-     * attention. It is invisible except while that animation runs. */
+    /* A disc the size of the handle, which expands and fades to draw
+     * attention. It is the handle's own color, so only the part that
+     * spreads beyond the handle shows, as a ring. It is invisible except
+     * while that animation runs. */
     content: '';
     position: absolute;
     inset: 0;
@@ -534,11 +538,6 @@ $: ticks =
     to {
       transform: scale(2.4);
       opacity: 0;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .handle.attention::before {
-      animation: none;
     }
   }
   .handle.selected::after {

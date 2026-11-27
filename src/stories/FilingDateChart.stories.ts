@@ -57,8 +57,10 @@ interface ChartState {
 }
 
 /**
- * Builds a play function that puts the chart into a given state, the way a
- * reader would: by moving the slider and then resting the pointer on a month.
+ * Builds a play function that puts the chart into a given state: it sets the
+ * filing date store, which the chart follows, and then moves the pointer over
+ * a month. The chart treats a filing date set from outside as the slider
+ * having been used, so the slider hint does not pulse in these stories.
  */
 function showing(who: Recipient, state: ChartState) {
   return async ({ canvasElement }: { canvasElement: HTMLElement }) => {

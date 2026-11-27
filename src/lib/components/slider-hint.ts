@@ -3,13 +3,13 @@
  * chart but has not touched the slider, and so may not have noticed that it
  * can be moved.
  *
- * The hint is shown when the pointer has rested on the chart for a moment. It
- * is shown once per visit to the chart: after the pointer has been away for a
- * while, the next visit shows it again. Once the slider has been used, it is
- * never shown again.
+ * The hint is shown when the pointer has stayed over the chart for a moment,
+ * moving or not. It is shown once per visit to the chart: after the pointer
+ * has been away for a while, the next visit shows it again. Once the slider
+ * has been used, it is never shown again.
  */
 
-/** How long the pointer rests on the chart before the hint is shown. */
+/** How long the pointer stays over the chart before the hint is shown. */
 export const SLIDER_HINT_DWELL_MS = 400;
 /** How long the pointer is away from the chart before the hint may repeat. */
 export const SLIDER_HINT_REARM_MS = 5000;
@@ -19,7 +19,7 @@ type Timer = ReturnType<typeof setTimeout>;
 export class SliderHint {
   private sliderUsed_: boolean = false;
   private shown_: boolean = false;
-  // Runs while the pointer rests on the chart, before the hint is shown.
+  // Runs while the pointer stays over the chart, before the hint is shown.
   private dwellTimer_: Timer | null = null;
   // Runs while the pointer is away from the chart, before the hint may repeat.
   private rearmTimer_: Timer | null = null;

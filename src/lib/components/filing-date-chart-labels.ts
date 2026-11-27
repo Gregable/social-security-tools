@@ -2,10 +2,11 @@ import type { ChartLayout } from '$lib/components/chart-utils';
 import type { MonthDate } from '$lib/month-time';
 
 /**
- * Placement rules for the labels that explain the filing date chart: the
- * label on the hover line and the label on the filing date line. The longer
- * forms are drawn only when they fit, so this module is pure geometry: it
- * decides where a label goes and whether it has room.
+ * Placement rules for the rotated labels on the filing date chart: the label
+ * on the hover line, the label on the filing date line, and the year labels
+ * those may cover. Nothing is drawn here. This module decides where a label
+ * goes and whether it has room, so that the longer forms of a label can be
+ * left out where they do not fit.
  */
 
 /** Axis-aligned rectangle in canvas pixels. */
@@ -40,6 +41,11 @@ export function hoverPhase(
   return 'filing-month';
 }
 
+/** Dash pattern of the hover line and the filing date line. */
+export const LINE_DASH = [6, 4];
+/** Font of the labels on those two lines. */
+export const LINE_LABEL_FONT = 'bold 14px Helvetica';
+
 // These match the box that renderTextInWhiteBox paints behind 14px text:
 // 14px above the baseline, 4px below it, and 7px beyond each end.
 const ABOVE_BASELINE = 14;
@@ -47,14 +53,17 @@ const BELOW_BASELINE = 4;
 const END_PADDING = 7;
 
 // Clear space kept between the labels of two neighboring lines.
-const MARGIN = 3;
-// Clear space kept below a line label, enough for the benefit amount that is
-// printed just above the shaded area.
+const LINE_LABEL_GAP = 3;
+// Clear space kept below a line label. Above the shaded area this leaves room
+// for the benefit amount that is printed there; it is also the gap kept above
+// the $0 line where the label runs to the bottom of the chart.
 const CLEARANCE_BELOW = 24;
-// A line label is centered this far right of its line, and its text ends this
-// far above the top of the chart area. Both match the hover line's label.
-const LINE_LABEL_OFFSET_X = 5;
-const LINE_LABEL_TOP = 67;
+// A line label's baseline sits this far right of its line, which centers its
+// box on the line: 14px of the box is left of the baseline and 4px is right.
+const LINE_LABEL_BASELINE_OFFSET_X = 5;
+// The text of a line label ends this far above the top of the chart area,
+// which lines it up with the year labels.
+const LINE_LABEL_END_ABOVE_CHART = 67;
 
 export function rotatedLabelAt(
   anchorX: number,
@@ -94,8 +103,8 @@ export function lineLabel(
   layout: ChartLayout
 ): RotatedLabel {
   return rotatedLabelAt(
-    lineX + LINE_LABEL_OFFSET_X,
-    layout.reservedTop - LINE_LABEL_TOP + textWidth,
+    lineX + LINE_LABEL_BASELINE_OFFSET_X,
+    layout.reservedTop - LINE_LABEL_END_ABOVE_CHART + textWidth,
     textWidth
   );
 }
@@ -109,9 +118,11 @@ export function fitsAbove(label: RotatedLabel, clearY: number): boolean {
 }
 
 /**
- * @returns true if the labels of two vertical lines would overlap, which
- *     depends only on how close the lines are.
+ * @returns true if the labels of two vertical lines would overlap or come
+ *     within a few pixels of each other, which depends only on how close the
+ *     lines are.
  */
 export function lineLabelsCollide(lineXA: number, lineXB: number): boolean {
-  return Math.abs(lineXA - lineXB) < ABOVE_BASELINE + BELOW_BASELINE + MARGIN;
+  const labelThickness = ABOVE_BASELINE + BELOW_BASELINE;
+  return Math.abs(lineXA - lineXB) < labelThickness + LINE_LABEL_GAP;
 }
