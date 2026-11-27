@@ -226,7 +226,7 @@ const faqs: FAQItem[] = [
     A retiree born in {birthYear} has a standard monthly benefit age of
     {standardAge.years()} and a Primary Insurance Amount of
     {EXAMPLE_PIA.wholeDollars()}. Here is the monthly benefit at each of the
-    three named ages, in today's dollars:
+    three named ages:
   </p>
 
   <table class="rule-table">
@@ -272,25 +272,26 @@ const faqs: FAQItem[] = [
   <h2>Why Congress Changed the Terms</h2>
 
   <p>
-    Age 62 is the most common age to claim. According to the
+    Many people claim at 62. According to the
     <a href="https://www.congress.gov/crs-product/IN12630"
       >Congressional Research Service</a
-    >, 26% of people who started retirement benefits in 2024 claimed at 62.
+    >, 26% of people who started retirement benefits in 2024 claimed at 62,
+    more than at any other single age.
     Supporters of the law argued that the old terms do not make clear how
     much the claiming age changes the monthly benefit. "Full retirement age,"
     for example, can suggest the largest benefit available, when waiting
     past it still raises the benefit until 70. The Research Service also
-    notes that researchers testing the alternative names (minimum, standard,
-    and maximum benefit age) found that people understood the claiming ages
+    notes research finding that a similar set of names (minimum, standard,
+    and maximum benefit age) helped people understand the claiming ages
     better.
   </p>
 
   <p>
-    The bill was introduced in the House by Representatives Lloyd Smucker
-    and Don Beyer on September 10, 2025, alongside an identical Senate bill
-    from Senator Bill Cassidy. The House passed it by voice vote on December
-    1, 2025, the Senate passed it in 2026, and it was signed on November 20,
-    2026.
+    An identical Senate bill, S. 1504, was introduced by Senator Bill
+    Cassidy in April 2025. Representatives Lloyd Smucker and Don Beyer
+    introduced H.R. 5284 in the House on September 10, 2025. The House
+    passed it by voice vote on December 1, 2025, the Senate passed it in
+    2026, and it was signed on November 20, 2026.
   </p>
 
   <h2>When You Will See the New Terms</h2>
