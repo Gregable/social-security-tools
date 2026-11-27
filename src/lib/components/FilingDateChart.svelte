@@ -2,7 +2,6 @@
 import { onMount } from 'svelte';
 
 import type { Birthdate } from '$lib/birthday';
-import { benefitOnDateNominal } from '$lib/benefit-calculator';
 import {
   type ChartLayout,
   type TickItem,
@@ -12,18 +11,15 @@ import { recipientFilingDate, spouseFilingDate } from '$lib/context';
 import { Money } from '$lib/money';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
+import FilingDateHoverText from './FilingDateHoverText.svelte';
 import RecipientName from './RecipientName.svelte';
 import Slider from './Slider.svelte';
+import { renderFilingDateChart } from './filing-date-chart-scene';
+import { SliderHint } from './slider-hint';
 import {
   dateX,
   maxRenderedYDollars,
 } from './filing-date-chart-math';
-import {
-  renderBenefit,
-  renderHorizontalLines,
-  renderSelectedDateVerticalLine,
-  renderYearVerticalLines,
-} from './filing-date-chart-renderer';
 
 export let recipient: Recipient = new Recipient();
 
@@ -65,6 +61,9 @@ $: {
   if (filingDateValue && $recipient && mounted_) {
     const currentEpoch = userSelectedDate().monthsSinceEpoch();
     if (filingDateValue.monthsSinceEpoch() !== currentEpoch) {
+      // The filing date was changed somewhere else, such as on the combined
+      // chart's slider, so this reader knows that the sliders move.
+      sliderHint_.sliderUsed();
       const ageAtFiling = $recipient.birthdate.ageAtSsaDate(filingDateValue);
       sliderMonths_ = ageAtFiling.asMonths();
     }
@@ -112,6 +111,7 @@ onMount(() => {
   printMediaQuery.addEventListener('change', updateCanvas);
   return () => {
     removeMediaQueryListener();
+    sliderHint_.dispose();
   };
 });
 
@@ -168,9 +168,14 @@ function onClick(event: MouseEvent) {
   render();
 }
 
+// Pulses the slider's handle for a reader who is exploring the chart without
+// having used the slider. See slider-hint.ts for when that happens.
+const sliderHint_ = new SliderHint(() => sliderEl_?.drawAttention());
+
 function onMove(event: MouseEvent) {
   if (!mouseToggle_) return;
   if (!canvasEl_) return;
+  sliderHint_.pointerOverChart();
   const mouseDate = eventDate(event);
   // Avoid redrawing if the mouse hasn't moved to a new month.
   if (
@@ -184,6 +189,7 @@ function onMove(event: MouseEvent) {
 }
 
 function onOut(_event: MouseEvent) {
+  sliderHint_.pointerLeftChart();
   if (!mouseToggle_) return;
   selectedDate_ = null;
   render();
@@ -261,13 +267,13 @@ function render() {
   ctx_.save();
   ctx_.clearRect(0, 0, canvasEl_.width, canvasEl_.height);
 
-  renderYearVerticalLines(ctx_, recipient, l);
-  renderHorizontalLines(ctx_, recipient, l);
-  renderBenefit(ctx_, recipient, userSelectedDate(), userFloor_, l);
-
-  if (selectedDate_ !== null) {
-    renderSelectedDateVerticalLine(ctx_, selectedDate_, recipient, l);
-  }
+  renderFilingDateChart(ctx_, {
+    recipient,
+    filingDate: userSelectedDate(),
+    hoverDate: selectedDate_,
+    userFloor: userFloor_,
+    layout: l,
+  });
 
   ctx_.restore();
 }
@@ -279,6 +285,12 @@ function updateFilingDateString(
   const filingDate = birthdate.dateAtLayAge(new MonthDuration(sliderMonths_));
   return `${filingDate.monthName()} ${filingDate.year()}`;
 }
+// The filing date selected on the slider, kept reactive for the hover text.
+let selectedFilingDate_: MonthDate;
+$: selectedFilingDate_ = $recipient.birthdate.dateAtSsaAge(
+  new MonthDuration(sliderMonths_)
+);
+
 let filingDateString_: string = '';
 $: filingDateString_ = updateFilingDateString(
   recipient.birthdate,
@@ -302,10 +314,15 @@ $: filingDateString_ = updateFilingDateString(
   files">you file</RecipientName
     > for benefits:
   </p>
+  <!-- These handlers only observe that the slider inside has been used; the
+       slider itself handles the interaction. -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="slider-box"
     style:--reserved-left="{reservedLeft_}px"
     style:--reserved-right="{reservedRight_}px"
+    on:pointerdown|capture={() => sliderHint_.sliderUsed()}
+    on:keydown|capture={() => sliderHint_.sliderUsed()}
   >
     <Slider
       bind:value={sliderMonths_}
@@ -343,22 +360,12 @@ $: filingDateString_ = updateFilingDateString(
     class:hidden={selectedDate_ === null}
   >
     {#if selectedDate_ !== null}
-      If filing for benefits in <span class="filingDate"
-        >{filingDateString_}</span
-      >,
-      <br />
-      In
-      <span class="selectedDate"
-        >{selectedDate_.monthName()}
-        {selectedDate_.year()}</span
-      >, <RecipientName r={recipient} apos noColor={true} shortenTo={30}
-        >your</RecipientName
-      > benefit will be:
-
-      <b>
-        {benefitOnDateNominal($recipient, userSelectedDate(), selectedDate_)
-          .wholeDollars()}</b
-      >
+      <FilingDateHoverText
+        {recipient}
+        filingDate={selectedFilingDate_}
+        filingDateText={filingDateString_}
+        hoverDate={selectedDate_}
+      />
     {:else}
       <!-- This text shouldn't ever be visible,
            it is here to ensure the div doesn't collapse
@@ -373,7 +380,6 @@ $: filingDateString_ = updateFilingDateString(
   .chart-container {
     position: relative;
     width: 80vw;
-    height: calc(80vw * 0.67 + 105px);
     margin: 2em 1em 1em 0;
   }
   p {
@@ -410,15 +416,17 @@ $: filingDateString_ = updateFilingDateString(
   .selectedDateBox.hidden {
     visibility: hidden;
   }
-  .filingDate {
-    color: var(--filing-date-text-color);
-    font-weight: bold;
+  /**
+   * On narrow screens some of the sentences in the box wrap to a third line
+   * and others do not. Reserving three lines keeps the page below from
+   * moving as the reader moves across the chart. The 20px is the box's
+   * padding and border.
+   */
+  @media screen and (max-width: 600px) {
+    .selectedDateBox {
+      min-height: calc(3lh + 20px);
+    }
   }
-  .selectedDate {
-    color: var(--selected-date-text-color);
-    font-weight: bold;
-  }
-
   /**
    * If the screen is wide, the sidebar is displayed. The sidebar takes
    * up some of the horizontal space, so the chart should be smaller,
@@ -427,7 +435,6 @@ $: filingDateString_ = updateFilingDateString(
   @media screen and (min-width: 1025px) {
     .chart-container {
       width: min(55vw, 740px);
-      height: calc(min(55vw, 740px) * 0.67 + 105px);
     }
     canvas {
       width: min(55vw, 740px);
@@ -440,7 +447,6 @@ $: filingDateString_ = updateFilingDateString(
   @media screen and (max-width: 1024px) {
     .chart-container {
       width: 80vw;
-      height: calc(80vw * 0.67 + 105px);
     }
     canvas {
       width: 80vw;
@@ -453,7 +459,6 @@ $: filingDateString_ = updateFilingDateString(
   @media print {
     .chart-container {
       width: 80vw;
-      height: calc(80vw * 0.67 + 105px);
     }
     canvas {
       width: 80vw;

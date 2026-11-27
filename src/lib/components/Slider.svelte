@@ -169,6 +169,20 @@ onMount(() => {
 // the user clicks elsewhere.
 let dragging: boolean = false;
 let selected: boolean = false;
+
+// True while the handle is pulsing to draw attention to itself. Cleared when
+// the pulse animation ends.
+let attention: boolean = false;
+
+/**
+ * Briefly pulses a ring around the handle, to show that it can be moved.
+ * Does nothing for readers who have asked for reduced motion.
+ */
+export function drawAttention() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  attention = true;
+}
+
 function onFocus(_event: FocusEvent) {
   selected = true;
 }
@@ -258,7 +272,9 @@ function valueToPosition(
   width: number
 ): number {
   const percent = (value - floor) / (ceiling - floor);
-  return Math.floor(percent * width);
+  // Round to the nearest pixel, as the charts drawn under a slider do for the
+  // same value, so that the handle sits directly above what it controls.
+  return Math.round(percent * width);
 }
 let sliderPosition: string = '0px';
 $: sliderPosition =
@@ -281,7 +297,7 @@ function updateHandleLabel(widthIn = width) {
     return;
   const rect = handleLabelEl.getBoundingClientRect();
   const percent = (value - floor) / (ceiling - floor);
-  handleLabelEl.style.left = `${Math.floor(percent * widthIn) - rect.width / 2}px`;
+  handleLabelEl.style.left = `${Math.round(percent * widthIn) - rect.width / 2}px`;
 }
 afterUpdate(() => {
   updateHandleLabel();
@@ -394,6 +410,8 @@ $: ticks =
   <span
     class="handle noTouchAction"
     class:selected
+    class:attention
+    on:animationend={() => (attention = false)}
     tabindex="0"
     role="slider"
     aria-valuemin={floor}
@@ -495,6 +513,32 @@ $: ticks =
     left: 12px;
     background-color: #fff;
     border-radius: 4px;
+  }
+  .handle::before {
+    /* A disc the size of the handle, which expands and fades to draw
+     * attention. It is the handle's own color, so only the part that
+     * spreads beyond the handle shows, as a ring. It is invisible except
+     * while that animation runs. */
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: var(--handle-color);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .handle.attention::before {
+    animation: attention-ring 0.9s ease-out 2;
+  }
+  @keyframes attention-ring {
+    from {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(2.4);
+      opacity: 0;
+    }
   }
   .handle.selected::after {
     background-color: var(--handle-selected-color);

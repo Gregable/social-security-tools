@@ -6,6 +6,7 @@ import { canvasX } from '$lib/components/filing-date-chart-math';
 import { renderSelectedDateVerticalLine } from '$lib/components/filing-date-chart-renderer';
 import { MonthDate, MonthDuration } from '$lib/month-time';
 import { Recipient } from '$lib/recipient';
+import { recordingContext } from './recording-context';
 
 /**
  * Regression tests for issue #561: the "Explore Filing Dates" drop-line and its
@@ -15,50 +16,6 @@ import { Recipient } from '$lib/recipient';
  * @media print block widens it), so a date-driven renderer must derive both the
  * line position and the label from a MonthDate, not from a stored pixel.
  */
-
-/**
- * A minimal recording stand-in for CanvasRenderingContext2D that captures the
- * text drawn (fillText) and the path moves (moveTo/lineTo) so tests can assert
- * what the renderer produced without a real canvas.
- */
-function recordingContext() {
-  const fillTexts: string[] = [];
-  const moveTos: Array<[number, number]> = [];
-  const lineTos: Array<[number, number]> = [];
-  const ctx = {
-    fillTexts,
-    moveTos,
-    lineTos,
-    // Settable style properties the renderer assigns to.
-    strokeStyle: '',
-    fillStyle: '',
-    lineCap: '',
-    lineWidth: 0,
-    font: '',
-    save() {},
-    restore() {},
-    beginPath() {},
-    stroke() {},
-    translate() {},
-    rotate() {},
-    setLineDash() {},
-    fillRect() {},
-    measureText(text: string) {
-      // Width proportional to length is enough for layout math under test.
-      return { width: text.length * 7 } as TextMetrics;
-    },
-    moveTo(x: number, y: number) {
-      moveTos.push([x, y]);
-    },
-    lineTo(x: number, y: number) {
-      lineTos.push([x, y]);
-    },
-    fillText(text: string) {
-      fillTexts.push(text);
-    },
-  };
-  return ctx;
-}
 
 function layoutOfWidth(canvasWidth: number): ChartLayout {
   return {
@@ -126,9 +83,34 @@ describe('renderSelectedDateVerticalLine', () => {
         recipient.birthdate,
         layoutOfWidth(width)
       );
-      // The vertical line starts at the top (y=0) at the date's x position.
-      expect(ctx.moveTos).toContainEqual([expectedX, 0]);
+      // The vertical line starts where the label's text ends (67px above the
+      // chart area), at the date's x position, and not up at the slider.
+      expect(ctx.moveTos).toContainEqual([
+        expectedX,
+        layoutOfWidth(width).reservedTop - 67,
+      ]);
     }
+  });
+
+  it('labels the line with other text when it is given some', () => {
+    const recipient = recipientBornJan1960();
+    const layout = layoutOfWidth(740);
+    const ctx = recordingContext();
+    renderSelectedDateVerticalLine(
+      ctx as unknown as CanvasRenderingContext2D,
+      selectedDate,
+      recipient,
+      layout,
+      'Month shown: Jan 2025'
+    );
+
+    expect(ctx.fillTexts).toEqual(['Month shown: Jan 2025']);
+    // A longer label hangs further down, but the line still starts where
+    // the label's text ends.
+    expect(ctx.moveTos).toContainEqual([
+      canvasX(selectedDate, recipient.birthdate, layout),
+      layout.reservedTop - 67,
+    ]);
   });
 
   // The renderer's guard is the half-open interval [reservedLeft, canvasWidth):
@@ -155,7 +137,10 @@ describe('renderSelectedDateVerticalLine', () => {
       layout
     );
 
-    expect(ctx.moveTos).toContainEqual([layout.reservedLeft, 0]);
+    expect(ctx.moveTos).toContainEqual([
+      layout.reservedLeft,
+      layout.reservedTop - 67,
+    ]);
     expect(ctx.fillTexts.length).toBeGreaterThan(0);
   });
 
